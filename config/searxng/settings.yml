@@ -1,0 +1,74 @@
+use_default_settings: true
+
+server:
+  secret_key: "c9b1e04b8f2a4d67a3e58c1f7d20b9a6e4f81c35d7092b6a8e13f5c40a72d918"
+  limiter: false
+
+# Task 4.1 — spread load across MORE upstream engines so a single provider
+# rate-limiting (Google CSE / Brave / Startpage suspend fastest, especially on
+# site: dork queries) does not zero out the whole result set. Give outgoing
+# requests a real timeout + transport-level retry budget too.
+# One Discover run asks this instance for ~10-15 dorks, and every dork fans out
+# to ~12 engines, so the instance is making 120-180 outgoing requests per run.
+# pool_maxsize was 20, which queued nearly all of them: measured 2026-08-02, a
+# 40-dork burst came back with a p50 of 48s and a p90 of 60s, so even the dorks
+# that SUCCEEDED landed long after the 28s source budget had given up on them.
+# The pool has to be wider than the fan-out or the timeouts are self-inflicted.
+outgoing:
+  request_timeout: 6.0
+  max_request_timeout: 10.0
+  pool_connections: 300
+  pool_maxsize: 100
+  retries: 1
+
+search:
+  safe_search: 0
+  autocomplete: ""
+  default_lang: "en"
+  formats:
+    - html
+    - json
+
+# NOTE ON site: DORKS — only a subset of engines honor the `site:` operator
+# reliably (google, brave, startpage, qwant). bing/mojeek/duckduckgo answer
+# general queries but return little/nothing for `site:` dorks. The app-side
+# rotation in searxng.server.ts sends site:-heavy dork queries to the
+# site:-capable engines and general queries to the broad set, so one engine's
+# suspension degrades gracefully instead of failing hard.
+# Measured 2026-07-29: after ~3 Discover runs, SIX of the seven consumer
+# engines below were suspended at once (brave/google "too many requests",
+# duckduckgo + startpage CAPTCHA, mojeek/qwant "access denied") leaving only
+# bing — which is why the same search returned 46 leads then 6. The consumer
+# engines are the ones that rate-limit; the independent indexes below barely do.
+# Keeping both groups means a suspension degrades the result count instead of
+# zeroing it.
+engines:
+  # ── consumer engines: best coverage, first to rate-limit ──
+  - name: google
+    disabled: false
+  - name: brave
+    disabled: false
+  - name: startpage
+    disabled: false
+  - name: qwant
+    disabled: false
+  - name: duckduckgo
+    disabled: false
+  - name: bing
+    disabled: false
+  - name: mojeek
+    disabled: false
+  - name: yahoo
+    disabled: false
+  # ── independent indexes: lower coverage, far more tolerant ──
+  - name: presearch
+    disabled: false
+  - name: yep
+    disabled: false
+  # crowdview indexes FORUM discussions specifically — which is exactly the
+  # shape of a demand post ("anyone know a designer?"), so it punches well
+  # above its size for this product.
+  - name: crowdview
+    disabled: false
+  - name: mwmbl
+    disabled: false

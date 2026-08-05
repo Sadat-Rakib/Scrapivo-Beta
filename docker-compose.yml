@@ -1,0 +1,20 @@
+services:
+  searxng:
+    image: searxng/searxng:latest
+    container_name: scrapivo-searxng
+    # 8888 on the host — 8080 is the Vite dev server; mapping SearXNG there
+    # made the app query itself and get nothing.
+    ports:
+      - "8888:8080"
+    volumes:
+      - ./config/searxng:/etc/searxng:rw
+    environment:
+      - SEARXNG_BASE_URL=http://localhost:8888/
+    restart: unless-stopped
+
+  scrape-worker:
+    build: ./workers/scrape-worker
+    container_name: scrapivo-scrape-worker
+    ports:
+      - "3098:3098"
+    restart: unless-stopped
