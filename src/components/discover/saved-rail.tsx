@@ -57,7 +57,7 @@ export function SavedRail({
             >
               <div className="text-sm font-medium line-clamp-1">{l.title}</div>
               <div className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
-                {l.platform} · {l.author ?? "anon"}
+                {l.author ?? "Opportunity"}
               </div>
             </button>
           ))}

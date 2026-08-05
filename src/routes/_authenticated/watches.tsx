@@ -79,17 +79,18 @@ function WatchesPage() {
   });
 
   return (
-    <div className="p-6 max-w-3xl">
-      <div className="flex items-start justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight mb-1">Signal watches</h1>
-          <p className="text-sm text-muted-foreground">
-            Save plain-English buying signals and re-run them on a schedule. Outreach stays draft-only — nothing is sent automatically.
+    <div className="p-6 sm:p-8 max-w-2xl mx-auto w-full">
+      <div className="flex items-start justify-between gap-4 mb-8">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-semibold tracking-tight mb-2">Signal watches</h1>
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-xl">
+            Save a buying signal once. Scrapivo re-runs it on your schedule and brings fresh matches back into Discover. Outreach stays draft-only — nothing sends automatically.
           </p>
         </div>
         <Button
           variant="outline"
           size="sm"
+          className="shrink-0"
           onClick={() => dueMut.mutate()}
           disabled={dueMut.isPending}
         >
@@ -99,27 +100,27 @@ function WatchesPage() {
       </div>
 
       <form
-        className="rounded-xl border border-border bg-card p-4 space-y-3 mb-6"
+        className="rounded-2xl border border-border/80 bg-card/80 p-5 space-y-4 mb-8 shadow-sm"
         onSubmit={(e) => {
           e.preventDefault();
           if (!newQuery.trim()) return;
           createMut.mutate();
         }}
       >
-        <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+        <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
           <Bell className="size-3.5" /> New watch
         </div>
         <input
           value={newQuery}
           onChange={(e) => setNewQuery(e.target.value)}
           placeholder='e.g. Currently hiring 3+ engineers with experience in Next.js'
-          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary"
+          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-primary"
         />
         <div className="flex items-center justify-between gap-3">
           <select
             value={schedule}
             onChange={(e) => setSchedule(e.target.value as "daily" | "weekly")}
-            className="rounded-md border border-border bg-background px-2 py-1.5 text-xs"
+            className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
           >
             <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>
@@ -131,7 +132,7 @@ function WatchesPage() {
       </form>
 
       {!q.data?.length && (
-        <div className="text-sm text-muted-foreground">
+        <div className="text-sm text-muted-foreground text-center py-6 rounded-xl border border-dashed border-border">
           No watches yet. Save a signal from Discover or create one above.
         </div>
       )}

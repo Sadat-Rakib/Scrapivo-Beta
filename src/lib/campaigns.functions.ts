@@ -207,9 +207,12 @@ async function executeWatchSearch(
   const classified = classifyQuery(query);
   const expanded = expandFromClassified(classified);
   const subredditBoosts = getSubredditBoostsForQuery(classified);
+  const yoe = profile?.years_experience ?? null;
   const prefs = {
-    yearsExperience: profile?.years_experience ?? null,
-    preferJunior: true,
+    yearsExperience: yoe,
+    preferJunior: yoe == null || yoe <= 1,
+    preferMid: yoe != null && yoe >= 2 && yoe <= 4,
+    preferSenior: yoe != null && yoe >= 5,
     preferRemote: true,
   };
 

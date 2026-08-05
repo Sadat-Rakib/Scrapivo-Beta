@@ -151,10 +151,20 @@ function DiscoverPage() {
       work_style: a.work_style,
     };
     try {
-      // Sync display name into profiles for return greetings.
-      if (a.business_name?.trim()) {
-        void patchProfile({ data: { full_name: a.business_name.trim() } })
-          .then(() => qc.invalidateQueries({ queryKey: ["my-profile"] }))
+      if (a.business_name?.trim() || a.service?.trim() || a.location?.trim()) {
+        const yoe =
+          a.experience_level === "5+" ? 6 : a.experience_level === "2-4" ? 3 : 1;
+        void patchProfile({
+          data: {
+            full_name: a.business_name?.trim() || undefined,
+            job_title: a.service?.trim() || undefined,
+            years_experience: yoe,
+            location: a.location?.trim() || undefined,
+            work_preference: a.work_style || undefined,
+            skills: a.service?.trim() ? [a.service.trim()] : undefined,
+          },
+        })
+          .then(() => qc.invalidateQueries({ queryKey: ["profile"] }))
           .catch(() => {});
       }
       const r = await createProj({ data: payload });
@@ -187,14 +197,9 @@ function DiscoverPage() {
     }
   };
 
-  // ── Freshness filter (server ranks hours-first; chips hard-cut the feed) ──
-  //
   // 24h = real posted_at within 24 hours only.
-  // 2d (default) = real posted_at ≤ 2 days, OR social host with engine day/hour window.
   // All = no UI age cut.
-  const [freshness, setFreshness] = useState<"all" | "2d" | "24h">("2d");
-  const SOCIAL_HOST_RE =
-    /linkedin\.com|instagram\.com|facebook\.com|(?:twitter|x)\.com/i;
+  const [freshness, setFreshness] = useState<"all" | "24h">("24h");
   const inWindow = (l: {
     posted_at?: string;
     freshness_window?: string;
@@ -202,27 +207,13 @@ function DiscoverPage() {
     source?: string;
   }) => {
     if (freshness === "all") return true;
-    const maxMs = freshness === "24h" ? 86_400_000 : 2 * 86_400_000;
+    const maxMs = 86_400_000;
     if (l.posted_at) {
       const t = new Date(l.posted_at).getTime();
       return Number.isFinite(t) && Date.now() - t <= maxMs;
     }
-    // 24h never trusts undated. 2d allows engine day/hour on social hosts only.
-    if (freshness === "24h") return false;
-    const engineDay =
-      l.freshness_window === "day" || l.freshness_window === "hour";
-    if (!engineDay) return false;
-    const url = l.full_post_url || "";
-    const src = (l.source || "").toLowerCase();
-    return (
-      SOCIAL_HOST_RE.test(url) ||
-      src === "linkedin" ||
-      src === "instagram" ||
-      src === "facebook" ||
-      src === "twitter" ||
-      src === "serpapi" ||
-      src === "tavily"
-    );
+    // 24h never trusts undated posts.
+    return false;
   };
 
   const [input, setInput] = useState("");
@@ -847,7 +838,6 @@ function DiscoverPage() {
                   <div className="inline-flex rounded-full border border-border p-0.5 bg-muted/40 ml-auto">
                     {(
                       [
-                        ["2d", "2d"],
                         ["24h", "24h"],
                         ["all", "All"],
                       ] as const

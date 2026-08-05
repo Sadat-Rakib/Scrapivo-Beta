@@ -15,7 +15,7 @@ function HistoryPage() {
   const q = useQuery({ queryKey: ["history"], queryFn: () => list() });
 
   return (
-    <div className="p-6 max-w-3xl">
+    <div className="p-6 sm:p-8 max-w-2xl mx-auto w-full">
       <h1 className="text-xl font-semibold tracking-tight mb-1">Search history</h1>
       <p className="text-sm text-muted-foreground mb-6">Last 100 searches.</p>
       {!q.data?.length && <div className="text-sm text-muted-foreground">No searches yet.</div>}

@@ -36,31 +36,31 @@ const FAQ_ITEMS = [
   },
   {
     q: "Which sources do you search?",
-    a: "Reddit, Hacker News (including Who is Hiring), GitHub issues, Bluesky, RemoteOK, We Work Remotely, Remotive, Jobicy, Dev.to, Mastodon, Lemmy, Lobsters, public government tenders, and curated web search when keys are configured.",
+    a: "We search across public sites, public communities, public servers, social media platforms, company pages, and public government sites. The focus is live, open web activity, not a closed private database.",
   },
   {
-    q: "How is this different from a lead list?",
-    a: "Lead lists give you contacts. Scrapivo gives you moments: a person, today, asking for your exact thing. Every result links back to the original public post so you can respond in context.",
+    q: "How is this different from existing systems?",
+    a: "Most existing systems hand you a static list. They scrape millions of company pages or profiles once, store everything in their database, and serve matches from that pile forever. There is often no buying signal, no recent activity, and sometimes no posts at all. You only get people loosely related to your role or service. Scrapivo is different. It finds real-time moments where someone is actively looking, so you reach out while intent is still alive.",
   },
   {
     q: "How does AI scoring work?",
-    a: "Each result is filtered for buyer intent and skill relevance, then ranked Hot or Warm based on recency, decision maker detection, urgency, and budget cues. Low confidence noise is suppressed.",
+    a: "Each result is filtered for buyer intent and skill relevance, then ranked Hot or Warm. Hot means strong, recent intent with clear decision maker or urgency cues. Warm means solid relevance with useful timing signals, still worth acting on. Scoring weighs recency, decision maker detection, urgency, and budget cues so the strongest opportunities rise first.",
   },
   {
     q: "How do you stop scams and throwaway accounts?",
-    a: "Account age checks, post history checks, and cross platform corroboration filter out single post throwaways. Verified posters are badged so you can trust the score.",
+    a: "We run account verification on top of intent scoring. That includes account age checks, post history review, and cross platform corroboration so single post throwaways and fake profiles get filtered out. Verified posters are badged so you can trust what you see.",
   },
   {
     q: "Will the outreach sound like me?",
-    a: "Yes. Scrapivo writes tailored DM, email, and call scripts grounded in the original post. No templates, no spray and pray.",
+    a: "Yes. Our model is trained on outreach frameworks that actually convert, and every script is grounded in the original public post so it stays specific to you. We also keep inbox legalities in mind for channels like Gmail and Outlook, so bounce risk and deliverability practices are covered instead of spray and pray templates.",
   },
   {
     q: "Is the data public?",
-    a: "Everything Scrapivo surfaces is from public, indexed pages. We never scrape gated or private content.",
+    a: "Yes. We only scrape public data assets. We do not touch private or gated content because that is not legal. Even for social media platforms, we rely on public algorithms and public patterns, never private access, so the product stays on the right side of the line.",
   },
   {
     q: "How much does it cost?",
-    a: "Start free. Upgrade when Scrapivo pays for itself. Reach out at mirsadat@scrapivo.com for team pricing.",
+    a: "Start free. Upgrade when Scrapivo pays for itself. Reach out at mirsadat@scrapivo.com for pricing.",
   },
 ];
 
@@ -684,7 +684,7 @@ function FaqSection({
                 </button>
                 <div
                   className="faq-body"
-                  style={{ maxHeight: isOpen ? 220 : 0 }}
+                  style={{ maxHeight: isOpen ? 480 : 0 }}
                 >
                   <div className="faq-body-inner">{item.a}</div>
                 </div>
@@ -712,20 +712,68 @@ function FaqSection({
             </NitroButton>
           </div>
         </div>
-        <p
-          style={{
-            textAlign: "center",
-            fontSize: 11,
-            color: "rgba(255,255,255,0.35)",
-            letterSpacing: "0.05em",
-            margin: "20px 0 0",
-            fontWeight: 400,
-          }}
-        >
-          © {new Date().getFullYear()} Scrapivo
-        </p>
       </div>
     </section>
+  );
+}
+
+function LandingFooter() {
+  const year = new Date().getFullYear();
+  return (
+    <footer
+      className="w-full relative z-20 border-t border-white/[0.06] bg-black/40 backdrop-blur-sm"
+      style={{ marginTop: 0 }}
+    >
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 py-6 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-gray-500 font-light tracking-wide text-center md:text-left">
+        <div>Copyright © {year} Scrapivo. All rights reserved.</div>
+
+        <div className="flex items-center gap-4 sm:gap-8 flex-wrap justify-center md:justify-start">
+          <a href="#faq-section" className="hover:text-gray-200 transition-colors duration-300">
+            Terms of Use
+          </a>
+          <a href="#faq-section" className="hover:text-gray-200 transition-colors duration-300">
+            Privacy Protocol
+          </a>
+        </div>
+
+        <div className="flex items-center gap-5 text-gray-400 flex-wrap justify-center md:justify-start">
+          <a
+            href="https://www.instagram.com/scrapivo"
+            target="_blank"
+            rel="noreferrer"
+            className="hover:text-white transition-colors duration-300"
+            aria-label="Instagram"
+          >
+            IG
+          </a>
+          <a
+            href="https://www.linkedin.com/company/scrapivo/"
+            target="_blank"
+            rel="noreferrer"
+            className="hover:text-white transition-colors duration-300"
+            aria-label="LinkedIn"
+          >
+            in
+          </a>
+          <a
+            href="mailto:mirsadat@scrapivo.com"
+            className="hover:text-white transition-colors duration-300"
+            aria-label="Contact"
+          >
+            ✉
+          </a>
+        </div>
+
+        <div className="flex items-center gap-2 group">
+          <span className="text-orange-500 text-base group-hover:scale-110 transition-transform duration-300">
+            ♥
+          </span>
+          <span className="group-hover:text-gray-300 transition-colors duration-300">
+            Made with passion by Scrapivo
+          </span>
+        </div>
+      </div>
+    </footer>
   );
 }
 
@@ -1157,6 +1205,7 @@ export function ScrapivoLanding({ cta }: Props) {
 
         <AiDemoSection />
         <FaqSection authTo={authTo} authSearch={signupSearch} />
+        <LandingFooter />
       </main>
     </div>
   );

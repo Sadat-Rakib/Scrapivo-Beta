@@ -87,9 +87,15 @@ export function prefersJunior(prefs?: LeadFilterPrefs): boolean {
 }
 
 export function isSeniorHeavyLead(lead: Lead): boolean {
-  const text = `${lead.title} ${lead.snippet}`;
-  if (JUNIOR_TITLE_RE.test(text)) return false;
-  return SENIOR_TITLE_RE.test(text);
+  const title = lead.title || "";
+  const snippet = lead.snippet || "";
+  // Junior title wins even if snippet mentions seniority elsewhere.
+  if (JUNIOR_TITLE_RE.test(`${title} ${snippet}`)) return false;
+  // Title is the reliable signal — snippet "lead generation" must not trip \blead\b.
+  if (SENIOR_TITLE_RE.test(title)) return true;
+  return /\b((?:5|6|7|8|9|10)\+?\s*(?:years|yrs|yoe)|senior\s+(?:engineer|developer|designer|role|position|hire))\b/i.test(
+    snippet,
+  );
 }
 
 export function isJuniorFriendlyLead(lead: Lead): boolean {
@@ -879,18 +885,19 @@ export function validateLeads(
     { name: "shouldInclude", reject: (l) => !shouldIncludeLead(l, classified, expanded) },
     {
       name: "seniorHeavy",
-      // On the clients path, an ATS opening is a COMPANY SIGNAL — the org needs
-      // this craft done — not a job for the user to apply to. Filtering "Senior
-      // Designer @ Acme" because the profile prefers junior emptied the
-      // Companies tab. Only enforce seniority when the user is hunting jobs,
-      // or when clarifier asked for a YoE band on social titles.
+      // Enforce YoE on titles whenever the user prefers junior/mid/senior.
+      // Exception: on the clients path, an ATS opening is a COMPANY SIGNAL
+      // (org needs this craft) — not a job the user applies to — so skip
+      // seniority there only.
       reject: (l) => {
-        const textOk = JOB_BOARD_SOURCES.has(l.source) || classified.goal === "jobs";
-        if (!textOk) return false;
         if (classified.goal === "clients" && JOB_BOARD_SOURCES.has(l.source)) return false;
         if (junior && isSeniorHeavyLead(l)) return true;
         if (senior && isJuniorFriendlyLead(l) && !isSeniorHeavyLead(l)) return true;
-        if (mid && (/\b(intern|internship|entry[- ]?level)\b/i.test(l.title || "") || /\b(staff|principal|vp\b|chief)\b/i.test(l.title || "")))
+        if (
+          mid &&
+          (/\b(intern|internship|entry[- ]?level|junior|jr\.?)\b/i.test(l.title || "") ||
+            /\b(staff|principal|vp\b|chief|director|10\+?\s*years)\b/i.test(l.title || ""))
+        )
           return true;
         return false;
       },

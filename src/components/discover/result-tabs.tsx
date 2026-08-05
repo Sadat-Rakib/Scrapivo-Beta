@@ -193,13 +193,6 @@ export function CompanyCard({
           </div>
         </div>
         <p className="mt-2 text-xs text-foreground/80 line-clamp-2">{row.why_now}</p>
-        <div className="mt-2 flex flex-wrap gap-1">
-          {row.platforms.slice(0, 4).map((p) => (
-            <span key={p} className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
-              {p}
-            </span>
-          ))}
-        </div>
       </button>
       <InPostContacts ic={row.inline_contacts} />
       {contact?.status === "ok" && (
@@ -288,11 +281,6 @@ export function PersonCard({
             )}
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">
-            {row.platform && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground truncate max-w-[130px]">
-                {row.platform}
-              </span>
-            )}
             {row.posted_at_relative ? (
               <span className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground">
                 <Clock className="size-3" /> {row.posted_at_relative}
@@ -486,7 +474,6 @@ export function PersonTable({
             <th className={th}>Name</th>
             <th className={th}>Role</th>
             <th className={th}>Company</th>
-            <th className={th}>Platform</th>
             <th className={th}>Posted</th>
             <th className={th}>Links</th>
           </tr>
@@ -503,7 +490,6 @@ export function PersonTable({
               <td className={`${td} text-muted-foreground`}>
                 {r.company_hint ?? r.company_domain ?? "—"}
               </td>
-              <td className={`${td} text-muted-foreground max-w-[160px] truncate`}>{r.platform ?? "—"}</td>
               <td className={`${td} text-muted-foreground`}>{r.posted_at_relative ?? "—"}</td>
               <td className={td} onClick={(e) => e.stopPropagation()}>
                 <span className="inline-flex items-center gap-2.5">

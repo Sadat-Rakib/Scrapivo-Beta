@@ -27,7 +27,10 @@ const nav = [
   { to: "/history", label: "History", icon: History },
 ] as const;
 
-const secondary = [{ to: "/profile", label: "Settings", icon: Settings }] as const;
+const secondary = [
+  { to: "/profile", label: "Settings", icon: Settings },
+  { to: "/help", label: "Help", icon: HelpCircle },
+] as const;
 
 const STORAGE_KEY = "scrapivo:sidebar-collapsed";
 
@@ -104,14 +107,6 @@ export function AppShell({ children }: { children: ReactNode }) {
         )}
         {isCollapsed && <div className="my-3 mx-2 border-t border-border/60" />}
         {renderNav(secondary, isCollapsed)}
-        <a
-          href="mailto:support@scrapivo.app"
-          title={isCollapsed ? "Help" : undefined}
-          className={`flex items-center ${isCollapsed ? "justify-center px-0" : "gap-2.5 px-3"} py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/60`}
-        >
-          <HelpCircle className="size-4" />
-          {!isCollapsed && <span>Help</span>}
-        </a>
       </nav>
       <div className={`${isCollapsed ? "p-2" : "p-3"} space-y-3`}>
         {!isCollapsed && usage.data && (

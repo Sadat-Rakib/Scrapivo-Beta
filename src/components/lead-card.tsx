@@ -28,25 +28,19 @@ const ATS_SOURCES = new Set([
 ]);
 
 /**
- * What the badge should say.
- *
- * The card was rendering "Greenhouse: stripe", "Ashby: ramp", "Greenhouse:
- * thoughtworks" — which tells the user which scraper found the row rather than
- * whose opportunity it is. For company-backed sources the company IS the
- * answer. Social sources keep their platform name, because "Reddit" genuinely
- * is where that post lives and clicking through goes there.
+ * Badge text for company-backed opportunities only.
+ * Social / marketplace platform names (Reddit, LinkedIn, Freelancer, …) are
+ * never shown — users reach the original via the open link.
  */
-function displaySource(lead: Lead): string {
+function displaySource(lead: Lead): string | null {
   if (ATS_SOURCES.has(lead.source)) {
     const company = (lead.author || "").trim();
     if (company) return company.charAt(0).toUpperCase() + company.slice(1);
-    return "Company careers page";
+    return "Company careers";
   }
   if (lead.source === "secedgar") return "SEC filing";
   if (lead.source === "news") return "News";
-  // Strip any "Provider: company" prefix that slipped into platform_label.
-  const label = lead.platform_label ?? lead.platform ?? "";
-  return label.includes(":") ? label.split(":").slice(1).join(":").trim() || label : label;
+  return null;
 }
 
 function VerificationBadge({ lead }: { lead: Lead }) {
@@ -101,6 +95,7 @@ export function LeadCard({
   const tier: "hot" | "warm" | undefined =
     rawTier === "hot" ? "hot" : rawTier ? "warm" : undefined;
   const score = lead.intent_score ?? lead.score;
+  const sourceLabel = displaySource(lead);
   return (
     <button
       onClick={onOpen}
@@ -108,15 +103,11 @@ export function LeadCard({
     >
       <div className="flex items-start justify-between gap-3 mb-2">
         <div className="flex items-center gap-1.5 text-xs flex-wrap">
-          {/* Show WHERE the opportunity is, not WHICH SCRAPER found it.
-              "Greenhouse: stripe" and "Ashby: ramp" leaked our plumbing onto
-              the card — the user cares that Stripe is hiring, not that we read
-              it off a Greenhouse board. Company-backed sources render the
-              company; social sources keep their platform, since "Reddit" is
-              genuinely where the post lives. */}
-          <span className="px-2 py-0.5 rounded-md bg-muted text-muted-foreground">
-            {displaySource(lead)}
-          </span>
+          {sourceLabel && (
+            <span className="px-2 py-0.5 rounded-md bg-muted text-muted-foreground">
+              {sourceLabel}
+            </span>
+          )}
           {tier && (
             <span
               className={`px-2 py-0.5 rounded-md border ${tierStyle[tier]} uppercase tracking-wide text-[10px] font-medium`}

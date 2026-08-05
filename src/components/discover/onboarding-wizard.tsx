@@ -20,8 +20,8 @@ export type OnboardingAnswers = {
 };
 
 type StepId =
-  | "kind" | "business_name" | "website" | "about" | "service"
-  | "niche" | "location" | "experience_level" | "work_style" | "audience" | "goal";
+  | "goal" | "kind" | "business_name" | "website" | "about" | "service"
+  | "niche" | "location" | "experience_level" | "work_style" | "audience";
 
 type Step = {
   id: StepId;
@@ -34,11 +34,24 @@ type Step = {
 
 const STEPS: Step[] = [
   {
-    id: "kind",
-    prompt: () => "Hey, I'm Scrapy 👋 Let's set up your first project. What do you need leads for?",
+    id: "goal",
+    prompt: () =>
+      "Hey, I'm Scrapy 👋 Let's set up your first project. What do you need help with?",
     chips: [
-      { label: "My business", value: "business" },
-      { label: "My freelance work", value: "freelance" },
+      { label: "Getting clients for my service or product", value: "clients" },
+      { label: "Finding jobs / opportunities", value: "jobs" },
+      { label: "Both", value: "both" },
+    ],
+  },
+  {
+    id: "kind",
+    prompt: (a) =>
+      a.goal === "jobs"
+        ? "Are you freelancing, or representing a business / team?"
+        : "Are you selling as a business, or as a freelancer / solo?",
+    chips: [
+      { label: "Business / product", value: "business" },
+      { label: "Freelance / solo", value: "freelance" },
     ],
   },
   {
@@ -59,7 +72,7 @@ const STEPS: Step[] = [
   {
     id: "about",
     prompt: () =>
-      "Tell me about you — what you've done, how many projects, your strengths. The more detail, the better your leads.",
+      "Tell me about you — what you've done, how many projects, your strengths. The more detail, the better your matches.",
     input: "textarea",
     placeholder: "e.g. 3 years building web apps, 20+ client projects, strongest in React/Next.js…",
     optional: true,
@@ -67,13 +80,19 @@ const STEPS: Step[] = [
   },
   {
     id: "service",
-    prompt: () => "What service will you provide?",
+    prompt: (a) =>
+      a.goal === "jobs"
+        ? "What role or craft are you targeting?"
+        : "What service or product are you offering?",
     input: "text",
-    placeholder: "e.g. web development, video editing, SEO",
+    placeholder: "e.g. web development, video editing, SEO, invoice SaaS",
   },
   {
     id: "niche",
-    prompt: () => "Who do you need? Describe your ideal lead or niche.",
+    prompt: (a) =>
+      a.goal === "jobs"
+        ? "Any industry or niche you want roles in?"
+        : "Who is your ideal customer or niche?",
     input: "text",
     placeholder: "e.g. SaaS startups, ecommerce brands, fitness coaches",
     chips: [{ label: "All niches", value: "all" }],
@@ -88,7 +107,7 @@ const STEPS: Step[] = [
   },
   {
     id: "experience_level",
-    prompt: () => "How much experience do you have? (I default to entry-friendly leads)",
+    prompt: () => "How much experience do you have? (I keep results matched to your level)",
     chips: [
       { label: "0–1 years", value: "0-1" },
       { label: "2–4 years", value: "2-4" },
@@ -106,22 +125,15 @@ const STEPS: Step[] = [
   },
   {
     id: "audience",
-    prompt: () => "Should I focus on companies, agencies, people — or all of them?",
+    prompt: (a) =>
+      a.goal === "jobs"
+        ? "Should I focus on companies hiring, agencies, people posting roles — or all?"
+        : "Should I focus on companies, agencies, people — or all of them?",
     chips: [
       { label: "Companies", value: "companies" },
       { label: "Agencies", value: "agencies" },
       { label: "People", value: "people" },
       { label: "All", value: "all" },
-    ],
-  },
-  {
-    id: "goal",
-    prompt: () =>
-      "Last one — are you after jobs (companies hiring) or clients (people & businesses asking for your service)?",
-    chips: [
-      { label: "Jobs", value: "jobs" },
-      { label: "Clients", value: "clients" },
-      { label: "Both", value: "both" },
     ],
   },
 ];
@@ -170,7 +182,10 @@ export function OnboardingWizard({
     } else {
       items.push({
         role: "scrapy",
-        text: "Perfect — project saved. Every search now starts from this context. Let's find your leads! 🚀",
+        text:
+          next.goal === "jobs"
+            ? "Perfect — project saved. Every search now starts from this context. Let's find opportunities! 🚀"
+            : "Perfect — project saved. Every search now starts from this context. Let's find your leads! 🚀",
       });
       setTranscript(items);
       const nicheRaw = (next.niche || "").trim();

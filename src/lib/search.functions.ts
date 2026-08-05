@@ -200,7 +200,8 @@ export const runSearch = createServerFn({ method: "POST" })
     const prefs = {
       yearsExperience: profile?.years_experience ?? null,
       preferJunior: (exp === "0-1" || exp === "1-2") && !queryWantsSenior,
-      preferMid: exp === "3-4",
+      // Project buckets use "2-4"; clarifier uses "3-4".
+      preferMid: (exp === "2-4" || exp === "3-4") && !queryWantsSenior,
       preferSenior: exp === "5+" || queryWantsSenior,
       preferRemote: style === "remote" && !queryWantsOnsite,
       maxAgeHours: refinement.maxAgeHours,
