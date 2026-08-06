@@ -1237,7 +1237,7 @@ export function isWeakFamilyTerm(term: string): boolean {
 export const SOCIAL_MAX_AGE_DAYS = 2;
 /** Preferred social window for goal=clients buyer demand. */
 /** Clients social freshness window (days). Rank still boosts under-24h higher. */
-export const CLIENTS_SOCIAL_MAX_AGE_DAYS = 2;
+export const CLIENTS_SOCIAL_MAX_AGE_DAYS = 7;
 export const JOB_BOARD_MAX_AGE_DAYS = 3;
 const MAX_AGE_DAYS = SOCIAL_MAX_AGE_DAYS;
 

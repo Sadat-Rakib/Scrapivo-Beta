@@ -402,6 +402,19 @@ export function extractCompanyFromLead(lead: Lead): string | undefined {
     }
   }
 
+  // Freelancer / marketplace buyer orgs often sit in author or platform_label.
+  if (lead.source === "freelancer" || lead.source === "fiverr" || lead.source === "upwork") {
+    const fromAuthor = cleanCompanyName(lead.author || "", { allowPersonNames: true });
+    if (fromAuthor && !looksLikePersonName(fromAuthor) && fromAuthor.length >= 2) {
+      return fromAuthor;
+    }
+    const fromPlat = cleanCompanyName(
+      (lead.platform_label || "").replace(/^freelancer:?\s*/i, "").trim(),
+      { allowPersonNames: true },
+    );
+    if (fromPlat && !looksLikePersonName(fromPlat) && fromPlat.length >= 2) return fromPlat;
+  }
+
   // Author-as-company ONLY for true company-authored sources / LinkedIn Jobs.
   // Never for LinkedIn posts (human authors).
   if (!isLiPost && COMPANY_AUTHOR_SOURCES.has(lead.source)) {
@@ -911,7 +924,9 @@ export function segmentLeads(rawLeads: Lead[]): LeadSegments {
     // A People row is a person you can actually reach. An anonymous platform
     // handle ("Impossible_Fee_6217") is not — there's no real name to match.
     // Ordinary handles with a digit suffix ARE reachable on-platform.
-    if (isAnonymousHandle(key)) continue;
+    // Strict anonymous throwaways only (e.g. Impossible_Fee_6217). Keep
+    // ordinary handles with digits — they are reachable on-platform.
+    if (isAnonymousHandle(key) && !l.author_url && !linkedInPersonUrl(l)) continue;
     if (!byPerson.has(key)) byPerson.set(key, { rows: [] });
     byPerson.get(key)!.rows.push(l);
   }

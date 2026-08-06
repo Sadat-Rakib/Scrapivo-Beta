@@ -450,7 +450,7 @@ async function fetchSubredditWithQuery(
       entry,
       seen,
       out,
-      timeRange === "hour" ? CLIENTS_SOCIAL_MAX_AGE_DAYS : 2,
+      timeRange === "hour" ? 1 : CLIENTS_SOCIAL_MAX_AGE_DAYS,
     );
   }
   return out;
@@ -1496,12 +1496,14 @@ export async function searchSerpAPI(qx: ExpandedQueries): Promise<SourceLead[]> 
       `site:facebook.com/groups ("looking for a ${craft}" OR "need a ${craft}" OR "recommend a ${craft}")`,
       `site:instagram.com ("looking for a ${craft}" OR "need a ${craft}" OR "hiring a ${craft}")`,
       `("${skillQ}" OR "${craft}") ("looking for" OR "need a" OR hiring) (site:news.ycombinator.com OR site:indiehackers.com OR site:dev.to)`,
+      `("${skillQ}") ("looking for a tool" OR "need a tool" OR "anyone recommend" OR "alternative to" OR "struggling with")`,
+      `site:reddit.com ("${skillQ}") ("looking for" OR "need a" OR "anyone know" OR "recommend")`,
     ];
 
     const fetchSerp = async (q: string, tbs: string) => {
       const url =
         `https://serpapi.com/search.json?engine=google&q=${encodeURIComponent(q)}` +
-        `&api_key=${key}&num=10&tbs=${tbs}`;
+        `&api_key=${key}&num=20&tbs=${tbs}`;
       return safe(fetch(url).then((r) => ok<any>(r)), null);
     };
 
@@ -1862,7 +1864,7 @@ async function searchScrapeCreatorsReddit(
         const date = p.created_utc
           ? new Date(p.created_utc * 1000).toISOString()
           : p.created_at || null;
-        if (!isRecent(date, timeframe === "hour" ? CLIENTS_SOCIAL_MAX_AGE_DAYS : 2)) continue;
+        if (!isRecent(date, timeframe === "hour" ? 1 : CLIENTS_SOCIAL_MAX_AGE_DAYS)) continue;
         const title = p.title || "";
         const flair = (p.link_flair_text || "").toLowerCase();
         const snippet = (p.selftext || p.body || "").slice(0, 500);
@@ -2032,7 +2034,7 @@ async function searchScrapeCreatorsLinkedInPosts(qx: ExpandedQueries): Promise<S
     `looking for ${qx.role || qx.skill} freelancer`,
     `hiring ${qx.skill} contractor`,
   ];
-  for (const q of queries.slice(0, 2)) {
+  for (const q of queries.slice(0, 4)) {
     try {
       const url =
         `https://api.scrapecreators.com/v1/linkedin/search/posts?query=${encodeURIComponent(q)}` +
@@ -2088,9 +2090,10 @@ export async function searchTavily(qx: ExpandedQueries): Promise<SourceLead[]> {
   if (!key) return out;
   const queries = [
     `people looking to hire ${qx.role} OR "${qx.skill} needed" OR "need a ${qx.skill}" freelance ${new Date().getFullYear()}`,
-    ...qx.booleanWebQueries.slice(0, 2),
+    `("${qx.skill}") ("looking for a tool" OR "need software" OR "struggling with" OR "anyone recommend")`,
+    ...qx.booleanWebQueries.slice(0, 3),
   ];
-  for (const q of queries.slice(0, 3)) {
+  for (const q of queries.slice(0, 5)) {
     try {
       const res = await fetch("https://api.tavily.com/search", {
         method: "POST",
@@ -2099,7 +2102,7 @@ export async function searchTavily(qx: ExpandedQueries): Promise<SourceLead[]> {
           api_key: key,
           query: q,
           search_depth: "advanced",
-          max_results: 12,
+          max_results: 15,
           include_domains: [
             "linkedin.com",
             "twitter.com",

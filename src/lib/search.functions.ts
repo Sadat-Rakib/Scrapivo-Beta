@@ -408,7 +408,7 @@ export const runSearch = createServerFn({ method: "POST" })
 
     // Quality gate: drop seekers; for clients require real buyer signal + skill
     // (skill-alone was letting tutorials / listicles into Posts).
-    const { isHirePolarityLookingFor, leadIntentText, isSellerOrProviderLead, isSalesFamilyCraft, isSalesTalentHireAsk, isPersonalStoryNoise, isEducationalNoise } =
+    const { isHirePolarityLookingFor, leadIntentText, isSellerOrProviderLead, isSalesFamilyCraft, isSalesTalentHireAsk, isPersonalStoryNoise, isEducationalNoise, detectProductIntent } =
       await import("./validation");
     const { isRecent: isRecentDate, CLIENTS_SOCIAL_MAX_AGE_DAYS } =
       await import("./search/query-expander");
@@ -544,6 +544,31 @@ export const runSearch = createServerFn({ method: "POST" })
           // TITLE only, never the description.
           const sourceIsDemand =
             DEMAND_BY_SOURCE.has(l.source) && skillOkFor(l.title || "");
+          // Product pitches hunt customers/competitors — hire-grammar is wrong.
+          // Accept product-intent / customer-pain language + skill match.
+          const productMode = classified.type === "product";
+          if (productMode && clientsMode) {
+            const productish =
+              detectProductIntent(fullText) ||
+              urg.hasUrgency ||
+              demand.buckets.length > 0 ||
+              sourceIsDemand ||
+              dmRelevant ||
+              /\b(looking for (a |an )?(tool|app|software|saas|platform|alternative)|switching from|recommend .{0,24}(tool|app|software)|anyone use|need (a |an )?(better |good )?(way|tool|app)|competitor|pricing|customers? for)\b/i.test(
+                fullText,
+              );
+            if (!productish && !skillOk) return false;
+            if (
+              /\b(hire me|my portfolio|my rates|available for hire|open to work|check out my gig|dm me your)\b/i.test(
+                text,
+              ) &&
+              !detectProductIntent(fullText)
+            ) {
+              return false;
+            }
+            const scoreFloor = l.posted_at && isSocial ? 28 : 34;
+            return skillOk && ((l.score ?? 0) >= scoreFloor || productish || dmRelevant);
+          }
           if (clientsMode) {
             const titleBuyer =
               TITLE_HIRE_RE.test(title) ||
@@ -628,7 +653,7 @@ export const runSearch = createServerFn({ method: "POST" })
         ? 450
         : goal === "clients" || classified.signalMode === "buying_signal" || volumePersona
           ? 400
-          : 200;
+          : 250;
     const leads = diversifiedTop12(quality, {
       directoryMode,
       maxJobBoard: goal === "jobs" ? 8 : goal === "both" ? 4 : 2,
@@ -638,17 +663,17 @@ export const runSearch = createServerFn({ method: "POST" })
       minSocial: goal === "jobs" ? 2 : goal === "clients" ? 8 : 5,
       maxReddit:
         volumePersona
-          ? 48
+          ? 60
           : goal === "clients" || classified.signalMode === "buying_signal"
-            ? 24
-            : 20,
+            ? 40
+            : 24,
       maxTotal,
       // Warm floor (45) — never show weak / no-signal rows.
       minScore:
         goal === "clients" || classified.signalMode === "buying_signal" || volumePersona
           ? 45
           : 0,
-      maxPerPlatform: volumePersona ? 40 : 30,
+      maxPerPlatform: volumePersona ? 60 : 50,
     });
     trace("diversified", leads);
 
@@ -728,6 +753,13 @@ export const runSearch = createServerFn({ method: "POST" })
           ),
           new Promise((r) => setTimeout(r, 2500)),
         ]);
+      }
+      // ScrapeGraphAI: enrich top companies still missing a website (fail-soft).
+      try {
+        const { enrichCompaniesWithScrapegraph } = await import("./search/scrapegraph.server");
+        await enrichCompaniesWithScrapegraph(segments.companies, 6);
+      } catch {
+        /* optional enricher */
       }
     } catch {
       /* enrichment is best-effort */

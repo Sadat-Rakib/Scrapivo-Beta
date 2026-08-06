@@ -30,6 +30,7 @@ const required = [
   "GEOAPIFY_API_KEY",
   "FOURSQUARE_API_KEY",
   "GITHUB_TOKEN",
+  "SGAI_API_KEY",
 ];
 
 const map = Object.fromEntries(

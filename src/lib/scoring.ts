@@ -560,11 +560,11 @@ export function fuzzyDedupeLeads(leads: Lead[]): Lead[] {
 }
 
 /** Diversified "front page" size; everything relevant is still returned after it. */
-const MAX_RESULTS = 80;
-/** Hard sanity cap — must allow ~80–200 per tab (Posts/Companies/People). */
+const MAX_RESULTS = 150;
+/** Hard sanity cap — must allow ~100–200 per tab (Posts/Companies/People). */
 const MAX_TOTAL_RESULTS = 400;
 const MAX_TOTAL_BOTH = 450;
-const MAX_PER_PLATFORM = 30;
+const MAX_PER_PLATFORM = 50;
 const MAX_JOB_BOARD = 6;
 const MAX_COMPANY_ATS = 120;
 const MIN_SOCIAL = 8;

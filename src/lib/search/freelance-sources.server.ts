@@ -29,8 +29,8 @@ const TIMEOUT_MS = 9000;
 const CACHE_MS = 3 * 60_000;
 
 /** Angles per craft on Freelancer, and rows per angle. */
-const FREELANCER_MAX_QUERIES = 4;
-const FREELANCER_MAX_QUERIES_VOLUME = 8;
+const FREELANCER_MAX_QUERIES = 6;
+const FREELANCER_MAX_QUERIES_VOLUME = 10;
 const FREELANCER_PAGE_SIZE = 100;
 
 function isVolumeCraft(qx: ExpandedQueries): boolean {
