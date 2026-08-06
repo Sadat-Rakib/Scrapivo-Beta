@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { ScrapivoLandingFooter } from "./ScrapivoLandingFooter";
 import {
   useCallback,
   useEffect,
@@ -717,65 +718,6 @@ function FaqSection({
   );
 }
 
-function LandingFooter() {
-  const year = new Date().getFullYear();
-  return (
-    <footer
-      className="w-full relative z-20 border-t border-white/[0.06] bg-black/40 backdrop-blur-sm"
-      style={{ marginTop: 0 }}
-    >
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 py-6 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-gray-500 font-light tracking-wide text-center md:text-left">
-        <div>Copyright © {year} Scrapivo. All rights reserved.</div>
-
-        <div className="flex items-center gap-4 sm:gap-8 flex-wrap justify-center md:justify-start">
-          <a href="#faq-section" className="hover:text-gray-200 transition-colors duration-300">
-            Terms of Use
-          </a>
-          <a href="#faq-section" className="hover:text-gray-200 transition-colors duration-300">
-            Privacy Protocol
-          </a>
-        </div>
-
-        <div className="flex items-center gap-5 text-gray-400 flex-wrap justify-center md:justify-start">
-          <a
-            href="https://www.instagram.com/scrapivo"
-            target="_blank"
-            rel="noreferrer"
-            className="hover:text-white transition-colors duration-300"
-            aria-label="Instagram"
-          >
-            IG
-          </a>
-          <a
-            href="https://www.linkedin.com/company/scrapivo/"
-            target="_blank"
-            rel="noreferrer"
-            className="hover:text-white transition-colors duration-300"
-            aria-label="LinkedIn"
-          >
-            in
-          </a>
-          <a
-            href="mailto:mirsadat@scrapivo.com"
-            className="hover:text-white transition-colors duration-300"
-            aria-label="Contact"
-          >
-            ✉
-          </a>
-        </div>
-
-        <div className="flex items-center gap-2 group">
-          <span className="text-orange-500 text-base group-hover:scale-110 transition-transform duration-300">
-            ♥
-          </span>
-          <span className="group-hover:text-gray-300 transition-colors duration-300">
-            Made with passion by Scrapivo
-          </span>
-        </div>
-      </div>
-    </footer>
-  );
-}
 
 export function ScrapivoLanding({ cta }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -1205,7 +1147,7 @@ export function ScrapivoLanding({ cta }: Props) {
 
         <AiDemoSection />
         <FaqSection authTo={authTo} authSearch={signupSearch} />
-        <LandingFooter />
+        <ScrapivoLandingFooter authTo={authTo} authSearch={signupSearch} />
       </main>
     </div>
   );
