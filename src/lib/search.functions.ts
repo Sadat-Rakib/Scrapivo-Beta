@@ -410,6 +410,7 @@ export const runSearch = createServerFn({ method: "POST" })
     // (skill-alone was letting tutorials / listicles into Posts).
     const { isHirePolarityLookingFor, leadIntentText, isSellerOrProviderLead, isSalesFamilyCraft, isSalesTalentHireAsk, isPersonalStoryNoise, isEducationalNoise, detectProductIntent } =
       await import("./validation");
+    const { isProfileShapedLead } = await import("./search/lead-segments");
     const { isRecent: isRecentDate, CLIENTS_SOCIAL_MAX_AGE_DAYS } =
       await import("./search/query-expander");
     const UNDATED_DROP_SOURCES = new Set([
@@ -476,6 +477,21 @@ export const runSearch = createServerFn({ method: "POST" })
           if (skillGate && !skillOk) return false;
           const goalNow = classified.goal ?? "clients";
           const clientsMode = goalNow === "clients" || classified.signalMode === "buying_signal";
+          // Bare profile pages are not Posts; keep only if clearly a field DM
+          // for the People tab.
+          if (
+            clientsMode &&
+            isProfileShapedLead(l) &&
+            !(
+              l.is_decision_maker &&
+              skillOk &&
+              /\b(cto|ceo|coo|founder|co-?founder|owner|director|vp\b|head of|sales|sdr|bdr)\b/i.test(
+                fullText,
+              )
+            )
+          ) {
+            return false;
+          }
           const isSocial =
             l.source === "reddit" ||
             l.source === "twitter" ||

@@ -28,11 +28,9 @@ const ATS_SOURCES = new Set([
 ]);
 
 /**
- * Badge text for company-backed opportunities only.
- * Social / marketplace platform names (Reddit, LinkedIn, Freelancer, …) are
- * never shown — users reach the original via the open link.
+ * Badge: company name for ATS; named platform for social/marketplace.
  */
-function displaySource(lead: Lead): string | null {
+function displaySource(lead: Lead): string {
   if (ATS_SOURCES.has(lead.source)) {
     const company = (lead.author || "").trim();
     if (company) return company.charAt(0).toUpperCase() + company.slice(1);
@@ -40,7 +38,28 @@ function displaySource(lead: Lead): string | null {
   }
   if (lead.source === "secedgar") return "SEC filing";
   if (lead.source === "news") return "News";
-  return null;
+  const label = lead.platform_label ?? lead.platform ?? "";
+  if (label) {
+    return label.includes(":") ? label.split(":").slice(1).join(":").trim() || label : label;
+  }
+  const fallback: Record<string, string> = {
+    reddit: "Reddit",
+    redditrss: "Reddit",
+    linkedin: "LinkedIn",
+    twitter: "X",
+    instagram: "Instagram",
+    facebook: "Facebook",
+    hn: "Hacker News",
+    bluesky: "Bluesky",
+    mastodon: "Mastodon",
+    freelancer: "Freelancer",
+    fiverr: "Fiverr",
+    serpapi: "Web",
+    tavily: "Web",
+    searxng: "Web",
+    webboolean: "Web",
+  };
+  return fallback[lead.source] || lead.source || "Web";
 }
 
 function VerificationBadge({ lead }: { lead: Lead }) {
@@ -103,11 +122,9 @@ export function LeadCard({
     >
       <div className="flex items-start justify-between gap-3 mb-2">
         <div className="flex items-center gap-1.5 text-xs flex-wrap">
-          {sourceLabel && (
-            <span className="px-2 py-0.5 rounded-md bg-muted text-muted-foreground">
-              {sourceLabel}
-            </span>
-          )}
+          <span className="px-2 py-0.5 rounded-md bg-muted text-muted-foreground">
+            {sourceLabel}
+          </span>
           {tier && (
             <span
               className={`px-2 py-0.5 rounded-md border ${tierStyle[tier]} uppercase tracking-wide text-[10px] font-medium`}

@@ -386,6 +386,24 @@ export function isRelevantToQuery(
   // Clients / buyer demand: core skill, then top related skills (avoid zeroing
   // skill-adjacent buyer posts while still rejecting bare "web"/"development").
   if (classified?.goal === "clients" || classified?.signalMode === "buying_signal") {
+    // Sales craft: require sales-family language — "fullstack engineer" must not
+    // sneak in via soft related skills or generic "hiring".
+    if (isSalesFamilyCraft(coreSkill, relatedSkills)) {
+      const salesHit =
+        /\b(sales|selling|salesperson|sales\s*rep|sdr|bdr|closer|outbound|inbound|account\s*executive|\bae\b|business\s*development|lead\s*gen(?:eration)?|pipeline|quota|crm|cold[-\s]?call|appointment\s*setter|revenue)\b/i.test(
+          text,
+        ) || isStronglyRelevantToSkill(text, coreSkill);
+      if (!salesHit) return false;
+      if (
+        /\b(full[- ]?stack|software engineer|frontend|front[- ]end|backend|back[- ]end|react|next\.?js|vue|angular|devops|machine learning|data scientist|ui\/?ux designer|graphic designer)\b/i.test(
+          `${lead.title}`,
+        ) &&
+        !/\b(sales|sdr|bdr|closer|account executive)\b/i.test(`${lead.title}`)
+      ) {
+        return false;
+      }
+      return true;
+    }
     if (isStronglyRelevantToSkill(text, coreSkill)) return true;
     // Use more related skills — "design" expands to web/UI/graphic/logo/Figma.
     return relatedSkills.slice(0, 8).some((s) => isStronglyRelevantToSkill(text, s));
@@ -541,6 +559,17 @@ export function isOffSkillRole(
   // Sales / partner / lead-gen titles: drop for every craft EXCEPT sales.
   if (!salesCraft && SALES_PARTNER_TITLE_RE.test(title)) return true;
 
+  // Sales craft: drop software/design role titles that aren't sales roles.
+  if (
+    salesCraft &&
+    /\b(full[- ]?stack|software engineer|frontend|front[- ]end|backend|back[- ]end|react developer|next\.?js|vue|angular|devops|machine learning|data scientist|ui\/?ux|graphic design(?:er)?|web developer|mobile (dev|developer)|ios engineer|android engineer)\b/i.test(
+      title,
+    ) &&
+    !/\b(sales|sdr|bdr|closer|account executive|ae\b|business development)\b/i.test(title)
+  ) {
+    return true;
+  }
+
   // Design searches: keep web/UI/graphic/product designers; only deny adjacent crafts.
   if (designFamily) {
     if (DESIGN_ADJACENCY_DENY_RE.test(body)) return true;
@@ -596,7 +625,7 @@ export function isLikelyScam(lead: Lead): boolean {
 
 /** Personal anecdotes / seeker stories that match a skill keyword but aren't leads. */
 const PERSONAL_STORY_RE =
-  /\b(taking a break|looking for (some )?advice|recently started a role|my store|chick[- ]?fil[- ]?a|for (chick|workers)|browse \d+ new .+ jobs in|just sharing|my journey|r\/\w*workers|how (have|do|did) you .{0,40}(find|get|land) (jobs?|clients?|work)|managed to find jobs|what would stop you from|would you hire|poll[: ]|unpopular opinion|my (thoughts|perspective|pov|take|notes|experience|story|opinion) (on|about|with)|designer notes|dev notes|a day in the life|ama\b|ask me anything|survey[: ]|fill (out |in )?(this |my )?survey|rate (my|this)|roast my|critique my|feedback on my|looking for feedback|share your (experience|thoughts)|what do you think about|hot take|unpopular|vent[: ]|rant[: ])\b/i;
+  /\b(taking a break|looking for (some )?advice|recently started a role|my store|chick[- ]?fil[- ]?a|for (chick|workers)|browse \d+ new .+ jobs in|just sharing|my journey|r\/\w*workers|how (have|do|did) you .{0,40}(find|get|land) (jobs?|clients?|work)|how i (got|broke|started|landed)|managed to find jobs|what would stop you from|would you hire|poll[: ]|unpopular opinion|my (thoughts|perspective|pov|take|notes|experience|story|opinion|bio|background) (on|about|with|in)|designer notes|dev notes|a day in the life|ama\b|ask me anything|survey[: ]|fill (out |in )?(this |my )?survey|rate (my|this)|roast my|critique my|feedback on my|looking for feedback|share your (experience|thoughts)|what do you think about|hot take|unpopular|vent[: ]|rant[: ]|here(?:'| i)?s my (story|experience|journey)|i(?:'| a)?ve been (in|doing) .{0,40} for \d+|career advice|resume review|linkedin (profile|headline) tips)\b/i;
 
 export function isPersonalStoryNoise(lead: Lead): boolean {
   const text = leadIntentText(lead);

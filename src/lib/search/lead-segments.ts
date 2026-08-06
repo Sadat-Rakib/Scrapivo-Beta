@@ -157,8 +157,139 @@ const COMPANY_SLUG_TAIL_RE =
 function isLinkedInPost(lead: Lead): boolean {
   return (
     /post/i.test(`${lead.platform_label || lead.platform || ""}`) ||
-    /linkedin\.com\/posts\//i.test(lead.full_post_url || "")
+    /linkedin\.com\/posts\//i.test(lead.full_post_url || "") ||
+    /linkedin\.com\/feed\/update\//i.test(lead.full_post_url || "")
   );
+}
+
+/** LinkedIn /in/, bare IG/X profile pages — People tab only, never Posts. */
+export function isProfileShapedLead(lead: Lead): boolean {
+  const platform = `${lead.platform_label || lead.platform || ""}`.toLowerCase();
+  if (/\bprofile\b/.test(platform) && !/\bpost\b/.test(platform)) return true;
+
+  const raw = (lead.full_post_url || "").trim();
+  if (!raw) return false;
+  try {
+    const u = new URL(raw.startsWith("http") ? raw : `https://${raw}`);
+    const host = u.hostname.replace(/^www\./, "").toLowerCase();
+    const path = u.pathname;
+
+    if (host.includes("linkedin.com")) {
+      if (/\/(posts|feed\/update)\//i.test(path)) return false;
+      if (/\/in\//i.test(path)) return true;
+      if (/\/company\//i.test(path)) return false;
+    }
+    if (host === "twitter.com" || host === "x.com") {
+      if (/\/status\//i.test(path)) return false;
+      if (/^\/[A-Za-z0-9_]+\/?$/.test(path)) return true;
+    }
+    if (host.includes("instagram.com")) {
+      if (/^\/(p|reel|tv)\//i.test(path)) return false;
+      if (
+        /^\/[A-Za-z0-9_.]{2,30}\/?$/.test(path) &&
+        !/^\/(explore|stories|accounts|directory)\b/i.test(path)
+      ) {
+        return true;
+      }
+    }
+    if (host.includes("facebook.com") || host.includes("fb.com")) {
+      if (/\/(posts|permalink\.php|story\.php|watch|groups\/.+\/posts)\b/i.test(path)) return false;
+      if (/\/(profile\.php|people\/)/i.test(path)) return true;
+    }
+    if (host.includes("github.com")) {
+      // /user or /org only — not /owner/repo/issues
+      if (/^\/[^/]+\/?$/.test(path)) return true;
+    }
+  } catch {
+    /* ignore */
+  }
+  return false;
+}
+
+const POSTS_ATS_EXCLUDE = new Set([
+  "upwork",
+  "remoteok",
+  "remotive",
+  "jobicy",
+  "arbeitnow",
+  "themuse",
+  "weworkremotely",
+  "usajobs",
+  "ashby",
+  "smartrecruiters",
+  "workable",
+  "recruitee",
+  "greenhouse",
+  "lever",
+  "google_jobs",
+  "wellfound",
+  "workatastartup",
+  "githubjobs",
+]);
+
+/**
+ * True content posts for the Posts tab. Profiles → People; ATS → Companies.
+ */
+export function isPostShapedLead(lead: Lead): boolean {
+  if (isProfileShapedLead(lead)) return false;
+  if (POSTS_ATS_EXCLUDE.has(lead.source)) return false;
+
+  const url = lead.full_post_url || "";
+
+  if (lead.source === "linkedin") return isLinkedInPost(lead);
+  if (lead.source === "twitter") return /\/status\//i.test(url);
+  if (lead.source === "instagram") return /\/(p|reel|tv)\//i.test(url);
+  if (lead.source === "facebook") {
+    return (
+      /\/(posts|permalink\.php|story\.php|watch)\b/i.test(url) ||
+      /facebook\.com\/groups\/[^/]+\/posts\//i.test(url) ||
+      /facebook\.com\/.+\/posts\//i.test(url)
+    );
+  }
+
+  // Native content sources
+  if (
+    lead.source === "reddit" ||
+    lead.source === "redditrss" ||
+    lead.source === "hn" ||
+    lead.source === "discourse" ||
+    lead.source === "freelancer" ||
+    lead.source === "fiverr" ||
+    lead.source === "stackexchange" ||
+    lead.source === "news" ||
+    lead.source === "bluesky" ||
+    lead.source === "mastodon" ||
+    lead.source === "lemmy" ||
+    lead.source === "devto" ||
+    lead.source === "lobsters" ||
+    lead.source === "indiehackers" ||
+    lead.source === "hashnode" ||
+    lead.source === "tenders" ||
+    lead.source === "github" ||
+    lead.source === "githubhiring" ||
+    lead.source === "githubintent" ||
+    lead.source === "secedgar" ||
+    lead.source === "dealroom" ||
+    lead.source === "neuronfeed" ||
+    lead.source === "startupsgallery"
+  ) {
+    return true;
+  }
+
+  // SERP / web dorks: allow only when the URL looks like content, not a profile
+  if (
+    lead.source === "serpapi" ||
+    lead.source === "tavily" ||
+    lead.source === "searxng" ||
+    lead.source === "webboolean"
+  ) {
+    if (/linkedin\.com\/in\//i.test(url) && !/linkedin\.com\/posts\//i.test(url)) return false;
+    if (/(twitter|x)\.com\/[A-Za-z0-9_]+\/?(\?|$)/i.test(url) && !/\/status\//i.test(url))
+      return false;
+    return !!url;
+  }
+
+  return !!url;
 }
 
 /** Title-Case 2–4 tokens with no org suffix → person name, not a firm. */
@@ -813,44 +944,17 @@ export function segmentLeads(rawLeads: Lead[]): LeadSegments {
     return l;
   });
   const posts = (() => {
-    // Posts = social / community / public asks. ATS and job boards already
-    // populate Companies; dumping them into Posts made every clients search
-    // look like "Reddit + company pages" even when LinkedIn/IG were present
-    // further down a 100+ ATS-dominated list (and then the 24h chip hid the
-    // undated social ones entirely).
+    // Posts = real content posts only. Profiles → People; ATS → Companies.
     const withInline = (l: Lead) => {
       const inline = extractInlineContacts(leadText(l));
       return inline ? { ...l, inline_contacts: inline } : l;
     };
-    // Only pure company career/ATS boards are excluded from Posts when we have
-    // social/community supply. News, GitHub, tenders, forums stay as Posts.
-    const ATS_ONLY = new Set([
-      "upwork",
-      "remoteok",
-      "remotive",
-      "jobicy",
-      "arbeitnow",
-      "themuse",
-      "weworkremotely",
-      "usajobs",
-      "ashby",
-      "smartrecruiters",
-      "workable",
-      "recruitee",
-      "greenhouse",
-      "lever",
-      "google_jobs",
-      "wellfound",
-      "workatastartup",
-      "githubjobs",
-    ]);
-    const isAtsOnly = (l: Lead) => ATS_ONLY.has(l.source);
-    const socialish = leads.filter((l) => !isAtsOnly(l));
-    const companyish = leads.filter(isAtsOnly);
-    // Prefer real posts; only pad with company openings if the social layer
-    // is empty so Discover is never a blank wall.
-    const pool = socialish.length >= 2 ? socialish : [...socialish, ...companyish];
-    return pool.map(withInline);
+    const postShaped = leads.filter(isPostShapedLead);
+    // Never pad Posts with profiles. Only if zero real posts, fall back to
+    // ATS company openings so Discover is not a blank wall.
+    if (postShaped.length >= 1) return postShaped.map(withInline);
+    const companyish = leads.filter((l) => POSTS_ATS_EXCLUDE.has(l.source));
+    return companyish.map(withInline);
   })();
 
   // Companies — group by extracted company identity.

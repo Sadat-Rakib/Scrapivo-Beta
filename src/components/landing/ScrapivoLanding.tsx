@@ -570,13 +570,7 @@ function AiDemoSection() {
   );
 }
 
-function FaqSection({
-  authTo,
-  authSearch,
-}: {
-  authTo: "/auth" | "/discover";
-  authSearch?: { mode?: "signin" | "signup" };
-}) {
+function FaqSection() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [open, setOpen] = useState<number | null>(0);
   useInViewVideo(videoRef);
@@ -692,26 +686,6 @@ function FaqSection({
               </div>
             );
           })}
-          <div style={{ marginTop: 24, display: "flex", justifyContent: "center" }}>
-            <NitroButton
-              to={authTo}
-              search={authSearch}
-              style={{
-                position: "relative",
-                zIndex: 1,
-                display: "inline-flex",
-                alignItems: "center",
-                borderRadius: 999,
-                padding: "14px 36px",
-                cursor: "pointer",
-                overflow: "hidden",
-                transition: "transform 0.2s, box-shadow 0.2s",
-                textDecoration: "none",
-              }}
-            >
-              Join Inner Circle →
-            </NitroButton>
-          </div>
         </div>
       </div>
     </section>
@@ -1146,7 +1120,7 @@ export function ScrapivoLanding({ cta }: Props) {
         </section>
 
         <AiDemoSection />
-        <FaqSection authTo={authTo} authSearch={signupSearch} />
+        <FaqSection />
         <ScrapivoLandingFooter authTo={authTo} authSearch={signupSearch} />
       </main>
     </div>

@@ -182,6 +182,7 @@ export function LeadDetailPanel({
     <div className="h-full flex flex-col">
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-2 min-w-0">
+          <Badge variant="outline">{lead.platform_label ?? lead.platform}</Badge>
           {lead.tier && <Badge className="uppercase text-[10px]">{lead.tier}</Badge>}
         </div>
         <Button variant="ghost" size="icon" onClick={onClose}>

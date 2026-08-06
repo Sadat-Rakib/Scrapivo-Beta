@@ -183,7 +183,7 @@ export function EntityDetailPanel({
                 ? [c?.domain, `${c?.signal_count} signal${c?.signal_count === 1 ? "" : "s"}`]
                     .filter(Boolean)
                     .join(" · ")
-                : (p?.role_hint ?? "")}
+                : [p?.role_hint, p?.platform].filter(Boolean).join(" · ")}
             </div>
           </div>
         </div>
@@ -276,7 +276,7 @@ export function EntityDetailPanel({
           >
             <div className="flex items-center gap-2 text-[10px] text-muted-foreground mb-1">
               <FileText className="size-3" />
-              <span className="truncate">Open signal</span>
+              <span className="truncate">{l.platform_label ?? l.platform ?? "Signal"}</span>
               <span className="ml-auto shrink-0">
                 {l.posted_at_relative || "Recently (undated)"}
               </span>

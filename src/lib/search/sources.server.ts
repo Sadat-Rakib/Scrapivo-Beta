@@ -1,4 +1,4 @@
-﻿import { companyCandidates, type Lead } from "../scoring";
+import { companyCandidates, type Lead } from "../scoring";
 import {
   expandQuery,
   isRecent,
