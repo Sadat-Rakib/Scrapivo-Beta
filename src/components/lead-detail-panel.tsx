@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { X, ExternalLink, Sparkles, Copy, Target, Brain, ShieldCheck, Radar } from "lucide-react";
+import { X, ExternalLink, Sparkles, Copy, Target, Brain, ShieldCheck, Radar, Mail } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { generateOutreach } from "@/lib/outreach.functions";
@@ -23,6 +23,11 @@ import {
   PIPELINE_STAGES,
   PIPELINE_STAGE_LABELS,
 } from "@/lib/leads.functions";
+import {
+  checkEmailGate,
+  sendLeadEmail,
+  startEmailSequence,
+} from "@/lib/outreach/email.functions";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -49,8 +54,13 @@ export function LeadDetailPanel({
   const setStage = useServerFn(setPipelineStage);
   const listActivity = useServerFn(listLeadActivity);
   const logActivity = useServerFn(logLeadActivity);
+  const checkGate = useServerFn(checkEmailGate);
+  const sendEmail = useServerFn(sendLeadEmail);
+  const startSeq = useServerFn(startEmailSequence);
 
   const [notes, setNotes] = useState<string>(saved?.notes ?? "");
+  const [gateReasons, setGateReasons] = useState<string[]>([]);
+  const [gateOk, setGateOk] = useState<boolean | null>(null);
   const [outreach, setOutreach] = useState<{
     dm: string;
     email_subject: string;
@@ -93,7 +103,34 @@ export function LeadDetailPanel({
     setBrief(null);
     setContact(null);
     setUsedHook(null);
+    setGateOk(null);
+    setGateReasons([]);
   }, [saved?.id, lead.full_post_url]);
+
+  useEffect(() => {
+    if (!saved?.id || !outreach?.email_body || !saved?.contact_email) {
+      setGateOk(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const g = await checkGate({ data: { savedLeadId: saved.id } });
+        if (!cancelled) {
+          setGateOk(g.ok);
+          setGateReasons(g.reasons);
+        }
+      } catch {
+        if (!cancelled) {
+          setGateOk(false);
+          setGateReasons(["Could not evaluate compliance gate"]);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [saved?.id, saved?.contact_email, outreach?.email_subject, outreach?.email_body, checkGate]);
 
   const ensureSaved = async (): Promise<string> => {
     if (saved?.id) return saved.id;
@@ -203,6 +240,10 @@ export function LeadDetailPanel({
         null;
       try {
         const id = await ensureSaved();
+        const bestRec =
+          (best && c.discovery?.emails?.find((e) => e.email === best)) ||
+          c.discovery?.emails?.[0] ||
+          null;
         await saveContactFn({
           data: {
             id,
@@ -214,6 +255,17 @@ export function LeadDetailPanel({
               registry_verified: c.registry_verified,
               verification: c.verification,
               domain: c.domain,
+              role_title: bestRec?.role_title || bestRec?.name || undefined,
+              provenance: bestRec?.provenance ?? [],
+              discovery_emails: (c.discovery?.emails ?? []).slice(0, 5).map((e) => ({
+                email: e.email,
+                role_title: e.role_title,
+                origin: e.origin,
+                provenance: e.provenance,
+                consent: e.consent,
+              })),
+              compliance_rows: c.compliance_rows ?? [],
+              outreach_ready: bestRec?.consent?.outreach_ready === true,
             },
           },
         });
@@ -253,6 +305,28 @@ export function LeadDetailPanel({
       qc.invalidateQueries({ queryKey: ["saved-leads"] });
       qc.invalidateQueries({ queryKey: ["lead-activity", id] });
       toast.success(`Stage: ${PIPELINE_STAGE_LABELS[status]}`);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const sendMut = useMutation({
+    mutationFn: async () => {
+      const id = await ensureSaved();
+      const result = await sendEmail({ data: { savedLeadId: id } });
+      try {
+        await startSeq({ data: { savedLeadId: id, followUpDelayDays: 3 } });
+      } catch {
+        /* sequence optional */
+      }
+      return { id, result };
+    },
+    onSuccess: ({ id }) => {
+      setStageLocal("contacted");
+      onSavedChange?.({ status: "contacted" });
+      qc.invalidateQueries({ queryKey: ["saved-leads"] });
+      qc.invalidateQueries({ queryKey: ["lead-activity", id] });
+      toast.success("Email sent (CASL footer + unsubscribe included)");
+      setGateOk(null);
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -737,6 +811,40 @@ export function LeadDetailPanel({
                   text={outreach.email_body}
                   onCopy={() => copy(`${outreach.email_subject}\n\n${outreach.email_body}`)}
                 />
+                <div className="mt-3 space-y-2">
+                  <Button
+                    size="sm"
+                    disabled={
+                      sendMut.isPending ||
+                      !saved?.contact_email ||
+                      gateOk === false ||
+                      !outreach.email_body
+                    }
+                    onClick={() => sendMut.mutate()}
+                    title={
+                      gateOk === false
+                        ? gateReasons.join(" · ")
+                        : !saved?.contact_email
+                          ? "Resolve & save a contact email first"
+                          : "Send via Resend with CASL footer"
+                    }
+                  >
+                    <Mail className="size-3.5 mr-1.5" />
+                    {sendMut.isPending ? "Sending…" : "Send email"}
+                  </Button>
+                  {gateOk === false && gateReasons.length > 0 && (
+                    <ul className="text-[11px] text-amber-700 dark:text-amber-400 space-y-0.5">
+                      {gateReasons.slice(0, 5).map((r, i) => (
+                        <li key={i}>• {r}</li>
+                      ))}
+                    </ul>
+                  )}
+                  {gateOk === true && (
+                    <p className="text-[11px] text-emerald-600 dark:text-emerald-500">
+                      CASL gate ready — send will re-verify immediately before Resend.
+                    </p>
+                  )}
+                </div>
               </TabsContent>
               <TabsContent value="call">
                 <OutreachBlock text={outreach.call} onCopy={() => copy(outreach.call)} />

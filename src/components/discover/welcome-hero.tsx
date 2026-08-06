@@ -66,7 +66,9 @@ export function WelcomeHero({
 
   return (
     <div className="max-w-2xl mx-auto w-full text-center px-6">
-      <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">{title}</h1>
+      <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-balance break-words">
+        {title}
+      </h1>
       <p className="mt-4 text-base text-muted-foreground">
         {greetingName?.trim()
           ? "What are you looking for now — a buying signal, niche, or role?"

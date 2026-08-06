@@ -708,30 +708,33 @@ export const runSearch = createServerFn({ method: "POST" })
       /tutor|teacher|tutoring/i.test(`${classified.coreSkill} ${classified.raw}`);
     const maxTotal =
       goal === "both" && qualityPool >= 80
-        ? 450
+        ? 500
         : goal === "clients" || classified.signalMode === "buying_signal" || volumePersona
-          ? 400
-          : 250;
+          ? 450
+          : 280;
     const leads = diversifiedTop12(quality, {
       directoryMode,
       maxJobBoard: goal === "jobs" ? 8 : goal === "both" ? 4 : 2,
       // Company-identity ATS boards are the Companies segment on the clients
       // path — an org posting a role for this craft IS a prospective buyer.
       maxCompanyAts: goal === "jobs" ? 20 : 120,
-      minSocial: goal === "jobs" ? 2 : goal === "clients" ? 8 : 5,
+      minSocial: goal === "jobs" ? 2 : goal === "clients" ? 10 : 5,
       maxReddit:
         volumePersona
-          ? 60
+          ? 70
           : goal === "clients" || classified.signalMode === "buying_signal"
-            ? 40
+            ? 48
             : 24,
       maxTotal,
-      // Warm floor (45) — never show weak / no-signal rows.
+      // Warm floor (45) — volume without weak / no-signal rows.
       minScore:
         goal === "clients" || classified.signalMode === "buying_signal" || volumePersona
           ? 45
           : 0,
-      maxPerPlatform: volumePersona ? 60 : 50,
+      maxPerPlatform: volumePersona ? 70 : 55,
+      // Freelancer is high-volume but crowds out LinkedIn/Reddit/People.
+      maxFreelancer:
+        goal === "clients" || classified.signalMode === "buying_signal" ? 22 : 32,
     });
     trace("diversified", leads);
 

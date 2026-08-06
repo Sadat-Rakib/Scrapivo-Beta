@@ -64,9 +64,9 @@ function PipelinePage() {
   });
 
   return (
-    <div className="flex h-screen">
-      <div className="flex-1 min-w-0 flex flex-col">
-        <div className="border-b border-border p-4 flex items-center justify-between gap-3">
+    <div className="flex h-full min-h-0">
+      <div className="flex-1 min-w-0 flex flex-col min-h-0">
+        <div className="border-b border-border p-4 flex items-center justify-between gap-3 shrink-0">
           <div>
             <h1 className="text-xl font-semibold tracking-tight">Pipeline</h1>
             <p className="text-sm text-muted-foreground">

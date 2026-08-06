@@ -5,20 +5,8 @@ type Goal = "jobs" | "clients" | "both";
 type Audience = "companies" | "agencies" | "people" | "all";
 
 // =====================================================================
-// Search progress — steps APPEAR one at a time.
-//
-// The previous version rendered the whole list upfront at 30% opacity and lit
-// each row in place. That reads as "the answer was already decided and the
-// spinner is theatre" — you can see the ending before it happens. Appending
-// instead means the panel grows as work completes, which is why Unify's and
-// Origami's feel alive.
-//
-// DELIBERATELY GENERAL WORDING. Origami leaks internals — "I'm using keyword X",
-// "the filter had a syntax miss" — which is noise to the user and hands your
-// method to anyone reading a screenshot. Every label here names a CATEGORY of
-// work ("Searching social platforms"), never a query, keyword, source name, or
-// internal decision. Rule for adding steps: if it would mean nothing to someone
-// who has never seen the code, it doesn't belong here.
+// Search progress — steps APPEAR one at a time, then keep talking while
+// the real search is still running (searches often outlast the step list).
 // =====================================================================
 
 function stepsFor(goal?: Goal, audience?: Audience): string[] {
@@ -71,16 +59,21 @@ function stepsFor(goal?: Goal, audience?: Audience): string[] {
   return [...base, ...jobsAll];
 }
 
-/**
- * Steps don't advance on a fixed clock. A uniform tick either races ahead of a
- * slow search (finishing the list while work continues) or crawls behind a fast
- * one. Early stages are genuinely quick; crawling and ranking are the slow ones,
- * so the cadence stretches as it goes and then holds on the last step until
- * real results replace this component.
- */
+/** Extra lines that keep appearing after the main list while search continues. */
+const HOLDING_LINES = [
+  "Still pulling fresh signals…",
+  "Cross-checking sources for better matches…",
+  "Filtering noise so you only see real demand…",
+  "Scoring volume and quality together…",
+  "Almost there — packing the strongest leads…",
+  "Double-checking recency and relevance…",
+  "Still working — good searches take a moment…",
+];
+
 function delayForStep(index: number, total: number): number {
   const progress = index / Math.max(1, total - 1);
-  return 420 + Math.round(progress * 1400);
+  // Stretch so the main list lasts longer (~45–70s for full clients list).
+  return 900 + Math.round(progress * 2800);
 }
 
 export function SearchingSteps({
@@ -93,31 +86,48 @@ export function SearchingSteps({
   audience?: Audience;
 }) {
   const steps = useMemo(() => stepsFor(goal, audience), [goal, audience]);
-  // How many steps are VISIBLE. Starts at 1 so the panel never flashes empty.
   const [shown, setShown] = useState(1);
+  const [holdingIdx, setHoldingIdx] = useState(-1);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setShown(1);
+    setHoldingIdx(-1);
     let current = 1;
 
+    const clearTimers = () => {
+      if (timer.current) clearTimeout(timer.current);
+      if (holdTimer.current) clearTimeout(holdTimer.current);
+    };
+
+    const startHolding = () => {
+      let i = 0;
+      setHoldingIdx(0);
+      const tick = () => {
+        i = (i + 1) % HOLDING_LINES.length;
+        setHoldingIdx(i);
+        holdTimer.current = setTimeout(tick, 2200);
+      };
+      holdTimer.current = setTimeout(tick, 2200);
+    };
+
     const advance = () => {
-      // Hold on the final step rather than completing it — the search isn't
-      // done until results replace this component, and showing every step
-      // ticked while still spinning is the same lie as pre-rendering them.
-      if (current >= steps.length) return;
+      if (current >= steps.length) {
+        startHolding();
+        return;
+      }
       current += 1;
       setShown(current);
       timer.current = setTimeout(advance, delayForStep(current, steps.length));
     };
 
     timer.current = setTimeout(advance, delayForStep(1, steps.length));
-    return () => {
-      if (timer.current) clearTimeout(timer.current);
-    };
+    return clearTimers;
   }, [steps]);
 
   const visible = steps.slice(0, shown);
+  const holdingLine = holdingIdx >= 0 ? HOLDING_LINES[holdingIdx] : null;
 
   return (
     <div className="rounded-2xl border border-border bg-card/60 p-4 md:p-5">
@@ -133,12 +143,10 @@ export function SearchingSteps({
 
       <ul className="space-y-1.5 text-sm">
         {visible.map((s, idx) => {
-          const isCurrent = idx === visible.length - 1;
+          const isCurrent = holdingIdx < 0 && idx === visible.length - 1;
           return (
             <li
               key={s}
-              // Each row fades + slides in as it's appended. `animate-in` is
-              // from tw-animate-css, already a dependency.
               className={`flex animate-in items-center gap-2 fade-in slide-in-from-bottom-1 duration-300 ${
                 isCurrent ? "text-foreground" : "text-muted-foreground"
               }`}
@@ -152,6 +160,15 @@ export function SearchingSteps({
             </li>
           );
         })}
+        {holdingLine && (
+          <li
+            key={`hold-${holdingIdx}`}
+            className="flex animate-in items-center gap-2 fade-in slide-in-from-bottom-1 duration-300 text-foreground"
+          >
+            <Loader2 className="size-3.5 shrink-0 animate-spin text-primary" />
+            <span>{holdingLine}</span>
+          </li>
+        )}
       </ul>
     </div>
   );

@@ -109,8 +109,14 @@ function DiscoverPage() {
   const activeProject = projects.find((p) => p.is_active) ?? projects[0] ?? null;
   const showOnboarding =
     wizardOpen || (projectsQuery.isSuccess && projects.length === 0 && !onboardingSkipped);
-  const greetingName =
-    profileQuery.data?.full_name?.trim() || activeProject?.business_name?.trim() || "";
+  const greetingName = (() => {
+    const fromProfile = profileQuery.data?.full_name?.trim() || "";
+    const fromProject = activeProject?.business_name?.trim() || "";
+    // Prefer the longest real personal name — never truncate multi-part names
+    // like "Mir Sadat Bin Rakib" down to the last two tokens.
+    if (fromProfile) return fromProfile;
+    return fromProject;
+  })();
   // Zero-typing: fire ONE automatic search as soon as onboarding produced an
   // active project (server or local). Never re-fires for the same project.
   const [pendingAutoSearch, setPendingAutoSearch] = useState(false);
@@ -154,17 +160,27 @@ function DiscoverPage() {
       if (a.business_name?.trim() || a.service?.trim() || a.location?.trim()) {
         const yoe =
           a.experience_level === "5+" ? 6 : a.experience_level === "2-4" ? 3 : 1;
-        void patchProfile({
-          data: {
-            full_name: a.business_name?.trim() || undefined,
-            job_title: a.service?.trim() || undefined,
-            years_experience: yoe,
-            location: a.location?.trim() || undefined,
-            work_preference: a.work_style || undefined,
-            skills: a.service?.trim() ? [a.service.trim()] : undefined,
-          },
-        })
-          .then(() => qc.invalidateQueries({ queryKey: ["profile"] }))
+        void getProfile()
+          .then((existing) => {
+            const existingName = existing?.full_name?.trim() || "";
+            const wizardName = a.business_name?.trim() || "";
+            // Don't overwrite a longer saved full name with a shorter wizard answer.
+            const nextName =
+              wizardName && wizardName.length >= existingName.length
+                ? wizardName
+                : existingName || wizardName || undefined;
+            return patchProfile({
+              data: {
+                full_name: nextName,
+                job_title: a.service?.trim() || undefined,
+                years_experience: yoe,
+                location: a.location?.trim() || undefined,
+                work_preference: a.work_style || undefined,
+                skills: a.service?.trim() ? [a.service.trim()] : undefined,
+              },
+            });
+          })
+          .then(() => qc.invalidateQueries({ queryKey: ["my-profile"] }))
           .catch(() => {});
       }
       const r = await createProj({ data: payload });
@@ -683,9 +699,9 @@ function DiscoverPage() {
   ]);
 
   return (
-    <div className="flex h-[100dvh] md:h-screen">
-      <div className="flex-1 min-w-0 flex flex-col">
-        <header className="h-14 md:h-16 px-4 md:px-6 flex items-center justify-between gap-2">
+    <div className="flex h-full min-h-0">
+      <div className="flex-1 min-w-0 flex flex-col min-h-0">
+        <header className="h-14 md:h-16 px-4 md:px-6 flex items-center justify-between gap-2 shrink-0">
           <h1 className="text-base md:text-lg font-semibold tracking-tight truncate">
             AI Discover
           </h1>

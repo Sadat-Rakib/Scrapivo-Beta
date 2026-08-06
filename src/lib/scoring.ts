@@ -560,11 +560,11 @@ export function fuzzyDedupeLeads(leads: Lead[]): Lead[] {
 }
 
 /** Diversified "front page" size; everything relevant is still returned after it. */
-const MAX_RESULTS = 150;
+const MAX_RESULTS = 220;
 /** Hard sanity cap — must allow ~100–200 per tab (Posts/Companies/People). */
-const MAX_TOTAL_RESULTS = 400;
-const MAX_TOTAL_BOTH = 450;
-const MAX_PER_PLATFORM = 50;
+const MAX_TOTAL_RESULTS = 450;
+const MAX_TOTAL_BOTH = 500;
+const MAX_PER_PLATFORM = 55;
 const MAX_JOB_BOARD = 6;
 const MAX_COMPANY_ATS = 120;
 const MIN_SOCIAL = 8;
@@ -720,6 +720,8 @@ export function diversifiedTop12(
     maxPerPlatform?: number;
     /** Cap Reddit so LinkedIn/X/FB can surface (clients path). */
     maxReddit?: number;
+    /** Cap Freelancer marketplace rows so social/People aren't drowned out. */
+    maxFreelancer?: number;
   },
 ): Lead[] {
   const directoryMode = !!opts?.directoryMode;
@@ -731,8 +733,10 @@ export function diversifiedTop12(
   const minScore = opts?.minScore ?? 0;
   const perPlatformCap = directoryMode ? maxTotal : (opts?.maxPerPlatform ?? MAX_PER_PLATFORM);
   const maxReddit = directoryMode ? maxTotal : (opts?.maxReddit ?? 10);
+  const maxFreelancer = opts?.maxFreelancer ?? 28;
   const frontPage = Math.min(MAX_RESULTS, maxTotal);
   const isReddit = (l: Lead) => l.source === "reddit" || l.source === "redditrss";
+  const isFreelancer = (l: Lead) => l.source === "freelancer";
   // Qualify on the real score, ORDER on the age-decayed one.
   //
   // Sorting by raw score put a 5-day-old company posting above a 1-hour-old
@@ -754,6 +758,7 @@ export function diversifiedTop12(
   let smbCount = 0;
   let jobShapedCount = 0;
   let redditCount = 0;
+  let freelancerCount = 0;
   const result: Lead[] = [];
 
   // Hold the front page to >= 2 opportunities per job, but only while there is
@@ -766,6 +771,7 @@ export function diversifiedTop12(
     const key = lead.platform || lead.source;
     if ((platformCounts[key] ?? 0) >= perPlatformCap) return false;
     if (!directoryMode && isReddit(lead) && redditCount >= maxReddit) return false;
+    if (!directoryMode && isFreelancer(lead) && freelancerCount >= maxFreelancer) return false;
     if (!directoryMode && isJobBoardLead(lead) && jobBoardCount >= maxJobBoard) return false;
     if (!directoryMode && isCompanyAtsLead(lead) && companyAtsCount >= maxCompanyAts) return false;
     if (!directoryMode && isJobShapedLead(lead) && opportunityCount < opportunitySupply) {
@@ -788,6 +794,7 @@ export function diversifiedTop12(
     else opportunityCount++;
     if (isSmbLead(lead)) smbCount++;
     if (isReddit(lead)) redditCount++;
+    if (isFreelancer(lead)) freelancerCount++;
     result.push(lead);
     return true;
   };
@@ -820,6 +827,7 @@ export function diversifiedTop12(
           if (isJobBoardLead(removed)) jobBoardCount--;
           if (isSmbLead(removed)) smbCount--;
           if (isReddit(removed)) redditCount = Math.max(0, redditCount - 1);
+          if (isFreelancer(removed)) freelancerCount = Math.max(0, freelancerCount - 1);
           result.splice(replaceIdx, 1);
         }
         if (add(lead)) socialInResult++;
@@ -846,6 +854,7 @@ export function diversifiedTop12(
     if (isJobBoardLead(lead)) jobBoardCount++;
     if (isCompanyAtsLead(lead)) companyAtsCount++;
     if (isReddit(lead)) redditCount++;
+    if (isFreelancer(lead)) freelancerCount++;
     if (isSmbLead(lead)) smbCount++;
     result.push(lead);
   }

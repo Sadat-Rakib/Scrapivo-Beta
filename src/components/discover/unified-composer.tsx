@@ -60,7 +60,7 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
           {pending ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
         </button>
       </div>
-      <div className="flex items-center justify-between gap-2 px-3 pb-2.5 pt-0.5 text-xs text-muted-foreground">
+      <div className="flex items-center gap-2 px-3 pb-2.5 pt-0.5 text-xs text-muted-foreground">
         <div className="flex items-center gap-1">
           <div className="inline-flex rounded-full border border-border p-0.5">
             <button
@@ -87,9 +87,6 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
             }}
           />
         </div>
-        <span className="font-mono">
-          {value.length} / {maxChars.toLocaleString()}
-        </span>
       </div>
     </div>
   );

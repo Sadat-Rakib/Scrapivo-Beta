@@ -680,6 +680,20 @@ export async function searchSearxng(
   // produced connection errors that looked identical to "container not running"
   // and wiped every social dork mid-search.
   const baseUrl = rawBase.replace(/:\/\/localhost(?=[:/]|$)/i, "://127.0.0.1");
+  // Vercel / serverless cannot reach a laptop Docker SearXNG. If Production still
+  // has SEARXNG_URL=http://127.0.0.1:8888, every socialdork call hangs/fails and
+  // Discover looks like "Freelancer-only". Skip and let SerpAPI/Tavily carry social.
+  if (
+    process.env.VERCEL === "1" &&
+    /:\/\/(127\.0\.0\.1|localhost|0\.0\.0\.0)(?=[:/]|$)/i.test(baseUrl)
+  ) {
+    if (process.env.NODE_ENV === "development" || process.env.SCRAPIVO_DEBUG_SOURCES) {
+      console.warn(
+        "[searxng] skipping localhost URL on Vercel — set a public SEARXNG_URL or rely on USE_PAID_SOURCES + SerpAPI",
+      );
+    }
+    return [];
+  }
 
   const results: SearxngResult[] = [];
   const seen = new Set<string>();

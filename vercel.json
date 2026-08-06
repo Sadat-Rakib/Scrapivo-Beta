@@ -10,5 +10,11 @@
         { "key": "Cross-Origin-Embedder-Policy", "value": "credentialless" }
       ]
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/email-sequences",
+      "schedule": "0 * * * *"
+    }
   ]
 }

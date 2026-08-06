@@ -21,6 +21,9 @@ const PatchSchema = z.object({
   skills: z.array(z.string()).optional(),
   notify_email: z.boolean().optional(),
   slack_webhook: z.string().optional(),
+  sender_name: z.string().max(120).optional(),
+  sender_physical_address: z.string().max(500).optional(),
+  outreach_from_email: z.string().max(200).optional(),
 });
 
 export const updateMyProfile = createServerFn({ method: "POST" })

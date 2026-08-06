@@ -22,7 +22,16 @@ function ProfilePage() {
   const [form, setForm] = useState<any>({});
   const [skillInput, setSkillInput] = useState("");
   useEffect(() => {
-    if (q.data) setForm(q.data);
+    if (!q.data) return;
+    const full = (q.data.full_name ?? "").trim();
+    const sender = (q.data.sender_name ?? "").trim();
+    // If the full name was only typed into the (now-removed) CASL sender field,
+    // surface it as Full name so Discover greets with the complete name.
+    if (sender && sender.length > full.length) {
+      setForm({ ...q.data, full_name: sender });
+    } else {
+      setForm(q.data);
+    }
   }, [q.data]);
 
   const mut = useMutation({
@@ -42,6 +51,7 @@ function ProfilePage() {
     onSuccess: () => {
       toast.success("Saved");
       qc.invalidateQueries({ queryKey: ["profile"] });
+      qc.invalidateQueries({ queryKey: ["my-profile"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -54,7 +64,7 @@ function ProfilePage() {
   };
 
   return (
-    <div className="p-6 sm:p-8 max-w-2xl mx-auto w-full space-y-8">
+    <div className="h-full overflow-y-auto p-6 sm:p-8 max-w-2xl mx-auto w-full space-y-8">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
         <p className="text-sm text-muted-foreground mt-1">
@@ -68,7 +78,11 @@ function ProfilePage() {
           <Input
             value={form.full_name ?? ""}
             onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+            placeholder="e.g. Mir Sadat Bin Rakib"
           />
+          <p className="text-[11px] text-muted-foreground">
+            Shown on Discover — use your full name, not just part of it.
+          </p>
         </Field>
         <Field label="Job title / craft">
           <Input

@@ -90,15 +90,38 @@ export function AppShell({ children }: { children: ReactNode }) {
       );
     });
 
-  const renderSidebar = (isCollapsed: boolean) => (
+  const renderSidebar = (isCollapsed: boolean, showCollapseToggle: boolean) => (
     <>
       <div
-        className={`h-16 flex items-center ${isCollapsed ? "justify-center px-0" : "gap-2 px-5"}`}
+        className={`h-16 flex items-center ${
+          isCollapsed ? "justify-center px-0 gap-0" : "gap-2 px-3"
+        }`}
       >
         <div className="size-7 rounded-md bg-primary flex items-center justify-center shrink-0">
           <Search className="size-4 text-primary-foreground" />
         </div>
-        {!isCollapsed && <span className="font-semibold tracking-tight text-base">Scrapivo</span>}
+        {!isCollapsed && (
+          <span className="font-semibold tracking-tight text-base flex-1 min-w-0 truncate">
+            Scrapivo
+          </span>
+        )}
+        {showCollapseToggle && (
+          <button
+            type="button"
+            onClick={() => setCollapsed((c) => !c)}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className={`inline-flex items-center justify-center size-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors shrink-0 ${
+              isCollapsed ? "mt-1" : ""
+            }`}
+          >
+            {collapsed ? (
+              <PanelLeftOpen className="size-4" />
+            ) : (
+              <PanelLeftClose className="size-4" />
+            )}
+          </button>
+        )}
       </div>
       <nav className={`${isCollapsed ? "px-2" : "px-3"} flex-1 space-y-1`}>
         {renderNav(nav, isCollapsed)}
@@ -154,20 +177,16 @@ export function AppShell({ children }: { children: ReactNode }) {
   );
 
   return (
-    <div className="min-h-screen flex bg-background text-foreground">
+    <div className="h-[100dvh] md:h-screen flex overflow-hidden bg-background text-foreground">
       <aside
         className={`hidden md:flex relative shrink-0 border-r border-border bg-sidebar flex-col transition-[width] duration-200 ${
           collapsed ? "w-16" : "w-64"
         }`}
       >
-        {renderSidebar(collapsed)}
-        {/* NOTE: there used to be a second collapse button floating on the
-            sidebar's right edge (`absolute -right-3`). With the topbar toggle
-            below it rendered two chevrons a few pixels apart, which read as two
-            separate sidebars. One control, in the topbar, is enough. */}
+        {renderSidebar(collapsed, true)}
       </aside>
-      <div className="flex-1 min-w-0 flex flex-col">
-        <div className="md:hidden h-14 flex items-center gap-2 px-3 border-b border-border bg-background sticky top-0 z-30">
+      <div className="flex-1 min-w-0 min-h-0 flex flex-col overflow-hidden">
+        <div className="md:hidden h-14 flex items-center gap-2 px-3 border-b border-border bg-background shrink-0 z-30">
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" aria-label="Open menu">
@@ -175,7 +194,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="p-0 w-72 bg-sidebar flex flex-col">
-              {renderSidebar(false)}
+              {renderSidebar(false, false)}
             </SheetContent>
           </Sheet>
           <div className="flex items-center gap-2">
@@ -185,21 +204,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span className="font-semibold tracking-tight text-sm">Scrapivo</span>
           </div>
         </div>
-        <div className="hidden md:flex h-11 items-center px-3 border-b border-border bg-background sticky top-0 z-20">
-          <button
-            type="button"
-            onClick={() => setCollapsed((c) => !c)}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className="inline-flex items-center justify-center size-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-          >
-            {collapsed ? (
-              <PanelLeftOpen className="size-4" />
-            ) : (
-              <PanelLeftClose className="size-4" />
-            )}
-          </button>
-        </div>
-        <main className="flex-1 min-w-0 overflow-auto">{children}</main>
+        <main className="flex-1 min-w-0 min-h-0 overflow-hidden">{children}</main>
       </div>
     </div>
   );
