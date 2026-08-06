@@ -46,6 +46,8 @@ export function ClarifyPanel({ questions, refinement, onApply, onDismiss, disabl
       // override rather than a value.
       if (q.id === "craft") {
         if (value !== "confirm") next.craft = value;
+      } else if (q.id === "signal_focus") {
+        next.signal_focus = value as ClarifyAnswers["signal_focus"];
       } else {
         (next as Record<string, unknown>)[q.id] = value;
       }

@@ -23,6 +23,7 @@ const ClarifyInput = z.object({
   buyer_type: z.enum(["startups", "smb", "agency", "enterprise", "individual", "any"]).optional(),
   geography: z.enum(["global", "us", "na", "eu", "uk", "local"]).optional(),
   experience: z.enum(["0-1", "1-2", "3-4", "5+"]).optional(),
+  signal_focus: z.enum(["all", "recommend", "pain", "compare"]).optional(),
   craft: z.string().max(80).optional(),
   other: z.record(z.string(), z.string().max(120)).optional(),
 });
@@ -188,21 +189,38 @@ export const runSearch = createServerFn({ method: "POST" })
       ];
     }
     const subredditBoosts = getSubredditBoostsForQuery(classified);
-    // Clarifier YoE beats project default; map buckets to filter prefs.
-    const expFromClarify = refinement.experience;
-    const exp = expFromClarify ?? ctx?.experience_level ?? "0-1";
+    // Product clarifiers ask signal focus, not YoE — don't force junior filters.
+    const productClarify = classified.type === "product";
+    const expFromClarify = productClarify ? undefined : refinement.experience;
+    const exp = productClarify
+      ? undefined
+      : (expFromClarify ?? ctx?.experience_level ?? "0-1");
     const style = ctx?.work_style ?? "remote";
     const queryWantsSenior =
       /\b(senior|sr\.?|staff|principal|lead|[5-9]\+?\s*(?:years|yrs|yoe)|1[0-9]\+?\s*(?:years|yrs|yoe))\b/i.test(
         data.query,
       );
     const queryWantsOnsite = /\b(on[- ]?site|in[- ]?office|in person|onsite)\b/i.test(data.query);
+    if (refinement.signalTerms?.length) {
+      const focusOr = refinement.signalTerms
+        .slice(0, 5)
+        .map((t) => `"${t}"`)
+        .join(" OR ");
+      expanded.booleanWebQueries = [
+        `(${focusOr}) ("${classified.coreSkill}" OR "${data.query.slice(0, 60)}")`,
+        ...expanded.booleanWebQueries,
+      ];
+      expanded.redditBuyerQueries = [
+        ...refinement.signalTerms.slice(0, 4).map((t) => `${t} ${classified.coreSkill}`),
+        ...expanded.redditBuyerQueries,
+      ];
+    }
     const prefs = {
-      yearsExperience: profile?.years_experience ?? null,
-      preferJunior: (exp === "0-1" || exp === "1-2") && !queryWantsSenior,
+      yearsExperience: productClarify ? null : (profile?.years_experience ?? null),
+      preferJunior: !productClarify && (exp === "0-1" || exp === "1-2") && !queryWantsSenior,
       // Project buckets use "2-4"; clarifier uses "3-4".
-      preferMid: (exp === "2-4" || exp === "3-4") && !queryWantsSenior,
-      preferSenior: exp === "5+" || queryWantsSenior,
+      preferMid: !productClarify && (exp === "2-4" || exp === "3-4") && !queryWantsSenior,
+      preferSenior: !productClarify && (exp === "5+" || queryWantsSenior),
       preferRemote: style === "remote" && !queryWantsOnsite,
       maxAgeHours: refinement.maxAgeHours,
     };
