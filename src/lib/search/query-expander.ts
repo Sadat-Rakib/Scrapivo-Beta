@@ -647,10 +647,18 @@ function expandProductQuery(cq: ClassifiedQuery, negativeSignals: string[]): Exp
       : ["i built", "i made", "i created", "launched my", "my app", "show hn", "product hunt", "built with", "source code"]),
   ];
 
+  // Prefer multi-word capability phrases; never fan out bare lead/services/generation.
+  const safeDemandEarly = demandTerms.filter(
+    (t) => t.length >= 4 && !/^(lead|leads|generation|service|services)$/i.test(t),
+  );
+  const fanTerms = safeDemandEarly.length
+    ? safeDemandEarly
+    : [/\blead\s*gen/i.test(skill) ? "lead generation" : skill].filter(Boolean);
+
   // Customer-hunt: find people EXPRESSING need for the service/product
   const customerPhrases = hunt
     ? [
-        ...demandTerms.flatMap((t) => [
+        ...fanTerms.flatMap((t) => [
           `"looking for" "${t}"`,
           `"need a" "${t}"`,
           `"need an" "${t}"`,
@@ -661,11 +669,11 @@ function expandProductQuery(cq: ClassifiedQuery, negativeSignals: string[]): Exp
           `"struggling with" "${t}"`,
           `"need help with" "${t}"`,
         ]),
-        `"need help with" ${demandTerms[0] || skill}`,
-        `"struggling with" ${demandTerms[0] || skill}`,
-        `"what do you use for" ${demandTerms[0] || skill}`,
-        `"any good" ${demandTerms[0] || skill}`,
-        `"recommendations for" ${demandTerms[0] || skill}`,
+        `"need help with" ${fanTerms[0] || skill}`,
+        `"struggling with" ${fanTerms[0] || skill}`,
+        `"what do you use for" ${fanTerms[0] || skill}`,
+        `"any good" ${fanTerms[0] || skill}`,
+        `"recommendations for" ${fanTerms[0] || skill}`,
       ]
     : [
         `"looking for" "${raw}"`,
@@ -677,57 +685,66 @@ function expandProductQuery(cq: ClassifiedQuery, negativeSignals: string[]): Exp
         `"${raw}" "any good"`,
         `"${raw}" "suggestions"`,
         `"anyone use" "${raw}"`,
-        ...relatedSkills.map((s) => `"looking for" "${s}"`),
-        ...relatedSkills.map((s) => `"best" "${s}"`),
-      ];
-
-  const redditBuyerQueries = hunt
-    ? demandTerms.slice(0, 6).flatMap((t) => [
-        `looking for ${t}`,
-        `need ${t}`,
-        `recommend ${t}`,
-        `best ${t}`,
-        `struggling with ${t}`,
-      ])
-    : [
-        `${raw} recommendation`,
-        `best ${raw}`,
-        `looking for ${raw}`,
-        `need ${raw}`,
-        `${raw} alternative`,
-        ...relatedSkills.slice(0, 2).map((s) => `best ${s}`),
+        ...relatedSkills
+          .filter((s) => !/^(lead|generation|services)$/i.test(s))
+          .map((s) => `"looking for" "${s}"`),
+        ...relatedSkills
+          .filter((s) => !/^(lead|generation|services)$/i.test(s))
+          .map((s) => `"best" "${s}"`),
       ];
 
   const booleanWebQueries = hunt
     ? [
-        `(${demandTerms.slice(0, 5).map((t) => `"${t}"`).join(" OR ")}) ("looking for" OR "need a" OR "recommend" OR "struggling with" OR "best tool" OR alternative)`,
-        `site:reddit.com (${demandTerms.slice(0, 4).map((t) => `"${t}"`).join(" OR ")}) ("looking for" OR "need" OR recommend OR struggling)`,
-        `site:softwarerecs.stackexchange.com (${demandTerms.slice(0, 3).map((t) => `"${t}"`).join(" OR ")})`,
-        `(${demandTerms.slice(0, 3).map((t) => `"${t}"`).join(" OR ")}) site:indiehackers.com`,
+        `(${fanTerms.slice(0, 5).map((t) => `"${t}"`).join(" OR ")}) ("looking for" OR "need a" OR "recommend" OR "struggling with" OR "best tool" OR alternative)`,
+        `site:reddit.com (${fanTerms.slice(0, 4).map((t) => `"${t}"`).join(" OR ")}) ("looking for" OR "need" OR recommend OR struggling)`,
+        `site:softwarerecs.stackexchange.com (${fanTerms.slice(0, 3).map((t) => `"${t}"`).join(" OR ")})`,
+        `(${fanTerms.slice(0, 3).map((t) => `"${t}"`).join(" OR ")}) site:indiehackers.com`,
       ]
     : [
         `site:reddit.com "${raw}" ("recommend" OR "looking for" OR "best" OR "suggestions")`,
         `"${raw}" ("recommendation" OR "alternative" OR "best tool") -"i built" -"launched"`,
       ];
 
-  // Prefer a short searchable noun for marketplaces ("invoicing") over phrases.
+  // Prefer a short searchable noun for marketplaces — never bare ambiguous
+  // tokens like "lead" / "services" / "generation".
   const marketplaceTerm =
-    demandTerms.find((t) => !/\s/.test(t) && t.length >= 4) ||
-    demandTerms[0] ||
+    fanTerms.find((t) => /\s/.test(t) && t.length >= 6) ||
+    fanTerms.find((t) => !/\s/.test(t) && t.length >= 5 && !/^(lead|leads|generation|service|services|client|clients)$/i.test(t)) ||
+    fanTerms.find((t) => /\blead\s*gen/i.test(t)) ||
+    (/\blead\s*gen/i.test(skill) ? "lead generation" : null) ||
+    fanTerms[0] ||
     skill;
+
+  const demandForFanout = fanTerms.length ? fanTerms : [marketplaceTerm].filter(Boolean);
 
   return {
     raw,
-    skill: demandTerms[0] || skill,
+    skill: marketplaceTerm,
     role: marketplaceTerm,
     queryType,
-    relatedSkills: demandTerms.length ? demandTerms : relatedSkills,
+    relatedSkills: demandForFanout.length
+      ? demandForFanout
+      : relatedSkills.filter((r) => !/^(lead|generation|services)$/i.test(r)),
     buyerIntentQueries: customerPhrases.slice(0, 18),
     buyerPhrases: customerPhrases.slice(0, 18),
-    jobBoardQueries: hunt ? demandTerms.slice(0, 8) : [raw, ...relatedSkills.slice(0, 2)],
-    jobBoardTerms: hunt ? demandTerms.slice(0, 8) : [raw, ...relatedSkills.slice(0, 2)],
+    jobBoardQueries: hunt ? demandForFanout.slice(0, 8) : [raw, ...relatedSkills.slice(0, 2)],
+    jobBoardTerms: hunt ? demandForFanout.slice(0, 8) : [raw, ...relatedSkills.slice(0, 2)],
     socialQueries: customerPhrases.slice(0, 10),
-    redditBuyerQueries,
+    redditBuyerQueries: hunt
+      ? demandForFanout.slice(0, 6).flatMap((t) => [
+          `looking for ${t}`,
+          `need ${t}`,
+          `recommend ${t}`,
+          `best ${t}`,
+          `struggling with ${t}`,
+        ])
+      : [
+          `${marketplaceTerm} recommendation`,
+          `best ${marketplaceTerm}`,
+          `looking for ${marketplaceTerm}`,
+          `need ${marketplaceTerm}`,
+          `${marketplaceTerm} alternative`,
+        ],
     booleanWebQueries,
     customerPhrases,
     subreddits: [
@@ -1104,15 +1121,36 @@ const GENERIC_WORDS = new Set([
   "engineers", "dev", "web", "app", "apps", "tech", "software", "data",
   "cloud", "management", "manager", "science", "analyst", "design",
   "help", "admin", "email", "social", "content", "ads", "ai", "server", "api",
+  // Ambiguous splits from multi-word crafts — "lead generation" must NOT
+  // admit "Team Lead" / "AI generation" / "notary services".
+  "lead", "leads", "generation", "service", "services", "client", "clients",
+  "specialist", "specialists", "system", "systems", "solution", "solutions",
 ]);
+
+/** Tokens that are too ambiguous to use alone in product/Freelancer bags. */
+export function isAmbiguousSkillToken(token: string): boolean {
+  const t = (token || "").toLowerCase().trim();
+  return GENERIC_WORDS.has(t) || /^(lead|leads|generation|service|services)$/i.test(t);
+}
 
 export function getSkillSynonyms(skill: string): string[] {
   const s = (skill || "").toLowerCase().trim();
   if (!s) return [];
   const tokens = new Set<string>([s]);
-  // Never add bare generic tokens ("web", "development") — they match everything.
+  // Never add bare generic tokens ("web", "development", "lead") — they match everything.
   for (const w of s.split(/\s+/)) {
     if (w.length > 1 && !GENERIC_WORDS.has(w)) tokens.add(w);
+  }
+  // Prefer phrase forms for lead-gen so "Team Lead" cannot pass.
+  if (/\blead\s*gen(?:eration)?\b/i.test(s) || /\blead\s+generation\b/i.test(s)) {
+    tokens.add("lead generation");
+    tokens.add("lead gen");
+    tokens.add("lead-gen");
+    tokens.delete("lead");
+    tokens.delete("leads");
+    tokens.delete("generation");
+    tokens.delete("services");
+    tokens.delete("service");
   }
   for (const [k, syns] of Object.entries(SKILL_SYNONYMS)) {
     if (s.includes(k)) syns.forEach((x) => {
@@ -1237,7 +1275,7 @@ export function isWeakFamilyTerm(term: string): boolean {
 export const SOCIAL_MAX_AGE_DAYS = 2;
 /** Preferred social window for goal=clients buyer demand. */
 /** Clients social freshness window (days). Rank still boosts under-24h higher. */
-export const CLIENTS_SOCIAL_MAX_AGE_DAYS = 7;
+export const CLIENTS_SOCIAL_MAX_AGE_DAYS = 2;
 export const JOB_BOARD_MAX_AGE_DAYS = 3;
 const MAX_AGE_DAYS = SOCIAL_MAX_AGE_DAYS;
 

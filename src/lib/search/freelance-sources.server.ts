@@ -33,8 +33,22 @@ const FREELANCER_MAX_QUERIES = 6;
 const FREELANCER_MAX_QUERIES_VOLUME = 10;
 const FREELANCER_PAGE_SIZE = 100;
 
+function craftTermsOf(qx: ExpandedQueries): string[] {
+  return [qx.skill, qx.role, ...(qx.relatedSkills ?? [])]
+    .flatMap((t) => (t || "").split(/\s*\/\s*/))
+    .map((t) => t.trim())
+    .filter(
+      (t) =>
+        t.length >= 3 &&
+        !/^(lead|leads|generation|service|services|client|clients)$/i.test(t),
+    );
+}
+
 function isVolumeCraft(qx: ExpandedQueries): boolean {
   const blob = `${qx.skill} ${qx.role} ${qx.queryType} ${(qx.relatedSkills || []).join(" ")}`;
+  // Lead-gen / sales crafts must NOT use product volume mode — that matched
+  // any Freelancer gig whose description mentioned "lead" or "services".
+  if (/\blead\s*gen|sales|sdr|bdr|outbound|appointment\s*sett/i.test(blob)) return false;
   return (
     qx.queryType === "product" ||
     /tutor|tutoring|homework|teacher|invoice|billing|client acquisition|freelance/i.test(blob)
@@ -58,13 +72,6 @@ async function fetchCached(url: string, accept: string): Promise<string> {
   } catch {
     return "";
   }
-}
-
-function craftTermsOf(qx: ExpandedQueries): string[] {
-  return [qx.skill, qx.role, ...(qx.relatedSkills ?? [])]
-    .flatMap((t) => (t || "").split(/\s*\/\s*/))
-    .map((t) => t.trim())
-    .filter((t) => t.length >= 3);
 }
 
 function relativeAge(iso: string): string {
@@ -124,7 +131,12 @@ async function searchFreelancerApi(
     : [craft, qx.skill, ...(qx.relatedSkills ?? [])];
   const queries = [...new Set(preferred)]
     .map((t) => (t || "").trim())
-    .filter((t) => t.length >= 3 && t.length <= 40)
+    .filter(
+      (t) =>
+        t.length >= 3 &&
+        t.length <= 40 &&
+        !/^(lead|leads|generation|service|services|client|clients)$/i.test(t),
+    )
     .slice(0, volume ? FREELANCER_MAX_QUERIES_VOLUME : FREELANCER_MAX_QUERIES);
 
   const bodies = await Promise.all(

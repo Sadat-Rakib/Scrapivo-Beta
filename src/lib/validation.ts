@@ -386,19 +386,29 @@ export function isRelevantToQuery(
   // Clients / buyer demand: core skill, then top related skills (avoid zeroing
   // skill-adjacent buyer posts while still rejecting bare "web"/"development").
   if (classified?.goal === "clients" || classified?.signalMode === "buying_signal") {
-    // Sales craft: require sales-family language — "fullstack engineer" must not
-    // sneak in via soft related skills or generic "hiring".
+    // Sales / lead-gen craft: require phrase-level sales-family language.
+    // Never fall back to isStronglyRelevantToSkill(coreSkill) when coreSkill
+    // is "lead generation…" — that used to admit "Team Lead" / "Lead Guitarist".
     if (isSalesFamilyCraft(coreSkill, relatedSkills)) {
       const salesHit =
-        /\b(sales|selling|salesperson|sales\s*rep|sdr|bdr|closer|outbound|inbound|account\s*executive|\bae\b|business\s*development|lead\s*gen(?:eration)?|pipeline|quota|crm|cold[-\s]?call|appointment\s*setter|revenue)\b/i.test(
+        /\b(sales|selling|salesperson|sales\s*rep|sdr|bdr|closer|outbound|inbound|account\s*executive|\bae\b|business\s*development|lead\s*gen(?:eration)?|lead[- ]gen|lead[- ]sourc(?:e|ing)|appointment\s*sett(?:er|ing)|prospecting|pipeline|quota|crm|cold[-\s]?call|client\s*acquisition|revenue|verified\s+leads?|(?:need|want|buy|buying|looking for|generate|generating)\s+(?:\d+\s+)?(?:qualified\s+)?leads?|lead[- ]focused|meta\s*ads?\s*lead|google\s*ads?\s*lead)\b/i.test(
           text,
-        ) || isStronglyRelevantToSkill(text, coreSkill);
+        );
       if (!salesHit) return false;
+      // Job-title "Lead …" that is NOT lead-gen / sales.
       if (
-        /\b(full[- ]?stack|software engineer|frontend|front[- ]end|backend|back[- ]end|react|next\.?js|vue|angular|devops|machine learning|data scientist|ui\/?ux designer|graphic designer)\b/i.test(
+        /\b(lead\s+(guitar|guitarist|vocalist|singer|man|product|designer|developer|engineer|architect|pastor|pastorate)|team\s+lead|tech(?:nical)?\s+lead|site\s+lead|engineering\s+lead|social\s+media\s+lead)\b/i.test(
           `${lead.title}`,
         ) &&
-        !/\b(sales|sdr|bdr|closer|account executive)\b/i.test(`${lead.title}`)
+        !/\b(lead\s*gen|lead\s*generation|sales|sdr|bdr|outbound|appointment)\b/i.test(text)
+      ) {
+        return false;
+      }
+      if (
+        /\b(full[- ]?stack|software engineer|frontend|front[- ]end|backend|back[- ]end|react|next\.?js|vue|angular|devops|machine learning|data scientist|ui\/?ux designer|graphic designer|guitarist|bassist|drummer|vocalist|band)\b/i.test(
+          `${lead.title}`,
+        ) &&
+        !/\b(sales|sdr|bdr|closer|account executive|lead\s*gen)\b/i.test(`${lead.title}`)
       ) {
         return false;
       }
@@ -406,32 +416,53 @@ export function isRelevantToQuery(
     }
     if (isStronglyRelevantToSkill(text, coreSkill)) return true;
     // Use more related skills — "design" expands to web/UI/graphic/logo/Figma.
-    return relatedSkills.slice(0, 8).some((s) => isStronglyRelevantToSkill(text, s));
+    return relatedSkills.slice(0, 8).some(
+      (s) =>
+        s.length > 3 &&
+        !/^(lead|leads|generation|service|services|client|clients)$/i.test(s) &&
+        isStronglyRelevantToSkill(text, s),
+    );
   }
   if (classified?.type === "product") {
     const terms = [coreSkill, ...relatedSkills].filter(Boolean);
     const lower = text.toLowerCase();
-    if (terms.some((t) => t.length >= 3 && lower.includes(t.toLowerCase()))) return true;
+    // Prefer multi-word / specific phrases — never bare lead/services/generation.
+    const phraseHit = terms.some((t) => {
+      const tl = t.toLowerCase().trim();
+      if (tl.length < 4) return false;
+      if (/^(lead|leads|generation|service|services|client|clients)$/i.test(tl)) return false;
+      if (/\s/.test(tl) || tl.length >= 8) return lower.includes(tl);
+      return new RegExp(`(?<![a-z0-9+#])${tl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![a-z0-9])`).test(
+        lower,
+      );
+    });
+    if (phraseHit) return true;
     const tokens = new Set<string>();
     for (const t of terms) {
       for (const w of t.toLowerCase().split(/\s+/)) {
-        if (w.length < 4 || /^(with|from|that|this|help|need|find|more|manage)$/i.test(w)) continue;
+        if (w.length < 5) continue;
+        if (
+          /^(with|from|that|this|help|need|find|more|manage|lead|leads|generation|service|services|client|clients)$/i.test(
+            w,
+          )
+        ) {
+          continue;
+        }
         tokens.add(w);
         if (w === "invoice") tokens.add("invoicing");
         if (w === "invoicing" || w === "invoices") {
           tokens.add("invoice");
           tokens.add("invoicing");
         }
-        if (w === "clients") tokens.add("client");
-        if (w === "client") tokens.add("clients");
       }
     }
-    if ([...tokens].some((w) => lower.includes(w))) return true;
-    if (
-      lead.source === "stackexchange" ||
-      lead.source === "freelancer"
-    ) {
-      return /invoice|invoicing|billing|client|freelance|crm|saas|accounting|bookkeep/i.test(lower);
+    if ([...tokens].some((w) => new RegExp(`(?<![a-z0-9+#])${w}(?![a-z0-9])`).test(lower))) {
+      return true;
+    }
+    if (lead.source === "stackexchange" || lead.source === "freelancer") {
+      return /invoice|invoicing|billing|client acquisition|freelance|crm|saas|accounting|bookkeep|lead\s*gen/i.test(
+        lower,
+      );
     }
     return false;
   }
@@ -540,6 +571,15 @@ export function isSellerOrProviderLead(
       );
     if (!clearThirdParty) return true;
   }
+  // Product / SaaS pitches about "our lead gen tool" are sellers, not buyers.
+  if (
+    /\b(our|my|introducing|meet|check out)\b.{0,40}\b(lead\s*gen(?:eration)?|social listening|finds buyers)\b/i.test(
+      text,
+    ) ||
+    /\b(lead\s*gen(?:eration)?|social listening)\b.{0,40}\b(tool|platform|software|saas|app)\b/i.test(text)
+  ) {
+    if (!/\b(need|looking for|hiring|willing to pay|who can)\b/i.test(title)) return true;
+  }
   return false;
 }
 
@@ -559,13 +599,23 @@ export function isOffSkillRole(
   // Sales / partner / lead-gen titles: drop for every craft EXCEPT sales.
   if (!salesCraft && SALES_PARTNER_TITLE_RE.test(title)) return true;
 
-  // Sales craft: drop software/design role titles that aren't sales roles.
+  // Sales craft: drop software/design/music role titles that aren't sales roles.
   if (
     salesCraft &&
-    /\b(full[- ]?stack|software engineer|frontend|front[- ]end|backend|back[- ]end|react developer|next\.?js|vue|angular|devops|machine learning|data scientist|ui\/?ux|graphic design(?:er)?|web developer|mobile (dev|developer)|ios engineer|android engineer)\b/i.test(
+    /\b(full[- ]?stack|software engineer|frontend|front[- ]end|backend|back[- ]end|react developer|next\.?js|vue|angular|devops|machine learning|data scientist|ui\/?ux|graphic design(?:er)?|web developer|mobile (dev|developer)|ios engineer|android engineer|guitarist|bassist|drummer|vocalist|keyboard(?:ist)?|rhythm guitar|lead guitar|band seeking|band wants)\b/i.test(
       title,
     ) &&
-    !/\b(sales|sdr|bdr|closer|account executive|ae\b|business development)\b/i.test(title)
+    !/\b(sales|sdr|bdr|closer|account executive|ae\b|business development|lead\s*gen)\b/i.test(title)
+  ) {
+    return true;
+  }
+  // Job-title "Lead …" collisions for lead-gen / sales crafts.
+  if (
+    salesCraft &&
+    /\b(lead\s+(guitar|guitarist|vocalist|singer|man|product|designer|developer|engineer|architect)|team\s+lead|tech(?:nical)?\s+lead|site\s+lead|engineering\s+lead|social\s+media\s+lead)\b/i.test(
+      title,
+    ) &&
+    !/\b(lead\s*gen|lead\s*generation|sales|sdr|bdr|outbound)\b/i.test(body)
   ) {
     return true;
   }

@@ -84,16 +84,21 @@ console.log("\n── Product question construction ─────────�
     /customer/i.test(qs.find((q) => q.id === "buyer_type")?.question ?? ""),
   );
 
-  const svc = classifyQuery("lead generation services");
-  check("service noun uses product path", isProductClarifyPath(svc), svc.type);
+  const svc = classifyQuery("CRM software for freelancers");
+  check("crm software uses product path", isProductClarifyPath(svc), svc.type);
   const svcQs = buildClarifyingQuestions(svc);
-  check("lead-gen services asks signal focus", svcQs.some((q) => q.id === "signal_focus"));
-  check("lead-gen services skips YoE", !svcQs.some((q) => q.id === "experience"));
+  check("crm software asks signal focus", svcQs.some((q) => q.id === "signal_focus"));
+  check("crm software skips YoE", !svcQs.some((q) => q.id === "experience"));
 
   const skill = classifyQuery("sales");
   check("bare skill is NOT product path", !isProductClarifyPath(skill), skill.type);
   const skillQs = buildClarifyingQuestions(skill);
   check("bare skill asks experience", skillQs.some((q) => q.id === "experience"));
+
+  const leadGen = classifyQuery("lead generation services");
+  check("lead generation services is NOT product clarifier", !isProductClarifyPath(leadGen), leadGen.type);
+  const leadGenQs = buildClarifyingQuestions(leadGen);
+  check("lead generation services asks experience (skill path)", leadGenQs.some((q) => q.id === "experience"));
 }
 
 console.log("\n── Applying answers ─────────────────────────────────────");
@@ -129,7 +134,7 @@ console.log("\n── Applying answers ─────────────�
   const corrected = applyClarifyAnswers(c, { other: { craft: "brand identity design" } });
   check("user correction overrides detected craft", corrected.craft === "brand identity design");
 
-  const product = classifyQuery("lead generation services");
+  const product = classifyQuery("I'm selling a SaaS invoicing tool for freelancers");
   const productSkip = applyClarifyAnswers(product);
   check("product skip has no YoE", productSkip.experience === undefined, productSkip);
   check(

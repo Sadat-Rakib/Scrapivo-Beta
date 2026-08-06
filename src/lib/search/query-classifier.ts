@@ -454,6 +454,51 @@ export const CLASSIFIER_ROLE_MAP: Record<string, RoleEntry> = {
     targetCustomerDesc: "SaaS and B2B companies hiring outbound sales",
     subredditBoosts: ["sales", "salesjobs", "SaaS", "forhire"],
   },
+  "lead generation": {
+    roleTitle: "Lead Generation Specialist",
+    relatedSkills: [
+      "lead gen",
+      "outbound",
+      "appointment setting",
+      "SDR",
+      "BDR",
+      "cold calling",
+      "client acquisition",
+      "pipeline",
+      "prospecting",
+    ],
+    targetCustomerDesc: "businesses buying lead generation or outbound services",
+    subredditBoosts: ["sales", "salesjobs", "Entrepreneur", "smallbusiness", "SaaS", "forhire"],
+  },
+  "lead gen": {
+    roleTitle: "Lead Generation Specialist",
+    relatedSkills: [
+      "lead generation",
+      "outbound",
+      "appointment setting",
+      "SDR",
+      "BDR",
+      "cold calling",
+      "client acquisition",
+    ],
+    targetCustomerDesc: "businesses buying lead generation or outbound services",
+    subredditBoosts: ["sales", "salesjobs", "Entrepreneur", "smallbusiness", "SaaS", "forhire"],
+  },
+  "lead generation services": {
+    roleTitle: "Lead Generation Specialist",
+    relatedSkills: [
+      "lead generation",
+      "lead gen",
+      "outbound",
+      "appointment setting",
+      "SDR",
+      "BDR",
+      "client acquisition",
+      "prospecting",
+    ],
+    targetCustomerDesc: "businesses buying lead generation services",
+    subredditBoosts: ["sales", "salesjobs", "Entrepreneur", "smallbusiness", "SaaS", "forhire"],
+  },
   "content writer": {
     roleTitle: "Content Writer",
     relatedSkills: ["blog posts", "articles", "SEO writing", "ghostwriting", "technical writing"],
@@ -1636,10 +1681,19 @@ export function classifyQuery(raw: string): ClassifiedQuery {
   const selfCraft = extractSelfDescribedCraft(trimmed);
   const skillSeed = selfCraft || stripLocationAndEntities(trimmed, location) || lower;
 
+  // Known crafts (e.g. "lead generation services") must win over product-keyword
+  // substring hits — "services".includes("service") used to force type=product
+  // and explode relevance on bare tokens lead/generation/services.
+  const roleMatch = findRoleMatch(skillSeed) ?? findRoleMatch(lower);
   const isProduct =
-    !directory && signalMode === "skill_role" && PRODUCT_KEYWORDS.some((kw) => lower.includes(kw));
+    !directory &&
+    signalMode === "skill_role" &&
+    !roleMatch &&
+    PRODUCT_KEYWORDS.some((kw) => new RegExp(`\\b${kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(lower));
   if (isProduct) {
-    const related = extractProductKeywords(lower);
+    const related = extractProductKeywords(lower).filter(
+      (t) => !/^(lead|leads|generation|service|services|client|clients)$/i.test(t),
+    );
     return withMeta(
       {
         raw: trimmed,
@@ -1657,7 +1711,6 @@ export function classifyQuery(raw: string): ClassifiedQuery {
     );
   }
 
-  const roleMatch = findRoleMatch(skillSeed) ?? findRoleMatch(lower);
   if (roleMatch && signalMode === "skill_role") {
     const { key, entry } = roleMatch;
     const isDept = DEPARTMENT_KEYWORDS.includes(key);

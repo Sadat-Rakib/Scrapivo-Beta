@@ -327,7 +327,11 @@ export const runSearch = createServerFn({ method: "POST" })
     }
     const relatedOk = (text: string) =>
       classified.relatedSkills.some(
-        (s) => s.length > 2 && !isWeakFamilyTerm(s) && isStronglyRelevantToSkill(text, s),
+        (s) =>
+          s.length > 3 &&
+          !isWeakFamilyTerm(s) &&
+          !/^(lead|leads|generation|service|services|client|clients)$/i.test(s) &&
+          isStronglyRelevantToSkill(text, s),
       );
     const skillOkFor = (text: string) => {
       if (directoryMode) return true;
@@ -339,18 +343,22 @@ export const runSearch = createServerFn({ method: "POST" })
         return true;
       }
       const lower = text.toLowerCase();
-      // Product pitches: invoice↔invoicing, client↔clients, etc.
+      // Product pitches: invoice↔invoicing — never bare lead/services/generation.
       if (classified.type === "product") {
         const bag = [classified.coreSkill, ...classified.relatedSkills];
         for (const t of bag) {
-          for (const w of t.toLowerCase().split(/\s+/)) {
-            if (w.length < 4) continue;
-            if (lower.includes(w)) return true;
+          const tl = t.toLowerCase().trim();
+          if (tl.length >= 6 && /\s/.test(tl) && lower.includes(tl)) return true;
+          for (const w of tl.split(/\s+/)) {
+            if (w.length < 5) continue;
+            if (/^(lead|leads|generation|service|services|client|clients|with|from|that|this|help|need|find)$/i.test(w)) {
+              continue;
+            }
+            if (new RegExp(`(?<![a-z0-9+#])${w}(?![a-z0-9])`).test(lower)) return true;
             if (w.startsWith("invoice") && /invoice/.test(lower)) return true;
-            if (w.startsWith("client") && /client/.test(lower)) return true;
           }
         }
-        return /invoice|invoicing|billing|bookkeep|freelance|crm|client acquisition/i.test(lower);
+        return /invoice|invoicing|billing|bookkeep|client acquisition|lead\s*gen|crm\b/i.test(lower);
       }
       if (/tutor|teacher|tutoring/i.test(`${classified.coreSkill} ${classified.raw}`)) {
         return /\b(tutor|tutoring|homework|lessons|instructor)\b/i.test(lower);
@@ -510,6 +518,11 @@ export const runSearch = createServerFn({ method: "POST" })
           ) {
             return false;
           }
+          // Field decision-makers (CTO/founder) — keep for People even undated.
+          const dmRelevant =
+            !!l.is_decision_maker &&
+            skillOk &&
+            /\b(cto|ceo|coo|founder|co-?founder|owner|director|vp\b|head of)\b/i.test(fullText);
           const isSocial =
             l.source === "reddit" ||
             l.source === "twitter" ||
@@ -521,20 +534,16 @@ export const runSearch = createServerFn({ method: "POST" })
             l.source === "mastodon" ||
             l.source === "lemmy" ||
             l.source === "discourse";
-          // Stale dated social (e.g. 2023 IG) — never keep for clients.
+          // Clients: drop dated rows older than the clients window across ALL
+          // sources (news/dealroom/github used to keep 100+ day-old token hits).
           if (
             clientsMode &&
-            isSocial &&
             l.posted_at &&
-            !isRecentDate(l.posted_at, CLIENTS_SOCIAL_MAX_AGE_DAYS)
+            !isRecentDate(l.posted_at, CLIENTS_SOCIAL_MAX_AGE_DAYS) &&
+            !dmRelevant
           ) {
             return false;
           }
-          // Field decision-makers (CTO/founder) — keep for People even undated.
-          const dmRelevant =
-            !!l.is_decision_maker &&
-            skillOk &&
-            /\b(cto|ceo|coo|founder|co-?founder|owner|director|vp\b|head of)\b/i.test(fullText);
           // Hard-drop undated SERP/web/IG/FB. Keep LinkedIn /posts/ with slug
           // only when we still need People fill — but prefer dated.
           const isLiPostWithAuthor =
@@ -566,6 +575,21 @@ export const runSearch = createServerFn({ method: "POST" })
             !l.posted_at &&
             !timeBoxed &&
             (l.source === "instagram" || l.source === "facebook")
+          ) {
+            return false;
+          }
+          // Also drop undated news / dealroom / github / hn for clients —
+          // these were the "Recently (undated)" and megathread junk paths.
+          if (
+            clientsMode &&
+            !l.posted_at &&
+            !timeBoxed &&
+            !dmRelevant &&
+            (l.source === "news" ||
+              l.source === "dealroom" ||
+              l.source === "neuronfeed" ||
+              l.source === "github" ||
+              (l.source === "hn" && /who is hiring|ask hn/i.test(l.title || "")))
           ) {
             return false;
           }
