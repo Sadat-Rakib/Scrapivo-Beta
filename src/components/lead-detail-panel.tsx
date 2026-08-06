@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { X, ExternalLink, Sparkles, Copy, Target, Brain, ShieldCheck, Radar } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { generateOutreach } from "@/lib/outreach.functions";
 import { researchLead, type LeadResearch } from "@/lib/research.functions";
@@ -13,7 +13,16 @@ import {
   verificationLabel,
   type ContactResolutionResult,
 } from "@/lib/contact.functions";
-import { saveLead, updateSavedLead } from "@/lib/leads.functions";
+import {
+  saveLead,
+  updateSavedLead,
+  saveLeadContact,
+  setPipelineStage,
+  listLeadActivity,
+  logLeadActivity,
+  PIPELINE_STAGES,
+  PIPELINE_STAGE_LABELS,
+} from "@/lib/leads.functions";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -23,10 +32,12 @@ export function LeadDetailPanel({
   lead,
   saved,
   onClose,
+  onSavedChange,
 }: {
   lead: Lead;
   saved?: SavedRow | null;
   onClose: () => void;
+  onSavedChange?: (patch: Record<string, unknown>) => void;
 }) {
   const qc = useQueryClient();
   const gen = useServerFn(generateOutreach);
@@ -34,6 +45,10 @@ export function LeadDetailPanel({
   const resolveContact = useServerFn(resolveLeadContact);
   const save = useServerFn(saveLead);
   const update = useServerFn(updateSavedLead);
+  const saveContactFn = useServerFn(saveLeadContact);
+  const setStage = useServerFn(setPipelineStage);
+  const listActivity = useServerFn(listLeadActivity);
+  const logActivity = useServerFn(logLeadActivity);
 
   const [notes, setNotes] = useState<string>(saved?.notes ?? "");
   const [outreach, setOutreach] = useState<{
@@ -54,9 +69,17 @@ export function LeadDetailPanel({
   const [brief, setBrief] = useState<LeadResearch | null>(null);
   const [contact, setContact] = useState<ContactResolutionResult | null>(null);
   const [usedHook, setUsedHook] = useState<string | null>(null);
+  const [stage, setStageLocal] = useState<string>(saved?.status ?? "saved");
+
+  const activityQ = useQuery({
+    queryKey: ["lead-activity", saved?.id],
+    queryFn: () => listActivity({ data: { saved_lead_id: saved!.id, limit: 20 } }),
+    enabled: !!saved?.id,
+  });
 
   useEffect(() => {
     setNotes(saved?.notes ?? "");
+    setStageLocal(saved?.status ?? "saved");
     setOutreach(
       saved && saved.outreach_dm
         ? {
@@ -105,7 +128,16 @@ export function LeadDetailPanel({
           outreach_call: out.call,
         },
       });
+      await logActivity({
+        data: {
+          saved_lead_id: id,
+          lead_url: lead.full_post_url,
+          kind: "outreach_draft",
+          detail: "Outreach drafts generated",
+        },
+      });
       await qc.invalidateQueries({ queryKey: ["saved-leads"] });
+      await qc.invalidateQueries({ queryKey: ["lead-activity", id] });
       return out;
     },
     onSuccess: (out) => {
@@ -161,7 +193,67 @@ export function LeadDetailPanel({
         },
       });
     },
-    onSuccess: (c) => setContact(c),
+    onSuccess: async (c) => {
+      setContact(c);
+      const best = c.discovery?.emails?.[0]?.email || c.contacts?.[0]?.email || null;
+      const phone = c.discovery?.phones?.[0]?.phone || c.harvested_phones?.[0] || null;
+      const company =
+        c.domain?.domain ||
+        (lead.author || lead.title.split(/[@—-]/)[0] || "").trim().slice(0, 80) ||
+        null;
+      try {
+        const id = await ensureSaved();
+        await saveContactFn({
+          data: {
+            id,
+            contact_name: lead.author || undefined,
+            contact_email: best || undefined,
+            contact_phone: phone || undefined,
+            contact_company: company || undefined,
+            contact_meta: {
+              registry_verified: c.registry_verified,
+              verification: c.verification,
+              domain: c.domain,
+            },
+          },
+        });
+        onSavedChange?.({
+          contact_name: lead.author || null,
+          contact_email: best,
+          contact_phone: phone,
+          contact_company: company,
+        });
+        await qc.invalidateQueries({ queryKey: ["saved-leads"] });
+        await qc.invalidateQueries({ queryKey: ["lead-activity", id] });
+        toast.success(best ? `Contact saved · ${best}` : "Contact lookup finished");
+      } catch (e: any) {
+        toast.message("Contact found — save failed (apply CRM migration if columns missing)");
+        console.warn("[crm] persist contact", e);
+      }
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const stageMut = useMutation({
+    mutationFn: async (status: (typeof PIPELINE_STAGES)[number]) => {
+      const id = await ensureSaved();
+      await setStage({
+        data: {
+          id,
+          status,
+          lead_url: lead.full_post_url,
+          lead_title: lead.title,
+        },
+      });
+      return { id, status };
+    },
+    onSuccess: ({ id, status }) => {
+      setStageLocal(status);
+      onSavedChange?.({ status });
+      qc.invalidateQueries({ queryKey: ["saved-leads"] });
+      qc.invalidateQueries({ queryKey: ["lead-activity", id] });
+      toast.success(`Stage: ${PIPELINE_STAGE_LABELS[status]}`);
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -169,7 +261,16 @@ export function LeadDetailPanel({
     if (!notes && !saved?.id) return;
     const id = await ensureSaved();
     await update({ data: { id, notes } });
+    await logActivity({
+      data: {
+        saved_lead_id: id,
+        lead_url: lead.full_post_url,
+        kind: "note",
+        detail: notes.trim() ? "Notes updated" : "Notes cleared",
+      },
+    });
     await qc.invalidateQueries({ queryKey: ["saved-leads"] });
+    await qc.invalidateQueries({ queryKey: ["lead-activity", id] });
     toast.success("Notes saved");
   };
 
@@ -205,6 +306,36 @@ export function LeadDetailPanel({
             Open original <ExternalLink className="size-3" />
           </a>
         </div>
+
+        <div className="space-y-2 rounded-lg border border-border bg-card/40 p-3">
+          <div className="text-xs font-medium">Pipeline stage</div>
+          <div className="flex flex-wrap gap-1.5">
+            {PIPELINE_STAGES.map((s) => (
+              <Button
+                key={s}
+                type="button"
+                size="sm"
+                variant={stage === s ? "default" : "outline"}
+                className="h-7 text-[11px]"
+                disabled={stageMut.isPending}
+                onClick={() => stageMut.mutate(s)}
+              >
+                {PIPELINE_STAGE_LABELS[s]}
+              </Button>
+            ))}
+          </div>
+          {(saved?.contact_email || saved?.contact_name) && (
+            <p className="text-[11px] text-muted-foreground">
+              Saved contact:{" "}
+              <span className="text-foreground">
+                {[saved.contact_name, saved.contact_email, saved.contact_phone]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </span>
+            </p>
+          )}
+        </div>
+
         <p className="text-sm leading-relaxed whitespace-pre-wrap text-muted-foreground">
           {lead.snippet}
         </p>
@@ -530,6 +661,28 @@ export function LeadDetailPanel({
                 </div>
               )}
             </div>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-xs font-medium text-muted-foreground">Activity</label>
+          {!saved?.id ? (
+            <p className="text-[11px] text-muted-foreground">Save this lead to start an activity log.</p>
+          ) : activityQ.isLoading ? (
+            <p className="text-[11px] text-muted-foreground">Loading…</p>
+          ) : !(activityQ.data?.length) ? (
+            <p className="text-[11px] text-muted-foreground">No activity yet.</p>
+          ) : (
+            <ul className="space-y-1.5 max-h-36 overflow-y-auto">
+              {activityQ.data.map((a: any) => (
+                <li key={a.id} className="text-[11px] text-muted-foreground flex gap-2">
+                  <span className="shrink-0 tabular-nums opacity-70">
+                    {a.created_at ? new Date(a.created_at).toLocaleString() : ""}
+                  </span>
+                  <span className="text-foreground/90">{a.detail || a.kind}</span>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
 

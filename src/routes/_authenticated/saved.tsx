@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listSavedLeads, deleteSavedLead } from "@/lib/leads.functions";
@@ -21,7 +21,11 @@ function SavedPage() {
   const [sel, setSel] = useState<any>(null);
   const delMut = useMutation({
     mutationFn: (id: string) => del({ data: { id } }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["saved-leads"] }); setSel(null); toast.success("Deleted"); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["saved-leads"] });
+      setSel(null);
+      toast.success("Deleted");
+    },
   });
 
   return (
@@ -30,7 +34,12 @@ function SavedPage() {
         <div className="border-b border-border p-4 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-semibold tracking-tight">Saved leads</h1>
-            <p className="text-sm text-muted-foreground">{q.data?.length ?? 0} saved</p>
+            <p className="text-sm text-muted-foreground">
+              {q.data?.length ?? 0} saved ·{" "}
+              <Link to="/pipeline" className="underline underline-offset-2 hover:text-foreground">
+                Open pipeline
+              </Link>
+            </p>
           </div>
           {sel && (
             <Button variant="ghost" size="sm" onClick={() => delMut.mutate(sel.id)}>
@@ -39,7 +48,9 @@ function SavedPage() {
           )}
         </div>
         <div className="p-4 overflow-y-auto flex-1">
-          {!q.data?.length && <div className="text-sm text-muted-foreground text-center py-12">No saved leads yet.</div>}
+          {!q.data?.length && (
+            <div className="text-sm text-muted-foreground text-center py-12">No saved leads yet.</div>
+          )}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             {q.data?.map((l: any) => (
               <LeadCard key={l.id} lead={l} saved onOpen={() => setSel(l)} onSave={() => delMut.mutate(l.id)} />
@@ -49,7 +60,12 @@ function SavedPage() {
       </div>
       {sel && (
         <div className="w-[420px] border-l border-border shrink-0 bg-card">
-          <LeadDetailPanel lead={sel} saved={sel} onClose={() => setSel(null)} />
+          <LeadDetailPanel
+            lead={sel}
+            saved={sel}
+            onClose={() => setSel(null)}
+            onSavedChange={(patch) => setSel((prev: any) => (prev ? { ...prev, ...patch } : prev))}
+          />
         </div>
       )}
     </div>

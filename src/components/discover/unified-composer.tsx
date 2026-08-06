@@ -80,7 +80,12 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
               <Sparkles className="size-3" /> Chat
             </button>
           </div>
-          <VoiceInputButton onResult={(t) => onChange(t)} />
+          <VoiceInputButton
+            onResult={(t) => {
+              const next = value.trim() ? `${value.trim()} ${t}` : t;
+              onChange(next.slice(0, maxChars));
+            }}
+          />
         </div>
         <span className="font-mono">
           {value.length} / {maxChars.toLocaleString()}

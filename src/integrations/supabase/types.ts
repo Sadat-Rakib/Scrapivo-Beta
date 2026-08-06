@@ -180,6 +180,11 @@ export type Database = {
         Row: {
           author: string | null
           author_url: string | null
+          contact_company: string | null
+          contact_email: string | null
+          contact_meta: Json | null
+          contact_name: string | null
+          contact_phone: string | null
           created_at: string
           engagement: number
           full_post_url: string
@@ -204,6 +209,11 @@ export type Database = {
         Insert: {
           author?: string | null
           author_url?: string | null
+          contact_company?: string | null
+          contact_email?: string | null
+          contact_meta?: Json | null
+          contact_name?: string | null
+          contact_phone?: string | null
           created_at?: string
           engagement?: number
           full_post_url: string
@@ -228,6 +238,11 @@ export type Database = {
         Update: {
           author?: string | null
           author_url?: string | null
+          contact_company?: string | null
+          contact_email?: string | null
+          contact_meta?: Json | null
+          contact_name?: string | null
+          contact_phone?: string | null
           created_at?: string
           engagement?: number
           full_post_url?: string
@@ -247,6 +262,39 @@ export type Database = {
           tier?: string | null
           title?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      lead_activity: {
+        Row: {
+          created_at: string
+          detail: string | null
+          id: string
+          kind: string
+          lead_url: string | null
+          metadata: Json | null
+          saved_lead_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          detail?: string | null
+          id?: string
+          kind: string
+          lead_url?: string | null
+          metadata?: Json | null
+          saved_lead_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          detail?: string | null
+          id?: string
+          kind?: string
+          lead_url?: string | null
+          metadata?: Json | null
+          saved_lead_id?: string | null
           user_id?: string
         }
         Relationships: []

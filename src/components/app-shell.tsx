@@ -13,6 +13,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Bell,
+  Columns3,
 } from "lucide-react";
 import { mySupabase } from "@/integrations/my-supabase/client";
 import { getRemainingSearches } from "@/lib/search.functions";
@@ -23,6 +24,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 const nav = [
   { to: "/discover", label: "Discover", icon: Search },
   { to: "/watches", label: "Watches", icon: Bell },
+  { to: "/pipeline", label: "Pipeline", icon: Columns3 },
   { to: "/saved", label: "Saved", icon: Bookmark },
   { to: "/history", label: "History", icon: History },
 ] as const;
