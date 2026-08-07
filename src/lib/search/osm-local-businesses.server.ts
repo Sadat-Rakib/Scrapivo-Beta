@@ -1,12 +1,10 @@
 /**
- * OpenStreetMap / Overpass local-business discovery (Mainstreet-style).
- * No API key. ODbL — attribute OpenStreetMap contributors in UI.
- *
- * Finds amenity/shop/office nodes with names in a place bbox, preferring
- * listings that publish a website (email harvest target) or phone.
+ * OpenStreetMap / Overpass local-business discovery.
+ * Finds amenity/shop/office/craft nodes with names in a place bbox.
  */
 import type { Lead } from "../scoring";
 import type { ExpandedQueries } from "./query-expander";
+import { disambiguatePlaceQuery, isRealBusinessWebsite } from "./place-disambiguate.server";
 
 export type SourceLead = Lead & { intentBoost?: number };
 
@@ -19,8 +17,12 @@ const OVERPASS_MIRRORS = [
 function craftTags(skill: string): string[] {
   const s = (skill || "").toLowerCase();
   if (/dentist|dental|ortho/.test(s)) return ['"amenity"="dentist"', '"healthcare"="dentist"'];
-  if (/roof|plumb|hvac|electric/.test(s)) return ['"craft"~"roofer|plumber|electrician"', '"shop"="trade"'];
-  if (/law|attorney|legal/.test(s)) return ['"office"="lawyer"', '"amenity"="courthouse"'];
+  // Exact crafts only — never broad shop=trade (pulls unrelated stores).
+  if (/\bplumb/.test(s)) return ['"craft"="plumber"'];
+  if (/\broof/.test(s)) return ['"craft"="roofer"'];
+  if (/\belectric/.test(s)) return ['"craft"="electrician"'];
+  if (/\bhvac|heating|cooling/.test(s)) return ['"craft"="hvac"', '"craft"="plumber"'];
+  if (/law|attorney|legal/.test(s)) return ['"office"="lawyer"'];
   if (/gym|fitness|yoga/.test(s)) return ['"leisure"="fitness_centre"', '"sport"="fitness"'];
   if (/cafe|coffee|restaurant|food/.test(s)) return ['"amenity"="cafe"', '"amenity"="restaurant"'];
   if (/market|agency|seo|design|lead|sales/.test(s)) {
@@ -30,18 +32,52 @@ function craftTags(skill: string): string[] {
   return ['"office"', '"shop"', '"amenity"="business"'];
 }
 
-async function geocodeNominatim(place: string): Promise<{ south: number; west: number; north: number; east: number } | null> {
+async function geocodeNominatim(
+  place: string,
+): Promise<{ south: number; west: number; north: number; east: number } | null> {
   try {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(place)}`;
+    const q = disambiguatePlaceQuery(place);
+    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=5&addressdetails=1&q=${encodeURIComponent(q)}`;
     const res = await fetch(url, {
-      headers: { "User-Agent": "Scrapivo/1.0 (local-business discovery; contact: support@scrapivo.app)" },
+      headers: {
+        "User-Agent": "Scrapivo/1.0 (local-business discovery; contact: support@scrapivo.app)",
+      },
       signal: AbortSignal.timeout(12_000),
     });
     if (!res.ok) return null;
-    const data = (await res.json()) as Array<{ boundingbox?: string[] }>;
-    const bb = data[0]?.boundingbox;
+    const data = (await res.json()) as Array<{
+      boundingbox?: string[];
+      type?: string;
+      class?: string;
+      importance?: number;
+      address?: { country_code?: string; city?: string };
+      display_name?: string;
+    }>;
+    if (!data?.length) return null;
+
+    const score = (r: (typeof data)[0]): number => {
+      let s = (r.importance ?? 0) * 100;
+      const t = `${r.type || ""} ${r.class || ""}`.toLowerCase();
+      if (/city|town|municipality|administrative/.test(t)) s += 40;
+      if (/village|hamlet/.test(t)) s -= 30;
+      const cc = (r.address?.country_code || "").toLowerCase();
+      if (/, canada$/i.test(q) && cc === "ca") s += 50;
+      if (/, uk$/i.test(q) && cc === "gb") s += 50;
+      if (/usa$/i.test(q) && cc === "us") s += 50;
+      // Bare "Toronto" must not win as Toronto IA
+      if (
+        /toronto/i.test(place) &&
+        !/canada|ontario/i.test(place) &&
+        cc === "us"
+      ) {
+        s -= 100;
+      }
+      return s;
+    };
+
+    const best = [...data].sort((a, b) => score(b) - score(a))[0];
+    const bb = best?.boundingbox;
     if (!bb || bb.length < 4) return null;
-    // Nominatim: [south, north, west, east]
     const south = Number(bb[0]);
     const north = Number(bb[1]);
     const west = Number(bb[2]);
@@ -74,7 +110,6 @@ async function overpass(query: string): Promise<any[]> {
 
 /**
  * Discover local businesses near `place` matching the craft.
- * Returns company-shaped leads (source: osm) for the Local tab + Companies.
  */
 export async function searchOsmLocalBusinesses(
   qx: ExpandedQueries,
@@ -88,14 +123,35 @@ export async function searchOsmLocalBusinesses(
   if (!bbox) return [];
 
   const tags = craftTags(skill);
-  const tagFilter = tags.map((t) => `node[${t}](${bbox.south},${bbox.west},${bbox.north},${bbox.east});`).join("\n  ");
+  // Include ways (many shops are mapped as ways) + nodes. No office union.
+  const tagFilter = tags
+    .flatMap((t) => [
+      `node[${t}](${bbox.south},${bbox.west},${bbox.north},${bbox.east});`,
+      `way[${t}](${bbox.south},${bbox.west},${bbox.north},${bbox.east});`,
+    ])
+    .join("\n  ");
+  // Name fallback for sparse craft tags (e.g. plumbers tagged only by name).
+  const nameNeedle = /\bplumb/.test(skill)
+    ? "plumb"
+    : /\broof/.test(skill)
+      ? "roof"
+      : /\belectric/.test(skill)
+        ? "electric"
+        : "";
+  const nameFallback = nameNeedle
+    ? `node["name"~"${nameNeedle}",i]["craft"](${bbox.south},${bbox.west},${bbox.north},${bbox.east});
+  node["name"~"${nameNeedle}",i]["shop"](${bbox.south},${bbox.west},${bbox.north},${bbox.east});
+  node["name"~"${nameNeedle}",i]["office"](${bbox.south},${bbox.west},${bbox.north},${bbox.east});
+  way["name"~"${nameNeedle}",i]["craft"](${bbox.south},${bbox.west},${bbox.north},${bbox.east});
+  way["name"~"${nameNeedle}",i]["shop"](${bbox.south},${bbox.west},${bbox.north},${bbox.east});`
+    : "";
   const query = `
 [out:json][timeout:40];
 (
   ${tagFilter}
-  node["name"]["office"](${bbox.south},${bbox.west},${bbox.north},${bbox.east});
+  ${nameFallback}
 );
-out body 80;
+out center 80;
 `;
 
   const elements = await overpass(query);
@@ -110,41 +166,38 @@ out body 80;
     if (seen.has(key)) continue;
     seen.add(key);
 
-    const website = (tagsMap.website || tagsMap["contact:website"] || "").trim();
+    const websiteRaw = (tagsMap.website || tagsMap["contact:website"] || "").trim();
+    const website = isRealBusinessWebsite(
+      websiteRaw
+        ? websiteRaw.startsWith("http")
+          ? websiteRaw
+          : `https://${websiteRaw}`
+        : "",
+    )
+      ? websiteRaw.startsWith("http")
+        ? websiteRaw
+        : `https://${websiteRaw}`
+      : undefined;
     const phone = (tagsMap.phone || tagsMap["contact:phone"] || "").trim();
     const email = (tagsMap.email || tagsMap["contact:email"] || "").trim();
-    const lat = el.lat;
-    const lon = el.lon;
-    const osmUrl =
-      lat != null && lon != null
-        ? `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=18/${lat}/${lon}`
-        : `https://www.openstreetmap.org/node/${el.id}`;
-
     const category =
-      tagsMap.office || tagsMap.amenity || tagsMap.shop || tagsMap.craft || tagsMap.leisure || "business";
-    const snippetParts = [
-      `${category} in ${loc}`,
-      phone ? `Phone: ${phone}` : null,
-      website ? `Website: ${website}` : null,
-      email ? `Email: ${email}` : null,
-    ].filter(Boolean);
+      tagsMap.craft || tagsMap.office || tagsMap.amenity || tagsMap.shop || tagsMap.leisure || skill;
+    const lat = el.lat ?? el.center?.lat;
+    const lon = el.lon ?? el.center?.lon;
 
     out.push({
       source: "osm",
-      platform: "OpenStreetMap",
-      platform_label: "Local business (OSM)",
+      platform: "Local business",
+      platform_label: "Local business",
       title: name,
-      snippet: snippetParts.join(" · "),
-      full_post_url: website || osmUrl,
+      snippet: [loc, phone ? `Phone: ${phone}` : null].filter(Boolean).join(" · "),
+      full_post_url: website,
       author: name,
       company: name,
       company_domain: website
         ? (() => {
             try {
-              return new URL(website.startsWith("http") ? website : `https://${website}`).hostname.replace(
-                /^www\./,
-                "",
-              );
+              return new URL(website).hostname.replace(/^www\./, "");
             } catch {
               return undefined;
             }
@@ -154,10 +207,8 @@ out body 80;
       source_confidence: website ? 70 : 55,
       intentBoost: website ? 16 : 10,
       demand_verified: true,
-      match_reasons: ["Local business on OpenStreetMap", `${category} near ${loc}`],
-      why_match: website
-        ? `Local ${category} with a website — good email harvest target`
-        : `Local ${category} in ${loc} (OSM)`,
+      match_reasons: [`${category} near ${loc}`],
+      why_match: `${name} — ${category} in ${loc}`,
       emails: email ? [email] : undefined,
       phones: phone ? [phone] : undefined,
     } as SourceLead);

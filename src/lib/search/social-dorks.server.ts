@@ -150,7 +150,13 @@ function ingestPlatformLeads(
 
     const verdict = classifyDemand({ title, body: snippet });
     if (verdict.rejectedAs) continue;
-    if (!verdict.isDemand) continue;
+    // Week-window SERP snippets often fail strict DEMAND_RULES — keep hire grammar.
+    const hireGrammar =
+      /\b(looking (for|to hire)|need (a|an|someone)|who can|willing to pay|hiring|freelancer needed|help wanted|\[hiring\])\b/i.test(
+        `${title} ${snippet}`,
+      );
+    const weekOk = opts?.freshness_window === "week" && hireGrammar;
+    if (!verdict.isDemand && !weekOk) continue;
 
     seen.add(url);
     const postedAt =
@@ -174,9 +180,9 @@ function ingestPlatformLeads(
       demand_verified: true,
       freshness_window: opts?.freshness_window,
       engagement: 10,
-      intentBoost: verdict.boost || 16,
-      match_reasons: [verdict.reason, `${spec.label} public post`],
-      why_match: `${verdict.reason} — public ${spec.label} post`,
+      intentBoost: verdict.boost || (weekOk ? 14 : 16),
+      match_reasons: [verdict.reason || "Hire ask", `${spec.label} public post`],
+      why_match: `${verdict.reason || "Hire ask"} — public ${spec.label} post`,
     } as SourceLead);
   }
 }
@@ -228,6 +234,15 @@ async function searchSocialDorksViaSerp(
   // second pass only when week already returned something thin.
   await Promise.all(core.map((spec) => runDork(spec, spec.dorks(craft)[0], "week")));
 
+  // Always run Instagram + a second FB dork so platforms aren't starved when
+  // LI/X return junk that later filters out.
+  const ig = priority.find((p) => p.key === "instagram");
+  const fb = priority.find((p) => p.key === "facebook");
+  await Promise.all([
+    ig ? runDork(ig, ig.dorks(craft)[0], "week") : Promise.resolve(),
+    fb && fb.dorks(craft)[1] ? runDork(fb, fb.dorks(craft)[1], "week") : Promise.resolve(),
+  ]);
+
   if (existing.length + out.length < 12) {
     await Promise.all(
       core.map((spec) => {
@@ -239,11 +254,6 @@ async function searchSocialDorksViaSerp(
 
   if (existing.length + out.length < 8) {
     await Promise.all(core.map((spec) => runDork(spec, spec.dorks(craft)[0], "day")));
-  }
-
-  if (existing.length + out.length < 6) {
-    const ig = priority.find((p) => p.key === "instagram");
-    if (ig) await runDork(ig, ig.dorks(craft)[0], "week");
   }
 
   if (out.length) {

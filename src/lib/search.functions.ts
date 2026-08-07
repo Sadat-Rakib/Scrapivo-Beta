@@ -579,24 +579,34 @@ export const runSearch = createServerFn({ method: "POST" })
               BODY_HIRE_RE.test(text) ||
               isHirePolarityLookingFor(title, craftHireTerms) ||
               isHirePolarityLookingFor(text, craftHireTerms));
+          // Serper rarely returns dates — week-boxed + demand_verified social is the normal case.
+          const weekSocialOk =
+            l.demand_verified === true &&
+            l.freshness_window === "week" &&
+            (l.source === "linkedin" ||
+              l.source === "twitter" ||
+              l.source === "facebook" ||
+              l.source === "instagram" ||
+              l.source === "serpapi");
           if (
             clientsMode &&
             !l.posted_at &&
             !timeBoxed &&
             !weekHireOk &&
+            !weekSocialOk &&
             UNDATED_DROP_SOURCES.has(l.source) &&
             !(isLiPostWithAuthor && (BODY_HIRE_RE.test(text) || isSalesTalentHireAsk(text) || TITLE_HIRE_RE.test(title))) &&
             !dmRelevant
           ) {
             return false;
           }
-          // Instagram/Facebook: keep demand_verified / week-hire; undated
-          // without any demand signal still drops.
+          // Instagram/Facebook: keep demand_verified week-window social.
           if (
             clientsMode &&
             !l.posted_at &&
             !timeBoxed &&
             !weekHireOk &&
+            !weekSocialOk &&
             !(l.demand_verified === true && (TITLE_HIRE_RE.test(title) || BODY_HIRE_RE.test(text))) &&
             (l.source === "instagram" || l.source === "facebook")
           ) {

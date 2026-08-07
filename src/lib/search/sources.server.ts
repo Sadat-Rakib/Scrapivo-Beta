@@ -1578,7 +1578,6 @@ export async function searchSerpAPI(qx: ExpandedQueries): Promise<SourceLead[]> 
     coreQueries.map((q) => searchGoogleSerp(q, { tbs: "qdr:d", num: 20 })),
   );
   const emptyIdx: number[] = [];
-  let socialHits = 0;
   dayBatches.forEach((batch, i) => {
     if (batch.status !== "fulfilled" || !batch.value) {
       emptyIdx.push(i);
@@ -1587,15 +1586,16 @@ export async function searchSerpAPI(qx: ExpandedQueries): Promise<SourceLead[]> 
     const hits = batch.value.organic_results?.length ?? 0;
     if (hits === 0) emptyIdx.push(i);
     else {
-      const added = ingest(batch.value, "day");
-      if (i < 3) socialHits += added;
+      ingest(batch.value, "day");
     }
   });
 
-  // Conditional Instagram — only when LinkedIn/X/FB day yield is thin.
-  if (socialHits < 3) {
+  // Always run Instagram — don't wait for LI/X/FB day yield to be thin.
+  {
     const ig = await searchGoogleSerp(igQuery, { tbs: "qdr:d", num: 15 });
     ingest(ig, "day");
+    const igWeek = await searchGoogleSerp(igQuery, { tbs: "qdr:w", num: 15 });
+    ingest(igWeek, "week");
   }
 
   // Extra public/ask surface when overall day yield is still thin.

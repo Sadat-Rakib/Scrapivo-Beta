@@ -3,7 +3,6 @@ import type { ExpandedQueries } from "./query-expander";
 import type { Lead } from "../scoring";
 import {
   agencyRelevanceRank,
-  categoriesForQuery,
   extractLocationHint,
   geocodePlace,
   majorCitiesForCountry,
@@ -22,10 +21,12 @@ function queryText(qx: ExpandedQueries): string {
     }
     return `${qx.skill || "marketing"} agency`;
   }
-  const cats = categoriesForQuery(qx);
-  if (/office|service|commercial/.test(cats.join(","))) {
-    return qx.role || qx.skill || "marketing agency";
-  }
+  // Trades: search the craft noun, not "office/service"
+  if (/\bplumb/.test(blob)) return "plumber";
+  if (/\broof/.test(blob)) return "roofer";
+  if (/\belectric/.test(blob)) return "electrician";
+  if (/\bhvac|heating/.test(blob)) return "hvac";
+  if (/\bdentist|dental/.test(blob)) return "dentist";
   return qx.skill || qx.role || "business";
 }
 
@@ -178,40 +179,42 @@ function mapResults(
     const cats = (r.categories || []).map((c: any) => c.name || c.short_name).filter(Boolean);
     const rank = preferAgency ? agencyRelevanceRank(name, cats) : 1;
     if (preferAgency && rank < 0) continue;
-    if (preferAgency && rank < 20) continue; // need marketing/digital signal, not bare “agency”
+    if (preferAgency && rank < 20) continue;
 
-    const website = r.website || r.link || undefined;
+    // Real website only — never Foursquare venue pages.
+    const websiteRaw = r.website || undefined;
+    const website =
+      websiteRaw &&
+      /^https?:\/\//i.test(websiteRaw) &&
+      !/foursquare\.com/i.test(websiteRaw)
+        ? websiteRaw
+        : undefined;
     const loc = r.location || {};
-    const address = loc.formatted_address || [loc.address, loc.locality, loc.region].filter(Boolean).join(", ");
+    const address =
+      loc.formatted_address || [loc.address, loc.locality, loc.region].filter(Boolean).join(", ");
     const locality = loc.locality || loc.region || city;
-    const fsqId = r.fsq_place_id || r.fsq_id || r.id;
-    const urlOut = website || (fsqId ? `https://foursquare.com/v/${fsqId}` : `https://foursquare.com/explore?q=${encodeURIComponent(name)}`);
+    const phone = r.tel || r.phone || undefined;
     const agencyHit = rank > 0;
 
     out.push({
       source: "foursquare",
-      platform: "Local business (Foursquare)",
+      platform: "Local business",
       title: `${name}${locality ? ` — ${locality}` : ""}`,
-      snippet: [
-        `Local business: ${name}`,
-        `Location: ${city}`,
-        address ? `Address: ${address}` : "",
-        website ? `Website: ${website}` : "",
-        cats.slice(0, 4).join(", "),
-      ].filter(Boolean).join("\n"),
-      full_post_url: urlOut,
+      snippet: [address || locality || city, phone ? `Phone: ${phone}` : ""]
+        .filter(Boolean)
+        .join(" · "),
+      full_post_url: website,
       author: name,
+      company: name,
+      phones: phone ? [phone] : undefined,
       posted_at: undefined,
       engagement: agencyHit ? 50 : 30,
       is_decision_maker: true,
       intentBoost: directoryMode ? (agencyHit ? 24 : 14) : 8,
       signal_type: "direct_intent",
-      match_reasons: [
-        `Directory match in ${locality || city}`,
-        "Foursquare Places",
-        ...(agencyHit ? ["Agency/marketing name signal"] : []),
-      ],
-    });
+      why_match: address || `${name} in ${locality || city}`,
+      match_reasons: [`Match in ${locality || city}`, ...(agencyHit ? ["Agency signal"] : [])],
+    } as SourceLead);
   }
   return out;
 }

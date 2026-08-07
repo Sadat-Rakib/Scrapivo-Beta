@@ -7,6 +7,11 @@ import { z } from "zod";
 import { requireMyAuth } from "@/integrations/my-supabase/auth-middleware";
 import type { LocalBusinessRow } from "@/lib/search/lead-segments";
 import type { ExpandedQueries } from "@/lib/search/query-expander";
+import {
+  isJunkLocalListing,
+  isRealBusinessWebsite,
+  matchesLocalCraft,
+} from "@/lib/search/place-disambiguate.server";
 
 function toQx(category: string, location: string): ExpandedQueries {
   return {
@@ -29,6 +34,21 @@ function toQx(category: string, location: string): ExpandedQueries {
   };
 }
 
+function cleanDescription(raw: string, name: string, category: string, location: string): string {
+  const cleaned = (raw || "")
+    .replace(/\b(OpenStreetMap|OSM|Geoapify|Foursquare|Overpass|Jurisdiction hint:?\s*\S+)\b/gi, "")
+    .replace(/\b(service|building|office|amenity|craft):[a-z0-9_.-]+/gi, "")
+    .replace(/\bLocal business:\s*/gi, "")
+    .replace(/\b(City|Location|Address|Website|Phone|Email):\s*/gi, "")
+    .replace(/\s{2,}/g, " ")
+    .replace(/\n+/g, " · ")
+    .trim();
+  if (cleaned && cleaned.length > 8 && cleaned.toLowerCase() !== name.toLowerCase()) {
+    return cleaned.slice(0, 220);
+  }
+  return `${name} — ${category} in ${location}`;
+}
+
 function leadToRow(
   l: {
     source: string;
@@ -46,12 +66,14 @@ function leadToRow(
     phones?: string[];
   },
   category: string,
-): LocalBusinessRow {
-  const name = (l.company || l.author || l.title || "").trim();
-  const website =
-    l.full_post_url?.startsWith("http") && !/openstreetmap\.org/i.test(l.full_post_url)
-      ? l.full_post_url
-      : undefined;
+  location: string,
+): LocalBusinessRow | null {
+  const name = (l.company || l.author || (l.title || "").split(" — ")[0] || "").trim();
+  if (!name || name.length < 2) return null;
+  if (isJunkLocalListing(name, category)) return null;
+  if (!matchesLocalCraft(name, category)) return null;
+
+  const website = isRealBusinessWebsite(l.full_post_url) ? l.full_post_url : undefined;
   let domain = l.company_domain;
   if (!domain && website) {
     try {
@@ -60,11 +82,7 @@ function leadToRow(
       /* ignore */
     }
   }
-  // Prefer user-facing category over platform labels like "Local business (Foursquare)".
-  const cleanDesc = (l.snippet || "")
-    .replace(/\b(OpenStreetMap|OSM|Geoapify|Foursquare|Overpass)\b/gi, "")
-    .replace(/\s{2,}/g, " ")
-    .trim();
+
   return {
     key: name.toLowerCase(),
     name,
@@ -73,9 +91,14 @@ function leadToRow(
     email: l.emails?.[0],
     website,
     domain,
-    description: cleanDesc || `${name} — ${category} in local listings`,
+    description: cleanDescription(
+      l.why_match || l.snippet || "",
+      name,
+      category,
+      location,
+    ),
     source: l.source,
-    sample_url: l.full_post_url || website || "",
+    sample_url: website || "",
     score: l.score ?? 50,
   };
 }
@@ -126,18 +149,23 @@ export const runLocalBusinessSearch = createServerFn({ method: "POST" })
 
     const byKey = new Map<string, LocalBusinessRow>();
     for (const l of [...osm, ...places]) {
-      const row = leadToRow(l as Parameters<typeof leadToRow>[0], category);
-      if (!row.name || row.name.length < 2) continue;
+      const row = leadToRow(l as Parameters<typeof leadToRow>[0], category, location);
+      if (!row) continue;
       const prev = byKey.get(row.key);
       if (!prev || row.score > prev.score) byKey.set(row.key, row);
     }
 
-    let businesses = [...byKey.values()].sort((a, b) => b.score - a.score).slice(0, 80);
+    let businesses = [...byKey.values()].sort((a, b) => {
+      const aw = a.website ? 1 : 0;
+      const bw = b.website ? 1 : 0;
+      return bw - aw || b.score - a.score;
+    }).slice(0, 80);
 
     if (data.enrichEmails !== false) {
       const { extractEmailsWithCheerio } = await import("./contact/cheerio-email.server");
       const { verifyEmailDeep } = await import("./contact/verify-contact.server");
-      const targets = businesses.filter((b) => b.website).slice(0, 20);
+      // Deep-harvest top 5 with real websites first.
+      const targets = businesses.filter((b) => b.website && isRealBusinessWebsite(b.website)).slice(0, 5);
       await Promise.race([
         Promise.allSettled(
           targets.map(async (b) => {
@@ -152,7 +180,6 @@ export const runLocalBusinessSearch = createServerFn({ method: "POST" })
               if (b.email) {
                 const v = await verifyEmailDeep(b.email);
                 b.email_verified = v.tier === "verified";
-                // Do not surface verifier labels in the UI.
                 delete b.verify_note;
               }
             } catch {
@@ -160,9 +187,8 @@ export const runLocalBusinessSearch = createServerFn({ method: "POST" })
             }
           }),
         ),
-        new Promise((r) => setTimeout(r, 45_000)),
+        new Promise((r) => setTimeout(r, 50_000)),
       ]);
-      // Prefer rows with emails first for the UI.
       businesses = [...businesses].sort((a, b) => {
         const ae = a.email ? (a.email_verified ? 2 : 1) : 0;
         const be = b.email ? (b.email_verified ? 2 : 1) : 0;

@@ -113,23 +113,43 @@ function phonesFromHtml(html: string): string[] {
     .slice(0, 5);
 }
 
+async function fetchHtmlViaScrapingBee(url: string): Promise<string> {
+  const key = (process.env.SCRAPINGBEE_API_KEY || "").trim();
+  if (!key) return "";
+  try {
+    const api =
+      `https://app.scrapingbee.com/api/v1/?api_key=${encodeURIComponent(key)}` +
+      `&url=${encodeURIComponent(url)}&render_js=false&premium_proxy=false`;
+    const res = await fetch(api, { signal: AbortSignal.timeout(20_000) });
+    if (!res.ok) return "";
+    return (await res.text()).slice(0, 400_000);
+  } catch {
+    return "";
+  }
+}
+
 async function fetchHtml(url: string): Promise<string> {
   try {
     const res = await fetch(url, {
       headers: {
-        "User-Agent": "Scrapivo/1.0 (local-business contact discovery; +https://scrapivo-beta.vercel.app)",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         Accept: "text/html,application/xhtml+xml",
       },
       redirect: "follow",
       signal: AbortSignal.timeout(12_000),
     });
-    if (!res.ok) return "";
-    const ct = res.headers.get("content-type") || "";
-    if (!/html|xml/i.test(ct) && ct) return "";
-    return (await res.text()).slice(0, 400_000);
+    if (res.ok) {
+      const ct = res.headers.get("content-type") || "";
+      if (!ct || /html|xml/i.test(ct)) {
+        const html = (await res.text()).slice(0, 400_000);
+        if (html.length > 200) return html;
+      }
+    }
   } catch {
-    return "";
+    /* fall through to ScrapingBee */
   }
+  return fetchHtmlViaScrapingBee(url);
 }
 
 function contactPaths(base: string): string[] {

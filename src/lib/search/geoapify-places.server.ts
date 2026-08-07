@@ -49,7 +49,7 @@ export function majorCitiesForCountry(location: string): string[] {
 export function categoriesForQuery(qx: ExpandedQueries): string[] {
   const blob = `${qx.skill} ${qx.role} ${qx.raw ?? ""}`.toLowerCase();
   if (/restaurant|cafe|food|catering|bakery/.test(blob)) return ["catering.restaurant", "catering.cafe"];
-  if (/salon|spa|beauty|barber/.test(blob)) return ["service.beauty", "service.hairdresser"];
+  if (/salon|spa|beauty|barber|med.?spa/.test(blob)) return ["service.beauty", "service.hairdresser"];
   if (/dentist|doctor|clinic|health|medical/.test(blob)) return ["healthcare"];
   if (/lawyer|legal|attorney/.test(blob)) return ["office.lawyer", "office"];
   if (/accountant|bookkeep|cpa/.test(blob)) return ["office.accountant", "office"];
@@ -57,10 +57,31 @@ export function categoriesForQuery(qx: ExpandedQueries): string[] {
   if (/gym|fitness|yoga/.test(blob)) return ["sport.fitness", "sport"];
   if (/hotel|lodging|airbnb/.test(blob)) return ["accommodation"];
   if (/retail|shop|store/.test(blob)) return ["commercial"];
+  // Trades — never fall through to bare office/service/commercial (post/fire/banks).
+  if (/\bplumb/.test(blob)) return ["service.plumbing", "craft.plumber", "service"];
+  if (/\broof/.test(blob)) return ["craft.roofer", "service"];
+  if (/\belectric/.test(blob)) return ["craft.electrician", "service"];
+  if (/\bhvac|heating|cooling|furnace/.test(blob)) return ["craft.hvac", "service"];
+  if (/\b(contractor|handyman|remodel)/.test(blob)) return ["craft", "service"];
   if (/market|seo|advertis|agency|design|consult|brand|content|social media/.test(blob)) {
     return ["office", "service", "commercial"];
   }
   return ["office", "service", "commercial"];
+}
+
+/** Name filter for Places API when searching a specific trade/category. */
+export function nameFilterForQuery(qx: ExpandedQueries): string | undefined {
+  const blob = `${qx.skill} ${qx.role}`.toLowerCase().trim();
+  if (/\bplumb/.test(blob)) return "plumber";
+  if (/\broof/.test(blob)) return "roofer";
+  if (/\belectric/.test(blob)) return "electrician";
+  if (/\bhvac|heating/.test(blob)) return "hvac";
+  if (/\bdentist|dental/.test(blob)) return "dentist";
+  if (/\blaw|attorney/.test(blob)) return "lawyer";
+  if (/\bgym|fitness/.test(blob)) return "gym";
+  if (/\bmed.?spa|spa\b/.test(blob)) return "spa";
+  if (/salon|barber/.test(blob)) return "salon";
+  return undefined;
 }
 
 /** @deprecated Use extractLocationFromQuery from query-classifier (case-insensitive). */
@@ -71,35 +92,50 @@ export function extractLocationHint(text: string): string | null {
 export async function geocodePlace(query: string): Promise<GeoPoint | null> {
   const key = process.env.GEOAPIFY_API_KEY;
   if (!key || !query?.trim()) return null;
+  const { disambiguatePlaceQuery } = await import("./place-disambiguate.server");
+  const q = disambiguatePlaceQuery(query);
   const url =
-    `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(query)}` +
-    `&limit=1&format=json&apiKey=${key}`;
+    `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(q)}` +
+    `&limit=5&format=json&apiKey=${key}`;
   try {
     const res = await fetch(url);
     if (!res.ok) return null;
     const data = (await res.json()) as any;
-    const r = data?.results?.[0];
-    if (!r || r.lon == null || r.lat == null) return null;
+    const results = (data?.results ?? []) as any[];
+    if (!results.length) return null;
+
+    const score = (r: any): number => {
+      let s = Number(r.rank?.confidence ?? r.rank?.importance ?? 0) * 100;
+      const type = String(r.result_type || r.type || "").toLowerCase();
+      if (/city|municipality|town/.test(type)) s += 40;
+      if (/village|hamlet|suburb/.test(type)) s -= 20;
+      // Prefer known major countries when query was disambiguated to them
+      const cc = String(r.country_code || "").toLowerCase();
+      if (/, canada$/i.test(q) && cc === "ca") s += 50;
+      if (/, uk$/i.test(q) && cc === "gb") s += 50;
+      if (/usa$/i.test(q) && cc === "us") s += 50;
+      if (/, australia$/i.test(q) && cc === "au") s += 50;
+      // Penalize tiny US places when user typed a bare major-city name
+      if (cc === "us" && /toronto|london|paris|berlin/i.test(query) && !/usa|us\b|united states/i.test(query)) {
+        s -= 80;
+      }
+      return s;
+    };
+
+    const best = [...results].sort((a, b) => score(b) - score(a))[0];
+    if (!best || best.lon == null || best.lat == null) return null;
     return {
-      lon: r.lon,
-      lat: r.lat,
-      city: r.city,
-      country_code: (r.country_code || "").toLowerCase(),
-      state_code: (r.state_code || "").toLowerCase(),
-      place_id: r.place_id,
-      result_type: r.result_type || r.type,
+      lon: best.lon,
+      lat: best.lat,
+      city: best.city,
+      country_code: (best.country_code || "").toLowerCase(),
+      state_code: (best.state_code || "").toLowerCase(),
+      place_id: best.place_id,
+      result_type: best.result_type || best.type,
     };
   } catch {
     return null;
   }
-}
-
-function jurisdictionFromPoint(p: GeoPoint): string | undefined {
-  const cc = p.country_code;
-  if (!cc) return undefined;
-  if (cc === "us" && p.state_code) return `us_${p.state_code}`;
-  if (cc === "ca" && p.state_code) return `ca_${p.state_code}`;
-  return cc;
 }
 
 function wantsAgencyIcp(qx: ExpandedQueries): boolean {
@@ -161,11 +197,11 @@ function featuresToLeads(
   features: any[],
   locText: string,
   point: GeoPoint,
-  opts?: { directoryMode?: boolean; preferAgency?: boolean },
+  opts?: { directoryMode?: boolean; preferAgency?: boolean; craftAsk?: string },
 ): SourceLead[] {
-  const juris = jurisdictionFromPoint(point);
   const allowCountry = (point.country_code || "").toLowerCase();
   const preferAgency = !!opts?.preferAgency;
+  const craftAsk = opts?.craftAsk || "";
 
   const scored = features.map((f: any) => {
     const p = f?.properties ?? {};
@@ -180,7 +216,6 @@ function featuresToLeads(
   let ordered = scored;
   if (preferAgency) {
     const good = scored.filter((s) => s.rank >= 20);
-    // Drop gas/news/estate agencies and generic offices when we have real marketing hits
     ordered = good.length >= 3 ? good : scored.filter((s) => s.rank >= 20);
   }
 
@@ -197,44 +232,42 @@ function featuresToLeads(
     if (allowCountry && p.country_code && String(p.country_code).toLowerCase() !== allowCountry) {
       continue;
     }
-    const website = p.website || p.contact?.website || undefined;
+    // Real business website only — never geoapify place pages.
+    const websiteRaw = p.website || p.contact?.website || undefined;
+    const website =
+      websiteRaw && /^https?:\/\//i.test(websiteRaw) && !/geoapify\.com\/place/i.test(websiteRaw)
+        ? websiteRaw
+        : undefined;
     const phone = p.phone || p.contact?.phone || undefined;
     const city = p.city || point.city || locText;
-    const placeId = p.place_id || f.id;
-    const urlOut = website
-      || (placeId ? `https://www.geoapify.com/place?id=${placeId}` : `https://www.openstreetmap.org/?mlat=${p.lat}&mlon=${p.lon}`);
+    const address = p.formatted || p.address_line1 || "";
 
     const agencyHit = rank > 0;
-
-    const snippet = [
-      `Local business: ${name}`,
-      city ? `City: ${city}` : "",
-      locText ? `Location: ${locText}` : "",
-      p.formatted ? `Address: ${p.formatted}` : "",
-      phone ? `Phone: ${phone}` : "",
-      website ? `Website: ${website}` : "",
-      (p.categories || []).slice?.(0, 4)?.join?.(", ") || "",
-      juris ? `Jurisdiction hint: ${juris}` : "",
-    ].filter(Boolean).join("\n");
+    const snippet = [address || city, phone ? `Phone: ${phone}` : ""]
+      .filter(Boolean)
+      .join(" · ");
 
     out.push({
       source: "geoapify",
-      platform: "Local business (Geoapify)",
+      platform: "Local business",
       title: `${name}${city ? ` — ${city}` : ""}`,
-      snippet,
-      full_post_url: urlOut,
+      snippet: snippet || `${name} in ${city || locText}`,
+      full_post_url: website,
       author: name,
+      company: name,
+      phones: phone ? [phone] : undefined,
       posted_at: undefined,
       engagement: agencyHit ? 55 : 30,
       is_decision_maker: true,
       intentBoost: opts?.directoryMode ? (agencyHit ? 26 : 12) : 10,
       signal_type: "direct_intent",
+      why_match: address || `${name} in ${city || locText}`,
       match_reasons: [
-        `Directory match in ${city || locText}`,
+        `Match in ${city || locText}`,
         ...(website ? ["Has website"] : []),
         ...(agencyHit ? ["Agency/marketing name signal"] : []),
       ],
-    });
+    } as SourceLead);
   }
   return out;
 }
@@ -253,17 +286,19 @@ async function searchCityCircle(
   const cats = categoriesForQuery(qx).join(",");
   const filter = `circle:${point.lon},${point.lat},${CITY_RADIUS_M}`;
 
-  // Try agency-biased name first, then broad category fill
-  let features = preferAgency
-    ? await fetchPlacesFeatures({
-      filter,
-      bias: `${point.lon},${point.lat}`,
-      limit: PLACES_LIMIT_PER_CITY,
-      cats,
-      key,
-      nameFilter: "agency",
-    })
-    : [];
+  // Try agency-biased or trade name filter first, then broad category fill
+  const tradeName = nameFilterForQuery(qx);
+  let features =
+    preferAgency || tradeName
+      ? await fetchPlacesFeatures({
+          filter,
+          bias: `${point.lon},${point.lat}`,
+          limit: PLACES_LIMIT_PER_CITY,
+          cats,
+          key,
+          nameFilter: preferAgency ? "agency" : tradeName,
+        })
+      : [];
   if (features.length < 4) {
     const broad = await fetchPlacesFeatures({
       filter,
@@ -271,6 +306,7 @@ async function searchCityCircle(
       limit: PLACES_LIMIT_PER_CITY,
       cats,
       key,
+      nameFilter: tradeName,
     });
     const seen = new Set(features.map((f) => f?.properties?.place_id || f?.id));
     for (const f of broad) {
@@ -284,6 +320,7 @@ async function searchCityCircle(
   return featuresToLeads(features, country, { ...point, city }, {
     directoryMode: opts?.directoryMode,
     preferAgency,
+    craftAsk: qx.skill || qx.role,
   });
 }
 
@@ -350,24 +387,27 @@ export async function searchGeoapifyPlaces(
     filter = `circle:${point.lon},${point.lat},${CITY_RADIUS_M}`;
   }
 
-  let features = preferAgency && !filter.startsWith("place:")
-    ? await fetchPlacesFeatures({
-      filter,
-      bias: filter.startsWith("circle:") ? `${point.lon},${point.lat}` : undefined,
-      limit,
-      cats,
-      key,
-      nameFilter: "agency",
-    })
-    : [];
+  let features =
+    (preferAgency || nameFilterForQuery(qx)) && !filter.startsWith("place:")
+      ? await fetchPlacesFeatures({
+          filter,
+          bias: filter.startsWith("circle:") ? `${point.lon},${point.lat}` : undefined,
+          limit,
+          cats,
+          key,
+          nameFilter: preferAgency ? "agency" : nameFilterForQuery(qx),
+        })
+      : [];
 
   if (features.length < 6) {
+    const tradeName = nameFilterForQuery(qx);
     const broad = await fetchPlacesFeatures({
       filter,
       bias: filter.startsWith("circle:") ? `${point.lon},${point.lat}` : undefined,
       limit,
       cats,
       key,
+      nameFilter: tradeName,
     });
     const seen = new Set(features.map((f) => f?.properties?.place_id || f?.id));
     for (const f of broad) {
@@ -381,5 +421,6 @@ export async function searchGeoapifyPlaces(
   return featuresToLeads(features, locText, point, {
     directoryMode: opts?.directoryMode,
     preferAgency,
+    craftAsk: qx.skill || qx.role,
   });
 }
