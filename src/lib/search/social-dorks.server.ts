@@ -217,28 +217,30 @@ async function searchSocialDorksViaSerp(
   };
 
   const core = priority.filter((p) => p.key !== "instagram");
-  await Promise.all(core.map((spec) => runDork(spec, spec.dorks(craft)[0], "day")));
+  // Week-first: day windows are too sparse for Discover tab volume; day is a
+  // second pass only when week already returned something thin.
+  await Promise.all(core.map((spec) => runDork(spec, spec.dorks(craft)[0], "week")));
 
-  if (existing.length + out.length < 6) {
+  if (existing.length + out.length < 12) {
     await Promise.all(
       core.map((spec) => {
         const d2 = spec.dorks(craft)[1];
-        return d2 ? runDork(spec, d2, "day") : Promise.resolve();
+        return d2 ? runDork(spec, d2, "week") : Promise.resolve();
       }),
     );
   }
 
-  if (existing.length + out.length < 4) {
-    const ig = priority.find((p) => p.key === "instagram");
-    if (ig) await runDork(ig, ig.dorks(craft)[0], "day");
+  if (existing.length + out.length < 8) {
+    await Promise.all(core.map((spec) => runDork(spec, spec.dorks(craft)[0], "day")));
   }
 
-  if (existing.length + out.length < 3) {
-    await Promise.all(core.slice(0, 2).map((spec) => runDork(spec, spec.dorks(craft)[0], "week")));
+  if (existing.length + out.length < 6) {
+    const ig = priority.find((p) => p.key === "instagram");
+    if (ig) await runDork(ig, ig.dorks(craft)[0], "week");
   }
 
   if (out.length) {
-    console.info(`[social-dorks] Serper fallback added ${out.length} (SearXNG was thin)`);
+    console.info(`[social-dorks] Serper path added ${out.length}`);
   }
   return out;
 }
@@ -267,6 +269,7 @@ export async function searchSocialDorks(qx: ExpandedQueries): Promise<SourceLead
   const { searchSearxng, searxngResultsToLeads, detectPlatformFromUrl } = await import(
     "./searxng.server",
   );
+  const { paidDiscoveryEnabled } = await import("./paid-discovery");
 
   const wave = (n: number) =>
     PLATFORMS.map((p) => ({ spec: p, dork: p.dorks(craft)[n] })).filter((x) => !!x.dork);
@@ -295,27 +298,45 @@ export async function searchSocialDorks(qx: ExpandedQueries): Promise<SourceLead
     return batch;
   };
 
-  const primary = await runWave(wave(0));
-  const secondary = await runWave(wave(1));
-  const perPlatform = [...primary, ...secondary];
+  // Run hosted SERP in parallel with SearXNG. On Vercel / slow SearXNG the
+  // outer withBudget used to kill this entire function before the Serper
+  // fallback ever ran — socialdorks stayed at 0 and Discover collapsed.
+  const searxSeen = new Set<string>();
+  const searxOut: SourceLead[] = [];
+  const searxPromise = (async () => {
+    const primary = await runWave(wave(0));
+    const secondary = await runWave(wave(1));
+    for (const { spec, leads } of [...primary, ...secondary]) {
+      ingestPlatformLeads(spec, leads, terms, searxSeen, searxOut, detectPlatformFromUrl);
+    }
+  })();
 
-  const out: SourceLead[] = [];
-  const seen = new Set<string>();
+  const serpSeen = new Set<string>();
+  const serpPromise = paidDiscoveryEnabled()
+    ? searchSocialDorksViaSerp(craft, terms, serpSeen, [], detectPlatformFromUrl)
+    : Promise.resolve([] as SourceLead[]);
 
-  for (const { spec, leads } of perPlatform) {
-    ingestPlatformLeads(spec, leads, terms, seen, out, detectPlatformFromUrl);
+  const [, serpExtra] = await Promise.all([searxPromise, serpPromise]);
+
+  const out: SourceLead[] = [...searxOut];
+  const seen = new Set(searxSeen);
+  for (const l of serpExtra) {
+    const u = (l.full_post_url || "").split("?")[0].toLowerCase();
+    if (!u || seen.has(u)) continue;
+    seen.add(u);
+    out.push(l);
   }
 
-  // SearXNG empty/down (local without Docker, Vercel): Serper fills social.
-  if (out.length < 4) {
-    const serpExtra = await searchSocialDorksViaSerp(
+  // If paid SERP was off / empty and SearXNG was thin, one last Serper try.
+  if (out.length < 4 && paidDiscoveryEnabled() && !serpExtra.length) {
+    const late = await searchSocialDorksViaSerp(
       craft,
       terms,
       seen,
       out,
       detectPlatformFromUrl,
     );
-    out.push(...serpExtra);
+    out.push(...late);
   }
 
   return out;

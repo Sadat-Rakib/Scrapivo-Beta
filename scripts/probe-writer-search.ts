@@ -95,19 +95,25 @@ console.log("quality pool", quality.length);
 const volumePersona =
   classified.type === "product" ||
   /tutor|teacher|tutoring/i.test(`${classified.coreSkill} ${classified.raw}`);
-const div = diversifiedTop12(quality as Lead[], {
+const pool = [...quality]
+  .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+  .slice(0, 500) as Lead[];
+const div = diversifiedTop12(pool, {
   maxJobBoard: 2,
-  maxCompanyAts: 120,
-  minSocial: 8,
-  maxReddit: volumePersona ? 48 : 24,
-  maxTotal: 400,
+  maxCompanyAts: 150,
+  minSocial: 15,
+  maxReddit: volumePersona ? 60 : 40,
+  maxTotal: 500,
   minScore: 45,
-  maxPerPlatform: volumePersona ? 40 : 30,
+  maxPerPlatform: 500,
+  maxFreelancer: 50,
 });
 console.log("diversified", div.length);
 
-const segs = segmentLeads(div);
-const { posts, companies: cos, people: ppl } = segs;
+const segs = segmentLeads(pool);
+const posts = div;
+const cos = segs.companies.slice(0, 150);
+const ppl = segs.people.slice(0, 150);
 console.log("\n=== TAB COUNTS ===");
 console.log("Posts", posts.length);
 console.log("Companies", cos.length);
