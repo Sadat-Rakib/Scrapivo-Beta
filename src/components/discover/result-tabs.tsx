@@ -80,7 +80,7 @@ export function ResultTabPills({
       { id: "posts" as const, label: "Posts", icon: FileText, n: counts.posts },
       { id: "companies" as const, label: "Companies", icon: Building2, n: counts.companies },
       { id: "people" as const, label: "People", icon: Users, n: counts.people },
-      { id: "local" as const, label: "Local", icon: Store, n: counts.local ?? 0 },
+      { id: "local" as const, label: "Businesses", icon: Store, n: counts.local ?? 0 },
     ] as const
   ).filter((it) => !visible || visible.includes(it.id));
   if (!items.length) return null;

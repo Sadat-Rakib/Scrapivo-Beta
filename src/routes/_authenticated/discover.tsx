@@ -996,7 +996,8 @@ function DiscoverPage() {
                   ) : (
                     <p className="text-sm text-muted-foreground">
                       No local businesses yet — include a city or region in your search (e.g.
-                      &quot;dentists in Austin&quot;) so OpenStreetMap / Places can run.
+                      &quot;dentists in Austin&quot; or &quot;marketing agencies in Toronto&quot;)
+                      so OpenStreetMap / Places can fill the Businesses tab.
                     </p>
                   )}
                 </div>
