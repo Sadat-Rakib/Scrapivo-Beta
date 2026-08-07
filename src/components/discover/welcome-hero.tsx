@@ -12,7 +12,6 @@ import {
   Building2,
   Bell,
   Layers,
-  Store,
 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 
@@ -28,7 +27,6 @@ const CAPABILITY_PILLS = [
   { label: "Jobs", icon: Briefcase },
   { label: "People", icon: Users },
   { label: "Companies", icon: Building2 },
-  { label: "Businesses", icon: Store },
   { label: "Posts", icon: FileText },
   { label: "Sites", icon: Globe },
   { label: "News", icon: Newspaper },

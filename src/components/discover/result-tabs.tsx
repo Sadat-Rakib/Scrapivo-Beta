@@ -17,10 +17,9 @@ import {
   MapPin,
   Clock,
   BadgeCheck,
-  Store,
 } from "lucide-react";
 
-export type ResultTab = "posts" | "companies" | "people" | "local";
+export type ResultTab = "posts" | "companies" | "people";
 
 export type ResolvedContactInfo = {
   email?: string;
@@ -71,7 +70,7 @@ export function ResultTabPills({
 }: {
   tab: ResultTab;
   onChange: (t: ResultTab) => void;
-  counts: { posts: number; companies: number; people: number; local?: number };
+  counts: { posts: number; companies: number; people: number };
   /** When set, only these tabs are shown (audience-scoped Discover). */
   visible?: ResultTab[];
 }) {
@@ -80,7 +79,6 @@ export function ResultTabPills({
       { id: "posts" as const, label: "Posts", icon: FileText, n: counts.posts },
       { id: "companies" as const, label: "Companies", icon: Building2, n: counts.companies },
       { id: "people" as const, label: "People", icon: Users, n: counts.people },
-      { id: "local" as const, label: "Businesses", icon: Store, n: counts.local ?? 0 },
     ] as const
   ).filter((it) => !visible || visible.includes(it.id));
   if (!items.length) return null;
