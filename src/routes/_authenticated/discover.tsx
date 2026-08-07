@@ -18,7 +18,7 @@ import {
 import { getMyProfile, updateMyProfile } from "@/lib/profile.functions";
 import { OnboardingWizard, type OnboardingAnswers } from "@/components/discover/onboarding-wizard";
 import type { Lead } from "@/lib/scoring";
-import type { CompanyRow, PersonRow } from "@/lib/search/lead-segments";
+import type { CompanyRow, PersonRow, LocalBusinessRow } from "@/lib/search/lead-segments";
 import { LeadDetailPanel } from "@/components/lead-detail-panel";
 import { WelcomeHero } from "@/components/discover/welcome-hero";
 import {
@@ -35,6 +35,7 @@ import {
   CompanyTable,
   PersonTable,
   ViewToggle,
+  LocalBusinessesGrid,
   type ResultTab,
   type ResolvedContactInfo,
 } from "@/components/discover/result-tabs";
@@ -237,6 +238,7 @@ function DiscoverPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [companies, setCompanies] = useState<CompanyRow[]>([]);
   const [people, setPeople] = useState<PersonRow[]>([]);
+  const [localBusinesses, setLocalBusinesses] = useState<LocalBusinessRow[]>([]);
   const [resultTab, setResultTab] = useState<ResultTab>("posts");
   const [activeQuery, setActiveQuery] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -441,6 +443,7 @@ function DiscoverPage() {
       setLeads(posts);
       setCompanies(cos);
       setPeople(ppl);
+      setLocalBusinesses((res as { local?: LocalBusinessRow[] }).local ?? []);
       // Seed published in-post contacts so Resolve isn't required to see them.
       const seeded: Record<string, ResolvedContactInfo> = {};
       for (const c of cos) {
@@ -585,6 +588,7 @@ function DiscoverPage() {
     setLeads([]);
     setCompanies([]);
     setPeople([]);
+    setLocalBusinesses([]);
     setContactByKey({});
     setSelected(null);
     setSelectedEntity(null);
@@ -794,7 +798,7 @@ function DiscoverPage() {
               {activeQuery &&
                 clarifyQs.length === 0 &&
                 !runSearchMut.isPending &&
-                (leads.length > 0 || companies.length > 0 || people.length > 0) && (
+                (leads.length > 0 || companies.length > 0 || people.length > 0 || localBusinesses.length > 0) && (
                 <div className="flex items-center justify-between gap-2">
                   <div className="text-sm min-w-0">
                     <span className="text-muted-foreground">Results for </span>
@@ -830,7 +834,7 @@ function DiscoverPage() {
               {activeQuery &&
                 clarifyQs.length === 0 &&
                 !runSearchMut.isPending &&
-                (leads.length > 0 || companies.length > 0 || people.length > 0) && (
+                (leads.length > 0 || companies.length > 0 || people.length > 0 || localBusinesses.length > 0) && (
                 <div className="flex flex-wrap items-center gap-2">
                   <ResultTabPills
                     tab={resultTab}
@@ -839,6 +843,7 @@ function DiscoverPage() {
                       posts: shownLeads.length,
                       companies: shownCompanies.length,
                       people: shownPeople.length,
+                      local: localBusinesses.length,
                     }}
                     visible={
                       searchContext?.audience === "people"
@@ -984,6 +989,18 @@ function DiscoverPage() {
                     )}
                   </div>
                 ))}
+              {resultTab === "local" && (
+                <div className="pb-4">
+                  {localBusinesses.length ? (
+                    <LocalBusinessesGrid rows={localBusinesses} />
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      No local businesses yet — include a city or region in your search (e.g.
+                      &quot;dentists in Austin&quot;) so OpenStreetMap / Places can run.
+                    </p>
+                  )}
+                </div>
+              )}
                 </>
               )}
 

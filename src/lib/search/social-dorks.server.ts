@@ -111,7 +111,14 @@ const PLATFORMS: PlatformSpec[] = [
   },
 ];
 
-const SERP_PRIORITY_KEYS = ["linkedin", "facebook", "twitter", "instagram"] as const;
+const SERP_PRIORITY_KEYS = [
+  "linkedin",
+  "facebook",
+  "twitter",
+  "instagram",
+  "quora",
+  "substack",
+] as const;
 
 type LooseLead = {
   full_post_url?: string;

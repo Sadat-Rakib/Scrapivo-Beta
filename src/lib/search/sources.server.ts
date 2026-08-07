@@ -35,6 +35,7 @@ import {
 import { searchSecEdgar } from "./gov-sources.server";
 import { searchNewsSignals } from "./news-signals.server";
 import { searchLocalBusinesses } from "./foursquare-places.server";
+import { searchOsmLocalBusinesses } from "./osm-local-businesses.server";
 import {
   searchWorkAtAStartup,
   searchStartupsGallery,
@@ -1644,16 +1645,22 @@ export async function searchRelevantDecisionMakers(qx: ExpandedQueries): Promise
   const skill = (qx.skill || qx.role || "").trim();
   if (!skill) return [];
   const out: SourceLead[] = [];
-  try {
-    const { searchSearxng, searxngResultsToLeads } = await import("./searxng.server");
-    const queries = [
-      `"${skill}" (CTO OR founder OR CEO OR owner) (hiring OR looking OR need OR building)`,
-      `site:linkedin.com/in "${skill}" (CTO OR founder OR "Head of" OR CEO)`,
-      `"${skill}" ("co-founder" OR "chief technology") (startup OR SaaS OR agency)`,
-    ];
-    const results = await searchSearxng(queries, 4, "day", "decisionmakers");
-    for (const lead of searxngResultsToLeads(results, 12)) {
-      const text = `${lead.title} ${lead.snippet}`;
+  const seen = new Set<string>();
+
+  const ingest = (
+    leads: Array<{
+      full_post_url?: string;
+      title?: string;
+      snippet?: string;
+      author?: string;
+      author_url?: string;
+      source?: string;
+      platform?: string;
+      match_reasons?: string[];
+    }>,
+  ) => {
+    for (const lead of leads) {
+      const text = `${lead.title || ""} ${lead.snippet || ""}`;
       if (
         !detectDecisionMaker(text) &&
         !/\b(cto|founder|ceo|owner|head of|co-?founder)\b/i.test(text)
@@ -1671,26 +1678,77 @@ export async function searchRelevantDecisionMakers(qx: ExpandedQueries): Promise
       const fromTitle = roleTitle ? roleTitle[1] : undefined;
       const author = lead.author || idFromUrl.author || fromTitle;
       if (!author) continue;
+      const url = (lead.full_post_url || "").split("?")[0].toLowerCase();
+      if (url && seen.has(url)) continue;
+      if (url) seen.add(url);
       out.push({
         ...lead,
-        source: idFromUrl.source || lead.source || "searxng",
+        source: idFromUrl.source || lead.source || "decisionmakers",
         platform: idFromUrl.platform || lead.platform || "Decision-maker",
         platform_label: "Decision-maker",
         author,
         author_url: lead.author_url || idFromUrl.author_url,
         is_decision_maker: true,
         intentBoost: 14,
+        demand_verified: true,
         match_reasons: ["Relevant decision-maker in field", ...(lead.match_reasons ?? [])].slice(
           0,
           6,
         ),
         signal_type: "leading_indicator",
-      });
-      if (out.length >= 14) break;
+        why_match: `Decision-maker in ${skill} — relevant operator beyond buying posts`,
+      } as SourceLead);
+      if (out.length >= 40) break;
     }
+  };
+
+  try {
+    const { searchSearxng, searxngResultsToLeads } = await import("./searxng.server");
+    const queries = [
+      `"${skill}" (CTO OR founder OR CEO OR owner) (hiring OR looking OR need OR building)`,
+      `site:linkedin.com/in "${skill}" (CTO OR founder OR "Head of" OR CEO)`,
+      `"${skill}" ("co-founder" OR "chief technology") (startup OR SaaS OR agency)`,
+    ];
+    const results = await searchSearxng(queries, 4, "week", "decisionmakers");
+    ingest(searxngResultsToLeads(results, 18));
   } catch {
     /* optional */
   }
+
+  // Hosted SERP when SearXNG is empty (Vercel) or thin — same gate as social-dorks.
+  if (out.length < 8) {
+    try {
+      const { paidDiscoveryEnabled } = await import("./paid-discovery");
+      const { searchGoogleSerp, hasGoogleSerpProvider } = await import("./serp-providers.server");
+      if (paidDiscoveryEnabled() && hasGoogleSerpProvider()) {
+        const dorks = [
+          `"${skill}" (CTO OR founder OR CEO OR owner) (hiring OR looking OR need)`,
+          `site:linkedin.com/in "${skill}" (CTO OR founder OR CEO OR "Head of")`,
+          `"${skill}" ("co-founder" OR owner OR "VP of") (startup OR SaaS OR agency)`,
+        ];
+        for (const dork of dorks) {
+          if (out.length >= 40) break;
+          const data = await searchGoogleSerp(dork, { tbs: "qdr:w", num: 15 });
+          if (!data?.organic_results?.length) continue;
+          ingest(
+            data.organic_results.map((r) => ({
+              full_post_url: r.link || "",
+              title: r.title || "",
+              snippet: (r.snippet || "").slice(0, 400),
+              source: "decisionmakers",
+              platform: "Decision-maker",
+            })),
+          );
+        }
+        if (out.length) {
+          console.info(`[decisionmakers] Serper path total ${out.length}`);
+        }
+      }
+    } catch {
+      /* optional */
+    }
+  }
+
   return out;
 }
 
@@ -3315,7 +3373,10 @@ async function searchAllSourcesInner(
       add("news", searchNewsSignals(qx));
       add("secedgar", searchSecEdgar(qx));
       add("startupsgallery", searchStartupsGallery(qx));
-      if (loc) add("localbiz", searchLocalBusinesses(qx, loc, { directoryMode: false }));
+      if (loc) {
+        add("localbiz", searchLocalBusinesses(qx, loc, { directoryMode: false }));
+        add("osm", searchOsmLocalBusinesses(qx, loc));
+      }
     }
     // YC Work at a Startup — named companies hiring for this craft (Companies tab).
     if (!peopleOnly) {
@@ -3487,7 +3548,10 @@ async function searchAllSourcesInner(
     add("secedgar", searchSecEdgar(qx));
     add("news", searchNewsSignals(qx));
     add("startupsgallery", searchStartupsGallery(qx));
-    if (loc) add("localbiz", searchLocalBusinesses(qx, loc, { directoryMode: false }));
+    if (loc) {
+      add("localbiz", searchLocalBusinesses(qx, loc, { directoryMode: false }));
+      add("osm", searchOsmLocalBusinesses(qx, loc));
+    }
   }
 
   // YC Work at a Startup — named companies (Companies tab on clients too).

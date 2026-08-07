@@ -205,6 +205,11 @@ export function EntityDetailPanel({
             <Row label="Why now">
               <p className="text-sm text-foreground/85">{c.why_now}</p>
             </Row>
+            {c.description && (
+              <Row label="About">
+                <p className="text-sm text-foreground/85">{c.description}</p>
+              </Row>
+            )}
             <Row label="Links">
               <div className="flex flex-wrap gap-y-1">
                 {c.website && <LinkOut href={c.website} label="Website" icon={Globe} />}
@@ -235,6 +240,11 @@ export function EntityDetailPanel({
             {p.why_match && (
               <Row label="Why match">
                 <p className="text-sm text-foreground/85">{p.why_match}</p>
+              </Row>
+            )}
+            {p.description && (
+              <Row label="About">
+                <p className="text-sm text-foreground/85">{p.description}</p>
               </Row>
             )}
             <Row label="Links">

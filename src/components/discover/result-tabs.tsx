@@ -1,5 +1,5 @@
 import type { Lead } from "@/lib/scoring";
-import type { CompanyRow, PersonRow, InlineContacts } from "@/lib/search/lead-segments";
+import type { CompanyRow, PersonRow, InlineContacts, LocalBusinessRow } from "@/lib/search/lead-segments";
 import { LeadCard } from "@/components/lead-card";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,16 +17,17 @@ import {
   MapPin,
   Clock,
   BadgeCheck,
+  Store,
 } from "lucide-react";
 
-export type ResultTab = "posts" | "companies" | "people";
+export type ResultTab = "posts" | "companies" | "people" | "local";
 
 export type ResolvedContactInfo = {
   email?: string;
   phone?: string;
   domain?: string;
   note?: string;
-  /** MX / ZeroBounce / pattern verification label */
+  /** MX / ZeroBounce / MillionVerifier / pattern verification label */
   verifyNote?: string;
   socials?: {
     linkedin?: string;
@@ -70,7 +71,7 @@ export function ResultTabPills({
 }: {
   tab: ResultTab;
   onChange: (t: ResultTab) => void;
-  counts: { posts: number; companies: number; people: number };
+  counts: { posts: number; companies: number; people: number; local?: number };
   /** When set, only these tabs are shown (audience-scoped Discover). */
   visible?: ResultTab[];
 }) {
@@ -79,6 +80,7 @@ export function ResultTabPills({
       { id: "posts" as const, label: "Posts", icon: FileText, n: counts.posts },
       { id: "companies" as const, label: "Companies", icon: Building2, n: counts.companies },
       { id: "people" as const, label: "People", icon: Users, n: counts.people },
+      { id: "local" as const, label: "Local", icon: Store, n: counts.local ?? 0 },
     ] as const
   ).filter((it) => !visible || visible.includes(it.id));
   if (!items.length) return null;
@@ -193,6 +195,9 @@ export function CompanyCard({
           </div>
         </div>
         <p className="mt-2 text-xs text-foreground/80 line-clamp-2">{row.why_now}</p>
+        {row.description && (
+          <p className="mt-1 text-[11px] text-muted-foreground line-clamp-2">{row.description}</p>
+        )}
         <div className="mt-2 flex flex-wrap gap-1">
           {row.platforms.slice(0, 4).map((p) => (
             <span key={p} className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
@@ -319,6 +324,9 @@ export function PersonCard({
         )}
         {row.why_match && (
           <p className="mt-1.5 text-xs text-foreground/80 line-clamp-2">{row.why_match}</p>
+        )}
+        {row.description && (
+          <p className="mt-1 text-[11px] text-muted-foreground line-clamp-2">{row.description}</p>
         )}
       </button>
 
@@ -542,6 +550,69 @@ export function PostsGrid({
           onOpen={() => onOpen(l)}
           onSave={() => onSave(l)}
         />
+      ))}
+    </div>
+  );
+}
+
+export function LocalBusinessCard({ row }: { row: LocalBusinessRow }) {
+  return (
+    <div className="w-full p-4 rounded-xl border border-border bg-card hover:border-primary/30 transition-all space-y-2">
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <div className="font-medium text-sm truncate">{row.name}</div>
+          {row.category && (
+            <div className="text-xs text-muted-foreground truncate">{row.category}</div>
+          )}
+        </div>
+        <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground shrink-0">
+          {row.source === "osm" ? "OSM" : row.source}
+        </span>
+      </div>
+      {row.description && (
+        <p className="text-xs text-foreground/80 line-clamp-3">{row.description}</p>
+      )}
+      <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs">
+        {row.website && (
+          <a
+            href={row.website}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1 text-primary hover:underline"
+          >
+            <Globe className="size-3" /> Website
+          </a>
+        )}
+        {row.phone && (
+          <span className="inline-flex items-center gap-1 text-muted-foreground">
+            <Phone className="size-3" /> {row.phone}
+          </span>
+        )}
+        {row.email && (
+          <a
+            href={`mailto:${row.email}`}
+            className="inline-flex items-center gap-1 text-emerald-500 hover:underline"
+          >
+            <Mail className="size-3" /> {row.email}
+            {row.email_verified && <BadgeCheck className="size-3" />}
+          </a>
+        )}
+      </div>
+      {row.verify_note && (
+        <div className="text-[10px] text-muted-foreground">{row.verify_note}</div>
+      )}
+      <div className="text-[10px] text-muted-foreground">
+        Business data © OpenStreetMap contributors (ODbL) when sourced from OSM
+      </div>
+    </div>
+  );
+}
+
+export function LocalBusinessesGrid({ rows }: { rows: LocalBusinessRow[] }) {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 pb-4">
+      {rows.map((r) => (
+        <LocalBusinessCard key={r.key} row={r} />
       ))}
     </div>
   );

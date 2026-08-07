@@ -573,20 +573,83 @@ export async function verifyEmailDeep(
     label,
   };
 
-  // 5) Paid last resort, only when the free path stayed genuinely inconclusive.
+  // 5) Paid verifiers — MillionVerifier first, then ZeroBounce — only when
+  // the free path stayed genuinely inconclusive.
   const inconclusive = smtpOk === null && tier !== "verified" && tier !== "invalid";
-  if (inconclusive && !opts.freeOnly && process.env.ZEROBOUNCE_KEY) {
-    const zb = await zeroBounce(e);
-    if (zb) {
-      evidence.push(`ZeroBounce: ${zb.status}`);
-      out = {
-        ...out,
-        smtp_ok: zb.valid,
-        method: "zerobounce",
-        confidence: zb.valid ? 0.95 : 0.1,
-        tier: zb.valid ? "verified" : "invalid",
-        label: zb.valid ? "Verified by ZeroBounce" : `Rejected by ZeroBounce (${zb.status})`,
-      };
+  if (inconclusive && !opts.freeOnly) {
+    if (process.env.MILLIONVERIFIER_API_KEY) {
+      try {
+        const { verifyWithMillionVerifier } = await import("./millionverifier.server");
+        const mv = await verifyWithMillionVerifier(e);
+        if (mv) {
+          evidence.push(`MillionVerifier: ${mv.result}`);
+          if (mv.disposable) {
+            out = {
+              ...out,
+              disposable: true,
+              smtp_ok: false,
+              method: "millionverifier",
+              confidence: 0.05,
+              tier: "invalid",
+              label: "Disposable address (MillionVerifier)",
+            };
+          } else if (mv.valid) {
+            out = {
+              ...out,
+              smtp_ok: true,
+              catch_all: false,
+              method: "millionverifier",
+              confidence: 0.95,
+              tier: "verified",
+              label: "Verified by MillionVerifier",
+            };
+          } else if (mv.catchAll) {
+            out = {
+              ...out,
+              smtp_ok: true,
+              catch_all: true,
+              method: "millionverifier",
+              confidence: opts.derived ? 0.35 : 0.55,
+              tier: "unconfirmable",
+              label: "Catch-all domain (MillionVerifier) — delivery unconfirmed",
+            };
+          } else if (mv.unknown) {
+            out = {
+              ...out,
+              method: "millionverifier",
+              confidence: 0.4,
+              tier: "risky",
+              label: `MillionVerifier: ${mv.result || "unknown"}`,
+            };
+          } else {
+            out = {
+              ...out,
+              smtp_ok: false,
+              method: "millionverifier",
+              confidence: 0.1,
+              tier: "invalid",
+              label: `Rejected by MillionVerifier (${mv.result})`,
+            };
+          }
+          return out;
+        }
+      } catch {
+        /* fall through to ZeroBounce */
+      }
+    }
+    if (process.env.ZEROBOUNCE_KEY) {
+      const zb = await zeroBounce(e);
+      if (zb) {
+        evidence.push(`ZeroBounce: ${zb.status}`);
+        out = {
+          ...out,
+          smtp_ok: zb.valid,
+          method: "zerobounce",
+          confidence: zb.valid ? 0.95 : 0.1,
+          tier: zb.valid ? "verified" : "invalid",
+          label: zb.valid ? "Verified by ZeroBounce" : `Rejected by ZeroBounce (${zb.status})`,
+        };
+      }
     }
   }
 

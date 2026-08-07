@@ -43,6 +43,8 @@ export type CompanyRow = {
   linkedin_url?: string;
   twitter_url?: string;
   facebook_url?: string;
+  /** Short About blurb for the drawer (what they do / why they may need you). */
+  description?: string;
   why_now: string;
   signal_count: number;
   platforms: string[];
@@ -66,6 +68,8 @@ export type PersonRow = {
   company_hint?: string;
   company_domain?: string;
   location_hint?: string;
+  /** Short About blurb for the drawer. */
+  description?: string;
   why_match?: string;
   sample_url: string;
   posted_at_relative?: string;
@@ -76,11 +80,79 @@ export type PersonRow = {
   score: number;
 };
 
+export type LocalBusinessRow = {
+  key: string;
+  name: string;
+  category?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  domain?: string;
+  description?: string;
+  source: string;
+  sample_url: string;
+  email_verified?: boolean;
+  verify_note?: string;
+  score: number;
+};
+
 export type LeadSegments = {
   posts: Lead[];
   companies: CompanyRow[];
   people: PersonRow[];
+  local: LocalBusinessRow[];
 };
+
+const LOCAL_SOURCES = new Set(["osm", "geoapify", "foursquare", "coreclaw_maps", "smb"]);
+
+/** Build Local Businesses tab from Places/OSM leads (not dumped into Posts). */
+export function buildLocalBusinesses(rawLeads: Lead[]): LocalBusinessRow[] {
+  const by = new Map<string, Lead>();
+  for (const l of rawLeads) {
+    if (!LOCAL_SOURCES.has(l.source)) continue;
+    const name = ((l as Lead & { company?: string }).company || l.author || l.title || "").trim();
+    if (!name || name.length < 2) continue;
+    const key = name.toLowerCase();
+    const prev = by.get(key);
+    if (!prev || (l.score ?? 0) > (prev.score ?? 0)) by.set(key, l);
+  }
+  return Array.from(by.entries())
+    .map(([key, l]) => {
+      const ext = l as Lead & { company?: string; company_domain?: string; emails?: string[]; phones?: string[] };
+      const website = l.full_post_url?.startsWith("http") && !/openstreetmap\.org/i.test(l.full_post_url)
+        ? l.full_post_url
+        : undefined;
+      const domain =
+        ext.company_domain ||
+        (website
+          ? (() => {
+              try {
+                return new URL(website).hostname.replace(/^www\./, "");
+              } catch {
+                return undefined;
+              }
+            })()
+          : undefined);
+      return {
+        key,
+        name: ext.company || l.author || l.title || key,
+        category: l.platform_label || l.platform,
+        phone: ext.phones?.[0],
+        email: ext.emails?.[0],
+        website,
+        domain,
+        description:
+          l.why_match ||
+          l.snippet ||
+          `${ext.company || l.title} — local business listing`,
+        source: l.source,
+        sample_url: l.full_post_url || website || "",
+        score: l.score ?? 0,
+      } satisfies LocalBusinessRow;
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 150);
+}
 
 // Sources where `author` is the hiring company, not a person.
 // Note: "linkedin" is NOT here — LinkedIn posts have human authors; jobs are
@@ -115,6 +187,7 @@ const COMPANY_AUTHOR_SOURCES = new Set([
   "foursquare",
   "smb",
   "coreclaw_maps",
+  "osm",
 ]);
 
 // Sources whose authors are real humans with public profiles.
@@ -225,6 +298,11 @@ const POSTS_ATS_EXCLUDE = new Set([
   "wellfound",
   "workatastartup",
   "githubjobs",
+  "geoapify",
+  "foursquare",
+  "coreclaw_maps",
+  "osm",
+  "smb",
 ]);
 
 /**
@@ -922,8 +1000,48 @@ function relativeAge(iso?: string): string | undefined {
   return d === 1 ? "1 day ago" : `${d} days ago`;
 }
 
+const BUYER_ASK_RE =
+  /\b(looking for|need a|need an|hiring|who can|willing to pay|asking for)\b/i;
+
+/** Compose a short About line for company drawers from the best signal lead. */
+function companyDescription(name: string, best: Lead, craftHint?: string): string {
+  const snip = (best.snippet || best.title || "").replace(/\s+/g, " ").trim();
+  const signal =
+    best.why_match ||
+    best.match_reasons?.[0] ||
+    (BUYER_PHRASE_RE.test(leadText(best)) ? "Publicly showing buying intent" : "");
+  const craft = craftHint || "your service";
+  if (snip.length >= 40) {
+    const cut = snip.length > 180 ? `${snip.slice(0, 177)}…` : snip;
+    return `${name}: ${cut}`;
+  }
+  if (signal) {
+    return `${name} — ${signal}. They may need ${craft}.`;
+  }
+  return `${name} is showing signals related to ${craft}.`;
+}
+
+/** Compose a short About line for people drawers. */
+function personDescription(name: string, l: Lead): string {
+  const role = roleHint(l);
+  const ask = (l.title || l.snippet || "").replace(/\s+/g, " ").trim();
+  if (isFieldDecisionMaker(l)) {
+    return role
+      ? `${name} appears to be a ${role} in this field — a relevant operator beyond buying posts.`
+      : `${name} is a relevant decision-maker in this field.`;
+  }
+  if (ask.length >= 30) {
+    const cut = ask.length > 160 ? `${ask.slice(0, 157)}…` : ask;
+    return `${name}: ${cut}`;
+  }
+  if (BUYER_PHRASE_RE.test(leadText(l))) {
+    return `${name} is publicly asking for this kind of help.`;
+  }
+  return role ? `${name} — ${role}.` : `${name} appears in signals matching your craft.`;
+}
+
 // ── Segmentation ────────────────────────────────────────────────────────────
-export function segmentLeads(rawLeads: Lead[]): LeadSegments {
+export function segmentLeads(rawLeads: Lead[], opts?: { craft?: string }): LeadSegments {
   // Pre-pass: LinkedIn post URLs encode their author — attach it so those
   // leads can become people rows (never company rows from author alone).
   const leads = rawLeads.map((l) => {
@@ -992,6 +1110,7 @@ export function segmentLeads(rawLeads: Lead[]): LeadSegments {
         twitter_url: twitter,
         facebook_url: facebook,
         why_now: best.why_match || best.match_reasons?.[0] || "Active buying signal",
+        description: companyDescription(name, best, opts?.craft),
         signal_count: group.length,
         platforms,
         sample_url: best.full_post_url,
@@ -1066,6 +1185,7 @@ export function segmentLeads(rawLeads: Lead[]): LeadSegments {
             : BUYER_PHRASE_RE.test(leadText(l))
               ? "Person publicly asking for this service"
               : undefined),
+        description: personDescription(personDisplayName(l.author!), l),
         sample_url: l.full_post_url,
         posted_at_relative: l.posted_at_relative || relativeAge(l.posted_at),
         signal_count: rows.length,
@@ -1081,5 +1201,5 @@ export function segmentLeads(rawLeads: Lead[]): LeadSegments {
     })
     .slice(0, 150);
 
-  return { posts, companies, people };
+  return { posts, companies, people, local: buildLocalBusinesses(leads) };
 }

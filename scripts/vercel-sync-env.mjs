@@ -32,6 +32,9 @@ const required = [
   "CORECLAW_API_KEY",
   "GEOAPIFY_API_KEY",
   "FOURSQUARE_API_KEY",
+  "ZEROBOUNCE_KEY",
+  "MILLIONVERIFIER_API_KEY",
+  "MILLIONVERIFIER_DAILY_CAP",
   "GITHUB_TOKEN",
   "SGAI_API_KEY",
 ];
@@ -49,9 +52,14 @@ const map = Object.fromEntries(
 const targets = ["production", "preview", "development"];
 
 for (const key of required) {
-  const val = map[key];
+  let val = map[key];
   if (!val) {
     console.log(`skip ${key} (empty)`);
+    continue;
+  }
+  // Never push laptop Docker SearXNG to Vercel — social dies there.
+  if (key === "SEARXNG_URL" && /:\/\/(127\.0\.0\.1|localhost)\b/i.test(val)) {
+    console.log(`skip SEARXNG_URL (localhost — leave unset on Vercel)`);
     continue;
   }
   for (const target of targets) {

@@ -163,15 +163,16 @@ export const runSearch = createServerFn({ method: "POST" })
     // Query/clarifier "everything" must clear project audience (companies/people)
     // so People/Posts tabs are not wiped after a healthy fetch.
     const statedAud = extractStatedAudience(data.query);
-    if (refinement.audience === "all" || statedAud === "all") {
+    const refAud = refinement.audience as string;
+    if (refAud === "all" || statedAud === "all") {
       classified.audience = "all";
-    } else if (refinement.audience && refinement.audience !== "all") {
+    } else if (refAud && refAud !== "all") {
       classified.audience =
-        refinement.audience === "posts"
+        refAud === "posts"
           ? "all"
-          : refinement.audience === "people"
+          : refAud === "people"
             ? "people"
-            : refinement.audience === "companies"
+            : refAud === "companies"
               ? "companies"
               : classified.audience;
     }
@@ -585,13 +586,14 @@ export const runSearch = createServerFn({ method: "POST" })
           ) {
             return false;
           }
-          // Instagram/Facebook: undated drops unless the query itself was
-          // time-boxed (same reasoning as above — the engine did the dating).
+          // Instagram/Facebook: keep demand_verified / week-hire; undated
+          // without any demand signal still drops.
           if (
             clientsMode &&
             !l.posted_at &&
             !timeBoxed &&
             !weekHireOk &&
+            !(l.demand_verified === true && (TITLE_HIRE_RE.test(title) || BODY_HIRE_RE.test(text))) &&
             (l.source === "instagram" || l.source === "facebook")
           ) {
             return false;
@@ -769,13 +771,14 @@ export const runSearch = createServerFn({ method: "POST" })
 
     // Segment from the full quality pool (not only the diversify cut) so
     // Companies/People can reach three figures when supply exists.
-    let segments = segmentLeads(pool);
+    let segments = segmentLeads(pool, { craft: classified.coreSkill || expanded.skill });
     // Posts feed: diversify for mix (Freelancer soft-cap + social pin).
     segments = {
       ...segments,
       posts: rankedForFeed,
       companies: segments.companies.slice(0, 150),
       people: segments.people.slice(0, 150),
+      local: (segments.local || []).slice(0, 150),
     };
 
     // Top 2–3 cards: PIE contact harvest (regex → page → capped enrich → LLM).
@@ -817,12 +820,14 @@ export const runSearch = createServerFn({ method: "POST" })
         posts: dedupeUrls(segments.people.map((p) => p.lead)),
         companies: [],
         people: segments.people,
+        local: [],
       };
     } else if (aud === "companies" || aud === "agencies") {
       segments = {
         posts: dedupeUrls(segments.companies.flatMap((c) => c.leads)),
         companies: segments.companies,
         people: [],
+        local: segments.local,
       };
     }
     // If scoped segment still has no posts but ranked leads exist, keep the leads
@@ -853,6 +858,9 @@ export const runSearch = createServerFn({ method: "POST" })
               }
               c.linkedin_url = c.linkedin_url || w.socials.linkedin;
               c.twitter_url = c.twitter_url || w.socials.twitter;
+              if (!c.description && w.hq) {
+                c.description = `${c.name} — ${w.hq}`;
+              }
             }),
           ),
           new Promise((r) => setTimeout(r, 4000)),
@@ -887,6 +895,52 @@ export const runSearch = createServerFn({ method: "POST" })
       /* enrichment is best-effort */
     }
 
+    // Local businesses: harvest website emails + MillionVerifier for top rows.
+    try {
+      const locals = segments.local || [];
+      const targets = locals.filter((b) => b.website && !b.email).slice(0, 8);
+      if (targets.length) {
+        const { harvestDomainContacts } = await import("./contact/harvest.server");
+        const { verifyEmailDeep } = await import("./contact/verify-contact.server");
+        await Promise.race([
+          Promise.allSettled(
+            targets.map(async (b) => {
+              try {
+                const host = b.domain || new URL(b.website!).hostname.replace(/^www\./, "");
+                const harvested = await harvestDomainContacts(host);
+                const email = harvested?.emails?.[0]?.email;
+                if (!email) return;
+                b.email = email;
+                const v = await verifyEmailDeep(email);
+                b.email_verified = v.tier === "verified";
+                b.verify_note = v.label;
+              } catch {
+                /* skip one */
+              }
+            }),
+          ),
+          new Promise((r) => setTimeout(r, 10_000)),
+        ]);
+      }
+      // Verify emails already present on OSM tags.
+      const withEmail = locals.filter((b) => b.email && !b.verify_note).slice(0, 6);
+      if (withEmail.length) {
+        const { verifyEmailDeep } = await import("./contact/verify-contact.server");
+        await Promise.race([
+          Promise.allSettled(
+            withEmail.map(async (b) => {
+              const v = await verifyEmailDeep(b.email!);
+              b.email_verified = v.tier === "verified";
+              b.verify_note = v.label;
+            }),
+          ),
+          new Promise((r) => setTimeout(r, 8_000)),
+        ]);
+      }
+    } catch {
+      /* local enrich optional */
+    }
+
     const suggestions =
       leadsWithContacts.length === 0 || (classified.intentMode === "directory_smb" && !classified.location)
         ? generateSmartSuggestions(classified)
@@ -917,7 +971,8 @@ export const runSearch = createServerFn({ method: "POST" })
     if (traceStages) {
       console.log(
         `[stages] SEGMENTS    posts:${segments.posts.length} ` +
-          `companies:${segments.companies.length} people:${segments.people.length}`,
+          `companies:${segments.companies.length} people:${segments.people.length} ` +
+          `local:${segments.local?.length ?? 0}`,
       );
     }
 
@@ -926,6 +981,7 @@ export const runSearch = createServerFn({ method: "POST" })
       posts: segments.posts,
       companies: segments.companies,
       people: segments.people,
+      local: segments.local || [],
       sources,
       suggestions,
       queryType: classified.type,
