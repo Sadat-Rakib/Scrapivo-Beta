@@ -815,16 +815,25 @@ export function diversifiedTop12(
 
     if (socialInResult < socialTarget) {
       for (const lead of socialAvailable) {
-        if (socialInResult >= socialTarget || result.length >= frontPage) break;
+        if (socialInResult >= socialTarget) break;
         if (used.has(lead.full_post_url)) continue;
-        if (result.length >= frontPage) {
-          const replaceIdx = result.findIndex((r) => !isSocialLead(r) && isJobBoardLead(r));
+        // Make room by swapping Freelancer / job-board / other non-social first —
+        // otherwise marketplace volume parks LinkedIn/X/FB below the fold.
+        if (result.length >= frontPage || !canAdd(lead)) {
+          const replaceIdx = result.findIndex(
+            (r) =>
+              !isSocialLead(r) &&
+              (isFreelancer(r) || isJobBoardLead(r) || isCompanyAtsLead(r)),
+          );
           if (replaceIdx === -1) break;
           const removed = result[replaceIdx];
           used.delete(removed.full_post_url);
           const removedKey = removed.platform || removed.source;
           platformCounts[removedKey] = Math.max(0, (platformCounts[removedKey] ?? 1) - 1);
           if (isJobBoardLead(removed)) jobBoardCount--;
+          if (isCompanyAtsLead(removed)) companyAtsCount--;
+          if (isJobShapedLead(removed)) jobShapedCount = Math.max(0, jobShapedCount - 1);
+          else opportunityCount = Math.max(0, opportunityCount - 1);
           if (isSmbLead(removed)) smbCount--;
           if (isReddit(removed)) redditCount = Math.max(0, redditCount - 1);
           if (isFreelancer(removed)) freelancerCount = Math.max(0, freelancerCount - 1);
@@ -832,6 +841,29 @@ export function diversifiedTop12(
         }
         if (add(lead)) socialInResult++;
       }
+    }
+
+    // Pin non-Reddit social into the first viewport (demo + relevance signal).
+    const pinTarget = Math.min(6, socialTarget, result.filter((l) => isSocialLead(l) && !isReddit(l)).length);
+    if (pinTarget > 0) {
+      const pinned: Lead[] = [];
+      const rest: Lead[] = [];
+      for (const r of result) {
+        if (pinned.length < pinTarget && isSocialLead(r) && !isReddit(r)) pinned.push(r);
+        else rest.push(r);
+      }
+      // Interleave: social, filler, social, filler… so Freelancer volume remains visible.
+      const interleaved: Lead[] = [];
+      let pi = 0;
+      let ri = 0;
+      while (interleaved.length < result.length && (pi < pinned.length || ri < rest.length)) {
+        if (pi < pinned.length) interleaved.push(pinned[pi++]);
+        if (ri < rest.length && interleaved.length < result.length) interleaved.push(rest[ri++]);
+      }
+      while (ri < rest.length && interleaved.length < result.length) interleaved.push(rest[ri++]);
+      while (pi < pinned.length && interleaved.length < result.length) interleaved.push(pinned[pi++]);
+      result.length = 0;
+      result.push(...interleaved);
     }
   }
 

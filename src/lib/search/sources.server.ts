@@ -840,34 +840,32 @@ export async function searchUpwork(qx: ExpandedQueries): Promise<SourceLead[]> {
       /* continue */
     }
 
-    const serpKey = paidDiscoveryEnabled() ? process.env.SERPAPI_KEY : undefined;
-    if (serpKey && out.length < 5) {
+    if (out.length < 5 && paidDiscoveryEnabled()) {
       try {
-        const q = `site:upwork.com/jobs "${skill}" (need OR looking OR hiring)`;
-        const url = `https://serpapi.com/search.json?engine=google&q=${encodeURIComponent(q)}&api_key=${serpKey}&num=8`;
-        const data = await safe(
-          fetch(url).then((r) => ok<any>(r)),
-          null,
-        );
-        for (const r of data?.organic_results ?? []) {
-          const link = r.link || "";
-          if (!/upwork\.com\/jobs/i.test(link) || seen.has(link)) continue;
-          const title = r.title || "";
-          const snippet = (r.snippet || "").slice(0, 400);
-          if (!isBuyerContent(`${title} ${snippet}`, qx.negativePhrases || [])) continue;
-          seen.add(link);
-          out.push({
-            source: "upwork",
-            platform: "Upwork Job Posting",
-            title: `JOB: ${title}`,
-            snippet,
-            full_post_url: link,
-            posted_at: undefined,
-            engagement: 35,
-            is_decision_maker: true,
-            intentBoost: 12,
-            match_reasons: ["Upwork SerpAPI fallback"],
-          });
+        const { searchGoogleSerp, hasGoogleSerpProvider } = await import("./serp-providers.server");
+        if (hasGoogleSerpProvider()) {
+          const q = `site:upwork.com/jobs "${skill}" (need OR looking OR hiring)`;
+          const data = await searchGoogleSerp(q, { tbs: "qdr:w", num: 8 });
+          for (const r of data?.organic_results ?? []) {
+            const link = r.link || "";
+            if (!/upwork\.com\/jobs/i.test(link) || seen.has(link)) continue;
+            const title = r.title || "";
+            const snippet = (r.snippet || "").slice(0, 400);
+            if (!isBuyerContent(`${title} ${snippet}`, qx.negativePhrases || [])) continue;
+            seen.add(link);
+            out.push({
+              source: "upwork",
+              platform: "Upwork Job Posting",
+              title: `JOB: ${title}`,
+              snippet,
+              full_post_url: link,
+              posted_at: undefined,
+              engagement: 35,
+              is_decision_maker: true,
+              intentBoost: 12,
+              match_reasons: ["Upwork SERP fallback"],
+            });
+          }
         }
       } catch {
         /* continue */
@@ -1153,18 +1151,14 @@ export async function searchTwitter(qx: ExpandedQueries): Promise<SourceLead[]> 
     }
   }
 
-  // Paid SerpAPI Twitter backup — opt-in only
+  // Paid SERP Twitter backup — Serper/ScrapingDog (opt-in)
   if (out.length < 3 && paidDiscoveryEnabled()) {
-    const serpKey = process.env.SERPAPI_KEY;
-    if (serpKey) {
-      for (const phrase of qx.buyerPhrases.slice(0, 2)) {
-        try {
+    try {
+      const { searchGoogleSerp, hasGoogleSerpProvider } = await import("./serp-providers.server");
+      if (hasGoogleSerpProvider()) {
+        for (const phrase of qx.buyerPhrases.slice(0, 2)) {
           const googleQuery = `site:twitter.com OR site:x.com "${phrase}" -filter:retweets`;
-          const url = `https://serpapi.com/search.json?engine=google&q=${encodeURIComponent(googleQuery)}&api_key=${serpKey}&num=10&tbs=qdr:d`;
-          const data = await safe(
-            fetch(url).then((r) => ok<any>(r)),
-            null,
-          );
+          const data = await searchGoogleSerp(googleQuery, { tbs: "qdr:d", num: 10 });
           for (const r of data?.organic_results ?? []) {
             const link = r.link || "";
             if (!link || seen.has(link)) continue;
@@ -1185,8 +1179,10 @@ export async function searchTwitter(qx: ExpandedQueries): Promise<SourceLead[]> 
               intentBoost: 12,
             });
           }
-        } catch {}
+        }
       }
+    } catch {
+      /* optional */
     }
   }
 
@@ -1294,45 +1290,44 @@ export async function searchLinkedIn(
   const postQueries = qx.booleanWebQueries
     .filter((q) => q.includes("linkedin.com/posts"))
     .slice(0, 2);
-  const serpKey = paidDiscoveryEnabled() ? process.env.SERPAPI_KEY : undefined;
-  if (serpKey && postQueries.length) {
-    for (const q of postQueries) {
-      try {
-        const url = `https://serpapi.com/search.json?engine=google&q=${encodeURIComponent(q)}&api_key=${serpKey}&num=10&tbs=qdr:d`;
-        const data = await safe(
-          fetch(url).then((r) => ok<any>(r)),
-          null,
-        );
-        for (const r of data?.organic_results ?? []) {
-          const link = r.link || "";
-          if (!link || seen.has(link) || !link.includes("linkedin.com")) continue;
-          if (!/linkedin\.com\/posts\//i.test(link) && postsOnly) continue;
-          const text = `${r.title || ""} ${r.snippet || ""}`;
-          if (!isBuyerContent(text, qx.negativePhrases)) continue;
-          // Bare "hiring" / "need a" alone is not enough on LinkedIn SERP.
-          if (
-            !LINKEDIN_FREELANCE_BUYER_RE.test(text) &&
-            !/\b(need someone|who can|willing to pay|budget|freelancer|contractor)\b/i.test(text)
-          ) {
-            continue;
+  if (paidDiscoveryEnabled() && postQueries.length) {
+    try {
+      const { searchGoogleSerp, hasGoogleSerpProvider } = await import("./serp-providers.server");
+      if (hasGoogleSerpProvider()) {
+        for (const q of postQueries) {
+          const data = await searchGoogleSerp(q, { tbs: "qdr:d", num: 10 });
+          for (const r of data?.organic_results ?? []) {
+            const link = r.link || "";
+            if (!link || seen.has(link) || !link.includes("linkedin.com")) continue;
+            if (!/linkedin\.com\/posts\//i.test(link) && postsOnly) continue;
+            const text = `${r.title || ""} ${r.snippet || ""}`;
+            if (!isBuyerContent(text, qx.negativePhrases)) continue;
+            if (
+              !LINKEDIN_FREELANCE_BUYER_RE.test(text) &&
+              !/\b(need someone|who can|willing to pay|budget|freelancer|contractor)\b/i.test(text)
+            ) {
+              continue;
+            }
+            seen.add(link);
+            const idFromUrl = identityFromSocialUrl(link, r.title || "");
+            out.push({
+              source: "linkedin",
+              platform: "LinkedIn Post",
+              title: r.title || "",
+              snippet: (r.snippet || "").slice(0, 400),
+              full_post_url: link,
+              author: idFromUrl.author,
+              author_url: idFromUrl.author_url,
+              posted_at: parseSerpDate(r.date || r.published_date),
+              engagement: 12,
+              is_decision_maker: detectDecisionMaker(text),
+              intentBoost: 15,
+            });
           }
-          seen.add(link);
-          const idFromUrl = identityFromSocialUrl(link, r.title || "");
-          out.push({
-            source: "linkedin",
-            platform: "LinkedIn Post",
-            title: r.title || "",
-            snippet: (r.snippet || "").slice(0, 400),
-            full_post_url: link,
-            author: idFromUrl.author,
-            author_url: idFromUrl.author_url,
-            posted_at: parseSerpDate(r.date || r.published_date),
-            engagement: 12,
-            is_decision_maker: detectDecisionMaker(text),
-            intentBoost: 15,
-          });
         }
-      } catch {}
+      }
+    } catch {
+      /* optional */
     }
   }
 
@@ -1364,53 +1359,54 @@ export async function searchWebBoolean(qx: ExpandedQueries): Promise<SourceLead[
     out.push(lead as SourceLead);
   }
 
-  if (out.length < 4 && paidDiscoveryEnabled() && process.env.SERPAPI_KEY) {
-    for (const q of qx.booleanWebQueries.slice(0, 3)) {
-      try {
-        const url = `https://serpapi.com/search.json?engine=google&q=${encodeURIComponent(q)}&api_key=${process.env.SERPAPI_KEY}&num=10&tbs=qdr:d`;
-        const data = await safe(
-          fetch(url).then((r) => ok<any>(r)),
-          null,
-        );
-        for (const r of data?.organic_results ?? []) {
-          const link = r.link || "";
-          if (!link || seen.has(link)) continue;
-          if (URL_BLOCKLIST.some((b) => link.toLowerCase().includes(b))) continue;
-          if (isSocialProfilePage(link)) continue;
-          const text = `${r.title || ""} ${r.snippet || ""}`;
-          if (!isBuyerContent(text, qx.negativePhrases)) continue;
-          seen.add(link);
-          const idFromUrl = identityFromSocialUrl(link, r.title || "");
-          const lower = link.toLowerCase();
-          let source = idFromUrl.source || "searxng";
-          let platform = idFromUrl.platform || "Web Search";
-          if (!idFromUrl.source) {
-            if (lower.includes("reddit.com")) {
-              source = "reddit";
-              platform = "Reddit Post";
-            } else if (lower.includes("linkedin.com/posts")) {
-              source = "linkedin";
-              platform = "LinkedIn Post";
-            } else if (lower.includes("twitter.com") || lower.includes("x.com")) {
-              source = "twitter";
-              platform = "Twitter/X";
+  if (out.length < 4 && paidDiscoveryEnabled()) {
+    try {
+      const { searchGoogleSerp, hasGoogleSerpProvider } = await import("./serp-providers.server");
+      if (hasGoogleSerpProvider()) {
+        for (const q of qx.booleanWebQueries.slice(0, 2)) {
+          const data = await searchGoogleSerp(q, { tbs: "qdr:d", num: 10 });
+          for (const r of data?.organic_results ?? []) {
+            const link = r.link || "";
+            if (!link || seen.has(link)) continue;
+            if (URL_BLOCKLIST.some((b) => link.toLowerCase().includes(b))) continue;
+            if (isSocialProfilePage(link)) continue;
+            const text = `${r.title || ""} ${r.snippet || ""}`;
+            if (!isBuyerContent(text, qx.negativePhrases)) continue;
+            seen.add(link);
+            const idFromUrl = identityFromSocialUrl(link, r.title || "");
+            const lower = link.toLowerCase();
+            let source = idFromUrl.source || "searxng";
+            let platform = idFromUrl.platform || "Web Search";
+            if (!idFromUrl.source) {
+              if (lower.includes("reddit.com")) {
+                source = "reddit";
+                platform = "Reddit Post";
+              } else if (lower.includes("linkedin.com/posts")) {
+                source = "linkedin";
+                platform = "LinkedIn Post";
+              } else if (lower.includes("twitter.com") || lower.includes("x.com")) {
+                source = "twitter";
+                platform = "Twitter/X";
+              }
             }
+            out.push({
+              source,
+              platform,
+              title: r.title || "",
+              snippet: (r.snippet || "").slice(0, 400),
+              full_post_url: link,
+              author: idFromUrl.author,
+              author_url: idFromUrl.author_url,
+              posted_at: parseSerpDate(r.date || r.published_date),
+              engagement: 10,
+              is_decision_maker: detectDecisionMaker(text),
+              intentBoost: 10,
+            });
           }
-          out.push({
-            source,
-            platform,
-            title: r.title || "",
-            snippet: (r.snippet || "").slice(0, 400),
-            full_post_url: link,
-            author: idFromUrl.author,
-            author_url: idFromUrl.author_url,
-            posted_at: parseSerpDate(r.date || r.published_date),
-            engagement: 10,
-            is_decision_maker: detectDecisionMaker(text),
-            intentBoost: 10,
-          });
         }
-      } catch {}
+      }
+    } catch {
+      /* optional */
     }
   }
 
@@ -1477,109 +1473,128 @@ export async function searchStealthWorker(qx: ExpandedQueries): Promise<SourceLe
 }
 
 // =====================================================================
-// SerpAPI — boolean buyer-intent Google queries (when key present)
+// Hosted Google SERP (Serper → ScrapingDog → SerpAPI) — social + public dorks
 // =====================================================================
 export async function searchSerpAPI(qx: ExpandedQueries): Promise<SourceLead[]> {
   const out: SourceLead[] = [];
   if (!paidDiscoveryEnabled()) return out;
-  const key = process.env.SERPAPI_KEY;
-  if (key) {
-    const craft = personNoun(qx.skill, qx.role);
-    const skillQ = qx.skill || qx.role;
-    // Reddit already has native/RSS supply. Paid SerpAPI must buy what SearXNG
-    // cannot: LinkedIn/X/FB/IG/forums/gov. When Docker/SearXNG is down this is
-    // the ONLY multi-platform path — empty SerpAPI = Reddit-only Discover.
-    const queries = [
-      `site:linkedin.com/posts ("looking for a ${craft}" OR "need a ${craft}" OR "hiring a ${craft}" OR "need a ${skillQ}")`,
-      `site:linkedin.com/posts ("${skillQ}") ("willing to pay" OR "looking for" OR "anyone recommend" OR "[hiring]")`,
-      `site:x.com OR site:twitter.com ("looking for a ${craft}" OR "need a ${craft}" OR "hiring ${skillQ}")`,
-      `site:facebook.com/groups ("looking for a ${craft}" OR "need a ${craft}" OR "recommend a ${craft}")`,
-      `site:instagram.com ("looking for a ${craft}" OR "need a ${craft}" OR "hiring a ${craft}")`,
-      `("${skillQ}" OR "${craft}") ("looking for" OR "need a" OR hiring) (site:news.ycombinator.com OR site:indiehackers.com OR site:dev.to)`,
-      `("${skillQ}") ("looking for a tool" OR "need a tool" OR "anyone recommend" OR "alternative to" OR "struggling with")`,
-      `site:reddit.com ("${skillQ}") ("looking for" OR "need a" OR "anyone know" OR "recommend")`,
-    ];
 
-    const fetchSerp = async (q: string, tbs: string) => {
-      const url =
-        `https://serpapi.com/search.json?engine=google&q=${encodeURIComponent(q)}` +
-        `&api_key=${key}&num=20&tbs=${tbs}`;
-      return safe(fetch(url).then((r) => ok<any>(r)), null);
-    };
+  const { searchGoogleSerp, hasGoogleSerpProvider } = await import("./serp-providers.server");
+  if (!hasGoogleSerpProvider()) {
+    // CoreClaw-only fallback when no Serper/Dog/SerpAPI keys.
+    try {
+      const { searchCoreClawSerp } = await import("./coreclaw-sources.server");
+      return await withBudget(searchCoreClawSerp(qx), [], PAID_BACKUP_BUDGET_MS);
+    } catch {
+      return out;
+    }
+  }
 
-    // Prefer past-day. Only spend week fallback when day yield is thin —
-    // Free SerpAPI is 250/mo; don't double every query on every search.
-    const dayBatches = await Promise.allSettled(queries.map((q) => fetchSerp(q, "qdr:d")));
-    const emptyIdx: number[] = [];
-    const ingest = (
-      data: any,
-      window: "day" | "week" | "hour",
-    ) => {
-      for (const r of data?.organic_results ?? []) {
-        const link = r.link || "";
-        if (!link || seen.has(link)) continue;
-        seen.add(link);
-        const title = r.title || "";
-        const snippet = (r.snippet || "").slice(0, 400);
-        const text = `${title} ${snippet}`;
-        if (URL_BLOCKLIST.some((b) => link.toLowerCase().includes(b))) continue;
-        if (/reddit\.com/i.test(link)) continue;
-        if (SELLER_DROP_RE.test(text)) continue;
-        const onPlatform =
-          /linkedin\.com\/posts|facebook\.com|instagram\.com|(twitter|x)\.com/i.test(link);
-        if (!onPlatform && !isBuyerContent(text, qx.negativePhrases)) continue;
-        const postedAt = resolveLeadDate(r.date || r.published_date, title, snippet);
-        // Social older than the clients window — never keep (2019 tweets, 28w IG).
-        if (postedAt && onPlatform) {
-          const age = ageDays(postedAt);
-          if (age != null && age > CLIENTS_SOCIAL_MAX_AGE_DAYS) continue;
-        }
-        const idFromUrl = identityFromSocialUrl(link, title);
-        const source = idFromUrl.source || "serpapi";
-        const platform = idFromUrl.platform || "Google: Buyer Post";
-        out.push({
-          source,
-          platform,
-          title,
-          snippet,
-          full_post_url: link,
-          author: idFromUrl.author,
-          author_url: idFromUrl.author_url,
-          posted_at: postedAt,
-          engagement: 10,
-          is_decision_maker: detectDecisionMaker(text),
-          demand_verified: true,
-          freshness_window: window,
-          intentBoost: 12,
-          match_reasons: ["Paid web search (SerpAPI)", platform],
-        });
+  const craft = personNoun(qx.skill, qx.role);
+  const skillQ = qx.skill || qx.role;
+  // Credit-efficient: 4 high-yield dorks (LI / X / FB / public). Instagram
+  // only if the social trio is thin — avoids burning free Serper credits.
+  const coreQueries = [
+    `site:linkedin.com/posts ("looking for a ${craft}" OR "need a ${craft}" OR "hiring a ${craft}" OR "need a ${skillQ}")`,
+    `site:x.com OR site:twitter.com ("looking for a ${craft}" OR "need a ${craft}" OR "hiring ${skillQ}")`,
+    `site:facebook.com/groups ("looking for a ${craft}" OR "need a ${craft}" OR "recommend a ${craft}")`,
+    `("${skillQ}" OR "${craft}") ("looking for" OR "need a" OR hiring OR "request for proposal" OR RFP) (site:.gov OR site:indiehackers.com OR site:dev.to OR site:news.ycombinator.com OR site:sam.gov)`,
+  ];
+  const igQuery = `site:instagram.com ("looking for a ${craft}" OR "need a ${craft}" OR "hiring a ${craft}")`;
+
+  const SELLER_DROP_RE =
+    /\b(hire me|my portfolio|my rates|available for hire|open to work|check out my (gig|work|service)|i (build|offer|provide|specialize)|dm me your|starting at\s*\$|for your (business|company|startup))\b/i;
+  const seen = new Set<string>();
+
+  const ingest = (data: { organic_results?: any[]; provider?: string } | null, window: "day" | "week") => {
+    if (!data) return 0;
+    let n = 0;
+    const providerLabel =
+      data.provider === "serper"
+        ? "Paid web search (Serper)"
+        : data.provider === "scrapingdog"
+          ? "Paid web search (ScrapingDog)"
+          : "Paid web search (SERP)";
+    for (const r of data.organic_results ?? []) {
+      const link = r.link || "";
+      if (!link || seen.has(link)) continue;
+      seen.add(link);
+      const title = r.title || "";
+      const snippet = (r.snippet || "").slice(0, 400);
+      const text = `${title} ${snippet}`;
+      if (URL_BLOCKLIST.some((b) => link.toLowerCase().includes(b))) continue;
+      if (/reddit\.com/i.test(link)) continue;
+      if (SELLER_DROP_RE.test(text)) continue;
+      const onPlatform =
+        /linkedin\.com\/posts|facebook\.com|instagram\.com|(twitter|x)\.com/i.test(link);
+      if (!onPlatform && !isBuyerContent(text, qx.negativePhrases)) continue;
+      const postedAt = resolveLeadDate(r.date || r.published_date, title, snippet);
+      if (postedAt && onPlatform) {
+        const age = ageDays(postedAt);
+        if (age != null && age > CLIENTS_SOCIAL_MAX_AGE_DAYS) continue;
       }
-    };
-    const seen = new Set<string>();
-    const SELLER_DROP_RE =
-      /\b(hire me|my portfolio|my rates|available for hire|open to work|check out my (gig|work|service)|i (build|offer|provide|specialize)|dm me your|starting at\s*\$|for your (business|company|startup))\b/i;
-    dayBatches.forEach((batch, i) => {
-      if (batch.status !== "fulfilled" || !batch.value) {
-        emptyIdx.push(i);
-        return;
-      }
-      const hits = batch.value.organic_results?.length ?? 0;
-      if (hits === 0) emptyIdx.push(i);
-      else ingest(batch.value, "day");
-    });
-    if (out.length < 5 && emptyIdx.length) {
-      const weekBatches = await Promise.allSettled(
-        emptyIdx.map((i) => fetchSerp(queries[i], "qdr:w")),
-      );
-      for (const batch of weekBatches) {
-        if (batch.status !== "fulfilled" || !batch.value) continue;
-        // Week filter is NOT a day window — UI 24h requires real posted_at.
-        ingest(batch.value, "week");
-      }
+      const idFromUrl = identityFromSocialUrl(link, title);
+      const source = idFromUrl.source || "serpapi";
+      const platform = idFromUrl.platform || "Google: Buyer Post";
+      out.push({
+        source,
+        platform,
+        title,
+        snippet,
+        full_post_url: link,
+        author: idFromUrl.author,
+        author_url: idFromUrl.author_url,
+        posted_at: postedAt,
+        engagement: 10,
+        is_decision_maker: detectDecisionMaker(text),
+        demand_verified: true,
+        freshness_window: window,
+        intentBoost: 12,
+        match_reasons: [providerLabel, platform],
+      });
+      n++;
     }
-    if (process.env.NODE_ENV === "development") {
-      console.info(`[serpapi] ${out.length} leads across platforms`);
+    return n;
+  };
+
+  const dayBatches = await Promise.allSettled(
+    coreQueries.map((q) => searchGoogleSerp(q, { tbs: "qdr:d", num: 20 })),
+  );
+  const emptyIdx: number[] = [];
+  let socialHits = 0;
+  dayBatches.forEach((batch, i) => {
+    if (batch.status !== "fulfilled" || !batch.value) {
+      emptyIdx.push(i);
+      return;
     }
+    const hits = batch.value.organic_results?.length ?? 0;
+    if (hits === 0) emptyIdx.push(i);
+    else {
+      const added = ingest(batch.value, "day");
+      if (i < 3) socialHits += added;
+    }
+  });
+
+  // Conditional Instagram — only when LinkedIn/X/FB day yield is thin.
+  if (socialHits < 3) {
+    const ig = await searchGoogleSerp(igQuery, { tbs: "qdr:d", num: 15 });
+    ingest(ig, "day");
+  }
+
+  // Week fallback only when day yield is very thin — each week call can
+  // burn a scarce SerpAPI credit if Serper/Dog fail.
+  if (out.length < 3 && emptyIdx.length) {
+    const weekBatches = await Promise.allSettled(
+      emptyIdx.slice(0, 2).map((i) => searchGoogleSerp(coreQueries[i], { tbs: "qdr:w", num: 10 })),
+    );
+    for (const batch of weekBatches) {
+      if (batch.status !== "fulfilled" || !batch.value) continue;
+      ingest(batch.value, "week");
+    }
+  }
+
+  if (process.env.NODE_ENV === "development") {
+    console.info(`[serp] ${out.length} leads (Serper/ScrapingDog/SerpAPI)`);
   }
 
   // CoreClaw SERP backup — short race only (never stall Discover for 90s)
@@ -1587,7 +1602,6 @@ export async function searchSerpAPI(qx: ExpandedQueries): Promise<SourceLead[]> 
     try {
       const { searchCoreClawSerp } = await import("./coreclaw-sources.server");
       const cc = await withBudget(searchCoreClawSerp(qx), [], PAID_BACKUP_BUDGET_MS);
-      const seen = new Set(out.map((l) => l.full_post_url));
       for (const l of cc) {
         if (seen.has(l.full_post_url)) continue;
         seen.add(l.full_post_url);
@@ -3088,7 +3102,10 @@ export async function searchAllSources(
   // shared one rolling minute, so a second search started moments after the
   // first found the budget already spent and silently skipped social entirely.
   const { withSearxngBudget } = await import("./searxng.server");
-  return withSearxngBudget(() => searchAllSourcesInner(params)) as Promise<{
+  const { withSerpApiBudget } = await import("./serp-providers.server");
+  return withSearxngBudget(() =>
+    withSerpApiBudget(() => searchAllSourcesInner(params)),
+  ) as Promise<{
     leads: Lead[];
     sources: string[];
     debug?: SearchDebug;

@@ -64,10 +64,10 @@ export const runSearch = createServerFn({ method: "POST" })
         .eq("id", userId);
     }
     const plan = profile?.plan ?? "free";
-    if (plan === "free" && used >= 5) {
+    if (plan === "free" && used >= 2) {
       return {
         error: "limit",
-        message: "Free plan: 5 searches per day. Try again tomorrow.",
+        message: "Free plan: 2 searches per day. Try again tomorrow.",
         leads: [],
         sources: [] as string[],
         suggestions: [] as string[],
@@ -719,26 +719,33 @@ export const runSearch = createServerFn({ method: "POST" })
       // path — an org posting a role for this craft IS a prospective buyer.
       maxCompanyAts: goal === "jobs" ? 20 : 120,
       minSocial: goal === "jobs" ? 2 : goal === "clients" ? 10 : 5,
-      maxReddit:
-        volumePersona
-          ? 70
-          : goal === "clients" || classified.signalMode === "buying_signal"
-            ? 48
-            : 24,
+      // No Freelancer/Reddit volume caps — quality via filters/scoring only.
+      maxReddit: maxTotal,
       maxTotal,
       // Warm floor (45) — volume without weak / no-signal rows.
       minScore:
         goal === "clients" || classified.signalMode === "buying_signal" || volumePersona
           ? 45
           : 0,
-      maxPerPlatform: volumePersona ? 70 : 55,
-      // Freelancer is high-volume but crowds out LinkedIn/Reddit/People.
-      maxFreelancer:
-        goal === "clients" || classified.signalMode === "buying_signal" ? 22 : 32,
+      maxPerPlatform: maxTotal,
+      maxFreelancer: maxTotal,
     });
     trace("diversified", leads);
 
-    let segments = segmentLeads(leads);
+    // Top 2–3 cards: PIE contact harvest (regex → page → capped enrich → LLM).
+    // Fail-soft with a hard time budget so Discover never stalls.
+    let leadsWithContacts = leads;
+    try {
+      const { enrichTopLeadContacts } = await import("./contact/pie-top-leads.server");
+      leadsWithContacts = await Promise.race([
+        enrichTopLeadContacts(leads),
+        new Promise<typeof leads>((r) => setTimeout(() => r(leads), 12_000)),
+      ]);
+    } catch {
+      leadsWithContacts = leads;
+    }
+
+    let segments = segmentLeads(leadsWithContacts);
     // Audience scopes tabs — but NEVER return a blank Posts feed when we have
     // underlying signal leads (that caused "0 posts" empty-state with Companies > 0).
     const aud = classified.audience ?? "all";
@@ -766,8 +773,8 @@ export const runSearch = createServerFn({ method: "POST" })
     }
     // If scoped segment still has no posts but ranked leads exist, keep the leads
     // as posts so Discover is never a blank wall.
-    if (!segments.posts.length && leads.length) {
-      segments = { ...segments, posts: leads };
+    if (!segments.posts.length && leadsWithContacts.length) {
+      segments = { ...segments, posts: leadsWithContacts };
     }
 
     // Free identity enrichment for the top companies (Wikidata, ~300ms each,
@@ -827,7 +834,7 @@ export const runSearch = createServerFn({ method: "POST" })
     }
 
     const suggestions =
-      leads.length === 0 || (classified.intentMode === "directory_smb" && !classified.location)
+      leadsWithContacts.length === 0 || (classified.intentMode === "directory_smb" && !classified.location)
         ? generateSmartSuggestions(classified)
         : [];
 
@@ -838,7 +845,7 @@ export const runSearch = createServerFn({ method: "POST" })
         afterDedup: deduped.length,
         afterValidate: validated.length,
         afterQuality: quality.length,
-        afterTop10: leads.length,
+        afterTop10: leadsWithContacts.length,
       });
     }
 
@@ -849,7 +856,7 @@ export const runSearch = createServerFn({ method: "POST" })
     await supabase.from("search_history").insert({
       user_id: userId,
       query: data.query,
-      results_count: leads.length,
+      results_count: leadsWithContacts.length,
       sources_searched: sources,
     });
 
@@ -861,7 +868,7 @@ export const runSearch = createServerFn({ method: "POST" })
     }
 
     return {
-      leads,
+      leads: leadsWithContacts,
       posts: segments.posts,
       companies: segments.companies,
       people: segments.people,

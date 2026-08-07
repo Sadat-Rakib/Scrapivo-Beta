@@ -4,6 +4,8 @@ import {
   Crown,
   DollarSign,
   ExternalLink,
+  Mail,
+  Phone,
   ShieldCheck,
   ShieldQuestion,
   Zap,
@@ -181,6 +183,23 @@ export function LeadCard({
       {!lead.ai_summary && (
         <div className="mt-1.5 text-xs text-muted-foreground line-clamp-2">{lead.snippet}</div>
       )}
+      {lead.inline_contacts &&
+        (lead.inline_contacts.emails.length > 0 || lead.inline_contacts.phones.length > 0) && (
+          <div className="mt-2 rounded-lg border border-primary/20 bg-primary/5 px-2.5 py-1.5 space-y-0.5">
+            {lead.inline_contacts.emails.slice(0, 2).map((e) => (
+              <div key={e} className="flex items-center gap-1.5 text-xs text-foreground/90">
+                <Mail className="size-3 text-primary shrink-0" />
+                <span className="truncate">{e}</span>
+              </div>
+            ))}
+            {lead.inline_contacts.phones.slice(0, 1).map((p) => (
+              <div key={p} className="flex items-center gap-1.5 text-xs text-foreground/90">
+                <Phone className="size-3 text-primary shrink-0" />
+                <span className="truncate">{p}</span>
+              </div>
+            ))}
+          </div>
+        )}
       <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
         <span className="truncate">
           {lead.author ?? "anon"} · {lead.engagement ?? 0} eng.

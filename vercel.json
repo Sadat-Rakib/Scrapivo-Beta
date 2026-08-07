@@ -14,7 +14,7 @@
   "crons": [
     {
       "path": "/api/cron/email-sequences",
-      "schedule": "0 * * * *"
+      "schedule": "0 14 * * *"
     }
   ]
 }

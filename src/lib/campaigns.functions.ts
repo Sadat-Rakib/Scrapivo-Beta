@@ -196,11 +196,11 @@ async function executeWatchSearch(
     await supabase.from("profiles").update({ searches_used: 0, searches_reset_at: now.toISOString() }).eq("id", userId);
   }
   const plan = profile?.plan ?? "free";
-  if (plan === "free" && used >= 5) {
+  if (plan === "free" && used >= 2) {
     return {
       leads: [],
       error: "limit",
-      message: "Free plan: 5 searches per day. Watch skipped.",
+      message: "Free plan: 2 searches per day. Watch skipped.",
     };
   }
 
