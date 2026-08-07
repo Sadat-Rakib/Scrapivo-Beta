@@ -215,7 +215,7 @@ function DiscoverPage() {
 
   // 24h = real posted_at within 24 hours only.
   // All = no UI age cut.
-  const [freshness, setFreshness] = useState<"all" | "24h">("24h");
+  const [freshness, setFreshness] = useState<"all" | "24h">("all");
   const inWindow = (l: {
     posted_at?: string;
     freshness_window?: string;

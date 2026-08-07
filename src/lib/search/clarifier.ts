@@ -71,6 +71,30 @@ const BUYER_TYPE_RE =
  * Infer result-segment audience from the typed query so we never re-ask
  * "What should we bring back?" when the user already said companies/people/posts.
  */
+const DEMAND_VERB_RE =
+  /\b(?:looking\s+for|look\s+for|hiring|hire|need(?:s|ing)?|want(?:s|ing)?|asking\s+for|seeking|searching\s+for|in\s+search\s+of|who\s+can)\b/i;
+
+/**
+ * Buyer / client hunts — not job applications. YoE and "who are you targeting"
+ * are the wrong clarifiers here.
+ */
+export function isClientsBuyerHunt(classified: ClassifiedQuery): boolean {
+  if (classified.goal === "jobs") return false;
+  if (classified.goal === "clients" || classified.goal === "both") return true;
+  if (classified.signalMode === "buying_signal") return true;
+  if (classified.type === "product") return true;
+  const raw = classified.raw || "";
+  if (DEMAND_VERB_RE.test(raw)) return true;
+  // Service / lead crafts imply hunting buyers, not applying for roles.
+  if (
+    /\b(services?|clients?|customers?|leads?|buyers?)\b/i.test(raw) &&
+    raw.trim().split(/\s+/).length >= 2
+  ) {
+    return true;
+  }
+  return false;
+}
+
 export function extractStatedAudience(
   raw: string,
 ): NonNullable<ClarifyAnswers["audience"]> | null {
@@ -81,11 +105,28 @@ export function extractStatedAudience(
     /\b(companies|company|businesses|business|firms?|organizations?|organisations?)\b/.test(t);
   const wantsPosts = /\b((linkedin\s+)?posts?|tweets?|threads?)\b/.test(t);
   const wantsEverything = /\b(everything|all (of )?(them|those|three)|etc\.?)\b/.test(t);
+  const exclusiveCompanies =
+    /\b(?:companies|company|businesses|business|firms?)\s+only\b/.test(t) ||
+    /\bonly\s+(?:companies|company|businesses|business|firms?)\b/.test(t);
+  const exclusivePeople =
+    /\b(?:people|persons?|individuals?)\s+only\b/.test(t) ||
+    /\bonly\s+(?:people|persons?|individuals?)\b/.test(t);
+  const exclusivePosts =
+    /\b(?:(?:linkedin\s+)?posts?|tweets?|threads?)\s+only\b/.test(t) ||
+    /\bonly\s+(?:(?:linkedin\s+)?posts?|tweets?|threads?)\b/.test(t);
+  const demandVerb = DEMAND_VERB_RE.test(t);
 
   if (wantsEverything) return "all";
+  // Explicit exclusives win before dual / demand broadening.
+  if (exclusiveCompanies) return "companies";
+  if (exclusivePeople) return "people";
+  if (exclusivePosts) return "posts";
   if (wantsPeople && wantsCompanies) return "all";
   if (wantsPeople && wantsPosts) return "all";
   if (wantsCompanies && wantsPosts) return "all";
+  // "companies looking for X" / "people looking for X" = hunt buyers across
+  // tabs — not companies-only / people-only scoping that wipes People/Posts.
+  if ((wantsCompanies || wantsPeople) && demandVerb) return "all";
   if (wantsPeople) return "people";
   if (wantsCompanies) return "companies";
   if (wantsPosts) return "posts";
@@ -365,6 +406,7 @@ export function buildClarifyingQuestions(
   const statedExp = extractStatedExperience(raw);
   const statedBuyer = hasStatedBuyerType(raw);
   const hasLocation = !!opts.hasLocation || !!classified.location || mentionsPlace(raw);
+  const clientsHunt = isClientsBuyerHunt(classified);
   const out: ClarifyQuestion[] = [];
 
   if (craftLooksUncertain(classified.coreSkill)) {
@@ -383,11 +425,22 @@ export function buildClarifyingQuestions(
 
   if (product) {
     out.push(productSignalFocusQuestion());
-  } else if (!statedExp) {
+  } else if (!statedExp && classified.goal === "jobs") {
+    // YoE only for job hunts — never for clients / buying-signal buyer hunts.
+    out.push(skillExperienceQuestion());
+  } else if (!statedExp && !clientsHunt) {
+    // Bare vague craft with no demand language (e.g. "designer") — YoE still helps.
     out.push(skillExperienceQuestion());
   }
 
-  if (!statedBuyer) {
+  // Buyer type: skip when already stated, or when craft + audience/demand are
+  // clear enough that default "any" is fine (volume demos / precise hunts).
+  const skipBuyer =
+    statedBuyer ||
+    (clientsHunt &&
+      !craftLooksUncertain(classified.coreSkill) &&
+      (!!statedAudience || DEMAND_VERB_RE.test(raw)));
+  if (!skipBuyer) {
     out.push(product ? productBuyerQuestion() : skillBuyerQuestion());
   }
 
@@ -540,8 +593,11 @@ export function applyClarifyAnswers(
   const geo = answers.geography ?? "global";
   const signalFocus = product ? (answers.signal_focus ?? "all") : undefined;
   const inferredExp = extractStatedExperience(classified.raw || "");
-  const experience = product
-    ? undefined
+  const clientsHunt = isClientsBuyerHunt(classified);
+  // Clients / buying-signal hunts: never invent a YoE bucket — it biases ATS
+  // filters toward junior roles the user never asked for.
+  const experience = product || clientsHunt
+    ? (answers.experience ?? inferredExp ?? undefined)
     : (answers.experience ?? inferredExp ?? "0-1");
 
   const location =
@@ -604,14 +660,25 @@ export function shouldClarify(classified: ClassifiedQuery): boolean {
   const hasPlace = !!classified.location || mentionsPlace(raw);
   const hasAudience = !!extractStatedAudience(raw);
   const hasBuyer = hasStatedBuyerType(raw);
-  const hasHiring =
-    /\b(hiring|looking for|need a|need an|who can|asking for)\b/i.test(raw);
+  const hasHiring = DEMAND_VERB_RE.test(raw);
 
   // Precise hiring queries with place + craft: search immediately.
   if (
     !craftLooksUncertain(classified.coreSkill) &&
     hasPlace &&
     (hasBuyer || hasHiring) &&
+    raw.split(/\s+/).length >= 5
+  ) {
+    return false;
+  }
+
+  // Clear clients hunt with craft + audience already stated: only geography
+  // might remain — if place is present, skip the panel entirely.
+  if (
+    isClientsBuyerHunt(classified) &&
+    !craftLooksUncertain(classified.coreSkill) &&
+    hasAudience &&
+    hasPlace &&
     raw.split(/\s+/).length >= 5
   ) {
     return false;

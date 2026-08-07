@@ -1002,7 +1002,7 @@ export function segmentLeads(rawLeads: Lead[]): LeadSegments {
       };
     })
     .sort((a, b) => b.score - a.score || b.signal_count - a.signal_count)
-    .slice(0, 120);
+    .slice(0, 150);
 
   /**
    * Auto-generated throwaway handles ("Impossible_Fee_6217") — Reddit's
@@ -1079,7 +1079,7 @@ export function segmentLeads(rawLeads: Lead[]): LeadSegments {
       const dm = (isFieldDecisionMaker(b.lead) ? 8 : 0) - (isFieldDecisionMaker(a.lead) ? 8 : 0);
       return b.score - a.score || dm;
     })
-    .slice(0, 120);
+    .slice(0, 150);
 
   return { posts, companies, people };
 }

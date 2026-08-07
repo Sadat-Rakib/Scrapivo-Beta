@@ -127,7 +127,7 @@ export const runSearch = createServerFn({ method: "POST" })
     // ── Clarifying answers → concrete search inputs ────────────────────────
     // Applied BEFORE the audience/service tweaks below so an explicit user
     // choice ("target startups") shapes the same query fields those use.
-    const { applyClarifyAnswers, buildClarifyingQuestions, shouldClarify } =
+    const { applyClarifyAnswers, buildClarifyingQuestions, shouldClarify, extractStatedAudience } =
       await import("./search/clarifier");
     const refinement = applyClarifyAnswers(classified, data.clarify ?? {});
     // Only offer questions when the query was actually vague AND the user
@@ -160,7 +160,12 @@ export const runSearch = createServerFn({ method: "POST" })
     if (refinement.location) {
       classified.location = refinement.location;
     }
-    if (refinement.audience && refinement.audience !== "all") {
+    // Query/clarifier "everything" must clear project audience (companies/people)
+    // so People/Posts tabs are not wiped after a healthy fetch.
+    const statedAud = extractStatedAudience(data.query);
+    if (refinement.audience === "all" || statedAud === "all") {
+      classified.audience = "all";
+    } else if (refinement.audience && refinement.audience !== "all") {
       classified.audience =
         refinement.audience === "posts"
           ? "all"
@@ -190,11 +195,12 @@ export const runSearch = createServerFn({ method: "POST" })
     }
     const subredditBoosts = getSubredditBoostsForQuery(classified);
     // Product clarifiers ask signal focus, not YoE — don't force junior filters.
+    // Clients / buying-signal hunts also omit YoE (refinement.experience unset).
     const productClarify = classified.type === "product";
     const expFromClarify = productClarify ? undefined : refinement.experience;
     const exp = productClarify
       ? undefined
-      : (expFromClarify ?? ctx?.experience_level ?? "0-1");
+      : (expFromClarify ?? (classified.goal === "jobs" ? (ctx?.experience_level ?? "0-1") : undefined));
     const style = ctx?.work_style ?? "remote";
     const queryWantsSenior =
       /\b(senior|sr\.?|staff|principal|lead|[5-9]\+?\s*(?:years|yrs|yoe)|1[0-9]\+?\s*(?:years|yrs|yoe))\b/i.test(
@@ -719,31 +725,31 @@ export const runSearch = createServerFn({ method: "POST" })
     const volumePersona =
       classified.type === "product" ||
       /tutor|teacher|tutoring/i.test(`${classified.coreSkill} ${classified.raw}`);
-    const maxTotal =
-      goal === "both" && qualityPool >= 80
-        ? 500
-        : goal === "clients" || classified.signalMode === "buying_signal" || volumePersona
-          ? 450
-          : 280;
-    const leads = diversifiedTop12(quality, {
+    const clientsVolume =
+      goal === "clients" || classified.signalMode === "buying_signal" || volumePersona;
+    // Large pool for three-figure Posts / Companies / People — segment BEFORE
+    // diversify so tab volume is not capped by a thin ranked cut.
+    const poolCap = clientsVolume || (goal === "both" && qualityPool >= 80) ? 500 : 320;
+    const qualitySorted = [...quality].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+    const pool = qualitySorted.slice(0, poolCap);
+
+    const maxTotal = poolCap;
+    const rankedForFeed = diversifiedTop12(pool, {
       directoryMode,
       maxJobBoard: goal === "jobs" ? 8 : goal === "both" ? 4 : 2,
       // Company-identity ATS boards are the Companies segment on the clients
       // path — an org posting a role for this craft IS a prospective buyer.
-      maxCompanyAts: goal === "jobs" ? 20 : 120,
-      minSocial: goal === "jobs" ? 2 : goal === "clients" ? 10 : 5,
-      maxReddit: goal === "clients" ? 40 : maxTotal,
+      maxCompanyAts: goal === "jobs" ? 20 : 150,
+      minSocial: goal === "jobs" ? 2 : clientsVolume ? 15 : 5,
+      maxReddit: clientsVolume ? 60 : maxTotal,
       maxTotal,
       // Warm floor (45) — volume without weak / no-signal rows.
-      minScore:
-        goal === "clients" || classified.signalMode === "buying_signal" || volumePersona
-          ? 45
-          : 0,
+      minScore: clientsVolume ? 45 : 0,
       maxPerPlatform: maxTotal,
       // Cap Freelancer so social/public/ATS can surface in the viewport.
-      maxFreelancer: goal === "clients" || classified.signalMode === "buying_signal" ? 30 : maxTotal,
+      maxFreelancer: clientsVolume ? 50 : maxTotal,
     });
-    trace("diversified", leads);
+    trace("diversified", rankedForFeed);
 
     // Always-on compact funnel log (local + production) for mix diagnosis.
     {
@@ -757,28 +763,47 @@ export const runSearch = createServerFn({ method: "POST" })
           .join(" ");
       };
       console.info(
-        `[discover] raw=${raw.length} quality=${quality.length} out=${leads.length} | quality_by ${bySrc(quality)} | out_by ${bySrc(leads)} | fetch ${debug?.sourceCounts ? JSON.stringify(debug.sourceCounts) : "{}"}`,
+        `[discover] raw=${raw.length} quality=${quality.length} pool=${pool.length} out=${rankedForFeed.length} | quality_by ${bySrc(quality)} | out_by ${bySrc(rankedForFeed)} | fetch ${debug?.sourceCounts ? JSON.stringify(debug.sourceCounts) : "{}"}`,
       );
     }
 
+    // Segment from the full quality pool (not only the diversify cut) so
+    // Companies/People can reach three figures when supply exists.
+    let segments = segmentLeads(pool);
+    // Posts feed: diversify for mix (Freelancer soft-cap + social pin).
+    segments = {
+      ...segments,
+      posts: rankedForFeed,
+      companies: segments.companies.slice(0, 150),
+      people: segments.people.slice(0, 150),
+    };
+
     // Top 2–3 cards: PIE contact harvest (regex → page → capped enrich → LLM).
     // Fail-soft with a hard time budget so Discover never stalls.
-    let leadsWithContacts = leads;
+    let leadsWithContacts = rankedForFeed;
     try {
       const { enrichTopLeadContacts } = await import("./contact/pie-top-leads.server");
       leadsWithContacts = await Promise.race([
-        enrichTopLeadContacts(leads),
-        new Promise<typeof leads>((r) => setTimeout(() => r(leads), 12_000)),
+        enrichTopLeadContacts(rankedForFeed),
+        new Promise<typeof rankedForFeed>((r) => setTimeout(() => r(rankedForFeed), 12_000)),
       ]);
+      // Keep enriched contact fields on the posts tab when URLs match.
+      if (leadsWithContacts !== rankedForFeed) {
+        const byUrl = new Map(leadsWithContacts.map((l) => [l.full_post_url || "", l]));
+        segments = {
+          ...segments,
+          posts: segments.posts.map((p) => byUrl.get(p.full_post_url || "") || p),
+        };
+      }
     } catch {
-      leadsWithContacts = leads;
+      leadsWithContacts = rankedForFeed;
     }
 
-    let segments = segmentLeads(leadsWithContacts);
     // Audience scopes tabs — but NEVER return a blank Posts feed when we have
     // underlying signal leads (that caused "0 posts" empty-state with Companies > 0).
+    // Only wipe when the user explicitly chose companies-only / people-only.
     const aud = classified.audience ?? "all";
-    const dedupeUrls = (arr: typeof leads) => {
+    const dedupeUrls = (arr: typeof rankedForFeed) => {
       const seen = new Set<string>();
       return arr.filter((l) => {
         const u = l.full_post_url || "";

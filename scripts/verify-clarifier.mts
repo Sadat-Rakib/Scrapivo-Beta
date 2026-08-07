@@ -54,6 +54,18 @@ console.log("\n── Stated audience skips redundant ask ───────�
     extractStatedAudience(dual.raw) === "all",
     extractStatedAudience(dual.raw),
   );
+  const companiesOnlyDemand = extractStatedAudience(
+    "companies looking for lead generation services",
+  );
+  check(
+    "companies looking for… → all (not companies-only)",
+    companiesOnlyDemand === "all",
+    companiesOnlyDemand,
+  );
+  check(
+    "companies only stays companies",
+    extractStatedAudience("companies only looking for writers") === "companies",
+  );
   const dualQs = buildClarifyingQuestions(dual, { hasLocation: !!dual.location });
   check(
     "does NOT ask What should we bring back when audience stated",
@@ -66,6 +78,28 @@ console.log("\n── Stated audience skips redundant ask ───────�
     dualQs.map((q) => q.id),
   );
   check("geography is first when craft is clear", dualQs[0]?.id === "geography", dualQs[0]?.id);
+  check(
+    "dual lead-gen does NOT ask years of experience",
+    !dualQs.some((q) => q.id === "experience"),
+    dualQs.map((q) => q.id),
+  );
+  check(
+    "dual lead-gen does NOT ask buyer type",
+    !dualQs.some((q) => q.id === "buyer_type"),
+    dualQs.map((q) => q.id),
+  );
+
+  const hunting = classifyQuery(
+    "I am looking for companies and people looking for lead generation services",
+  );
+  const huntingQs = buildClarifyingQuestions(hunting, {
+    hasLocation: !!hunting.location,
+  });
+  check(
+    "I am looking for… does NOT ask YoE",
+    !huntingQs.some((q) => q.id === "experience"),
+    huntingQs.map((q) => q.id),
+  );
 
   const india = classifyQuery("lead gen in India");
   const indiaQs = buildClarifyingQuestions(india, {
@@ -89,7 +123,11 @@ console.log("\n── Skill question construction ──────────
     !qs.some((q) => q.id === "audience"),
     qs.map((q) => q.id),
   );
-  check("skill path asks experience when YoE not stated", qs.some((q) => q.id === "experience"));
+  check(
+    "clients hunt does NOT ask experience",
+    !qs.some((q) => q.id === "experience"),
+    qs.map((q) => q.id),
+  );
   check("skill path does NOT ask signal focus", !qs.some((q) => q.id === "signal_focus"));
 
   const clean = classifyQuery("logo design");
@@ -143,7 +181,11 @@ console.log("\n── Product question construction ─────────�
   const leadGen = classifyQuery("lead generation services");
   check("lead generation services is NOT product clarifier", !isProductClarifyPath(leadGen), leadGen.type);
   const leadGenQs = buildClarifyingQuestions(leadGen);
-  check("lead generation services asks experience (skill path)", leadGenQs.some((q) => q.id === "experience"));
+  check(
+    "lead generation services skips YoE (clients craft)",
+    !leadGenQs.some((q) => q.id === "experience"),
+    leadGenQs.map((q) => q.id),
+  );
 }
 
 console.log("\n── Applying answers ─────────────────────────────────────");
@@ -166,6 +208,19 @@ console.log("\n── Applying answers ─────────────�
     "skip still honors companies+people as everything",
     dualSkip.audience === "all",
     dualSkip.audience,
+  );
+  check(
+    "clients hunt skip has no invented YoE",
+    dualSkip.experience === undefined,
+    dualSkip.experience,
+  );
+
+  const companiesLooking = classifyQuery("companies looking for lead generation services");
+  const companiesLookingSkip = applyClarifyAnswers(companiesLooking);
+  check(
+    "companies looking for… skip audience=all",
+    companiesLookingSkip.audience === "all",
+    companiesLookingSkip.audience,
   );
 
   const answered = applyClarifyAnswers(c, {
