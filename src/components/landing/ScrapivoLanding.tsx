@@ -1067,7 +1067,7 @@ export function ScrapivoLanding({ cta }: Props) {
               >
                 AI powered real-time opportunity finder,
                 <br />
-                get verified leads just by typing.
+                get verified leads just by talking.
               </p>
             </div>
             <div style={{ flex: 1 }} />
