@@ -64,10 +64,10 @@ export const runSearch = createServerFn({ method: "POST" })
         .eq("id", userId);
     }
     const plan = profile?.plan ?? "free";
-    if (plan === "free" && used >= 2) {
+    if (plan === "free" && used >= 5) {
       return {
         error: "limit",
-        message: "Free plan: 2 searches per day. Try again tomorrow.",
+        message: "Free plan: 5 searches per day. Try again tomorrow.",
         leads: [],
         sources: [] as string[],
         suggestions: [] as string[],
@@ -437,7 +437,7 @@ export const runSearch = createServerFn({ method: "POST" })
     const { isHirePolarityLookingFor, leadIntentText, isSellerOrProviderLead, isSalesFamilyCraft, isSalesTalentHireAsk, isPersonalStoryNoise, isEducationalNoise, detectProductIntent } =
       await import("./validation");
     const { isProfileShapedLead } = await import("./search/lead-segments");
-    const { isRecent: isRecentDate, CLIENTS_SOCIAL_MAX_AGE_DAYS } =
+    const { isRecent: isRecentDate, CLIENTS_SOCIAL_MAX_AGE_DAYS, ATS_COMPANY_MAX_AGE_DAYS } =
       await import("./search/query-expander");
     const UNDATED_DROP_SOURCES = new Set([
       "linkedin",
@@ -450,8 +450,13 @@ export const runSearch = createServerFn({ method: "POST" })
       "github",
     ]);
     const salesCraft = isSalesFamilyCraft(classified.coreSkill, classified.relatedSkills);
+    const craftHireTerms = [
+      classified.coreSkill,
+      classified.roleTitle,
+      ...(classified.relatedSkills ?? []),
+    ].filter((t): t is string => !!t && t.trim().length >= 3);
     const LINKEDIN_FREELANCE_BUYER_RE =
-      /\b(freelancer|contractor|freelance|budget|who can|need someone to|looking to hire|willing to pay|need a (freelance|contractor|developer|designer|sales)|looking for a (sales|sdr|bdr|salesperson|designer|developer)|anyone recommend|\[hiring\])\b/i;
+      /\b(freelancer|contractor|freelance|budget|who can|need someone to|looking to hire|looking for (a|an|someone)|willing to pay|need a (freelance|contractor|developer|designer|sales)|looking for a (sales|sdr|bdr|salesperson|designer|developer)|anyone recommend|\[hiring\])\b/i;
     // Posting on one of these is itself an act of buying — the org/person put
     // the work up publicly with intent to pay. No hire grammar required.
     const DEMAND_BY_SOURCE = new Set([
@@ -468,12 +473,14 @@ export const runSearch = createServerFn({ method: "POST" })
       "stackexchange",
       "dealroom",
       "neuronfeed",
+      "workatastartup",
+      "startupsgallery",
     ]);
-    // No bare `\bhiring\b` — that matched the old "BOUNTY/HIRING:" title cheat.
+    // Include "looking for a/an" — matches SERP/social dork phrasing.
     const TITLE_HIRE_RE =
-      /\b(i(?:'| a)?m (looking|need)|we(?:'| a)?re (looking|hiring|need)|looking to hire|need (a|an|someone)|who can|willing to pay|freelancer needed|help wanted|\[hiring\]|we're hiring|we are hiring)\b/i;
+      /\b(i(?:'| a)?m (looking|need)|we(?:'| a)?re (looking|hiring|need)|looking to hire|looking for (a|an|someone)|need (a|an|someone)|who can|willing to pay|freelancer needed|help wanted|\[hiring\]|we're hiring|we are hiring)\b/i;
     const BODY_HIRE_RE =
-      /\b(need a|need an|need someone|looking to hire|who can|willing to pay|freelancer needed|help wanted|\[hiring\]|we're hiring|we are hiring|hiring (a |an )?(designer|developer|freelancer|sales|sdr|bdr)|looking for a (sales|salesperson|sdr|bdr))\b/i;
+      /\b(need a|need an|need someone|looking to hire|looking for (a|an|someone)|who can|willing to pay|freelancer needed|help wanted|\[hiring\]|we're hiring|we are hiring|hiring (a |an )?(designer|developer|freelancer|sales|sdr|bdr)|looking for a (sales|salesperson|sdr|bdr))\b/i;
     const quality = directoryMode
       ? ranked
       : ranked.filter((l) => {
@@ -491,7 +498,7 @@ export const runSearch = createServerFn({ method: "POST" })
             /\b(so you need|how to (hire|find|become)|why you (need|should)|tips for hiring|ultimate guide|unpaid design tests|hiring trend|strong belief|emotion\s*=|thoughts on|a day in the life)\b/i.test(
               title,
             ) &&
-            !/\b(we(?:'| a)?re hiring|looking to hire|\[hiring\]|willing to pay|dm me|apply (now|here))\b/i.test(
+            !/\b(we(?:'| a)?re hiring|looking to hire|looking for (a|an)|\[hiring\]|willing to pay|dm me|apply (now|here))\b/i.test(
               fullText,
             )
           ) {
@@ -534,14 +541,11 @@ export const runSearch = createServerFn({ method: "POST" })
             l.source === "mastodon" ||
             l.source === "lemmy" ||
             l.source === "discourse";
-          // Clients: drop dated rows older than the clients window across ALL
-          // sources (news/dealroom/github used to keep 100+ day-old token hits).
-          if (
-            clientsMode &&
-            l.posted_at &&
-            !isRecentDate(l.posted_at, CLIENTS_SOCIAL_MAX_AGE_DAYS) &&
-            !dmRelevant
-          ) {
+          // Company boards (ATS etc.): 7d. Social/web: 2d.
+          const maxAgeDays = DEMAND_BY_SOURCE.has(l.source)
+            ? ATS_COMPANY_MAX_AGE_DAYS
+            : CLIENTS_SOCIAL_MAX_AGE_DAYS;
+          if (clientsMode && l.posted_at && !isRecentDate(l.posted_at, maxAgeDays) && !dmRelevant) {
             return false;
           }
           // Hard-drop undated SERP/web/IG/FB. Keep LinkedIn /posts/ with slug
@@ -551,19 +555,26 @@ export const runSearch = createServerFn({ method: "POST" })
             /linkedin\.com\/posts\//i.test(l.full_post_url || "") &&
             !!(l.author || /linkedin\.com\/posts\/[A-Za-z0-9-]+_/i.test(l.full_post_url || ""));
           // Time-boxed SERP only when the engine used a day/hour window.
-          // `demand_verified` + "week" used to keep undated months-old SERP
-          // rows under the 24h chip — that is the stale-feed bug.
+          // Week + demand_verified kept when hire grammar matches (thin-day fill).
           const timeBoxed =
             l.freshness_window === "day" ||
             l.freshness_window === "hour" ||
             (l.demand_verified === true &&
               (l.freshness_window === "day" || l.freshness_window === "hour"));
+          const weekHireOk =
+            l.demand_verified === true &&
+            l.freshness_window === "week" &&
+            (TITLE_HIRE_RE.test(title) ||
+              BODY_HIRE_RE.test(text) ||
+              isHirePolarityLookingFor(title, craftHireTerms) ||
+              isHirePolarityLookingFor(text, craftHireTerms));
           if (
             clientsMode &&
             !l.posted_at &&
             !timeBoxed &&
+            !weekHireOk &&
             UNDATED_DROP_SOURCES.has(l.source) &&
-            !(isLiPostWithAuthor && (BODY_HIRE_RE.test(text) || isSalesTalentHireAsk(text))) &&
+            !(isLiPostWithAuthor && (BODY_HIRE_RE.test(text) || isSalesTalentHireAsk(text) || TITLE_HIRE_RE.test(title))) &&
             !dmRelevant
           ) {
             return false;
@@ -574,6 +585,7 @@ export const runSearch = createServerFn({ method: "POST" })
             clientsMode &&
             !l.posted_at &&
             !timeBoxed &&
+            !weekHireOk &&
             (l.source === "instagram" || l.source === "facebook")
           ) {
             return false;
@@ -630,14 +642,14 @@ export const runSearch = createServerFn({ method: "POST" })
           if (clientsMode) {
             const titleBuyer =
               TITLE_HIRE_RE.test(title) ||
-              isHirePolarityLookingFor(title) ||
+              isHirePolarityLookingFor(title, craftHireTerms) ||
               isSalesTalentHireAsk(title) ||
               CLEAR_THIRD_PARTY_BUYER_RE.test(title);
             const bodyBuyer =
               urg.hasUrgency ||
               demand.buckets.includes("explicit_demand") ||
               CLEAR_THIRD_PARTY_BUYER_RE.test(text) ||
-              isHirePolarityLookingFor(text) ||
+              isHirePolarityLookingFor(text, craftHireTerms) ||
               isSalesTalentHireAsk(text) ||
               BODY_HIRE_RE.test(text);
             const llmBuyer =
@@ -646,26 +658,26 @@ export const runSearch = createServerFn({ method: "POST" })
               l.ai_intent === "buying" ||
               l.ai_intent === "researching";
             // Dated social may use body hire; undated/web still needs title hire.
+            // Time-boxed / week-hire SERP counts as dated for buyer heuristics.
+            const datedOrBoxed = !!l.posted_at || timeBoxed || weekHireOk;
             const heuristicBuyer =
               titleBuyer ||
-              (bodyBuyer && !!l.posted_at && isSocial) ||
+              (bodyBuyer && datedOrBoxed && isSocial) ||
               (bodyBuyer && !/\bstarting at\s*\$/i.test(title) && isSocial) ||
-              (salesCraft && isSalesTalentHireAsk(text) && timeBoxed);
+              (salesCraft && isSalesTalentHireAsk(text) && (timeBoxed || weekHireOk));
             const buyerish =
               heuristicBuyer ||
-              (llmBuyer && (titleBuyer || bodyBuyer || !!l.posted_at || isSocial));
-            // Twitter/X / LinkedIn: short buyer asks — keep when skill-matched
-            // and either dated or SERP time-boxed (SearXNG/SerpAPI undated).
+              (llmBuyer && (titleBuyer || bodyBuyer || datedOrBoxed || isSocial));
+            // Twitter/X / LinkedIn: short buyer asks — dated OR SERP time-boxed.
             const twitterKeep =
               l.source === "twitter" &&
               skillOk &&
-              !!l.posted_at &&
+              datedOrBoxed &&
               (bodyBuyer || titleBuyer || urg.hasUrgency || (l.score ?? 0) >= 40);
-            // Never keep LinkedIn solely because of a (possibly false) day stamp.
             const linkedInKeep =
               l.source === "linkedin" &&
               skillOk &&
-              !!l.posted_at &&
+              datedOrBoxed &&
               (bodyBuyer ||
                 titleBuyer ||
                 LINKEDIN_FREELANCE_BUYER_RE.test(text) ||
@@ -683,6 +695,7 @@ export const runSearch = createServerFn({ method: "POST" })
             }
             if (l.source === "linkedin" && !dmRelevant && !linkedInKeep) {
               if (
+                !titleBuyer &&
                 !LINKEDIN_FREELANCE_BUYER_RE.test(text) &&
                 !CLEAR_THIRD_PARTY_BUYER_RE.test(text) &&
                 !(llmBuyer && (titleBuyer || bodyBuyer)) &&
@@ -693,7 +706,7 @@ export const runSearch = createServerFn({ method: "POST" })
               }
             }
             // Dated social: lower score floor; undated/web still needs 36+.
-            const scoreFloor = l.posted_at && isSocial ? 28 : dmRelevant ? 30 : 36;
+            const scoreFloor = datedOrBoxed && isSocial ? 28 : dmRelevant ? 30 : 36;
             return skillOk && ((l.score ?? 0) >= scoreFloor || buyerish || dmRelevant);
           }
           return urg.hasUrgency || demand.buckets.length > 0 || skillOk || (l.score ?? 0) >= 50;
@@ -719,8 +732,7 @@ export const runSearch = createServerFn({ method: "POST" })
       // path — an org posting a role for this craft IS a prospective buyer.
       maxCompanyAts: goal === "jobs" ? 20 : 120,
       minSocial: goal === "jobs" ? 2 : goal === "clients" ? 10 : 5,
-      // No Freelancer/Reddit volume caps — quality via filters/scoring only.
-      maxReddit: maxTotal,
+      maxReddit: goal === "clients" ? 40 : maxTotal,
       maxTotal,
       // Warm floor (45) — volume without weak / no-signal rows.
       minScore:
@@ -728,9 +740,26 @@ export const runSearch = createServerFn({ method: "POST" })
           ? 45
           : 0,
       maxPerPlatform: maxTotal,
-      maxFreelancer: maxTotal,
+      // Cap Freelancer so social/public/ATS can surface in the viewport.
+      maxFreelancer: goal === "clients" || classified.signalMode === "buying_signal" ? 30 : maxTotal,
     });
     trace("diversified", leads);
+
+    // Always-on compact funnel log (local + production) for mix diagnosis.
+    {
+      const bySrc = (arr: ReadonlyArray<{ source?: string }>) => {
+        const by: Record<string, number> = {};
+        for (const l of arr) by[l.source ?? "?"] = (by[l.source ?? "?"] ?? 0) + 1;
+        return Object.entries(by)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 12)
+          .map(([s, n]) => `${s}:${n}`)
+          .join(" ");
+      };
+      console.info(
+        `[discover] raw=${raw.length} quality=${quality.length} out=${leads.length} | quality_by ${bySrc(quality)} | out_by ${bySrc(leads)} | fetch ${debug?.sourceCounts ? JSON.stringify(debug.sourceCounts) : "{}"}`,
+      );
+    }
 
     // Top 2–3 cards: PIE contact harvest (regex → page → capped enrich → LLM).
     // Fail-soft with a hard time budget so Discover never stalls.

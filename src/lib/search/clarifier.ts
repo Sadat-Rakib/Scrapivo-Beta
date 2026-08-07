@@ -64,6 +64,56 @@ function craftLooksUncertain(coreSkill: string): boolean {
   return /\b(?:am|is|are|the|and|etc|who|that|looking|need|want|find)\b/i.test(s);
 }
 
+const BUYER_TYPE_RE =
+  /\b(startups?|founders?|small businesses?|agenc(?:y|ies)|studios?|enterprises?|smbs?|local|shops?|stores?|brands?|ecommerce|e-commerce|saas|nonprofits?)\b/i;
+
+/**
+ * Infer result-segment audience from the typed query so we never re-ask
+ * "What should we bring back?" when the user already said companies/people/posts.
+ */
+export function extractStatedAudience(
+  raw: string,
+): NonNullable<ClarifyAnswers["audience"]> | null {
+  const t = (raw || "").toLowerCase();
+  if (!t.trim()) return null;
+  const wantsPeople = /\b(people|persons?|individuals?|humans)\b/.test(t);
+  const wantsCompanies =
+    /\b(companies|company|businesses|business|firms?|organizations?|organisations?)\b/.test(t);
+  const wantsPosts = /\b((linkedin\s+)?posts?|tweets?|threads?)\b/.test(t);
+  const wantsEverything = /\b(everything|all (of )?(them|those|three)|etc\.?)\b/.test(t);
+
+  if (wantsEverything) return "all";
+  if (wantsPeople && wantsCompanies) return "all";
+  if (wantsPeople && wantsPosts) return "all";
+  if (wantsCompanies && wantsPosts) return "all";
+  if (wantsPeople) return "people";
+  if (wantsCompanies) return "companies";
+  if (wantsPosts) return "posts";
+  return null;
+}
+
+export function extractStatedExperience(
+  raw: string,
+): NonNullable<ClarifyAnswers["experience"]> | null {
+  const t = (raw || "").toLowerCase();
+  if (/\b(5\+|10\+|senior|staff|principal|lead\s+level)\b/.test(t)) return "5+";
+  if (/\b(3-4|3–4|mid[- ]level|3\+?\s*years?)\b/.test(t)) return "3-4";
+  if (/\b(1-2|1–2|1\+?\s*years?)\b/.test(t)) return "1-2";
+  if (/\b(0-1|0–1|junior|entry[- ]level|intern)\b/.test(t)) return "0-1";
+  if (/\b(\d+)\+?\s*years?\b/.test(t)) {
+    const n = Number(RegExp.$1);
+    if (n >= 5) return "5+";
+    if (n >= 3) return "3-4";
+    if (n >= 1) return "1-2";
+    return "0-1";
+  }
+  return null;
+}
+
+export function hasStatedBuyerType(raw: string): boolean {
+  return BUYER_TYPE_RE.test(raw || "");
+}
+
 function skillAudienceQuestion(): ClarifyQuestion {
   return {
     id: "audience",
@@ -310,27 +360,38 @@ export function buildClarifyingQuestions(
   opts: { hasLocation?: boolean } = {},
 ): ClarifyQuestion[] {
   const product = isProductClarifyPath(classified);
+  const raw = classified.raw || "";
+  const statedAudience = extractStatedAudience(raw);
+  const statedExp = extractStatedExperience(raw);
+  const statedBuyer = hasStatedBuyerType(raw);
+  const hasLocation = !!opts.hasLocation || !!classified.location || mentionsPlace(raw);
   const out: ClarifyQuestion[] = [];
 
   if (craftLooksUncertain(classified.coreSkill)) {
     out.push(product ? productCraftQuestion(classified) : skillCraftQuestion(classified));
   }
 
-  out.push(product ? productAudienceQuestion() : skillAudienceQuestion());
-
-  if (product) {
-    out.push(productSignalFocusQuestion());
-  } else {
-    out.push(skillExperienceQuestion());
-  }
-
-  out.push(product ? productBuyerQuestion() : skillBuyerQuestion());
-
-  if (!opts.hasLocation) {
+  // Geography early so the 4-slot budget never drops the most relevant ask
+  // when craft + audience are already clear.
+  if (!hasLocation) {
     out.push(geographyQuestion());
   }
 
-  // Cap at 4 — product swaps YoE for signal focus; skill keeps YoE.
+  if (!statedAudience) {
+    out.push(product ? productAudienceQuestion() : skillAudienceQuestion());
+  }
+
+  if (product) {
+    out.push(productSignalFocusQuestion());
+  } else if (!statedExp) {
+    out.push(skillExperienceQuestion());
+  }
+
+  if (!statedBuyer) {
+    out.push(product ? productBuyerQuestion() : skillBuyerQuestion());
+  }
+
+  // Cap at 4 — prefer geography + remaining missing dims.
   return out.slice(0, 4);
 }
 
@@ -471,14 +532,20 @@ export function applyClarifyAnswers(
   const craft = craftRaw
     ? PRODUCT_CRAFT_LABELS[craftRaw] || craftRaw
     : undefined;
-  const audience = answers.audience ?? "all";
+  // Honor audience already typed in the query when the user skips the form.
+  const inferredAudience = extractStatedAudience(classified.raw || "");
+  const audience = answers.audience ?? inferredAudience ?? "all";
   const buyerKey = answers.buyer_type ?? "any";
   const profile = BUYER_PROFILES[buyerKey];
   const geo = answers.geography ?? "global";
   const signalFocus = product ? (answers.signal_focus ?? "all") : undefined;
-  const experience = product ? undefined : (answers.experience ?? "0-1");
+  const inferredExp = extractStatedExperience(classified.raw || "");
+  const experience = product
+    ? undefined
+    : (answers.experience ?? inferredExp ?? "0-1");
 
-  const location = answers.other?.geography?.trim() || classified.location || GEO_LOCATIONS[geo];
+  const location =
+    answers.other?.geography?.trim() || classified.location || GEO_LOCATIONS[geo];
 
   const noun = craft || classified.coreSkill || (product ? "your product" : "work");
   const parts: string[] = [];
@@ -515,9 +582,11 @@ export function mentionsPlace(raw: string): boolean {
 }
 
 export function shouldClarify(classified: ClassifiedQuery): boolean {
-  if (craftLooksUncertain(classified.coreSkill)) return true;
   const raw = (classified.raw || "").trim();
+  if (!raw) return true;
   if (raw.split(/\s+/).length <= 2) return true;
+  if (craftLooksUncertain(classified.coreSkill)) return true;
+
   // Clear product pitches with ICP + place already stated don't need a form.
   if (isProductClarifyPath(classified)) {
     const hasIcp =
@@ -531,10 +600,26 @@ export function shouldClarify(classified: ClassifiedQuery): boolean {
       );
     if (hasIcp && (hasPlace || hasPain) && raw.split(/\s+/).length >= 8) return false;
   }
-  const hasBuyer =
-    /\b(startups?|founders?|small businesses?|agenc(?:y|ies)|studios?|enterprises?|smbs?|local|shops?|stores?|brands?|ecommerce|e-commerce|saas|nonprofits?)\b/i.test(
-      raw,
-    );
+
   const hasPlace = !!classified.location || mentionsPlace(raw);
-  return !(hasBuyer && hasPlace);
+  const hasAudience = !!extractStatedAudience(raw);
+  const hasBuyer = hasStatedBuyerType(raw);
+  const hasHiring =
+    /\b(hiring|looking for|need a|need an|who can|asking for)\b/i.test(raw);
+
+  // Precise hiring queries with place + craft: search immediately.
+  if (
+    !craftLooksUncertain(classified.coreSkill) &&
+    hasPlace &&
+    (hasBuyer || hasHiring) &&
+    raw.split(/\s+/).length >= 5
+  ) {
+    return false;
+  }
+
+  // Only open the panel when we would actually ask something.
+  const questions = buildClarifyingQuestions(classified, {
+    hasLocation: hasPlace,
+  });
+  return questions.length > 0;
 }

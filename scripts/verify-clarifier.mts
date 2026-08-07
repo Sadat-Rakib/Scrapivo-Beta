@@ -12,6 +12,7 @@ import {
   applyClarifyAnswers,
   shouldClarify,
   isProductClarifyPath,
+  extractStatedAudience,
 } from "../src/lib/search/clarifier.ts";
 
 let pass = 0;
@@ -36,6 +37,45 @@ console.log("\n── When to ask ───────────────�
 
   const precise = classifyQuery("Shopify stores hiring copywriters in Toronto");
   check("precise query is NOT interrupted", !shouldClarify(precise), precise.coreSkill);
+
+  const dual = classifyQuery(
+    "companies and people looking for lead generation services",
+  );
+  check("companies+people lead-gen still clarifies (missing place)", shouldClarify(dual));
+}
+
+console.log("\n── Stated audience skips redundant ask ───────────────────");
+{
+  const dual = classifyQuery(
+    "companies and people looking for lead generation services",
+  );
+  check(
+    "infers audience=all from companies and people",
+    extractStatedAudience(dual.raw) === "all",
+    extractStatedAudience(dual.raw),
+  );
+  const dualQs = buildClarifyingQuestions(dual, { hasLocation: !!dual.location });
+  check(
+    "does NOT ask What should we bring back when audience stated",
+    !dualQs.some((q) => q.id === "audience"),
+    dualQs.map((q) => q.id),
+  );
+  check(
+    "DOES ask geography when no place typed",
+    dualQs.some((q) => q.id === "geography"),
+    dualQs.map((q) => q.id),
+  );
+  check("geography is first when craft is clear", dualQs[0]?.id === "geography", dualQs[0]?.id);
+
+  const india = classifyQuery("lead gen in India");
+  const indiaQs = buildClarifyingQuestions(india, {
+    hasLocation: !!india.location,
+  });
+  check(
+    "skips geography when location extracted",
+    !indiaQs.some((q) => q.id === "geography") || !!india.location,
+    { loc: india.location, ids: indiaQs.map((q) => q.id) },
+  );
 }
 
 console.log("\n── Skill question construction ──────────────────────────");
@@ -44,8 +84,12 @@ console.log("\n── Skill question construction ──────────
   const qs = buildClarifyingQuestions(messy);
   check("asks at most 4", qs.length > 0 && qs.length <= 4, qs.length);
   check("every question has a recommended default", qs.every((q) => q.options.some((o) => o.recommended)));
-  check("asks what to bring back", qs.some((q) => q.id === "audience"));
-  check("skill path asks experience", qs.some((q) => q.id === "experience"));
+  check(
+    "messy people+companies skips audience re-ask",
+    !qs.some((q) => q.id === "audience"),
+    qs.map((q) => q.id),
+  );
+  check("skill path asks experience when YoE not stated", qs.some((q) => q.id === "experience"));
   check("skill path does NOT ask signal focus", !qs.some((q) => q.id === "signal_focus"));
 
   const clean = classifyQuery("logo design");
@@ -69,7 +113,7 @@ console.log("\n── Product question construction ─────────�
   check("product pitch classified as product", pitch.type === "product", pitch.type);
   check("product clarify path", isProductClarifyPath(pitch));
 
-  const qs = buildClarifyingQuestions(pitch, { hasLocation: false });
+  const qs = buildClarifyingQuestions(pitch, { hasLocation: true });
   check("product asks at most 4", qs.length > 0 && qs.length <= 4, qs.length);
   check("product asks signal focus instead of YoE", qs.some((q) => q.id === "signal_focus"));
   check("product does NOT ask years of experience", !qs.some((q) => q.id === "experience"));
@@ -82,6 +126,7 @@ console.log("\n── Product question construction ─────────�
   check(
     "product buyer question says customer",
     /customer/i.test(qs.find((q) => q.id === "buyer_type")?.question ?? ""),
+    qs.map((q) => q.id),
   );
 
   const svc = classifyQuery("CRM software for freelancers");
@@ -114,6 +159,14 @@ console.log("\n── Applying answers ─────────────�
   check("skipped search defaults to worldwide", skipped.location === null);
   check("skill skip defaults YoE to 0-1", skipped.experience === "0-1");
   check("skill summary includes experience", /years experience/.test(skipped.summary), skipped.summary);
+
+  const dual = classifyQuery("companies and people looking for lead generation services");
+  const dualSkip = applyClarifyAnswers(dual);
+  check(
+    "skip still honors companies+people as everything",
+    dualSkip.audience === "all",
+    dualSkip.audience,
+  );
 
   const answered = applyClarifyAnswers(c, {
     audience: "companies",

@@ -1277,6 +1277,8 @@ export const SOCIAL_MAX_AGE_DAYS = 2;
 /** Clients social freshness window (days). Rank still boosts under-24h higher. */
 export const CLIENTS_SOCIAL_MAX_AGE_DAYS = 2;
 export const JOB_BOARD_MAX_AGE_DAYS = 3;
+/** Named-company ATS / boards on clients path — longer than social (2d). */
+export const ATS_COMPANY_MAX_AGE_DAYS = 7;
 const MAX_AGE_DAYS = SOCIAL_MAX_AGE_DAYS;
 
 export function isRecent(dateStr: string | null | undefined, maxDays = MAX_AGE_DAYS): boolean {

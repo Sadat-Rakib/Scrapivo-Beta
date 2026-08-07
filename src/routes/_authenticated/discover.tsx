@@ -626,6 +626,7 @@ function DiscoverPage() {
         const questions = buildClarifyingQuestions(classified, {
           hasLocation: !!classified.location,
         });
+        // Empty question list = nothing left to ask (all dims inferred).
         if (questions.length) {
           setPendingQuery(trimmed);
           setClarifyQs(questions as ClarifyQuestion[]);

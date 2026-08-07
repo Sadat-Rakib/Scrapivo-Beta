@@ -10,6 +10,7 @@ import {
   URL_BLOCKLIST,
   JOB_BOARD_MAX_AGE_DAYS,
   CLIENTS_SOCIAL_MAX_AGE_DAYS,
+  ATS_COMPANY_MAX_AGE_DAYS,
   SOCIAL_MAX_AGE_DAYS,
   extractDateFromText,
   ageDays,
@@ -1490,17 +1491,32 @@ export async function searchSerpAPI(qx: ExpandedQueries): Promise<SourceLead[]> 
     }
   }
 
-  const craft = personNoun(qx.skill, qx.role);
+  const craftSeed =
+    (qx.relatedSkills || []).find((s) => /lead\s*gen/i.test(s)) ||
+    (qx.skill || "").replace(/\b(services?|solutions?)\b/gi, " ").replace(/\s+/g, " ").trim() ||
+    qx.skill;
+  const craft = personNoun(craftSeed, qx.role);
   const skillQ = qx.skill || qx.role;
+  const alts = [
+    skillQ,
+    craft,
+    craftSeed,
+    ...(qx.relatedSkills || []).slice(0, 4),
+  ]
+    .filter(Boolean)
+    .filter((v, i, a) => a.findIndex((x) => x!.toLowerCase() === v!.toLowerCase()) === i)
+    .slice(0, 5);
+  const altOr = alts.map((a) => `"${a}"`).join(" OR ");
   // Credit-efficient: 4 high-yield dorks (LI / X / FB / public). Instagram
   // only if the social trio is thin — avoids burning free Serper credits.
   const coreQueries = [
-    `site:linkedin.com/posts ("looking for a ${craft}" OR "need a ${craft}" OR "hiring a ${craft}" OR "need a ${skillQ}")`,
-    `site:x.com OR site:twitter.com ("looking for a ${craft}" OR "need a ${craft}" OR "hiring ${skillQ}")`,
-    `site:facebook.com/groups ("looking for a ${craft}" OR "need a ${craft}" OR "recommend a ${craft}")`,
-    `("${skillQ}" OR "${craft}") ("looking for" OR "need a" OR hiring OR "request for proposal" OR RFP) (site:.gov OR site:indiehackers.com OR site:dev.to OR site:news.ycombinator.com OR site:sam.gov)`,
+    `site:linkedin.com/posts ("looking for a ${craft}" OR "need a ${craft}" OR "hiring a ${craft}" OR "need a ${skillQ}" OR (${altOr}) ("looking for" OR "need a" OR hiring))`,
+    `site:x.com OR site:twitter.com ("looking for a ${craft}" OR "need a ${craft}" OR "hiring ${skillQ}" OR (${altOr}) (hiring OR "looking for"))`,
+    `site:facebook.com/groups ("looking for a ${craft}" OR "need a ${craft}" OR "recommend a ${craft}" OR (${altOr}) ("looking for" OR hiring))`,
+    `(${altOr}) ("looking for" OR "need a" OR hiring OR "request for proposal" OR RFP) (site:.gov OR site:indiehackers.com OR site:dev.to OR site:news.ycombinator.com OR site:sam.gov)`,
   ];
-  const igQuery = `site:instagram.com ("looking for a ${craft}" OR "need a ${craft}" OR "hiring a ${craft}")`;
+  const igQuery = `site:instagram.com ("looking for a ${craft}" OR "need a ${craft}" OR "hiring a ${craft}" OR (${altOr}))`;
+  const thinPublicQuery = `site:quora.com OR site:indiehackers.com ("looking for a ${craft}" OR "need a ${craft}" OR "recommend a ${craft}" OR (${altOr}))`;
 
   const SELLER_DROP_RE =
     /\b(hire me|my portfolio|my rates|available for hire|open to work|check out my (gig|work|service)|i (build|offer|provide|specialize)|dm me your|starting at\s*\$|for your (business|company|startup))\b/i;
@@ -1581,11 +1597,17 @@ export async function searchSerpAPI(qx: ExpandedQueries): Promise<SourceLead[]> 
     ingest(ig, "day");
   }
 
+  // Extra public/ask surface when overall day yield is still thin.
+  if (out.length < 6) {
+    const pub = await searchGoogleSerp(thinPublicQuery, { tbs: "qdr:d", num: 12 });
+    ingest(pub, "day");
+  }
+
   // Week fallback only when day yield is very thin — each week call can
   // burn a scarce SerpAPI credit if Serper/Dog fail.
-  if (out.length < 3 && emptyIdx.length) {
+  if (out.length < 5 && emptyIdx.length) {
     const weekBatches = await Promise.allSettled(
-      emptyIdx.slice(0, 2).map((i) => searchGoogleSerp(coreQueries[i], { tbs: "qdr:w", num: 10 })),
+      emptyIdx.slice(0, 3).map((i) => searchGoogleSerp(coreQueries[i], { tbs: "qdr:w", num: 10 })),
     );
     for (const batch of weekBatches) {
       if (batch.status !== "fulfilled" || !batch.value) continue;
@@ -2362,7 +2384,7 @@ export async function searchJobicy(qx: ExpandedQueries): Promise<SourceLead[]> {
       for (const j of data?.jobs ?? []) {
         if (!j.url || seen.has(j.url)) continue;
         seen.add(j.url);
-        if (!isRecent(j.pubDate, JOB_BOARD_MAX_AGE_DAYS)) continue;
+        if (!isRecent(j.pubDate, ATS_COMPANY_MAX_AGE_DAYS)) continue;
         out.push({
           source: "jobicy",
           platform: "Jobicy",
@@ -3074,6 +3096,23 @@ function isRelevantAtSource(
     if (skill) {
       if (isStronglyRelevantToSkill(text, skill)) return true;
       if (core && core !== skill && isStronglyRelevantToSkill(text, core)) return true;
+      // Related crafts — "lead generation services" must also keep SDR / lead gen /
+      // appointment-setting ATS rows for the Companies tab.
+      const related = [
+        ...(qx.relatedSkills || []),
+        ...(classified.relatedSkills || []),
+      ]
+        .filter(Boolean)
+        .slice(0, 10);
+      for (const rel of related) {
+        if (rel.length < 3 || isWeakFamilyTerm(rel)) continue;
+        if (isStronglyRelevantToSkill(text, rel)) return true;
+        if (lower.includes(rel.toLowerCase())) return true;
+      }
+      // Named-company boards: role-query OR is enough (Companies tab volume).
+      if (isRelevantToRoleQuery(text, classified.coreSkill, classified.relatedSkills)) {
+        return true;
+      }
       return false;
     }
     // No concrete skill (e.g. "faced a data breach in the last 12 months"):
@@ -4019,11 +4058,14 @@ async function finishSearch(
           return isRecent(l.posted_at, CLIENTS_SOCIAL_MAX_AGE_DAYS);
         }
         // Undated social: keep engine day/hour window (2d chip trusts that);
-        // drop only when we already have enough dated social AND no engine window.
+        // week + demand_verified kept when dated social is still thin.
         if (socialish && !l.posted_at) {
           const engineDay =
             l.freshness_window === "day" || l.freshness_window === "hour";
           if (engineDay) return true;
+          if (l.freshness_window === "week" && l.demand_verified === true && datedSocial < 6) {
+            return true;
+          }
           if (datedSocial >= 4) return false;
           if (l.freshness_window === "week") return false;
           return true;

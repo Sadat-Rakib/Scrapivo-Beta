@@ -218,8 +218,9 @@ export function isSalesTalentHireAsk(text: string): boolean {
 /**
  * Bare "looking for" is overloaded (seller CTAs, advice, partner hunts).
  * Only count hire-polarity shapes that are not seller CTAs.
+ * Optional craftTerms: match "looking for a <lead generation|…>" for any skill.
  */
-export function isHirePolarityLookingFor(text: string): boolean {
+export function isHirePolarityLookingFor(text: string, craftTerms?: string[]): boolean {
   if (!text) return false;
   // Seller / partner CTAs first — except hiring sales talent into a team.
   if (SELLER_HOOK_RE.test(text)) return false;
@@ -233,9 +234,30 @@ export function isHirePolarityLookingFor(text: string): boolean {
     return false;
   }
   if (isSalesTalentHireAsk(text)) return true;
-  return /\blooking for (a |an )?(freelance[rs]?|developer|designer|contractor|engineer|someone (to|who)|help with|web developer|web designer|sales(?:person| ?rep| ?manager| ?closer| ?executive)?|sdr|bdr|account executive)\b/i.test(
+  if (/\blooking to hire\b/i.test(text)) return true;
+  if (
+    /\blooking for (a |an )?(freelance[rs]?|developer|designer|contractor|engineer|someone (to|who)|help with|web developer|web designer|sales(?:person| ?rep| ?manager| ?closer| ?executive)?|sdr|bdr|account executive)\b/i.test(
+      text,
+    )
+  ) {
+    return true;
+  }
+  // Craft-aware — SERP dorks search "looking for a ${craft}" for any skill
+  // (lead generation, copywriter, VA, …), not only hardcoded role nouns.
+  if (craftTerms?.length) {
+    for (const raw of craftTerms) {
+      const t = (raw || "").trim();
+      if (t.length < 3) continue;
+      const esc = t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      if (new RegExp(`\\blooking for (a |an )?[^\\n.]{0,48}${esc}\\b`, "i").test(text)) {
+        return true;
+      }
+    }
+  }
+  // Hire-shaped follow-through (not bare "looking for a better way").
+  return /\blooking for (a |an |someone ).{0,48}\b(to (help|build|design|write|manage|join|hire)|who (can|knows)|for (our|my|the)|asap|urgently|please)\b/i.test(
     text,
-  ) || /\blooking to hire\b/i.test(text);
+  );
 }
 
 const EDUCATIONAL_NOISE_RE =

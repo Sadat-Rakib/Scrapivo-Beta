@@ -355,6 +355,33 @@ export function craftVariants(term: string): string[] {
   if (t.length < 3) return t ? [t] : [];
   const out = new Set<string>([t]);
 
+  // Peel trailing service wrappers: "lead generation services" → also match
+  // "lead generation" / "lead gen" (how posts actually phrase it).
+  const peeledSvc = t
+    .replace(/\b(services?|solutions?|agency|agencies|consulting|consultancy)\b/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (peeledSvc && peeledSvc !== t && peeledSvc.length >= 3) {
+    out.add(peeledSvc);
+    for (const v of craftVariants(peeledSvc)) out.add(v);
+  }
+
+  // Lead-gen aliases — SERP titles rarely say the full "lead generation services".
+  if (/\blead\s*gen/i.test(t) || peeledSvc === "lead generation" || t.includes("lead generation")) {
+    for (const extra of [
+      "lead generation",
+      "lead gen",
+      "lead generator",
+      "appointment setting",
+      "appointment setter",
+      "outbound",
+      "sdr",
+      "bdr",
+    ]) {
+      out.add(extra);
+    }
+  }
+
   // Peel org-unit wrappers: "sales team" → also match "sales" / "sales rep".
   const peeled = t
     .replace(

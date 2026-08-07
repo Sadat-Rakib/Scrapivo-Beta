@@ -466,6 +466,9 @@ export const CLASSIFIER_ROLE_MAP: Record<string, RoleEntry> = {
       "client acquisition",
       "pipeline",
       "prospecting",
+      "sales",
+      "sales rep",
+      "account executive",
     ],
     targetCustomerDesc: "businesses buying lead generation or outbound services",
     subredditBoosts: ["sales", "salesjobs", "Entrepreneur", "smallbusiness", "SaaS", "forhire"],
@@ -480,6 +483,8 @@ export const CLASSIFIER_ROLE_MAP: Record<string, RoleEntry> = {
       "BDR",
       "cold calling",
       "client acquisition",
+      "sales",
+      "sales rep",
     ],
     targetCustomerDesc: "businesses buying lead generation or outbound services",
     subredditBoosts: ["sales", "salesjobs", "Entrepreneur", "smallbusiness", "SaaS", "forhire"],
@@ -495,6 +500,9 @@ export const CLASSIFIER_ROLE_MAP: Record<string, RoleEntry> = {
       "BDR",
       "client acquisition",
       "prospecting",
+      "sales",
+      "sales rep",
+      "account executive",
     ],
     targetCustomerDesc: "businesses buying lead generation services",
     subredditBoosts: ["sales", "salesjobs", "Entrepreneur", "smallbusiness", "SaaS", "forhire"],
@@ -737,8 +745,7 @@ const FILLERS = [
   "clients",
   "customer",
   "customers",
-  "lead",
-  "leads",
+  // Do NOT strip bare "lead"/"leads" — that destroys "lead generation".
   "job",
   "jobs",
   "work",
@@ -1394,6 +1401,14 @@ const SIGNAL_BOILERPLATE = new Set([
   "roles",
   "role",
   "positions",
+  "asking",
+  "ask",
+  "find",
+  "finding",
+  "companies",
+  "company",
+  "services",
+  "service",
   "position",
   "openings",
   "opening",
@@ -1760,13 +1775,16 @@ export function classifyQuery(raw: string): ClassifiedQuery {
     );
   }
 
-  // Buying-signal path: keep raw signal as roleTitle. The core skill must be
-  // the concrete technology/function mentioned in the signal ("next.js"), NOT
-  // the leftover sentence — otherwise every job board query and relevance
-  // check runs on filler words like "with"/"experience".
+  // Buying-signal path: known crafts in the raw sentence must win before
+  // filler-subtraction / fallbackSignalSkill. Otherwise
+  // "…asking for lead generation services" becomes coreSkill
+  // "find asking lead generation" and every social dork misses real posts.
   if (signalMode === "buying_signal") {
+    const roleFromRaw =
+      findRoleMatch(lower) ?? findRoleMatch(skillSeed) ?? findRoleMatch(extractCoreSkill(skillSeed));
     const detected = detectSkillMentions(trimmed);
     const primary =
+      roleFromRaw?.key ||
       detected[0] ||
       fallbackSignalSkill(skillSeed) ||
       extractCoreSkill(skillSeed) ||
@@ -1774,6 +1792,7 @@ export function classifyQuery(raw: string): ClassifiedQuery {
     // Always expand bare skills ("design") via ROLE_CATALOG — detected-only
     // lookup left relatedSkills=[design] and starved Reddit/forhire queries.
     const roleEntry =
+      roleFromRaw ??
       findRoleMatch(primary) ??
       findRoleMatch(skillSeed) ??
       (detected[0] ? findRoleMatch(detected[0]) : null);
