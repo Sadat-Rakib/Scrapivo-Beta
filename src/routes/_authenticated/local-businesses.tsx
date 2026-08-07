@@ -33,7 +33,6 @@ function LocalBusinessesPage() {
   const [category, setCategory] = useState("");
   const [location, setLocation] = useState("");
   const [rows, setRows] = useState<LocalBusinessRow[]>([]);
-  const [attribution, setAttribution] = useState("");
 
   const mut = useMutation({
     mutationFn: () =>
@@ -51,11 +50,12 @@ function LocalBusinessesPage() {
         return;
       }
       setRows(res.businesses ?? []);
-      setAttribution(res.attribution ?? "");
       const withEmail = (res.businesses ?? []).filter((b) => b.email).length;
+      const withPhone = (res.businesses ?? []).filter((b) => b.phone).length;
       toast.success(
         `${res.businesses?.length ?? 0} local businesses` +
-          (withEmail ? ` · ${withEmail} with email` : ""),
+          (withEmail ? ` · ${withEmail} with email` : "") +
+          (withPhone ? ` · ${withPhone} with phone` : ""),
       );
     },
     onError: (e: Error) => toast.error(e.message || "Search failed"),
@@ -63,7 +63,7 @@ function LocalBusinessesPage() {
 
   const exportCsv = () => {
     if (!rows.length) return;
-    const header = ["name", "category", "phone", "email", "verified", "website", "source", "description"];
+    const header = ["name", "category", "phone", "email", "verified", "website", "description"];
     const lines = [
       header.join(","),
       ...rows.map((r) =>
@@ -74,7 +74,6 @@ function LocalBusinessesPage() {
           r.email ?? "",
           r.email_verified ? "yes" : "",
           r.website ?? "",
-          r.source,
           (r.description ?? "").replace(/"/g, '""'),
         ]
           .map((c) => `"${String(c).replace(/\n/g, " ")}"`)
@@ -91,17 +90,18 @@ function LocalBusinessesPage() {
   };
 
   return (
-    <div className="p-6 sm:p-8 max-w-5xl mx-auto w-full">
+    <div className="h-full overflow-y-auto p-6 sm:p-8 max-w-5xl mx-auto w-full">
       <div className="mb-8">
         <div className="inline-flex items-center gap-2 text-muted-foreground mb-2">
           <Store className="size-4" />
-          <span className="text-xs uppercase tracking-wide">Maps-style local leads</span>
+          <span className="text-xs uppercase tracking-wide">Local business leads</span>
         </div>
         <h1 className="text-2xl font-semibold tracking-tight mb-2">Local businesses</h1>
         <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
-          Pick a business category and place. Scrapivo finds listings via OpenStreetMap (and
-          Places APIs when keyed), visits each website with Cheerio to extract published emails,
-          then verifies deliverability. Separate from Discover buyer-intent search.
+          Pick a business category and a place. Scrapivo finds live local businesses that match,
+          monitors their public listings, and gathers published contact details—emails, phones,
+          websites, and addresses—then verifies deliverability so your outreach list is ready.
+          Separate from Discover buyer-intent search.
         </p>
       </div>
 
@@ -161,36 +161,37 @@ function LocalBusinessesPage() {
         </div>
         <ol className="text-[11px] text-muted-foreground space-y-1 list-decimal list-inside">
           <li>Describe category + territory</li>
-          <li>We query OSM / Places live, then Cheerio-read each website for emails</li>
+          <li>We find matching local businesses live and collect public contact info from their sites</li>
           <li>Verify and download for outreach</li>
         </ol>
       </div>
 
       {mut.isPending && (
         <p className="text-sm text-muted-foreground mb-4">
-          Collecting listings and extracting emails from websites — this can take up to a minute…
+          Collecting listings and gathering contact details from websites — this can take up to a
+          minute…
         </p>
       )}
 
       {!mut.isPending && rows.length > 0 && (
-        <div className="space-y-3">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-sm text-muted-foreground">
-              {rows.length} businesses
-              {rows.filter((r) => r.email).length
-                ? ` · ${rows.filter((r) => r.email).length} with email`
-                : ""}
-            </p>
-            {attribution && <p className="text-[10px] text-muted-foreground">{attribution}</p>}
-          </div>
+        <div className="space-y-3 pb-8">
+          <p className="text-sm text-muted-foreground">
+            {rows.length} businesses
+            {rows.filter((r) => r.email).length
+              ? ` · ${rows.filter((r) => r.email).length} with email`
+              : ""}
+            {rows.filter((r) => r.phone).length
+              ? ` · ${rows.filter((r) => r.phone).length} with phone`
+              : ""}
+          </p>
           <LocalBusinessesGrid rows={rows} />
         </div>
       )}
 
       {!mut.isPending && !rows.length && (
         <p className="text-sm text-muted-foreground">
-          Results appear here after you run a search. Coverage follows OpenStreetMap mapping density
-          for each city.
+          Results appear here after you run a search. We’ll surface matching local businesses and
+          their public contact details.
         </p>
       )}
     </div>

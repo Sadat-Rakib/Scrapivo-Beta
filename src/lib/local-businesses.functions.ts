@@ -1,6 +1,6 @@
 /**
  * Dedicated Local Businesses search (sidebar page — not Discover).
- * OSM/Overpass + Geoapify/Foursquare → Cheerio website emails → MillionVerifier.
+ * Places/maps listings → website contact harvest → email verification.
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
@@ -29,21 +29,24 @@ function toQx(category: string, location: string): ExpandedQueries {
   };
 }
 
-function leadToRow(l: {
-  source: string;
-  title?: string;
-  author?: string;
-  company?: string;
-  snippet?: string;
-  full_post_url?: string;
-  company_domain?: string;
-  platform?: string;
-  platform_label?: string;
-  why_match?: string;
-  score?: number;
-  emails?: string[];
-  phones?: string[];
-}): LocalBusinessRow {
+function leadToRow(
+  l: {
+    source: string;
+    title?: string;
+    author?: string;
+    company?: string;
+    snippet?: string;
+    full_post_url?: string;
+    company_domain?: string;
+    platform?: string;
+    platform_label?: string;
+    why_match?: string;
+    score?: number;
+    emails?: string[];
+    phones?: string[];
+  },
+  category: string,
+): LocalBusinessRow {
   const name = (l.company || l.author || l.title || "").trim();
   const website =
     l.full_post_url?.startsWith("http") && !/openstreetmap\.org/i.test(l.full_post_url)
@@ -57,15 +60,20 @@ function leadToRow(l: {
       /* ignore */
     }
   }
+  // Prefer user-facing category over platform labels like "Local business (Foursquare)".
+  const cleanDesc = (l.snippet || "")
+    .replace(/\b(OpenStreetMap|OSM|Geoapify|Foursquare|Overpass)\b/gi, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
   return {
     key: name.toLowerCase(),
     name,
-    category: l.platform_label || l.platform,
+    category,
     phone: l.phones?.[0],
     email: l.emails?.[0],
     website,
     domain,
-    description: l.why_match || l.snippet || `${name} — local business`,
+    description: cleanDesc || `${name} — ${category} in local listings`,
     source: l.source,
     sample_url: l.full_post_url || website || "",
     score: l.score ?? 50,
@@ -118,7 +126,7 @@ export const runLocalBusinessSearch = createServerFn({ method: "POST" })
 
     const byKey = new Map<string, LocalBusinessRow>();
     for (const l of [...osm, ...places]) {
-      const row = leadToRow(l as Parameters<typeof leadToRow>[0]);
+      const row = leadToRow(l as Parameters<typeof leadToRow>[0], category);
       if (!row.name || row.name.length < 2) continue;
       const prev = byKey.get(row.key);
       if (!prev || row.score > prev.score) byKey.set(row.key, row);
@@ -134,14 +142,18 @@ export const runLocalBusinessSearch = createServerFn({ method: "POST" })
         Promise.allSettled(
           targets.map(async (b) => {
             try {
-              if (!b.email) {
-                const { emails } = await extractEmailsWithCheerio(b.website!);
-                if (emails[0]) b.email = emails[0];
+              const needEmail = !b.email;
+              const needPhone = !b.phone;
+              if (needEmail || needPhone) {
+                const { emails, phones } = await extractEmailsWithCheerio(b.website!);
+                if (needEmail && emails[0]) b.email = emails[0];
+                if (needPhone && phones[0]) b.phone = phones[0];
               }
               if (b.email) {
                 const v = await verifyEmailDeep(b.email);
                 b.email_verified = v.tier === "verified";
-                b.verify_note = v.label;
+                // Do not surface verifier labels in the UI.
+                delete b.verify_note;
               }
             } catch {
               /* skip one */
@@ -154,7 +166,9 @@ export const runLocalBusinessSearch = createServerFn({ method: "POST" })
       businesses = [...businesses].sort((a, b) => {
         const ae = a.email ? (a.email_verified ? 2 : 1) : 0;
         const be = b.email ? (b.email_verified ? 2 : 1) : 0;
-        return be - ae || b.score - a.score;
+        const ap = a.phone ? 1 : 0;
+        const bp = b.phone ? 1 : 0;
+        return be - ae || bp - ap || b.score - a.score;
       });
     }
 
@@ -181,6 +195,5 @@ export const runLocalBusinessSearch = createServerFn({ method: "POST" })
       message: null as string | null,
       businesses,
       sources,
-      attribution: "OpenStreetMap contributors (ODbL) · Geoapify/Foursquare when keyed",
     };
   });

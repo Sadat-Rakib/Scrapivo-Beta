@@ -29,7 +29,7 @@ const TIMEOUT_MS = 9000;
 const CACHE_MS = 3 * 60_000;
 
 /** Angles per craft on Freelancer, and rows per angle. */
-const FREELANCER_MAX_QUERIES = 6;
+const FREELANCER_MAX_QUERIES = 8;
 const FREELANCER_MAX_QUERIES_VOLUME = 10;
 const FREELANCER_PAGE_SIZE = 100;
 
@@ -46,9 +46,13 @@ function craftTermsOf(qx: ExpandedQueries): string[] {
 
 function isVolumeCraft(qx: ExpandedQueries): boolean {
   const blob = `${qx.skill} ${qx.role} ${qx.queryType} ${(qx.relatedSkills || []).join(" ")}`;
-  // Lead-gen / sales crafts must NOT use product volume mode — that matched
-  // any Freelancer gig whose description mentioned "lead" or "services".
+  // Lead-gen / sales crafts must NOT use loose description matching — that
+  // matched any Freelancer gig whose description mentioned "lead" or "services".
+  // They still get the default multi-angle query fan-out below.
   if (/\blead\s*gen|sales|sdr|bdr|outbound|appointment\s*sett/i.test(blob)) return false;
+  // Any concrete craft/role gets wider Freelancer fan-out (not a tiny allowlist).
+  const craft = (qx.role || qx.skill || "").trim();
+  if (craft.length >= 3) return true;
   return (
     qx.queryType === "product" ||
     /tutor|tutoring|homework|teacher|invoice|billing|client acquisition|freelance/i.test(blob)

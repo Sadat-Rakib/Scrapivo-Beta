@@ -1274,8 +1274,8 @@ export function isWeakFamilyTerm(term: string): boolean {
  * always rank on top. Clients-goal social prefer ≤24h when a date exists. */
 export const SOCIAL_MAX_AGE_DAYS = 2;
 /** Preferred social window for goal=clients buyer demand. */
-/** Clients social freshness window (days). Rank still boosts under-24h higher. */
-export const CLIENTS_SOCIAL_MAX_AGE_DAYS = 2;
+/** Clients social freshness window (days). Wider than 2d so sparse crafts can fill tabs; rank still boosts under-24h higher. */
+export const CLIENTS_SOCIAL_MAX_AGE_DAYS = 7;
 export const JOB_BOARD_MAX_AGE_DAYS = 3;
 /** Named-company ATS / boards on clients path — longer than social (2d). */
 export const ATS_COMPANY_MAX_AGE_DAYS = 7;

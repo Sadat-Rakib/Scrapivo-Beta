@@ -1,11 +1,15 @@
 /**
- * Cheerio-based website email extraction for Local Businesses.
- * Fetches public HTML (contact/about/home) and pulls published mailto + text emails.
+ * Website contact extraction for Local Businesses.
+ * Fetches public HTML (contact/about/home) and pulls published emails + phones.
  */
 import * as cheerio from "cheerio";
+import { parsePhone } from "./phone";
 
 const MAILTO_RE = /mailto:([a-zA-Z0-9._%+'-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/gi;
 const PLAIN_EMAIL_RE = /\b[a-zA-Z0-9._%+'-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b/g;
+const TEL_HREF_RE = /tel:([+\d()\s.\-]{7,})/gi;
+const PLAIN_PHONE_RE =
+  /(?:\+\d{1,3}[\s.\-]?)?(?:\(?\d{2,4}\)?[\s.\-]?)?\d{3,4}[\s.\-]?\d{3,4}(?:\s*(?:ext|x|#)\s*\d{1,6})?/gi;
 const JUNK_LOCAL = new Set([
   "noreply",
   "no-reply",
@@ -61,6 +65,54 @@ function emailsFromHtml(html: string): Array<{ email: string; score: number }> {
     .sort((a, b) => b.score - a.score);
 }
 
+function phonesFromHtml(html: string): string[] {
+  const $ = cheerio.load(html || "");
+  const scored = new Map<string, { display: string; score: number }>();
+
+  const consider = (raw: string, boost = 0) => {
+    const cleaned = (raw || "").trim();
+    if (!cleaned || cleaned.replace(/\D/g, "").length < 7) return;
+    const p = parsePhone(cleaned);
+    if (p.status === "not_a_number" || p.status === "fictional") return;
+    if (p.confidence < 0.25 && !p.e164) return;
+    const digits = (p.e164 || cleaned).replace(/\D/g, "");
+    if (digits.length < 7 || digits.length > 15) return;
+    const display = p.e164 || p.national || cleaned;
+    const score = (p.confidence || 0.3) + boost;
+    const prev = scored.get(digits);
+    if (!prev || score > prev.score) scored.set(digits, { display, score });
+  };
+
+  $("a[href^='tel:']").each((_, el) => {
+    const href = $(el).attr("href") || "";
+    for (const m of href.matchAll(TEL_HREF_RE)) {
+      consider(m[1], 0.3);
+    }
+  });
+
+  // WhatsApp click-to-chat
+  $("a[href*='wa.me'], a[href*='whatsapp']").each((_, el) => {
+    const href = $(el).attr("href") || "";
+    const m = href.match(/(?:wa\.me\/|phone=)(\+?\d{8,15})/i);
+    if (m) consider(m[1].startsWith("+") ? m[1] : `+${m[1]}`, 0.25);
+  });
+
+  const preferBlocks = $("footer, [class*='contact'], [id*='contact'], [class*='footer']").text();
+  for (const m of preferBlocks.matchAll(PLAIN_PHONE_RE)) {
+    consider(m[0], 0.15);
+  }
+
+  const body = $("body").text() || "";
+  for (const m of body.matchAll(PLAIN_PHONE_RE)) {
+    consider(m[0], 0);
+  }
+
+  return [...scored.values()]
+    .sort((a, b) => b.score - a.score)
+    .map((x) => x.display)
+    .slice(0, 5);
+}
+
 async function fetchHtml(url: string): Promise<string> {
   try {
     const res = await fetch(url, {
@@ -97,16 +149,17 @@ function contactPaths(base: string): string[] {
 }
 
 /**
- * Visit a business website (home + contact/about) and extract published emails.
+ * Visit a business website (home + contact/about) and extract published emails + phones.
  */
 export async function extractEmailsWithCheerio(
   website: string,
-): Promise<{ emails: string[]; pagesFetched: number }> {
+): Promise<{ emails: string[]; phones: string[]; pagesFetched: number }> {
   let url = (website || "").trim();
-  if (!url) return { emails: [], pagesFetched: 0 };
+  if (!url) return { emails: [], phones: [], pagesFetched: 0 };
   if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
 
-  const ranked = new Map<string, number>();
+  const rankedEmails = new Map<string, number>();
+  const phones = new Set<string>();
   let pagesFetched = 0;
   const paths = contactPaths(url).slice(0, 3);
 
@@ -115,15 +168,18 @@ export async function extractEmailsWithCheerio(
     if (!html) continue;
     pagesFetched += 1;
     for (const { email, score } of emailsFromHtml(html)) {
-      ranked.set(email, Math.max(ranked.get(email) ?? 0, score));
+      rankedEmails.set(email, Math.max(rankedEmails.get(email) ?? 0, score));
     }
-    if (ranked.size >= 3) break;
+    for (const phone of phonesFromHtml(html)) {
+      phones.add(phone);
+    }
+    if (rankedEmails.size >= 3 && phones.size >= 1) break;
   }
 
-  const emails = [...ranked.entries()]
+  const emails = [...rankedEmails.entries()]
     .sort((a, b) => b[1] - a[1])
     .map(([e]) => e)
     .slice(0, 5);
 
-  return { emails, pagesFetched };
+  return { emails, phones: [...phones].slice(0, 5), pagesFetched };
 }

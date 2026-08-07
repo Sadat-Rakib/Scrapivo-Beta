@@ -564,7 +564,7 @@ export function LocalBusinessCard({ row }: { row: LocalBusinessRow }) {
           )}
         </div>
         <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground shrink-0">
-          {row.source === "osm" ? "OSM" : row.source}
+          Local
         </span>
       </div>
       {row.description && (
@@ -595,12 +595,6 @@ export function LocalBusinessCard({ row }: { row: LocalBusinessRow }) {
             {row.email_verified && <BadgeCheck className="size-3" />}
           </a>
         )}
-      </div>
-      {row.verify_note && (
-        <div className="text-[10px] text-muted-foreground">{row.verify_note}</div>
-      )}
-      <div className="text-[10px] text-muted-foreground">
-        Business data © OpenStreetMap contributors (ODbL) when sourced from OSM
       </div>
     </div>
   );

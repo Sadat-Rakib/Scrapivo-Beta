@@ -39,7 +39,9 @@ export const runSearch = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => Input.parse(d))
   .handler(async ({ data, context }) => {
     const { searchAllSources } = await import("./search/sources.server");
-    const { classifyQuery, getSubredditBoostsForQuery } = await import("./search/query-classifier");
+    const { classifyQuery, getSubredditBoostsForQuery, inferGoalFromQuery } = await import(
+      "./search/query-classifier"
+    );
     const { expandFromClassified } = await import("./search/query-expander");
     const { generateSmartSuggestions } = await import("./search/suggestions");
     const { dedupeByUrl, fuzzyDedupeLeads, diversifiedTop12 } = await import("./scoring");
@@ -81,7 +83,9 @@ export const runSearch = createServerFn({ method: "POST" })
     const ctx = data.context;
     classified.audience = ctx?.audience ?? null;
     // Default to client-demand (people/businesses asking for the service).
-    classified.goal = ctx?.goal ?? "clients";
+    // Query text can override when the user states jobs vs selling vs demand hunt.
+    const inferredGoal = inferGoalFromQuery(data.query);
+    classified.goal = ctx?.goal ?? inferredGoal ?? "clients";
     if (ctx?.location && ctx.location.toLowerCase() !== "anywhere" && !classified.location) {
       classified.location = ctx.location;
     }
@@ -745,11 +749,11 @@ export const runSearch = createServerFn({ method: "POST" })
       minSocial: goal === "jobs" ? 2 : clientsVolume ? 15 : 5,
       maxReddit: clientsVolume ? 60 : maxTotal,
       maxTotal,
-      // Warm floor (45) — volume without weak / no-signal rows.
-      minScore: clientsVolume ? 45 : 0,
+      // Warm floor (35) — enough to cut junk without starving sparse crafts.
+      minScore: clientsVolume ? 35 : 0,
       maxPerPlatform: maxTotal,
       // Cap Freelancer so social/public/ATS can surface in the viewport.
-      maxFreelancer: clientsVolume ? 50 : maxTotal,
+      maxFreelancer: clientsVolume ? 60 : maxTotal,
     });
     trace("diversified", rankedForFeed);
 

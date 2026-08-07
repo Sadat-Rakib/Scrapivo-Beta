@@ -1545,6 +1545,8 @@ export function isProductPitchQuery(text: string): boolean {
   const t = (text || "").toLowerCase();
   if (!t.trim()) return false;
   if (/\b(i'?m|i am|we'?re|we are)\s+selling\b/.test(t)) return true;
+  if (/\b(try(?:ing)?\s+to\s+sell|want\s+to\s+sell|need\s+to\s+sell)\b/.test(t)) return true;
+  if (/\bsell(?:ing)?\s+(?:my|our)\b/.test(t)) return true;
   if (
     /\b(selling|building|launched|built)\s+(a|an|my|our)\s+(product|app|tool|saas|platform|software|service)\b/.test(
       t,
@@ -1552,11 +1554,61 @@ export function isProductPitchQuery(text: string): boolean {
   ) {
     return true;
   }
+  if (/\bsell(?:ing)?\s+(?:a|an|my|our)\s+[\w\s-]{0,40}\bservices?\b/.test(t)) return true;
   if (/\bmy (product|app|tool|saas|platform|software)\b.{0,40}\b(that|which|helps|does)\b/.test(t)) {
     return true;
   }
   if (/\b(customers?|clients?|users?|leads?)\s+for\s+(my|our)\b/.test(t)) return true;
+  if (/\b(find|get|generate)\s+(me\s+)?(more\s+)?(clients?|customers?|buyers?)\s+for\b/.test(t))
+    return true;
   return false;
+}
+
+/**
+ * Infer jobs vs clients from natural language when project context left goal unset.
+ * Examples:
+ * - "I'm a designer looking for a design role" → jobs
+ * - "I'm selling lead gen" / "companies looking for designers" → clients
+ */
+export function inferGoalFromQuery(text: string): Goal | null {
+  const t = (text || "").toLowerCase();
+  if (!t.trim()) return null;
+
+  if (isProductPitchQuery(t)) return "clients";
+
+  // Demand hunt for buyers of a craft — always clients.
+  if (
+    /\b(companies|people|businesses|firms?)\b.{0,40}\b(looking for|need|want|hiring|seeking)\b/.test(
+      t,
+    ) ||
+    /\b(looking for|find)\s+(people|companies|businesses|clients|customers)\b.{0,40}\b(who|that)\b/.test(
+      t,
+    ) ||
+    /\b(who|that)\s+(need|want|are looking for|buy)\b/.test(t)
+  ) {
+    return "clients";
+  }
+
+  // Explicit job/role seeker — not "looking for people who need…".
+  const jobSeek =
+    /\b(looking for|seeking|searching for|find(?:ing)?)\s+(a |an )?(job|role|position|opening|gig)\b/.test(
+      t,
+    ) ||
+    /\b(job hunt|job hunting|open to work|career change|apply for (jobs?|roles?))\b/.test(t) ||
+    (/\b(i'?m|i am)\s+(a|an)\b/.test(t) &&
+      /\b(looking for|seeking)\s+(a |an )?(design|dev|engineering|marketing|sales|writer|writing)?\s*(job|role|position|opening)\b/.test(
+        t,
+      ));
+
+  if (jobSeek) {
+    const demandAudience =
+      /\blooking for (people|companies|businesses|clients|customers|someone who|folks who)\b/.test(
+        t,
+      ) || /\b(who (need|want|are looking)|that (need|want))\b/.test(t);
+    if (!demandAudience) return "jobs";
+  }
+
+  return null;
 }
 
 const PRODUCT_STOP = new Set([
@@ -1634,6 +1686,18 @@ export function extractProductPitchKeywords(text: string): string[] {
     if (noun.length >= 3) add(noun);
   }
 
+  // "sell my lead generation service" / "trying to sell our outbound service"
+  const sellMine = t.match(
+    /\b(?:try(?:ing)?\s+to\s+sell|sell(?:ing)?)\s+(?:a|an|my|our)\s+(.+?)(?:\s+services?)?(?:\.|$|,|\s+to\b|\s+and\b)/i,
+  );
+  if (sellMine?.[1]) {
+    const noun = sellMine[1]
+      .replace(/\b(product|app|tool|saas|platform|software|service|services)\b/gi, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (noun.length >= 3) add(noun);
+  }
+
   const selling = t.match(
     /\b(?:selling|building|launched)\s+(?:a|an|my|our)\s+([a-z0-9][\w+-]*(?:\s+[a-z0-9][\w+-]*){0,2})/i,
   );
@@ -1661,9 +1725,15 @@ export function classifyQuery(raw: string): ClassifiedQuery {
   if (!directory && isProductPitchQuery(trimmed)) {
     const related = extractProductPitchKeywords(trimmed);
     const audience = extractProductPitchAudience(trimmed);
+    // Prefer a known craft in the pitch ("lead generation") over filler seeds.
+    const roleFromPitch =
+      related.map((r) => findRoleMatch(r)).find(Boolean) ||
+      findRoleMatch(trimmed) ||
+      null;
     // Prefer capability phrase over audience noun as core skill
     // ("find clients" beats "freelancers" for fan-out quality).
     const capability =
+      roleFromPitch?.key ||
       related.find((r) => /\s/.test(r) && r !== audience) ||
       related.find((r) => r !== audience) ||
       related[0];
@@ -1672,14 +1742,22 @@ export function classifyQuery(raw: string): ClassifiedQuery {
       extractProductKeywords(lower).slice(0, 3).join(" ") ||
       "product";
     const who = audience || "people";
+    const relatedSkills = [
+      ...new Set([
+        ...(roleFromPitch?.entry.relatedSkills ?? []),
+        ...related,
+        ...extractProductKeywords(lower),
+      ]),
+    ].filter((t) => t && t.length >= 2);
     return withMeta(
       {
         raw: trimmed,
-        type: "product",
+        type: roleFromPitch ? "role" : "product",
         coreSkill: seed,
-        roleTitle: seed,
-        relatedSkills: related.length ? related : extractProductKeywords(lower),
-        targetCustomerDesc: `${who} who need ${seed}`,
+        roleTitle: roleFromPitch?.entry.roleTitle || seed,
+        relatedSkills: relatedSkills.length ? relatedSkills : [seed],
+        targetCustomerDesc:
+          roleFromPitch?.entry.targetCustomerDesc || `${who} who need ${seed}`,
       },
       location,
       "buyer_intent",
