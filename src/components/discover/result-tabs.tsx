@@ -17,9 +17,10 @@ import {
   MapPin,
   Clock,
   BadgeCheck,
+  Store,
 } from "lucide-react";
 
-export type ResultTab = "posts" | "companies" | "people";
+export type ResultTab = "posts" | "companies" | "people" | "local";
 
 export type ResolvedContactInfo = {
   email?: string;
@@ -70,7 +71,7 @@ export function ResultTabPills({
 }: {
   tab: ResultTab;
   onChange: (t: ResultTab) => void;
-  counts: { posts: number; companies: number; people: number };
+  counts: { posts: number; companies: number; people: number; local?: number };
   /** When set, only these tabs are shown (audience-scoped Discover). */
   visible?: ResultTab[];
 }) {
@@ -79,6 +80,7 @@ export function ResultTabPills({
       { id: "posts" as const, label: "Posts", icon: FileText, n: counts.posts },
       { id: "companies" as const, label: "Companies", icon: Building2, n: counts.companies },
       { id: "people" as const, label: "People", icon: Users, n: counts.people },
+      { id: "local" as const, label: "Local", icon: Store, n: counts.local ?? 0 },
     ] as const
   ).filter((it) => !visible || visible.includes(it.id));
   if (!items.length) return null;
@@ -569,6 +571,18 @@ export function LocalBusinessCard({ row }: { row: LocalBusinessRow }) {
       </div>
       {row.description && (
         <p className="text-xs text-foreground/80 line-clamp-3">{row.description}</p>
+      )}
+      {!!row.opportunity_tags?.length && (
+        <div className="flex flex-wrap gap-1">
+          {row.opportunity_tags.map((t) => (
+            <span
+              key={t}
+              className="text-[10px] px-1.5 py-0.5 rounded-full border border-border text-muted-foreground"
+            >
+              {t.replace(/_/g, " ")}
+            </span>
+          ))}
+        </div>
       )}
       <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs">
         {row.website && (

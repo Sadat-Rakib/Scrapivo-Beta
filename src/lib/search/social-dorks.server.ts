@@ -213,6 +213,7 @@ async function searchSocialDorksViaSerp(
       const data = await searchGoogleSerp(dork, {
         tbs: window === "day" ? "qdr:d" : "qdr:w",
         num: 15,
+        allowEmptyProviderFallback: true,
       });
       if (!data?.organic_results?.length) return;
       const leads: LooseLead[] = data.organic_results.map((r) => ({

@@ -75,6 +75,9 @@ export type LeadFilterPrefs = {
   preferRemote?: boolean;
   /** Server-side max age in hours for dated social (from clarifier). */
   maxAgeHours?: number;
+  /** User explicitly answered YoE in clarifier — enforce on clients ATS too. */
+  explicitExperience?: boolean;
+  location?: string | null;
 };
 
 export function prefersJunior(prefs?: LeadFilterPrefs): boolean {
@@ -555,7 +558,23 @@ export function isJobListPage(lead: Lead): boolean {
 /** Marketplace / “best N services” listicles — never a single buyer lead. */
 export function isMarketplaceOrListicle(lead: Lead): boolean {
   const text = `${lead.title} ${lead.snippet}`;
-  return MARKETPLACE_LISTICLE_RE.test(text);
+  const url = (lead.full_post_url || "").toLowerCase();
+  if (MARKETPLACE_LISTICLE_RE.test(text)) return true;
+  // SERP profile / directory noise that looks like a hire but isn't.
+  if (
+    /\b(top \d+|best \d+|list of|directory of|freelance platforms?|how to find|hire the best)\b/i.test(
+      text,
+    )
+  ) {
+    return true;
+  }
+  if (/linkedin\.com\/in\//i.test(url) && !/\b(hiring|looking for|need a|we're hiring)\b/i.test(text)) {
+    return true;
+  }
+  if (/\/(tag|category|topics?|search)\//i.test(url) && !/\b(hiring|need a|looking for)\b/i.test(text)) {
+    return true;
+  }
+  return false;
 }
 
 /** Explicit seller/provider pitch — never a client lead. */
@@ -723,10 +742,23 @@ const LOCATION_ALLOW: Record<string, string[]> = {
     "noida", "ahmedabad", "jaipur", "kochi", "chandigarh", ".in/", "🇮🇳",
   ],
   "united states": [
-    "united states", "usa", "u.s.", "america", "new york", "boston", "san francisco",
-    "los angeles", "chicago", "austin", "seattle", "denver", ".us/",
+    "united states", "usa", "u.s.", "u.s.a", "america", "american",
+    "new york", "boston", "san francisco", "los angeles", "chicago", "austin",
+    "seattle", "denver", "texas", "california", "florida", "arizona",
+    "atlanta", "miami", "dallas", "houston", "philadelphia", "san diego",
+    "portland", "las vegas", "washington", "nyc", ".us/", "🇺🇸",
   ],
-  "united kingdom": ["united kingdom", "uk", "britain", "england", "london", "manchester", ".uk/"],
+  "united kingdom": [
+    "united kingdom", "uk", "u.k.", "britain", "british", "england", "scotland",
+    "wales", "london", "manchester", "birmingham", "edinburgh", ".uk/", "🇬🇧",
+  ],
+  europe: [
+    "europe", "european", "eu", "germany", "france", "spain", "italy",
+    "netherlands", "belgium", "sweden", "norway", "denmark", "finland",
+    "poland", "portugal", "ireland", "austria", "switzerland", "berlin",
+    "paris", "amsterdam", "dublin", "madrid", "barcelona", "lisbon",
+    "stockholm", "copenhagen", "munich", "zurich", ".eu/",
+  ],
   canada: [
     "canada", "canadian", "toronto", "vancouver", "montreal", "ottawa", "calgary",
     "edmonton", "winnipeg", "quebec", "victoria", "halifax", "mississauga", ".ca/",
@@ -761,17 +793,15 @@ export function locationAllowTokens(location: string): string[] {
 
 /**
  * When user asked for a place, drop leads that clearly reference a conflicting geography
- * without also matching the requested place. Country-scoped client searches require
- * allow-token OR explicit remote/global with no foreign city.
+ * without also matching the requested place.
  *
- * Soft keep when there is NO geo mention at all (volume). We never invent a country —
- * UI location_hint only comes from explicit "based in / located in" text.
- * Conflicting foreign geo always rejects.
+ * Soft keep when there is NO geo mention (volume) for known countries — but foreign
+ * geo always rejects. Europe / UK / US all use allow-lists.
  */
 export function passesLocationFilter(lead: Lead, location: string | null | undefined): boolean {
   if (!location) return true;
   // Directory Places results already geo-scoped
-  if (lead.source === "geoapify" || lead.source === "foursquare") return true;
+  if (lead.source === "geoapify" || lead.source === "foursquare" || lead.source === "osm") return true;
 
   const text = `${lead.title} ${lead.snippet} ${lead.full_post_url} ${lead.platform}`.toLowerCase();
   const allow = locationAllowTokens(location);
@@ -779,13 +809,15 @@ export function passesLocationFilter(lead: Lead, location: string | null | undef
   if (hasAllow) return true;
 
   const remoteOk = /\b(remote|worldwide|global|anywhere|work from home|wfh)\b/i.test(text);
-  const locKey = location.toLowerCase();
+  const locKey = location.toLowerCase().trim();
   const deny = GLOBAL_DENY_TOKENS.filter((d) => {
     return !allow.some((a) => a.includes(d.trim()) || d.trim().includes(a));
   });
   // Also deny other countries' allow-lists
   for (const [country, tokens] of Object.entries(LOCATION_ALLOW)) {
     if (country === locKey) continue;
+    // Europe contains many EU countries — don't deny intra-EU tokens against Europe.
+    if (locKey === "europe" && ["germany", "france", "united kingdom"].includes(country)) continue;
     for (const t of tokens) {
       if (t.length >= 4 && text.includes(t) && !allow.includes(t)) {
         return false;
@@ -797,10 +829,16 @@ export function passesLocationFilter(lead: Lead, location: string | null | undef
   const anyGeoMention = Object.values(LOCATION_ALLOW).flat().some((t) => t.length >= 5 && text.includes(t));
   if (anyGeoMention && !hasAllow) return false;
 
-  // Country-level hard gate: require allow OR remote without foreign geo.
-  if (LOCATION_ALLOW[locKey] || locKey === "canada" || locKey === "india" || locKey === "united states") {
+  // Country-level gate: require allow OR remote without foreign geo OR no geo mention.
+  if (
+    LOCATION_ALLOW[locKey] ||
+    locKey === "canada" ||
+    locKey === "india" ||
+    locKey === "united states" ||
+    locKey === "europe" ||
+    locKey === "united kingdom"
+  ) {
     if (remoteOk) return true;
-    // No geo mention at all → keep (soft); foreign already denied above.
     if (!anyGeoMention) return true;
     return false;
   }
@@ -988,10 +1026,14 @@ export function validateLeads(
       name: "seniorHeavy",
       // Enforce YoE on titles whenever the user prefers junior/mid/senior.
       // Exception: on the clients path, an ATS opening is a COMPANY SIGNAL
-      // (org needs this craft) — not a job the user applies to — so skip
-      // seniority there only.
+      // unless the user explicitly answered the experience clarifier.
       reject: (l) => {
-        if (classified.goal === "clients" && JOB_BOARD_SOURCES.has(l.source)) return false;
+        if (
+          classified.goal === "clients" &&
+          JOB_BOARD_SOURCES.has(l.source) &&
+          !prefs?.explicitExperience
+        )
+          return false;
         if (junior && isSeniorHeavyLead(l)) return true;
         if (senior && isJuniorFriendlyLead(l) && !isSeniorHeavyLead(l)) return true;
         if (

@@ -15,6 +15,7 @@ import {
   Bell,
   Columns3,
   Store,
+  Landmark,
 } from "lucide-react";
 import { mySupabase } from "@/integrations/my-supabase/client";
 import { getRemainingSearches } from "@/lib/search.functions";
@@ -25,6 +26,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 const nav = [
   { to: "/discover", label: "Discover", icon: Search },
   { to: "/local-businesses", label: "Local businesses", icon: Store },
+  { to: "/investors", label: "Investors", icon: Landmark },
   { to: "/watches", label: "Watches", icon: Bell },
   { to: "/pipeline", label: "Pipeline", icon: Columns3 },
   { to: "/saved", label: "Saved", icon: Bookmark },

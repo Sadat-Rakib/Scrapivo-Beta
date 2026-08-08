@@ -9,7 +9,9 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "smoke": "tsx scripts/smoke-all-features.mts",
+    "probe:keys": "tsx scripts/probe-api-keys.mts"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

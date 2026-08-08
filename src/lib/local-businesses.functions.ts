@@ -6,6 +6,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireMyAuth } from "@/integrations/my-supabase/auth-middleware";
 import type { LocalBusinessRow } from "@/lib/search/lead-segments";
+import { deriveOpportunityTags } from "@/lib/search/lead-segments";
 import type { ExpandedQueries } from "@/lib/search/query-expander";
 import {
   isJunkLocalListing,
@@ -100,6 +101,11 @@ function leadToRow(
     source: l.source,
     sample_url: website || "",
     score: l.score ?? 50,
+    opportunity_tags: deriveOpportunityTags({
+      website,
+      email: l.emails?.[0],
+      phone: l.phones?.[0],
+    }),
   };
 }
 
@@ -144,7 +150,7 @@ export const runLocalBusinessSearch = createServerFn({ method: "POST" })
 
     const [osm, places] = await Promise.all([
       searchOsmLocalBusinesses(qx, location).catch(() => []),
-      searchLocalBusinesses(qx, location, { directoryMode: true, min: 8 }).catch(() => []),
+      searchLocalBusinesses(qx, location, { directoryMode: true, min: 20 }).catch(() => []),
     ]);
 
     const byKey = new Map<string, LocalBusinessRow>();
@@ -155,40 +161,76 @@ export const runLocalBusinessSearch = createServerFn({ method: "POST" })
       if (!prev || row.score > prev.score) byKey.set(row.key, row);
     }
 
-    let businesses = [...byKey.values()].sort((a, b) => {
-      const aw = a.website ? 1 : 0;
-      const bw = b.website ? 1 : 0;
-      return bw - aw || b.score - a.score;
-    }).slice(0, 80);
+    let businesses = [...byKey.values()].sort((a, b) => b.score - a.score).slice(0, 150);
+
+    // Tag every row before enrichment so "no website" filters work immediately.
+    for (const b of businesses) {
+      b.opportunity_tags = deriveOpportunityTags(b);
+    }
 
     if (data.enrichEmails !== false) {
+      const { harvestDomainContacts } = await import("./contact/harvest.server");
       const { extractEmailsWithCheerio } = await import("./contact/cheerio-email.server");
       const { verifyEmailDeep } = await import("./contact/verify-contact.server");
-      // Deep-harvest top 5 with real websites first.
-      const targets = businesses.filter((b) => b.website && isRealBusinessWebsite(b.website)).slice(0, 5);
+      // Deep-harvest more sites — prefer harvestDomainContacts, Cheerio fallback.
+      const targets = businesses
+        .filter((b) => b.website && isRealBusinessWebsite(b.website))
+        .slice(0, 28);
       await Promise.race([
         Promise.allSettled(
           targets.map(async (b) => {
             try {
               const needEmail = !b.email;
               const needPhone = !b.phone;
-              if (needEmail || needPhone) {
+              let https = true;
+              let thinPage = false;
+              let missingMeta = false;
+              if (b.website) {
+                try {
+                  https = new URL(b.website).protocol === "https:";
+                } catch {
+                  https = false;
+                }
+              }
+              if ((needEmail || needPhone) && b.domain) {
+                const harvested = await harvestDomainContacts(b.domain, { maxPages: 4 });
+                if (needEmail && harvested.emails[0]?.email) b.email = harvested.emails[0].email;
+                if (needPhone && harvested.phones[0]) {
+                  b.phone =
+                    harvested.phones[0].parsed?.e164 ||
+                    harvested.phones[0].raw ||
+                    b.phone;
+                }
+                if ((harvested.pages?.length ?? 0) === 0) thinPage = true;
+              }
+              if ((needEmail && !b.email) || (needPhone && !b.phone)) {
                 const { emails, phones } = await extractEmailsWithCheerio(b.website!);
-                if (needEmail && emails[0]) b.email = emails[0];
-                if (needPhone && phones[0]) b.phone = phones[0];
+                if (needEmail && !b.email && emails[0]) b.email = emails[0];
+                if (needPhone && !b.phone && phones[0]) b.phone = phones[0];
+                if (!emails.length && !phones.length) missingMeta = true;
               }
               if (b.email) {
                 const v = await verifyEmailDeep(b.email);
                 b.email_verified = v.tier === "verified";
                 delete b.verify_note;
               }
+              b.opportunity_tags = deriveOpportunityTags({
+                ...b,
+                https,
+                thinPage,
+                missingMeta,
+              });
             } catch {
-              /* skip one */
+              b.opportunity_tags = deriveOpportunityTags(b);
             }
           }),
         ),
-        new Promise((r) => setTimeout(r, 50_000)),
+        new Promise((r) => setTimeout(r, 55_000)),
       ]);
+      // Re-tag businesses without websites / not enriched.
+      for (const b of businesses) {
+        if (!b.opportunity_tags?.length) b.opportunity_tags = deriveOpportunityTags(b);
+      }
       businesses = [...businesses].sort((a, b) => {
         const ae = a.email ? (a.email_verified ? 2 : 1) : 0;
         const be = b.email ? (b.email_verified ? 2 : 1) : 0;

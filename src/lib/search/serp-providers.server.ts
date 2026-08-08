@@ -3,11 +3,12 @@
  *
  * Primary: Serper (generous free tier — prefer this)
  * Failover: ScrapingDog
- * Reserve: SerpAPI (250/mo free — burn ONLY when Serper+Dog fail hard)
+ * Reserve: SerpAPI (250/mo free — burn ONLY when Serper+Dog fail hard,
+ *   OR when SearXNG is unavailable and Serper returned empty for site: dorks)
  *
  * Credit discipline for SerpAPI:
- * - Never call SerpAPI when Serper/Dog returned a response (even empty)
- * - Hard cap SERPAPI_MAX_CALLS_PER_RUN (default 4) across one Discover
+ * - Prefer not calling SerpAPI when Serper/Dog returned organic hits
+ * - Hard cap SERPAPI_MAX_CALLS_PER_RUN (default 4, or 10 when SearXNG is dead)
  * - Prefer num≤10 on SerpAPI (same 1 credit, less payload)
  *
  * All paths return SerpAPI-shaped organic_results so ingest stays shared.
@@ -41,8 +42,19 @@ function serpApiBudget(): SerpBudget {
   return serpBudgetAls.getStore() ?? { serpapiCalls: 0 };
 }
 
+/** True when production cannot use local SearXNG (Vercel / unset / localhost). */
+export function searxngUnavailable(): boolean {
+  const raw = process.env.SEARXNG_URL?.trim();
+  if (!raw) return true;
+  if (process.env.VERCEL === "1" && /localhost|127\.0\.0\.1|0\.0\.0\.0/.test(raw)) {
+    return true;
+  }
+  return false;
+}
+
 function serpApiMaxCalls(): number {
-  const n = Number(process.env.SERPAPI_MAX_CALLS_PER_RUN ?? "4");
+  const def = searxngUnavailable() ? "10" : "4";
+  const n = Number(process.env.SERPAPI_MAX_CALLS_PER_RUN ?? def);
   return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 4;
 }
 
@@ -164,15 +176,18 @@ export function hasGoogleSerpProvider(): boolean {
 /**
  * One Google SERP query.
  * Serper → ScrapingDog → SerpAPI (last resort, budget-capped).
- * Empty Serper/Dog results do NOT burn SerpAPI (saves the 250/mo quota).
+ * When SearXNG is unavailable (typical on Vercel), empty Serper/Dog still
+ * fall through to SerpAPI for site: marketplace/social dorks.
  */
 export async function searchGoogleSerp(
   q: string,
-  opts?: { tbs?: string; num?: number },
+  opts?: { tbs?: string; num?: number; allowEmptyProviderFallback?: boolean },
 ): Promise<SerpResponse | null> {
   if (!paidDiscoveryEnabled()) return null;
   const tbs = opts?.tbs ?? "qdr:d";
   const num = opts?.num ?? 20;
+  const emptyFallback =
+    opts?.allowEmptyProviderFallback === true || searxngUnavailable();
 
   const serper = await fetchSerper(q, tbs, num);
   if (serper && serper.organic_results.length > 0) return serper;
@@ -180,10 +195,84 @@ export async function searchGoogleSerp(
   const dog = await fetchScrapingDog(q, tbs, num);
   if (dog && dog.organic_results.length > 0) return dog;
 
-  // Serper/Dog answered but empty — do not spend SerpAPI on the same barren query.
+  if (emptyFallback) {
+    const api = await fetchSerpApi(q, tbs, num);
+    if (api && api.organic_results.length > 0) return api;
+  }
+
+  // Serper/Dog answered but empty — do not spend SerpAPI on the same barren query
+  // unless emptyFallback already tried above.
   if (serper) return serper;
   if (dog) return dog;
 
   // Both providers hard-failed (null) — spend a scarce SerpAPI credit.
   return fetchSerpApi(q, tbs, num);
+}
+
+/**
+ * Run site: dorks via SearXNG when available, else hosted Google SERP.
+ * Used by Fiverr / Discord / IG / FB / Upwork on Vercel where SearXNG is dead.
+ */
+export async function searchSiteDorks(
+  queries: string[],
+  opts?: {
+    maxPerQuery?: number;
+    tbs?: string;
+    searxngSource?: string;
+    timeRange?: "day" | "week" | "month";
+  },
+): Promise<Array<{ url: string; title: string; content: string; publishedDate?: string }>> {
+  const out: Array<{ url: string; title: string; content: string; publishedDate?: string }> = [];
+  const seen = new Set<string>();
+  const maxPer = opts?.maxPerQuery ?? 8;
+
+  if (!searxngUnavailable()) {
+    try {
+      const { searchSearxng } = await import("./searxng.server");
+      const results = await searchSearxng(
+        queries,
+        maxPer,
+        opts?.timeRange ?? "day",
+        opts?.searxngSource,
+      );
+      for (const r of results) {
+        if (!r.url || seen.has(r.url)) continue;
+        seen.add(r.url);
+        out.push({
+          url: r.url,
+          title: r.title || "",
+          content: r.content || "",
+          publishedDate: r.publishedDate,
+        });
+      }
+    } catch {
+      /* fall through to SERP */
+    }
+  }
+
+  if (out.length >= 3 || !hasGoogleSerpProvider()) return out;
+
+  for (const q of queries.slice(0, 3)) {
+    try {
+      const data = await searchGoogleSerp(q, {
+        tbs: opts?.tbs ?? "qdr:w",
+        num: Math.min(maxPer, 10),
+        allowEmptyProviderFallback: true,
+      });
+      for (const r of data?.organic_results ?? []) {
+        const link = r.link || "";
+        if (!link || seen.has(link)) continue;
+        seen.add(link);
+        out.push({
+          url: link,
+          title: r.title || "",
+          content: r.snippet || "",
+          publishedDate: r.date || r.published_date,
+        });
+      }
+    } catch {
+      /* continue */
+    }
+  }
+  return out;
 }

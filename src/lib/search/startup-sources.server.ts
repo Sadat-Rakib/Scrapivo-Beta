@@ -191,6 +191,7 @@ export async function searchGitHubHiringLists(qx: ExpandedQueries): Promise<Sour
 
 /**
  * Public Fiverr — buyer-request pages only (never seller gigs / categories).
+ * Uses SearXNG locally; on Vercel falls through to hosted Google SERP.
  */
 export async function searchFiverrPublic(qx: ExpandedQueries): Promise<SourceLead[]> {
   const skill = qx.skill || qx.role || "";
@@ -202,27 +203,34 @@ export async function searchFiverrPublic(qx: ExpandedQueries): Promise<SourceLea
   const BUYER_RE =
     /\b(looking for|need a|need an|hiring|buyer request|willing to pay|budget|need someone|who can)\b/i;
   try {
-    const { searchSearxng, searxngResultsToLeads } = await import("./searxng.server");
-    const results = await searchSearxng(queries, 2, "day", "fiverr");
-    const leads = searxngResultsToLeads(results, 8) as SourceLead[];
-    return leads
-      .filter((l) => /fiverr\.com/i.test(l.full_post_url))
-      .filter((l) => !/fiverr\.com\/categories\//i.test(l.full_post_url))
-      .filter((l) => {
-        // Seller gig URLs look like /username/gig-slug — drop unless buyer phrasing.
-        const url = l.full_post_url || "";
-        const isGig = /fiverr\.com\/[^/]+\/[^/?#]+/i.test(url) && !/\/request/i.test(url);
-        const text = `${l.title} ${l.snippet}`;
+    const { searchSiteDorks } = await import("./serp-providers.server");
+    const results = await searchSiteDorks(queries, {
+      maxPerQuery: 8,
+      searxngSource: "fiverr",
+      tbs: "qdr:w",
+    });
+    return results
+      .filter((r) => /fiverr\.com/i.test(r.url))
+      .filter((r) => !/fiverr\.com\/categories\//i.test(r.url))
+      .filter((r) => {
+        const isGig = /fiverr\.com\/[^/]+\/[^/?#]+/i.test(r.url) && !/\/request/i.test(r.url);
+        const text = `${r.title} ${r.content}`;
         if (isGig && !BUYER_RE.test(text)) return false;
         return BUYER_RE.test(text);
       })
-      .map((l) => ({
-        ...l,
+      .slice(0, 8)
+      .map((r) => ({
         source: "fiverr",
         platform: "Fiverr (buyer request)",
-        intentBoost: (l.intentBoost ?? 0) + 8,
-        match_reasons: [...(l.match_reasons ?? []), "Fiverr public buyer-request dork"],
-      }));
+        title: r.title || "Fiverr buyer request",
+        snippet: (r.content || "").slice(0, 400),
+        full_post_url: r.url,
+        posted_at: r.publishedDate || undefined,
+        engagement: 20,
+        is_decision_maker: true,
+        intentBoost: 8,
+        match_reasons: ["Fiverr public buyer-request dork"],
+      })) as SourceLead[];
   } catch {
     return [];
   }
@@ -245,19 +253,28 @@ export async function searchDiscordPublic(qx: ExpandedQueries): Promise<SourceLe
   const BUYER_RE =
     /\b(hiring|looking for|need|freelance|developers?|jobs?|recruit|talent)\b/i;
   try {
-    const { searchSearxng, searxngResultsToLeads } = await import("./searxng.server");
-    const results = await searchSearxng(queries, 2, "day", "discord");
-    const leads = searxngResultsToLeads(results, 10) as SourceLead[];
-    return leads
-      .filter((l) => /disboard\.org|top\.gg|discord\.gg|discord\.com\/invite/i.test(l.full_post_url))
-      .filter((l) => BUYER_RE.test(`${l.title} ${l.snippet}`))
-      .map((l) => ({
-        ...l,
+    const { searchSiteDorks } = await import("./serp-providers.server");
+    const results = await searchSiteDorks(queries, {
+      maxPerQuery: 8,
+      searxngSource: "discord",
+      tbs: "qdr:w",
+    });
+    return results
+      .filter((r) => /disboard\.org|top\.gg|discord\.gg|discord\.com\/invite/i.test(r.url))
+      .filter((r) => BUYER_RE.test(`${r.title} ${r.content}`))
+      .slice(0, 10)
+      .map((r) => ({
         source: "discord_public",
         platform: "Discord (public listing)",
-        intentBoost: (l.intentBoost ?? 0) + 6,
-        match_reasons: [...(l.match_reasons ?? []), "Public Discord server listing"],
-      }));
+        title: r.title || "Discord hiring listing",
+        snippet: (r.content || "").slice(0, 400),
+        full_post_url: r.url,
+        posted_at: r.publishedDate || undefined,
+        engagement: 15,
+        is_decision_maker: true,
+        intentBoost: 6,
+        match_reasons: ["Public Discord server listing"],
+      })) as SourceLead[];
   } catch {
     return [];
   }
@@ -335,31 +352,40 @@ export async function searchInstagramPublic(qx: ExpandedQueries): Promise<Source
       `site:instagram.com ("hiring" OR "looking for a designer" OR "need a designer") "${skill}"`,
     ];
     try {
-      const { searchSearxng, searxngResultsToLeads } = await import("./searxng.server");
-      const results = await searchSearxng(queries, 3, "day", "instagram");
-      for (const l of searxngResultsToLeads(results, 8) as SourceLead[]) {
-        const url = l.full_post_url || "";
+      const { searchSiteDorks } = await import("./serp-providers.server");
+      const results = await searchSiteDorks(queries, {
+        maxPerQuery: 8,
+        searxngSource: "instagram",
+        tbs: "qdr:w",
+      });
+      for (const r of results) {
+        const url = r.url || "";
         if (!/instagram\.com\/(p|reel)\//i.test(url)) continue;
         if (seen.has(url)) continue;
-        const text = `${l.title} ${l.snippet}`;
+        const text = `${r.title} ${r.content}`;
         if (!BUYER_RE.test(text)) continue;
-        // SearXNG rarely has IG dates — refuse undated so 2023 reels cannot leak.
-        if (!l.posted_at || !isRecent(l.posted_at, CLIENTS_SOCIAL_MAX_AGE_DAYS)) continue;
+        // Prefer dated; on SERP-only path accept undated with lower boost.
+        const postedAt = r.publishedDate || undefined;
+        if (postedAt && !isRecent(postedAt, CLIENTS_SOCIAL_MAX_AGE_DAYS)) continue;
         seen.add(url);
         const handle =
-          l.author ||
           text.match(/@([A-Za-z0-9_.]{2,30})/)?.[1] ||
           text.match(/\b([a-z0-9_.]{3,30}\.design)\b/i)?.[1];
         out.push({
-          ...l,
           source: "instagram",
           platform: "Instagram Post",
-          author: handle || l.author,
+          title: r.title || `Instagram @${handle || "post"}`,
+          snippet: (r.content || "").slice(0, 400),
+          full_post_url: url,
+          author: handle,
           author_url: handle
             ? `https://www.instagram.com/${String(handle).replace(/^@/, "")}/`
-            : l.author_url,
-          intentBoost: (l.intentBoost ?? 0) + 8,
-          match_reasons: [...(l.match_reasons ?? []), "Instagram public buyer dork"],
+            : undefined,
+          posted_at: postedAt,
+          engagement: 10,
+          is_decision_maker: /\b(founder|ceo|owner|hiring)\b/i.test(text),
+          intentBoost: postedAt ? 8 : 4,
+          match_reasons: ["Instagram public buyer dork"],
         });
       }
     } catch { /* continue */ }
@@ -369,7 +395,7 @@ export async function searchInstagramPublic(qx: ExpandedQueries): Promise<Source
 }
 
 /**
- * Public Facebook group / post discovery via SearXNG site: dorks only.
+ * Public Facebook group / post discovery via SearXNG or hosted SERP site: dorks.
  * Never scrapes private Facebook sessions.
  */
 export async function searchFacebookPublic(qx: ExpandedQueries): Promise<SourceLead[]> {
@@ -383,22 +409,32 @@ export async function searchFacebookPublic(qx: ExpandedQueries): Promise<SourceL
   const BUYER_RE =
     /\b(looking for|need a|need an|hiring|who can|willing to pay|budget|freelancer needed|help wanted)\b/i;
   try {
-    const { searchSearxng, searxngResultsToLeads } = await import("./searxng.server");
-    const results = await searchSearxng(queries, 3, "day", "facebook");
-    const leads = searxngResultsToLeads(results, 9) as SourceLead[];
-    return leads
-      .filter((l) => /facebook\.com\//i.test(l.full_post_url || ""))
-      .filter((l) => !/facebook\.com\/(login|sharer|share|marketplace)\b/i.test(l.full_post_url || ""))
-      .filter((l) => BUYER_RE.test(`${l.title} ${l.snippet}`))
-      // Undated Facebook SERP hits are usually stale — refuse without a fresh date.
-      .filter((l) => !!l.posted_at && isRecent(l.posted_at, CLIENTS_SOCIAL_MAX_AGE_DAYS))
-      .map((l) => ({
-        ...l,
-        source: "facebook",
-        platform: "Facebook (public)",
-        intentBoost: (l.intentBoost ?? 0) + 7,
-        match_reasons: [...(l.match_reasons ?? []), "Public Facebook buyer dork"],
-      }))
+    const { searchSiteDorks } = await import("./serp-providers.server");
+    const results = await searchSiteDorks(queries, {
+      maxPerQuery: 8,
+      searxngSource: "facebook",
+      tbs: "qdr:w",
+    });
+    return results
+      .filter((r) => /facebook\.com\//i.test(r.url || ""))
+      .filter((r) => !/facebook\.com\/(login|sharer|share|marketplace)\b/i.test(r.url || ""))
+      .filter((r) => BUYER_RE.test(`${r.title} ${r.content}`))
+      .map((r) => {
+        const postedAt = r.publishedDate || undefined;
+        return {
+          source: "facebook",
+          platform: "Facebook (public)",
+          title: r.title || "Facebook hiring post",
+          snippet: (r.content || "").slice(0, 400),
+          full_post_url: r.url,
+          posted_at: postedAt,
+          engagement: 12,
+          is_decision_maker: true,
+          intentBoost: postedAt ? 7 : 3,
+          match_reasons: ["Public Facebook buyer dork"],
+        } as SourceLead;
+      })
+      .filter((l) => !l.posted_at || isRecent(l.posted_at, CLIENTS_SOCIAL_MAX_AGE_DAYS))
       .slice(0, 12);
   } catch {
     return [];

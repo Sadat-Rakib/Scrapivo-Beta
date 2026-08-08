@@ -732,8 +732,8 @@ export function diversifiedTop12(
   const maxTotal = opts?.maxTotal ?? MAX_TOTAL_RESULTS;
   const minScore = opts?.minScore ?? 0;
   const perPlatformCap = directoryMode ? maxTotal : (opts?.maxPerPlatform ?? MAX_PER_PLATFORM);
-  const maxReddit = directoryMode ? maxTotal : (opts?.maxReddit ?? 10);
-  const maxFreelancer = opts?.maxFreelancer ?? 28;
+  const maxReddit = directoryMode ? maxTotal : (opts?.maxReddit ?? 6);
+  const maxFreelancer = opts?.maxFreelancer ?? 12;
   const frontPage = Math.min(MAX_RESULTS, maxTotal);
   const isReddit = (l: Lead) => l.source === "reddit" || l.source === "redditrss";
   const isFreelancer = (l: Lead) => l.source === "freelancer";

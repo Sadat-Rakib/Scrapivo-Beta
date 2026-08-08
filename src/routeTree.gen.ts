@@ -18,6 +18,7 @@ import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPipelineRouteImport } from './routes/_authenticated/pipeline'
 import { Route as AuthenticatedLocalBusinessesRouteImport } from './routes/_authenticated/local-businesses'
+import { Route as AuthenticatedInvestorsRouteImport } from './routes/_authenticated/investors'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
 import { Route as AuthenticatedHelpRouteImport } from './routes/_authenticated/help'
 import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticated/discover'
@@ -69,6 +70,11 @@ const AuthenticatedLocalBusinessesRoute =
     path: '/local-businesses',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedInvestorsRoute = AuthenticatedInvestorsRouteImport.update({
+  id: '/investors',
+  path: '/investors',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedHistoryRoute = AuthenticatedHistoryRouteImport.update({
   id: '/history',
   path: '/history',
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/discover': typeof AuthenticatedDiscoverRoute
   '/help': typeof AuthenticatedHelpRoute
   '/history': typeof AuthenticatedHistoryRoute
+  '/investors': typeof AuthenticatedInvestorsRoute
   '/local-businesses': typeof AuthenticatedLocalBusinessesRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -117,6 +124,7 @@ export interface FileRoutesByTo {
   '/discover': typeof AuthenticatedDiscoverRoute
   '/help': typeof AuthenticatedHelpRoute
   '/history': typeof AuthenticatedHistoryRoute
+  '/investors': typeof AuthenticatedInvestorsRoute
   '/local-businesses': typeof AuthenticatedLocalBusinessesRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -134,6 +142,7 @@ export interface FileRoutesById {
   '/_authenticated/discover': typeof AuthenticatedDiscoverRoute
   '/_authenticated/help': typeof AuthenticatedHelpRoute
   '/_authenticated/history': typeof AuthenticatedHistoryRoute
+  '/_authenticated/investors': typeof AuthenticatedInvestorsRoute
   '/_authenticated/local-businesses': typeof AuthenticatedLocalBusinessesRoute
   '/_authenticated/pipeline': typeof AuthenticatedPipelineRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
@@ -151,6 +160,7 @@ export interface FileRouteTypes {
     | '/discover'
     | '/help'
     | '/history'
+    | '/investors'
     | '/local-businesses'
     | '/pipeline'
     | '/profile'
@@ -166,6 +176,7 @@ export interface FileRouteTypes {
     | '/discover'
     | '/help'
     | '/history'
+    | '/investors'
     | '/local-businesses'
     | '/pipeline'
     | '/profile'
@@ -182,6 +193,7 @@ export interface FileRouteTypes {
     | '/_authenticated/discover'
     | '/_authenticated/help'
     | '/_authenticated/history'
+    | '/_authenticated/investors'
     | '/_authenticated/local-businesses'
     | '/_authenticated/pipeline'
     | '/_authenticated/profile'
@@ -265,6 +277,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLocalBusinessesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/investors': {
+      id: '/_authenticated/investors'
+      path: '/investors'
+      fullPath: '/investors'
+      preLoaderRoute: typeof AuthenticatedInvestorsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/history': {
       id: '/_authenticated/history'
       path: '/history'
@@ -307,6 +326,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDiscoverRoute: typeof AuthenticatedDiscoverRoute
   AuthenticatedHelpRoute: typeof AuthenticatedHelpRoute
   AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
+  AuthenticatedInvestorsRoute: typeof AuthenticatedInvestorsRoute
   AuthenticatedLocalBusinessesRoute: typeof AuthenticatedLocalBusinessesRoute
   AuthenticatedPipelineRoute: typeof AuthenticatedPipelineRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
@@ -318,6 +338,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDiscoverRoute: AuthenticatedDiscoverRoute,
   AuthenticatedHelpRoute: AuthenticatedHelpRoute,
   AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
+  AuthenticatedInvestorsRoute: AuthenticatedInvestorsRoute,
   AuthenticatedLocalBusinessesRoute: AuthenticatedLocalBusinessesRoute,
   AuthenticatedPipelineRoute: AuthenticatedPipelineRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,

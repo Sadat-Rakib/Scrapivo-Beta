@@ -80,6 +80,14 @@ export type PersonRow = {
   score: number;
 };
 
+export type OpportunityTag =
+  | "no_website"
+  | "has_website"
+  | "has_email"
+  | "has_phone"
+  | "seo_poor"
+  | "sales_ready";
+
 export type LocalBusinessRow = {
   key: string;
   name: string;
@@ -94,7 +102,36 @@ export type LocalBusinessRow = {
   email_verified?: boolean;
   verify_note?: string;
   score: number;
+  /** Opportunity filters for agency ICP (no website, SEO-poor, contacts, …). */
+  opportunity_tags?: OpportunityTag[];
 };
+
+/** Derive filterable opportunity tags from a local business row. */
+export function deriveOpportunityTags(
+  row: Pick<LocalBusinessRow, "website" | "email" | "phone" | "email_verified"> & {
+    https?: boolean;
+    thinPage?: boolean;
+    missingMeta?: boolean;
+  },
+): OpportunityTag[] {
+  const tags: OpportunityTag[] = [];
+  if (row.website) tags.push("has_website");
+  else tags.push("no_website");
+  if (row.email) tags.push("has_email");
+  if (row.phone) tags.push("has_phone");
+  if (
+    !row.website ||
+    row.https === false ||
+    row.thinPage === true ||
+    row.missingMeta === true
+  ) {
+    if (row.website) tags.push("seo_poor");
+  }
+  if ((row.email || row.phone) && (row.email_verified || row.phone)) {
+    tags.push("sales_ready");
+  }
+  return [...new Set(tags)];
+}
 
 export type LeadSegments = {
   posts: Lead[];
@@ -148,6 +185,11 @@ export function buildLocalBusinesses(rawLeads: Lead[]): LocalBusinessRow[] {
         source: l.source,
         sample_url: l.full_post_url || website || "",
         score: l.score ?? 0,
+        opportunity_tags: deriveOpportunityTags({
+          website,
+          email: ext.emails?.[0],
+          phone: ext.phones?.[0],
+        }),
       } satisfies LocalBusinessRow;
     })
     .sort((a, b) => b.score - a.score)

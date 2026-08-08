@@ -27,7 +27,10 @@ export type ClarifyQuestionId =
   | "geography"
   | "experience"
   | "craft"
-  | "signal_focus";
+  | "signal_focus"
+  | "local_opportunity"
+  | "investor_stage"
+  | "investor_check";
 
 export type ClarifyQuestion = {
   id: ClarifyQuestionId;
@@ -47,6 +50,12 @@ export type ClarifyAnswers = {
   /** Product path: which buyer-signal shapes to prioritize. */
   signal_focus?: "all" | "recommend" | "pain" | "compare";
   craft?: string;
+  /** Local business opportunity filter (no website, SEO poor, …). */
+  local_opportunity?: "any" | "no_website" | "seo_poor" | "has_phone" | "sales_ready";
+  /** Investor hunt: preferred stage. */
+  investor_stage?: "pre-seed" | "seed" | "series-a" | "series-b" | "any";
+  /** Investor hunt: check-size band. */
+  investor_check?: "angel" | "seed" | "growth" | "any";
   /** Free-text the user typed instead of picking. */
   other?: Partial<Record<ClarifyQuestionId, string>>;
 };
@@ -396,6 +405,63 @@ function productCraftQuestion(classified: ClassifiedQuery): ClarifyQuestion {
   };
 }
 
+function isLocalBusinessHunt(classified: ClassifiedQuery): boolean {
+  return /\b(local businesses?|plumbers?|dentists?|roofers?|restaurants?|gyms?|med spas?|law firms?|near me|in (texas|london|austin|toronto))\b/i.test(
+    classified.raw || "",
+  );
+}
+
+function isFindInvestorHunt(classified: ClassifiedQuery): boolean {
+  // Finding VCs/angels for the founder — not "startups raising" deal-flow.
+  return /\b(find (an? )?investors?|need (an? )?investors?|looking for (an? )?(vc|angel|venture)|raise from|pitch (to )?(vcs?|investors?))\b/i.test(
+    classified.raw || "",
+  );
+}
+
+function localOpportunityQuestion(): ClarifyQuestion {
+  return {
+    id: "local_opportunity",
+    question: "Any opportunity filter for local businesses?",
+    allowOther: true,
+    options: [
+      { id: "no_website", label: "No website", hint: "Best for pitching web builds", recommended: true },
+      { id: "seo_poor", label: "SEO poor", hint: "Thin / HTTP / weak site signals" },
+      { id: "has_phone", label: "Has phone", hint: "Ready to call" },
+      { id: "sales_ready", label: "Sales ready", hint: "Email or phone present" },
+      { id: "any", label: "Any", hint: "No opportunity filter" },
+    ],
+  };
+}
+
+function investorStageQuestion(): ClarifyQuestion {
+  return {
+    id: "investor_stage",
+    question: "Which stage should the investor cover?",
+    allowOther: true,
+    options: [
+      { id: "pre-seed", label: "Pre-seed", hint: "Earliest checks" },
+      { id: "seed", label: "Seed", hint: "Most common early raise", recommended: true },
+      { id: "series-a", label: "Series A", hint: "Growth round" },
+      { id: "series-b", label: "Series B+", hint: "Later stage" },
+      { id: "any", label: "Any stage", hint: "No stage filter" },
+    ],
+  };
+}
+
+function investorCheckQuestion(): ClarifyQuestion {
+  return {
+    id: "investor_check",
+    question: "Rough check size?",
+    allowOther: true,
+    options: [
+      { id: "angel", label: "Angel (<$100K)", hint: "Individual angels" },
+      { id: "seed", label: "$100K–$5M", hint: "Typical seed / early VC", recommended: true },
+      { id: "growth", label: "$5M+", hint: "Larger funds" },
+      { id: "any", label: "Any size", hint: "No check filter" },
+    ],
+  };
+}
+
 export function buildClarifyingQuestions(
   classified: ClassifiedQuery,
   opts: { hasLocation?: boolean } = {},
@@ -408,6 +474,24 @@ export function buildClarifyingQuestions(
   const hasLocation = !!opts.hasLocation || !!classified.location || mentionsPlace(raw);
   const clientsHunt = isClientsBuyerHunt(classified);
   const out: ClarifyQuestion[] = [];
+
+  // Investor directory hunt — dedicated clarifiers (seeded DB path).
+  if (isFindInvestorHunt(classified)) {
+    out.push(investorStageQuestion());
+    out.push(investorCheckQuestion());
+    if (!hasLocation) out.push(geographyQuestion());
+    return out.slice(0, 4);
+  }
+
+  // Local business hunt — opportunity + place.
+  if (isLocalBusinessHunt(classified)) {
+    out.push(localOpportunityQuestion());
+    if (!hasLocation) out.push(geographyQuestion());
+    if (craftLooksUncertain(classified.coreSkill)) {
+      out.push(skillCraftQuestion(classified));
+    }
+    return out.slice(0, 4);
+  }
 
   if (craftLooksUncertain(classified.coreSkill)) {
     out.push(product ? productCraftQuestion(classified) : skillCraftQuestion(classified));
@@ -469,6 +553,11 @@ export type SearchRefinement = {
   signalFocus?: "all" | "recommend" | "pain" | "compare";
   /** Extra query phrases derived from signal_focus. */
   signalTerms: string[];
+  localOpportunity?: ClarifyAnswers["local_opportunity"];
+  investorStage?: ClarifyAnswers["investor_stage"];
+  investorCheck?: ClarifyAnswers["investor_check"];
+  /** True when query is find-investors outreach, not startups-raising. */
+  findInvestors?: boolean;
   /** Human-readable summary, shown back so the user can see what we assumed. */
   summary: string;
 };
@@ -603,14 +692,37 @@ export function applyClarifyAnswers(
   const location =
     answers.other?.geography?.trim() || classified.location || GEO_LOCATIONS[geo];
 
+  const findInvestors = isFindInvestorHunt(classified);
+  const localOpportunity =
+    answers.local_opportunity ||
+    (answers.other?.local_opportunity as ClarifyAnswers["local_opportunity"]) ||
+    undefined;
+  const investorStage =
+    answers.investor_stage ||
+    (answers.other?.investor_stage as ClarifyAnswers["investor_stage"]) ||
+    undefined;
+  const investorCheck =
+    answers.investor_check ||
+    (answers.other?.investor_check as ClarifyAnswers["investor_check"]) ||
+    undefined;
+
   const noun = craft || classified.coreSkill || (product ? "your product" : "work");
   const parts: string[] = [];
-  parts.push(product ? `Looking for customers for ${noun}` : `Looking for ${noun}`);
+  if (findInvestors) {
+    parts.push("Finding investors / VCs");
+    if (investorStage && investorStage !== "any") parts.push(investorStage);
+    if (investorCheck && investorCheck !== "any") parts.push(`check: ${investorCheck}`);
+  } else {
+    parts.push(product ? `Looking for customers for ${noun}` : `Looking for ${noun}`);
+  }
   if (audience !== "all") parts.push(`${audience} only`);
   if (buyerKey !== "any") {
     parts.push(product ? `customers: ${profile.label}` : `targeting ${profile.label}`);
   }
   parts.push(location ? `in ${location}` : "worldwide");
+  if (localOpportunity && localOpportunity !== "any") {
+    parts.push(localOpportunity.replace(/_/g, " "));
+  }
   if (signalFocus && signalFocus !== "all") {
     parts.push(SIGNAL_FOCUS[signalFocus].label);
   }
@@ -626,9 +738,15 @@ export function applyClarifyAnswers(
     experience,
     signalFocus,
     signalTerms: signalFocus ? SIGNAL_FOCUS[signalFocus].terms : [],
+    localOpportunity,
+    investorStage,
+    investorCheck,
+    findInvestors,
     summary: parts.join(" · "),
   };
 }
+
+export { isFindInvestorHunt, isLocalBusinessHunt };
 
 export function mentionsPlace(raw: string): boolean {
   const t = (raw || "").trim();

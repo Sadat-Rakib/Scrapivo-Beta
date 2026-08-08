@@ -112,6 +112,8 @@ export type SearchParams = {
     preferSenior?: boolean;
     preferRemote?: boolean;
     maxAgeHours?: number;
+    explicitExperience?: boolean;
+    location?: string | null;
   };
 };
 
@@ -806,32 +808,38 @@ export async function searchUpwork(qx: ExpandedQueries): Promise<SourceLead[]> {
     }
   }
 
-  // RSS often blocked — fall back to public Upwork job dorks via SearXNG/SerpAPI.
+  // RSS often blocked (410 Gone) — fall back to public Upwork job dorks via
+  // SearXNG locally or hosted Google SERP on Vercel.
   if (out.length < 3) {
     const skill = qx.skill || qx.role || "";
     const dorks = [
       `site:upwork.com/jobs "${skill}" (looking OR need OR hiring)`,
-      `site:upwork.com/jobs/ "~" "${skill}"`,
+      `site:upwork.com/freelance-jobs "${skill}"`,
+      `site:upwork.com/jobs "~" "${skill}"`,
     ];
     try {
-      const { searchSearxng, searxngResultsToLeads } = await import("./searxng.server");
-      const results = await searchSearxng(dorks, 4);
-      for (const l of searxngResultsToLeads(results, 8)) {
-        const link = l.full_post_url || "";
-        if (!/upwork\.com\/jobs/i.test(link) || seen.has(link)) continue;
-        if (!isBuyerContent(`${l.title} ${l.snippet}`, qx.negativePhrases || [])) continue;
+      const { searchSiteDorks } = await import("./serp-providers.server");
+      const results = await searchSiteDorks(dorks, {
+        maxPerQuery: 8,
+        tbs: "qdr:w",
+        timeRange: "week",
+      });
+      for (const r of results) {
+        const link = r.url || "";
+        if (!/upwork\.com\/(jobs|freelance-jobs)/i.test(link) || seen.has(link)) continue;
+        if (!isBuyerContent(`${r.title} ${r.content}`, qx.negativePhrases || [])) continue;
         seen.add(link);
-        const co = `${l.title} ${l.snippet}`
+        const co = `${r.title} ${r.content}`
           .match(/\b(?:company|client)\s*:\s*([A-Za-z0-9][\w&.'\s-]{1,40})/i)?.[1]
           ?.trim();
         out.push({
           source: "upwork",
           platform: "Upwork Job Posting",
-          title: `JOB: ${l.title}`,
-          snippet: co ? `Company: ${co}\n${l.snippet}` : l.snippet,
+          title: `JOB: ${r.title}`,
+          snippet: co ? `Company: ${co}\n${r.content}` : (r.content || "").slice(0, 400),
           full_post_url: link,
           author: co || undefined,
-          posted_at: l.posted_at,
+          posted_at: r.publishedDate || undefined,
           engagement: 40,
           is_decision_maker: true,
           intentBoost: 14,
@@ -840,38 +848,6 @@ export async function searchUpwork(qx: ExpandedQueries): Promise<SourceLead[]> {
       }
     } catch {
       /* continue */
-    }
-
-    if (out.length < 5 && paidDiscoveryEnabled()) {
-      try {
-        const { searchGoogleSerp, hasGoogleSerpProvider } = await import("./serp-providers.server");
-        if (hasGoogleSerpProvider()) {
-          const q = `site:upwork.com/jobs "${skill}" (need OR looking OR hiring)`;
-          const data = await searchGoogleSerp(q, { tbs: "qdr:w", num: 8 });
-          for (const r of data?.organic_results ?? []) {
-            const link = r.link || "";
-            if (!/upwork\.com\/jobs/i.test(link) || seen.has(link)) continue;
-            const title = r.title || "";
-            const snippet = (r.snippet || "").slice(0, 400);
-            if (!isBuyerContent(`${title} ${snippet}`, qx.negativePhrases || [])) continue;
-            seen.add(link);
-            out.push({
-              source: "upwork",
-              platform: "Upwork Job Posting",
-              title: `JOB: ${title}`,
-              snippet,
-              full_post_url: link,
-              posted_at: undefined,
-              engagement: 35,
-              is_decision_maker: true,
-              intentBoost: 12,
-              match_reasons: ["Upwork SERP fallback"],
-            });
-          }
-        }
-      } catch {
-        /* continue */
-      }
     }
   }
   return out;
@@ -1236,17 +1212,21 @@ const LINKEDIN_FREELANCE_BUYER_RE =
 
 export async function searchLinkedIn(
   qx: ExpandedQueries,
-  opts?: { postsOnly?: boolean },
+  opts?: { postsOnly?: boolean; location?: string | null },
 ): Promise<SourceLead[]> {
   const out: SourceLead[] = [];
   const seen = new Set<string>();
   const postsOnly = opts?.postsOnly === true;
+  const locParam =
+    opts?.location && !/^(global|worldwide|anywhere)$/i.test(opts.location)
+      ? opts.location
+      : "Worldwide";
 
   // Clients / buying_signal: posts only — guest Jobs API injects off-skill titles
   // and polluted snippets ("Active LinkedIn listing for ${qx.role}").
   if (!postsOnly) {
     try {
-      const jobsUrl = `https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=${encodeURIComponent(qx.role)}&location=Worldwide&start=0&count=25`;
+      const jobsUrl = `https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=${encodeURIComponent(qx.role)}&location=${encodeURIComponent(locParam)}&start=0&count=25`;
       const { resilientText } = await import("./http-fetch.server");
       const html = await resilientText(jobsUrl, {
         headers: { Accept: "application/json, text/html" },
@@ -3212,7 +3192,7 @@ export async function searchAllSources(
 async function searchAllSourcesInner(
   params: SearchParams,
 ): Promise<{ leads: Lead[]; sources: string[]; debug?: SearchDebug }> {
-  const { classified, expanded: qx, prefs: _prefs } = params;
+  const { classified, expanded: qx, prefs } = params;
   const subredditBoosts = [
     ...new Set([...(params.subredditBoosts || []), ...(qx.subreddits || [])].filter(Boolean)),
   ];
@@ -3224,7 +3204,7 @@ async function searchAllSourcesInner(
     );
   }
   let redditSubCounts: Record<string, number> = {};
-  const loc = classified.location;
+  const loc = classified.location ?? prefs?.location ?? null;
   const directoryMode = classified.intentMode === "directory_smb";
 
   // Directory ICP (e.g. "Marketing Agencies in India"): Places-first, skip global ATS/jobs/Reddit noise.
@@ -3347,7 +3327,7 @@ async function searchAllSourcesInner(
         add("youtube", searchYouTubeSignals(qx));
         add("decisionmakers", searchRelevantDecisionMakers(qx));
         add("twitter", searchTwitter(qx), CRITICAL_SOURCE_BUDGET_MS);
-        add("linkedin", searchLinkedIn(qx, { postsOnly: clientsOnly }), CRITICAL_SOURCE_BUDGET_MS);
+        add("linkedin", searchLinkedIn(qx, { postsOnly: clientsOnly, location: loc }), CRITICAL_SOURCE_BUDGET_MS);
       }
       add("upwork", searchUpwork(qx), CRITICAL_SOURCE_BUDGET_MS);
       // GitHub hiring issues + org intent — safe on clients (demand-shaped filters).
@@ -3501,7 +3481,7 @@ async function searchAllSourcesInner(
   if (usePaidSources) {
     add("decisionmakers", searchRelevantDecisionMakers(qx));
     add("twitter", searchTwitter(qx), CRITICAL_SOURCE_BUDGET_MS);
-    add("linkedin", searchLinkedIn(qx, { postsOnly: clientsOnly }), CRITICAL_SOURCE_BUDGET_MS);
+    add("linkedin", searchLinkedIn(qx, { postsOnly: clientsOnly, location: loc }), CRITICAL_SOURCE_BUDGET_MS);
     add("webboolean", searchWebBoolean(qx), CRITICAL_SOURCE_BUDGET_MS);
   } else if (
     classified.type === "product" ||

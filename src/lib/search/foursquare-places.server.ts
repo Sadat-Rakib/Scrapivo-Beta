@@ -44,7 +44,7 @@ async function foursquareSearch(ll: string, query: string, radius: number): Prom
     ll,
     query,
     radius: String(radius),
-    limit: "20",
+    limit: "50",
   });
 
   const attempts: Array<{ url: string; headers: Record<string, string> }> = [
@@ -82,7 +82,7 @@ async function foursquareSearch(ll: string, query: string, radius: number): Prom
 async function foursquareNear(near: string, query: string): Promise<any[]> {
   const key = process.env.FOURSQUARE_API_KEY;
   if (!key) return [];
-  const params = new URLSearchParams({ near, query, limit: "20" });
+  const params = new URLSearchParams({ near, query, limit: "50" });
   const attempts: Array<{ url: string; headers: Record<string, string> }> = [
     {
       url: `https://places-api.foursquare.com/places/search?${params}`,
@@ -152,7 +152,7 @@ export async function searchFoursquarePlaces(
         }
       }
       merged.sort((a, b) => (b.intentBoost ?? 0) - (a.intentBoost ?? 0));
-      return merged.slice(0, 40);
+      return merged.slice(0, 100);
     }
   }
 
@@ -225,7 +225,7 @@ export async function searchLocalBusinesses(
   locationHint?: string | null,
   opts?: { directoryMode?: boolean; min?: number },
 ): Promise<SourceLead[]> {
-  const min = opts?.min ?? (opts?.directoryMode ? 8 : 6);
+  const min = opts?.min ?? (opts?.directoryMode ? 20 : 10);
   const directoryMode = !!opts?.directoryMode;
   const { searchGeoapifyPlaces } = await import("./geoapify-places.server");
 
@@ -264,8 +264,8 @@ export async function searchLocalBusinesses(
       merged.push(l);
     }
     const strong = merged.filter((l) => (l.intentBoost ?? 0) >= 18);
-    if (strong.length >= min) return strong.slice(0, 40);
-    return merged.slice(0, 40);
+    if (strong.length >= min) return strong.slice(0, 120);
+    return merged.slice(0, 120);
   }
 
   const primary = await searchGeoapifyPlaces(qx, locationHint, { directoryMode: false });

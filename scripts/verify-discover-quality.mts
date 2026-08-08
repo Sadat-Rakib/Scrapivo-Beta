@@ -18,12 +18,12 @@ const ok = (n: string, c: boolean) => {
   else console.log("OK:", n);
 };
 
-ok("CLIENTS_SOCIAL_MAX_AGE_DAYS is 2", CLIENTS_SOCIAL_MAX_AGE_DAYS === 2);
+ok("CLIENTS_SOCIAL_MAX_AGE_DAYS is 7", CLIENTS_SOCIAL_MAX_AGE_DAYS === 7);
 
 const hours36 = new Date(Date.now() - 36 * 3600_000).toISOString();
-ok("36h ago is recent at 2d", isRecent(hours36, CLIENTS_SOCIAL_MAX_AGE_DAYS));
-const days3 = new Date(Date.now() - 3 * 86_400_000).toISOString();
-ok("3d ago is NOT recent at 2d", !isRecent(days3, CLIENTS_SOCIAL_MAX_AGE_DAYS));
+ok("36h ago is recent at 7d", isRecent(hours36, CLIENTS_SOCIAL_MAX_AGE_DAYS));
+const days8 = new Date(Date.now() - 8 * 86_400_000).toISOString();
+ok("8d ago is NOT recent at 7d", !isRecent(days8, CLIENTS_SOCIAL_MAX_AGE_DAYS));
 
 // TITLE_HIRE_RE must not match bare BOUNTY/HIRING cheat (mirrors search.functions)
 const TITLE_HIRE_RE =

@@ -151,7 +151,7 @@ export async function searchOsmLocalBusinesses(
   ${tagFilter}
   ${nameFallback}
 );
-out center 80;
+out center 150;
 `;
 
   const elements = await overpass(query);

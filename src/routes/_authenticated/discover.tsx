@@ -18,7 +18,7 @@ import {
 import { getMyProfile, updateMyProfile } from "@/lib/profile.functions";
 import { OnboardingWizard, type OnboardingAnswers } from "@/components/discover/onboarding-wizard";
 import type { Lead } from "@/lib/scoring";
-import type { CompanyRow, PersonRow } from "@/lib/search/lead-segments";
+import type { CompanyRow, PersonRow, LocalBusinessRow } from "@/lib/search/lead-segments";
 import { LeadDetailPanel } from "@/components/lead-detail-panel";
 import { WelcomeHero } from "@/components/discover/welcome-hero";
 import {
@@ -35,6 +35,7 @@ import {
   CompanyTable,
   PersonTable,
   ViewToggle,
+  LocalBusinessesGrid,
   type ResultTab,
   type ResolvedContactInfo,
 } from "@/components/discover/result-tabs";
@@ -237,6 +238,7 @@ function DiscoverPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [companies, setCompanies] = useState<CompanyRow[]>([]);
   const [people, setPeople] = useState<PersonRow[]>([]);
+  const [localRows, setLocalRows] = useState<LocalBusinessRow[]>([]);
   const [resultTab, setResultTab] = useState<ResultTab>("posts");
   const [activeQuery, setActiveQuery] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -416,21 +418,25 @@ function DiscoverPage() {
   const shownPeople = people;
 
   const runSearchMut = useMutation({
-    mutationFn: async (q: string) => {
+    mutationFn: async (vars: string | { query: string; clarify?: ClarifyAnswers | null }) => {
+      const q = typeof vars === "string" ? vars : vars.query;
+      const clarify =
+        typeof vars === "string" ? clarifyAnswers : (vars.clarify ?? clarifyAnswers);
       const plain = toPlainSearchQuery(q) || q.trim();
       return search({
         data: {
           query: plain,
           context: searchContext,
-          ...(clarifyAnswers ? { clarify: clarifyAnswers } : {}),
+          ...(clarify ? { clarify } : {}),
         },
       });
     },
-    onSuccess: (res, q) => {
+    onSuccess: (res, vars) => {
       if (res.error === "limit") {
         toast.error(res.message ?? "Search limit reached");
         return;
       }
+      const q = typeof vars === "string" ? vars : vars.query;
       // Empty [] is truthy for ?? — fall back to ranked leads when posts is empty
       // so Discover never paints a blank wall while Companies/People have rows.
       const rawPosts = (res.posts as Lead[] | undefined) ?? [];
@@ -438,9 +444,11 @@ function DiscoverPage() {
       const posts = rawPosts.length > 0 ? rawPosts : rawLeads;
       const cos = (res.companies as CompanyRow[]) ?? [];
       const ppl = (res.people as PersonRow[]) ?? [];
+      const locs = (res.local as LocalBusinessRow[] | undefined) ?? [];
       setLeads(posts);
       setCompanies(cos);
       setPeople(ppl);
+      setLocalRows(locs);
       // Seed published in-post contacts so Resolve isn't required to see them.
       const seeded: Record<string, ResolvedContactInfo> = {};
       for (const c of cos) {
@@ -585,6 +593,7 @@ function DiscoverPage() {
     setLeads([]);
     setCompanies([]);
     setPeople([]);
+    setLocalRows([]);
     setContactByKey({});
     setSelected(null);
     setSelectedEntity(null);
@@ -830,7 +839,7 @@ function DiscoverPage() {
               {activeQuery &&
                 clarifyQs.length === 0 &&
                 !runSearchMut.isPending &&
-                (leads.length > 0 || companies.length > 0 || people.length > 0) && (
+                (leads.length > 0 || companies.length > 0 || people.length > 0 || localRows.length > 0) && (
                 <div className="flex flex-wrap items-center gap-2">
                   <ResultTabPills
                     tab={resultTab}
@@ -839,13 +848,14 @@ function DiscoverPage() {
                       posts: shownLeads.length,
                       companies: shownCompanies.length,
                       people: shownPeople.length,
+                      local: localRows.length,
                     }}
                     visible={
                       searchContext?.audience === "people"
                         ? ["people"]
                         : searchContext?.audience === "companies" ||
                             searchContext?.audience === "agencies"
-                          ? ["companies"]
+                          ? ["companies", "local"]
                           : undefined
                     }
                   />
@@ -885,21 +895,28 @@ function DiscoverPage() {
                     setClarifyQs([]);
                     const q = pendingQuery;
                     setPendingQuery(null);
-                    if (q) runSearchMut.mutate(q);
+                    if (q) runSearchMut.mutate({ query: q, clarify: null });
                   }}
                   onApply={(answers) => {
                     setClarifyAnswers(answers);
                     setClarifyQs([]);
                     const q = pendingQuery ?? activeQuery;
                     setPendingQuery(null);
-                    if (q) setTimeout(() => runSearchMut.mutate(q), 0);
+                    // Pass clarify into mutate vars — do not rely on setState timing.
+                    if (q) runSearchMut.mutate({ query: q, clarify: answers });
                   }}
                 />
               )}
 
               {runSearchMut.isPending && (
                 <SearchingSteps
-                  query={displaySearchLabel(runSearchMut.variables ?? activeQuery ?? "")}
+                  query={displaySearchLabel(
+                    (typeof runSearchMut.variables === "string"
+                      ? runSearchMut.variables
+                      : runSearchMut.variables?.query) ??
+                      activeQuery ??
+                      "",
+                  )}
                   goal={searchContext?.goal}
                   audience={searchContext?.audience}
                 />
@@ -983,6 +1000,15 @@ function DiscoverPage() {
                       </p>
                     )}
                   </div>
+                ))}
+              {resultTab === "local" &&
+                (localRows.length ? (
+                  <LocalBusinessesGrid rows={localRows} />
+                ) : (
+                  <p className="text-sm text-muted-foreground pb-4">
+                    No local businesses in this search. Try a place + category (e.g. plumbers in
+                    Texas), or use the Local businesses page for a dedicated hunt.
+                  </p>
                 ))}
                 </>
               )}

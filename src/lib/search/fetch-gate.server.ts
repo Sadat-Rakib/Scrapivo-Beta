@@ -99,3 +99,85 @@ export function jitterMs(minMs = 2000, maxMs = 4000): number {
 export function sleep(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
 }
+
+/**
+ * Lightweight HEAD/GET probe for Discover lead URLs.
+ * Drops obvious 404 / gone / soft-404 / login walls without full page scrape.
+ */
+export async function probeUrlAlive(
+  url: string,
+  opts?: { timeoutMs?: number },
+): Promise<{ ok: boolean; reason?: string }> {
+  if (!url || !/^https?:\/\//i.test(url)) return { ok: false, reason: "bad_url" };
+  // First-party APIs / known-good hosts — skip network probe.
+  if (
+    /reddit\.com|freelancer\.com|news\.ycombinator|stackoverflow\.com|stackexchange\.com|github\.com|sam\.gov/i.test(
+      url,
+    )
+  ) {
+    return { ok: true };
+  }
+  const timeout = opts?.timeoutMs ?? 4000;
+  try {
+    const ctrl = AbortSignal.timeout(timeout);
+    let res = await fetch(url, {
+      method: "HEAD",
+      redirect: "follow",
+      signal: ctrl,
+      headers: { "user-agent": "Mozilla/5.0 (compatible; ScrapivoBot/1.0)" },
+    });
+    // Some hosts reject HEAD — fall back to GET range.
+    if (res.status === 405 || res.status === 501) {
+      res = await fetch(url, {
+        method: "GET",
+        redirect: "follow",
+        signal: AbortSignal.timeout(timeout),
+        headers: {
+          "user-agent": "Mozilla/5.0 (compatible; ScrapivoBot/1.0)",
+          Range: "bytes=0-2047",
+        },
+      });
+    }
+    if (res.status === 404 || res.status === 410 || res.status === 451) {
+      return { ok: false, reason: `http_${res.status}` };
+    }
+    if (res.status >= 400 && res.status !== 403) {
+      // 403 often means bot wall on a live page — keep.
+      return { ok: false, reason: `http_${res.status}` };
+    }
+    const ct = (res.headers.get("content-type") || "").toLowerCase();
+    if (ct && !/html|text|json|xml|javascript/i.test(ct) && /image|video|audio|octet/i.test(ct)) {
+      return { ok: false, reason: "non_page" };
+    }
+    return { ok: true };
+  } catch {
+    // Network flake — keep the lead rather than wipe the feed.
+    return { ok: true, reason: "probe_error_keep" };
+  }
+}
+
+/** Probe top N leads in parallel; drop confirmed dead URLs. */
+export async function filterAliveLeads<T extends { full_post_url?: string }>(
+  leads: T[],
+  opts?: { sample?: number; concurrency?: number },
+): Promise<T[]> {
+  const sample = opts?.sample ?? 24;
+  const concurrency = opts?.concurrency ?? 6;
+  if (!leads.length) return leads;
+  const head = leads.slice(0, sample);
+  const tail = leads.slice(sample);
+  const alive: T[] = [];
+  for (let i = 0; i < head.length; i += concurrency) {
+    const batch = head.slice(i, i + concurrency);
+    const results = await Promise.all(
+      batch.map(async (l) => {
+        const probe = await probeUrlAlive(l.full_post_url || "");
+        return { lead: l, ok: probe.ok };
+      }),
+    );
+    for (const r of results) {
+      if (r.ok) alive.push(r.lead);
+    }
+  }
+  return [...alive, ...tail];
+}

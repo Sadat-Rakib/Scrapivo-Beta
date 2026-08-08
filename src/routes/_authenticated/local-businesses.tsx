@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { runLocalBusinessSearch } from "@/lib/local-businesses.functions";
-import type { LocalBusinessRow } from "@/lib/search/lead-segments";
+import type { LocalBusinessRow, OpportunityTag } from "@/lib/search/lead-segments";
 import { LocalBusinessesGrid } from "@/components/discover/result-tabs";
 import { Button } from "@/components/ui/button";
 import { Store, Search, Download } from "lucide-react";
@@ -23,9 +23,48 @@ const CATEGORY_SUGGESTIONS = [
   "gyms",
   "med spas",
   "plumbers",
+  "electricians",
+  "HVAC",
   "marketing agencies",
   "restaurants",
+  "cafes",
+  "salons",
+  "auto repair",
+  "real estate agents",
+  "accountants",
+  "chiropractors",
 ];
+
+const LOCATION_SUGGESTIONS = [
+  "Austin TX",
+  "Toronto",
+  "London",
+  "New York",
+  "Los Angeles",
+  "Chicago",
+  "Miami",
+  "Vancouver",
+  "San Francisco",
+  "Dallas",
+];
+
+const FILTERS: { id: OpportunityTag | "all"; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "no_website", label: "No website" },
+  { id: "seo_poor", label: "SEO poor" },
+  { id: "has_email", label: "Has email" },
+  { id: "has_phone", label: "Has phone" },
+  { id: "sales_ready", label: "Sales ready" },
+  { id: "has_website", label: "Has website" },
+];
+
+function chipClass(active: boolean) {
+  return `text-[11px] px-2.5 py-1 rounded-full border transition-colors ${
+    active
+      ? "border-primary bg-primary/10 text-foreground"
+      : "border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+  }`;
+}
 
 function LocalBusinessesPage() {
   const qc = useQueryClient();
@@ -33,6 +72,12 @@ function LocalBusinessesPage() {
   const [category, setCategory] = useState("");
   const [location, setLocation] = useState("");
   const [rows, setRows] = useState<LocalBusinessRow[]>([]);
+  const [filter, setFilter] = useState<OpportunityTag | "all">("all");
+
+  const filtered = useMemo(() => {
+    if (filter === "all") return rows;
+    return rows.filter((r) => r.opportunity_tags?.includes(filter));
+  }, [rows, filter]);
 
   const mut = useMutation({
     mutationFn: () =>
@@ -50,23 +95,37 @@ function LocalBusinessesPage() {
         return;
       }
       setRows(res.businesses ?? []);
+      setFilter("all");
       const withEmail = (res.businesses ?? []).filter((b) => b.email).length;
       const withPhone = (res.businesses ?? []).filter((b) => b.phone).length;
+      const noWeb = (res.businesses ?? []).filter((b) =>
+        b.opportunity_tags?.includes("no_website"),
+      ).length;
       toast.success(
         `${res.businesses?.length ?? 0} local businesses` +
           (withEmail ? ` · ${withEmail} with email` : "") +
-          (withPhone ? ` · ${withPhone} with phone` : ""),
+          (withPhone ? ` · ${withPhone} with phone` : "") +
+          (noWeb ? ` · ${noWeb} no website` : ""),
       );
     },
     onError: (e: Error) => toast.error(e.message || "Search failed"),
   });
 
   const exportCsv = () => {
-    if (!rows.length) return;
-    const header = ["name", "category", "phone", "email", "verified", "website", "description"];
+    if (!filtered.length) return;
+    const header = [
+      "name",
+      "category",
+      "phone",
+      "email",
+      "verified",
+      "website",
+      "tags",
+      "description",
+    ];
     const lines = [
       header.join(","),
-      ...rows.map((r) =>
+      ...filtered.map((r) =>
         [
           r.name,
           r.category ?? "",
@@ -74,6 +133,7 @@ function LocalBusinessesPage() {
           r.email ?? "",
           r.email_verified ? "yes" : "",
           r.website ?? "",
+          (r.opportunity_tags ?? []).join("|"),
           (r.description ?? "").replace(/"/g, '""'),
         ]
           .map((c) => `"${String(c).replace(/\n/g, " ")}"`)
@@ -98,10 +158,8 @@ function LocalBusinessesPage() {
         </div>
         <h1 className="text-2xl font-semibold tracking-tight mb-2">Local businesses</h1>
         <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
-          Pick a business category and a place. Scrapivo finds live local businesses that match,
-          monitors their public listings, and gathers published contact details—emails, phones,
-          websites, and addresses—then verifies deliverability so your outreach list is ready.
-          Separate from Discover buyer-intent search.
+          Pick a category and place — Scrapivo finds live listings, scrapes emails and phones, and
+          tags opportunities so you can filter for the right pitch.
         </p>
       </div>
 
@@ -126,18 +184,43 @@ function LocalBusinessesPage() {
             />
           </label>
         </div>
-        <div className="flex flex-wrap gap-1.5">
-          {CATEGORY_SUGGESTIONS.map((c) => (
-            <button
-              key={c}
-              type="button"
-              onClick={() => setCategory(c)}
-              className="text-[11px] px-2 py-1 rounded-full border border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
-            >
-              {c}
-            </button>
-          ))}
+
+        <div className="space-y-2">
+          <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
+            Quick categories
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {CATEGORY_SUGGESTIONS.map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setCategory(c)}
+                className={chipClass(category.toLowerCase() === c.toLowerCase())}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
         </div>
+
+        <div className="space-y-2">
+          <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
+            Quick locations
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {LOCATION_SUGGESTIONS.map((loc) => (
+              <button
+                key={loc}
+                type="button"
+                onClick={() => setLocation(loc)}
+                className={chipClass(location.toLowerCase() === loc.toLowerCase())}
+              >
+                {loc}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="flex flex-wrap items-center gap-2">
           <Button
             onClick={() => {
@@ -159,39 +242,55 @@ function LocalBusinessesPage() {
             </Button>
           )}
         </div>
-        <ol className="text-[11px] text-muted-foreground space-y-1 list-decimal list-inside">
-          <li>Describe category + territory</li>
-          <li>We find matching local businesses live and collect public contact info from their sites</li>
-          <li>Verify and download for outreach</li>
-        </ol>
       </div>
 
       {mut.isPending && (
         <p className="text-sm text-muted-foreground mb-4">
-          Collecting listings and gathering contact details from websites — this can take up to a
-          minute…
+          Collecting listings and harvesting contacts — this can take up to a minute…
         </p>
       )}
 
       {!mut.isPending && rows.length > 0 && (
         <div className="space-y-3 pb-8">
+          <div className="space-y-2">
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
+              Opportunity filters
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {FILTERS.map((f) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => setFilter(f.id)}
+                  className={chipClass(filter === f.id)}
+                >
+                  {f.label}
+                  {f.id !== "all" && (
+                    <span className="opacity-60 ml-1">
+                      {rows.filter((r) => r.opportunity_tags?.includes(f.id as OpportunityTag)).length}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
           <p className="text-sm text-muted-foreground">
-            {rows.length} businesses
-            {rows.filter((r) => r.email).length
-              ? ` · ${rows.filter((r) => r.email).length} with email`
+            {filtered.length} businesses
+            {filtered.filter((r) => r.email).length
+              ? ` · ${filtered.filter((r) => r.email).length} with email`
               : ""}
-            {rows.filter((r) => r.phone).length
-              ? ` · ${rows.filter((r) => r.phone).length} with phone`
+            {filtered.filter((r) => r.phone).length
+              ? ` · ${filtered.filter((r) => r.phone).length} with phone`
               : ""}
           </p>
-          <LocalBusinessesGrid rows={rows} />
+          <LocalBusinessesGrid rows={filtered} />
         </div>
       )}
 
       {!mut.isPending && !rows.length && (
         <p className="text-sm text-muted-foreground">
-          Results appear here after you run a search. We’ll surface matching local businesses and
-          their public contact details.
+          Tap a category and location above, then search. After results load, filter by no website /
+          SEO poor to find businesses that need your services.
         </p>
       )}
     </div>

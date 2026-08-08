@@ -20,9 +20,9 @@ type GeoPoint = {
 };
 
 const CITY_RADIUS_M = 35_000;
-const PLACES_LIMIT_DEFAULT = 20;
-const PLACES_LIMIT_DIRECTORY = 40;
-const PLACES_LIMIT_PER_CITY = 12;
+const PLACES_LIMIT_DEFAULT = 40;
+const PLACES_LIMIT_DIRECTORY = 80;
+const PLACES_LIMIT_PER_CITY = 20;
 
 /** Major metros for country-scale directory fan-out (Geoapify place:country is too sparse/noisy). */
 export const COUNTRY_MAJOR_CITIES: Record<string, string[]> = {

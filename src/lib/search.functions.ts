@@ -25,6 +25,11 @@ const ClarifyInput = z.object({
   experience: z.enum(["0-1", "1-2", "3-4", "5+"]).optional(),
   signal_focus: z.enum(["all", "recommend", "pain", "compare"]).optional(),
   craft: z.string().max(80).optional(),
+  local_opportunity: z
+    .enum(["any", "no_website", "seo_poor", "has_phone", "sales_ready"])
+    .optional(),
+  investor_stage: z.enum(["pre-seed", "seed", "series-a", "series-b", "any"]).optional(),
+  investor_check: z.enum(["angel", "seed", "growth", "any"]).optional(),
   other: z.record(z.string(), z.string().max(120)).optional(),
 });
 
@@ -126,20 +131,26 @@ export const runSearch = createServerFn({ method: "POST" })
         }
       }
     }
-    const expanded = expandFromClassified(classified);
 
-    // ── Clarifying answers → concrete search inputs ────────────────────────
-    // Applied BEFORE the audience/service tweaks below so an explicit user
-    // choice ("target startups") shapes the same query fields those use.
+    // ── Clarifying answers BEFORE expand so location/craft reshape queries ──
     const { applyClarifyAnswers, buildClarifyingQuestions, shouldClarify, extractStatedAudience } =
       await import("./search/clarifier");
     const refinement = applyClarifyAnswers(classified, data.clarify ?? {});
-    // Only offer questions when the query was actually vague AND the user
-    // hasn't already answered them.
     const clarifyQuestions =
       !data.clarify && shouldClarify(classified)
         ? buildClarifyingQuestions(classified, { hasLocation: !!classified.location })
         : [];
+
+    if (refinement.craft) {
+      classified.coreSkill = refinement.craft;
+    }
+    if (refinement.location) {
+      classified.location = refinement.location;
+    }
+
+    const { injectLocationBias } = await import("./search/query-expander");
+    let expanded = expandFromClassified(classified);
+    expanded = injectLocationBias(expanded, classified.location);
 
     if (refinement.craft) {
       // The user corrected what we detected — that beats extraction outright.
@@ -159,10 +170,6 @@ export const runSearch = createServerFn({ method: "POST" })
       expanded.subreddits = [
         ...new Set([...refinement.extraSubreddits, ...expanded.subreddits]),
       ].slice(0, 14);
-    }
-    // Apply clarifier location / audience (previously computed then ignored).
-    if (refinement.location) {
-      classified.location = refinement.location;
     }
     // Query/clarifier "everything" must clear project audience (companies/people)
     // so People/Posts tabs are not wiped after a healthy fetch.
@@ -199,9 +206,8 @@ export const runSearch = createServerFn({ method: "POST" })
       ];
     }
     const subredditBoosts = getSubredditBoostsForQuery(classified);
-    // Product clarifiers ask signal focus, not YoE — don't force junior filters.
-    // Clients / buying-signal hunts also omit YoE (refinement.experience unset).
     const productClarify = classified.type === "product";
+    const explicitYoe = !!(data.clarify?.experience || data.clarify?.other?.experience);
     const expFromClarify = productClarify ? undefined : refinement.experience;
     const exp = productClarify
       ? undefined
@@ -234,7 +240,92 @@ export const runSearch = createServerFn({ method: "POST" })
       preferSenior: !productClarify && (exp === "5+" || queryWantsSenior),
       preferRemote: style === "remote" && !queryWantsOnsite,
       maxAgeHours: refinement.maxAgeHours,
+      /** User answered YoE in clarifier — enforce even on clients ATS signals. */
+      explicitExperience: explicitYoe && !!exp,
+      location: classified.location ?? null,
     };
+
+    // Investor outreach matches — separate from Dealroom "startups raising".
+    if (refinement.findInvestors) {
+      const { searchInvestors } = await import("./investors/search");
+      type Lead = import("./scoring").Lead;
+      const investors = searchInvestors({
+        query: data.query,
+        stage: refinement.investorStage,
+        location: refinement.location || undefined,
+        checkBand: refinement.investorCheck,
+        limit: 40,
+      });
+      const people = investors.map((inv) => {
+        const lead: Lead = {
+          source: "investors",
+          platform: "Investors",
+          title: `${inv.name} — ${inv.firm}`,
+          snippet: inv.focus_areas.map((f) => `${f.sector} (${f.stage})`).join("; "),
+          full_post_url: `https://www.google.com/search?q=${encodeURIComponent(inv.name + " " + inv.firm + " investor")}`,
+          author: inv.name,
+          posted_at: undefined,
+          score: 70,
+          match_reasons: ["Investor match"],
+        };
+        return {
+          key: `inv:${inv.id}`,
+          name: inv.name,
+          title_hint: inv.title,
+          company_hint: inv.firm,
+          location_hint: inv.locations.join(", ") || undefined,
+          description: inv.focus_areas
+            .slice(0, 5)
+            .map((f) => `${f.sector} (${f.stage})`)
+            .join(", "),
+          why_match: `Check ${inv.check_sweet_spot_usd || inv.check_min_usd} · ${inv.status}`,
+          sample_url: lead.full_post_url,
+          signal_count: 1,
+          lead,
+          score: 70,
+        };
+      });
+      const companies = investors.map((inv) => {
+        const person = people.find((p) => p.key === `inv:${inv.id}`);
+        return {
+          key: inv.id,
+          name: inv.firm || inv.name,
+          description: `${inv.name} (${inv.title})`,
+          why_now: inv.focus_areas
+            .slice(0, 3)
+            .map((f) => `${f.sector} (${f.stage})`)
+            .join(", "),
+          signal_count: 1,
+          platforms: ["Investors"],
+          sample_url: person?.sample_url || "",
+          leads: person ? [person.lead] : [],
+          score: 70,
+        };
+      });
+      await supabase
+        .from("profiles")
+        .update({ searches_used: used + 1, searches_reset_at: now.toISOString() })
+        .eq("id", userId);
+      return {
+        error: null,
+        message: null,
+        leads: people.map((p) => p.lead),
+        posts: people.map((p) => p.lead),
+        companies,
+        people,
+        local: [],
+        investors,
+        sources: ["investors"],
+        suggestions: [
+          "Try FinTech Seed",
+          "Climate investors in Europe",
+          "Angel check under $50K",
+        ],
+        queryType: classified.type,
+        refinement: refinement.summary,
+        clarifyQuestions: [],
+      };
+    }
 
     const {
       leads: raw,
@@ -273,11 +364,13 @@ export const runSearch = createServerFn({ method: "POST" })
     trace("raw", raw);
     trace("deduped", deduped);
     let validated = validateLeads(deduped, classified, expanded, prefs);
-    // Never return a blank Discover when we still have skill-matched posts —
-    // validate was wiping design SERP/Upwork hits (off-skill + negativeSignals).
+    // Soft-keep only when validate emptied a healthy multi-source fetch —
+    // never paper over a zero-source / single-source Reddit-only collapse.
+    const sourceVariety = new Set(deduped.map((l) => l.source).filter(Boolean)).size;
     if (
       validated.length === 0 &&
-      deduped.length > 0 &&
+      deduped.length >= 8 &&
+      sourceVariety >= 2 &&
       (classified.goal === "clients" || classified.signalMode === "buying_signal")
     ) {
       const { isStronglyRelevantToSkill: strongSkill } = await import("./search/query-expander");
@@ -304,8 +397,6 @@ export const runSearch = createServerFn({ method: "POST" })
             strongSkill(text, classified.coreSkill) ||
             classified.relatedSkills.slice(0, 8).some((s) => strongSkill(text, s));
           if (!skillOk) return false;
-          // Soft-keep must still look like demand or a company opening —
-          // skill-alone was re-admitting POV/notes after validate emptied.
           if (boards.has(l.source)) return true;
           return (
             detectBuyerIntent(text).isBuyer ||
@@ -325,6 +416,15 @@ export const runSearch = createServerFn({ method: "POST" })
           `[runSearch] validate emptied ${deduped.length} → soft-kept ${validated.length}`,
         );
       }
+    }
+
+    // Sampled URL liveness — drop confirmed dead / gone links before ranking.
+    try {
+      const { filterAliveLeads } = await import("./search/fetch-gate.server");
+      validated = await filterAliveLeads(validated, { sample: 20, concurrency: 5 });
+      trace("alive", validated);
+    } catch {
+      /* optional */
     }
 
     const directoryMode = classified.intentMode === "directory_smb";
@@ -757,13 +857,13 @@ export const runSearch = createServerFn({ method: "POST" })
       // path — an org posting a role for this craft IS a prospective buyer.
       maxCompanyAts: goal === "jobs" ? 20 : 150,
       minSocial: goal === "jobs" ? 2 : clientsVolume ? 15 : 5,
-      maxReddit: clientsVolume ? 60 : maxTotal,
+      // Cap Reddit/Freelancer so social / Upwork / gov / communities can surface.
+      maxReddit: clientsVolume ? 18 : Math.min(8, maxTotal),
       maxTotal,
       // Warm floor (35) — enough to cut junk without starving sparse crafts.
       minScore: clientsVolume ? 35 : 0,
       maxPerPlatform: maxTotal,
-      // Cap Freelancer so social/public/ATS can surface in the viewport.
-      maxFreelancer: clientsVolume ? 60 : maxTotal,
+      maxFreelancer: clientsVolume ? 18 : Math.min(12, maxTotal),
     });
     trace("diversified", rankedForFeed);
 

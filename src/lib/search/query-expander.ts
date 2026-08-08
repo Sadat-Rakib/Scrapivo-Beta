@@ -782,6 +782,39 @@ export function expandFromClassified(cq: ClassifiedQuery): ExpandedQueries {
   return expandRoleSkillQuery(cq, negativeSignals);
 }
 
+/**
+ * Inject clarifier / classified geography into dorks so US/UK/EU selections
+ * actually change what sources fetch — not only soft post-filters.
+ */
+export function injectLocationBias(
+  qx: ExpandedQueries,
+  location: string | null | undefined,
+): ExpandedQueries {
+  const loc = (location || "").trim();
+  if (!loc || /^(global|worldwide|anywhere|remote)$/i.test(loc)) return qx;
+
+  const withLoc = (q: string) => {
+    if (new RegExp(`\\b${loc.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(q)) return q;
+    return `${q} "${loc}"`;
+  };
+  const biasFirst = (qs: string[], n = 5) =>
+    qs.map((q, i) => (i < n ? withLoc(q) : q));
+
+  const geoWeb = [
+    `"${qx.skill}" ("need a" OR "looking for" OR hiring OR freelancer) "${loc}"`,
+    `("${qx.skill}") "${loc}" ("who can" OR "willing to pay" OR budget)`,
+  ];
+
+  return {
+    ...qx,
+    booleanWebQueries: [...geoWeb, ...biasFirst(qx.booleanWebQueries, 6)].slice(0, 16),
+    socialQueries: biasFirst(qx.socialQueries, 5),
+    redditBuyerQueries: biasFirst(qx.redditBuyerQueries, 6),
+    buyerIntentQueries: biasFirst(qx.buyerIntentQueries, 5),
+    jobBoardQueries: biasFirst(qx.jobBoardQueries, 4),
+  };
+}
+
 /** Coldreach-style plain-English buying signal → source-specific query sets. */
 function expandBuyingSignalQuery(cq: ClassifiedQuery, negativeSignals: string[]): ExpandedQueries {
   const signal = cq.raw.trim();
