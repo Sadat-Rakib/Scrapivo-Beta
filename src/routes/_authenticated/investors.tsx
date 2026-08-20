@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { runInvestorSearch, refreshInvestorVerification } from "@/lib/investors.functions";
 import type { InvestorWithMetadata } from "@/lib/investors/search";
 import { getInvestorSectors, getInvestorStages } from "@/lib/investors/types";
@@ -11,6 +11,9 @@ import { ViewToggle, type ViewMode } from "@/components/shared/view-toggle";
 import { EntityCard } from "@/components/shared/entity-card";
 import { EntityTable, type ColumnDef } from "@/components/shared/entity-table";
 import { FilterPanel } from "@/components/shared/filter-panel";
+import { MobileFilterSheet } from "@/components/shared/mobile-filter-sheet";
+import { LoadMoreSentinel } from "@/components/shared/load-more-sentinel";
+import { useProgressiveCount } from "@/hooks/use-progressive-count";
 import { getRemainingSearches } from "@/lib/search.functions";
 import {
   Landmark,
@@ -48,6 +51,113 @@ const CATEGORY_CHIPS = [
   "Consumer",
   "Web3",
 ]; // leaving the comment to not break line nums
+
+function checkRangeOf(r: InvestorWithMetadata): string {
+  return "sweet_spot" in r && r.sweet_spot
+    ? `${r.sweet_spot.range_min}\u2013${r.sweet_spot.range_max}`
+    : "check_min_usd" in r && "check_max_usd" in r
+      ? `${formatUsd(r.check_min_usd)}\u2013${formatUsd(r.check_max_usd)}`
+      : "\u2014";
+}
+
+function buildInvestorEntity(r: InvestorWithMetadata): Company360Data {
+  const isFirm = "type" in r && r.type === "firm";
+  const firm = "firm" in r ? r.firm : "";
+  const role = "role" in r ? r.role : "title" in r ? r.title : "";
+  const email = "email" in r ? r.email : undefined;
+  const website = "website" in r ? r.website : undefined;
+  const physicalLocation =
+    "location" in r && typeof r.location === "string" ? r.location : undefined;
+  const categories = getInvestorSectors(r).slice(0, 3);
+  const stages = getInvestorStages(r);
+  const investorType =
+    "entity_type" in r ? String(r.entity_type) : "investor_type" in r ? r.investor_type : undefined;
+  const thesis =
+    ("thesis" in r && r.thesis) || ("investment_thesis" in r && r.investment_thesis) || undefined;
+  const checkRange = checkRangeOf(r);
+
+  const description =
+    ("bio" in r && r.bio) ||
+    ("description" in r && r.description) ||
+    ("thesis" in r && r.thesis) ||
+    ("investment_thesis" in r && r.investment_thesis) ||
+    `${r.name} is ${isFirm ? "a venture capital firm" : "an angel investor"} focusing on ${categories.slice(0, 3).join(", ") || "technology investments"}.`;
+
+  const descriptionStr =
+    typeof description === "string"
+      ? description
+      : `${r.name} is ${isFirm ? "a venture capital firm" : "an angel investor"}.`;
+
+  return {
+    domain: "investor",
+    name: r.name,
+    subtitle: isFirm ? "VC Firm" : `${role}${firm ? ` \u00b7 ${firm}` : ""}`,
+    category: isFirm ? "Firm" : "Angel",
+    location: physicalLocation || undefined,
+    description: descriptionStr,
+    email,
+    website,
+    tags: categories,
+    check_size: checkRange,
+    sectors: categories,
+    firm: firm || undefined,
+    investor_type: investorType,
+    stage: stages.length ? stages.join(", ") : undefined,
+    thesis: typeof thesis === "string" ? thesis : undefined,
+    stats: [
+      { label: "Check Size", value: checkRange },
+      { label: "Type", value: isFirm ? "Firm" : "Individual" },
+      { label: "Status", value: "Verified" },
+    ],
+  };
+}
+
+// Memoized grid card: with up to thousands of rows, per-card derived values
+// (sectors, relevance text) must only recompute when this row's own props change.
+const InvestorGridCard = memo(function InvestorGridCard({
+  row,
+  saved,
+  searchFilters,
+  onToggleBookmark,
+  onOpen,
+}: {
+  row: InvestorWithMetadata;
+  saved: boolean;
+  searchFilters: SearchFilters;
+  onToggleBookmark: (id: string) => void;
+  onOpen: (row: InvestorWithMetadata) => void;
+}) {
+  const isFirm = "type" in row && row.type === "firm";
+  const firm = "firm" in row ? row.firm : "";
+  const role = "role" in row ? row.role : "title" in row ? row.title : "";
+  const physicalLocation =
+    "location" in row && typeof row.location === "string" ? row.location : "";
+  const categories = getInvestorSectors(row).slice(0, 3);
+  const checkRange = checkRangeOf(row);
+  const relevantBecause = generateRelevantBecause(row, searchFilters, row._matchMetadata || {});
+
+  return (
+    <EntityCard
+      id={row.id}
+      title={row.name}
+      subtitle={isFirm ? "VC Firm" : `${role}${firm ? ` \u00b7 ${firm}` : ""}`}
+      category={isFirm ? "Firm" : "Angel"}
+      location={physicalLocation || undefined}
+      stats={[
+        { label: "Check Size", value: checkRange },
+        { label: "Type", value: isFirm ? "Firm" : "Individual" },
+        { label: "Status", value: "Verified" },
+      ]}
+      tags={categories}
+      relevantBecause={searchFilters.location ? relevantBecause : undefined}
+      saved={saved}
+      onSaveToggle={() => onToggleBookmark(row.id)}
+      primaryActionLabel="View Details"
+      onViewDetails={() => onOpen(row)}
+      onClick={() => onOpen(row)}
+    />
+  );
+});
 
 import { saveRouteSearchState, loadRouteSearchState } from "@/lib/store/search-store";
 
@@ -98,6 +208,15 @@ function InvestorsPage() {
     mut.mutate();
   };
 
+  // Reset clears the form fields without firing a search (searches are quota-limited).
+  const resetFilters = () => {
+    setQuery("");
+    setStage("any");
+    setSector("");
+    setCheckBand("any");
+    setLocation("");
+  };
+
   const mut = useMutation({
     mutationFn: () =>
       searchFn({
@@ -117,7 +236,9 @@ function InvestorsPage() {
       saveRouteSearchState("investors", {
         query: query.trim(),
         filters: { query, stage, sector, checkBand, location },
-        results: fetchedRows,
+        // Cap what we persist: serializing thousands of rich investor objects
+        // into sessionStorage on every search was a major source of lag.
+        results: fetchedRows.slice(0, 300),
         timestamp: Date.now(),
       });
       toast.success(`${fetchedRows.length} investors matched`);
@@ -133,76 +254,23 @@ function InvestorsPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const toggleBookmark = (id: string) => {
+  // Progressive rendering: only mount a window of cards and grow it as the
+  // user scrolls, instead of rendering thousands of cards at once.
+  const { visible, hasMore, loadMore, shown } = useProgressiveCount(rows, 24);
+
+  // Stable callbacks so memoized cards don't re-render on unrelated state changes.
+  const toggleBookmark = useCallback((id: string) => {
     setBookmarkedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
     });
-  };
+  }, []);
 
-  const openDetailView = (r: InvestorWithMetadata) => {
-    const isFirm = "type" in r && r.type === "firm";
-    const firm = "firm" in r ? r.firm : "";
-    const role = "role" in r ? r.role : "title" in r ? r.title : "";
-    const email = "email" in r ? r.email : undefined;
-    const website = "website" in r ? r.website : undefined;
-    const linkedIn = r.links?.linkedin || undefined;
-    const physicalLocation =
-      "location" in r && typeof r.location === "string" ? r.location : undefined;
-    const categories = getInvestorSectors(r).slice(0, 3);
-    const stages = getInvestorStages(r);
-    const investorType =
-      "entity_type" in r
-        ? String(r.entity_type)
-        : "investor_type" in r
-          ? r.investor_type
-          : undefined;
-    const thesis =
-      ("thesis" in r && r.thesis) || ("investment_thesis" in r && r.investment_thesis) || undefined;
-    const checkRange =
-      "sweet_spot" in r && r.sweet_spot
-        ? `${r.sweet_spot.range_min}–${r.sweet_spot.range_max}`
-        : "check_min_usd" in r && "check_max_usd" in r
-          ? `${formatUsd(r.check_min_usd)}–${formatUsd(r.check_max_usd)}`
-          : "—";
-
-    const description =
-      ("bio" in r && r.bio) ||
-      ("description" in r && r.description) ||
-      ("thesis" in r && r.thesis) ||
-      ("investment_thesis" in r && r.investment_thesis) ||
-      `${r.name} is ${isFirm ? "a venture capital firm" : "an angel investor"} focusing on ${categories.slice(0, 3).join(", ") || "technology investments"}.`;
-
-    const descriptionStr =
-      typeof description === "string"
-        ? description
-        : `${r.name} is ${isFirm ? "a venture capital firm" : "an angel investor"}.`;
-
-    setSelectedEntity({
-      domain: "investor",
-      name: r.name,
-      subtitle: isFirm ? "VC Firm" : `${role}${firm ? ` · ${firm}` : ""}`,
-      category: isFirm ? "Firm" : "Angel",
-      location: physicalLocation || undefined,
-      description: descriptionStr,
-      email,
-      website,
-      tags: categories,
-      check_size: checkRange,
-      sectors: categories,
-      firm: firm || undefined,
-      investor_type: investorType,
-      stage: stages.length ? stages.join(", ") : undefined,
-      thesis: typeof thesis === "string" ? thesis : undefined,
-      stats: [
-        { label: "Check Size", value: checkRange },
-        { label: "Type", value: isFirm ? "Firm" : "Individual" },
-        { label: "Status", value: "Verified" },
-      ],
-    });
-  };
+  const openDetailView = useCallback((r: InvestorWithMetadata) => {
+    setSelectedEntity(buildInvestorEntity(r));
+  }, []);
 
   const exportCsv = () => {
     if (!rows.length) return;
@@ -422,7 +490,19 @@ function InvestorsPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-3 shrink-0 flex-wrap">
+            {/* Mobile filter entry — desktop uses the persistent right rail below */}
+            <MobileFilterSheet
+              title="Filter Investors"
+              subtitle="Refine stage, check size, & region"
+              onApply={runSearch}
+              onReset={resetFilters}
+              isPending={mut.isPending}
+              applyLabel="Find Investors"
+              usage={usageQuery.data ?? undefined}
+            >
+              {FilterForm}
+            </MobileFilterSheet>
             {rows.length > 0 && (
               <button
                 type="button"
@@ -450,58 +530,25 @@ function InvestorsPage() {
         {/* Results */}
         {!mut.isPending && searched && rows.length > 0 && (
           <div>
-            <div className="text-xs text-white/50 mb-3">{rows.length} investors matched</div>
+            <div className="text-xs text-white/50 mb-3">
+              {rows.length} investors matched{hasMore ? ` — showing ${shown}` : ""}
+            </div>
             {viewMode === "grid" ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                {rows.map((r) => {
-                  const isFirm = "type" in r && r.type === "firm";
-                  const firm = "firm" in r ? r.firm : "";
-                  const role = "role" in r ? r.role : "title" in r ? r.title : "";
-                  const email = "email" in r ? r.email : undefined;
-                  const website = "website" in r ? r.website : undefined;
-                  const linkedIn = r.links?.linkedin || undefined;
-                  const physicalLocation =
-                    "location" in r && typeof r.location === "string" ? r.location : "";
-                  const categories = getInvestorSectors(r).slice(0, 3);
-                  const checkRange =
-                    "sweet_spot" in r && r.sweet_spot
-                      ? `${r.sweet_spot.range_min}–${r.sweet_spot.range_max}`
-                      : "check_min_usd" in r && "check_max_usd" in r
-                        ? `${formatUsd(r.check_min_usd)}–${formatUsd(r.check_max_usd)}`
-                        : "—";
-                  const relevantBecause = generateRelevantBecause(
-                    r,
-                    searchFilters,
-                    r._matchMetadata || {},
-                  );
-
-                  return (
-                    <EntityCard
-                      key={r.id}
-                      id={r.id}
-                      title={r.name}
-                      subtitle={isFirm ? "VC Firm" : `${role}${firm ? ` · ${firm}` : ""}`}
-                      category={isFirm ? "Firm" : "Angel"}
-                      location={physicalLocation || undefined}
-                      stats={[
-                        { label: "Check Size", value: checkRange },
-                        { label: "Type", value: isFirm ? "Firm" : "Individual" },
-                        { label: "Status", value: "Verified" },
-                      ]}
-                      tags={categories}
-                      relevantBecause={searchFilters.location ? relevantBecause : undefined}
-                      saved={bookmarkedIds.has(r.id)}
-                      onSaveToggle={() => toggleBookmark(r.id)}
-                      primaryActionLabel="View Details"
-                      onViewDetails={() => openDetailView(r)}
-                      onClick={() => openDetailView(r)}
-                    />
-                  );
-                })}
+                {visible.map((r) => (
+                  <InvestorGridCard
+                    key={r.id}
+                    row={r}
+                    saved={bookmarkedIds.has(r.id)}
+                    searchFilters={searchFilters}
+                    onToggleBookmark={toggleBookmark}
+                    onOpen={openDetailView}
+                  />
+                ))}
               </div>
             ) : (
               <EntityTable
-                rows={rows}
+                rows={visible}
                 keyExtractor={(r) => r.id}
                 columns={tableColumns}
                 onBookmark={(r) => toggleBookmark(r.id)}
@@ -509,6 +556,12 @@ function InvestorsPage() {
                 onRowClick={openDetailView}
               />
             )}
+            <LoadMoreSentinel
+              hasMore={hasMore}
+              onLoadMore={loadMore}
+              shown={shown}
+              total={rows.length}
+            />
           </div>
         )}
 
@@ -523,7 +576,8 @@ function InvestorsPage() {
             <Landmark className="size-8 mx-auto text-white/30" />
             <h3 className="text-base font-semibold text-white">Find Active Investors</h3>
             <p className="max-w-md mx-auto text-xs text-white/50 leading-relaxed">
-              Use the filter panel on the right (or tap Search) to browse VCs and angels.
+              Use the Filters panel (or tap Browse) to search VCs and angels by sector, stage, and
+              location.
             </p>
             <button
               type="button"
@@ -548,6 +602,7 @@ function InvestorsPage() {
             title="Filter Investors"
             subtitle="Refine stage, check size, & region"
             onApply={runSearch}
+            onReset={resetFilters}
             isPending={mut.isPending}
             applyLabel="Find Investors"
             usage={usageQuery.data ?? undefined}

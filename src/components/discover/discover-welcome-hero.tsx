@@ -33,16 +33,17 @@ export function DiscoverWelcomeHero({
         What are you looking for now, a buying signal, niche, or role?
       </p>
 
-      {/* 3 Main Action Cards */}
-      <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {/* 3 Main Action Cards: compact horizontal rows on phones so the hero
+          fits the viewport; vertical centered cards from sm: and up. */}
+      <div className="mt-6 sm:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
         {/* Find Investors */}
         <button
           type="button"
           onClick={() => navigate({ to: "/investors" })}
-          className="liquid-glass rounded-2xl p-6 sm:p-8 flex flex-col items-center gap-4 text-center hover:bg-white/[0.04] transition-all duration-200 hover:-translate-y-0.5 group"
+          className="liquid-glass rounded-2xl p-4 sm:p-8 flex flex-row items-center gap-3 text-left sm:flex-col sm:items-center sm:gap-4 sm:text-center hover:bg-white/[0.04] transition-all duration-200 hover:-translate-y-0.5 group"
         >
-          <div className="size-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform">
-            <Landmark className="size-6" />
+          <div className="size-10 sm:size-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform">
+            <Landmark className="size-5 sm:size-6" />
           </div>
           <div>
             <h3 className="font-semibold text-base text-white group-hover:text-white/90">
@@ -58,10 +59,10 @@ export function DiscoverWelcomeHero({
         <button
           type="button"
           onClick={onFocusComposer}
-          className="liquid-glass rounded-2xl p-6 sm:p-8 flex flex-col items-center gap-4 text-center hover:bg-white/[0.04] transition-all duration-200 hover:-translate-y-0.5 group"
+          className="liquid-glass rounded-2xl p-4 sm:p-8 flex flex-row items-center gap-3 text-left sm:flex-col sm:items-center sm:gap-4 sm:text-center hover:bg-white/[0.04] transition-all duration-200 hover:-translate-y-0.5 group"
         >
-          <div className="size-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform">
-            <Users className="size-6" />
+          <div className="size-10 sm:size-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform">
+            <Users className="size-5 sm:size-6" />
           </div>
           <div>
             <h3 className="font-semibold text-base text-white group-hover:text-white/90">
@@ -77,10 +78,10 @@ export function DiscoverWelcomeHero({
         <button
           type="button"
           onClick={() => navigate({ to: "/jobs" })}
-          className="liquid-glass rounded-2xl p-6 sm:p-8 flex flex-col items-center gap-4 text-center hover:bg-white/[0.04] transition-all duration-200 hover:-translate-y-0.5 group"
+          className="liquid-glass rounded-2xl p-4 sm:p-8 flex flex-row items-center gap-3 text-left sm:flex-col sm:items-center sm:gap-4 sm:text-center hover:bg-white/[0.04] transition-all duration-200 hover:-translate-y-0.5 group"
         >
-          <div className="size-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform">
-            <Briefcase className="size-6" />
+          <div className="size-10 sm:size-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform">
+            <Briefcase className="size-5 sm:size-6" />
           </div>
           <div>
             <h3 className="font-semibold text-base text-white group-hover:text-white/90">

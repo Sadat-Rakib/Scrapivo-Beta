@@ -8,9 +8,23 @@ import { ViewToggle, type ViewMode } from "@/components/shared/view-toggle";
 import { EntityCard } from "@/components/shared/entity-card";
 import { EntityTable, type ColumnDef } from "@/components/shared/entity-table";
 import { FilterPanel } from "@/components/shared/filter-panel";
+import { MobileFilterSheet } from "@/components/shared/mobile-filter-sheet";
+import { LoadMoreSentinel } from "@/components/shared/load-more-sentinel";
+import { useProgressiveCount } from "@/hooks/use-progressive-count";
 import { getRemainingSearches } from "@/lib/search.functions";
 import { saveRouteSearchState, loadRouteSearchState } from "@/lib/store/search-store";
-import { Store, Search, Download, MapPin, Phone, Mail, Globe, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Store,
+  Search,
+  Download,
+  MapPin,
+  Phone,
+  Mail,
+  Globe,
+  RefreshCw,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Company360View, type Company360Data } from "@/components/shared/company-360-view";
 
@@ -63,7 +77,10 @@ function LocalBusinessesPage() {
   const getUsage = useServerFn(getRemainingSearches);
   const usageQuery = useQuery({ queryKey: ["usage"], queryFn: () => getUsage() });
 
-  const initialState = useMemo(() => loadRouteSearchState<LocalBusinessRow>("local-businesses"), []);
+  const initialState = useMemo(
+    () => loadRouteSearchState<LocalBusinessRow>("local-businesses"),
+    [],
+  );
 
   const [category, setCategory] = useState(initialState?.filters?.category ?? "");
   const [location, setLocation] = useState(initialState?.filters?.location ?? "");
@@ -83,9 +100,21 @@ function LocalBusinessesPage() {
     return rows.filter((r) => r.opportunity_tags?.includes(filter));
   }, [rows, filter]);
 
+  // Progressive rendering: keep the mounted card count small and grow on scroll.
+  const { visible, hasMore, loadMore, shown } = useProgressiveCount(filtered, 24);
+
   if (typeof window !== "undefined") {
-    window.localStorage.setItem("scrapivo:businesses-filters-collapsed", filtersCollapsed ? "1" : "0");
+    window.localStorage.setItem(
+      "scrapivo:businesses-filters-collapsed",
+      filtersCollapsed ? "1" : "0",
+    );
   }
+
+  // Reset clears the form fields without firing a search (searches are quota-limited).
+  const resetFilters = () => {
+    setCategory("");
+    setLocation("");
+  };
 
   const mut = useMutation({
     mutationFn: () =>
@@ -181,7 +210,9 @@ function LocalBusinessesPage() {
           </div>
           <div className="min-w-0">
             <div className="font-semibold text-white truncate">{r.name}</div>
-            <div className="text-[11px] text-white/50 truncate">{r.category || "Local Business"}</div>
+            <div className="text-[11px] text-white/50 truncate">
+              {r.category || "Local Business"}
+            </div>
           </div>
         </div>
       ),
@@ -220,7 +251,10 @@ function LocalBusinessesPage() {
       accessor: (r) => (
         <div className="flex flex-wrap gap-1">
           {(r.opportunity_tags || []).slice(0, 2).map((t, i) => (
-            <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.06] text-white/70 border border-white/10">
+            <span
+              key={i}
+              className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.06] text-white/70 border border-white/10"
+            >
               {t.replace("_", " ")}
             </span>
           ))}
@@ -258,7 +292,9 @@ function LocalBusinessesPage() {
       </label>
 
       <div className="space-y-1.5 pt-2">
-        <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">Quick Categories</span>
+        <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">
+          Quick Categories
+        </span>
         <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto no-scrollbar">
           {CATEGORY_SUGGESTIONS.map((c) => (
             <button
@@ -266,7 +302,9 @@ function LocalBusinessesPage() {
               type="button"
               onClick={() => setCategory(c)}
               className={`glass-pill px-2.5 py-1 text-[11px] font-medium ${
-                category.toLowerCase() === c.toLowerCase() ? "bg-white/20 text-white" : "text-white/60 hover:text-white"
+                category.toLowerCase() === c.toLowerCase()
+                  ? "bg-white/20 text-white"
+                  : "text-white/60 hover:text-white"
               }`}
             >
               {c}
@@ -290,11 +328,30 @@ function LocalBusinessesPage() {
             </div>
             <h1 className="text-2xl font-semibold tracking-tight text-white">Businesses</h1>
             <p className="text-xs text-white/60 mt-1 max-w-xl">
-              Live listings with scraped emails, phone numbers, website status, and outreach signals.
+              Live listings with scraped emails, phone numbers, website status, and outreach
+              signals.
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-3 shrink-0 flex-wrap">
+            {/* Mobile filter entry — desktop uses the persistent right rail below */}
+            <MobileFilterSheet
+              title="Find Businesses"
+              subtitle="Search category & location"
+              onApply={() => {
+                if (category.trim().length < 2 || location.trim().length < 2) {
+                  toast.error("Enter a category and location");
+                  return false; // keep the sheet open so fields can be fixed
+                }
+                mut.mutate();
+              }}
+              isPending={mut.isPending}
+              onReset={resetFilters}
+              applyLabel="Search Businesses"
+              usage={usageQuery.data ?? undefined}
+            >
+              {FilterForm}
+            </MobileFilterSheet>
             {rows.length > 0 && (
               <button
                 type="button"
@@ -314,14 +371,19 @@ function LocalBusinessesPage() {
           <div className="flex flex-wrap gap-2">
             {OPPORTUNITY_FILTERS.map((f) => {
               const active = filter === f.id;
-              const count = f.id === "all" ? rows.length : rows.filter((r) => r.opportunity_tags?.includes(f.id as OpportunityTag)).length;
+              const count =
+                f.id === "all"
+                  ? rows.length
+                  : rows.filter((r) => r.opportunity_tags?.includes(f.id as OpportunityTag)).length;
               return (
                 <button
                   key={f.id}
                   type="button"
                   onClick={() => setFilter(f.id)}
                   className={`glass-pill px-3 py-1.5 text-xs font-medium transition-all ${
-                    active ? "bg-white/20 text-white border-white/30" : "text-white/60 hover:text-white hover:bg-white/10"
+                    active
+                      ? "bg-white/20 text-white border-white/30"
+                      : "text-white/60 hover:text-white hover:bg-white/10"
                   }`}
                 >
                   <span>{f.label}</span>
@@ -343,47 +405,54 @@ function LocalBusinessesPage() {
         {/* Results */}
         {!mut.isPending && rows.length > 0 && (
           <div>
-            <div className="text-xs text-white/50 mb-3">{filtered.length} local businesses listed</div>
+            <div className="text-xs text-white/50 mb-3">
+              {filtered.length} local businesses listed{hasMore ? ` — showing ${shown}` : ""}
+            </div>
             {viewMode === "grid" ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                {filtered.map((r, idx) => {
+                {visible.map((r, idx) => {
                   const key = `${r.name}-${r.address || idx}`;
                   const tags = (r.opportunity_tags || []).map((t) => t.replace("_", " "));
                   return (
-                      <EntityCard
-                        key={key}
-                        id={key}
-                        title={r.name}
-                        subtitle={r.category || "Local Business"}
-                        category={r.email ? "Has Email" : "Listing"}
-                        location={r.address || undefined}
-                        stats={[
-                          { label: "Phone", value: r.phone ? "Available" : "None" },
-                          { label: "Email", value: r.email ? "Verified" : "None" },
-                          { label: "Website", value: r.website ? "Yes" : "No" },
-                        ]}
-                        tags={tags}
-                        description={r.description || undefined}
-                        saved={bookmarkedKeys.has(key)}
-                        onSaveToggle={() => toggleBookmark(key)}
-                        primaryActionLabel="View Details"
-                        onViewDetails={() => openDetailView(r)}
-                        onClick={() => openDetailView(r)}
-                      />
-                    );
-                  })}
-                </div>
-              ) : (
-                <EntityTable
-                  rows={filtered}
-                  keyExtractor={(r) => `${r.name}-${r.address || ""}`}
-                  columns={tableColumns}
-                  onBookmark={(r) => toggleBookmark(`${r.name}-${r.address || ""}`)}
-                  isBookmarked={(r) => bookmarkedKeys.has(`${r.name}-${r.address || ""}`)}
-                  onRowClick={openDetailView}
-                />
-              )}
-
+                    <EntityCard
+                      key={key}
+                      id={key}
+                      title={r.name}
+                      subtitle={r.category || "Local Business"}
+                      category={r.email ? "Has Email" : "Listing"}
+                      location={r.address || undefined}
+                      stats={[
+                        { label: "Phone", value: r.phone ? "Available" : "None" },
+                        { label: "Email", value: r.email ? "Verified" : "None" },
+                        { label: "Website", value: r.website ? "Yes" : "No" },
+                      ]}
+                      tags={tags}
+                      description={r.description || undefined}
+                      saved={bookmarkedKeys.has(key)}
+                      onSaveToggle={() => toggleBookmark(key)}
+                      primaryActionLabel="View Details"
+                      onViewDetails={() => openDetailView(r)}
+                      onClick={() => openDetailView(r)}
+                    />
+                  );
+                })}
+              </div>
+            ) : (
+              <EntityTable
+                rows={visible}
+                keyExtractor={(r) => `${r.name}-${r.address || ""}`}
+                columns={tableColumns}
+                onBookmark={(r) => toggleBookmark(`${r.name}-${r.address || ""}`)}
+                isBookmarked={(r) => bookmarkedKeys.has(`${r.name}-${r.address || ""}`)}
+                onRowClick={openDetailView}
+              />
+            )}
+            <LoadMoreSentinel
+              hasMore={hasMore}
+              onLoadMore={loadMore}
+              shown={shown}
+              total={filtered.length}
+            />
           </div>
         )}
 
@@ -392,7 +461,8 @@ function LocalBusinessesPage() {
             <Store className="size-8 mx-auto text-white/30" />
             <h3 className="text-base font-semibold text-white">Find Businesses</h3>
             <p className="max-w-md mx-auto text-xs text-white/50 leading-relaxed">
-              Enter a category and city on the right to discover businesses with public contact info.
+              Enter a category and city in the Filters panel to discover businesses with public
+              contact info.
             </p>
           </div>
         )}
@@ -416,6 +486,7 @@ function LocalBusinessesPage() {
               mut.mutate();
             }}
             isPending={mut.isPending}
+            onReset={resetFilters}
             applyLabel="Search Businesses"
             usage={usageQuery.data ?? undefined}
             onToggleCollapse={() => setFiltersCollapsed(!filtersCollapsed)}

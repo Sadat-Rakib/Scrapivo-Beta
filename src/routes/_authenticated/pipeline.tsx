@@ -9,6 +9,7 @@ import {
   PIPELINE_STAGE_LABELS,
 } from "@/lib/leads.functions";
 import { LeadDetailPanel } from "@/components/lead-detail-panel";
+import type { Lead } from "@/lib/scoring";
 import { toast } from "sonner";
 import { Columns3 } from "lucide-react";
 
@@ -32,11 +33,13 @@ function PipelinePage() {
   const qc = useQueryClient();
   const list = useServerFn(listSavedLeads);
   const setStage = useServerFn(setPipelineStage);
+  // Row shape derived from the actual query so no `any` is needed below.
+  type PipelineLead = NonNullable<Awaited<ReturnType<typeof list>>[number]>;
   const q = useQuery({ queryKey: ["saved-leads"], queryFn: () => list() });
-  const [sel, setSel] = useState<any>(null);
+  const [sel, setSel] = useState<PipelineLead | null>(null);
 
   const byStage = useMemo(() => {
-    const map: Record<string, any[]> = {};
+    const map: Record<string, PipelineLead[]> = {};
     for (const s of PIPELINE_STAGES) map[s] = [];
     for (const lead of q.data ?? []) {
       const status = (PIPELINE_STAGES as readonly string[]).includes(lead.status)
@@ -48,7 +51,11 @@ function PipelinePage() {
   }, [q.data]);
 
   const moveMut = useMutation({
-    mutationFn: (args: { id: string; status: (typeof PIPELINE_STAGES)[number]; lead: any }) =>
+    mutationFn: (args: {
+      id: string;
+      status: (typeof PIPELINE_STAGES)[number];
+      lead: PipelineLead;
+    }) =>
       setStage({
         data: {
           id: args.id,
@@ -156,15 +163,17 @@ function PipelinePage() {
         </div>
       </div>
 
-      {/* Slideout Detail Panel */}
+      {/* Slideout Detail Panel: full-width overlay on phones, fixed rail on sm+ */}
       {sel && (
-        <div className="w-[420px] border-l border-white/10 shrink-0 bg-[#0e0e11] liquid-glass">
+        <div className="w-full max-w-[420px] sm:w-[420px] sm:max-w-none border-l border-white/10 shrink-0 bg-[#0e0e11] liquid-glass">
           <LeadDetailPanel
-            lead={sel}
+            lead={sel as unknown as Lead}
             saved={sel}
             onClose={() => setSel(null)}
             onSavedChange={(patch) => {
-              setSel((prev: any) => (prev ? { ...prev, ...patch } : prev));
+              setSel((prev: PipelineLead | null) =>
+                prev ? ({ ...prev, ...patch } as PipelineLead) : prev,
+              );
               qc.invalidateQueries({ queryKey: ["saved-leads"] });
             }}
           />

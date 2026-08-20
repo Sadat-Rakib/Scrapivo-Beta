@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getMyProfile, updateMyProfile } from "@/lib/profile.functions";
 import { Switch } from "@/components/ui/switch";
+import { CollapsibleSection } from "@/components/shared/collapsible-section";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { X, Mail, MessageCircle, Send, Settings as SettingsIcon, Save } from "lucide-react";
@@ -14,22 +15,35 @@ export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
 });
 
+type ProfileForm = {
+  full_name?: string | null;
+  sender_name?: string | null;
+  job_title?: string | null;
+  years_experience?: number | string | null;
+  work_preference?: string | null;
+  location?: string | null;
+  skills?: string[] | null;
+  notify_email?: boolean | null;
+  slack_webhook?: string | null;
+};
+
 function ProfilePage() {
   const qc = useQueryClient();
   const get = useServerFn(getMyProfile);
   const upd = useServerFn(updateMyProfile);
   const q = useQuery({ queryKey: ["profile"], queryFn: () => get() });
-  const [form, setForm] = useState<any>({});
+  const [form, setForm] = useState<ProfileForm>({});
   const [skillInput, setSkillInput] = useState("");
 
   useEffect(() => {
     if (!q.data) return;
-    const full = (q.data.full_name ?? "").trim();
-    const sender = (q.data.sender_name ?? "").trim();
+    const data = q.data as ProfileForm;
+    const full = (data.full_name ?? "").trim();
+    const sender = (data.sender_name ?? "").trim();
     if (sender && sender.length > full.length) {
-      setForm({ ...q.data, full_name: sender });
+      setForm({ ...data, full_name: sender });
     } else {
-      setForm(q.data);
+      setForm(data);
     }
   }, [q.data]);
 
@@ -58,7 +72,7 @@ function ProfilePage() {
   const addSkill = () => {
     const s = skillInput.trim();
     if (!s) return;
-    setForm((f: any) => ({ ...f, skills: Array.from(new Set([...(f.skills ?? []), s])) }));
+    setForm((f: ProfileForm) => ({ ...f, skills: Array.from(new Set([...(f.skills ?? []), s])) }));
     setSkillInput("");
   };
 
@@ -77,11 +91,7 @@ function ProfilePage() {
       </div>
 
       {/* Profile Section */}
-      <section className="liquid-glass rounded-2xl p-6 space-y-5">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-white/50 border-b border-white/10 pb-3">
-          Profile Context
-        </h2>
-
+      <CollapsibleSection id="profile-context" title="Profile Context">
         <Field label="Full name">
           <input
             value={form.full_name ?? ""}
@@ -160,7 +170,7 @@ function ProfilePage() {
                 <button
                   type="button"
                   onClick={() =>
-                    setForm({ ...form, skills: form.skills.filter((x: string) => x !== s) })
+                    setForm({ ...form, skills: (form.skills ?? []).filter((x: string) => x !== s) })
                   }
                   className="text-white/40 hover:text-white"
                 >
@@ -170,19 +180,14 @@ function ProfilePage() {
             ))}
           </div>
         </Field>
-      </section>
+      </CollapsibleSection>
 
       {/* Report Delivery Section */}
-      <section className="liquid-glass rounded-2xl p-6 space-y-5">
-        <div>
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-white/50 border-b border-white/10 pb-3">
-            Report Delivery
-          </h2>
-          <p className="text-xs text-white/50 mt-2">
-            When signal watches find new leads, send reports to your inbox or Slack.
-          </p>
-        </div>
-
+      <CollapsibleSection
+        id="report-delivery"
+        title="Report Delivery"
+        description="When signal watches find new leads, send reports to your inbox or Slack."
+      >
         <div className="flex items-center justify-between p-4 rounded-xl border border-white/10 bg-white/[0.03]">
           <div className="flex items-start gap-3">
             <Mail className="size-4 mt-0.5 text-white/60" />
@@ -220,7 +225,7 @@ function ProfilePage() {
             <p className="text-[10px] text-white/40">Coming soon — direct digests.</p>
           </div>
         </div>
-      </section>
+      </CollapsibleSection>
 
       {/* Save Button */}
       <div className="pt-2">

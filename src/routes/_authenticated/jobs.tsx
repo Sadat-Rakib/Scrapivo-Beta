@@ -9,8 +9,20 @@ import { ViewToggle, type ViewMode } from "@/components/shared/view-toggle";
 import { EntityCard } from "@/components/shared/entity-card";
 import { EntityTable, type ColumnDef } from "@/components/shared/entity-table";
 import { FilterPanel } from "@/components/shared/filter-panel";
+import { MobileFilterSheet } from "@/components/shared/mobile-filter-sheet";
+import { LoadMoreSentinel } from "@/components/shared/load-more-sentinel";
+import { useProgressiveCount } from "@/hooks/use-progressive-count";
 import { getRemainingSearches } from "@/lib/search.functions";
-import { Briefcase, Search, Download, ExternalLink, MapPin, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Briefcase,
+  Search,
+  Download,
+  ExternalLink,
+  MapPin,
+  RefreshCw,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Company360View, type Company360Data } from "@/components/shared/company-360-view";
 
@@ -59,6 +71,16 @@ function JobsPage() {
     window.localStorage.setItem("scrapivo:jobs-filters-collapsed", filtersCollapsed ? "1" : "0");
   }
 
+  // Reset clears the form fields without firing a search (searches are quota-limited).
+  const resetFilters = () => {
+    setQuery("");
+    setLocation("");
+    setRemoteOnly(false);
+    setSeniority("any");
+    setContactRoles("");
+    setRegion("any");
+  };
+
   const mut = useMutation({
     mutationFn: () =>
       searchFn({
@@ -96,6 +118,9 @@ function JobsPage() {
     onError: (e: Error) => toast.error(e.message || "Job search failed"),
   });
 
+  // Progressive rendering: keep the mounted card count small and grow on scroll.
+  const { visible, hasMore, loadMore, shown } = useProgressiveCount(rows, 24);
+
   const toggleBookmark = (id: string) => {
     setBookmarkedIds((prev) => {
       const next = new Set(prev);
@@ -123,7 +148,16 @@ function JobsPage() {
 
   const exportCsv = () => {
     if (!rows.length) return;
-    const header = ["title", "company", "location", "remote", "seniority", "salary", "url", "source"];
+    const header = [
+      "title",
+      "company",
+      "location",
+      "remote",
+      "seniority",
+      "salary",
+      "url",
+      "source",
+    ];
     const lines = [
       header.join(","),
       ...rows.map((j) =>
@@ -253,7 +287,9 @@ function JobsPage() {
           className="w-full h-9 px-3 rounded-lg border border-white/10 bg-[#131316] text-xs text-white outline-none focus:border-white/30"
         >
           {REGIONS.map((r) => (
-            <option key={r.id} value={r.id}>{r.label}</option>
+            <option key={r.id} value={r.id}>
+              {r.label}
+            </option>
           ))}
         </select>
       </label>
@@ -283,11 +319,24 @@ function JobsPage() {
             </div>
             <h1 className="text-2xl font-semibold tracking-tight text-white">Jobs</h1>
             <p className="text-xs text-white/60 mt-1 max-w-xl">
-              Real-time active postings from company career pages, ATS Boards, Job sites, ATS sites, etc.
+              Real-time active postings from company career pages, ATS Boards, Job sites, ATS sites,
+              etc.
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-3 shrink-0 flex-wrap">
+            {/* Mobile filter entry — desktop uses the persistent right rail below */}
+            <MobileFilterSheet
+              title="Filter Jobs"
+              subtitle="Refine role, seniority & region"
+              onApply={() => mut.mutate()}
+              onReset={resetFilters}
+              isPending={mut.isPending}
+              applyLabel="Find Jobs"
+              usage={usageQuery.data ?? undefined}
+            >
+              {FilterForm}
+            </MobileFilterSheet>
             {rows.length > 0 && (
               <button
                 type="button"
@@ -313,10 +362,12 @@ function JobsPage() {
         {/* Results */}
         {!mut.isPending && searched && rows.length > 0 && (
           <div>
-            <div className="text-xs text-white/50 mb-3">{rows.length} active jobs loaded</div>
+            <div className="text-xs text-white/50 mb-3">
+              {rows.length} active jobs loaded{hasMore ? ` — showing ${shown}` : ""}
+            </div>
             {viewMode === "grid" ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                {rows.map((j) => (
+                {visible.map((j) => (
                   <EntityCard
                     key={j.id}
                     id={j.id}
@@ -341,7 +392,7 @@ function JobsPage() {
               </div>
             ) : (
               <EntityTable
-                rows={rows}
+                rows={visible}
                 keyExtractor={(j) => j.id}
                 columns={tableColumns}
                 onBookmark={(j) => toggleBookmark(j.id)}
@@ -349,6 +400,12 @@ function JobsPage() {
                 onRowClick={openDetailView}
               />
             )}
+            <LoadMoreSentinel
+              hasMore={hasMore}
+              onLoadMore={loadMore}
+              shown={shown}
+              total={rows.length}
+            />
           </div>
         )}
 
@@ -363,7 +420,8 @@ function JobsPage() {
             <Briefcase className="size-8 mx-auto text-white/30" />
             <h3 className="text-base font-semibold text-white">Search Active Job Postings</h3>
             <p className="max-w-md mx-auto text-xs text-white/50 leading-relaxed">
-              Use the filter panel on the right to search across company ATS boards and career pages.
+              Use the Filters panel to search across company career pages, ATS boards, and job
+              sites.
             </p>
             <button
               type="button"
@@ -388,6 +446,7 @@ function JobsPage() {
             title="Filter Jobs"
             subtitle="Refine role, seniority & region"
             onApply={() => mut.mutate()}
+            onReset={resetFilters}
             isPending={mut.isPending}
             applyLabel="Find Jobs"
             usage={usageQuery.data ?? undefined}

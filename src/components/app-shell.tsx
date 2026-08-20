@@ -362,10 +362,12 @@ export function AppShell({ children }: { children: ReactNode }) {
             <button
               type="button"
               onClick={() => navigate({ to: "/discover" })}
-              className="glass-pill px-3.5 py-1.5 text-xs font-medium text-white flex items-center gap-1.5 hover:bg-white/15"
+              aria-label="New chat"
+              className="glass-pill px-3 sm:px-3.5 py-1.5 text-xs font-medium text-white flex items-center gap-1.5 hover:bg-white/15"
             >
               <Plus className="size-3.5" />
-              <span>New chat</span>
+              {/* Label collapses to an icon-only pill on the narrowest phones */}
+              <span className="hidden min-[400px]:inline">New chat</span>
             </button>
 
             {/* Mobile Right Drawer Trigger */}

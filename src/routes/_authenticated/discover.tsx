@@ -78,7 +78,10 @@ function DiscoverPage() {
 
   const savedQuery = useQuery({ queryKey: ["saved-leads"], queryFn: () => getSaved() });
   const savedLeads = savedQuery.data ?? [];
-  const savedByUrl = new Map<string, any>(savedLeads.map((l: any) => [l.full_post_url, l]));
+  type SavedLeadRow = NonNullable<(typeof savedLeads)[number]>;
+  const savedByUrl = new Map<string, SavedLeadRow>(
+    savedLeads.map((l): [string, SavedLeadRow] => [l.full_post_url, l]),
+  );
 
   const profileQuery = useQuery({ queryKey: ["my-profile"], queryFn: () => getProfile() });
   const usageQuery = useQuery({ queryKey: ["usage"], queryFn: () => getUsage() });
@@ -208,8 +211,8 @@ function DiscoverPage() {
         toast.success("Project saved — searches now start from this context");
       }
       markReturnChatAsked();
-    } catch (e: any) {
-      toast.error(e?.message || "Could not save project");
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Could not save project");
     } finally {
       setWizardOpen(false);
       setPendingAutoSearch(true);
@@ -336,8 +339,8 @@ function DiscoverPage() {
       } else {
         setContactByKey((m) => ({ ...m, [key]: { status: "none" } }));
       }
-    } catch (e: any) {
-      toast.error(e?.message || "Contact resolve failed");
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Contact resolve failed");
     } finally {
       setContactBusyKey(null);
     }
@@ -518,7 +521,7 @@ function DiscoverPage() {
   });
 
   const saveMut = useMutation({
-    mutationFn: async (lead: Lead) => save({ data: lead as any }),
+    mutationFn: async (lead: Lead) => save({ data: lead }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["saved-leads"] }),
     onError: (e: Error) => toast.error(e.message),
   });
@@ -714,10 +717,11 @@ function DiscoverPage() {
     <div className="h-full flex min-h-0 bg-[#0a0a0b] text-white">
       <div className="flex-1 min-w-0 flex flex-col min-h-0">
         <div className="flex-1 min-h-0 overflow-y-auto px-4 md:px-6">
-
-
           {showOnboarding ? (
-            <div className="h-full flex items-center justify-center py-6 md:py-10">
+            // min-h-full (not h-full) + flex-col: when the content is taller
+            // than the scroll container it grows and scrolls from the top
+            // instead of being centered past the scroll origin (clipped).
+            <div className="min-h-full flex flex-col items-center justify-center py-6 md:py-10">
               <OnboardingWizard
                 onComplete={completeOnboarding}
                 onSkip={() => {
@@ -730,7 +734,7 @@ function DiscoverPage() {
               />
             </div>
           ) : showHero ? (
-            <div className="h-full flex items-center justify-center py-6 md:py-10">
+            <div className="min-h-full flex flex-col items-center justify-center py-6 md:py-10">
               <DiscoverWelcomeHero
                 greetingName={greetingName || undefined}
                 onFocusComposer={() => {
@@ -1057,8 +1061,6 @@ function DiscoverPage() {
         </div>
       </div>
 
-
-
       {selected && (
         <div className="hidden lg:block w-[420px] border-l border-border shrink-0 bg-card overflow-y-auto">
           <LeadDetailPanel
@@ -1111,4 +1113,3 @@ function DiscoverPage() {
     </div>
   );
 }
-
