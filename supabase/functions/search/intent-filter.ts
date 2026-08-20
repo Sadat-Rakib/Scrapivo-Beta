@@ -132,14 +132,16 @@ export function scoreIntent(params: {
   else if (hoursOld < 336) score += 3;
   else return { score: 0, tier: "signal", hasBudget: false, hasUrgency: false };
 
-  const hasBudget = /\$[\d,]+k?|\d+k\/(?:yr|year|month|mo|hr|hour)|budget|compensation|rate:|salary/i.test(
-    params.text,
-  );
+  const hasBudget =
+    /\$[\d,]+k?|\d+k\/(?:yr|year|month|mo|hr|hour)|budget|compensation|rate:|salary/i.test(
+      params.text,
+    );
   if (hasBudget) score += 12;
 
-  const hasUrgency = /\basap\b|urgent|immediately|this week|right away|quickly|starting soon|need now|asap/i.test(
-    text,
-  );
+  const hasUrgency =
+    /\basap\b|urgent|immediately|this week|right away|quickly|starting soon|need now|asap/i.test(
+      text,
+    );
   if (hasUrgency) score += 8;
 
   if (params.isDecisionMaker) score += 10;
@@ -148,8 +150,7 @@ export function scoreIntent(params: {
   score += Math.min(15, signalCount * 3);
 
   score = Math.min(100, Math.max(0, score));
-  const tier: "hot" | "warm" | "signal" =
-    score >= 70 ? "hot" : score >= 45 ? "warm" : "signal";
+  const tier: "hot" | "warm" | "signal" = score >= 70 ? "hot" : score >= 45 ? "warm" : "signal";
 
   return { score, tier, hasBudget, hasUrgency };
 }
@@ -207,7 +208,10 @@ export function deduplicateLeads(leads: Lead[]): Lead[] {
 
 export function isRelevantToSkill(text: string, skill: string): boolean {
   const lower = text.toLowerCase();
-  const words = skill.toLowerCase().split(/\s+/).filter((w) => w.length > 2);
+  const words = skill
+    .toLowerCase()
+    .split(/\s+/)
+    .filter((w) => w.length > 2);
   if (!words.length) return true;
   return words.some((w) => lower.includes(w));
 }

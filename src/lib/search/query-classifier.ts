@@ -1,3 +1,9 @@
+import {
+  LOCATION_ALIASES,
+  isGazetteerCountry,
+  normalizeLocalLocation,
+} from "@/lib/local/city-gazetteer";
+
 export type QueryType = "role" | "skill" | "department" | "product" | "industry" | "generic";
 
 export type IntentMode = "directory_smb" | "buyer_intent";
@@ -353,7 +359,14 @@ export const CLASSIFIER_ROLE_MAP: Record<string, RoleEntry> = {
   },
   copywriter: {
     roleTitle: "Copywriter",
-    relatedSkills: ["copywriting", "sales copy", "landing pages", "email copy", "ad copy", "writer"],
+    relatedSkills: [
+      "copywriting",
+      "sales copy",
+      "landing pages",
+      "email copy",
+      "ad copy",
+      "writer",
+    ],
     targetCustomerDesc: "businesses needing persuasive copy for sales and marketing",
     subredditBoosts: ["HireaWriter", "copywriting", "Entrepreneur", "marketing"],
   },
@@ -372,7 +385,14 @@ export const CLASSIFIER_ROLE_MAP: Record<string, RoleEntry> = {
       "SEO writing",
     ],
     targetCustomerDesc: "companies and founders needing writing or content help",
-    subredditBoosts: ["HireaWriter", "Blogging", "copywriting", "content_marketing", "forhire", "freelanceWriters"],
+    subredditBoosts: [
+      "HireaWriter",
+      "Blogging",
+      "copywriting",
+      "content_marketing",
+      "forhire",
+      "freelanceWriters",
+    ],
   },
   teacher: {
     roleTitle: "Teacher / Tutor",
@@ -387,7 +407,14 @@ export const CLASSIFIER_ROLE_MAP: Record<string, RoleEntry> = {
       "online tutor",
     ],
     targetCustomerDesc: "students and parents looking for tutoring or lessons",
-    subredditBoosts: ["tutors", "Teachers", "learnprogramming", "HomeworkHelp", "forhire", "slavelabour"],
+    subredditBoosts: [
+      "tutors",
+      "Teachers",
+      "learnprogramming",
+      "HomeworkHelp",
+      "forhire",
+      "slavelabour",
+    ],
   },
   tutor: {
     roleTitle: "Tutor",
@@ -420,7 +447,14 @@ export const CLASSIFIER_ROLE_MAP: Record<string, RoleEntry> = {
       "startup",
     ],
     targetCustomerDesc: "startups that are raising or seeking investment",
-    subredditBoosts: ["startups", "startup_funding", "VentureCapital", "AngelInvesting", "Entrepreneur", "SaaS"],
+    subredditBoosts: [
+      "startups",
+      "startup_funding",
+      "VentureCapital",
+      "AngelInvesting",
+      "Entrepreneur",
+      "SaaS",
+    ],
   },
   sales: {
     roleTitle: "Sales Specialist",
@@ -558,7 +592,17 @@ export const CLASSIFIER_ROLE_MAP: Record<string, RoleEntry> = {
   },
   "data analyst": {
     roleTitle: "Data Analyst",
-    relatedSkills: ["SQL", "Excel", "Python", "Tableau", "Power BI", "dashboards", "reporting", "analytics", "data"],
+    relatedSkills: [
+      "SQL",
+      "Excel",
+      "Python",
+      "Tableau",
+      "Power BI",
+      "dashboards",
+      "reporting",
+      "analytics",
+      "data",
+    ],
     targetCustomerDesc: "businesses needing data analysis and reporting",
     subredditBoosts: ["dataanalysis", "BusinessIntelligence", "SQL", "datascience"],
   },
@@ -907,32 +951,12 @@ function extractProductKeywords(productDesc: string): string[] {
 const DIRECTORY_ENTITY_RE =
   /\b(agenc(?:y|ies)|companies|company|businesses|business|firms|firm|studios|studio|shops|shop)\b/i;
 
-const LOCATION_ALIASES: Record<string, string> = {
-  india: "India",
-  indian: "India",
-  bharat: "India",
-  usa: "United States",
-  "united states": "United States",
-  "united states of america": "United States",
-  us: "United States",
-  uk: "United Kingdom",
-  "united kingdom": "United Kingdom",
-  britain: "United Kingdom",
-  england: "United Kingdom",
-  uae: "United Arab Emirates",
-  dubai: "Dubai",
-  canada: "Canada",
-  australia: "Australia",
-  germany: "Germany",
-  france: "France",
-  singapore: "Singapore",
-  israel: "Israel",
-};
-
 /** Country-level locations get Geoapify place: boundary filters. */
 export const COUNTRY_LOCATIONS = new Set([
   "india",
   "united states",
+  "usa",
+  "us",
   "united kingdom",
   "canada",
   "australia",
@@ -1208,7 +1232,13 @@ export function isDirectoryQuery(text: string): boolean {
 
 export function isCountryLocation(location: string | null | undefined): boolean {
   if (!location) return false;
-  return COUNTRY_LOCATIONS.has(location.toLowerCase());
+  const normalized = normalizeLocalLocation(location);
+  const key = normalized.toLowerCase();
+  return (
+    COUNTRY_LOCATIONS.has(key) ||
+    COUNTRY_LOCATIONS.has(location.toLowerCase()) ||
+    isGazetteerCountry(normalized)
+  );
 }
 
 /** ICP fillers like "for startups" — strip from skill seed, keep as audience hint. */
@@ -1555,7 +1585,9 @@ export function isProductPitchQuery(text: string): boolean {
     return true;
   }
   if (/\bsell(?:ing)?\s+(?:a|an|my|our)\s+[\w\s-]{0,40}\bservices?\b/.test(t)) return true;
-  if (/\bmy (product|app|tool|saas|platform|software)\b.{0,40}\b(that|which|helps|does)\b/.test(t)) {
+  if (
+    /\bmy (product|app|tool|saas|platform|software)\b.{0,40}\b(that|which|helps|does)\b/.test(t)
+  ) {
     return true;
   }
   if (/\b(customers?|clients?|users?|leads?)\s+for\s+(my|our)\b/.test(t)) return true;
@@ -1612,10 +1644,42 @@ export function inferGoalFromQuery(text: string): Goal | null {
 }
 
 const PRODUCT_STOP = new Set([
-  "product", "app", "tool", "saas", "platform", "software", "service", "that",
-  "which", "helps", "help", "does", "lets", "allows", "enables", "with", "from",
-  "their", "them", "this", "into", "onto", "your", "my", "our", "the", "and",
-  "for", "who", "can", "are", "looking", "need", "want", "people", "users",
+  "product",
+  "app",
+  "tool",
+  "saas",
+  "platform",
+  "software",
+  "service",
+  "that",
+  "which",
+  "helps",
+  "help",
+  "does",
+  "lets",
+  "allows",
+  "enables",
+  "with",
+  "from",
+  "their",
+  "them",
+  "this",
+  "into",
+  "onto",
+  "your",
+  "my",
+  "our",
+  "the",
+  "and",
+  "for",
+  "who",
+  "can",
+  "are",
+  "looking",
+  "need",
+  "want",
+  "people",
+  "users",
 ]);
 
 /** Audience noun the product serves — e.g. freelancers, founders, agencies. */
@@ -1671,7 +1735,8 @@ export function extractProductPitchKeywords(text: string): string[] {
       .filter((p) => p.length >= 4);
     for (const p of parts) add(p);
     // Noun anchors inside phrases — skip bare verbs.
-    const bareVerb = /^(find|manage|track|get|book|hire|schedule|send|create|build|sell|buy|pay|help|need)$/i;
+    const bareVerb =
+      /^(find|manage|track|get|book|hire|schedule|send|create|build|sell|buy|pay|help|need)$/i;
     for (const p of parts) {
       for (const w of p.split(/\s+/)) {
         if (w.length > 4 && !PRODUCT_STOP.has(w.toLowerCase()) && !bareVerb.test(w)) add(w);
@@ -1680,7 +1745,9 @@ export function extractProductPitchKeywords(text: string): string[] {
   }
 
   // Avoid swallowing the whole pitch as one junk term.
-  const forMy = t.match(/\b(?:customers?|clients?|users?|leads?)\s+for\s+(?:my|our)\s+(.+?)(?:\.|$)/i);
+  const forMy = t.match(
+    /\b(?:customers?|clients?|users?|leads?)\s+for\s+(?:my|our)\s+(.+?)(?:\.|$)/i,
+  );
   if (forMy?.[1]) {
     const noun = forMy[1].replace(/\b(product|app|tool|saas|platform|software)\b/gi, " ").trim();
     if (noun.length >= 3) add(noun);
@@ -1727,9 +1794,7 @@ export function classifyQuery(raw: string): ClassifiedQuery {
     const audience = extractProductPitchAudience(trimmed);
     // Prefer a known craft in the pitch ("lead generation") over filler seeds.
     const roleFromPitch =
-      related.map((r) => findRoleMatch(r)).find(Boolean) ||
-      findRoleMatch(trimmed) ||
-      null;
+      related.map((r) => findRoleMatch(r)).find(Boolean) || findRoleMatch(trimmed) || null;
     // Prefer capability phrase over audience noun as core skill
     // ("find clients" beats "freelancers" for fan-out quality).
     const capability =
@@ -1737,10 +1802,7 @@ export function classifyQuery(raw: string): ClassifiedQuery {
       related.find((r) => /\s/.test(r) && r !== audience) ||
       related.find((r) => r !== audience) ||
       related[0];
-    const seed =
-      capability ||
-      extractProductKeywords(lower).slice(0, 3).join(" ") ||
-      "product";
+    const seed = capability || extractProductKeywords(lower).slice(0, 3).join(" ") || "product";
     const who = audience || "people";
     const relatedSkills = [
       ...new Set([
@@ -1756,8 +1818,7 @@ export function classifyQuery(raw: string): ClassifiedQuery {
         coreSkill: seed,
         roleTitle: roleFromPitch?.entry.roleTitle || seed,
         relatedSkills: relatedSkills.length ? relatedSkills : [seed],
-        targetCustomerDesc:
-          roleFromPitch?.entry.targetCustomerDesc || `${who} who need ${seed}`,
+        targetCustomerDesc: roleFromPitch?.entry.targetCustomerDesc || `${who} who need ${seed}`,
       },
       location,
       "buyer_intent",
@@ -1782,7 +1843,9 @@ export function classifyQuery(raw: string): ClassifiedQuery {
     !directory &&
     signalMode === "skill_role" &&
     !roleMatch &&
-    PRODUCT_KEYWORDS.some((kw) => new RegExp(`\\b${kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(lower));
+    PRODUCT_KEYWORDS.some((kw) =>
+      new RegExp(`\\b${kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(lower),
+    );
   if (isProduct) {
     const related = extractProductKeywords(lower).filter(
       (t) => !/^(lead|leads|generation|service|services|client|clients)$/i.test(t),
@@ -1859,7 +1922,9 @@ export function classifyQuery(raw: string): ClassifiedQuery {
   // "find asking lead generation" and every social dork misses real posts.
   if (signalMode === "buying_signal") {
     const roleFromRaw =
-      findRoleMatch(lower) ?? findRoleMatch(skillSeed) ?? findRoleMatch(extractCoreSkill(skillSeed));
+      findRoleMatch(lower) ??
+      findRoleMatch(skillSeed) ??
+      findRoleMatch(extractCoreSkill(skillSeed));
     const detected = detectSkillMentions(trimmed);
     const primary =
       roleFromRaw?.key ||

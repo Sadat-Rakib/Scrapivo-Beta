@@ -26,7 +26,9 @@ const DEMAND_BY_SOURCE = new Set([
 
 const classified = classifyQuery(QUERY);
 const expanded = expandQuery(QUERY);
-console.log(`query="${QUERY}" skill="${classified.coreSkill}" goal="${classified.goal ?? "clients"}"`);
+console.log(
+  `query="${QUERY}" skill="${classified.coreSkill}" goal="${classified.goal ?? "clients"}"`,
+);
 
 const t0 = Date.now();
 const { leads: raw, sources } = await searchAllSources({ classified, expanded } as never);
@@ -55,7 +57,9 @@ let totalPass = 0;
 console.log("Demand-by-source leads clearing the title skill gate:");
 for (const [src, e] of [...bySource].sort((a, b) => b[1].passes - a[1].passes)) {
   totalPass += e.passes;
-  console.log(`  ${src.padEnd(16)} ${String(e.passes).padStart(3)}/${String(e.total).padEnd(3)} pass`);
+  console.log(
+    `  ${src.padEnd(16)} ${String(e.passes).padStart(3)}/${String(e.total).padEnd(3)} pass`,
+  );
   for (const s of e.sample) console.log(`      · ${s.slice(0, 78)}`);
 }
 

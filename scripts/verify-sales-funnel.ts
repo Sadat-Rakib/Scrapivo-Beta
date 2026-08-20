@@ -54,9 +54,7 @@ const socialKept = validated.filter((l) => {
   if (!["linkedin", "instagram", "facebook", "twitter", "threads"].includes(l.source)) return false;
   const text = `${l.title} ${l.snippet}`;
   const buyer =
-    detectBuyerIntent(text).isBuyer ||
-    isSalesTalentHireAsk(text) ||
-    l.demand_verified === true;
+    detectBuyerIntent(text).isBuyer || isSalesTalentHireAsk(text) || l.demand_verified === true;
   return buyer;
 });
 const platforms = [...new Set(socialKept.map((l) => l.source))];

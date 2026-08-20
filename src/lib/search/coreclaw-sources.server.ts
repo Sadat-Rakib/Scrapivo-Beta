@@ -36,7 +36,8 @@ function pickEmail(row: Record<string, unknown>): string | undefined {
   const e = row.email ?? row.email_address ?? row.business_email;
   if (typeof e === "string" && e.includes("@")) return e.toLowerCase();
   const emails = row.emails;
-  if (Array.isArray(emails) && typeof emails[0] === "string") return String(emails[0]).toLowerCase();
+  if (Array.isArray(emails) && typeof emails[0] === "string")
+    return String(emails[0]).toLowerCase();
   return undefined;
 }
 
@@ -128,9 +129,7 @@ export async function searchCoreClawMapsLeads(
 }
 
 /** SERP backup — one buyer-intent query when SerpAPI is missing or thin. */
-export async function searchCoreClawSerp(
-  qx: ExpandedQueries,
-): Promise<SourceLead[]> {
+export async function searchCoreClawSerp(qx: ExpandedQueries): Promise<SourceLead[]> {
   if (!coreclawEnabled()) return [];
   const skill = (qx.skill || qx.role || "").trim();
   if (!skill) return [];

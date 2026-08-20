@@ -99,11 +99,13 @@ const good = [
   "B2B Sales Lead Email Copy",
 ];
 for (const title of good) {
-  const lead = { title, snippet: `looking to hire ${title}`, source: "freelancer", platform: "Freelancer" } as any;
-  check(
-    `keep: ${title.slice(0, 48)}`,
-    isRelevantToQuery(lead, cq.coreSkill, cq.relatedSkills, cq),
-  );
+  const lead = {
+    title,
+    snippet: `looking to hire ${title}`,
+    source: "freelancer",
+    platform: "Freelancer",
+  } as any;
+  check(`keep: ${title.slice(0, 48)}`, isRelevantToQuery(lead, cq.coreSkill, cq.relatedSkills, cq));
 }
 
 check(

@@ -40,5 +40,9 @@ try {
   const j = (await res.json()) as { results?: unknown[] };
   console.log("resilientFetch results", j.results?.length ?? 0);
 } catch (e) {
-  console.log("resilientFetch FAIL", (e as Error).message, (e as Error & { cause?: unknown }).cause);
+  console.log(
+    "resilientFetch FAIL",
+    (e as Error).message,
+    (e as Error & { cause?: unknown }).cause,
+  );
 }

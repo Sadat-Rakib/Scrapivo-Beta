@@ -50,7 +50,9 @@ export function normalizeHooks(
     if (!h || typeof h !== "object") continue;
     const claim = String((h as any).claim || "").trim();
     let citation_url = String((h as any).citation_url || "").trim();
-    const source_type = String((h as any).source_type || "lead_post") as VerifiedHook["source_type"];
+    const source_type = String(
+      (h as any).source_type || "lead_post",
+    ) as VerifiedHook["source_type"];
     if (!claim) continue;
     if (!citation_url || !allow.has(citation_url.toLowerCase())) {
       citation_url = leadUrl;
@@ -72,7 +74,11 @@ export function rowToResearch(row: any, leadUrl: string): LeadResearch {
   const citations = (row.citations as string[]) ?? [];
   const verified_hooks =
     Array.isArray(raw.verified_hooks) && (raw.verified_hooks as any[]).length
-      ? normalizeHooks(raw.verified_hooks, [leadUrl, ...((raw.allowed_urls as string[]) || [])], leadUrl)
+      ? normalizeHooks(
+          raw.verified_hooks,
+          [leadUrl, ...((raw.allowed_urls as string[]) || [])],
+          leadUrl,
+        )
       : hooksFromLegacy(citations, leadUrl);
   return {
     overview: row.overview ?? "",

@@ -2,15 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getMyProfile, updateMyProfile } from "@/lib/profile.functions";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { X, Mail, MessageCircle, Send } from "lucide-react";
+import { X, Mail, MessageCircle, Send, Settings as SettingsIcon, Save } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/profile")({
+  head: () => ({
+    meta: [{ title: "Scrapivo — Settings" }],
+  }),
   component: ProfilePage,
 });
 
@@ -21,12 +21,11 @@ function ProfilePage() {
   const q = useQuery({ queryKey: ["profile"], queryFn: () => get() });
   const [form, setForm] = useState<any>({});
   const [skillInput, setSkillInput] = useState("");
+
   useEffect(() => {
     if (!q.data) return;
     const full = (q.data.full_name ?? "").trim();
     const sender = (q.data.sender_name ?? "").trim();
-    // If the full name was only typed into the (now-removed) CASL sender field,
-    // surface it as Full name so Discover greets with the complete name.
     if (sender && sender.length > full.length) {
       setForm({ ...q.data, full_name: sender });
     } else {
@@ -49,7 +48,7 @@ function ProfilePage() {
         },
       }),
     onSuccess: () => {
-      toast.success("Saved");
+      toast.success("Settings saved");
       qc.invalidateQueries({ queryKey: ["profile"] });
       qc.invalidateQueries({ queryKey: ["my-profile"] });
     },
@@ -64,58 +63,74 @@ function ProfilePage() {
   };
 
   return (
-    <div className="h-full overflow-y-auto p-6 sm:p-8 max-w-2xl mx-auto w-full space-y-8">
+    <div className="h-full overflow-y-auto no-scrollbar p-4 sm:p-6 lg:p-8 max-w-2xl mx-auto w-full space-y-6 text-white">
+      {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Personalize outreach, delivery, and how Scrapivo understands you.
+        <div className="inline-flex items-center gap-1.5 text-xs text-white/50 uppercase tracking-wider font-semibold mb-1">
+          <SettingsIcon className="size-3.5" />
+          <span>Account Preferences</span>
+        </div>
+        <h1 className="text-2xl font-semibold tracking-tight text-white">Settings</h1>
+        <p className="text-xs text-white/60 mt-1">
+          Personalize outreach, report delivery, and how Scrapivo understands you.
         </p>
       </div>
 
-      <section className="space-y-4 rounded-2xl border border-border/80 bg-card/50 p-5">
-        <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">Profile</h2>
+      {/* Profile Section */}
+      <section className="liquid-glass rounded-2xl p-6 space-y-5">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-white/50 border-b border-white/10 pb-3">
+          Profile Context
+        </h2>
+
         <Field label="Full name">
-          <Input
+          <input
             value={form.full_name ?? ""}
             onChange={(e) => setForm({ ...form, full_name: e.target.value })}
             placeholder="e.g. Mir Sadat Bin Rakib"
+            className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-xs text-white placeholder:text-white/30 outline-none focus:border-white/30"
           />
-          <p className="text-[11px] text-muted-foreground">
-            Shown on Discover — use your full name, not just part of it.
-          </p>
+          <p className="text-[11px] text-white/40 mt-1">Shown on Discover greeting.</p>
         </Field>
+
         <Field label="Job title / craft">
-          <Input
+          <input
             value={form.job_title ?? ""}
             onChange={(e) => setForm({ ...form, job_title: e.target.value })}
             placeholder="e.g. React developer, video editor"
+            className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-xs text-white placeholder:text-white/30 outline-none focus:border-white/30"
           />
         </Field>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="Years of experience">
-            <Input
+            <input
               type="number"
               value={form.years_experience ?? ""}
               onChange={(e) => setForm({ ...form, years_experience: e.target.value })}
+              className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-xs text-white placeholder:text-white/30 outline-none focus:border-white/30"
             />
           </Field>
           <Field label="Work preference">
-            <Input
+            <input
               value={form.work_preference ?? ""}
               onChange={(e) => setForm({ ...form, work_preference: e.target.value })}
               placeholder="Remote, part-time"
+              className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-xs text-white placeholder:text-white/30 outline-none focus:border-white/30"
             />
           </Field>
         </div>
+
         <Field label="Location">
-          <Input
+          <input
             value={form.location ?? ""}
             onChange={(e) => setForm({ ...form, location: e.target.value })}
+            className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-xs text-white placeholder:text-white/30 outline-none focus:border-white/30"
           />
         </Field>
+
         <Field label="Skills">
           <div className="flex gap-2">
-            <Input
+            <input
               value={skillInput}
               onChange={(e) => setSkillInput(e.target.value)}
               onKeyDown={(e) => {
@@ -125,23 +140,29 @@ function ProfilePage() {
                 }
               }}
               placeholder="Type a skill and press Enter"
+              className="flex-1 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-xs text-white placeholder:text-white/30 outline-none focus:border-white/30"
             />
-            <Button type="button" variant="secondary" onClick={addSkill}>
+            <button
+              type="button"
+              onClick={addSkill}
+              className="glass-pill px-4 py-2 text-xs font-semibold text-white bg-white/10 hover:bg-white/20"
+            >
               Add
-            </Button>
+            </button>
           </div>
-          <div className="mt-2 flex flex-wrap gap-1.5">
+          <div className="mt-2.5 flex flex-wrap gap-1.5">
             {(form.skills ?? []).map((s: string) => (
               <span
                 key={s}
-                className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted text-xs"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.06] border border-white/10 text-xs text-white"
               >
-                {s}
+                <span>{s}</span>
                 <button
                   type="button"
                   onClick={() =>
                     setForm({ ...form, skills: form.skills.filter((x: string) => x !== s) })
                   }
+                  className="text-white/40 hover:text-white"
                 >
                   <X className="size-3" />
                 </button>
@@ -151,22 +172,23 @@ function ProfilePage() {
         </Field>
       </section>
 
-      <section className="space-y-4 rounded-2xl border border-border/80 bg-card/50 p-5">
+      {/* Report Delivery Section */}
+      <section className="liquid-glass rounded-2xl p-6 space-y-5">
         <div>
-          <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-            Report delivery
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-white/50 border-b border-white/10 pb-3">
+            Report Delivery
           </h2>
-          <p className="text-xs text-muted-foreground mt-1">
-            When watches find new signals, send a report here. Email and Slack work today;
-            Telegram and WhatsApp are next.
+          <p className="text-xs text-white/50 mt-2">
+            When signal watches find new leads, send reports to your inbox or Slack.
           </p>
         </div>
-        <div className="flex items-center justify-between p-3 rounded-xl border border-border bg-background/60">
+
+        <div className="flex items-center justify-between p-4 rounded-xl border border-white/10 bg-white/[0.03]">
           <div className="flex items-start gap-3">
-            <Mail className="size-4 mt-0.5 text-muted-foreground" />
+            <Mail className="size-4 mt-0.5 text-white/60" />
             <div>
-              <div className="text-sm font-medium">Email notifications</div>
-              <div className="text-xs text-muted-foreground">Hot leads and watch digests to your inbox.</div>
+              <div className="text-xs font-semibold text-white">Email Notifications</div>
+              <div className="text-[11px] text-white/50">Hot leads and watch digests.</div>
             </div>
           </div>
           <Switch
@@ -174,32 +196,44 @@ function ProfilePage() {
             onCheckedChange={(v) => setForm({ ...form, notify_email: v })}
           />
         </div>
-        <Field label="Slack webhook">
-          <Input
+
+        <Field label="Slack Webhook URL">
+          <input
             value={form.slack_webhook ?? ""}
             onChange={(e) => setForm({ ...form, slack_webhook: e.target.value })}
             placeholder="https://hooks.slack.com/services/…"
+            className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-xs text-white placeholder:text-white/30 outline-none focus:border-white/30"
           />
         </Field>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="rounded-xl border border-dashed border-border p-3 opacity-80">
-            <div className="flex items-center gap-2 text-sm font-medium mb-1">
-              <Send className="size-3.5" /> Telegram
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+          <div className="rounded-xl border border-dashed border-white/10 p-3 bg-white/[0.01]">
+            <div className="flex items-center gap-2 text-xs font-medium text-white/70 mb-1">
+              <Send className="size-3.5 text-white/40" /> Telegram
             </div>
-            <p className="text-[11px] text-muted-foreground">Coming soon — bot + chat id for digests.</p>
+            <p className="text-[10px] text-white/40">Coming soon — bot pings.</p>
           </div>
-          <div className="rounded-xl border border-dashed border-border p-3 opacity-80">
-            <div className="flex items-center gap-2 text-sm font-medium mb-1">
-              <MessageCircle className="size-3.5" /> WhatsApp
+          <div className="rounded-xl border border-dashed border-white/10 p-3 bg-white/[0.01]">
+            <div className="flex items-center gap-2 text-xs font-medium text-white/70 mb-1">
+              <MessageCircle className="size-3.5 text-white/40" /> WhatsApp
             </div>
-            <p className="text-[11px] text-muted-foreground">Coming soon — report pings to your number.</p>
+            <p className="text-[10px] text-white/40">Coming soon — direct digests.</p>
           </div>
         </div>
       </section>
 
-      <Button onClick={() => mut.mutate()} disabled={mut.isPending}>
-        {mut.isPending ? "Saving…" : "Save changes"}
-      </Button>
+      {/* Save Button */}
+      <div className="pt-2">
+        <button
+          type="button"
+          onClick={() => mut.mutate()}
+          disabled={mut.isPending}
+          className="glass-pill px-6 py-2.5 text-xs font-semibold text-white bg-white/15 hover:bg-white/25 border border-white/20 inline-flex items-center gap-2"
+        >
+          <Save className="size-4" />
+          <span>{mut.isPending ? "Saving..." : "Save Changes"}</span>
+        </button>
+      </div>
     </div>
   );
 }
@@ -207,7 +241,7 @@ function ProfilePage() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <Label>{label}</Label>
+      <label className="block text-xs font-medium text-white/70">{label}</label>
       {children}
     </div>
   );

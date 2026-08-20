@@ -1,4 +1,4 @@
-import { useRef, useImperativeHandle, forwardRef } from "react";
+import { useRef, useImperativeHandle, forwardRef, useState, useEffect } from "react";
 import { Send, Loader2, Search, Sparkles } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { VoiceInputButton } from "@/components/voice-input-button";
@@ -17,11 +17,77 @@ type Props = {
   maxChars?: number;
 };
 
+const AUTOTYPE_EXAMPLES = [
+  "businesses looking for web development services…",
+  "companies searching for marketing agencies…",
+  "startups expanding into new markets…",
+  "HVAC businesses with an online presence but no website…",
+  "investors backing pre-seed startups…",
+];
+
+function useAutotypePlaceholder(paused: boolean) {
+  const [text, setText] = useState("");
+  const stateRef = useRef({
+    index: 0,
+    charIndex: 0,
+    isDeleting: false,
+    isDwell: false,
+  });
+
+  useEffect(() => {
+    if (paused) return;
+
+    let timeoutId: number;
+
+    const tick = () => {
+      const state = stateRef.current;
+      const currentString = AUTOTYPE_EXAMPLES[state.index];
+
+      if (state.isDwell) {
+        timeoutId = window.setTimeout(() => {
+          state.isDwell = false;
+          state.isDeleting = true;
+          tick();
+        }, 2500);
+        return;
+      }
+
+      if (state.isDeleting) {
+        timeoutId = window.setTimeout(() => {
+          state.charIndex--;
+          setText(currentString.substring(0, state.charIndex));
+          if (state.charIndex <= 0) {
+            state.isDeleting = false;
+            state.index = (state.index + 1) % AUTOTYPE_EXAMPLES.length;
+          }
+          tick();
+        }, 20); // fast backspace
+      } else {
+        timeoutId = window.setTimeout(() => {
+          state.charIndex++;
+          setText(currentString.substring(0, state.charIndex));
+          if (state.charIndex >= currentString.length) {
+            state.isDwell = true;
+          }
+          tick();
+        }, 35); // typing speed
+      }
+    };
+
+    tick();
+
+    return () => clearTimeout(timeoutId);
+  }, [paused]);
+
+  return text || "Search...";
+}
+
 export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function UnifiedComposer(
   { value, onChange, mode, onModeChange, onSubmit, pending, maxChars = 3000 },
   ref,
 ) {
   const textRef = useRef<HTMLTextAreaElement>(null);
+  const [focused, setFocused] = useState(false);
   useImperativeHandle(ref, () => ({ focus: () => textRef.current?.focus() }));
 
   const submit = () => {
@@ -29,9 +95,12 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
     onSubmit();
   };
 
+  const isPaused = focused || value.trim().length > 0;
+  const autotypeText = useAutotypePlaceholder(isPaused);
+
   const placeholder =
     mode === "search"
-      ? "Buying signal or skill… e.g. Currently hiring Next.js engineers / marketing agencies in India"
+      ? autotypeText
       : "Ask Scrapivo to help you craft a search…";
 
   return (
@@ -41,6 +110,8 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
           ref={textRef}
           value={value}
           onChange={(e) => onChange(e.target.value.slice(0, maxChars))}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
@@ -66,7 +137,9 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
             <button
               onClick={() => onModeChange("search")}
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-colors ${
-                mode === "search" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+                mode === "search"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground"
               }`}
             >
               <Search className="size-3" /> Search
@@ -74,7 +147,9 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
             <button
               onClick={() => onModeChange("chat")}
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-colors ${
-                mode === "chat" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+                mode === "chat"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground"
               }`}
             >
               <Sparkles className="size-3" /> Chat

@@ -5,11 +5,13 @@ import { listSavedLeads, deleteSavedLead } from "@/lib/leads.functions";
 import { LeadCard } from "@/components/lead-card";
 import { LeadDetailPanel } from "@/components/lead-detail-panel";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Bookmark, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/saved")({
+  head: () => ({
+    meta: [{ title: "Scrapivo — Saved leads" }],
+  }),
   component: SavedPage,
 });
 
@@ -19,6 +21,7 @@ function SavedPage() {
   const del = useServerFn(deleteSavedLead);
   const q = useQuery({ queryKey: ["saved-leads"], queryFn: () => list() });
   const [sel, setSel] = useState<any>(null);
+
   const delMut = useMutation({
     mutationFn: (id: string) => del({ data: { id } }),
     onSuccess: () => {
@@ -29,37 +32,53 @@ function SavedPage() {
   });
 
   return (
-    <div className="flex h-full min-h-0">
+    <div className="flex h-full min-h-0 bg-[#0a0a0b] text-white">
       <div className="flex-1 min-w-0 flex flex-col min-h-0">
-        <div className="border-b border-border p-4 flex items-center justify-between shrink-0">
+        {/* Header Bar */}
+        <div className="border-b border-white/10 p-4 sm:px-6 flex items-center justify-between shrink-0 bg-black/20">
           <div>
-            <h1 className="text-xl font-semibold tracking-tight">Saved leads</h1>
-            <p className="text-sm text-muted-foreground">
-              {q.data?.length ?? 0} saved ·{" "}
-              <Link to="/pipeline" className="underline underline-offset-2 hover:text-foreground">
-                Open pipeline
-              </Link>
-            </p>
+            <div className="inline-flex items-center gap-1.5 text-xs text-white/50 uppercase tracking-wider font-semibold mb-0.5">
+              <Bookmark className="size-3.5" />
+              <span>Saved Pipeline</span>
+            </div>
+            <h1 className="text-xl font-semibold tracking-tight text-white">Saved Leads</h1>
           </div>
           {sel && (
-            <Button variant="ghost" size="sm" onClick={() => delMut.mutate(sel.id)}>
-              <Trash2 className="size-4 mr-1.5" /> Delete
-            </Button>
+            <button
+              type="button"
+              onClick={() => delMut.mutate(sel.id)}
+              className="glass-pill px-3 py-1.5 text-xs font-medium text-rose-300 hover:bg-rose-500/20 flex items-center gap-1.5"
+            >
+              <Trash2 className="size-3.5" /> Delete
+            </button>
           )}
         </div>
-        <div className="p-4 overflow-y-auto flex-1">
+
+        {/* Saved List / Grid */}
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1 no-scrollbar">
           {!q.data?.length && (
-            <div className="text-sm text-muted-foreground text-center py-12">No saved leads yet.</div>
+            <div className="liquid-glass rounded-2xl p-12 text-center text-xs text-white/50 max-w-lg mx-auto">
+              No saved leads yet. Save leads from Discover to track them here.
+            </div>
           )}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {q.data?.map((l: any) => (
-              <LeadCard key={l.id} lead={l} saved onOpen={() => setSel(l)} onSave={() => delMut.mutate(l.id)} />
+              <div key={l.id} className="liquid-glass rounded-2xl p-4">
+                <LeadCard
+                  lead={l}
+                  saved
+                  onOpen={() => setSel(l)}
+                  onSave={() => delMut.mutate(l.id)}
+                />
+              </div>
             ))}
           </div>
         </div>
       </div>
+
+      {/* Slideout Detail Panel */}
       {sel && (
-        <div className="w-[420px] border-l border-border shrink-0 bg-card">
+        <div className="w-[420px] border-l border-white/10 shrink-0 bg-[#0e0e11] liquid-glass">
           <LeadDetailPanel
             lead={sel}
             saved={sel}

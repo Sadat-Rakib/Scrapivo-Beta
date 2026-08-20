@@ -10,12 +10,21 @@ if (existsSync(".env")) {
 }
 
 const { geocodePlace } = await import("../src/lib/search/geoapify-places.server.ts");
-const { searchOsmLocalBusinesses } = await import("../src/lib/search/osm-local-businesses.server.ts");
+const { searchOsmLocalBusinesses } =
+  await import("../src/lib/search/osm-local-businesses.server.ts");
 const { disambiguatePlaceQuery } = await import("../src/lib/search/place-disambiguate.server.ts");
 
 console.log("disambiguate", disambiguatePlaceQuery("Toronto"));
 const p = await geocodePlace("Toronto");
-console.log("geocode", JSON.stringify({ city: p?.city, cc: p?.country_code, state: p?.state_code, type: p?.result_type }));
+console.log(
+  "geocode",
+  JSON.stringify({
+    city: p?.city,
+    cc: p?.country_code,
+    state: p?.state_code,
+    type: p?.result_type,
+  }),
+);
 
 const qx = {
   raw: "plumbers in Toronto",

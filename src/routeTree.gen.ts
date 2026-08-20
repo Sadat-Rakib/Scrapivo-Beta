@@ -18,6 +18,7 @@ import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPipelineRouteImport } from './routes/_authenticated/pipeline'
 import { Route as AuthenticatedLocalBusinessesRouteImport } from './routes/_authenticated/local-businesses'
+import { Route as AuthenticatedJobsRouteImport } from './routes/_authenticated/jobs'
 import { Route as AuthenticatedInvestorsRouteImport } from './routes/_authenticated/investors'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
 import { Route as AuthenticatedHelpRouteImport } from './routes/_authenticated/help'
@@ -70,6 +71,11 @@ const AuthenticatedLocalBusinessesRoute =
     path: '/local-businesses',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedJobsRoute = AuthenticatedJobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedInvestorsRoute = AuthenticatedInvestorsRouteImport.update({
   id: '/investors',
   path: '/investors',
@@ -109,6 +115,7 @@ export interface FileRoutesByFullPath {
   '/help': typeof AuthenticatedHelpRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/investors': typeof AuthenticatedInvestorsRoute
+  '/jobs': typeof AuthenticatedJobsRoute
   '/local-businesses': typeof AuthenticatedLocalBusinessesRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -125,6 +132,7 @@ export interface FileRoutesByTo {
   '/help': typeof AuthenticatedHelpRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/investors': typeof AuthenticatedInvestorsRoute
+  '/jobs': typeof AuthenticatedJobsRoute
   '/local-businesses': typeof AuthenticatedLocalBusinessesRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -143,6 +151,7 @@ export interface FileRoutesById {
   '/_authenticated/help': typeof AuthenticatedHelpRoute
   '/_authenticated/history': typeof AuthenticatedHistoryRoute
   '/_authenticated/investors': typeof AuthenticatedInvestorsRoute
+  '/_authenticated/jobs': typeof AuthenticatedJobsRoute
   '/_authenticated/local-businesses': typeof AuthenticatedLocalBusinessesRoute
   '/_authenticated/pipeline': typeof AuthenticatedPipelineRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
@@ -161,6 +170,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/history'
     | '/investors'
+    | '/jobs'
     | '/local-businesses'
     | '/pipeline'
     | '/profile'
@@ -177,6 +187,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/history'
     | '/investors'
+    | '/jobs'
     | '/local-businesses'
     | '/pipeline'
     | '/profile'
@@ -194,6 +205,7 @@ export interface FileRouteTypes {
     | '/_authenticated/help'
     | '/_authenticated/history'
     | '/_authenticated/investors'
+    | '/_authenticated/jobs'
     | '/_authenticated/local-businesses'
     | '/_authenticated/pipeline'
     | '/_authenticated/profile'
@@ -277,6 +289,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLocalBusinessesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/jobs': {
+      id: '/_authenticated/jobs'
+      path: '/jobs'
+      fullPath: '/jobs'
+      preLoaderRoute: typeof AuthenticatedJobsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/investors': {
       id: '/_authenticated/investors'
       path: '/investors'
@@ -327,6 +346,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHelpRoute: typeof AuthenticatedHelpRoute
   AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
   AuthenticatedInvestorsRoute: typeof AuthenticatedInvestorsRoute
+  AuthenticatedJobsRoute: typeof AuthenticatedJobsRoute
   AuthenticatedLocalBusinessesRoute: typeof AuthenticatedLocalBusinessesRoute
   AuthenticatedPipelineRoute: typeof AuthenticatedPipelineRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
@@ -339,6 +359,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHelpRoute: AuthenticatedHelpRoute,
   AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
   AuthenticatedInvestorsRoute: AuthenticatedInvestorsRoute,
+  AuthenticatedJobsRoute: AuthenticatedJobsRoute,
   AuthenticatedLocalBusinessesRoute: AuthenticatedLocalBusinessesRoute,
   AuthenticatedPipelineRoute: AuthenticatedPipelineRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,

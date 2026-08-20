@@ -32,7 +32,10 @@ const sellerBiz = {
   source: "reddit",
 } as any;
 ok("drop seller for-your-business", isSellerOrProviderLead(sellerBiz));
-ok("seller not hire-polarity", !isHirePolarityLookingFor(`${sellerBiz.title} ${sellerBiz.snippet}`));
+ok(
+  "seller not hire-polarity",
+  !isHirePolarityLookingFor(`${sellerBiz.title} ${sellerBiz.snippet}`),
+);
 
 const roomSeller = {
   title: "Let's fix that room you've been staring at! (Starting at $99)",
@@ -113,10 +116,7 @@ ok(
 
 ok(
   "drop interior design adjacency",
-  !isStronglyRelevantToSkill(
-    "Let's fix that room interior design starting at $99",
-    "design",
-  ),
+  !isStronglyRelevantToSkill("Let's fix that room interior design starting at $99", "design"),
 );
 
 ok(
@@ -155,8 +155,7 @@ const liPerson = {
   platform: "LinkedIn Post",
   title: "Need a freelancer for our web app. Budget ready.",
   snippet: "Looking for a contractor who can help. Willing to pay.",
-  full_post_url:
-    "https://www.linkedin.com/posts/alaa-ezzeddine_need-a-freelancer-activity-999",
+  full_post_url: "https://www.linkedin.com/posts/alaa-ezzeddine_need-a-freelancer-activity-999",
   author: "",
   score: 70,
   tier: "hot" as const,
@@ -164,7 +163,10 @@ const liPerson = {
 } as any;
 const seg = segmentLeads([liPerson, realBuyer]);
 ok("people > 0", seg.people.length >= 1);
-ok("alaa in people", seg.people.some((p) => /Alaa/i.test(p.name)));
+ok(
+  "alaa in people",
+  seg.people.some((p) => /Alaa/i.test(p.name)),
+);
 
 const firm = {
   source: "reddit",

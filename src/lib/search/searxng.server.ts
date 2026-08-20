@@ -326,7 +326,10 @@ type RequestBudget = {
 const budgetStore = new AsyncLocalStorage<RequestBudget>();
 
 /** Wrap one Discover run so its SearXNG quotas are its own. */
-export function withSearxngBudget<T>(fn: () => Promise<T>, total = SEARXNG_QUERIES_PER_REQUEST): T | Promise<T> {
+export function withSearxngBudget<T>(
+  fn: () => Promise<T>,
+  total = SEARXNG_QUERIES_PER_REQUEST,
+): T | Promise<T> {
   return budgetStore.run(
     { total, used: 0, usedByClass: { social: 0, other: 0 }, perSource: new Map(), socialLive: 0 },
     fn,
@@ -566,8 +569,7 @@ async function querySearxngOnce(
   const { resilientFetch } = await import("./http-fetch.server");
   const engines = enginesForQuery(q, index);
   const localSearx =
-    /127\.0\.0\.1|localhost/i.test(baseUrl) ||
-    process.env.SEARXNG_LOCAL_FETCH === "1";
+    /127\.0\.0\.1|localhost/i.test(baseUrl) || process.env.SEARXNG_LOCAL_FETCH === "1";
 
   let lastStatus: "empty" | "error" = "error";
   /** Distinguishes "no matches" from "the engines could not answer". */

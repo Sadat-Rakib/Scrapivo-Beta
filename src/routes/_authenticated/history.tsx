@@ -2,10 +2,12 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listHistory } from "@/lib/leads.functions";
-import { Button } from "@/components/ui/button";
-import { RotateCw } from "lucide-react";
+import { RotateCw, History as HistoryIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/history")({
+  head: () => ({
+    meta: [{ title: "Scrapivo — Search history" }],
+  }),
   component: HistoryPage,
 });
 
@@ -15,22 +17,43 @@ function HistoryPage() {
   const q = useQuery({ queryKey: ["history"], queryFn: () => list() });
 
   return (
-    <div className="p-6 sm:p-8 max-w-2xl mx-auto w-full">
-      <h1 className="text-xl font-semibold tracking-tight mb-1">Search history</h1>
-      <p className="text-sm text-muted-foreground mb-6">Last 100 searches.</p>
-      {!q.data?.length && <div className="text-sm text-muted-foreground">No searches yet.</div>}
-      <div className="space-y-2">
+    <div className="h-full overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-3xl mx-auto w-full space-y-6 text-white no-scrollbar">
+      <div>
+        <div className="inline-flex items-center gap-1.5 text-xs text-white/50 uppercase tracking-wider font-semibold mb-1">
+          <HistoryIcon className="size-3.5" />
+          <span>Audit Log</span>
+        </div>
+        <h1 className="text-2xl font-semibold tracking-tight text-white">Search History</h1>
+        <p className="text-xs text-white/60 mt-1">Review your recent queries and executed signals.</p>
+      </div>
+
+      {!q.data?.length && (
+        <div className="liquid-glass rounded-2xl p-8 text-center text-xs text-white/50">
+          No search history recorded yet.
+        </div>
+      )}
+
+      <div className="space-y-3">
         {q.data?.map((h: any) => (
-          <div key={h.id} className="flex items-center justify-between p-3 rounded-lg border border-border bg-card">
+          <div
+            key={h.id}
+            className="liquid-glass rounded-xl p-4 flex items-center justify-between gap-4 hover:bg-white/[0.03] transition-all"
+          >
             <div className="min-w-0">
-              <div className="text-sm font-medium truncate">{h.query}</div>
-              <div className="text-xs text-muted-foreground">
-                {h.results_count} results · {new Date(h.created_at).toLocaleString()} · {(h.sources_searched ?? []).join(", ")}
+              <div className="text-sm font-semibold text-white truncate">{h.query}</div>
+              <div className="text-xs text-white/50 mt-0.5">
+                {h.results_count} results · {new Date(h.created_at).toLocaleString()}
+                {h.sources_searched?.length ? ` · ${h.sources_searched.join(", ")}` : ""}
               </div>
             </div>
-            <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/discover" })}>
-              <RotateCw className="size-3.5 mr-1.5" /> Open
-            </Button>
+            <button
+              type="button"
+              onClick={() => navigate({ to: "/discover" })}
+              className="glass-pill px-3.5 py-1.5 text-xs font-medium text-white/80 hover:text-white flex items-center gap-1.5 shrink-0"
+            >
+              <RotateCw className="size-3.5" />
+              <span>Open</span>
+            </button>
           </div>
         ))}
       </div>

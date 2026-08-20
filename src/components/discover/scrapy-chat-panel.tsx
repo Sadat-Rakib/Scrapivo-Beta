@@ -78,8 +78,13 @@ export function ScrapyChatPanel({
               {messages.length === 0 && (
                 <div className="text-sm text-muted-foreground space-y-2">
                   <p>Hey! I'm Scrapy</p>
-                  <p>What do you want to find now — your skill, ideal client, or the kind of project? I'll craft the search and run it for you.</p>
-                  <p className="text-xs opacity-70">Try: "founders needing help with React performance"</p>
+                  <p>
+                    What do you want to find now — your skill, ideal client, or the kind of project?
+                    I'll craft the search and run it for you.
+                  </p>
+                  <p className="text-xs opacity-70">
+                    Try: "founders needing help with React performance"
+                  </p>
                 </div>
               )}
               {messages.map((m, i) => (
@@ -108,7 +113,10 @@ export function ScrapyChatPanel({
                 value={input}
                 onChange={(e) => setInput(e.target.value.slice(0, 1000))}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); }
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    send();
+                  }
                 }}
                 rows={1}
                 placeholder="Talk to Scrapy…"
@@ -120,7 +128,11 @@ export function ScrapyChatPanel({
                 className="size-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-40"
                 aria-label="Send"
               >
-                {pending ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
+                {pending ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Send className="size-4" />
+                )}
               </button>
             </div>
           </>

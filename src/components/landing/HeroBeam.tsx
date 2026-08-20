@@ -40,14 +40,16 @@ export function HeroBeam() {
       }`;
     const compile = (type: number, src: string) => {
       const sh = gl.createShader(type)!;
-      gl.shaderSource(sh, src); gl.compileShader(sh); return sh;
+      gl.shaderSource(sh, src);
+      gl.compileShader(sh);
+      return sh;
     };
     const prog = gl.createProgram()!;
     gl.attachShader(prog, compile(gl.VERTEX_SHADER, vs));
     gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, fs));
     gl.linkProgram(prog);
     gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,1,1,1,-1,-1,1,-1]), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, 1, 1, 1, -1, -1, 1, -1]), gl.STATIC_DRAW);
     const aP = gl.getAttribLocation(prog, "aP");
     gl.enableVertexAttribArray(aP);
     gl.vertexAttribPointer(aP, 2, gl.FLOAT, false, 0, 0);
@@ -98,7 +100,9 @@ export function HeroBeam() {
           <div
             className="absolute top-0 bottom-0"
             style={{
-              left: "62%", width: "3px", transform: "translateX(-50%)",
+              left: "62%",
+              width: "3px",
+              transform: "translateX(-50%)",
               background:
                 "linear-gradient(to bottom, transparent 0%, rgba(180,200,230,0.85) 35%, rgba(140,165,210,0.55) 80%, transparent 100%)",
               filter: "blur(1px)",
@@ -107,7 +111,10 @@ export function HeroBeam() {
           <div
             className="absolute"
             style={{
-              left: "62%", top: "10%", width: "55vw", height: "70%",
+              left: "62%",
+              top: "10%",
+              width: "55vw",
+              height: "70%",
               transform: "translateX(-50%)",
               background:
                 "radial-gradient(closest-side, rgba(160,185,225,0.30), rgba(120,150,200,0.10) 55%, transparent 75%)",

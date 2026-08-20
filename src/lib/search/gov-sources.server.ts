@@ -29,7 +29,13 @@ const SEC_MAX_AGE_DAYS = 30; // Form D "about to spend" window
 function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
   return new Promise<T>((resolve) => {
     const t = setTimeout(() => resolve(fallback), ms);
-    p.then((v) => { clearTimeout(t); resolve(v); }).catch(() => { clearTimeout(t); resolve(fallback); });
+    p.then((v) => {
+      clearTimeout(t);
+      resolve(v);
+    }).catch(() => {
+      clearTimeout(t);
+      resolve(fallback);
+    });
   });
 }
 
@@ -96,7 +102,10 @@ export async function searchSecEdgar(qx: ExpandedQueries): Promise<SourceLead[]>
           `${company} just filed a Form D private-placement notice with the SEC`,
           loc ? `(${loc})` : "",
           `— a leading indicator they are raising capital and likely to increase hiring/spend soon. Filed ${fileDate}.`,
-        ].filter(Boolean).join(" ").slice(0, 400),
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .slice(0, 400),
         full_post_url: edgarFilingUrl(cik, adsh),
         author: company,
         posted_at: fileDate ? new Date(fileDate).toISOString() : new Date().toISOString(),

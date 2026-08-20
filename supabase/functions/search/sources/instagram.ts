@@ -46,9 +46,7 @@ export async function searchInstagram(query: SearchQuery): Promise<Lead[]> {
           seen.add(String(postId));
 
           const username = post.user?.username || post.owner?.username || "";
-          const isDecisionMaker = detectDecisionMaker(
-            caption + " " + (post.user?.biography || ""),
-          );
+          const isDecisionMaker = detectDecisionMaker(caption + " " + (post.user?.biography || ""));
           const { score, tier, hasBudget, hasUrgency } = scoreIntent({
             text: caption,
             platform: "instagram",
@@ -100,8 +98,7 @@ export async function searchInstagram(query: SearchQuery): Promise<Lead[]> {
 
   if (serpKey && leads.length < 3) {
     try {
-      const q =
-        `site:instagram.com "looking for ${query.skill}" OR "hiring ${query.skill}" OR "need a ${query.skill}"`;
+      const q = `site:instagram.com "looking for ${query.skill}" OR "hiring ${query.skill}" OR "need a ${query.skill}"`;
       const params = new URLSearchParams({
         q,
         api_key: serpKey,
@@ -135,11 +132,7 @@ export async function searchInstagram(query: SearchQuery): Promise<Lead[]> {
             post_url: url,
             post_title: result.title || "",
             post_body_snippet: (result.snippet || "").slice(0, 600),
-            ai_summary: generateSummary(
-              result.title || "",
-              result.snippet || "",
-              query.skill,
-            ),
+            ai_summary: generateSummary(result.title || "", result.snippet || "", query.skill),
             why_shown: generateWhyShown(
               "Instagram",
               query.skill,

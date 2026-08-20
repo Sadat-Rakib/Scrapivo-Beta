@@ -20,7 +20,10 @@ const searxLocal = /:\/\/(127\.0\.0\.1|localhost)\b/i.test(searx);
 
 console.log("\n── Gates (no secret values) ─────────────────────────────");
 console.log("USE_PAID_SOURCES", paid ? "true" : "false/unset");
-console.log("SEARXNG_URL", searx ? (searxLocal ? "localhost (skipped on Vercel)" : "set") : "empty");
+console.log(
+  "SEARXNG_URL",
+  searx ? (searxLocal ? "localhost (skipped on Vercel)" : "set") : "empty",
+);
 console.log("SERPER_API_KEY", present("SERPER_API_KEY"));
 console.log("SCRAPINGDOG_API_KEY", present("SCRAPINGDOG_API_KEY"));
 console.log("SERPAPI_KEY", present("SERPAPI_KEY"));
@@ -68,7 +71,15 @@ console.log(
     .slice(0, 20),
 );
 console.log("sourceCounts", debug?.sourceCounts ?? {});
-const socialish = ["socialdorks", "linkedin", "facebook", "twitter", "instagram", "serpapi", "decisionmakers"];
+const socialish = [
+  "socialdorks",
+  "linkedin",
+  "facebook",
+  "twitter",
+  "instagram",
+  "serpapi",
+  "decisionmakers",
+];
 for (const k of socialish) {
   const n = debug?.sourceCounts?.[k] ?? by[k] ?? 0;
   console.log(`  ${k}: ${n}`);

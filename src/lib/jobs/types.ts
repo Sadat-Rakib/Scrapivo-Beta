@@ -1,0 +1,102 @@
+/** Normalized job posting. */
+export type JobSourceKind =
+  | "source-ats-greenhouse"
+  | "source-ats-lever"
+  | "source-ats-ashby"
+  | "source-ats-smartrecruiters"
+  | "source-ats-workable"
+  | "source-ats-recruitee"
+  | "source-remoteok"
+  | "source-remotive"
+  | "source-jobicy"
+  | "source-weworkremotely"
+  | "source-arbeitnow"
+  | "source-workingnomads"
+  | "source-usajobs"
+  | "source-themuse"
+  | "source-githubjobs"
+  | "source-hn"
+  | "source-workatastartup";
+
+export type JobRegion = "any" | "remote" | "north_america" | "europe" | "asia" | "middle_east";
+
+export type JobSourceId =
+  | "greenhouse"
+  | "lever"
+  | "ashby"
+  | "smartrecruiters"
+  | "workable"
+  | "recruitee"
+  | "remoteok"
+  | "remotive"
+  | "jobicy"
+  | "weworkremotely"
+  | "arbeitnow"
+  | "workingnomads"
+  | "usajobs"
+  | "themuse"
+  | "githubjobs"
+  | "hn"
+  | "workatastartup";
+
+export const ALL_JOB_SOURCE_IDS: JobSourceId[] = [
+  "greenhouse",
+  "lever",
+  "ashby",
+  "smartrecruiters",
+  "workable",
+  "recruitee",
+  "remoteok",
+  "remotive",
+  "jobicy",
+  "weworkremotely",
+  "arbeitnow",
+  "workingnomads",
+  "usajobs",
+  "themuse",
+  "githubjobs",
+  "hn",
+  "workatastartup",
+];
+
+export type JobSearchFilters = {
+  query?: string;
+  location?: string;
+  remoteOnly?: boolean;
+  seniority?: string;
+  region?: JobRegion;
+  sources?: JobSourceId[];
+  limit?: number;
+  contactRoles?: string[];
+};
+
+export type JobPosting = {
+  id: string;
+  title: string;
+  company: string;
+  location: string | null;
+  url: string;
+  source: JobSourceKind;
+  board_id: string;
+  posted_at: string | null;
+  description: string | null;
+  salary: string | null;
+  remote: boolean;
+  seniority: string | null;
+  company_domain?: string | null;
+  contacts?: Array<{ name?: string; title?: string; email?: string }>;
+};
+
+export type RawJobPosting = {
+  title: string;
+  company: string;
+  location?: string | null;
+  url: string;
+  source: JobSourceKind;
+  board_id: string;
+  posted_at?: string | null;
+  description?: string | null;
+  salary?: string | null;
+  remote?: boolean;
+  seniority?: string | null;
+};

@@ -62,16 +62,33 @@ async function main() {
   console.log("=== 1. Investors seed ===");
   const all = getAllInvestors();
   check("investors loaded", all.length >= 500, `count=${all.length}`);
-  check("no Unknown titles", all.every((i) => !/^unknown$/i.test(i.title)));
-  check("no needs_review in seed", all.every((i) => i.status === "active"));
-  const fintech = searchInvestors({ query: "FinTech", stage: "Seed", limit: 20 });
+  check(
+    "no Unknown titles",
+    all.every((i) => {
+      const name = "name" in i ? String(i.name || "") : "";
+      const title = "title" in i ? String((i as { title?: string }).title || "") : "";
+      return !/^unknown$/i.test(name) && !/^unknown$/i.test(title);
+    }),
+  );
+  check(
+    "no needs_review in seed",
+    all.every((i) => {
+      const s = "status" in i ? (i as { status?: string }).status : undefined;
+      return !s || s === "active";
+    }),
+  );
+  const fintech = await searchInvestors({ query: "FinTech", stage: "Seed", limit: 20 });
   check("FinTech Seed search", fintech.length > 0, `n=${fintech.length}`);
-  const canada = searchInvestors({ location: "Canada", limit: 20 });
+  const canada = await searchInvestors({ location: "Canada", limit: 20 });
   check("Canada location search", canada.length > 0, `n=${canada.length}`);
-  const angel = searchInvestors({ checkBand: "angel", limit: 20 });
+  const angel = await searchInvestors({ checkBand: "angel", limit: 20 });
   check("angel check band", angel.length > 0, `n=${angel.length}`);
-  const climate = searchInvestors({ sector: "Climate", stage: "Seed", limit: 10 });
+  const climate = await searchInvestors({ sector: "Climate", stage: "Seed", limit: 10 });
   check("Climate Seed sector", climate.length > 0, `n=${climate.length}`);
+  const empty = await searchInvestors({ limit: 10000 });
+  check("empty filters ≈ all", empty.length === all.length, `n=${empty.length}`);
+  const bd = await searchInvestors({ location: "Bangladesh", limit: 50 });
+  check("Bangladesh geo", bd.length > 0, `n=${bd.length}`);
 
   console.log("\n=== 2. Clarifiers (investors / local / geo) ===");
   const invQ = classifyQuery("find investors for my FinTech startup");
@@ -105,7 +122,11 @@ async function main() {
     craft: "UI designer",
     experience: "3-4",
   });
-  check("geo eu → location", /Europe/i.test(designRef.location || ""), designRef.location || "(null)");
+  check(
+    "geo eu → location",
+    /Europe/i.test(designRef.location || ""),
+    designRef.location || "(null)",
+  );
   if (designRef.craft) designQ.coreSkill = designRef.craft;
   designQ.location = designRef.location;
   let expanded = expandFromClassified(designQ);
@@ -143,8 +164,15 @@ async function main() {
     "src/routes/_authenticated/discover.tsx",
     "src/routes/_authenticated/local-businesses.tsx",
     "src/routes/_authenticated/investors.tsx",
+    "src/routes/_authenticated/jobs.tsx",
+    "src/lib/contact/shared-contact-intelligence.server.ts",
+    "src/lib/search/playbook-planner.ts",
+    "src/lib/contact/domain-memory.server.ts",
+    "src/lib/profile/discover-profiles.server.ts",
+    "src/lib/intelligence/evidence.ts",
+    "src/lib/jobs/ats-adapters.ts",
     "src/components/discover/result-tabs.tsx",
-    "data/investors.json",
+    "data/investors_merged.json",
   ]) {
     check(`file ${f}`, existsSync(resolve(process.cwd(), f)));
   }
@@ -163,14 +191,24 @@ async function main() {
 
   const paid =
     present("SERPER_API_KEY") || present("SERPAPI_KEY") || present("SCRAPINGDOG_API_KEY");
-  check("at least one SERP key (Serper/SerpAPI/ScrapingDog)", paid, paid ? "present" : "MISSING — Discover volume will collapse on Vercel");
+  check(
+    "at least one SERP key (Serper/SerpAPI/ScrapingDog)",
+    paid,
+    paid ? "present" : "MISSING — Discover volume will collapse on Vercel",
+  );
   console.log(`  USE_PAID_SOURCES=${process.env.USE_PAID_SOURCES || "(unset)"}`);
   if (!searxDead && searxUrl) {
     const up = await probeUrl(searxUrl.replace(/\/$/, "") + "/");
     if (up) check("SearXNG reachable locally", true, searxUrl);
     else {
-      console.log(`  WARN SearXNG configured but not reachable (${searxUrl}) — Discover will fall back to paid SERP`);
-      results.push({ name: "SearXNG reachable locally", ok: true, detail: "soft-fail: using SERP fallback" });
+      console.log(
+        `  WARN SearXNG configured but not reachable (${searxUrl}) — Discover will fall back to paid SERP`,
+      );
+      results.push({
+        name: "SearXNG reachable locally",
+        ok: true,
+        detail: "soft-fail: using SERP fallback",
+      });
     }
   } else {
     console.log("  (SearXNG not required if paid SERP keys + USE_PAID_SOURCES=true on Vercel)");
@@ -202,7 +240,11 @@ async function main() {
         body: JSON.stringify({ q: "looking for freelance designer hiring", num: 5 }),
       });
       const j = (await res.json()) as { organic?: unknown[] };
-      check("Serper live search", res.ok && (j.organic?.length ?? 0) > 0, `status=${res.status} organic=${j.organic?.length ?? 0}`);
+      check(
+        "Serper live search",
+        res.ok && (j.organic?.length ?? 0) > 0,
+        `status=${res.status} organic=${j.organic?.length ?? 0}`,
+      );
     } catch (e) {
       check("Serper live search", false, String(e));
     }
@@ -229,7 +271,7 @@ async function main() {
 
   // Investor hunt classification → would short-circuit Discover (unit-level)
   console.log("\n=== 7. Discover investor short-circuit shape ===");
-  const invHits = searchInvestors({
+  const invHits = await searchInvestors({
     query: "FinTech",
     stage: invRef.investorStage,
     location: invRef.location || undefined,
@@ -238,8 +280,15 @@ async function main() {
   });
   check("Discover-like investor results", invHits.length > 0, `n=${invHits.length}`);
   check(
-    "investor rows have firm+focus",
-    invHits.every((i) => i.firm && i.focus_areas.length > 0),
+    "investor rows have name + invest locs/categories",
+    invHits.every((i) => {
+      const name = "name" in i && i.name;
+      const cats =
+        ("investment_categories" in i && (i.investment_categories?.length ?? 0) > 0) ||
+        ("focus_areas" in i && ((i as { focus_areas?: string[] }).focus_areas?.length ?? 0) > 0) ||
+        ("stages" in i && ((i as { stages?: string[] }).stages?.length ?? 0) > 0);
+      return Boolean(name) && Boolean(cats);
+    }),
   );
 
   console.log("\n======== SUMMARY ========");

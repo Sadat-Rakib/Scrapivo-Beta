@@ -76,10 +76,7 @@ export const Route = createFileRoute("/api/webhooks/resend")({
             .from("email_sends")
             .update({
               status,
-              error:
-                type === "email.bounced"
-                  ? event.data?.bounce?.message || "bounced"
-                  : null,
+              error: type === "email.bounced" ? event.data?.bounce?.message || "bounced" : null,
               updated_at: new Date().toISOString(),
             })
             .eq("id", send.id);

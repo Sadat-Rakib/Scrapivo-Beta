@@ -3,66 +3,25 @@
  * Also helpers for real websites and junk local listings.
  */
 
+import { CITY_COUNTRY_HINTS, normalizeLocalLocation } from "@/lib/local/city-gazetteer";
+
 /** City name (lowercase) → preferred country/region for geocoding. */
-const MAJOR_CITY_COUNTRY: Record<string, string> = {
-  // Canada
-  toronto: "Canada",
-  vancouver: "Canada",
-  montreal: "Canada",
-  calgary: "Canada",
-  ottawa: "Canada",
-  edmonton: "Canada",
-  winnipeg: "Canada",
-  // US metros
-  "new york": "New York, USA",
-  "los angeles": "California, USA",
-  chicago: "Illinois, USA",
-  austin: "Texas, USA",
-  seattle: "Washington, USA",
-  "san francisco": "California, USA",
-  denver: "Colorado, USA",
-  miami: "Florida, USA",
-  boston: "Massachusetts, USA",
-  dallas: "Texas, USA",
-  houston: "Texas, USA",
-  phoenix: "Arizona, USA",
-  atlanta: "Georgia, USA",
-  // UK / EU / AU / etc.
-  london: "UK",
-  manchester: "UK",
-  birmingham: "UK",
-  edinburgh: "UK",
-  paris: "France",
-  lyon: "France",
-  berlin: "Germany",
-  munich: "Germany",
-  hamburg: "Germany",
-  frankfurt: "Germany",
-  sydney: "Australia",
-  melbourne: "Australia",
-  brisbane: "Australia",
-  dubai: "UAE",
-  "abu dhabi": "UAE",
-  singapore: "Singapore",
-  mumbai: "India",
-  bengaluru: "India",
-  delhi: "India",
-  hyderabad: "India",
-  chennai: "India",
-  pune: "India",
-  gurugram: "India",
-  kolkata: "India",
-  dublin: "Ireland",
-};
+const MAJOR_CITY_COUNTRY: Record<string, string> = { ...CITY_COUNTRY_HINTS };
 
 /**
  * Expand a bare city into a geocode-friendly query when we know the major metro.
  * "Toronto" → "Toronto, Canada". Already-qualified strings pass through.
  */
 export function disambiguatePlaceQuery(place: string): string {
-  const raw = (place || "").trim();
+  const normalized = normalizeLocalLocation(place);
+  const raw = (normalized || "").trim();
   if (!raw) return raw;
-  if (/,/.test(raw) || /\b(canada|usa|us\b|uk|australia|ontario|texas|california|india)\b/i.test(raw)) {
+  if (
+    /,/.test(raw) ||
+    /\b(canada|usa|us\b|uk|australia|ontario|texas|california|india|bangladesh|pakistan|uae)\b/i.test(
+      raw,
+    )
+  ) {
     return raw;
   }
   const key = raw.toLowerCase().replace(/\s+/g, " ");
@@ -77,9 +36,7 @@ export function isRealBusinessWebsite(url: string | undefined | null): boolean {
   try {
     const u = new URL(url);
     const host = u.hostname.replace(/^www\./, "").toLowerCase();
-    if (
-      /^(geoapify\.com|foursquare\.com|openstreetmap\.org|osm\.org)$/i.test(host)
-    ) {
+    if (/^(geoapify\.com|foursquare\.com|openstreetmap\.org|osm\.org)$/i.test(host)) {
       return false;
     }
     if (/geoapify\.com\/place/i.test(url)) return false;
@@ -109,17 +66,55 @@ export function isJunkLocalListing(name: string, categoryAsk: string): boolean {
 }
 
 /**
- * For trades, reject clear category mismatches; trust provider filters otherwise.
+ * For trades and local categories, enforce strict category matching and reject clear category mismatches.
  */
 export function matchesLocalCraft(name: string, categoryAsk: string): boolean {
   const ask = (categoryAsk || "").toLowerCase().trim();
   const n = (name || "").toLowerCase();
   if (!ask) return true;
-  // Anti-matches for trades (government / infra already covered by junk filter)
-  if (/\b(plumb|roof|electric|hvac|dentist|law|gym|spa|salon)/.test(ask)) {
-    if (/\b(post office|fire department|police|volunteer fire|corvette|food\s*&\s*gas)\b/.test(n)) {
+
+  // Anti-matches for trades & medical categories
+  if (/\b(dentist|dentists|dental)\b/.test(ask)) {
+    if (
+      /\b(eye|vision|optical|optometry|ophthalmology|dermatology|skin|chiropractic|foot|podiatry|vet|veterinary|animal|pet|hospital|emergency|pharmacy)\b/.test(
+        n,
+      ) &&
+      !/\b(dentist|dental|teeth|tooth|orthodontic|smile)\b/.test(n)
+    ) {
       return false;
     }
   }
+
+  if (/\b(plumber|plumbers|plumbing)\b/.test(ask)) {
+    if (
+      /\b(electric|roof|hvac|solar|painter|cleaner|lawyer|attorney|salon|barber)\b/.test(n) &&
+      !/\b(plumb|pipe|drain|sewer)\b/.test(n)
+    ) {
+      return false;
+    }
+  }
+
+  if (/\b(roofer|roofers|roofing)\b/.test(ask)) {
+    if (
+      /\b(plumb|electric|hvac|solar|painter|lawyer|gym|spa)\b/.test(n) &&
+      !/\b(roof|shingle|gutters)\b/.test(n)
+    ) {
+      return false;
+    }
+  }
+
+  if (/\b(gym|gyms|fitness)\b/.test(ask)) {
+    if (
+      /\b(restaurant|cafe|barber|salon|lawyer|accounting|plumber)\b/.test(n) &&
+      !/\b(gym|fitness|crossfit|workout|training|studio|boxing|pilates|yoga)\b/.test(n)
+    ) {
+      return false;
+    }
+  }
+
+  if (/\b(post office|fire department|police|volunteer fire|corvette|food\s*&\s*gas)\b/.test(n)) {
+    return false;
+  }
+
   return true;
 }

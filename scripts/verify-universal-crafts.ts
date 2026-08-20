@@ -13,10 +13,22 @@ function check(name: string, ok: boolean, detail?: string) {
 
 {
   const c = classifyQuery("need a writer");
-  check("writer core", c.coreSkill === "writer" || c.relatedSkills.some((s) => /writ/i.test(s)), c.coreSkill);
+  check(
+    "writer core",
+    c.coreSkill === "writer" || c.relatedSkills.some((s) => /writ/i.test(s)),
+    c.coreSkill,
+  );
   const x = expandFromClassified(c);
-  check("writer synonyms", x.relatedSkills.some((s) => /copy|content|ghost/i.test(s)), x.relatedSkills.join(","));
-  check("no writer developer", !x.jobBoardTerms.some((t) => /writer developer/i.test(t)), x.jobBoardTerms.join(","));
+  check(
+    "writer synonyms",
+    x.relatedSkills.some((s) => /copy|content|ghost/i.test(s)),
+    x.relatedSkills.join(","),
+  );
+  check(
+    "no writer developer",
+    !x.jobBoardTerms.some((t) => /writer developer/i.test(t)),
+    x.jobBoardTerms.join(","),
+  );
 }
 
 {
@@ -41,22 +53,18 @@ function check(name: string, ok: boolean, detail?: string) {
 }
 
 {
-  const pitch =
-    "I'm selling a product that helps freelancers find clients and manage invoices";
+  const pitch = "I'm selling a product that helps freelancers find clients and manage invoices";
   const kws = extractProductPitchKeywords(pitch);
   check(
     "product kw phrases",
-    kws.some((k) => /find clients/i.test(k)) && kws.some((k) => /manage invoices|invoices/i.test(k)),
+    kws.some((k) => /find clients/i.test(k)) &&
+      kws.some((k) => /manage invoices|invoices/i.test(k)),
     kws.join(", "),
   );
   const c = classifyQuery(pitch);
   check("product type", c.type === "product", c.type);
   check("not selling product skill", !/selling product/i.test(c.coreSkill), c.coreSkill);
-  check(
-    "core is capability",
-    /client|invoice/i.test(c.coreSkill),
-    c.coreSkill,
-  );
+  check("core is capability", /client|invoice/i.test(c.coreSkill), c.coreSkill);
   const x = expandFromClassified(c);
   check(
     "product fan-out",

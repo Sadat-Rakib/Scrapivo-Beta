@@ -221,7 +221,9 @@ export function VoiceInputButton({ onResult, onInterim }: Props) {
         : MediaRecorder.isTypeSupported("audio/webm")
           ? "audio/webm"
           : "";
-      const recorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+      const recorder = mime
+        ? new MediaRecorder(stream, { mimeType: mime })
+        : new MediaRecorder(stream);
       chunksRef.current = [];
       recorder.ondataavailable = (e) => {
         if (e.data.size) chunksRef.current.push(e.data);

@@ -7,8 +7,7 @@ export async function searchTavily(query: SearchQuery): Promise<Lead[]> {
   const key = Deno.env.get("TAVILY_API_KEY");
   if (!key) return out;
 
-  const q =
-    `people looking to hire ${query.role} OR "${query.skill} needed" OR "need a ${query.skill}" freelance ${new Date().getFullYear()}`;
+  const q = `people looking to hire ${query.role} OR "${query.skill} needed" OR "need a ${query.skill}" freelance ${new Date().getFullYear()}`;
   try {
     const res = await fetch("https://api.tavily.com/search", {
       method: "POST",

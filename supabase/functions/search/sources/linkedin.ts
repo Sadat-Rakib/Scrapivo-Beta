@@ -16,8 +16,7 @@ export async function searchLinkedIn(query: SearchQuery): Promise<Lead[]> {
   const serpKey = Deno.env.get("SERPAPI_KEY");
 
   try {
-    const jobsUrl =
-      `https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=${encodeURIComponent(query.role)}&location=Worldwide&start=0&count=25`;
+    const jobsUrl = `https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=${encodeURIComponent(query.role)}&location=Worldwide&start=0&count=25`;
     const res = await fetch(jobsUrl, {
       headers: {
         "User-Agent": BROWSER_UA,
@@ -26,9 +25,9 @@ export async function searchLinkedIn(query: SearchQuery): Promise<Lead[]> {
     });
     if (res.ok) {
       const html = await res.text();
-      const jobIds = [
-        ...html.matchAll(/data-entity-urn="urn:li:jobPosting:(\d+)"/g),
-      ].map((m) => m[1]);
+      const jobIds = [...html.matchAll(/data-entity-urn="urn:li:jobPosting:(\d+)"/g)].map(
+        (m) => m[1],
+      );
       const titles = [
         ...html.matchAll(/class="base-search-card__title"[^>]*>([\s\S]*?)<\/h3>/g),
       ].map((m) => m[1].replace(/<[^>]+>/g, "").trim());
@@ -63,11 +62,9 @@ export async function searchLinkedIn(query: SearchQuery): Promise<Lead[]> {
           platform_label: "LinkedIn Jobs",
           post_url: `https://www.linkedin.com/jobs/view/${jobId}`,
           post_title: `${title} at ${company}`,
-          post_body_snippet:
-            `Job posting: ${title} at ${company}. Active LinkedIn job listing for ${query.role}.`,
+          post_body_snippet: `Job posting: ${title} at ${company}. Active LinkedIn job listing for ${query.role}.`,
           ai_summary: `${company} is hiring a ${title}`,
-          why_shown:
-            `Active LinkedIn job posting for ${query.role} at ${company} · ${relativeTime(postedAt)}`,
+          why_shown: `Active LinkedIn job posting for ${query.role} at ${company} · ${relativeTime(postedAt)}`,
           author_handle: company,
           author_url: "",
           author_name: company,
@@ -134,11 +131,7 @@ export async function searchLinkedIn(query: SearchQuery): Promise<Lead[]> {
             post_url: url,
             post_title: result.title || "",
             post_body_snippet: (result.snippet || "").slice(0, 600),
-            ai_summary: generateSummary(
-              result.title || "",
-              result.snippet || "",
-              query.skill,
-            ),
+            ai_summary: generateSummary(result.title || "", result.snippet || "", query.skill),
             why_shown: generateWhyShown(
               "LinkedIn",
               query.skill,
@@ -169,8 +162,7 @@ export async function searchLinkedIn(query: SearchQuery): Promise<Lead[]> {
 
   if (leads.length < 3) {
     try {
-      const searchUrl =
-        `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(query.role)}`;
+      const searchUrl = `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(query.role)}`;
       const jinaText = await safe(jinaRead(searchUrl), "");
       if (jinaText && jinaText.length > 100) {
         const now = new Date().toISOString();
@@ -190,14 +182,7 @@ export async function searchLinkedIn(query: SearchQuery): Promise<Lead[]> {
             post_title: `LinkedIn jobs for ${query.role}`,
             post_body_snippet: jinaText.slice(0, 600),
             ai_summary: `LinkedIn job listings for ${query.role}`,
-            why_shown: generateWhyShown(
-              "LinkedIn",
-              query.skill,
-              hasBudget,
-              true,
-              tier,
-              now,
-            ),
+            why_shown: generateWhyShown("LinkedIn", query.skill, hasBudget, true, tier, now),
             author_handle: "",
             author_url: "",
             author_name: "",

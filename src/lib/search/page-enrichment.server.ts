@@ -1,8 +1,5 @@
 /** Server client for optional scrape-worker (Crawl4AI) and stealth-worker /fetch enrichment. */
-import {
-  condensePageText,
-  validateFetchedPage,
-} from "./fetch-gate.server";
+import { condensePageText, validateFetchedPage } from "./fetch-gate.server";
 
 export type FetchedPage = {
   url: string;

@@ -40,7 +40,10 @@ const freshIg = {
   tier: "hot" as const,
 };
 const segCo = segmentLeads([freshIg]);
-ok("IG brand in companies", segCo.companies.some((c) => /snohetta/i.test(c.name)));
+ok(
+  "IG brand in companies",
+  segCo.companies.some((c) => /snohetta/i.test(c.name)),
+);
 ok("IG brand not people", !segCo.people.some((p) => /snohetta/i.test(p.name)));
 
 const humanIg = {
@@ -56,7 +59,10 @@ const humanIg = {
   tier: "hot" as const,
 } as any;
 const segPe = segmentLeads([humanIg]);
-ok("IG human in people", segPe.people.some((p) => /jane_founder/i.test(p.name)));
+ok(
+  "IG human in people",
+  segPe.people.some((p) => /jane_founder/i.test(p.name)),
+);
 
 const roomSeller = {
   title: "Let's fix that room you've been staring at! (Starting at $99)",

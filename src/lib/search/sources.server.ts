@@ -1474,16 +1474,14 @@ export async function searchSerpAPI(qx: ExpandedQueries): Promise<SourceLead[]> 
 
   const craftSeed =
     (qx.relatedSkills || []).find((s) => /lead\s*gen/i.test(s)) ||
-    (qx.skill || "").replace(/\b(services?|solutions?)\b/gi, " ").replace(/\s+/g, " ").trim() ||
+    (qx.skill || "")
+      .replace(/\b(services?|solutions?)\b/gi, " ")
+      .replace(/\s+/g, " ")
+      .trim() ||
     qx.skill;
   const craft = personNoun(craftSeed, qx.role);
   const skillQ = qx.skill || qx.role;
-  const alts = [
-    skillQ,
-    craft,
-    craftSeed,
-    ...(qx.relatedSkills || []).slice(0, 4),
-  ]
+  const alts = [skillQ, craft, craftSeed, ...(qx.relatedSkills || []).slice(0, 4)]
     .filter(Boolean)
     .filter((v, i, a) => a.findIndex((x) => x!.toLowerCase() === v!.toLowerCase()) === i)
     .slice(0, 5);
@@ -1503,7 +1501,10 @@ export async function searchSerpAPI(qx: ExpandedQueries): Promise<SourceLead[]> 
     /\b(hire me|my portfolio|my rates|available for hire|open to work|check out my (gig|work|service)|i (build|offer|provide|specialize)|dm me your|starting at\s*\$|for your (business|company|startup))\b/i;
   const seen = new Set<string>();
 
-  const ingest = (data: { organic_results?: any[]; provider?: string } | null, window: "day" | "week") => {
+  const ingest = (
+    data: { organic_results?: any[]; provider?: string } | null,
+    window: "day" | "week",
+  ) => {
     if (!data) return 0;
     let n = 0;
     const providerLabel =
@@ -1522,8 +1523,9 @@ export async function searchSerpAPI(qx: ExpandedQueries): Promise<SourceLead[]> 
       if (URL_BLOCKLIST.some((b) => link.toLowerCase().includes(b))) continue;
       if (/reddit\.com/i.test(link)) continue;
       if (SELLER_DROP_RE.test(text)) continue;
-      const onPlatform =
-        /linkedin\.com\/posts|facebook\.com|instagram\.com|(twitter|x)\.com/i.test(link);
+      const onPlatform = /linkedin\.com\/posts|facebook\.com|instagram\.com|(twitter|x)\.com/i.test(
+        link,
+      );
       if (!onPlatform && !isBuyerContent(text, qx.negativePhrases)) continue;
       const postedAt = resolveLeadDate(r.date || r.published_date, title, snippet);
       if (postedAt && onPlatform) {
@@ -1736,7 +1738,7 @@ export async function searchRelevantDecisionMakers(qx: ExpandedQueries): Promise
 // YouTube — public video discovery via SearXNG site: dorks
 // =====================================================================
 export async function searchYouTubeSignals(qx: ExpandedQueries): Promise<SourceLead[]> {
-  const out: SourceLead[] = [];
+  let out: SourceLead[] = [];
   const { searchSearxng, searxngResultsToLeads } = await import("./searxng.server");
   const queries = [
     `site:youtube.com "${qx.skill}" ("hiring" OR "looking for" OR "need a" OR "freelancer")`,
@@ -1755,6 +1757,11 @@ export async function searchYouTubeSignals(qx: ExpandedQueries): Promise<SourceL
         platform: "YouTube",
         platform_label: "YouTube",
       } as SourceLead);
+    }
+
+    if (out.length > 0) {
+      const { enhanceYouTubeLeads } = await import("./youtube-transcript.server");
+      out = (await enhanceYouTubeLeads(out, qx.skill || qx.role || "")) as SourceLead[];
     }
   } catch {
     /* best-effort */
@@ -2250,7 +2257,11 @@ export async function searchTavily(qx: ExpandedQueries): Promise<SourceLead[]> {
         const snippet = (r.content || "").slice(0, 400);
         const postedAt =
           r.published_date || extractDateFromText(`${title} ${snippet}`) || undefined;
-        if (postedAt && onPlatformSocial(link) && !isRecent(postedAt, CLIENTS_SOCIAL_MAX_AGE_DAYS)) {
+        if (
+          postedAt &&
+          onPlatformSocial(link) &&
+          !isRecent(postedAt, CLIENTS_SOCIAL_MAX_AGE_DAYS)
+        ) {
           continue;
         }
         out.push({
@@ -2804,7 +2815,12 @@ function platformBase(label: string): number {
   if (l.includes("work at a startup") || l.includes("yc")) return 16;
   if (l.includes("geoapify") || l.includes("foursquare") || l.includes("local business")) return 22;
   if (l.includes("dealroom") || l.includes("neuronfeed") || l.includes("just founded")) return 32;
-  if (l.includes("software recs") || l.includes("stack exchange") || l.includes("academia") || l.includes("ell se"))
+  if (
+    l.includes("software recs") ||
+    l.includes("stack exchange") ||
+    l.includes("academia") ||
+    l.includes("ell se")
+  )
     return 36;
   if (l.includes("bluesky")) return 12;
   if (l.includes("google")) return 10;
@@ -3104,11 +3120,15 @@ function isRelevantAtSource(
     }
     if ([...tokens].some((w) => lower.includes(w))) return true;
     // Softwarerecs / marketplace often say "invoicing" / "billing software".
-    return /invoice|invoicing|billing|bookkeep|freelance client|client acquisition|crm\b/i.test(lower);
+    return /invoice|invoicing|billing|bookkeep|freelance client|client acquisition|crm\b/i.test(
+      lower,
+    );
   }
 
   // Tutor: student-need language counts even without the exact word "teacher".
-  if (/tutor|teacher|tutoring|homework/i.test(`${classified.coreSkill} ${qx.skill} ${classified.raw}`)) {
+  if (
+    /tutor|teacher|tutoring|homework/i.test(`${classified.coreSkill} ${qx.skill} ${classified.raw}`)
+  ) {
     if (
       /\b(need (a |an )?(tutor|tutoring|teacher)|looking for (a |an )?(tutor|teacher)|homework help|tutor(ing)? needed|private (tutor|lessons)|struggling with .{0,20}(math|homework|english|physics))\b/i.test(
         lower,
@@ -3116,7 +3136,11 @@ function isRelevantAtSource(
     ) {
       return true;
     }
-    if (/\b(math|english|sat|act|physics|chemistry|biology|esl|calculus)\b.{0,30}\b(tutor|tutoring|help|lessons)\b/i.test(lower)) {
+    if (
+      /\b(math|english|sat|act|physics|chemistry|biology|esl|calculus)\b.{0,30}\b(tutor|tutoring|help|lessons)\b/i.test(
+        lower,
+      )
+    ) {
       return true;
     }
   }
@@ -3128,18 +3152,14 @@ function isRelevantAtSource(
   if (classified.signalMode === "buying_signal") {
     // Prefer expander skill when role templates remapped it (investor → fundraising).
     const mapped = (qx.skill || "").trim();
-    const skill =
-      mapped && mapped.length <= 40 ? mapped : concreteSkillOf(classified);
+    const skill = mapped && mapped.length <= 40 ? mapped : concreteSkillOf(classified);
     const core = concreteSkillOf(classified);
     if (skill) {
       if (isStronglyRelevantToSkill(text, skill)) return true;
       if (core && core !== skill && isStronglyRelevantToSkill(text, core)) return true;
       // Related crafts — "lead generation services" must also keep SDR / lead gen /
       // appointment-setting ATS rows for the Companies tab.
-      const related = [
-        ...(qx.relatedSkills || []),
-        ...(classified.relatedSkills || []),
-      ]
+      const related = [...(qx.relatedSkills || []), ...(classified.relatedSkills || [])]
         .filter(Boolean)
         .slice(0, 10);
       for (const rel of related) {
@@ -3219,10 +3239,10 @@ async function searchAllSourcesInner(
   if (directoryMode && loc) {
     const dirTasks: Array<Promise<SourceLead[]>> = [
       withBudget(searchLocalBusinesses(qx, loc, { directoryMode: true, min: 10 }), []),
-      // Light location-scoped web dorks only (no Reddit/ATS)
+      withBudget(searchOsmLocalBusinesses(qx, loc), []),
       withBudget(searchWebBoolean(qx), []),
     ];
-    const dirNames = ["localbiz", "webboolean"];
+    const dirNames = ["localbiz", "osm", "webboolean"];
     if (usePaidSources) {
       dirTasks.push(withBudget(searchSerpAPI(qx), []), withBudget(searchTavily(qx), []));
       dirNames.push("serpapi", "tavily");
@@ -3275,7 +3295,8 @@ async function searchAllSourcesInner(
       }),
       CRITICAL_SOURCE_BUDGET_MS,
     );
-    add("redditrss",
+    add(
+      "redditrss",
       searchRedditRss(qx).then((r) => r.leads),
       CRITICAL_SOURCE_BUDGET_MS,
     );
@@ -3302,6 +3323,18 @@ async function searchAllSourcesInner(
     add("freelancer", searchFreelancer(qx), CRITICAL_SOURCE_BUDGET_MS);
     add("remoteokapi", searchRemoteOkApi(qx));
     add("workingnomads", searchWorkingNomads(qx));
+
+    // NEW ZERO-AUTH SOURCES (AgentReach equivalents)
+    const craigslistP = import("./craigslist-sources.server")
+      .then((m) => m.searchCraigslist(qx))
+      .catch(() => []);
+    add("craigslist", craigslistP, CRITICAL_SOURCE_BUDGET_MS);
+
+    const devtoP = import("./devto-sources.server").then((m) => m.searchDevTo(qx)).catch(() => []);
+    add("devto", devtoP, CRITICAL_SOURCE_BUDGET_MS);
+
+    const quoraP = import("./quora-sources.server").then((m) => m.searchQuora(qx)).catch(() => []);
+    add("quora", quoraP, CRITICAL_SOURCE_BUDGET_MS);
     // decisionmakers is SearXNG — free path leaves that budget for socialdorks.
     if (usePaidSources) {
       add("decisionmakers", searchRelevantDecisionMakers(qx));
@@ -3327,7 +3360,11 @@ async function searchAllSourcesInner(
         add("youtube", searchYouTubeSignals(qx));
         add("decisionmakers", searchRelevantDecisionMakers(qx));
         add("twitter", searchTwitter(qx), CRITICAL_SOURCE_BUDGET_MS);
-        add("linkedin", searchLinkedIn(qx, { postsOnly: clientsOnly, location: loc }), CRITICAL_SOURCE_BUDGET_MS);
+        add(
+          "linkedin",
+          searchLinkedIn(qx, { postsOnly: clientsOnly, location: loc }),
+          CRITICAL_SOURCE_BUDGET_MS,
+        );
       }
       add("upwork", searchUpwork(qx), CRITICAL_SOURCE_BUDGET_MS);
       // GitHub hiring issues + org intent — safe on clients (demand-shaped filters).
@@ -3481,7 +3518,11 @@ async function searchAllSourcesInner(
   if (usePaidSources) {
     add("decisionmakers", searchRelevantDecisionMakers(qx));
     add("twitter", searchTwitter(qx), CRITICAL_SOURCE_BUDGET_MS);
-    add("linkedin", searchLinkedIn(qx, { postsOnly: clientsOnly, location: loc }), CRITICAL_SOURCE_BUDGET_MS);
+    add(
+      "linkedin",
+      searchLinkedIn(qx, { postsOnly: clientsOnly, location: loc }),
+      CRITICAL_SOURCE_BUDGET_MS,
+    );
     add("webboolean", searchWebBoolean(qx), CRITICAL_SOURCE_BUDGET_MS);
   } else if (
     classified.type === "product" ||
@@ -3552,8 +3593,7 @@ async function searchAllSourcesInner(
   // "Content Marketer" role is a company that needs marketing done. That is
   // exactly the Companies tier, and it's why that tab was empty too.
   // Product pitches + investor deal-flow skip employment boards (wrong shape).
-  const skipEmploymentBoards =
-    classified.type === "product" || isInvestorHuntQuery(classified, qx);
+  const skipEmploymentBoards = classified.type === "product" || isInvestorHuntQuery(classified, qx);
   if (!peopleOnly && !skipEmploymentBoards) {
     add("ashby", searchAshby(qx));
     add("greenhouse", searchGreenhouse(qx));
@@ -4050,8 +4090,7 @@ async function finishSearch(
           src === "news";
         if (companyish) return l;
 
-        const engineDay =
-          l.freshness_window === "day" || l.freshness_window === "hour";
+        const engineDay = l.freshness_window === "day" || l.freshness_window === "hour";
         // Undated social: demote but stay ≥ warm floor when engine time-boxed
         // or demand-verified — otherwise warm floor (≥45) silently zeros Posts.
         if (
@@ -4104,8 +4143,7 @@ async function finishSearch(
         // Undated social: keep engine day/hour window (2d chip trusts that);
         // week + demand_verified kept when dated social is still thin.
         if (socialish && !l.posted_at) {
-          const engineDay =
-            l.freshness_window === "day" || l.freshness_window === "hour";
+          const engineDay = l.freshness_window === "day" || l.freshness_window === "hour";
           if (engineDay) return true;
           if (l.freshness_window === "week" && l.demand_verified === true && datedSocial < 6) {
             return true;
@@ -4337,8 +4375,7 @@ async function finishSearch(
             });
             continue;
           }
-          const bonus =
-            label.intent === "hiring" ? 20 : label.intent === "buying" ? 12 : 6;
+          const bonus = label.intent === "hiring" ? 20 : label.intent === "buying" ? 12 : 6;
           boostedByUrl.set(l.full_post_url, {
             ...l,
             score: Math.min(100, (l.score ?? 0) + Math.round(bonus * label.confidence)),

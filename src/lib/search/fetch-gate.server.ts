@@ -27,8 +27,7 @@ const LOGIN_WALL_RE =
 const PARKED_RE =
   /\b(parked domain|domain for sale|buy this domain|this domain is for sale|godaddy|namecheap parking)\b/i;
 
-const JUNK_TITLE_RE =
-  /^(404|not found|error|untitled|access denied|forbidden|just a moment)/i;
+const JUNK_TITLE_RE = /^(404|not found|error|untitled|access denied|forbidden|just a moment)/i;
 
 export function isSoft404(title: string, text: string): boolean {
   const head = `${title}\n${(text || "").slice(0, 800)}`;
@@ -48,9 +47,7 @@ export function isParkedDomain(title: string, text: string): boolean {
 function hasRelevance(text: string, tokens?: string[]): boolean {
   if (!tokens?.length) return true;
   const hay = (text || "").toLowerCase();
-  const meaningful = tokens
-    .map((t) => t.toLowerCase().trim())
-    .filter((t) => t.length >= 3);
+  const meaningful = tokens.map((t) => t.toLowerCase().trim()).filter((t) => t.length >= 3);
   if (!meaningful.length) return true;
   const hits = meaningful.filter((t) => hay.includes(t));
   return hits.length >= Math.min(1, meaningful.length);

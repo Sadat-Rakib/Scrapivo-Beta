@@ -11,5 +11,9 @@ for (const q of [
   console.log("---", q.slice(0, 50));
   console.log("skill", x.skill, "related", x.relatedSkills.slice(0, 6), "type", x.queryType);
   const r = await searchStackExchange(x);
-  console.log("SE", r.length, r.slice(0, 3).map((l) => `${l.platform}: ${l.title}`));
+  console.log(
+    "SE",
+    r.length,
+    r.slice(0, 3).map((l) => `${l.platform}: ${l.title}`),
+  );
 }

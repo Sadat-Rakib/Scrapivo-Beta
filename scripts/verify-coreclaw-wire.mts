@@ -10,7 +10,10 @@ const ok = (n: string, c: boolean) => {
   else console.log("OK:", n);
 };
 
-ok("coreclaw disabled without CORECLAW_API_KEY", !coreclawEnabled() || !!process.env.CORECLAW_API_KEY);
+ok(
+  "coreclaw disabled without CORECLAW_API_KEY",
+  !coreclawEnabled() || !!process.env.CORECLAW_API_KEY,
+);
 
 const liCo = "https://www.linkedin.com/company/acme";
 const liPe = "https://www.linkedin.com/in/jane-doe";

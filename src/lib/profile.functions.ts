@@ -6,7 +6,10 @@ export const getMyProfile = createServerFn({ method: "GET" })
   .middleware([requireMyAuth])
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
-      .from("profiles").select("*").eq("id", context.userId).maybeSingle();
+      .from("profiles")
+      .select("*")
+      .eq("id", context.userId)
+      .maybeSingle();
     if (error) throw new Error(error.message);
     return data;
   });

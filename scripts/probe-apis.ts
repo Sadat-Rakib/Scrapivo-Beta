@@ -8,27 +8,44 @@
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 
-type Probe = { name: string; url: string; count: (j: any) => number; headers?: Record<string, string> };
+type Probe = {
+  name: string;
+  url: string;
+  count: (j: any) => number;
+  headers?: Record<string, string>;
+};
 
 const PROBES: Probe[] = [
   {
     name: "bluesky searchPosts",
-    url: "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts?q=" + encodeURIComponent("looking for a designer") + "&limit=20",
+    url:
+      "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts?q=" +
+      encodeURIComponent("looking for a designer") +
+      "&limit=20",
     count: (j) => j?.posts?.length ?? 0,
   },
   {
     name: "hn algolia (all)",
-    url: "https://hn.algolia.com/api/v1/search_by_date?query=" + encodeURIComponent("looking for a designer") + "&tags=comment&hitsPerPage=30",
+    url:
+      "https://hn.algolia.com/api/v1/search_by_date?query=" +
+      encodeURIComponent("looking for a designer") +
+      "&tags=comment&hitsPerPage=30",
     count: (j) => j?.hits?.length ?? 0,
   },
   {
     name: "lemmy (lemmy.world)",
-    url: "https://lemmy.world/api/v3/search?q=" + encodeURIComponent("designer") + "&type_=Posts&sort=New&limit=20",
+    url:
+      "https://lemmy.world/api/v3/search?q=" +
+      encodeURIComponent("designer") +
+      "&type_=Posts&sort=New&limit=20",
     count: (j) => j?.posts?.length ?? 0,
   },
   {
     name: "mastodon (mastodon.social)",
-    url: "https://mastodon.social/api/v2/search?q=" + encodeURIComponent("looking for a designer") + "&type=statuses&limit=20",
+    url:
+      "https://mastodon.social/api/v2/search?q=" +
+      encodeURIComponent("looking for a designer") +
+      "&type=statuses&limit=20",
     count: (j) => j?.statuses?.length ?? 0,
   },
   {
@@ -96,7 +113,9 @@ async function main() {
         note = ` (non-JSON: ${body.slice(0, 60).replace(/\s+/g, " ")})`;
       }
       const verdict = res.ok ? (n > 0 ? "OK" : "EMPTY") : `HTTP ${res.status}`;
-      console.log(`${p.name.padEnd(30)} ${verdict.padEnd(10)} ${String(n).padStart(4)} rows  ${ms}ms${note}`);
+      console.log(
+        `${p.name.padEnd(30)} ${verdict.padEnd(10)} ${String(n).padStart(4)} rows  ${ms}ms${note}`,
+      );
     } catch (e) {
       console.log(
         `${p.name.padEnd(30)} ${"THREW".padEnd(10)}    0 rows  ${Date.now() - started}ms  ${e instanceof Error ? e.message : e}`,

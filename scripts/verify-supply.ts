@@ -43,7 +43,10 @@ function makeQx(skill: string): ExpandedQueries {
   };
 }
 
-async function timed<T>(label: string, p: Promise<T>): Promise<{ label: string; ms: number; value: T }> {
+async function timed<T>(
+  label: string,
+  p: Promise<T>,
+): Promise<{ label: string; ms: number; value: T }> {
   const started = Date.now();
   const value = await p;
   return { label, ms: Date.now() - started, value };
@@ -51,9 +54,8 @@ async function timed<T>(label: string, p: Promise<T>): Promise<{ label: string; 
 
 async function main() {
   const qx = makeQx(CRAFT);
-  const { withSearxngBudget, searxngBudgetState } = await import(
-    "../src/lib/search/searxng.server"
-  );
+  const { withSearxngBudget, searxngBudgetState } =
+    await import("../src/lib/search/searxng.server");
   const { searchRedditRss } = await import("../src/lib/search/reddit-rss.server");
   const { searchSocialDorks } = await import("../src/lib/search/social-dorks.server");
 
@@ -72,7 +74,10 @@ async function main() {
 
   await withSearxngBudget(async () => {
     const [reddit, social] = await Promise.all([
-      timed("reddit-rss", searchRedditRss(qx).then((r) => r.leads)),
+      timed(
+        "reddit-rss",
+        searchRedditRss(qx).then((r) => r.leads),
+      ),
       timed("socialdorks", searchSocialDorks(qx)),
     ]);
 

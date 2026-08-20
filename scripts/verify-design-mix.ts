@@ -34,11 +34,33 @@ console.log("classified", {
 const { leads: raw, debug } = await searchAllSources({ classified, expanded });
 const by: Record<string, number> = {};
 for (const l of raw) by[l.source] = (by[l.source] ?? 0) + 1;
-console.log("\nraw top:", Object.entries(by).sort((a, b) => b[1] - a[1]).slice(0, 20));
+console.log(
+  "\nraw top:",
+  Object.entries(by)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 20),
+);
 console.log("debug sourceCounts", debug?.sourceCounts ?? "(none)");
 
 const socialish = Object.entries(by).filter(([s]) =>
-  ["linkedin", "instagram", "facebook", "twitter", "threads", "quora", "serpapi", "tavily", "hn", "github", "discourse", "lemmy", "mastodon", "secedgar", "tenders", "news"].includes(s),
+  [
+    "linkedin",
+    "instagram",
+    "facebook",
+    "twitter",
+    "threads",
+    "quora",
+    "serpapi",
+    "tavily",
+    "hn",
+    "github",
+    "discourse",
+    "lemmy",
+    "mastodon",
+    "secedgar",
+    "tenders",
+    "news",
+  ].includes(s),
 );
 console.log("non-reddit interesting:", socialish);
 

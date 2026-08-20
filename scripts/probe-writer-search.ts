@@ -95,9 +95,7 @@ console.log("quality pool", quality.length);
 const volumePersona =
   classified.type === "product" ||
   /tutor|teacher|tutoring/i.test(`${classified.coreSkill} ${classified.raw}`);
-const pool = [...quality]
-  .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
-  .slice(0, 500) as Lead[];
+const pool = [...quality].sort((a, b) => (b.score ?? 0) - (a.score ?? 0)).slice(0, 500) as Lead[];
 const div = diversifiedTop12(pool, {
   maxJobBoard: 2,
   maxCompanyAts: 150,
@@ -141,25 +139,11 @@ for (const l of posts.slice(0, 8)) {
 }
 console.log("\nSample companies:");
 for (const c of cos.slice(0, 6)) {
-  console.log(
-    "-",
-    c.name,
-    "|",
-    c.leads?.[0]?.source,
-    "| email?",
-    !!c.inline_contacts?.emails?.[0],
-  );
+  console.log("-", c.name, "|", c.leads?.[0]?.source, "| email?", !!c.inline_contacts?.emails?.[0]);
 }
 console.log("\nSample people:");
 for (const p of ppl.slice(0, 6)) {
-  console.log(
-    "-",
-    p.name,
-    "|",
-    p.leads?.[0]?.source,
-    "| email?",
-    !!p.inline_contacts?.emails?.[0],
-  );
+  console.log("-", p.name, "|", p.leads?.[0]?.source, "| email?", !!p.inline_contacts?.emails?.[0]);
 }
 
 const nonReddit = posts.filter(

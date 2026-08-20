@@ -30,9 +30,8 @@ await new Promise<void>((r) => server.listen(0, r));
 const port = (server.address() as { port: number }).port;
 process.env.SEARXNG_URL = `http://127.0.0.1:${port}`;
 
-const { searchSearxng, withSearxngBudget, searxngBudgetState } = await import(
-  "../src/lib/search/searxng.server.ts"
-);
+const { searchSearxng, withSearxngBudget, searxngBudgetState } =
+  await import("../src/lib/search/searxng.server.ts");
 
 const SOCIAL = ["linkedin", "facebook", "twitter", "instagram", "threads", "quora"];
 const OTHER = ["webboolean", "decisionmakers", "discord", "youtube", "fiverr", "startups"];
@@ -44,7 +43,9 @@ async function oneRun(label: string, nonce: string) {
   await withSearxngBudget(async () => {
     // Non-social sources are registered earlier in the real fan-out.
     await Promise.all(
-      OTHER.map((k) => searchSearxng([`${k} buyers ${nonce}`, `${k} hiring ${nonce}`], 2, "day", k)),
+      OTHER.map((k) =>
+        searchSearxng([`${k} buyers ${nonce}`, `${k} hiring ${nonce}`], 2, "day", k),
+      ),
     );
     await Promise.all(
       SOCIAL.map((k) => searchSearxng([`site:${k}.com "looking for a ${nonce}"`], 1, "", k)),
@@ -69,5 +70,7 @@ const c = await oneRun("search 3", "illustrator");
 
 server.close();
 console.log("\nsocial queries per search:", [a, b, c].join(" / "));
-console.log(a > 0 && b > 0 && c > 0 ? "PASS — no search was starved" : "FAIL — a search got zero social");
+console.log(
+  a > 0 && b > 0 && c > 0 ? "PASS — no search was starved" : "FAIL — a search got zero social",
+);
 process.exit(a > 0 && b > 0 && c > 0 ? 0 : 1);

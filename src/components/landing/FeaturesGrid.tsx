@@ -1,8 +1,20 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
-  ArrowRight, Radar, Layers, Sparkles, Network, ShieldCheck, Search,
-  MessageCircle, Hash, Github, MessageSquare, Twitter, Code2, Check,
+  ArrowRight,
+  Radar,
+  Layers,
+  Sparkles,
+  Network,
+  ShieldCheck,
+  Search,
+  MessageCircle,
+  Hash,
+  Github,
+  MessageSquare,
+  Twitter,
+  Code2,
+  Check,
 } from "lucide-react";
 
 /**
@@ -38,8 +50,8 @@ export function FeaturesGrid({ cta }: { cta: string }) {
               className="mt-4 text-sm sm:text-base max-w-xl"
               style={{ color: "var(--text-secondary)" }}
             >
-              Real-time signals from the open web, scored by AI, verified by
-              account history — every lead is a person actually asking, right now.
+              Real-time signals from the open web, scored by AI, verified by account history — every
+              lead is a person actually asking, right now.
             </p>
           </div>
           <Link to={cta}>
@@ -57,21 +69,41 @@ export function FeaturesGrid({ cta }: { cta: string }) {
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
-          <Card title="Buyer-intent discovery" desc="Only posts where someone is hiring, buying or asking — never job-board reposts." icon={<Radar className="size-4" />}>
+          <Card
+            title="Buyer-intent discovery"
+            desc="Only posts where someone is hiring, buying or asking — never job-board reposts."
+            icon={<Radar className="size-4" />}
+          >
             <KeywordOrb />
           </Card>
-          <Card title="Every source, one feed" desc="Reddit, HN, GitHub, Bluesky, X, Dev.to and more — unified, deduped, live." icon={<Layers className="size-4" />}>
+          <Card
+            title="Every source, one feed"
+            desc="Reddit, HN, GitHub, Bluesky, X, Dev.to and more — unified, deduped, live."
+            icon={<Layers className="size-4" />}
+          >
             <SourceMarquee />
           </Card>
-          <Card title="AI scoring you can trust" desc="Hot / Warm tiers with confidence — only warm-or-better leads are shown." icon={<Sparkles className="size-4" />}>
+          <Card
+            title="AI scoring you can trust"
+            desc="Hot / Warm tiers with confidence — only warm-or-better leads are shown."
+            icon={<Sparkles className="size-4" />}
+          >
             <DonutScore />
           </Card>
         </div>
         <div className="grid gap-4 md:grid-cols-2 mt-4">
-          <Card title="Cross-platform corroboration" desc="When the same buyer surfaces on two sources, we rank them higher." icon={<Network className="size-4" />}>
+          <Card
+            title="Cross-platform corroboration"
+            desc="When the same buyer surfaces on two sources, we rank them higher."
+            icon={<Network className="size-4" />}
+          >
             <CrossPlatformMatches />
           </Card>
-          <Card title="Verified posters only" desc="Account age, post history and freshness decay filter throwaways and stale posts." icon={<ShieldCheck className="size-4" />}>
+          <Card
+            title="Verified posters only"
+            desc="Account age, post history and freshness decay filter throwaways and stale posts."
+            icon={<ShieldCheck className="size-4" />}
+          >
             <TypewriterSearch />
           </Card>
         </div>
@@ -81,7 +113,10 @@ export function FeaturesGrid({ cta }: { cta: string }) {
 }
 
 function Card({
-  title, desc, icon, children,
+  title,
+  desc,
+  icon,
+  children,
 }: {
   title: string;
   desc: string;
@@ -112,8 +147,12 @@ function Card({
           {icon}
           <span className="text-[10px] uppercase tracking-[0.22em]">Live</span>
         </div>
-        <div className="font-medium text-base" style={{ color: "var(--text-primary)" }}>{title}</div>
-        <p className="text-xs mt-1 leading-relaxed" style={{ color: "var(--text-secondary)" }}>{desc}</p>
+        <div className="font-medium text-base" style={{ color: "var(--text-primary)" }}>
+          {title}
+        </div>
+        <p className="text-xs mt-1 leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+          {desc}
+        </p>
       </div>
     </div>
   );
@@ -121,14 +160,22 @@ function Card({
 
 /* ── Visual 1: Orb with rotating keyword chips ─────────── */
 function KeywordOrb() {
-  const keywords = ["hiring", "looking for", "need a dev", "who can build", "recommend", "anyone know"];
+  const keywords = [
+    "hiring",
+    "looking for",
+    "need a dev",
+    "who can build",
+    "recommend",
+    "anyone know",
+  ];
   return (
     <div className="relative w-[260px] h-[220px] flex items-center justify-center">
       {/* glowing core */}
       <div
         className="absolute size-14 rounded-full"
         style={{
-          background: "radial-gradient(circle, #ffffff 0%, rgba(255,255,255,0.4) 40%, transparent 70%)",
+          background:
+            "radial-gradient(circle, #ffffff 0%, rgba(255,255,255,0.4) 40%, transparent 70%)",
           filter: "blur(2px)",
         }}
       />
@@ -171,7 +218,9 @@ function KeywordOrb() {
                 <div
                   key={kw}
                   className="absolute top-1/2 left-1/2"
-                  style={{ transform: `rotate(${angle}deg) translateX(${radius}px) rotate(-${angle}deg)` }}
+                  style={{
+                    transform: `rotate(${angle}deg) translateX(${radius}px) rotate(-${angle}deg)`,
+                  }}
                 >
                   <span
                     className="inline-block -translate-x-1/2 -translate-y-1/2 text-[10px] px-2 py-0.5 rounded-full border whitespace-nowrap font-mono"
@@ -205,10 +254,14 @@ function SourceMarquee() {
   return (
     <div className="absolute inset-0 flex flex-col justify-center gap-2 px-2 overflow-hidden">
       {rows.map((row, i) => (
-        <div key={i} className="flex gap-2 whitespace-nowrap" style={{
-          animation: `marqueeX ${20 + i * 4}s linear infinite ${i % 2 ? "reverse" : ""}`,
-          width: "max-content",
-        }}>
+        <div
+          key={i}
+          className="flex gap-2 whitespace-nowrap"
+          style={{
+            animation: `marqueeX ${20 + i * 4}s linear infinite ${i % 2 ? "reverse" : ""}`,
+            width: "max-content",
+          }}
+        >
           {[...row, ...row].map((label, j) => (
             <span
               key={j}
@@ -250,22 +303,44 @@ function DonutScore() {
   return (
     <div className="relative">
       <svg viewBox="0 0 120 120" className="w-[180px] h-[180px] -rotate-90">
-        <circle cx="60" cy="60" r="42" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="9" />
         <circle
-          cx="60" cy="60" r="42" fill="none"
-          stroke="#f4f4f6" strokeWidth="9" strokeLinecap="round"
+          cx="60"
+          cy="60"
+          r="42"
+          fill="none"
+          stroke="rgba(255,255,255,0.06)"
+          strokeWidth="9"
+        />
+        <circle
+          cx="60"
+          cy="60"
+          r="42"
+          fill="none"
+          stroke="#f4f4f6"
+          strokeWidth="9"
+          strokeLinecap="round"
           strokeDasharray={C}
           strokeDashoffset={offset}
-          style={{ transition: "stroke-dashoffset 60ms linear", filter: "drop-shadow(0 0 6px rgba(255,255,255,0.35))" }}
+          style={{
+            transition: "stroke-dashoffset 60ms linear",
+            filter: "drop-shadow(0 0 6px rgba(255,255,255,0.35))",
+          }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <div className="text-4xl font-light tabular-nums" style={{ color: "var(--text-primary)" }}>
-          {val}<span className="text-base" style={{ color: "var(--text-tertiary)" }}>%</span>
+          {val}
+          <span className="text-base" style={{ color: "var(--text-tertiary)" }}>
+            %
+          </span>
         </div>
         <div
           className="text-[10px] uppercase tracking-[0.22em] mt-1 px-2 py-0.5 rounded-full border"
-          style={{ color: "var(--text-primary)", borderColor: "var(--border-default)", backgroundColor: "var(--bg-elevated-2)" }}
+          style={{
+            color: "var(--text-primary)",
+            borderColor: "var(--border-default)",
+            backgroundColor: "var(--bg-elevated-2)",
+          }}
         >
           Hot
         </div>
@@ -276,10 +351,34 @@ function DonutScore() {
 
 /* ── Visual 4: Cross-platform match rows ──────────────── */
 function CrossPlatformMatches() {
-  const rows: Array<{ handle: string; a: React.ReactNode; b: React.ReactNode; aName: string; bName: string }> = [
-    { handle: "@sarah_b", aName: "Reddit", bName: "HN", a: <MessageCircle className="size-3.5" />, b: <Hash className="size-3.5" /> },
-    { handle: "@devmark", aName: "GitHub", bName: "Bluesky", a: <Github className="size-3.5" />, b: <MessageSquare className="size-3.5" /> },
-    { handle: "@nora.k", aName: "X", bName: "Dev.to", a: <Twitter className="size-3.5" />, b: <Code2 className="size-3.5" /> },
+  const rows: Array<{
+    handle: string;
+    a: React.ReactNode;
+    b: React.ReactNode;
+    aName: string;
+    bName: string;
+  }> = [
+    {
+      handle: "@sarah_b",
+      aName: "Reddit",
+      bName: "HN",
+      a: <MessageCircle className="size-3.5" />,
+      b: <Hash className="size-3.5" />,
+    },
+    {
+      handle: "@devmark",
+      aName: "GitHub",
+      bName: "Bluesky",
+      a: <Github className="size-3.5" />,
+      b: <MessageSquare className="size-3.5" />,
+    },
+    {
+      handle: "@nora.k",
+      aName: "X",
+      bName: "Dev.to",
+      a: <Twitter className="size-3.5" />,
+      b: <Code2 className="size-3.5" />,
+    },
   ];
   return (
     <div className="w-[88%] max-w-md space-y-2.5">
@@ -300,7 +399,10 @@ function CrossPlatformMatches() {
             {r.a} {r.aName}
           </span>
           {/* connector */}
-          <div className="flex-1 relative h-px" style={{ backgroundColor: "var(--border-default)" }}>
+          <div
+            className="flex-1 relative h-px"
+            style={{ backgroundColor: "var(--border-default)" }}
+          >
             <div
               className="absolute -top-[3px] left-1/2 -translate-x-1/2 size-1.5 rounded-full"
               style={{ background: "#f4f4f6", boxShadow: "0 0 6px rgba(255,255,255,0.6)" }}
@@ -365,7 +467,10 @@ function TypewriterSearch() {
       }
     };
     type();
-    return () => { cancelled = true; clearTimeout(timeoutId); };
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
   }, [phraseIdx]);
 
   return (
@@ -381,7 +486,11 @@ function TypewriterSearch() {
         >
           {text}
         </span>
-        <span style={{ animation: "caretBlink 1s steps(1) infinite", color: "var(--text-primary)" }}>▍</span>
+        <span
+          style={{ animation: "caretBlink 1s steps(1) infinite", color: "var(--text-primary)" }}
+        >
+          ▍
+        </span>
       </div>
       <div className="flex items-center gap-2 mt-3 px-1">
         <span
@@ -394,7 +503,9 @@ function TypewriterSearch() {
         >
           <ShieldCheck className="size-3" /> Verified poster · 4y old
         </span>
-        <span className="text-[10px]" style={{ color: "var(--text-tertiary)" }}>posted 2h ago</span>
+        <span className="text-[10px]" style={{ color: "var(--text-tertiary)" }}>
+          posted 2h ago
+        </span>
       </div>
     </div>
   );

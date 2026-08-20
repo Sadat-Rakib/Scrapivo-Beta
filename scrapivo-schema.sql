@@ -198,3 +198,93 @@ DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- =========================================================================
+-- 6. core intelligence entities (Phase 1)
+-- =========================================================================
+
+CREATE TABLE IF NOT EXISTS public.companies (
+  id TEXT PRIMARY KEY,
+  canonical_name TEXT NOT NULL,
+  legal_name TEXT,
+  domain TEXT,
+  website TEXT,
+  description TEXT,
+  industry TEXT,
+  categories TEXT[] DEFAULT '{}',
+  employee_count INTEGER,
+  location TEXT,
+  headquarters TEXT,
+  country TEXT,
+  state_province TEXT,
+  city TEXT,
+  postal_code TEXT,
+  latitude DOUBLE PRECISION,
+  longitude DOUBLE PRECISION,
+  phone TEXT,
+  logo_url TEXT,
+  social_profiles JSONB DEFAULT '{}',
+  source_ids JSONB DEFAULT '[]',
+  source_metadata JSONB DEFAULT '{}',
+  enrichment_status TEXT DEFAULT 'none',
+  last_enriched_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS public.persons (
+  id TEXT PRIMARY KEY,
+  company_id TEXT REFERENCES public.companies(id) ON DELETE SET NULL,
+  full_name TEXT NOT NULL,
+  first_name TEXT,
+  last_name TEXT,
+  title TEXT,
+  seniority TEXT,
+  department TEXT,
+  linkedin_url TEXT,
+  website TEXT,
+  location TEXT,
+  source_ids JSONB DEFAULT '[]',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS public.contacts (
+  id TEXT PRIMARY KEY,
+  person_id TEXT REFERENCES public.persons(id) ON DELETE CASCADE,
+  company_id TEXT REFERENCES public.companies(id) ON DELETE CASCADE,
+  email TEXT,
+  phone TEXT,
+  type TEXT NOT NULL,
+  source TEXT NOT NULL,
+  confidence_score INTEGER DEFAULT 0,
+  verification_status TEXT DEFAULT 'unverified',
+  last_verified_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS public.signals (
+  id TEXT PRIMARY KEY,
+  company_id TEXT REFERENCES public.companies(id) ON DELETE CASCADE,
+  person_id TEXT REFERENCES public.persons(id) ON DELETE SET NULL,
+  type TEXT NOT NULL,
+  source TEXT NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  evidence_url TEXT,
+  evidence_text TEXT,
+  confidence INTEGER DEFAULT 0,
+  detected_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  expires_at TIMESTAMPTZ,
+  raw_metadata JSONB DEFAULT '{}'
+);
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.companies TO authenticated;
+GRANT ALL ON public.companies TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.persons TO authenticated;
+GRANT ALL ON public.persons TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.contacts TO authenticated;
+GRANT ALL ON public.contacts TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.signals TO authenticated;
+GRANT ALL ON public.signals TO service_role;

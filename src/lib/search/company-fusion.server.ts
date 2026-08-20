@@ -5,13 +5,28 @@ import type { Lead } from "../scoring";
 function companyKey(lead: Lead): string | null {
   const fromAuthor = (lead.author || "").trim();
   if (fromAuthor && fromAuthor.length > 1 && fromAuthor.toLowerCase() !== "anon") {
-    return fromAuthor.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+    return fromAuthor
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
   }
   const m = lead.title.match(/@\s*([^—\-|]+)/);
-  if (m) return m[1].toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  if (m)
+    return m[1]
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
   const dir = lead.title.match(/^(.+?)\s*(?:—|-)\s*/);
-  if (lead.source === "geoapify" || lead.source === "foursquare" || lead.source === "startupsgallery" || lead.source === "startups_gallery") {
-    return (dir?.[1] || lead.title).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  if (
+    lead.source === "geoapify" ||
+    lead.source === "foursquare" ||
+    lead.source === "startupsgallery" ||
+    lead.source === "startups_gallery"
+  ) {
+    return (dir?.[1] || lead.title)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
   }
   return null;
 }

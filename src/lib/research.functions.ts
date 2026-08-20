@@ -1,10 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireMyAuth } from "@/integrations/my-supabase/auth-middleware";
-import {
-  runLeadResearch,
-  type LeadResearch,
-} from "@/lib/research/run-research.server";
+import { runLeadResearch, type LeadResearch } from "@/lib/research/run-research.server";
 import type { VerifiedHook } from "@/lib/research/company-dossier.server";
 
 export type { LeadResearch, VerifiedHook };

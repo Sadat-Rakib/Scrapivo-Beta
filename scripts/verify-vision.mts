@@ -11,23 +11,31 @@ import {
 } from "../src/lib/vision/image-text.server.ts";
 import { classifyDemand } from "../src/lib/search/demand-classifier.ts";
 
-let pass = 0, fail = 0;
+let pass = 0,
+  fail = 0;
 const ok = (n: string, c: boolean, d = "") => {
   c ? pass++ : fail++;
   console.log(`  ${c ? "ok  " : "FAIL"} ${n}${d && !c ? ` — ${d}` : ""}`);
 };
 
 console.log("\nURL detection");
-for (const u of ["https://i.redd.it/abc.jpg", "https://i.imgur.com/x.png", "https://pbs.twimg.com/media/a.jpg"])
+for (const u of [
+  "https://i.redd.it/abc.jpg",
+  "https://i.imgur.com/x.png",
+  "https://pbs.twimg.com/media/a.jpg",
+])
   ok(`accepts ${u.slice(8, 30)}`, looksLikeImageUrl(u));
-for (const u of ["https://v.redd.it/abc", "https://reddit.com/r/x/comments/1/", "https://reddit.com/gallery/1"])
+for (const u of [
+  "https://v.redd.it/abc",
+  "https://reddit.com/r/x/comments/1/",
+  "https://reddit.com/gallery/1",
+])
   ok(`rejects ${u.slice(8, 34)}`, !looksLikeImageUrl(u));
 
 console.log("\nTranscription (live, free models)");
 // .png form on purpose: the detector requires a real extension, which is
 // what actual post images (i.redd.it/x.jpg) look like.
-const IMG =
-  "https://placehold.co/700x260.png?text=LOOKING+FOR+A+DESIGNER+DM+me+budget+500";
+const IMG = "https://placehold.co/700x260.png?text=LOOKING+FOR+A+DESIGNER+DM+me+budget+500";
 const text = await extractImageText(IMG);
 console.log(`       got: ${JSON.stringify(text.slice(0, 90))}`);
 ok("returned text", text.length > 0, "empty — all free models rate-limited?");

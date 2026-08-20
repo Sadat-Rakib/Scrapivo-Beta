@@ -406,11 +406,7 @@ export const resolveLeadContact = createServerFn({ method: "POST" })
     }
 
     // People path: post email already in knownEmail/signals; else first.last@domain guess.
-    if (
-      data.personName &&
-      domain?.domain &&
-      !hasOutreachEmail(signals, discovery)
-    ) {
+    if (data.personName && domain?.domain && !hasOutreachEmail(signals, discovery)) {
       const guesses = guessEmailPatterns(data.personName, domain.domain);
       for (const g of guesses.slice(0, 3)) {
         const v = await verifyEmailDeep(g, { freeOnly: data.freeOnly });
@@ -453,7 +449,9 @@ export const resolveLeadContact = createServerFn({ method: "POST" })
             ...{ linkedin: co.linkedin_url, twitter: co.twitter_url, facebook: co.facebook_url },
             ...socials,
           };
-          found = co.signals.some((s) => s.email && !ROLE_LOCALPARTS.has(s.email.split("@")[0] || ""));
+          found = co.signals.some(
+            (s) => s.email && !ROLE_LOCALPARTS.has(s.email.split("@")[0] || ""),
+          );
         }
         if (!found) signals.push(...(await hunterDomainSearch(domain.domain)));
       }

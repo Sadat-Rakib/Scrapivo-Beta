@@ -10,4 +10,6 @@ try {
     const v = m[2].trim().replace(/^["']|["']$/g, "");
     if (!process.env[m[1]]) process.env[m[1]] = v;
   }
-} catch { /* no .env — fine */ }
+} catch {
+  /* no .env — fine */
+}

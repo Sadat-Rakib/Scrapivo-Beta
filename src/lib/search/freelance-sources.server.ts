@@ -38,9 +38,7 @@ function craftTermsOf(qx: ExpandedQueries): string[] {
     .flatMap((t) => (t || "").split(/\s*\/\s*/))
     .map((t) => t.trim())
     .filter(
-      (t) =>
-        t.length >= 3 &&
-        !/^(lead|leads|generation|service|services|client|clients)$/i.test(t),
+      (t) => t.length >= 3 && !/^(lead|leads|generation|service|services|client|clients)$/i.test(t),
     );
 }
 
@@ -111,10 +109,7 @@ type FreelancerProject = {
 };
 
 /** Freelancer's public active-projects search. No key, no auth. */
-async function searchFreelancerApi(
-  qx: ExpandedQueries,
-  terms: string[],
-): Promise<SourceLead[]> {
+async function searchFreelancerApi(qx: ExpandedQueries, terms: string[]): Promise<SourceLead[]> {
   // The person noun is what marketplace titles use ("logo designer needed"),
   // and qx.skill is the field ("design"), so prefer the role.
   const craft = (qx.role || qx.skill || "").trim();

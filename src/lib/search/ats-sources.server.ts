@@ -43,7 +43,7 @@ export type AtsProvider =
 
 // Verified-live boards (probed 2026-07 — real 200 + populated payloads) used
 // as a fallback only. Production coverage is meant to grow via the DB table.
-const SEED_BOARDS: Record<AtsProvider, string[]> = {
+export const SEED_BOARDS: Record<AtsProvider, string[]> = {
   ashby: ["ramp", "openai", "posthog", "linear", "vanta", "hex"],
   smartrecruiters: ["BoschGroup", "Visa", "Square"],
   workable: ["automattic"],
@@ -217,7 +217,7 @@ function matchesTermsWord(text: string, terms: string[]): boolean {
 const MAX_PER_BOARD = 10;
 
 // ── DB-driven board loading + deterministic rotation (Task 1.7 / 1.3) ──────
-async function loadAtsBoards(provider: AtsProvider): Promise<string[]> {
+export async function loadAtsBoards(provider: AtsProvider): Promise<string[]> {
   try {
     const { getAdmin } = await import("@/integrations/my-supabase/admin.server");
     const { data } = await getAdmin()

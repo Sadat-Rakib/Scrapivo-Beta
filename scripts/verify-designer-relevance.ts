@@ -4,11 +4,7 @@
  */
 import { classifyQuery } from "../src/lib/search/query-classifier";
 import { expandFromClassified } from "../src/lib/search/query-expander";
-import {
-  isPersonalStoryNoise,
-  isEducationalNoise,
-  shouldIncludeLead,
-} from "../src/lib/validation";
+import { isPersonalStoryNoise, isEducationalNoise, shouldIncludeLead } from "../src/lib/validation";
 import type { Lead } from "../src/lib/scoring";
 
 const classified = classifyQuery("designer");

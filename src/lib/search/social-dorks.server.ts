@@ -159,8 +159,7 @@ function ingestPlatformLeads(
     if (!verdict.isDemand && !weekOk) continue;
 
     seen.add(url);
-    const postedAt =
-      l.posted_at || extractDateFromText(`${title} ${snippet}`) || undefined;
+    const postedAt = l.posted_at || extractDateFromText(`${title} ${snippet}`) || undefined;
     if (postedAt && !isRecent(postedAt, CLIENTS_SOCIAL_MAX_AGE_DAYS)) continue;
 
     const id = detectPlatformFromUrl(url);
@@ -280,13 +279,15 @@ export async function searchSocialDorks(qx: ExpandedQueries): Promise<SourceLead
   // Prefer a short craft for "looking for a X" dorks — strip trailing services.
   const craftSeed =
     (qx.relatedSkills || []).find((s) => /lead\s*gen/i.test(s)) ||
-    raw.replace(/\b(services?|solutions?|agency|consulting)\b/gi, " ").replace(/\s+/g, " ").trim() ||
+    raw
+      .replace(/\b(services?|solutions?|agency|consulting)\b/gi, " ")
+      .replace(/\s+/g, " ")
+      .trim() ||
     raw;
   const craft = personNoun(craftSeed, qx.role);
 
-  const { searchSearxng, searxngResultsToLeads, detectPlatformFromUrl } = await import(
-    "./searxng.server",
-  );
+  const { searchSearxng, searxngResultsToLeads, detectPlatformFromUrl } =
+    await import("./searxng.server");
   const { paidDiscoveryEnabled } = await import("./paid-discovery");
 
   const wave = (n: number) =>
@@ -296,7 +297,10 @@ export async function searchSocialDorks(qx: ExpandedQueries): Promise<SourceLead
     try {
       let rawHits = await searchSearxng([dork], 1, "", spec.key);
       if (!rawHits.length && /\bsite:/i.test(dork)) {
-        const soft = dork.replace(/\bsite:[^\s)]+/gi, "").replace(/\s+/g, " ").trim();
+        const soft = dork
+          .replace(/\bsite:[^\s)]+/gi, "")
+          .replace(/\s+/g, " ")
+          .trim();
         if (soft.length > 12) {
           rawHits = await searchSearxng([soft], 1, "", spec.key);
         }
@@ -347,13 +351,7 @@ export async function searchSocialDorks(qx: ExpandedQueries): Promise<SourceLead
 
   // If paid SERP was off / empty and SearXNG was thin, one last Serper try.
   if (out.length < 4 && paidDiscoveryEnabled() && !serpExtra.length) {
-    const late = await searchSocialDorksViaSerp(
-      craft,
-      terms,
-      seen,
-      out,
-      detectPlatformFromUrl,
-    );
+    const late = await searchSocialDorksViaSerp(craft, terms, seen, out, detectPlatformFromUrl);
     out.push(...late);
   }
 

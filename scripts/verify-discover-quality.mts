@@ -32,10 +32,7 @@ ok(
   "BOUNTY/HIRING title does not match TITLE_HIRE_RE",
   !TITLE_HIRE_RE.test("BOUNTY/HIRING: Pay $50 for logo"),
 );
-ok(
-  "real hire title matches TITLE_HIRE_RE",
-  TITLE_HIRE_RE.test("We're hiring a React developer"),
-);
+ok("real hire title matches TITLE_HIRE_RE", TITLE_HIRE_RE.test("We're hiring a React developer"));
 
 const GITHUB_HIRE_RE =
   /\b(we are hiring|we're hiring|hiring (a|an)|\[hiring\]|looking to hire|looking for (a |an )?(developer|engineer|designer|freelancer|contractor)|paid (contribution|contract|freelance)|contract (role|position)|full[- ]?time|part[- ]?time)\b/i;
@@ -90,7 +87,10 @@ const undatedGithub: Lead = {
 };
 
 const segs = segmentLeads([redditBuyer, githubOrgIssue]);
-ok("Reddit buyer → People", segs.people.some((p) => p.name === "startup_founder"));
+ok(
+  "Reddit buyer → People",
+  segs.people.some((p) => p.name === "startup_founder"),
+);
 ok(
   "GitHub org → Companies",
   segs.companies.some((c) => /acme/i.test(c.name)),

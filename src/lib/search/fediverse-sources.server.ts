@@ -115,9 +115,7 @@ export async function searchLemmy(qx: ExpandedQueries): Promise<SourceLead[]> {
       const url =
         `https://${host}/api/v3/search?q=${encodeURIComponent(q)}` +
         `&type_=Posts&sort=New&limit=30`;
-      jobs.push(
-        getJson<{ posts?: LemmyPost[] }>(url).then((d) => d?.posts ?? []),
-      );
+      jobs.push(getJson<{ posts?: LemmyPost[] }>(url).then((d) => d?.posts ?? []));
     }
   }
 

@@ -41,8 +41,7 @@ export async function searchGoogleJobs(query: SearchQuery): Promise<Lead[]> {
     const data = await res.json();
 
     for (const job of data?.jobs_results || []) {
-      const jobId =
-        job.job_id || idFromUrl(String(job.title) + String(job.company_name));
+      const jobId = job.job_id || idFromUrl(String(job.title) + String(job.company_name));
       if (seen.has(jobId)) continue;
       seen.add(jobId);
 
@@ -52,8 +51,10 @@ export async function searchGoogleJobs(query: SearchQuery): Promise<Lead[]> {
 
       if (!isWithin14Days(postedAt)) continue;
 
-      const fullText =
-        `${job.title} at ${job.company_name}. ${job.description || ""}`.slice(0, 600);
+      const fullText = `${job.title} at ${job.company_name}. ${job.description || ""}`.slice(
+        0,
+        600,
+      );
       const isDecisionMaker = detectDecisionMaker(fullText);
       const { score, tier, hasBudget, hasUrgency } = scoreIntent({
         text: fullText,
@@ -74,8 +75,7 @@ export async function searchGoogleJobs(query: SearchQuery): Promise<Lead[]> {
         post_title: `${job.title} at ${job.company_name}`,
         post_body_snippet: (job.description || "").slice(0, 600),
         ai_summary: `${job.company_name} is hiring a ${job.title}`,
-        why_shown:
-          `Active job listing on ${sourceLabel} · ${job.location || "Remote"} · ${relativeTime(postedAt)}`,
+        why_shown: `Active job listing on ${sourceLabel} · ${job.location || "Remote"} · ${relativeTime(postedAt)}`,
         author_handle: job.company_name,
         author_url: "",
         author_name: job.company_name,

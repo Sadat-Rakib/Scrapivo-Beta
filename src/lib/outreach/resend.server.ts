@@ -1,7 +1,11 @@
 // =====================================================================
 // Resend HTTP send helpers (server-only)
 // =====================================================================
-export { appBaseUrl, buildCaslFooter, signUnsubscribeToken } from "@/lib/outreach/unsub-token.server";
+export {
+  appBaseUrl,
+  buildCaslFooter,
+  signUnsubscribeToken,
+} from "@/lib/outreach/unsub-token.server";
 
 export async function resendSendEmail(input: {
   from: string;

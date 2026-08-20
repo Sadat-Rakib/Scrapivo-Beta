@@ -31,7 +31,7 @@ If they only want ideas / chat (not a hunt), skip the SEARCH line and answer bri
       method: "POST",
       headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: "openai/gpt-oss-20b",
         messages: [{ role: "system", content: system }, ...data.messages],
         temperature: 0.6,
         max_tokens: 120,

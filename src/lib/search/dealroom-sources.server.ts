@@ -99,7 +99,10 @@ export async function searchDealroomJustFounded(qx: ExpandedQueries): Promise<So
       signal_type: "leading_indicator",
       intentBoost: craftHit(hay, qx) ? 10 : 6,
       source_confidence: 70,
-      match_reasons: ["Dealroom just-founded", ...(craftHit(hay, qx) ? ["Matches craft/sector"] : [])],
+      match_reasons: [
+        "Dealroom just-founded",
+        ...(craftHit(hay, qx) ? ["Matches craft/sector"] : []),
+      ],
       why_match: "Newly founded startup — likely in-market for services soon",
     });
 

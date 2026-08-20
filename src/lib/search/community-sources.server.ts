@@ -397,11 +397,7 @@ export async function searchTedTenders(qx: ExpandedQueries): Promise<SourceLead[
   for (const n of notices) {
     const titleRaw = n["notice-title"];
     const title =
-      typeof titleRaw === "string"
-        ? titleRaw
-        : titleRaw
-          ? Object.values(titleRaw)[0] || ""
-          : "";
+      typeof titleRaw === "string" ? titleRaw : titleRaw ? Object.values(titleRaw)[0] || "" : "";
     const buyerRaw = n["buyer-name"];
     const buyer = Array.isArray(buyerRaw) ? buyerRaw[0] : buyerRaw;
     if (!title?.trim()) continue;

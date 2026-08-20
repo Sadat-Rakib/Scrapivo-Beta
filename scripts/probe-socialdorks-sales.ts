@@ -7,8 +7,17 @@ process.env.SEARXNG_URL = "http://127.0.0.1:8888";
 process.env.SCRAPIVO_DEBUG_STAGES = "1";
 import { classifyQuery } from "../src/lib/search/query-classifier";
 import { expandFromClassified } from "../src/lib/search/query-expander";
-import { personNoun, craftVariants, matchesCraft, classifyDemand } from "../src/lib/search/demand-classifier";
-import { searchSearxng, searxngResultsToLeads, withSearxngBudget } from "../src/lib/search/searxng.server";
+import {
+  personNoun,
+  craftVariants,
+  matchesCraft,
+  classifyDemand,
+} from "../src/lib/search/demand-classifier";
+import {
+  searchSearxng,
+  searxngResultsToLeads,
+  withSearxngBudget,
+} from "../src/lib/search/searxng.server";
 
 const x = expandFromClassified(classifyQuery("sales teams"));
 const craft = personNoun(x.skill, x.role);
@@ -42,7 +51,11 @@ await withSearxngBudget(async () => {
     const verdict = classifyDemand({ title: l.title, body: l.snippet });
     if (verdict.rejectedAs || !verdict.isDemand) {
       demandFail++;
-      console.log("  demand fail:", verdict.rejectedAs || "no demand", (l.title || "").slice(0, 60));
+      console.log(
+        "  demand fail:",
+        verdict.rejectedAs || "no demand",
+        (l.title || "").slice(0, 60),
+      );
       continue;
     }
     ok++;

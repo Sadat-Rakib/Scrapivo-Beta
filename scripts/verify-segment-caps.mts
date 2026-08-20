@@ -99,7 +99,10 @@ console.log("\nMixed feed yields all three segments");
   }
   console.log(`       ${JSON.stringify(Object.fromEntries(bySource))}`);
   check("reddit present", (bySource.get("reddit") ?? 0) > 0);
-  check("company ATS present", ATS.some((s) => (bySource.get(s) ?? 0) > 0));
+  check(
+    "company ATS present",
+    ATS.some((s) => (bySource.get(s) ?? 0) > 0),
+  );
   check("freelancer present", (bySource.get("freelancer") ?? 0) > 0);
   // On the cap-governed front page, aggregators may only take slots the good
   // sources could not fill: reddit(6) + companyAts(12) + freelancer(5) = 23,
@@ -121,7 +124,11 @@ console.log("\nFront page holds >= 2 opportunities per job");
   ).length;
   console.log(`       front=${front.length} jobShaped=${jobish}`);
   check("jobs <= 1/3 of front page", jobish * 3 <= front.length, `${jobish}/${front.length}`);
-  check("opportunities dominate", front.length - jobish >= 2 * jobish, `${front.length - jobish} vs ${jobish}`);
+  check(
+    "opportunities dominate",
+    front.length - jobish >= 2 * jobish,
+    `${front.length - jobish} vs ${jobish}`,
+  );
 }
 
 console.log("\nRatio never starves a job-only feed");

@@ -33,6 +33,7 @@ STEALTH_WORKER_TOKEN=optional-secret
 ```
 
 Endpoints:
+
 - `POST /scrape` — platform search (`linkedin`, `instagram`, `facebook`)
 - `POST /fetch` — extract page text from a single URL
 

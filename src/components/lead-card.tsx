@@ -113,8 +113,7 @@ export function LeadCard({
   saved?: boolean;
 }) {
   const rawTier = lead.intent_tier ?? lead.tier;
-  const tier: "hot" | "warm" | undefined =
-    rawTier === "hot" ? "hot" : rawTier ? "warm" : undefined;
+  const tier: "hot" | "warm" | undefined = rawTier === "hot" ? "hot" : rawTier ? "warm" : undefined;
   const score = lead.intent_score ?? lead.score;
   const sourceLabel = displaySource(lead);
   return (

@@ -53,15 +53,12 @@ export async function searchTwitter(query: SearchQuery): Promise<Lead[]> {
           tweet_mode: "extended",
           result_type: "recent",
         });
-        const res = await fetch(
-          `https://api.twitter.com/1.1/search/tweets.json?${params}`,
-          {
-            headers: {
-              Authorization: `Bearer ${TWITTER_BEARER}`,
-              "x-guest-token": guestToken,
-            },
+        const res = await fetch(`https://api.twitter.com/1.1/search/tweets.json?${params}`, {
+          headers: {
+            Authorization: `Bearer ${TWITTER_BEARER}`,
+            "x-guest-token": guestToken,
           },
-        );
+        });
         if (!res.ok) continue;
         const data = await res.json();
 
@@ -70,17 +67,13 @@ export async function searchTwitter(query: SearchQuery): Promise<Lead[]> {
           if (!tweetId || seen.has(tweetId)) continue;
 
           const text = tweet.full_text || tweet.text || "";
-          const postedAt = tweet.created_at
-            ? new Date(tweet.created_at).toISOString()
-            : null;
+          const postedAt = tweet.created_at ? new Date(tweet.created_at).toISOString() : null;
           if (!postedAt || !isWithin14Days(postedAt)) continue;
           if (!hasBuyerIntent(text, query.negativePhrases)) continue;
 
           seen.add(tweetId);
           const author = tweet.user;
-          const isDecisionMaker = detectDecisionMaker(
-            text + " " + (author?.description || ""),
-          );
+          const isDecisionMaker = detectDecisionMaker(text + " " + (author?.description || ""));
           const { score, tier, hasBudget, hasUrgency } = scoreIntent({
             text,
             platform: "twitter",
@@ -175,11 +168,7 @@ export async function searchTwitter(query: SearchQuery): Promise<Lead[]> {
             post_url: url,
             post_title: result.title || "",
             post_body_snippet: (result.snippet || "").slice(0, 600),
-            ai_summary: generateSummary(
-              result.title || "",
-              result.snippet || "",
-              query.skill,
-            ),
+            ai_summary: generateSummary(result.title || "", result.snippet || "", query.skill),
             why_shown: generateWhyShown(
               "Twitter/X",
               query.skill,
@@ -219,17 +208,14 @@ export async function searchTwitter(query: SearchQuery): Promise<Lead[]> {
         );
         if (!res.ok) continue;
         const html = await res.text();
-        const tweetMatches =
-          html.match(/class="tweet-content[^"]*"[^>]*>([\s\S]*?)<\/div>/g) || [];
+        const tweetMatches = html.match(/class="tweet-content[^"]*"[^>]*>([\s\S]*?)<\/div>/g) || [];
         const dateMatches = html.match(/datetime="([^"]+)"/g) || [];
         const linkMatches = html.match(/href="\/[^/]+\/status\/(\d+)"/g) || [];
         const userMatches = html.match(/class="username"[^>]*>@?([^<]+)<\/a>/g) || [];
 
         for (let i = 0; i < Math.min(tweetMatches.length, 10); i++) {
           const text = (tweetMatches[i] || "").replace(/<[^>]+>/g, "").trim();
-          const dateStr = (dateMatches[i] || "")
-            .replace('datetime="', "")
-            .replace('"', "");
+          const dateStr = (dateMatches[i] || "").replace('datetime="', "").replace('"', "");
           const postedAt = dateStr ? new Date(dateStr).toISOString() : null;
           const linkMatch = linkMatches[i]?.match(/\/status\/(\d+)/);
           const tweetId = linkMatch?.[1];
@@ -292,8 +278,7 @@ export async function searchTwitter(query: SearchQuery): Promise<Lead[]> {
 
   if (leads.length < 2) {
     try {
-      const searchUrl =
-        `https://twitter.com/search?q=${encodeURIComponent(`hiring ${query.skill}`)}&f=live`;
+      const searchUrl = `https://twitter.com/search?q=${encodeURIComponent(`hiring ${query.skill}`)}&f=live`;
       const jinaText = await safe(jinaRead(searchUrl), "");
       if (jinaText && hasBuyerIntent(jinaText, query.negativePhrases)) {
         const now = new Date().toISOString();

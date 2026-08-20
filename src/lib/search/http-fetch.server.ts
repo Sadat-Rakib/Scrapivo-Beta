@@ -28,7 +28,10 @@ function sleep(ms: number): Promise<void> {
 }
 
 /** Optional curl-impersonate subprocess when CURL_IMPERSONATE_BIN is set. */
-async function curlImpersonateFetch(url: string, headers: Record<string, string>): Promise<Response | null> {
+async function curlImpersonateFetch(
+  url: string,
+  headers: Record<string, string>,
+): Promise<Response | null> {
   const bin = process.env.CURL_IMPERSONATE_BIN;
   if (!bin) return null;
 
@@ -99,8 +102,14 @@ export async function resilientText(url: string, options?: ResilientFetchOptions
   return res.text();
 }
 
-export async function resilientJson<T>(url: string, options?: ResilientFetchOptions): Promise<T | null> {
-  const res = await resilientFetch(url, { ...options, headers: { Accept: "application/json", ...options?.headers } });
+export async function resilientJson<T>(
+  url: string,
+  options?: ResilientFetchOptions,
+): Promise<T | null> {
+  const res = await resilientFetch(url, {
+    ...options,
+    headers: { Accept: "application/json", ...options?.headers },
+  });
   if (!res.ok) return null;
   try {
     return (await res.json()) as T;

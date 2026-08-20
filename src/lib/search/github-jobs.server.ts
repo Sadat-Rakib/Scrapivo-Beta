@@ -15,11 +15,7 @@
 //                       (funding + hiring double signal → leading_indicator)
 // =====================================================================
 import type { Lead } from "../scoring";
-import {
-  isRecent,
-  isStronglyRelevantToSkill,
-  type ExpandedQueries,
-} from "./query-expander";
+import { isRecent, isStronglyRelevantToSkill, type ExpandedQueries } from "./query-expander";
 import type { ClassifiedQuery } from "./query-classifier";
 
 type SourceLead = Lead & { intentBoost?: number };
@@ -57,17 +53,57 @@ const MD_TABLE_REPOS: MdRepo[] = [
   {
     raw: "https://raw.githubusercontent.com/jobs-jobr-pro/Software-Engineering-Jobs/main/README.md",
     label: "GitHub: Software Engineering Jobs",
-    tags: ["software", "engineer", "developer", "backend", "frontend", "fullstack", "react", "next.js", "node.js", "python", "java", "golang", "rust", "typescript", "javascript", "web development"],
+    tags: [
+      "software",
+      "engineer",
+      "developer",
+      "backend",
+      "frontend",
+      "fullstack",
+      "react",
+      "next.js",
+      "node.js",
+      "python",
+      "java",
+      "golang",
+      "rust",
+      "typescript",
+      "javascript",
+      "web development",
+    ],
   },
   {
     raw: "https://raw.githubusercontent.com/jobs-jobr-pro/Full-Stack-Development-Jobs/main/README.md",
     label: "GitHub: Full-Stack Jobs",
-    tags: ["fullstack", "full stack", "react", "next.js", "node.js", "frontend", "backend", "web development", "javascript", "typescript"],
+    tags: [
+      "fullstack",
+      "full stack",
+      "react",
+      "next.js",
+      "node.js",
+      "frontend",
+      "backend",
+      "web development",
+      "javascript",
+      "typescript",
+    ],
   },
   {
     raw: "https://raw.githubusercontent.com/jobs-jobr-pro/Remote-Software-Engineering-Jobs/main/README.md",
     label: "GitHub: Remote SE Jobs",
-    tags: ["software", "engineer", "developer", "react", "next.js", "node.js", "python", "remote", "frontend", "backend", "fullstack"],
+    tags: [
+      "software",
+      "engineer",
+      "developer",
+      "react",
+      "next.js",
+      "node.js",
+      "python",
+      "remote",
+      "frontend",
+      "backend",
+      "fullstack",
+    ],
   },
   {
     raw: "https://raw.githubusercontent.com/jobs-jobr-pro/Data-Analyst-Jobs/main/README.md",
@@ -110,18 +146,65 @@ const MD_TABLE_REPOS: MdRepo[] = [
 ];
 
 const COLLIDER_FEEDS: Array<{ url: string; tags: string[] }> = [
-  { url: "https://jobscollider.com/remote-software-development-jobs.rss", tags: ["software", "developer", "engineer", "react", "next.js", "node.js", "python", "frontend", "backend", "fullstack", "web development", "javascript", "typescript"] },
-  { url: "https://jobscollider.com/remote-design-jobs.rss", tags: ["design", "ux", "ui", "figma", "graphic design"] },
-  { url: "https://jobscollider.com/remote-marketing-jobs.rss", tags: ["marketing", "seo", "ppc", "social media", "email marketing", "content writing"] },
-  { url: "https://jobscollider.com/remote-sales-jobs.rss", tags: ["sales", "sdr", "bdr", "account executive"] },
-  { url: "https://jobscollider.com/remote-data-jobs.rss", tags: ["data", "sql", "analytics", "data science", "machine learning"] },
-  { url: "https://jobscollider.com/remote-devops-jobs.rss", tags: ["devops", "cloud", "aws", "kubernetes", "docker", "terraform"] },
-  { url: "https://jobscollider.com/remote-cybersecurity-jobs.rss", tags: ["cybersecurity", "security", "infosec"] },
+  {
+    url: "https://jobscollider.com/remote-software-development-jobs.rss",
+    tags: [
+      "software",
+      "developer",
+      "engineer",
+      "react",
+      "next.js",
+      "node.js",
+      "python",
+      "frontend",
+      "backend",
+      "fullstack",
+      "web development",
+      "javascript",
+      "typescript",
+    ],
+  },
+  {
+    url: "https://jobscollider.com/remote-design-jobs.rss",
+    tags: ["design", "ux", "ui", "figma", "graphic design"],
+  },
+  {
+    url: "https://jobscollider.com/remote-marketing-jobs.rss",
+    tags: ["marketing", "seo", "ppc", "social media", "email marketing", "content writing"],
+  },
+  {
+    url: "https://jobscollider.com/remote-sales-jobs.rss",
+    tags: ["sales", "sdr", "bdr", "account executive"],
+  },
+  {
+    url: "https://jobscollider.com/remote-data-jobs.rss",
+    tags: ["data", "sql", "analytics", "data science", "machine learning"],
+  },
+  {
+    url: "https://jobscollider.com/remote-devops-jobs.rss",
+    tags: ["devops", "cloud", "aws", "kubernetes", "docker", "terraform"],
+  },
+  {
+    url: "https://jobscollider.com/remote-cybersecurity-jobs.rss",
+    tags: ["cybersecurity", "security", "infosec"],
+  },
   { url: "https://jobscollider.com/remote-qa-jobs.rss", tags: ["qa", "testing", "automation"] },
-  { url: "https://jobscollider.com/remote-writing-jobs.rss", tags: ["writing", "content writing", "copywriter"] },
-  { url: "https://jobscollider.com/remote-product-jobs.rss", tags: ["product manager", "product management"] },
-  { url: "https://jobscollider.com/remote-finance-legal-jobs.rss", tags: ["finance", "accounting", "legal", "bookkeeping"] },
-  { url: "https://jobscollider.com/remote-human-resources-jobs.rss", tags: ["hr", "recruiting", "human resources"] },
+  {
+    url: "https://jobscollider.com/remote-writing-jobs.rss",
+    tags: ["writing", "content writing", "copywriter"],
+  },
+  {
+    url: "https://jobscollider.com/remote-product-jobs.rss",
+    tags: ["product manager", "product management"],
+  },
+  {
+    url: "https://jobscollider.com/remote-finance-legal-jobs.rss",
+    tags: ["finance", "accounting", "legal", "bookkeeping"],
+  },
+  {
+    url: "https://jobscollider.com/remote-human-resources-jobs.rss",
+    tags: ["hr", "recruiting", "human resources"],
+  },
 ];
 
 const SIMPLIFY_LISTINGS =
@@ -141,7 +224,10 @@ function tagScore(tags: string[], blob: string): number {
 
 function stripMd(cell: string): { text: string; url?: string } {
   const link = cell.match(/\[([^\]]+)\]\(([^)]+)\)/);
-  const text = (link ? link[1] : cell).replace(/\*\*/g, "").replace(/<[^>]+>/g, "").trim();
+  const text = (link ? link[1] : cell)
+    .replace(/\*\*/g, "")
+    .replace(/<[^>]+>/g, "")
+    .trim();
   return { text, url: link?.[2] };
 }
 
@@ -161,7 +247,10 @@ function parseMdTable(md: string, label: string, qx: ExpandedQueries): SourceLea
   const out: SourceLead[] = [];
   for (const line of md.split("\n")) {
     if (!line.startsWith("|") || /^\|\s*-+/.test(line) || /\|\s*Company\s*\|/i.test(line)) continue;
-    const cells = line.split("|").slice(1, -1).map((c) => c.trim());
+    const cells = line
+      .split("|")
+      .slice(1, -1)
+      .map((c) => c.trim());
     if (cells.length < 3) continue;
     const company = stripMd(cells[0]);
     const position = stripMd(cells[1]);
@@ -204,7 +293,13 @@ function parseSimplify(jsonText: string, qx: ExpandedQueries): SourceLead[] {
     if (!j?.active || !j?.url || !j?.title) continue;
     const posted = Number(j.date_posted ?? j.date_updated ?? 0);
     if (posted < cutoff) continue;
-    if (!isStronglyRelevantToSkill(`${j.title} ${j.company_name} ${(j.locations || []).join(" ")}`, qx.skill)) continue;
+    if (
+      !isStronglyRelevantToSkill(
+        `${j.title} ${j.company_name} ${(j.locations || []).join(" ")}`,
+        qx.skill,
+      )
+    )
+      continue;
     out.push({
       source: "githubjobs",
       platform: "GitHub: New-Grad Positions (Simplify)",
@@ -226,8 +321,15 @@ function parseSimplify(jsonText: string, qx: ExpandedQueries): SourceLead[] {
 
 // ── JobsCollider RSS ────────────────────────────────────────────────────────
 function pickTag(block: string, tag: string): string {
-  const m = block.match(new RegExp(`<${tag}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?<\\/${tag}>`));
-  return m ? m[1].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() : "";
+  const m = block.match(
+    new RegExp(`<${tag}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?<\\/${tag}>`),
+  );
+  return m
+    ? m[1]
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+    : "";
 }
 
 function parseColliderRss(xml: string, qx: ExpandedQueries): SourceLead[] {
@@ -267,7 +369,11 @@ function parseAgo(s: string): string | undefined {
   return new Date(Date.now() - days * 86_400_000).toISOString();
 }
 
-function parseFundedStartups(md: string, qx: ExpandedQueries, audience?: string | null): SourceLead[] {
+function parseFundedStartups(
+  md: string,
+  qx: ExpandedQueries,
+  audience?: string | null,
+): SourceLead[] {
   const out: SourceLead[] = [];
   const seen = new Set<string>();
   for (const m of md.matchAll(/<tr>([\s\S]*?)<\/tr>/g)) {
@@ -281,7 +387,10 @@ function parseFundedStartups(md: string, qx: ExpandedQueries, audience?: string 
     const raiseLink = row.match(/<a href="(https:\/\/x\.com\/[^"]+status[^"]+)"/)?.[1];
     // description = the wide <td> without markup
     const descTd = [...row.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map((t) =>
-      t[1].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(),
+      t[1]
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim(),
     );
     const desc = descTd.sort((a, b) => b.length - a.length)[0] ?? "";
     const founders = row.match(/🧑‍💼\s*([^<]+)</)?.[1]?.trim();
@@ -295,8 +404,11 @@ function parseFundedStartups(md: string, qx: ExpandedQueries, audience?: string 
       source: "githubjobs",
       platform: "Funded AI Startups (GitHub)",
       title: `${name} raised ${raised}${round ? ` (${round})` : ""} — fresh budget, likely hiring`,
-      snippet: [desc.slice(0, 300), founders ? `Founders: ${founders}` : ""].filter(Boolean).join(" · "),
-      full_post_url: raiseLink || `https://github.com/landedjobs/recently-funded-ai-startups-hiring`,
+      snippet: [desc.slice(0, 300), founders ? `Founders: ${founders}` : ""]
+        .filter(Boolean)
+        .join(" · "),
+      full_post_url:
+        raiseLink || `https://github.com/landedjobs/recently-funded-ai-startups-hiring`,
       author: name,
       posted_at: date,
       engagement: 30,
@@ -318,16 +430,17 @@ export async function searchGitHubJobRepos(
   const loc = (classified?.location || "").toLowerCase();
 
   // Pick the best-matching md-table repos (max 3 + any location variants).
-  const mdPicks = MD_TABLE_REPOS
-    .map((r) => ({ r, score: tagScore(r.tags, blob) + (r.location && loc.includes(r.location) ? 3 : 0) }))
+  const mdPicks = MD_TABLE_REPOS.map((r) => ({
+    r,
+    score: tagScore(r.tags, blob) + (r.location && loc.includes(r.location) ? 3 : 0),
+  }))
     .filter(({ r, score }) => (r.location ? loc.includes(r.location) && score > 0 : score > 0))
     .sort((a, b) => b.score - a.score)
     .slice(0, 3)
     .map(({ r }) => r);
 
   // Pick up to 2 matching JobsCollider feeds (default dev feed if none match).
-  const colliderPicks = COLLIDER_FEEDS
-    .map((f) => ({ f, score: tagScore(f.tags, blob) }))
+  const colliderPicks = COLLIDER_FEEDS.map((f) => ({ f, score: tagScore(f.tags, blob) }))
     .filter(({ score }) => score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, 2)

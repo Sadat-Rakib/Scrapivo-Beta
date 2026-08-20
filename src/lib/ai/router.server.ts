@@ -24,84 +24,98 @@ function providersFor(task: Task): Provider[] {
 
   // ---- classify: fast, cheap, JSON-mode preferred -------------------
   if (task === "classify" || task === "extract") {
-    if (groq) list.push({
-      id: "groq:llama-3.1-8b",
-      available: true,
-      endpoint: "https://api.groq.com/openai/v1/chat/completions",
-      headers: () => ({ authorization: `Bearer ${groq}`, "content-type": "application/json" }),
-      model: "llama-3.1-8b-instant",
-      json: true,
-    });
-    if (groq) list.push({
-      id: "groq:llama-3.3-70b",
-      available: true,
-      endpoint: "https://api.groq.com/openai/v1/chat/completions",
-      headers: () => ({ authorization: `Bearer ${groq}`, "content-type": "application/json" }),
-      model: "llama-3.3-70b-versatile",
-      json: true,
-    });
-    if (openrouter) list.push({
-      id: "openrouter:deepseek-free",
-      available: true,
-      endpoint: "https://openrouter.ai/api/v1/chat/completions",
-      headers: () => ({
-        authorization: `Bearer ${openrouter}`,
-        "content-type": "application/json",
-        "http-referer": "https://scrapivo.app",
-        "x-title": "Scrapivo",
-      }),
-      model: "deepseek/deepseek-chat-v3.1:free",
-      json: true,
-    });
+    if (groq)
+      list.push({
+        id: "groq:gpt-oss-20b",
+        available: true,
+        endpoint: "https://api.groq.com/openai/v1/chat/completions",
+        headers: () => ({ authorization: `Bearer ${groq}`, "content-type": "application/json" }),
+        model: "openai/gpt-oss-20b",
+        json: true,
+      });
+    if (groq)
+      list.push({
+        id: "groq:gpt-oss-120b",
+        available: true,
+        endpoint: "https://api.groq.com/openai/v1/chat/completions",
+        headers: () => ({ authorization: `Bearer ${groq}`, "content-type": "application/json" }),
+        model: "openai/gpt-oss-120b",
+        json: true,
+      });
+    if (openrouter)
+      list.push({
+        id: "openrouter:gemma-free",
+        available: true,
+        endpoint: "https://openrouter.ai/api/v1/chat/completions",
+        headers: () => ({
+          authorization: `Bearer ${openrouter}`,
+          "content-type": "application/json",
+          "http-referer": "https://scrapivo.app",
+          "x-title": "Scrapivo",
+        }),
+        model: "google/gemma-4-31b-it:free",
+        json: true,
+      });
   }
 
   // ---- expand / research: longer-context, better synthesis ----------
   if (task === "expand" || task === "research") {
-    if (deepseek) list.push({
-      id: "deepseek:chat",
-      available: true,
-      endpoint: "https://api.deepseek.com/chat/completions",
-      headers: () => ({ authorization: `Bearer ${deepseek}`, "content-type": "application/json" }),
-      model: "deepseek-chat",
-      json: true,
-    });
-    if (moonshot) list.push({
-      id: "moonshot:8k",
-      available: true,
-      endpoint: "https://api.moonshot.cn/v1/chat/completions",
-      headers: () => ({ authorization: `Bearer ${moonshot}`, "content-type": "application/json" }),
-      model: "moonshot-v1-8k",
-      json: true,
-    });
-    if (glm) list.push({
-      id: "glm:4-flash",
-      available: true,
-      endpoint: "https://open.bigmodel.cn/api/paas/v4/chat/completions",
-      headers: () => ({ authorization: `Bearer ${glm}`, "content-type": "application/json" }),
-      model: "glm-4-flash",
-      json: true,
-    });
-    if (openrouter) list.push({
-      id: "openrouter:kimi-free",
-      available: true,
-      endpoint: "https://openrouter.ai/api/v1/chat/completions",
-      headers: () => ({
-        authorization: `Bearer ${openrouter}`,
-        "content-type": "application/json",
-        "http-referer": "https://scrapivo.app",
-        "x-title": "Scrapivo",
-      }),
-      model: "moonshotai/kimi-k2:free",
-      json: true,
-    });
-    if (groq) list.push({
-      id: "groq:llama-3.3-70b",
-      available: true,
-      endpoint: "https://api.groq.com/openai/v1/chat/completions",
-      headers: () => ({ authorization: `Bearer ${groq}`, "content-type": "application/json" }),
-      model: "llama-3.3-70b-versatile",
-      json: true,
-    });
+    if (deepseek)
+      list.push({
+        id: "deepseek:chat",
+        available: true,
+        endpoint: "https://api.deepseek.com/chat/completions",
+        headers: () => ({
+          authorization: `Bearer ${deepseek}`,
+          "content-type": "application/json",
+        }),
+        model: "deepseek-chat",
+        json: true,
+      });
+    if (moonshot)
+      list.push({
+        id: "moonshot:8k",
+        available: true,
+        endpoint: "https://api.moonshot.cn/v1/chat/completions",
+        headers: () => ({
+          authorization: `Bearer ${moonshot}`,
+          "content-type": "application/json",
+        }),
+        model: "moonshot-v1-8k",
+        json: true,
+      });
+    if (glm)
+      list.push({
+        id: "glm:4-flash",
+        available: true,
+        endpoint: "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+        headers: () => ({ authorization: `Bearer ${glm}`, "content-type": "application/json" }),
+        model: "glm-4-flash",
+        json: true,
+      });
+    if (openrouter)
+      list.push({
+        id: "openrouter:glm-free",
+        available: true,
+        endpoint: "https://openrouter.ai/api/v1/chat/completions",
+        headers: () => ({
+          authorization: `Bearer ${openrouter}`,
+          "content-type": "application/json",
+          "http-referer": "https://scrapivo.app",
+          "x-title": "Scrapivo",
+        }),
+        model: "z-ai/glm-5.2:free",
+        json: true,
+      });
+    if (groq)
+      list.push({
+        id: "groq:gpt-oss-120b",
+        available: true,
+        endpoint: "https://api.groq.com/openai/v1/chat/completions",
+        headers: () => ({ authorization: `Bearer ${groq}`, "content-type": "application/json" }),
+        model: "openai/gpt-oss-120b",
+        json: true,
+      });
   }
 
   return list.filter((p) => p.available);
@@ -132,7 +146,7 @@ export async function aiComplete(call: AiCall): Promise<string> {
   let lastErr: unknown = null;
   for (const p of providers) {
     try {
-      const body: any = {
+      const body: Record<string, unknown> = {
         model: p.model,
         messages: [
           { role: "system", content: call.system },
@@ -173,9 +187,18 @@ export function safeJsonParse<T = unknown>(s: string): T | null {
   if (!s) return null;
   // strip markdown fences if a provider ignored json_format
   const cleaned = s.replace(/^```(?:json)?\s*|\s*```$/g, "").trim();
-  try { return JSON.parse(cleaned) as T; } catch {}
-  // try to extract the first {...} block
+  try {
+    return JSON.parse(cleaned) as T;
+  } catch {
+    // not raw JSON — try to extract the first {...} block below
+  }
   const m = cleaned.match(/\{[\s\S]*\}/);
-  if (m) { try { return JSON.parse(m[0]) as T; } catch {} }
+  if (m) {
+    try {
+      return JSON.parse(m[0]) as T;
+    } catch {
+      // unparseable — fall through to null
+    }
+  }
   return null;
 }

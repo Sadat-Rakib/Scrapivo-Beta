@@ -44,10 +44,7 @@ export async function processDueSequenceSteps(
       .maybeSingle();
 
     if (!seq || seq.status !== "active") {
-      await admin
-        .from("email_sequence_steps")
-        .update({ status: "skipped" })
-        .eq("id", step.id);
+      await admin.from("email_sequence_steps").update({ status: "skipped" }).eq("id", step.id);
       continue;
     }
 
@@ -73,10 +70,7 @@ export async function processDueSequenceSteps(
       failed += 1;
       const msg = result.reasons.join("; ");
       errors.push(`${step.id}: ${msg}`);
-      await admin
-        .from("email_sequence_steps")
-        .update({ status: "failed" })
-        .eq("id", step.id);
+      await admin.from("email_sequence_steps").update({ status: "failed" }).eq("id", step.id);
       // Pause sequence on gate failure so we don't keep retrying forever
       await admin
         .from("email_sequences")

@@ -13,7 +13,9 @@ const SENIOR_RE =
   /\b(senior|sr\.?|staff|principal|lead|director|head of|10\+?\s*years|5\+?\s*years)\b/i;
 
 function terms(qx: ExpandedQueries): string[] {
-  return [qx.role, qx.skill, ...(qx.jobBoardTerms || [])].filter(Boolean).map((t) => t.toLowerCase());
+  return [qx.role, qx.skill, ...(qx.jobBoardTerms || [])]
+    .filter(Boolean)
+    .map((t) => t.toLowerCase());
 }
 
 function matches(text: string, t: string[]): boolean {
@@ -99,13 +101,17 @@ export async function searchWorkAtAStartup(qx: ExpandedQueries): Promise<SourceL
 export async function searchStartupsGallery(qx: ExpandedQueries): Promise<SourceLead[]> {
   const out: SourceLead[] = [];
   const t = terms(qx);
-  const page = await fetchHtmlGated("https://www.startups.gallery/", ["startup", "gallery", ...t.slice(0, 2)]);
+  const page = await fetchHtmlGated("https://www.startups.gallery/", [
+    "startup",
+    "gallery",
+    ...t.slice(0, 2),
+  ]);
   if (!page) return [];
 
   const re = /href="(https?:\/\/(?!www\.startups\.gallery)[^"]+)"[^>]*>([^<]{2,80})</gi;
   let m: RegExpExecArray | null;
   const seen = new Set<string>();
-    while ((m = re.exec(page.html)) && out.length < 36) {
+  while ((m = re.exec(page.html)) && out.length < 36) {
     const url = m[1].split("?")[0];
     const name = m[2].replace(/\s+/g, " ").trim();
     if (!name || name.length < 2 || seen.has(url)) continue;
@@ -142,7 +148,7 @@ export async function searchGitHubHiringLists(qx: ExpandedQueries): Promise<Sour
   const skill = qx.skill || qx.role || "hiring";
   const q = [
     `"${skill}"`,
-    "label:hiring OR \"who is hiring\" OR \"we are hiring\" OR \"looking for\"",
+    'label:hiring OR "who is hiring" OR "we are hiring" OR "looking for"',
     "is:issue",
     "is:open",
     `created:>${new Date(Date.now() - JOB_BOARD_MAX_AGE_DAYS * 86400_000).toISOString().slice(0, 10)}`,
@@ -250,8 +256,7 @@ export async function searchDiscordPublic(qx: ExpandedQueries): Promise<SourceLe
     `site:discord.gg "${skill}" (hiring OR "looking for" OR freelance OR developers)`,
     `"${skill}" ("discord server" OR disboard) (hiring OR "looking for developers")`,
   ];
-  const BUYER_RE =
-    /\b(hiring|looking for|need|freelance|developers?|jobs?|recruit|talent)\b/i;
+  const BUYER_RE = /\b(hiring|looking for|need|freelance|developers?|jobs?|recruit|talent)\b/i;
   try {
     const { searchSiteDorks } = await import("./serp-providers.server");
     const results = await searchSiteDorks(queries, {
@@ -323,8 +328,7 @@ export async function searchInstagramPublic(qx: ExpandedQueries): Promise<Source
           const username = post.user?.username || post.owner?.username || "";
           const code = post.code || post.shortcode;
           const link =
-            post.permalink ||
-            (code ? `https://www.instagram.com/p/${code}/` : post.url || "");
+            post.permalink || (code ? `https://www.instagram.com/p/${code}/` : post.url || "");
           if (!link || !/instagram\.com\/(p|reel)\//i.test(link)) continue;
           seen.add(postId);
           out.push({
@@ -341,7 +345,9 @@ export async function searchInstagramPublic(qx: ExpandedQueries): Promise<Source
             intentBoost: 12,
           });
         }
-      } catch { /* continue */ }
+      } catch {
+        /* continue */
+      }
     }
   }
 
@@ -388,7 +394,9 @@ export async function searchInstagramPublic(qx: ExpandedQueries): Promise<Source
           match_reasons: ["Instagram public buyer dork"],
         });
       }
-    } catch { /* continue */ }
+    } catch {
+      /* continue */
+    }
   }
 
   return out.slice(0, 20);

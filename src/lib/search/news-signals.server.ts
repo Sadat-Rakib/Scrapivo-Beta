@@ -46,19 +46,34 @@ const MAX_CLASSIFY = 24;
 function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
   return new Promise<T>((resolve) => {
     const t = setTimeout(() => resolve(fallback), ms);
-    p.then((v) => { clearTimeout(t); resolve(v); }).catch(() => { clearTimeout(t); resolve(fallback); });
+    p.then((v) => {
+      clearTimeout(t);
+      resolve(v);
+    }).catch(() => {
+      clearTimeout(t);
+      resolve(fallback);
+    });
   });
 }
 
 function pick(block: string, tag: string): string {
-  const m = block.match(new RegExp(`<${tag}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?<\\/${tag}>`));
-  return m ? m[1].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() : "";
+  const m = block.match(
+    new RegExp(`<${tag}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?<\\/${tag}>`),
+  );
+  return m
+    ? m[1]
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+    : "";
 }
 
 async function fetchFeed(feed: { url: string; outlet: string }): Promise<Article[]> {
   const text = await withTimeout(
     (async () => {
-      const res = await fetch(feed.url, { headers: { "user-agent": "scrapivo/1.0", accept: "application/rss+xml, application/xml" } });
+      const res = await fetch(feed.url, {
+        headers: { "user-agent": "scrapivo/1.0", accept: "application/rss+xml, application/xml" },
+      });
       return res.ok ? await res.text() : "";
     })(),
     NEWS_TIMEOUT_MS,
@@ -100,12 +115,19 @@ Respond with strict JSON, no prose/markdown:
 {"results":[{"id":"<id>","category":"direct_hiring_announcement|leading_indicator|none","company":"<name>","evidence":"<quote max 140 chars>"}]}`;
 
 function buildUser(articles: Array<Article & { id: string }>): string {
-  const items = articles.map((a) => `ID: ${a.id}\nTITLE: ${a.title}\nTEXT: ${a.snippet}`.slice(0, 700)).join("\n\n---\n\n");
+  const items = articles
+    .map((a) => `ID: ${a.id}\nTITLE: ${a.title}\nTEXT: ${a.snippet}`.slice(0, 700))
+    .join("\n\n---\n\n");
   return `ARTICLES:\n\n${items}`;
 }
 
 export type NewsCategory = "direct_hiring_announcement" | "leading_indicator" | "none";
-export type NewsClassification = { id: string; category: NewsCategory; company: string; evidence: string };
+export type NewsClassification = {
+  id: string;
+  category: NewsCategory;
+  company: string;
+  evidence: string;
+};
 
 /** Classify a batch of articles at the fork point. Exported for verification. */
 export async function classifyNewsArticles(
@@ -129,11 +151,19 @@ export async function classifyNewsArticles(
       for (const r of parsed?.results ?? []) {
         if (!r?.id) continue;
         const category: NewsCategory =
-          r.category === "direct_hiring_announcement" || r.category === "leading_indicator" ? r.category : "none";
-        out[r.id] = { id: r.id, category, company: (r.company || "").slice(0, 80), evidence: (r.evidence || "").slice(0, 200) };
+          r.category === "direct_hiring_announcement" || r.category === "leading_indicator"
+            ? r.category
+            : "none";
+        out[r.id] = {
+          id: r.id,
+          category,
+          company: (r.company || "").slice(0, 80),
+          evidence: (r.evidence || "").slice(0, 200),
+        };
       }
     } catch (err) {
-      if (process.env.NODE_ENV === "development") console.warn("[news-signals] classify batch failed", (err as Error)?.message);
+      if (process.env.NODE_ENV === "development")
+        console.warn("[news-signals] classify batch failed", (err as Error)?.message);
     }
   }
   return out;
@@ -154,7 +184,10 @@ async function triggerAtsCheck(companies: string[]): Promise<void> {
     const { getAdmin } = await import("@/integrations/my-supabase/admin.server");
     await getAdmin()
       .from("ats_check_queue")
-      .upsert(unique.map((company) => ({ company, requested_at: new Date().toISOString() })), { onConflict: "company" });
+      .upsert(
+        unique.map((company) => ({ company, requested_at: new Date().toISOString() })),
+        { onConflict: "company" },
+      );
   } catch {
     /* table optional — the log above is the durable minimum */
   }

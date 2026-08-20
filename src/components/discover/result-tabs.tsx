@@ -1,5 +1,10 @@
 import type { Lead } from "@/lib/scoring";
-import type { CompanyRow, PersonRow, InlineContacts, LocalBusinessRow } from "@/lib/search/lead-segments";
+import type {
+  CompanyRow,
+  PersonRow,
+  InlineContacts,
+  LocalBusinessRow,
+} from "@/lib/search/lead-segments";
 import { LeadCard } from "@/components/lead-card";
 import { Button } from "@/components/ui/button";
 import {
@@ -114,7 +119,11 @@ function InPostContacts({ ic }: { ic?: InlineContacts }) {
       {ic.emails.map((e) => (
         <div key={e} className="flex items-center gap-1.5 text-xs">
           <Mail className="size-3 text-primary shrink-0" />
-          <a href={`mailto:${e}`} className="hover:underline truncate" onClick={(ev) => ev.stopPropagation()}>
+          <a
+            href={`mailto:${e}`}
+            className="hover:underline truncate"
+            onClick={(ev) => ev.stopPropagation()}
+          >
             {e}
           </a>
         </div>
@@ -128,7 +137,13 @@ function InPostContacts({ ic }: { ic?: InlineContacts }) {
       {ic.links.map((l) => (
         <div key={l} className="flex items-center gap-1.5 text-xs">
           <ExternalLink className="size-3 text-primary shrink-0" />
-          <a href={l} target="_blank" rel="noreferrer" className="hover:underline truncate" onClick={(ev) => ev.stopPropagation()}>
+          <a
+            href={l}
+            target="_blank"
+            rel="noreferrer"
+            className="hover:underline truncate"
+            onClick={(ev) => ev.stopPropagation()}
+          >
             {l.replace(/^https?:\/\//, "")}
           </a>
         </div>
@@ -200,7 +215,10 @@ export function CompanyCard({
         )}
         <div className="mt-2 flex flex-wrap gap-1">
           {row.platforms.slice(0, 4).map((p) => (
-            <span key={p} className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+            <span
+              key={p}
+              className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground"
+            >
               {p}
             </span>
           ))}
@@ -212,7 +230,9 @@ export function CompanyCard({
           {contact.email && (
             <div className="flex items-center gap-1.5 text-xs">
               <Mail className="size-3 text-emerald-400 shrink-0" />
-              <a href={`mailto:${contact.email}`} className="hover:underline truncate">{contact.email}</a>
+              <a href={`mailto:${contact.email}`} className="hover:underline truncate">
+                {contact.email}
+              </a>
             </div>
           )}
           {contact.phone && (
@@ -235,16 +255,20 @@ export function CompanyCard({
           <SocialRow socials={contact.socials} />
         </div>
       )}
-      {contact?.status === "none" && !row.inline_contacts && !(row.website || row.linkedin_url || row.twitter_url) && (
-        <div className="rounded-lg border border-border bg-muted/30 px-2.5 py-2 text-[11px] text-muted-foreground">
-          No verified contact found yet — try Research on the lead.
-        </div>
-      )}
-      {contact?.status === "none" && !row.inline_contacts && (row.website || row.linkedin_url || row.twitter_url) && (
-        <div className="rounded-lg border border-border bg-muted/30 px-2.5 py-2 text-[11px] text-muted-foreground">
-          Profile available — email/phone not verified yet.
-        </div>
-      )}
+      {contact?.status === "none" &&
+        !row.inline_contacts &&
+        !(row.website || row.linkedin_url || row.twitter_url) && (
+          <div className="rounded-lg border border-border bg-muted/30 px-2.5 py-2 text-[11px] text-muted-foreground">
+            No verified contact found yet — try Research on the lead.
+          </div>
+        )}
+      {contact?.status === "none" &&
+        !row.inline_contacts &&
+        (row.website || row.linkedin_url || row.twitter_url) && (
+          <div className="rounded-lg border border-border bg-muted/30 px-2.5 py-2 text-[11px] text-muted-foreground">
+            Profile available — email/phone not verified yet.
+          </div>
+        )}
 
       <div className="flex flex-wrap items-center gap-2.5 pt-1 border-t border-border/60">
         {row.website && <IconLink href={row.website} label="Website" icon={Globe} />}
@@ -261,7 +285,11 @@ export function CompanyCard({
             onClick={() => onResolveContact(row)}
           >
             <Mail className="size-3 mr-1" />
-            {contactBusy ? "Resolving…" : contact?.status === "none" ? "Deep resolve" : "Resolve contact"}
+            {contactBusy
+              ? "Resolving…"
+              : contact?.status === "none"
+                ? "Deep resolve"
+                : "Resolve contact"}
           </Button>
         )}
       </div>
@@ -288,9 +316,7 @@ export function PersonCard({
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <div className="font-medium text-sm truncate">{row.name}</div>
-            {row.role_hint && (
-              <div className="text-[11px] text-primary/90">{row.role_hint}</div>
-            )}
+            {row.role_hint && <div className="text-[11px] text-primary/90">{row.role_hint}</div>}
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">
             {row.platform && (
@@ -336,7 +362,9 @@ export function PersonCard({
           {contact.email && (
             <div className="flex items-center gap-1.5 text-xs">
               <Mail className="size-3 text-emerald-400 shrink-0" />
-              <a href={`mailto:${contact.email}`} className="hover:underline truncate">{contact.email}</a>
+              <a href={`mailto:${contact.email}`} className="hover:underline truncate">
+                {contact.email}
+              </a>
             </div>
           )}
           {contact.phone && (
@@ -362,22 +390,24 @@ export function PersonCard({
       {contact?.status === "none" &&
         !row.inline_contacts &&
         !(row.author_url || row.linkedin_url || row.github_url) && (
-        <div className="rounded-lg border border-border bg-muted/30 px-2.5 py-2 text-[11px] text-muted-foreground">
-          No verified email/phone found yet — try Research on the lead.
-        </div>
-      )}
+          <div className="rounded-lg border border-border bg-muted/30 px-2.5 py-2 text-[11px] text-muted-foreground">
+            No verified email/phone found yet — try Research on the lead.
+          </div>
+        )}
       {contact?.status === "none" &&
         !row.inline_contacts &&
         !!(row.author_url || row.linkedin_url || row.github_url) && (
-        <div className="rounded-lg border border-border bg-muted/30 px-2.5 py-2 text-[11px] text-muted-foreground">
-          Profile available — email/phone not verified yet.
-        </div>
-      )}
-      {!contact && !!(row.author_url || row.linkedin_url || row.github_url) && !row.inline_contacts && (
-        <div className="rounded-lg border border-border bg-muted/20 px-2.5 py-2 text-[11px] text-muted-foreground">
-          Profile available
-        </div>
-      )}
+          <div className="rounded-lg border border-border bg-muted/30 px-2.5 py-2 text-[11px] text-muted-foreground">
+            Profile available — email/phone not verified yet.
+          </div>
+        )}
+      {!contact &&
+        !!(row.author_url || row.linkedin_url || row.github_url) &&
+        !row.inline_contacts && (
+          <div className="rounded-lg border border-border bg-muted/20 px-2.5 py-2 text-[11px] text-muted-foreground">
+            Profile available
+          </div>
+        )}
 
       <div className="flex flex-wrap items-center gap-2.5">
         {row.author_url && <IconLink href={row.author_url} label="Profile" icon={ExternalLink} />}
@@ -394,7 +424,11 @@ export function PersonCard({
           >
             <Mail className="size-3 mr-1" />
             <Phone className="size-3 mr-1" />
-            {contactBusy ? "Resolving…" : contact?.status === "none" ? "Deep resolve" : "Access contact"}
+            {contactBusy
+              ? "Resolving…"
+              : contact?.status === "none"
+                ? "Deep resolve"
+                : "Access contact"}
           </Button>
         )}
       </div>
@@ -511,11 +545,15 @@ export function PersonTable({
               <td className={`${td} text-muted-foreground`}>
                 {r.company_hint ?? r.company_domain ?? "—"}
               </td>
-              <td className={`${td} text-muted-foreground max-w-[160px] truncate`}>{r.platform ?? "—"}</td>
+              <td className={`${td} text-muted-foreground max-w-[160px] truncate`}>
+                {r.platform ?? "—"}
+              </td>
               <td className={`${td} text-muted-foreground`}>{r.posted_at_relative ?? "—"}</td>
               <td className={td} onClick={(e) => e.stopPropagation()}>
                 <span className="inline-flex items-center gap-2.5">
-                  {r.author_url && <IconLink href={r.author_url} label="Profile" icon={ExternalLink} />}
+                  {r.author_url && (
+                    <IconLink href={r.author_url} label="Profile" icon={ExternalLink} />
+                  )}
                   {r.linkedin_url && <IconLink href={r.linkedin_url} label="LI" icon={Linkedin} />}
                   {r.github_url && <IconLink href={r.github_url} label="GH" icon={Github} />}
                   <IconLink href={r.sample_url} label="Post" icon={FileText} />
@@ -569,7 +607,8 @@ export function LocalBusinessCard({ row }: { row: LocalBusinessRow }) {
           Local
         </span>
       </div>
-      {row.description && (
+      {row.address && <p className="text-xs text-muted-foreground">{row.address}</p>}
+      {row.description && row.description !== row.address && (
         <p className="text-xs text-foreground/80 line-clamp-3">{row.description}</p>
       )}
       {!!row.opportunity_tags?.length && (

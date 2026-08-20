@@ -104,9 +104,7 @@ export function isClientsBuyerHunt(classified: ClassifiedQuery): boolean {
   return false;
 }
 
-export function extractStatedAudience(
-  raw: string,
-): NonNullable<ClarifyAnswers["audience"]> | null {
+export function extractStatedAudience(raw: string): NonNullable<ClarifyAnswers["audience"]> | null {
   const t = (raw || "").toLowerCase();
   if (!t.trim()) return null;
   const wantsPeople = /\b(people|persons?|individuals?|humans)\b/.test(t);
@@ -310,7 +308,11 @@ function productBuyerQuestion(): ClarifyQuestion {
     question: "Who's your ideal customer?",
     options: [
       { id: "any", label: "Anyone", hint: "Don't filter by company size", recommended: true },
-      { id: "startups", label: "Startups / founders", hint: "Early-stage teams evaluating new tools" },
+      {
+        id: "startups",
+        label: "Startups / founders",
+        hint: "Early-stage teams evaluating new tools",
+      },
       { id: "smb", label: "Small businesses", hint: "Owner-operated shops and local companies" },
       { id: "agency", label: "Agencies", hint: "Studios that buy tools for client work" },
       { id: "enterprise", label: "Enterprise", hint: "Large companies with procurement cycles" },
@@ -424,7 +426,12 @@ function localOpportunityQuestion(): ClarifyQuestion {
     question: "Any opportunity filter for local businesses?",
     allowOther: true,
     options: [
-      { id: "no_website", label: "No website", hint: "Best for pitching web builds", recommended: true },
+      {
+        id: "no_website",
+        label: "No website",
+        hint: "Best for pitching web builds",
+        recommended: true,
+      },
       { id: "seo_poor", label: "SEO poor", hint: "Thin / HTTP / weak site signals" },
       { id: "has_phone", label: "Has phone", hint: "Ready to call" },
       { id: "sales_ready", label: "Sales ready", hint: "Email or phone present" },
@@ -596,10 +603,10 @@ const BUYER_PROFILES: Record<
 
 const GEO_LOCATIONS: Record<NonNullable<ClarifyAnswers["geography"]>, string | null> = {
   global: null,
-  us: "United States",
-  na: "United States",
+  us: "USA",
+  na: "North America",
   eu: "Europe",
-  uk: "United Kingdom",
+  uk: "UK",
   local: null,
 };
 
@@ -671,9 +678,7 @@ export function applyClarifyAnswers(
 ): SearchRefinement {
   const product = isProductClarifyPath(classified);
   const craftRaw = (answers.other?.craft || answers.craft || "").trim() || undefined;
-  const craft = craftRaw
-    ? PRODUCT_CRAFT_LABELS[craftRaw] || craftRaw
-    : undefined;
+  const craft = craftRaw ? PRODUCT_CRAFT_LABELS[craftRaw] || craftRaw : undefined;
   // Honor audience already typed in the query when the user skips the form.
   const inferredAudience = extractStatedAudience(classified.raw || "");
   const audience = answers.audience ?? inferredAudience ?? "all";
@@ -685,12 +690,12 @@ export function applyClarifyAnswers(
   const clientsHunt = isClientsBuyerHunt(classified);
   // Clients / buying-signal hunts: never invent a YoE bucket — it biases ATS
   // filters toward junior roles the user never asked for.
-  const experience = product || clientsHunt
-    ? (answers.experience ?? inferredExp ?? undefined)
-    : (answers.experience ?? inferredExp ?? "0-1");
+  const experience =
+    product || clientsHunt
+      ? (answers.experience ?? inferredExp ?? undefined)
+      : (answers.experience ?? inferredExp ?? "0-1");
 
-  const location =
-    answers.other?.geography?.trim() || classified.location || GEO_LOCATIONS[geo];
+  const location = answers.other?.geography?.trim() || classified.location || GEO_LOCATIONS[geo];
 
   const findInvestors = isFindInvestorHunt(classified);
   const localOpportunity =

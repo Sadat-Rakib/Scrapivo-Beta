@@ -165,7 +165,10 @@ export async function runComplianceGate(
   if (error || !row) {
     return {
       ok: false,
-      reasons: [...uniqueReasons, `Could not persist compliance log: ${error?.message || "unknown"}`],
+      reasons: [
+        ...uniqueReasons,
+        `Could not persist compliance log: ${error?.message || "unknown"}`,
+      ],
       assessment,
       verifierTier,
     };

@@ -52,7 +52,10 @@ function friendlyAuthError(message: string): string {
   if (m.includes("user already registered") || m.includes("already been registered")) {
     return "That email already has an account. Switch to Sign in, or use Sign up again to set a new password.";
   }
-  if (m.includes("password") && (m.includes("at least") || m.includes("weak") || m.includes("short"))) {
+  if (
+    m.includes("password") &&
+    (m.includes("at least") || m.includes("weak") || m.includes("short"))
+  ) {
     return "Password must be at least 6 characters.";
   }
   if (m.includes("valid email") || m.includes("unable to validate email")) {
@@ -226,8 +229,7 @@ function AuthPage() {
             backdropFilter: "blur(32px) saturate(180%)",
             WebkitBackdropFilter: "blur(32px) saturate(180%)",
             border: "1px solid rgba(255, 255, 255, 0.15)",
-            boxShadow:
-              "0 20px 60px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25)",
+            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25)",
           }}
         >
           <div className="flex items-center gap-2 justify-center mb-2">
@@ -392,11 +394,7 @@ function AuthPage() {
               <Button
                 className="w-full mt-2 bg-white text-black hover:bg-white/90"
                 disabled={
-                  loading ||
-                  !name.trim() ||
-                  !leadIssue.trim() ||
-                  !emailOk ||
-                  password.length < 6
+                  loading || !name.trim() || !leadIssue.trim() || !emailOk || password.length < 6
                 }
                 onClick={() => void signUp()}
               >

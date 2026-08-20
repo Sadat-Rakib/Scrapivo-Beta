@@ -1,4 +1,15 @@
-import { Search, Filter, Bookmark, MessageSquare, Flame, Zap, TrendingUp, Github, MessageCircle, Hash } from "lucide-react";
+import {
+  Search,
+  Filter,
+  Bookmark,
+  MessageSquare,
+  Flame,
+  Zap,
+  TrendingUp,
+  Github,
+  MessageCircle,
+  Hash,
+} from "lucide-react";
 
 /**
  * Static Scrapivo lead-feed mockup used inside the landing hero panel.
@@ -85,11 +96,9 @@ export function DashboardPreview() {
           aria-hidden
           className="absolute inset-x-0 top-0 h-32 pointer-events-none"
           style={{
-            background:
-              "linear-gradient(180deg, rgba(235,240,255,0.14) 0%, transparent 100%)",
+            background: "linear-gradient(180deg, rgba(235,240,255,0.14) 0%, transparent 100%)",
           }}
         />
-
 
         {/* Header */}
         <div className="relative flex items-center justify-between px-5 py-3.5 border-b border-white/5 bg-white/[0.015]">
@@ -97,12 +106,8 @@ export function DashboardPreview() {
             <div className="size-6 rounded-md bg-primary flex items-center justify-center">
               <Search className="size-3.5 text-primary-foreground" />
             </div>
-            <span className="text-sm font-medium tracking-tight text-white">
-              Scrapivo
-            </span>
-            <span className="hidden md:inline text-xs text-white/30">
-              / Discover
-            </span>
+            <span className="text-sm font-medium tracking-tight text-white">Scrapivo</span>
+            <span className="hidden md:inline text-xs text-white/30">/ Discover</span>
           </div>
           <div className="flex items-center gap-3">
             <div className="hidden md:flex items-center gap-2 bg-black/40 border border-white/10 rounded-lg px-3 py-1.5 min-w-[260px]">
@@ -147,9 +152,7 @@ export function DashboardPreview() {
                   <div className="text-2xl font-light text-white tracking-tight leading-none">
                     43
                   </div>
-                  <div className="text-[11px] text-white/40 mt-1">
-                    active leads
-                  </div>
+                  <div className="text-[11px] text-white/40 mt-1">active leads</div>
                 </div>
                 <div className="flex items-center gap-1 text-[11px] text-emerald-400 font-medium">
                   <TrendingUp className="size-3" />
@@ -211,13 +214,10 @@ export function DashboardPreview() {
                       <span className="text-white/30">· {l.posted}</span>
                     </div>
                     <div className="text-[11px] text-white/40">
-                      Score{" "}
-                      <span className="text-white font-medium">{l.score}</span>
+                      Score <span className="text-white font-medium">{l.score}</span>
                     </div>
                   </div>
-                  <h3 className="text-sm font-medium text-white tracking-tight">
-                    {l.title}
-                  </h3>
+                  <h3 className="text-sm font-medium text-white tracking-tight">{l.title}</h3>
                   <p className="text-xs text-white/50 mt-1.5 leading-relaxed line-clamp-2">
                     {l.snippet}
                   </p>

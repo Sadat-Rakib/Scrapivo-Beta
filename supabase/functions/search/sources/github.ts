@@ -20,9 +20,11 @@ export async function searchGitHub(query: SearchQuery): Promise<Lead[]> {
 
   for (const q of queries) {
     try {
-      const url =
-        `https://api.github.com/search/issues?q=${encodeURIComponent(q)}&sort=created&order=desc&per_page=10`;
-      const data = await safe(fetch(url, { headers }).then((r) => ok<Record<string, unknown>>(r)), null);
+      const url = `https://api.github.com/search/issues?q=${encodeURIComponent(q)}&sort=created&order=desc&per_page=10`;
+      const data = await safe(
+        fetch(url, { headers }).then((r) => ok<Record<string, unknown>>(r)),
+        null,
+      );
       for (const i of (data?.items as Array<Record<string, unknown>>) ?? []) {
         if (!isWithin14Days(String(i.created_at || ""))) continue;
         const text = `${i.title || ""} ${String(i.body || "").slice(0, 400)}`;
@@ -36,7 +38,9 @@ export async function searchGitHub(query: SearchQuery): Promise<Lead[]> {
           platform_label: "GitHub: Bounty/Hiring",
           post_url: String(i.html_url || ""),
           post_title: `BOUNTY/HIRING: ${i.title}`,
-          post_body_snippet: String(i.body || "").replace(/<[^>]+>/g, " ").slice(0, 400),
+          post_body_snippet: String(i.body || "")
+            .replace(/<[^>]+>/g, " ")
+            .slice(0, 400),
           query,
           posted_at: String(i.created_at || ""),
           author_handle: String(user?.login || ""),

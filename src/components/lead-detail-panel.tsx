@@ -3,7 +3,17 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { X, ExternalLink, Sparkles, Copy, Target, Brain, ShieldCheck, Radar, Mail } from "lucide-react";
+import {
+  X,
+  ExternalLink,
+  Sparkles,
+  Copy,
+  Target,
+  Brain,
+  ShieldCheck,
+  Radar,
+  Mail,
+} from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { generateOutreach } from "@/lib/outreach.functions";
@@ -23,11 +33,7 @@ import {
   PIPELINE_STAGES,
   PIPELINE_STAGE_LABELS,
 } from "@/lib/leads.functions";
-import {
-  checkEmailGate,
-  sendLeadEmail,
-  startEmailSequence,
-} from "@/lib/outreach/email.functions";
+import { checkEmailGate, sendLeadEmail, startEmailSequence } from "@/lib/outreach/email.functions";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -741,10 +747,12 @@ export function LeadDetailPanel({
         <div className="space-y-2">
           <label className="text-xs font-medium text-muted-foreground">Activity</label>
           {!saved?.id ? (
-            <p className="text-[11px] text-muted-foreground">Save this lead to start an activity log.</p>
+            <p className="text-[11px] text-muted-foreground">
+              Save this lead to start an activity log.
+            </p>
           ) : activityQ.isLoading ? (
             <p className="text-[11px] text-muted-foreground">Loading…</p>
-          ) : !(activityQ.data?.length) ? (
+          ) : !activityQ.data?.length ? (
             <p className="text-[11px] text-muted-foreground">No activity yet.</p>
           ) : (
             <ul className="space-y-1.5 max-h-36 overflow-y-auto">

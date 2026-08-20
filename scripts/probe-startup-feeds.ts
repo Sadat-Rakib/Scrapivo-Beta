@@ -14,5 +14,13 @@ console.log("classified", {
 const x = expandFromClassified(c);
 console.log("expanded", { skill: x.skill, related: x.relatedSkills.slice(0, 5) });
 const [d, n] = await Promise.all([searchDealroomJustFounded(x), searchNeuronFeedStartups(x)]);
-console.log("dealroom", d.length, d.slice(0, 3).map((l) => l.title));
-console.log("neuronfeed", n.length, n.slice(0, 3).map((l) => l.title));
+console.log(
+  "dealroom",
+  d.length,
+  d.slice(0, 3).map((l) => l.title),
+);
+console.log(
+  "neuronfeed",
+  n.length,
+  n.slice(0, 3).map((l) => l.title),
+);

@@ -65,7 +65,11 @@ export async function searchNeuronFeedStartups(qx: ExpandedQueries): Promise<Sou
   for (const s of rows) {
     const name = (s.name || "").trim();
     if (!name) continue;
-    const url = (s.website || s.url || (s.slug ? `https://neuronfeed.com/startups/${s.slug}` : "")).trim();
+    const url = (
+      s.website ||
+      s.url ||
+      (s.slug ? `https://neuronfeed.com/startups/${s.slug}` : "")
+    ).trim();
     if (!url || seen.has(url)) continue;
 
     const round = (s.funding?.latest_round_type || "").toLowerCase();
@@ -84,7 +88,9 @@ export async function searchNeuronFeedStartups(qx: ExpandedQueries): Promise<Sou
     const snippet = [
       s.tagline || (s.description || "").slice(0, 220) || `${name} — startup`,
       loc ? `Location: ${loc}` : "",
-      round ? `Funding: ${round}${s.funding?.latest_round_date ? ` (${s.funding.latest_round_date})` : ""}` : "",
+      round
+        ? `Funding: ${round}${s.funding?.latest_round_date ? ` (${s.funding.latest_round_date})` : ""}`
+        : "",
       s.website ? `Website: ${s.website}` : "",
       `Company: ${name}`,
     ]

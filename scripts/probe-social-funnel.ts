@@ -59,7 +59,13 @@ rows.push(
   ),
 );
 
-for (const host of ["lemmy.world", "lemmy.ml", "programming.dev", "sh.itjust.works", "beehaw.org"]) {
+for (const host of [
+  "lemmy.world",
+  "lemmy.ml",
+  "programming.dev",
+  "sh.itjust.works",
+  "beehaw.org",
+]) {
   rows.push(
     await probe(
       `lemmy/${host}`,
@@ -69,7 +75,13 @@ for (const host of ["lemmy.world", "lemmy.ml", "programming.dev", "sh.itjust.wor
   );
 }
 
-for (const host of ["mastodon.social", "mstdn.social", "fosstodon.org", "mas.to", "techhub.social"]) {
+for (const host of [
+  "mastodon.social",
+  "mstdn.social",
+  "fosstodon.org",
+  "mas.to",
+  "techhub.social",
+]) {
   for (const tag of ["forhire", "needhelp"]) {
     rows.push(
       await probe(
@@ -82,10 +94,8 @@ for (const host of ["mastodon.social", "mstdn.social", "fosstodon.org", "mas.to"
 }
 
 rows.push(
-  await probe(
-    "devto",
-    `https://dev.to/api/articles?per_page=30&tag=forhire`,
-    (b) => (Array.isArray(b) ? b.length : 0),
+  await probe("devto", `https://dev.to/api/articles?per_page=30&tag=forhire`, (b) =>
+    Array.isArray(b) ? b.length : 0,
   ),
 );
 rows.push(
@@ -103,7 +113,9 @@ rows.push(
 
 for (const r of rows) {
   const flag = r.status !== "ok" ? "  <-- UNREACHABLE" : r.items === 0 ? "  <-- empty" : "";
-  console.log(`  ${r.label.padEnd(34)} ${r.status.padEnd(12)} ${String(r.items).padStart(4)} items${flag}`);
+  console.log(
+    `  ${r.label.padEnd(34)} ${r.status.padEnd(12)} ${String(r.items).padStart(4)} items${flag}`,
+  );
 }
 
 const reachable = rows.filter((r) => r.status === "ok" && r.items > 0);
@@ -114,9 +126,8 @@ console.log(
 
 // ── Now the gates, on real Mastodon + Lemmy payloads ────────────────────────
 console.log(`\n=== WHERE OUR OWN GATES DROP THEM ===\n`);
-const { classifyDemand, craftVariants, matchesCraft } = await import(
-  "../src/lib/search/demand-classifier"
-);
+const { classifyDemand, craftVariants, matchesCraft } =
+  await import("../src/lib/search/demand-classifier");
 const terms = craftVariants(CRAFT);
 console.log(`craftVariants("${CRAFT}") -> ${JSON.stringify(terms)}\n`);
 
@@ -160,7 +171,10 @@ for (const tag of ["forhire", "needhelp", "hiring", "freelance", "commissions"])
       signal: AbortSignal.timeout(12_000),
     });
     const list = res.ok ? ((await res.json()) as any[]) : [];
-    await gateReport(`mastodon #${tag}`, list.map((s) => stripHtml(s.content || "")));
+    await gateReport(
+      `mastodon #${tag}`,
+      list.map((s) => stripHtml(s.content || "")),
+    );
   } catch (e) {
     console.log(`  mastodon #${tag}  ERR ${(e as Error).message.slice(0, 40)}`);
   }
@@ -171,10 +185,16 @@ for (const host of ["lemmy.world", "programming.dev"]) {
   try {
     const res = await fetch(
       `https://${host}/api/v3/search?q=${encodeURIComponent(CRAFT)}&type_=Posts&sort=New&limit=30`,
-      { headers: { "User-Agent": UA, Accept: "application/json" }, signal: AbortSignal.timeout(12_000) },
+      {
+        headers: { "User-Agent": UA, Accept: "application/json" },
+        signal: AbortSignal.timeout(12_000),
+      },
     );
     const body = res.ok ? ((await res.json()) as any) : { posts: [] };
-    await gateReport(`lemmy ${host}`, (body.posts ?? []).map((p: any) => p.post?.name ?? ""));
+    await gateReport(
+      `lemmy ${host}`,
+      (body.posts ?? []).map((p: any) => p.post?.name ?? ""),
+    );
   } catch (e) {
     console.log(`  lemmy ${host}  ERR ${(e as Error).message.slice(0, 40)}`);
   }

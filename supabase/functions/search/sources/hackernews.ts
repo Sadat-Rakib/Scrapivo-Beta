@@ -28,34 +28,44 @@ export async function searchHackerNews(query: SearchQuery): Promise<Lead[]> {
   const currentYear = now.getFullYear();
 
   try {
-    const threadSearch =
-      `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(`Ask HN Who is hiring ${currentMonth} ${currentYear}`)}&tags=story&hitsPerPage=5`;
-    const threads = await safe(fetch(threadSearch).then((r) => ok<Record<string, unknown>>(r)), null);
+    const threadSearch = `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(`Ask HN Who is hiring ${currentMonth} ${currentYear}`)}&tags=story&hitsPerPage=5`;
+    const threads = await safe(
+      fetch(threadSearch).then((r) => ok<Record<string, unknown>>(r)),
+      null,
+    );
     const hits = (threads?.hits as Array<Record<string, unknown>>) ?? [];
-    const thread = hits.find((h) =>
-      String(h.title || "").toLowerCase().includes("who is hiring") &&
-      String(h.title || "").includes(String(currentYear))
-    ) || hits[0];
+    const thread =
+      hits.find(
+        (h) =>
+          String(h.title || "")
+            .toLowerCase()
+            .includes("who is hiring") && String(h.title || "").includes(String(currentYear)),
+      ) || hits[0];
 
     if (thread?.objectID) {
-      const commentsUrl =
-        `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(query.skill)}&tags=comment,story_${thread.objectID}&hitsPerPage=30`;
-      const data = await safe(fetch(commentsUrl).then((r) => ok<Record<string, unknown>>(r)), null);
+      const commentsUrl = `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(query.skill)}&tags=comment,story_${thread.objectID}&hitsPerPage=30`;
+      const data = await safe(
+        fetch(commentsUrl).then((r) => ok<Record<string, unknown>>(r)),
+        null,
+      );
       for (const c of (data?.hits as Array<Record<string, unknown>>) ?? []) {
-        const text = String(c.comment_text || "").replace(/<[^>]+>/g, " ").trim();
+        const text = String(c.comment_text || "")
+          .replace(/<[^>]+>/g, " ")
+          .trim();
         if (text.length < 50) continue;
         const date = c.created_at
           ? String(c.created_at)
           : c.created_at_i
-          ? new Date((c.created_at_i as number) * 1000).toISOString()
-          : null;
+            ? new Date((c.created_at_i as number) * 1000).toISOString()
+            : null;
         if (!date || !isWithin14Days(date)) continue;
         const lower = text.toLowerCase();
         if (
           lower.includes("seeking work") ||
           lower.includes("seeking position") ||
           lower.startsWith("seeking")
-        ) continue;
+        )
+          continue;
         if (!isRelevantToSkill(text, query.skill)) continue;
 
         const lead = buildLead({
@@ -82,16 +92,18 @@ export async function searchHackerNews(query: SearchQuery): Promise<Lead[]> {
   }
 
   try {
-    const url =
-      `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(`freelancer ${query.skill}`)}&tags=comment&hitsPerPage=20`;
-    const data = await safe(fetch(url).then((r) => ok<Record<string, unknown>>(r)), null);
+    const url = `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(`freelancer ${query.skill}`)}&tags=comment&hitsPerPage=20`;
+    const data = await safe(
+      fetch(url).then((r) => ok<Record<string, unknown>>(r)),
+      null,
+    );
     for (const h of (data?.hits as Array<Record<string, unknown>>) ?? []) {
       const text = String(h.comment_text || "").replace(/<[^>]+>/g, " ");
       const date = h.created_at
         ? String(h.created_at)
         : h.created_at_i
-        ? new Date((h.created_at_i as number) * 1000).toISOString()
-        : null;
+          ? new Date((h.created_at_i as number) * 1000).toISOString()
+          : null;
       if (!date || !isWithin14Days(date)) continue;
       if (!hasBuyerIntent(text, query.negativePhrases)) continue;
 

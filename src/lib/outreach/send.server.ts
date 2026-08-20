@@ -77,10 +77,7 @@ function roleFromMeta(meta: unknown, toEmail?: string | null): string | null {
   return null;
 }
 
-export async function countSendsToday(
-  supabase: SupabaseClient,
-  userId: string,
-): Promise<number> {
+export async function countSendsToday(supabase: SupabaseClient, userId: string): Promise<number> {
   const start = new Date();
   start.setUTCHours(0, 0, 0, 0);
   const { count, error } = await supabase
@@ -121,12 +118,10 @@ export async function sendLeadEmailCore(
     .eq("id", userId)
     .maybeSingle();
 
-  const senderName =
-    (profile?.sender_name || profile?.full_name || "").trim() || null;
+  const senderName = (profile?.sender_name || profile?.full_name || "").trim() || null;
   const address = (profile?.sender_physical_address || "").trim() || null;
   const fromEmail =
-    (profile?.outreach_from_email || process.env.OUTREACH_FROM_EMAIL || "").trim() ||
-    null;
+    (profile?.outreach_from_email || process.env.OUTREACH_FROM_EMAIL || "").trim() || null;
 
   const sentToday = await countSendsToday(supabase, userId);
   if (sentToday >= DAILY_SEND_CAP) {
@@ -191,9 +186,7 @@ export async function sendLeadEmailCore(
   });
   const fullText = `${body}\n${footer}`;
 
-  const fromHeader = senderName
-    ? `${senderName} <${fromEmail}>`
-    : fromEmail!;
+  const fromHeader = senderName ? `${senderName} <${fromEmail}>` : fromEmail!;
 
   const sent = await resendSendEmail({
     from: fromHeader,
@@ -272,7 +265,8 @@ export async function previewComplianceGate(
     .eq("user_id", userId)
     .maybeSingle();
 
-  if (!lead) return { ok: false, reasons: ["Lead not found."], sentToday: 0, dailyCap: DAILY_SEND_CAP };
+  if (!lead)
+    return { ok: false, reasons: ["Lead not found."], sentToday: 0, dailyCap: DAILY_SEND_CAP };
 
   const { data: profile } = await supabase
     .from("profiles")

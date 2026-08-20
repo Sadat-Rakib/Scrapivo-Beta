@@ -170,10 +170,14 @@ async function main() {
   const slow = rows.filter((r) => r.ms > SOURCE_BUDGET_MS);
 
   console.log(`\n${"=".repeat(60)}`);
-  console.log(`producing leads : ${working.length}  (${rows.reduce((n, r) => n + r.leads, 0)} total)`);
+  console.log(
+    `producing leads : ${working.length}  (${rows.reduce((n, r) => n + r.leads, 0)} total)`,
+  );
   console.log(`returning zero  : ${empty.length}  ${empty.map((r) => r.name).join(", ")}`);
-  if (broken.length) console.log(`throwing        : ${broken.length}  ${broken.map((r) => r.name).join(", ")}`);
-  if (slow.length) console.log(`over budget     : ${slow.length}  ${slow.map((r) => r.name).join(", ")}`);
+  if (broken.length)
+    console.log(`throwing        : ${broken.length}  ${broken.map((r) => r.name).join(", ")}`);
+  if (slow.length)
+    console.log(`over budget     : ${slow.length}  ${slow.map((r) => r.name).join(", ")}`);
 
   console.log("\ntop producers:");
   for (const r of [...working].sort((a, b) => b.leads - a.leads).slice(0, 12)) {
@@ -188,14 +192,18 @@ async function main() {
   for (const b of BUCKETS) {
     const n = totals[b];
     const pct = Math.round((n / all) * 100);
-    console.log(`  ${b.padEnd(8)} ${String(n).padStart(4)}  ${"#".repeat(Math.round(pct / 2))} ${pct}%`);
+    console.log(
+      `  ${b.padEnd(8)} ${String(n).padStart(4)}  ${"#".repeat(Math.round(pct / 2))} ${pct}%`,
+    );
   }
 
   const stale = rows
     .filter((r) => (r.ages?.["7-30d"] ?? 0) + (r.ages?.[">30d"] ?? 0) + (r.ages?.["3-7d"] ?? 0) > 0)
     .sort(
       (a, b) =>
-        (b.ages!["3-7d"] + b.ages!["7-30d"] + b.ages![">30d"]) -
+        b.ages!["3-7d"] +
+        b.ages!["7-30d"] +
+        b.ages![">30d"] -
         (a.ages!["3-7d"] + a.ages!["7-30d"] + a.ages![">30d"]),
     );
   if (stale.length) {

@@ -9,7 +9,7 @@ export async function searchRemoteOK(query: SearchQuery): Promise<Lead[]> {
     const url = `https://remoteok.com/api?tag=${encodeURIComponent(tag)}`;
     const data = await safe(
       fetch(url, { headers: { "user-agent": "Scrapivo Job Aggregator" } }).then((r) =>
-        ok<unknown[]>(r)
+        ok<unknown[]>(r),
       ),
       [] as unknown[],
     );
@@ -17,15 +17,18 @@ export async function searchRemoteOK(query: SearchQuery): Promise<Lead[]> {
     for (const j of jobs.slice(0, 25) as Array<Record<string, unknown>>) {
       if (!j.url || !j.position) continue;
       const date = j.date
-        ? new Date(typeof j.date === "number" ? (j.date as number) * 1000 : String(j.date))
-          .toISOString()
+        ? new Date(
+            typeof j.date === "number" ? (j.date as number) * 1000 : String(j.date),
+          ).toISOString()
         : null;
       if (!date || !isWithin14Days(date)) continue;
       const snippet = [
         `REMOTE JOB: ${j.position}`,
         j.company ? `Company: ${j.company}` : "",
         j.salary ? `Salary: ${j.salary}` : "",
-        String(j.description || "").replace(/<[^>]+>/g, " ").slice(0, 300),
+        String(j.description || "")
+          .replace(/<[^>]+>/g, " ")
+          .slice(0, 300),
       ]
         .filter(Boolean)
         .join("\n");

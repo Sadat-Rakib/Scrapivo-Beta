@@ -58,11 +58,7 @@ export async function searchFacebook(query: SearchQuery): Promise<Lead[]> {
           post_url: url,
           post_title: result.title || "",
           post_body_snippet: (result.snippet || "").slice(0, 600),
-          ai_summary: generateSummary(
-            result.title || "",
-            result.snippet || "",
-            query.skill,
-          ),
+          ai_summary: generateSummary(result.title || "", result.snippet || "", query.skill),
           why_shown: generateWhyShown(
             "Facebook",
             query.skill,

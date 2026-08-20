@@ -76,9 +76,7 @@ export const startEmailSequence = createServerFn({ method: "POST" })
 
     const subject =
       data.followUpSubject ||
-      (lead?.outreach_email_subject
-        ? `Re: ${lead.outreach_email_subject}`
-        : "Following up");
+      (lead?.outreach_email_subject ? `Re: ${lead.outreach_email_subject}` : "Following up");
     const body =
       data.followUpBody ||
       "Just bumping this in case it got buried — happy to share a short example if useful.";

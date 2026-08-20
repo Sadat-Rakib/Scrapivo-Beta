@@ -8,8 +8,7 @@ export async function searchUpwork(query: SearchQuery): Promise<Lead[]> {
 
   for (const q of queries) {
     try {
-      const url =
-        `https://www.upwork.com/ab/feed/jobs/rss?q=${encodeURIComponent(q)}&sort=recency&paging=0%3B10`;
+      const url = `https://www.upwork.com/ab/feed/jobs/rss?q=${encodeURIComponent(q)}&sort=recency&paging=0%3B10`;
       const text = await safe(
         fetch(url, {
           headers: {

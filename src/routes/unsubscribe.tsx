@@ -32,9 +32,7 @@ export const Route = createFileRoute("/unsubscribe")({
 function UnsubscribePage() {
   const { t } = Route.useSearch();
   const unsub = useServerFn(processUnsubscribe);
-  const [done, setDone] = useState<{ ok: boolean; email?: string; error?: string } | null>(
-    null,
-  );
+  const [done, setDone] = useState<{ ok: boolean; email?: string; error?: string } | null>(null);
 
   const mut = useMutation({
     mutationFn: () => unsub({ data: { token: t } }),

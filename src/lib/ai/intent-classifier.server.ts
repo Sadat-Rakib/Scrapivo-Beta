@@ -55,10 +55,12 @@ Respond with strict JSON: {"results":[{"id":"<id>","intent":"...","confidence":0
 No prose, no markdown fences.`;
 
 function buildUser(target: string, leads: LeadLite[]): string {
-  const items = leads.map((l) => {
-    const text = `${l.title}\n${l.snippet}`.replace(/\s+/g, " ").slice(0, 700);
-    return `ID: ${l.id}\nPLATFORM: ${l.platform ?? "unknown"}\nTEXT: ${text}`;
-  }).join("\n\n---\n\n");
+  const items = leads
+    .map((l) => {
+      const text = `${l.title}\n${l.snippet}`.replace(/\s+/g, " ").slice(0, 700);
+      return `ID: ${l.id}\nPLATFORM: ${l.platform ?? "unknown"}\nTEXT: ${text}`;
+    })
+    .join("\n\n---\n\n");
   return `TARGET: ${target}\n\nPOSTS:\n\n${items}`;
 }
 

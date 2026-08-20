@@ -44,9 +44,8 @@ export const runSearch = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => Input.parse(d))
   .handler(async ({ data, context }) => {
     const { searchAllSources } = await import("./search/sources.server");
-    const { classifyQuery, getSubredditBoostsForQuery, inferGoalFromQuery } = await import(
-      "./search/query-classifier"
-    );
+    const { classifyQuery, getSubredditBoostsForQuery, inferGoalFromQuery } =
+      await import("./search/query-classifier");
     const { expandFromClassified } = await import("./search/query-expander");
     const { generateSmartSuggestions } = await import("./search/suggestions");
     const { dedupeByUrl, fuzzyDedupeLeads, diversifiedTop12 } = await import("./scoring");
@@ -141,11 +140,30 @@ export const runSearch = createServerFn({ method: "POST" })
         ? buildClarifyingQuestions(classified, { hasLocation: !!classified.location })
         : [];
 
+    const { buildSearchPlan, planUsesInvestorSeed, planNeedsLocalEnrichment } =
+      await import("./search/playbook-planner");
+    const searchPlanBase = buildSearchPlan(classified, refinement, {
+      service: ctx?.service,
+      niche: ctx?.niche,
+      location: ctx?.location || classified.location,
+      audience: ctx?.audience,
+      goal: ctx?.goal || classified.goal,
+    });
+    const { refineSearchPlanWithLlm } = await import("./search/playbook-planner");
+    const searchPlan =
+      searchPlanBase.playbook === "CUSTOM"
+        ? await refineSearchPlanWithLlm(searchPlanBase, data.query)
+        : searchPlanBase;
+
     if (refinement.craft) {
       classified.coreSkill = refinement.craft;
     }
     if (refinement.location) {
       classified.location = refinement.location;
+    }
+    if (classified.location) {
+      const { normalizeLocalLocation } = await import("./local/city-gazetteer");
+      classified.location = normalizeLocalLocation(classified.location);
     }
 
     const { injectLocationBias } = await import("./search/query-expander");
@@ -211,7 +229,8 @@ export const runSearch = createServerFn({ method: "POST" })
     const expFromClarify = productClarify ? undefined : refinement.experience;
     const exp = productClarify
       ? undefined
-      : (expFromClarify ?? (classified.goal === "jobs" ? (ctx?.experience_level ?? "0-1") : undefined));
+      : (expFromClarify ??
+        (classified.goal === "jobs" ? (ctx?.experience_level ?? "0-1") : undefined));
     const style = ctx?.work_style ?? "remote";
     const queryWantsSenior =
       /\b(senior|sr\.?|staff|principal|lead|[5-9]\+?\s*(?:years|yrs|yoe)|1[0-9]\+?\s*(?:years|yrs|yoe))\b/i.test(
@@ -246,62 +265,80 @@ export const runSearch = createServerFn({ method: "POST" })
     };
 
     // Investor outreach matches — separate from Dealroom "startups raising".
-    if (refinement.findInvestors) {
+    if (planUsesInvestorSeed(searchPlan) || refinement.findInvestors) {
       const { searchInvestors } = await import("./investors/search");
+      const { isIndividual, isFirm } = await import("./investors/types");
       type Lead = import("./scoring").Lead;
-      const investors = searchInvestors({
+      const investors = await searchInvestors({
         query: data.query,
         stage: refinement.investorStage,
         location: refinement.location || undefined,
         checkBand: refinement.investorCheck,
         limit: 40,
       });
-      const people = investors.map((inv) => {
-        const lead: Lead = {
-          source: "investors",
-          platform: "Investors",
-          title: `${inv.name} — ${inv.firm}`,
-          snippet: inv.focus_areas.map((f) => `${f.sector} (${f.stage})`).join("; "),
-          full_post_url: `https://www.google.com/search?q=${encodeURIComponent(inv.name + " " + inv.firm + " investor")}`,
-          author: inv.name,
-          posted_at: undefined,
-          score: 70,
-          match_reasons: ["Investor match"],
-        };
-        return {
-          key: `inv:${inv.id}`,
-          name: inv.name,
-          title_hint: inv.title,
-          company_hint: inv.firm,
-          location_hint: inv.locations.join(", ") || undefined,
-          description: inv.focus_areas
-            .slice(0, 5)
-            .map((f) => `${f.sector} (${f.stage})`)
-            .join(", "),
-          why_match: `Check ${inv.check_sweet_spot_usd || inv.check_min_usd} · ${inv.status}`,
-          sample_url: lead.full_post_url,
-          signal_count: 1,
-          lead,
-          score: 70,
-        };
-      });
-      const companies = investors.map((inv) => {
-        const person = people.find((p) => p.key === `inv:${inv.id}`);
-        return {
-          key: inv.id,
-          name: inv.firm || inv.name,
-          description: `${inv.name} (${inv.title})`,
-          why_now: inv.focus_areas
-            .slice(0, 3)
-            .map((f) => `${f.sector} (${f.stage})`)
-            .join(", "),
-          signal_count: 1,
-          platforms: ["Investors"],
-          sample_url: person?.sample_url || "",
-          leads: person ? [person.lead] : [],
-          score: 70,
-        };
-      });
+
+      const people = investors
+        .filter((inv) => !("type" in inv) || inv.type === "individual")
+        .map((inv) => {
+          const name = inv.name;
+          const firm = "firm" in inv ? inv.firm : "";
+          const role = "role" in inv ? inv.role : "title" in inv ? inv.title : "";
+          const categories =
+            "investment_categories" in inv
+              ? inv.investment_categories
+              : "focus_areas" in inv
+                ? inv.focus_areas.map((f: any) => `${f.sector} (${f.stage})`)
+                : [];
+          const locs =
+            "investment_locations" in inv
+              ? inv.investment_locations
+              : "locations" in inv
+                ? inv.locations
+                : [];
+
+          const lead: Lead = {
+            source: "investors",
+            platform: "Investors",
+            title: `${name} — ${firm}`,
+            snippet: categories.slice(0, 5).join("; "),
+            full_post_url: `https://www.google.com/search?q=${encodeURIComponent(name + " " + firm + " investor")}`,
+            author: name,
+            posted_at: undefined,
+            score: 70,
+            match_reasons: ["Investor match"],
+          };
+
+          return {
+            key: `inv:${inv.id}`,
+            name,
+            title_hint: role,
+            company_hint: firm,
+            location_hint: locs.join(", ") || undefined,
+            description: categories.slice(0, 5).join(", "),
+            why_match: `Investor · ${firm}`,
+            sample_url: lead.full_post_url,
+            signal_count: 1,
+            lead,
+            score: 70,
+          };
+        });
+
+      const companies = investors
+        .filter((inv) => "type" in inv && inv.type === "firm")
+        .map((inv) => {
+          const categories = "investment_categories" in inv ? inv.investment_categories : [];
+          return {
+            key: inv.id,
+            name: inv.name,
+            description: `VC Firm · ${categories.slice(0, 3).join(", ")}`,
+            why_now: categories.slice(0, 3).join(", "),
+            signal_count: 1,
+            platforms: ["Investors"],
+            sample_url: "website" in inv && inv.website ? inv.website : "",
+            leads: [],
+            score: 70,
+          };
+        });
       await supabase
         .from("profiles")
         .update({ searches_used: used + 1, searches_reset_at: now.toISOString() })
@@ -316,18 +353,15 @@ export const runSearch = createServerFn({ method: "POST" })
         local: [],
         investors,
         sources: ["investors"],
-        suggestions: [
-          "Try FinTech Seed",
-          "Climate investors in Europe",
-          "Angel check under $50K",
-        ],
+        suggestions: ["Try FinTech Seed", "Climate investors in Europe", "Angel check under $50K"],
         queryType: classified.type,
         refinement: refinement.summary,
         clarifyQuestions: [],
+        plan: searchPlan,
       };
     }
 
-    const {
+    let {
       leads: raw,
       sources,
       debug,
@@ -337,6 +371,64 @@ export const runSearch = createServerFn({ method: "POST" })
       subredditBoosts,
       prefs,
     });
+
+    if (searchPlan.playbook === "JOB_DISCOVERY") {
+      try {
+        const { ensureJobCatalogRegistered } = await import("./jobs/source-catalog");
+        const { fetchAllJobSources } = await import("./jobs/registry");
+        ensureJobCatalogRegistered();
+        const extraJobs = await fetchAllJobSources({
+          query: classified.roleTitle || classified.coreSkill || data.query,
+          location: classified.location || "",
+          remoteOnly: !!prefs.preferRemote,
+          limit: 80,
+        });
+        const seen = new Set(raw.map((l) => l.full_post_url));
+        for (const j of extraJobs) {
+          if (!j.url || seen.has(j.url)) continue;
+          seen.add(j.url);
+          raw.push({
+            source: j.source.replace(/^source-(ats-)?/, ""),
+            platform: j.source.replace(/^source-(ats-)?/, ""),
+            title: `${j.title} @ ${j.company}`,
+            snippet: [j.location, j.salary, j.description]
+              .filter(Boolean)
+              .join(" · ")
+              .slice(0, 400),
+            full_post_url: j.url,
+            author: j.company,
+            posted_at: j.posted_at || undefined,
+            engagement: 40,
+            is_decision_maker: true,
+          });
+        }
+        if (extraJobs.length) sources = [...new Set([...sources, "jobcatalog"])];
+      } catch (e) {
+        console.warn("[discover] job catalog merge failed", e);
+      }
+    }
+
+    if (planNeedsLocalEnrichment(searchPlan) && classified.location) {
+      const localCount = raw.filter((l) =>
+        ["osm", "geoapify", "foursquare", "coreclaw_maps"].includes(l.source),
+      ).length;
+      if (localCount < 8) {
+        try {
+          const { searchOsmLocalBusinesses } = await import("./search/osm-local-businesses.server");
+          const extraLocal = await searchOsmLocalBusinesses(expanded, classified.location);
+          const seenLoc = new Set(raw.map((l) => (l.author || l.title).toLowerCase()));
+          for (const l of extraLocal) {
+            const k = (l.author || l.title).toLowerCase();
+            if (seenLoc.has(k)) continue;
+            seenLoc.add(k);
+            raw.push(l);
+          }
+          if (extraLocal.length) sources = [...new Set([...sources, "osm"])];
+        } catch (e) {
+          console.warn("[discover] local osm merge failed", e);
+        }
+      }
+    }
 
     // 1) exact-URL dedup, then 2) cross-source fuzzy dedup (Task 1.1) so the
     // same job on a job board + a LinkedIn mention collapse to one lead.
@@ -387,7 +479,12 @@ export const runSearch = createServerFn({ method: "POST" })
       } = await import("./validation");
       validated = deduped
         .filter((l) => {
-          if (isScam(l) || isSeller(l, classified.coreSkill, classified.relatedSkills) || isStory(l) || isEdu(l))
+          if (
+            isScam(l) ||
+            isSeller(l, classified.coreSkill, classified.relatedSkills) ||
+            isStory(l) ||
+            isEdu(l)
+          )
             return false;
           if (isOffSkill(l, classified.coreSkill, classified.relatedSkills)) return false;
           if (isExpired(l) || isListicle(l)) return false;
@@ -462,14 +559,20 @@ export const runSearch = createServerFn({ method: "POST" })
           if (tl.length >= 6 && /\s/.test(tl) && lower.includes(tl)) return true;
           for (const w of tl.split(/\s+/)) {
             if (w.length < 5) continue;
-            if (/^(lead|leads|generation|service|services|client|clients|with|from|that|this|help|need|find)$/i.test(w)) {
+            if (
+              /^(lead|leads|generation|service|services|client|clients|with|from|that|this|help|need|find)$/i.test(
+                w,
+              )
+            ) {
               continue;
             }
             if (new RegExp(`(?<![a-z0-9+#])${w}(?![a-z0-9])`).test(lower)) return true;
             if (w.startsWith("invoice") && /invoice/.test(lower)) return true;
           }
         }
-        return /invoice|invoicing|billing|bookkeep|client acquisition|lead\s*gen|crm\b/i.test(lower);
+        return /invoice|invoicing|billing|bookkeep|client acquisition|lead\s*gen|crm\b/i.test(
+          lower,
+        );
       }
       if (/tutor|teacher|tutoring/i.test(`${classified.coreSkill} ${classified.raw}`)) {
         return /\b(tutor|tutoring|homework|lessons|instructor)\b/i.test(lower);
@@ -545,11 +648,22 @@ export const runSearch = createServerFn({ method: "POST" })
 
     // Quality gate: drop seekers; for clients require real buyer signal + skill
     // (skill-alone was letting tutorials / listicles into Posts).
-    const { isHirePolarityLookingFor, leadIntentText, isSellerOrProviderLead, isSalesFamilyCraft, isSalesTalentHireAsk, isPersonalStoryNoise, isEducationalNoise, detectProductIntent } =
-      await import("./validation");
+    const {
+      isHirePolarityLookingFor,
+      leadIntentText,
+      isSellerOrProviderLead,
+      isSalesFamilyCraft,
+      isSalesTalentHireAsk,
+      isPersonalStoryNoise,
+      isEducationalNoise,
+      detectProductIntent,
+    } = await import("./validation");
     const { isProfileShapedLead } = await import("./search/lead-segments");
-    const { isRecent: isRecentDate, CLIENTS_SOCIAL_MAX_AGE_DAYS, ATS_COMPANY_MAX_AGE_DAYS } =
-      await import("./search/query-expander");
+    const {
+      isRecent: isRecentDate,
+      CLIENTS_SOCIAL_MAX_AGE_DAYS,
+      ATS_COMPANY_MAX_AGE_DAYS,
+    } = await import("./search/query-expander");
     const UNDATED_DROP_SOURCES = new Set([
       "linkedin",
       "serpapi",
@@ -600,7 +714,8 @@ export const runSearch = createServerFn({ method: "POST" })
           const fullText = `${l.title} ${l.snippet}`;
           if (l.ai_role_in_post === "seeker" || l.ai_intent === "seeker") return false;
           if (SEEKER_RE.test(fullText) && !CLEAR_THIRD_PARTY_BUYER_RE.test(fullText)) return false;
-          if (isSellerOrProviderLead(l, classified.coreSkill, classified.relatedSkills)) return false;
+          if (isSellerOrProviderLead(l, classified.coreSkill, classified.relatedSkills))
+            return false;
           if (isPersonalStoryNoise(l) || isEducationalNoise(l)) return false;
           // LinkedIn thought-leadership / listicles that match "need a designer"
           // as prose, not a hire ask ("So You Need a Designer in 2026").
@@ -695,7 +810,10 @@ export const runSearch = createServerFn({ method: "POST" })
             !weekHireOk &&
             !weekSocialOk &&
             UNDATED_DROP_SOURCES.has(l.source) &&
-            !(isLiPostWithAuthor && (BODY_HIRE_RE.test(text) || isSalesTalentHireAsk(text) || TITLE_HIRE_RE.test(title))) &&
+            !(
+              isLiPostWithAuthor &&
+              (BODY_HIRE_RE.test(text) || isSalesTalentHireAsk(text) || TITLE_HIRE_RE.test(title))
+            ) &&
             !dmRelevant
           ) {
             return false;
@@ -707,7 +825,10 @@ export const runSearch = createServerFn({ method: "POST" })
             !timeBoxed &&
             !weekHireOk &&
             !weekSocialOk &&
-            !(l.demand_verified === true && (TITLE_HIRE_RE.test(title) || BODY_HIRE_RE.test(text))) &&
+            !(
+              l.demand_verified === true &&
+              (TITLE_HIRE_RE.test(title) || BODY_HIRE_RE.test(text))
+            ) &&
             (l.source === "instagram" || l.source === "facebook")
           ) {
             return false;
@@ -734,8 +855,7 @@ export const runSearch = createServerFn({ method: "POST" })
           // is why Companies was always 0 while Reddit ("[HIRING] need a
           // designer") sailed through. Relevance still enforced, and on the
           // TITLE only, never the description.
-          const sourceIsDemand =
-            DEMAND_BY_SOURCE.has(l.source) && skillOkFor(l.title || "");
+          const sourceIsDemand = DEMAND_BY_SOURCE.has(l.source) && skillOkFor(l.title || "");
           // Product pitches hunt customers/competitors — hire-grammar is wrong.
           // Accept product-intent / customer-pain language + skill match.
           const productMode = classified.type === "product";
@@ -788,8 +908,7 @@ export const runSearch = createServerFn({ method: "POST" })
               (bodyBuyer && !/\bstarting at\s*\$/i.test(title) && isSocial) ||
               (salesCraft && isSalesTalentHireAsk(text) && (timeBoxed || weekHireOk));
             const buyerish =
-              heuristicBuyer ||
-              (llmBuyer && (titleBuyer || bodyBuyer || datedOrBoxed || isSocial));
+              heuristicBuyer || (llmBuyer && (titleBuyer || bodyBuyer || datedOrBoxed || isSocial));
             // Twitter/X / LinkedIn: short buyer asks — dated OR SERP time-boxed.
             const twitterKeep =
               l.source === "twitter" &&
@@ -1056,7 +1175,8 @@ export const runSearch = createServerFn({ method: "POST" })
     }
 
     const suggestions =
-      leadsWithContacts.length === 0 || (classified.intentMode === "directory_smb" && !classified.location)
+      leadsWithContacts.length === 0 ||
+      (classified.intentMode === "directory_smb" && !classified.location)
         ? generateSmartSuggestions(classified)
         : [];
 
@@ -1110,6 +1230,7 @@ export const runSearch = createServerFn({ method: "POST" })
        */
       clarify: clarifyQuestions,
       refinement: refinement.summary,
+      plan: searchPlan,
       error: null as string | null,
       message: null as string | null,
     };

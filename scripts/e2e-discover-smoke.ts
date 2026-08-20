@@ -44,8 +44,14 @@ const serpSample = await searchGoogleSerp(
   `site:linkedin.com/posts ("looking for a web designer" OR "need a web designer")`,
   { tbs: "qdr:w", num: 8 },
 );
-assert(!!serpSample && serpSample.organic_results.length > 0, `searchGoogleSerp LinkedIn n=${serpSample?.organic_results.length ?? 0} provider=${serpSample?.provider}`);
-assert(serpSample?.provider === "serper" || serpSample?.provider === "scrapingdog", `provider is hosted (${serpSample?.provider})`);
+assert(
+  !!serpSample && serpSample.organic_results.length > 0,
+  `searchGoogleSerp LinkedIn n=${serpSample?.organic_results.length ?? 0} provider=${serpSample?.provider}`,
+);
+assert(
+  serpSample?.provider === "serper" || serpSample?.provider === "scrapingdog",
+  `provider is hosted (${serpSample?.provider})`,
+);
 
 // 2) searchSerpAPI multi-dork
 const serpLeads = await searchSerpAPI(
@@ -64,7 +70,11 @@ assert(socialFromSerp > 0, `searchSerpAPI social platforms count=${socialFromSer
 const classified = classifyQuery("looking for a web designer");
 classified.goal = "clients";
 const expanded = expandFromClassified(classified);
-console.log("classified", { core: classified.coreSkill, goal: classified.goal, signal: classified.signalMode });
+console.log("classified", {
+  core: classified.coreSkill,
+  goal: classified.goal,
+  signal: classified.signalMode,
+});
 
 const t0 = Date.now();
 const { leads: raw, debug, sources } = await searchAllSources({ classified, expanded });
@@ -82,8 +92,13 @@ console.log(
 
 assert(raw.length >= 20, `volume: raw leads >= 20 (got ${raw.length})`);
 const hasSocial = ["linkedin", "twitter", "facebook", "instagram"].some((s) => (by[s] ?? 0) > 0);
-const hasFiller = ["freelancer", "hn", "reddit", "redditrss", "tavily"].some((s) => (by[s] ?? 0) > 0);
-assert(hasSocial, `social present in mix: ${JSON.stringify(Object.fromEntries(Object.entries(by).filter(([k]) => ["linkedin","twitter","facebook","instagram"].includes(k))))}`);
+const hasFiller = ["freelancer", "hn", "reddit", "redditrss", "tavily"].some(
+  (s) => (by[s] ?? 0) > 0,
+);
+assert(
+  hasSocial,
+  `social present in mix: ${JSON.stringify(Object.fromEntries(Object.entries(by).filter(([k]) => ["linkedin", "twitter", "facebook", "instagram"].includes(k))))}`,
+);
 assert(hasFiller || raw.length > 40, `filler or high volume present`);
 
 const validated = validateLeads(raw as Lead[], classified, expanded, { preferJunior: false });
@@ -103,7 +118,9 @@ console.log("ranked", ranked.length);
 assert(ranked.length >= 8, `ranked results >= 8 (got ${ranked.length})`);
 
 const rankedSocial = ranked.filter((l) =>
-  /linkedin|twitter|facebook|instagram|x\.com/i.test(`${l.source} ${l.platform} ${l.full_post_url}`),
+  /linkedin|twitter|facebook|instagram|x\.com/i.test(
+    `${l.source} ${l.platform} ${l.full_post_url}`,
+  ),
 ).length;
 console.log("ranked social-ish", rankedSocial);
 assert(rankedSocial > 0 || socialFromSerp > 0, "social survives into ranked or SERP path");

@@ -15,8 +15,7 @@ export async function searchTikTok(query: SearchQuery): Promise<Lead[]> {
   const scKey = Deno.env.get("SCRAPECREATORS_KEY");
 
   if (scKey) {
-    const ttQuery =
-      `hiring ${query.skill} OR "looking for ${query.skill}" OR "need a ${query.skill}"`;
+    const ttQuery = `hiring ${query.skill} OR "looking for ${query.skill}" OR "need a ${query.skill}"`;
     try {
       const res = await fetch(
         `https://api.scrapecreators.com/v1/tiktok/search?query=${encodeURIComponent(ttQuery)}&type=videos`,
@@ -37,9 +36,7 @@ export async function searchTikTok(query: SearchQuery): Promise<Lead[]> {
           seen.add(String(videoId));
 
           const username = video.author?.unique_id || video.author_info?.unique_id || "";
-          const isDecisionMaker = detectDecisionMaker(
-            text + " " + (video.author?.signature || ""),
-          );
+          const isDecisionMaker = detectDecisionMaker(text + " " + (video.author?.signature || ""));
           const { score, tier, hasBudget, hasUrgency } = scoreIntent({
             text,
             platform: "tiktok",

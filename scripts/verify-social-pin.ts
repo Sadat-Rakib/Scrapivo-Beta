@@ -17,12 +17,18 @@ import { enrichTopLeadContacts } from "../src/lib/contact/pie-top-leads.server";
 
 const qx = expandFromClassified(classifyQuery("looking for a web designer"));
 const serp = await searchSerpAPI(qx);
-console.log("serp", serp.length, Object.fromEntries(
-  Object.entries(serp.reduce((a: Record<string, number>, l) => {
-    a[l.source] = (a[l.source] ?? 0) + 1;
-    return a;
-  }, {})),
-));
+console.log(
+  "serp",
+  serp.length,
+  Object.fromEntries(
+    Object.entries(
+      serp.reduce((a: Record<string, number>, l) => {
+        a[l.source] = (a[l.source] ?? 0) + 1;
+        return a;
+      }, {}),
+    ),
+  ),
+);
 
 const filler: Lead[] = Array.from({ length: 30 }, (_, i) => ({
   source: "freelancer",

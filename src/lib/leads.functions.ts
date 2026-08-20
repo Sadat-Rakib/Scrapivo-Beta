@@ -37,9 +37,7 @@ export const saveLead = createServerFn({ method: "POST" })
 export const listSavedLeads = createServerFn({ method: "GET" })
   .middleware([requireMyAuth])
   .handler(async ({ context }) => {
-    const { data, error } = await context.supabase
-      .from("saved_leads")
-      .select("*");
+    const { data, error } = await context.supabase.from("saved_leads").select("*");
     if (error) throw new Error(error.message);
     return (data ?? []).sort((a: any, b: any) => {
       const aTime = a.created_at ? new Date(a.created_at).getTime() : 0;

@@ -128,7 +128,13 @@ async function checkSerpApi(): Promise<Result> {
   if (!r.ok) return { name, present: true, wired: true, ok: false, detail: r.error };
   const { status, organic, error, meta } = r.value;
   if (error) {
-    return { name, present: true, wired: true, ok: false, detail: `HTTP ${status}, error=${error}` };
+    return {
+      name,
+      present: true,
+      wired: true,
+      ok: false,
+      detail: `HTTP ${status}, error=${error}`,
+    };
   }
   return {
     name,
@@ -174,7 +180,9 @@ async function checkGeoapify(): Promise<Result> {
       `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent("Toronto, Canada")}` +
       `&limit=1&format=json&apiKey=${key}`;
     const res = await fetch(url);
-    const data = (await res.json()) as { results?: Array<{ city?: string; country_code?: string }> };
+    const data = (await res.json()) as {
+      results?: Array<{ city?: string; country_code?: string }>;
+    };
     const hit = data.results?.[0];
     return { status: res.status, city: hit?.city, cc: hit?.country_code };
   });
@@ -219,7 +227,8 @@ async function checkFoursquare(): Promise<Result> {
       if (!res.ok) continue;
       const data = (await res.json()) as { results?: unknown[] };
       const n = data.results?.length ?? 0;
-      if (n > 0) return { status: res.status, n, via: a.url.includes("places-api") ? "places-api" : "v3" };
+      if (n > 0)
+        return { status: res.status, n, via: a.url.includes("places-api") ? "places-api" : "v3" };
     }
     return { status: 401, n: 0, via: "none" };
   });
@@ -272,7 +281,8 @@ async function checkMillionVerifier(): Promise<Result> {
 
 async function checkScrapingBee(): Promise<Result> {
   const name = "SCRAPINGBEE_API_KEY";
-  if (!present(name)) return { name, present: false, wired: true, ok: null, detail: "missing (Local HTML failover)" };
+  if (!present(name))
+    return { name, present: false, wired: true, ok: null, detail: "missing (Local HTML failover)" };
   const r = await timed(25_000, async () => {
     const key = process.env.SCRAPINGBEE_API_KEY!.trim();
     const api =
@@ -325,9 +335,8 @@ async function checkDeadKeys(): Promise<Result[]> {
 async function checkSerpChain(): Promise<void> {
   console.log("\n── SERP chain (same path Discover uses) ──");
   process.env.USE_PAID_SOURCES = process.env.USE_PAID_SOURCES || "true";
-  const { searchGoogleSerp, hasGoogleSerpProvider } = await import(
-    "../src/lib/search/serp-providers.server.ts"
-  );
+  const { searchGoogleSerp, hasGoogleSerpProvider } =
+    await import("../src/lib/search/serp-providers.server.ts");
   console.log("hasGoogleSerpProvider()", hasGoogleSerpProvider());
   const res = await searchGoogleSerp('site:linkedin.com/posts "looking for a designer"', {
     tbs: "qdr:w",
@@ -355,15 +364,10 @@ results.push(...(await checkDeadKeys()));
 
 console.log("\n── API key health (secrets never printed) ──\n");
 console.log(
-  "NAME".padEnd(28) +
-    "PRESENT".padEnd(10) +
-    "WIRED".padEnd(8) +
-    "OK".padEnd(8) +
-    "DETAIL",
+  "NAME".padEnd(28) + "PRESENT".padEnd(10) + "WIRED".padEnd(8) + "OK".padEnd(8) + "DETAIL",
 );
 for (const r of results) {
-  const ok =
-    r.ok === true ? "PASS" : r.ok === false ? "FAIL" : r.wired === false ? "N/A" : "SKIP";
+  const ok = r.ok === true ? "PASS" : r.ok === false ? "FAIL" : r.wired === false ? "N/A" : "SKIP";
   console.log(
     r.name.padEnd(28) +
       String(r.present).padEnd(10) +

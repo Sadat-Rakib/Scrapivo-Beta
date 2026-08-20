@@ -13,15 +13,11 @@ if (existsSync(".env")) {
 }
 process.env.USE_PAID_SOURCES = process.env.USE_PAID_SOURCES || "true";
 
-const q =
-  process.argv[2] ||
-  "I'm a designer looking for people and companies who need designers";
+const q = process.argv[2] || "I'm a designer looking for people and companies who need designers";
 
 console.log("── Discover E2E:", q, "──");
 
-const { classifyQuery, inferGoalFromQuery } = await import(
-  "../src/lib/search/query-classifier.ts"
-);
+const { classifyQuery, inferGoalFromQuery } = await import("../src/lib/search/query-classifier.ts");
 const { expandFromClassified } = await import("../src/lib/search/query-expander.ts");
 const { searchAllSources } = await import("../src/lib/search/sources.server.ts");
 const { segmentLeads } = await import("../src/lib/search/lead-segments.ts");
@@ -64,10 +60,7 @@ const segments = segmentLeads(pool, { craft: classified.coreSkill || expanded.sk
 
 const socialKeys = ["linkedin", "twitter", "facebook", "instagram", "socialdorks", "serpapi"];
 const socialInRaw = socialKeys.reduce((n, k) => n + (bySrc[k] || 0), 0);
-const socialFetch = socialKeys.reduce(
-  (n, k) => n + (debug?.sourceCounts?.[k] ?? 0),
-  0,
-);
+const socialFetch = socialKeys.reduce((n, k) => n + (debug?.sourceCounts?.[k] ?? 0), 0);
 
 const report = {
   elapsed_s: elapsed,

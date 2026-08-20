@@ -16,14 +16,11 @@ const category = "plumbers";
 const location = "Toronto";
 
 const { geocodePlace } = await import("../src/lib/search/geoapify-places.server.ts");
-const { searchOsmLocalBusinesses } = await import("../src/lib/search/osm-local-businesses.server.ts");
+const { searchOsmLocalBusinesses } =
+  await import("../src/lib/search/osm-local-businesses.server.ts");
 const { searchLocalBusinesses } = await import("../src/lib/search/foursquare-places.server.ts");
-const {
-  disambiguatePlaceQuery,
-  isJunkLocalListing,
-  isRealBusinessWebsite,
-  matchesLocalCraft,
-} = await import("../src/lib/search/place-disambiguate.server.ts");
+const { disambiguatePlaceQuery, isJunkLocalListing, isRealBusinessWebsite, matchesLocalCraft } =
+  await import("../src/lib/search/place-disambiguate.server.ts");
 const { extractEmailsWithCheerio } = await import("../src/lib/contact/cheerio-email.server.ts");
 
 const qx = {
@@ -68,7 +65,12 @@ type Row = {
 const rows: Row[] = [];
 const seen = new Set<string>();
 for (const l of [...osm, ...places]) {
-  const name = ((l as { company?: string }).company || l.author || (l.title || "").split(" — ")[0] || "").trim();
+  const name = (
+    (l as { company?: string }).company ||
+    l.author ||
+    (l.title || "").split(" — ")[0] ||
+    ""
+  ).trim();
   if (!name || seen.has(name.toLowerCase())) continue;
   if (isJunkLocalListing(name, category) || !matchesLocalCraft(name, category)) continue;
   seen.add(name.toLowerCase());

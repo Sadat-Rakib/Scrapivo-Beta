@@ -70,9 +70,7 @@ function asString(v: unknown): string | undefined {
 }
 
 /** Enrich a company homepage / profile URL into structured fields. */
-export async function scrapegraphExtractCompany(
-  url: string,
-): Promise<SgaiCompanyExtract | null> {
+export async function scrapegraphExtractCompany(url: string): Promise<SgaiCompanyExtract | null> {
   const raw = await sgaiExtract(url, EXTRACT_PROMPT);
   if (!raw) return null;
   const company =

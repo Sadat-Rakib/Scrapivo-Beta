@@ -48,8 +48,7 @@ export const createSignalWatch = createServerFn({ method: "POST" })
       notify: true,
     };
     const name =
-      data.name?.trim() ||
-      (data.query.length > 60 ? `${data.query.slice(0, 57)}…` : data.query);
+      data.name?.trim() || (data.query.length > 60 ? `${data.query.slice(0, 57)}…` : data.query);
 
     const { data: row, error } = await context.supabase
       .from("campaigns")
@@ -193,7 +192,10 @@ async function executeWatchSearch(
   const now = new Date();
   if (resetAt < new Date(now.getTime() - 86400_000)) {
     used = 0;
-    await supabase.from("profiles").update({ searches_used: 0, searches_reset_at: now.toISOString() }).eq("id", userId);
+    await supabase
+      .from("profiles")
+      .update({ searches_used: 0, searches_reset_at: now.toISOString() })
+      .eq("id", userId);
   }
   const plan = profile?.plan ?? "free";
   if (plan === "free" && used >= 5) {
@@ -228,7 +230,10 @@ async function executeWatchSearch(
     directoryMode: classified.intentMode === "directory_smb",
   });
 
-  await supabase.from("profiles").update({ searches_used: used + 1 }).eq("id", userId);
+  await supabase
+    .from("profiles")
+    .update({ searches_used: used + 1 })
+    .eq("id", userId);
   await supabase.from("search_history").insert({
     user_id: userId,
     query: `[watch] ${query}`,

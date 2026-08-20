@@ -27,77 +27,187 @@ export interface ExpandedQueries {
 }
 
 const FILLERS = [
-  "developer", "dev", "engineer", "designer", "consultant", "specialist",
-  "expert", "professional", "looking", "for", "i", "im", "i'm", "a", "an",
-  "the", "need", "want", "hire", "freelancer", "freelance",
+  "developer",
+  "dev",
+  "engineer",
+  "designer",
+  "consultant",
+  "specialist",
+  "expert",
+  "professional",
+  "looking",
+  "for",
+  "i",
+  "im",
+  "i'm",
+  "a",
+  "an",
+  "the",
+  "need",
+  "want",
+  "hire",
+  "freelancer",
+  "freelance",
 ];
 
 const ROLE_MAP: Record<string, string> = {
   // ── Development ────────────────────────────────────────────────
-  "react": "React developer", "react developer": "React developer", "react dev": "React developer",
-  "next": "Next.js developer", "nextjs": "Next.js developer", "next.js": "Next.js developer",
-  "vue": "Vue.js developer", "angular": "Angular developer", "svelte": "Svelte developer",
-  "frontend": "frontend developer", "front end": "frontend developer", "front-end": "frontend developer",
-  "backend": "backend developer", "back end": "backend developer", "back-end": "backend developer",
-  "fullstack": "full stack developer", "full stack": "full stack developer", "full-stack": "full stack developer",
-  "python": "Python developer", "django": "Django developer", "flask": "Flask developer", "fastapi": "FastAPI developer",
-  "node": "Node.js developer", "nodejs": "Node.js developer", "express": "Node.js developer",
-  "ruby": "Ruby developer", "rails": "Rails developer", "ror": "Rails developer",
-  "go": "Go developer", "golang": "Go developer", "rust": "Rust developer",
-  "java": "Java developer", "spring": "Spring developer", "kotlin": "Kotlin developer",
-  ".net": ".NET developer", "dotnet": ".NET developer", "c#": "C# developer", "csharp": "C# developer",
-  "php": "PHP developer", "laravel": "Laravel developer",
-  "ios": "iOS developer", "swift": "iOS developer", "android": "Android developer",
-  "mobile": "mobile app developer", "flutter": "Flutter developer", "react native": "React Native developer",
-  "devops": "DevOps engineer", "sre": "Site Reliability engineer", "platform": "platform engineer",
-  "blockchain": "blockchain developer", "solidity": "Solidity developer", "web3": "Web3 developer",
-  "wordpress": "WordPress developer", "shopify": "Shopify developer", "webflow": "Webflow developer",
-  "qa": "QA engineer", "test": "QA engineer", "automation": "QA automation engineer",
+  react: "React developer",
+  "react developer": "React developer",
+  "react dev": "React developer",
+  next: "Next.js developer",
+  nextjs: "Next.js developer",
+  "next.js": "Next.js developer",
+  vue: "Vue.js developer",
+  angular: "Angular developer",
+  svelte: "Svelte developer",
+  frontend: "frontend developer",
+  "front end": "frontend developer",
+  "front-end": "frontend developer",
+  backend: "backend developer",
+  "back end": "backend developer",
+  "back-end": "backend developer",
+  fullstack: "full stack developer",
+  "full stack": "full stack developer",
+  "full-stack": "full stack developer",
+  python: "Python developer",
+  django: "Django developer",
+  flask: "Flask developer",
+  fastapi: "FastAPI developer",
+  node: "Node.js developer",
+  nodejs: "Node.js developer",
+  express: "Node.js developer",
+  ruby: "Ruby developer",
+  rails: "Rails developer",
+  ror: "Rails developer",
+  go: "Go developer",
+  golang: "Go developer",
+  rust: "Rust developer",
+  java: "Java developer",
+  spring: "Spring developer",
+  kotlin: "Kotlin developer",
+  ".net": ".NET developer",
+  dotnet: ".NET developer",
+  "c#": "C# developer",
+  csharp: "C# developer",
+  php: "PHP developer",
+  laravel: "Laravel developer",
+  ios: "iOS developer",
+  swift: "iOS developer",
+  android: "Android developer",
+  mobile: "mobile app developer",
+  flutter: "Flutter developer",
+  "react native": "React Native developer",
+  devops: "DevOps engineer",
+  sre: "Site Reliability engineer",
+  platform: "platform engineer",
+  blockchain: "blockchain developer",
+  solidity: "Solidity developer",
+  web3: "Web3 developer",
+  wordpress: "WordPress developer",
+  shopify: "Shopify developer",
+  webflow: "Webflow developer",
+  qa: "QA engineer",
+  test: "QA engineer",
+  automation: "QA automation engineer",
   // ── AI / Data ──────────────────────────────────────────────────
-  "ai": "AI engineer", "ai engineer": "AI engineer", "ml": "machine learning engineer",
-  "ml engineer": "machine learning engineer", "machine learning": "machine learning engineer",
-  "data scientist": "data scientist", "data analyst": "data analyst", "data engineer": "data engineer",
-  "llm": "LLM engineer", "rag": "RAG engineer", "prompt": "prompt engineer", "prompt engineer": "prompt engineer",
-  "mlops": "MLOps engineer",
+  ai: "AI engineer",
+  "ai engineer": "AI engineer",
+  ml: "machine learning engineer",
+  "ml engineer": "machine learning engineer",
+  "machine learning": "machine learning engineer",
+  "data scientist": "data scientist",
+  "data analyst": "data analyst",
+  "data engineer": "data engineer",
+  llm: "LLM engineer",
+  rag: "RAG engineer",
+  prompt: "prompt engineer",
+  "prompt engineer": "prompt engineer",
+  mlops: "MLOps engineer",
   // ── Design ─────────────────────────────────────────────────────
-  "ux": "UX designer", "ui": "UI designer", "ui ux": "UI/UX designer", "ux ui": "UI/UX designer",
-  "ux designer": "UX designer", "ui designer": "UI designer", "product designer": "product designer",
-  "graphic design": "graphic designer", "graphic designer": "graphic designer",
-  "brand": "brand designer", "brand designer": "brand designer", "logo": "logo designer",
-  "motion": "motion designer", "motion designer": "motion designer",
-  "illustrator": "illustrator", "3d": "3D artist", "3d artist": "3D artist",
-  "figma": "Figma designer", "interior": "interior designer",
+  ux: "UX designer",
+  ui: "UI designer",
+  "ui ux": "UI/UX designer",
+  "ux ui": "UI/UX designer",
+  "ux designer": "UX designer",
+  "ui designer": "UI designer",
+  "product designer": "product designer",
+  "graphic design": "graphic designer",
+  "graphic designer": "graphic designer",
+  brand: "brand designer",
+  "brand designer": "brand designer",
+  logo: "logo designer",
+  motion: "motion designer",
+  "motion designer": "motion designer",
+  illustrator: "illustrator",
+  "3d": "3D artist",
+  "3d artist": "3D artist",
+  figma: "Figma designer",
+  interior: "interior designer",
   // ── Marketing & Growth ─────────────────────────────────────────
-  "marketing": "marketing consultant", "growth": "growth marketer", "growth marketer": "growth marketer",
-  "seo": "SEO specialist", "ppc": "PPC specialist", "google ads": "Google Ads specialist",
-  "facebook ads": "paid social specialist", "meta ads": "paid social specialist",
-  "email": "email marketer", "email marketing": "email marketer",
-  "social media": "social media manager", "community": "community manager",
-  "brand strategy": "brand strategist", "pr": "PR consultant",
+  marketing: "marketing consultant",
+  growth: "growth marketer",
+  "growth marketer": "growth marketer",
+  seo: "SEO specialist",
+  ppc: "PPC specialist",
+  "google ads": "Google Ads specialist",
+  "facebook ads": "paid social specialist",
+  "meta ads": "paid social specialist",
+  email: "email marketer",
+  "email marketing": "email marketer",
+  "social media": "social media manager",
+  community: "community manager",
+  "brand strategy": "brand strategist",
+  pr: "PR consultant",
   // ── Content ────────────────────────────────────────────────────
-  "copywriter": "copywriter", "copywriting": "copywriter",
-  "content writer": "content writer", "content": "content writer",
-  "technical writer": "technical writer", "ghostwriter": "ghostwriter",
-  "video editor": "video editor", "video editing": "video editor",
-  "podcast": "podcast editor", "podcast editor": "podcast editor",
-  "photographer": "photographer", "photography": "photographer",
-  "voiceover": "voiceover artist", "vo": "voiceover artist",
+  copywriter: "copywriter",
+  copywriting: "copywriter",
+  "content writer": "content writer",
+  content: "content writer",
+  "technical writer": "technical writer",
+  ghostwriter: "ghostwriter",
+  "video editor": "video editor",
+  "video editing": "video editor",
+  podcast: "podcast editor",
+  "podcast editor": "podcast editor",
+  photographer: "photographer",
+  photography: "photographer",
+  voiceover: "voiceover artist",
+  vo: "voiceover artist",
   // ── Business & Ops ─────────────────────────────────────────────
-  "va": "virtual assistant", "virtual assistant": "virtual assistant",
-  "project manager": "project manager", "pm": "project manager",
+  va: "virtual assistant",
+  "virtual assistant": "virtual assistant",
+  "project manager": "project manager",
+  pm: "project manager",
   "product manager": "product manager",
-  "operations": "operations manager", "ops": "operations manager",
-  "recruiter": "recruiter", "talent": "recruiter",
-  "sales": "sales rep", "sdr": "SDR", "bdr": "BDR",
-  "customer success": "customer success manager", "cs": "customer success manager",
-  "bookkeeper": "bookkeeper", "accountant": "accountant", "cfo": "fractional CFO",
-  "lawyer": "lawyer", "legal": "lawyer", "paralegal": "paralegal",
-  "hr": "HR consultant", "people ops": "HR consultant",
+  operations: "operations manager",
+  ops: "operations manager",
+  recruiter: "recruiter",
+  talent: "recruiter",
+  sales: "sales rep",
+  sdr: "SDR",
+  bdr: "BDR",
+  "customer success": "customer success manager",
+  cs: "customer success manager",
+  bookkeeper: "bookkeeper",
+  accountant: "accountant",
+  cfo: "fractional CFO",
+  lawyer: "lawyer",
+  legal: "lawyer",
+  paralegal: "paralegal",
+  hr: "HR consultant",
+  "people ops": "HR consultant",
   // ── Trades & Local Services ────────────────────────────────────
-  "plumber": "plumber", "electrician": "electrician", "contractor": "general contractor",
-  "real estate": "real estate agent", "realtor": "real estate agent",
-  "tutor": "tutor", "coach": "coach", "therapist": "therapist",
-  "fitness": "fitness trainer", "personal trainer": "fitness trainer",
+  plumber: "plumber",
+  electrician: "electrician",
+  contractor: "general contractor",
+  "real estate": "real estate agent",
+  realtor: "real estate agent",
+  tutor: "tutor",
+  coach: "coach",
+  therapist: "therapist",
+  fitness: "fitness trainer",
+  "personal trainer": "fitness trainer",
 };
 
 const SKILL_SUBS: Record<string, string[]> = {
@@ -116,8 +226,25 @@ const SKILL_SUBS: Record<string, string[]> = {
   copywrit: ["copywriting", "freelanceWriters", "HireaWriter"],
   content: ["freelanceWriters", "writing", "HireaWriter"],
   writer: ["HireaWriter", "freelanceWriters", "writing", "copywriting", "Blogging"],
-  teacher: ["tutors", "Teachers", "HomeworkHelp", "learnprogramming", "GetStudying", "APStudents", "Sat", "Parenting"],
-  tutor: ["tutors", "HomeworkHelp", "learnprogramming", "GetStudying", "APStudents", "Sat", "tutor"],
+  teacher: [
+    "tutors",
+    "Teachers",
+    "HomeworkHelp",
+    "learnprogramming",
+    "GetStudying",
+    "APStudents",
+    "Sat",
+    "Parenting",
+  ],
+  tutor: [
+    "tutors",
+    "HomeworkHelp",
+    "learnprogramming",
+    "GetStudying",
+    "APStudents",
+    "Sat",
+    "tutor",
+  ],
   investor: ["startups", "startup_funding", "VentureCapital", "AngelInvesting", "Entrepreneur"],
   video: ["VideoEditing", "editors"],
   photo: ["photography", "AskPhotography"],
@@ -169,22 +296,86 @@ function getSkillSubreddits(skill: string): string[] {
 
 function baseNegativeSignals(): string[] {
   return [
-    "available for hire", "available for work", "open to work", "open for work",
-    "for hire", "hire me", "i am a ", "i'm a ", "i am an ", "i'm an ",
-    "i offer", "i provide", "i specialize", "i can help", "i build", "i will build",
-    "my portfolio", "check out my", "my work", "my services", "my github", "my linkedin",
-    "years of experience", "years experience", "yrs of experience", "yrs experience",
-    "seeking role", "seeking position", "seeking opportunities", "seeking work",
-    "seeking a job", "looking for a job", "looking for job", "job hunting", "job seeker",
-    "looking for work", "looking for opportunities", "looking for a role", "looking for a position",
-    "looking for my next", "looking for new opportunities", "open to opportunities",
-    "i have built", "i've built", "i have worked", "i've worked",
-    "let me know if you", "feel free to reach out",
-    "tutorial", "how to", "learn ", "course", "documentation", "cheatsheet", "cheat sheet",
-    "steps to", "become a", "how to become", "guide to", "career path", "career in",
-    "wikipedia", "wiki/", "/wiki", "what is", "introduction to", "getting started",
-    "boilerplate", "starter template", "just released", "new library", "open source project",
-    " 2014", " 2015", " 2016", " 2017", " 2018", " 2019", " 2020", " 2021",
+    "available for hire",
+    "available for work",
+    "open to work",
+    "open for work",
+    "for hire",
+    "hire me",
+    "i am a ",
+    "i'm a ",
+    "i am an ",
+    "i'm an ",
+    "i offer",
+    "i provide",
+    "i specialize",
+    "i can help",
+    "i build",
+    "i will build",
+    "my portfolio",
+    "check out my",
+    "my work",
+    "my services",
+    "my github",
+    "my linkedin",
+    "years of experience",
+    "years experience",
+    "yrs of experience",
+    "yrs experience",
+    "seeking role",
+    "seeking position",
+    "seeking opportunities",
+    "seeking work",
+    "seeking a job",
+    "looking for a job",
+    "looking for job",
+    "job hunting",
+    "job seeker",
+    "looking for work",
+    "looking for opportunities",
+    "looking for a role",
+    "looking for a position",
+    "looking for my next",
+    "looking for new opportunities",
+    "open to opportunities",
+    "i have built",
+    "i've built",
+    "i have worked",
+    "i've worked",
+    "let me know if you",
+    "feel free to reach out",
+    "tutorial",
+    "how to",
+    "learn ",
+    "course",
+    "documentation",
+    "cheatsheet",
+    "cheat sheet",
+    "steps to",
+    "become a",
+    "how to become",
+    "guide to",
+    "career path",
+    "career in",
+    "wikipedia",
+    "wiki/",
+    "/wiki",
+    "what is",
+    "introduction to",
+    "getting started",
+    "boilerplate",
+    "starter template",
+    "just released",
+    "new library",
+    "open source project",
+    " 2014",
+    " 2015",
+    " 2016",
+    " 2017",
+    " 2018",
+    " 2019",
+    " 2020",
+    " 2021",
   ];
 }
 
@@ -300,7 +491,9 @@ function expandRoleSkillQuery(cq: ClassifiedQuery, negativeSignals: string[]): E
       skill: "fundraising",
       role: "Investor",
       queryType,
-      relatedSkills: relatedSkills.length ? relatedSkills : ["raising", "seed round", "looking for investors"],
+      relatedSkills: relatedSkills.length
+        ? relatedSkills
+        : ["raising", "seed round", "looking for investors"],
       buyerIntentQueries: raisePhrases,
       buyerPhrases: raisePhrases,
       jobBoardQueries: ["raising", "fundraising", "seed"],
@@ -448,9 +641,10 @@ function expandRoleSkillQuery(cq: ClassifiedQuery, negativeSignals: string[]): E
       ],
       negativePhrases: [
         ...negativeSignals.filter(
-          (s) => !/^(tutorial|how to|learn |course|documentation|cheatsheet|cheat sheet|steps to|become a|guide to)$/i.test(
-            s.trim(),
-          ),
+          (s) =>
+            !/^(tutorial|how to|learn |course|documentation|cheatsheet|cheat sheet|steps to|become a|guide to)$/i.test(
+              s.trim(),
+            ),
         ),
         "hire me as a tutor",
         "available to tutor",
@@ -458,9 +652,10 @@ function expandRoleSkillQuery(cq: ClassifiedQuery, negativeSignals: string[]): E
       ],
       negativeSignals: [
         ...negativeSignals.filter(
-          (s) => !/^(tutorial|how to|learn |course|documentation|cheatsheet|cheat sheet|steps to|become a|guide to)$/i.test(
-            s.trim(),
-          ),
+          (s) =>
+            !/^(tutorial|how to|learn |course|documentation|cheatsheet|cheat sheet|steps to|become a|guide to)$/i.test(
+              s.trim(),
+            ),
         ),
         "hire me as a tutor",
         "available to tutor",
@@ -543,7 +738,12 @@ function expandRoleSkillQuery(cq: ClassifiedQuery, negativeSignals: string[]): E
   ];
 
   const subreddits = [
-    "forhire", "hiring", "freelance", "Entrepreneur", "startups", "smallbusiness",
+    "forhire",
+    "hiring",
+    "freelance",
+    "Entrepreneur",
+    "startups",
+    "smallbusiness",
     ...getSkillSubreddits(skill),
   ];
 
@@ -581,10 +781,7 @@ function isCustomerHuntQuery(raw: string): boolean {
 function productDemandTerms(raw: string, related: string[]): string[] {
   const lower = raw.toLowerCase();
   // Prefer multi-word capability phrases first (from pitch keyword extract).
-  const ranked = [
-    ...related.filter((r) => /\s/.test(r)),
-    ...related.filter((r) => !/\s/.test(r)),
-  ];
+  const ranked = [...related.filter((r) => /\s/.test(r)), ...related.filter((r) => !/\s/.test(r))];
   const terms = new Set<string>();
   for (const r of ranked.slice(0, 10)) {
     const t = r.toLowerCase().trim();
@@ -605,9 +802,14 @@ function productDemandTerms(raw: string, related: string[]): string[] {
   }
 
   if (/invoice|billing|bookkeep/i.test(lower) || related.some((r) => /invoice|billing/i.test(r))) {
-    ["invoicing", "invoice software", "freelance invoicing", "billing tool", "invoices", "bookkeeping"].forEach(
-      (t) => terms.add(t),
-    );
+    [
+      "invoicing",
+      "invoice software",
+      "freelance invoicing",
+      "billing tool",
+      "invoices",
+      "bookkeeping",
+    ].forEach((t) => terms.add(t));
   }
   if (
     /client|freelance|lead gen|find clients/i.test(lower) ||
@@ -625,13 +827,22 @@ function productDemandTerms(raw: string, related: string[]): string[] {
     ].forEach((t) => terms.add(t));
   }
   if (/chatbot|chat bot|ai agent|support bot/i.test(lower)) {
-    ["chatbot", "chat bot", "customer support", "ai agent", "support automation", "helpdesk"].forEach((t) => terms.add(t));
+    [
+      "chatbot",
+      "chat bot",
+      "customer support",
+      "ai agent",
+      "support automation",
+      "helpdesk",
+    ].forEach((t) => terms.add(t));
   }
   if (/marketing/i.test(lower)) {
     ["marketing", "growth", "seo", "ads", "lead gen"].forEach((t) => terms.add(t));
   }
   if (/web\s*dev|website|web design/i.test(lower)) {
-    ["website", "web developer", "web design", "landing page", "wordpress"].forEach((t) => terms.add(t));
+    ["website", "web developer", "web design", "landing page", "wordpress"].forEach((t) =>
+      terms.add(t),
+    );
   }
   return Array.from(terms).filter(Boolean).slice(0, 16);
 }
@@ -644,7 +855,17 @@ function expandProductQuery(cq: ClassifiedQuery, negativeSignals: string[]): Exp
     ...negativeSignals,
     ...(hunt
       ? ["hire me", "my portfolio", "available for hire", "open to work"]
-      : ["i built", "i made", "i created", "launched my", "my app", "show hn", "product hunt", "built with", "source code"]),
+      : [
+          "i built",
+          "i made",
+          "i created",
+          "launched my",
+          "my app",
+          "show hn",
+          "product hunt",
+          "built with",
+          "source code",
+        ]),
   ];
 
   // Prefer multi-word capability phrases; never fan out bare lead/services/generation.
@@ -695,10 +916,24 @@ function expandProductQuery(cq: ClassifiedQuery, negativeSignals: string[]): Exp
 
   const booleanWebQueries = hunt
     ? [
-        `(${fanTerms.slice(0, 5).map((t) => `"${t}"`).join(" OR ")}) ("looking for" OR "need a" OR "recommend" OR "struggling with" OR "best tool" OR alternative)`,
-        `site:reddit.com (${fanTerms.slice(0, 4).map((t) => `"${t}"`).join(" OR ")}) ("looking for" OR "need" OR recommend OR struggling)`,
-        `site:softwarerecs.stackexchange.com (${fanTerms.slice(0, 3).map((t) => `"${t}"`).join(" OR ")})`,
-        `(${fanTerms.slice(0, 3).map((t) => `"${t}"`).join(" OR ")}) site:indiehackers.com`,
+        `(${fanTerms
+          .slice(0, 5)
+          .map((t) => `"${t}"`)
+          .join(
+            " OR ",
+          )}) ("looking for" OR "need a" OR "recommend" OR "struggling with" OR "best tool" OR alternative)`,
+        `site:reddit.com (${fanTerms
+          .slice(0, 4)
+          .map((t) => `"${t}"`)
+          .join(" OR ")}) ("looking for" OR "need" OR recommend OR struggling)`,
+        `site:softwarerecs.stackexchange.com (${fanTerms
+          .slice(0, 3)
+          .map((t) => `"${t}"`)
+          .join(" OR ")})`,
+        `(${fanTerms
+          .slice(0, 3)
+          .map((t) => `"${t}"`)
+          .join(" OR ")}) site:indiehackers.com`,
       ]
     : [
         `site:reddit.com "${raw}" ("recommend" OR "looking for" OR "best" OR "suggestions")`,
@@ -709,7 +944,12 @@ function expandProductQuery(cq: ClassifiedQuery, negativeSignals: string[]): Exp
   // tokens like "lead" / "services" / "generation".
   const marketplaceTerm =
     fanTerms.find((t) => /\s/.test(t) && t.length >= 6) ||
-    fanTerms.find((t) => !/\s/.test(t) && t.length >= 5 && !/^(lead|leads|generation|service|services|client|clients)$/i.test(t)) ||
+    fanTerms.find(
+      (t) =>
+        !/\s/.test(t) &&
+        t.length >= 5 &&
+        !/^(lead|leads|generation|service|services|client|clients)$/i.test(t),
+    ) ||
     fanTerms.find((t) => /\blead\s*gen/i.test(t)) ||
     (/\blead\s*gen/i.test(skill) ? "lead generation" : null) ||
     fanTerms[0] ||
@@ -731,13 +971,15 @@ function expandProductQuery(cq: ClassifiedQuery, negativeSignals: string[]): Exp
     jobBoardTerms: hunt ? demandForFanout.slice(0, 8) : [raw, ...relatedSkills.slice(0, 2)],
     socialQueries: customerPhrases.slice(0, 10),
     redditBuyerQueries: hunt
-      ? demandForFanout.slice(0, 6).flatMap((t) => [
-          `looking for ${t}`,
-          `need ${t}`,
-          `recommend ${t}`,
-          `best ${t}`,
-          `struggling with ${t}`,
-        ])
+      ? demandForFanout
+          .slice(0, 6)
+          .flatMap((t) => [
+            `looking for ${t}`,
+            `need ${t}`,
+            `recommend ${t}`,
+            `best ${t}`,
+            `struggling with ${t}`,
+          ])
       : [
           `${marketplaceTerm} recommendation`,
           `best ${marketplaceTerm}`,
@@ -797,8 +1039,7 @@ export function injectLocationBias(
     if (new RegExp(`\\b${loc.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(q)) return q;
     return `${q} "${loc}"`;
   };
-  const biasFirst = (qs: string[], n = 5) =>
-    qs.map((q, i) => (i < n ? withLoc(q) : q));
+  const biasFirst = (qs: string[], n = 5) => qs.map((q, i) => (i < n ? withLoc(q) : q));
 
   const geoWeb = [
     `"${qx.skill}" ("need a" OR "looking for" OR hiring OR freelancer) "${loc}"`,
@@ -846,10 +1087,7 @@ function expandBuyingSignalQuery(cq: ClassifiedQuery, negativeSignals: string[])
       redditBuyerQueries = [`hiring ${skill}`, `"looking for" ${skill}`, `need ${skill}`, skill];
       break;
     case "news":
-      booleanWebQueries = [
-        signal,
-        `"${skill}" (funding OR breach OR acquired OR announced)`,
-      ];
+      booleanWebQueries = [signal, `"${skill}" (funding OR breach OR acquired OR announced)`];
       buyerIntentQueries = [signal, `${skill} funding`, `${skill} data breach`];
       break;
     case "website":
@@ -864,11 +1102,7 @@ function expandBuyingSignalQuery(cq: ClassifiedQuery, negativeSignals: string[])
       booleanWebQueries = [`"${signal}"`, `LinkedIn hired ${skill}`];
       break;
     case "sec_10k":
-      booleanWebQueries = [
-        `site:sec.gov ${signal}`,
-        `site:sec.gov 10-K ${skill}`,
-        signal,
-      ];
+      booleanWebQueries = [`site:sec.gov ${signal}`, `site:sec.gov 10-K ${skill}`, signal];
       break;
     case "linkedin_company":
       socialQueries = [signal, `${skill} conference LinkedIn`];
@@ -880,12 +1114,9 @@ function expandBuyingSignalQuery(cq: ClassifiedQuery, negativeSignals: string[])
       const craftTerms = [skill, roleTerm, ...related].filter(
         (v, i, a) => !!v && a.findIndex((x) => x.toLowerCase() === v.toLowerCase()) === i,
       );
-      buyerIntentQueries = craftTerms.flatMap((t) => [
-        `need a ${t}`,
-        `looking for ${t}`,
-        `hiring ${t}`,
-        `who can ${t}`,
-      ]).slice(0, 12);
+      buyerIntentQueries = craftTerms
+        .flatMap((t) => [`need a ${t}`, `looking for ${t}`, `hiring ${t}`, `who can ${t}`])
+        .slice(0, 12);
       socialQueries = buyerIntentQueries.slice(0, 6);
       redditBuyerQueries = [
         ...craftTerms.flatMap((t) => [
@@ -1027,13 +1258,47 @@ export function expandQuery(rawInput: string): ExpandedQueries {
 // ops, etc.) pollute searches for technical roles.
 // =====================================================================
 const SKILL_SYNONYMS: Record<string, string[]> = {
-  react: ["react", "react.js", "reactjs", "next.js", "nextjs", "frontend", "front-end", "javascript", "typescript", "jsx", "tsx"],
+  react: [
+    "react",
+    "react.js",
+    "reactjs",
+    "next.js",
+    "nextjs",
+    "frontend",
+    "front-end",
+    "javascript",
+    "typescript",
+    "jsx",
+    "tsx",
+  ],
   next: ["next.js", "nextjs", "react", "frontend"],
   vue: ["vue", "vue.js", "vuejs", "nuxt", "frontend"],
   angular: ["angular", "frontend"],
   svelte: ["svelte", "sveltekit", "frontend"],
-  frontend: ["frontend", "front-end", "react", "vue", "angular", "svelte", "javascript", "typescript", "css", "html"],
-  backend: ["backend", "back-end", "api", "server", "node", "python", "go", "java", "rails", "django"],
+  frontend: [
+    "frontend",
+    "front-end",
+    "react",
+    "vue",
+    "angular",
+    "svelte",
+    "javascript",
+    "typescript",
+    "css",
+    "html",
+  ],
+  backend: [
+    "backend",
+    "back-end",
+    "api",
+    "server",
+    "node",
+    "python",
+    "go",
+    "java",
+    "rails",
+    "django",
+  ],
   fullstack: ["fullstack", "full stack", "full-stack", "frontend", "backend"],
   python: ["python", "django", "flask", "fastapi", "pandas", "pytorch"],
   django: ["django", "python"],
@@ -1055,18 +1320,45 @@ const SKILL_SYNONYMS: Record<string, string[]> = {
   wordpress: ["wordpress", "wp", "woocommerce", "php"],
   shopify: ["shopify", "liquid", "e-commerce", "ecommerce"],
   webflow: ["webflow"],
-  ai: ["ai", "artificial intelligence", "ml", "machine learning", "llm", "openai", "anthropic", "gpt", "rag"],
+  ai: [
+    "ai",
+    "artificial intelligence",
+    "ml",
+    "machine learning",
+    "llm",
+    "openai",
+    "anthropic",
+    "gpt",
+    "rag",
+  ],
   ml: ["ml", "machine learning", "ai", "pytorch", "tensorflow"],
   llm: ["llm", "openai", "anthropic", "gpt", "claude", "rag", "ai"],
   data: ["data", "analytics", "sql", "etl", "warehouse", "bi", "tableau", "looker"],
   design: [
-    "web design", "web designer", "ui", "ux", "ui/ux", "figma", "graphic design",
-    "graphic designer", "product design", "logo", "branding", "landing page",
-    "visual design", "website design", "designer",
+    "web design",
+    "web designer",
+    "ui",
+    "ux",
+    "ui/ux",
+    "figma",
+    "graphic design",
+    "graphic designer",
+    "product design",
+    "logo",
+    "branding",
+    "landing page",
+    "visual design",
+    "website design",
+    "designer",
   ],
   designer: [
-    "web designer", "ui designer", "ux designer", "graphic designer", "product designer",
-    "figma", "logo designer",
+    "web designer",
+    "ui designer",
+    "ux designer",
+    "graphic designer",
+    "product designer",
+    "figma",
+    "logo designer",
   ],
   ux: ["ux", "user experience", "ui", "product design", "figma"],
   ui: ["ui", "user interface", "ux", "figma"],
@@ -1074,10 +1366,43 @@ const SKILL_SYNONYMS: Record<string, string[]> = {
   motion: ["motion", "animation", "after effects", "ae"],
   seo: ["seo", "search engine", "google ranking", "backlinks", "serp"],
   ppc: ["ppc", "google ads", "adwords", "paid search"],
-  marketing: ["marketing", "growth", "ads", "seo", "ppc", "email", "social", "growth marketing", "go to market", "gtm"],
+  marketing: [
+    "marketing",
+    "growth",
+    "ads",
+    "seo",
+    "ppc",
+    "email",
+    "social",
+    "growth marketing",
+    "go to market",
+    "gtm",
+  ],
   growth: ["growth", "marketing", "growth marketing", "acquisition", "funnel", "gtm"],
-  chatbot: ["chatbot", "chat bot", "ai agent", "customer support", "support bot", "helpdesk", "conversational ai"],
-  "web develop": ["web developer", "web development", "website", "web design", "landing page", "frontend", "front end", "front-end", "fullstack", "full stack", "full-stack", "wordpress", "webflow"],
+  chatbot: [
+    "chatbot",
+    "chat bot",
+    "ai agent",
+    "customer support",
+    "support bot",
+    "helpdesk",
+    "conversational ai",
+  ],
+  "web develop": [
+    "web developer",
+    "web development",
+    "website",
+    "web design",
+    "landing page",
+    "frontend",
+    "front end",
+    "front-end",
+    "fullstack",
+    "full stack",
+    "full-stack",
+    "wordpress",
+    "webflow",
+  ],
   copywriter: ["copywriter", "copywriting", "copy", "content writer", "writer", "writing"],
   content: ["content writer", "copywriter", "blog", "article", "ghostwriter", "writer", "writing"],
   writer: [
@@ -1150,14 +1475,49 @@ const SKILL_SYNONYMS: Record<string, string[]> = {
 
 // Bare generic words that must NEVER count as skill evidence.
 const GENERIC_WORDS = new Set([
-  "development", "developer", "developers", "engineering", "engineer",
-  "engineers", "dev", "web", "app", "apps", "tech", "software", "data",
-  "cloud", "management", "manager", "science", "analyst", "design",
-  "help", "admin", "email", "social", "content", "ads", "ai", "server", "api",
+  "development",
+  "developer",
+  "developers",
+  "engineering",
+  "engineer",
+  "engineers",
+  "dev",
+  "web",
+  "app",
+  "apps",
+  "tech",
+  "software",
+  "data",
+  "cloud",
+  "management",
+  "manager",
+  "science",
+  "analyst",
+  "design",
+  "help",
+  "admin",
+  "email",
+  "social",
+  "content",
+  "ads",
+  "ai",
+  "server",
+  "api",
   // Ambiguous splits from multi-word crafts — "lead generation" must NOT
   // admit "Team Lead" / "AI generation" / "notary services".
-  "lead", "leads", "generation", "service", "services", "client", "clients",
-  "specialist", "specialists", "system", "systems", "solution", "solutions",
+  "lead",
+  "leads",
+  "generation",
+  "service",
+  "services",
+  "client",
+  "clients",
+  "specialist",
+  "specialists",
+  "system",
+  "systems",
+  "solution",
+  "solutions",
 ]);
 
 /** Tokens that are too ambiguous to use alone in product/Freelancer bags. */
@@ -1186,11 +1546,14 @@ export function getSkillSynonyms(skill: string): string[] {
     tokens.delete("service");
   }
   for (const [k, syns] of Object.entries(SKILL_SYNONYMS)) {
-    if (s.includes(k)) syns.forEach((x) => {
-      if (!GENERIC_WORDS.has(x.toLowerCase())) tokens.add(x);
-    });
+    if (s.includes(k))
+      syns.forEach((x) => {
+        if (!GENERIC_WORDS.has(x.toLowerCase())) tokens.add(x);
+      });
   }
-  return Array.from(tokens).filter((t) => t.length > 1 && (t === s || !GENERIC_WORDS.has(t.toLowerCase())));
+  return Array.from(tokens).filter(
+    (t) => t.length > 1 && (t === s || !GENERIC_WORDS.has(t.toLowerCase())),
+  );
 }
 
 // Word-boundary token matching — substring checks were a real relevance bug:
@@ -1229,10 +1592,29 @@ export function isRelevantToSkill(text: string, skill: string): boolean {
 // posts are exactly what they want).
 const WEAK_FAMILY_TERMS = new Set([
   ...GENERIC_WORDS,
-  "frontend", "front-end", "backend", "back-end", "fullstack", "full stack",
-  "full-stack", "javascript", "typescript", "jsx", "tsx", "css", "html",
-  "ui", "ux", "web development", "website", "mobile",
-  "web developer", "designer", "growth", "marketing", "assistant",
+  "frontend",
+  "front-end",
+  "backend",
+  "back-end",
+  "fullstack",
+  "full stack",
+  "full-stack",
+  "javascript",
+  "typescript",
+  "jsx",
+  "tsx",
+  "css",
+  "html",
+  "ui",
+  "ux",
+  "web development",
+  "website",
+  "mobile",
+  "web developer",
+  "designer",
+  "growth",
+  "marketing",
+  "assistant",
 ]);
 
 export function getStrongSkillSynonyms(skill: string): string[] {
@@ -1264,10 +1646,13 @@ export function isStronglyRelevantToSkill(text: string, skill: string): boolean 
     ) {
       return false;
     }
-    return /\b(ui|ux|figma|web design|website design|product design|graphic design|logo|landing page|responsive design|frontend design|front-end design|visual design|brand design)\b/i.test(
-      lower,
-    ) || /\b(looking for|need|hiring)\b.{0,40}\b(a |an )?(ui |ux |web |product |graphic |logo )?(designer|design)\b/i.test(
-      lower,
+    return (
+      /\b(ui|ux|figma|web design|website design|product design|graphic design|logo|landing page|responsive design|frontend design|front-end design|visual design|brand design)\b/i.test(
+        lower,
+      ) ||
+      /\b(looking for|need|hiring)\b.{0,40}\b(a |an )?(ui |ux |web |product |graphic |logo )?(designer|design)\b/i.test(
+        lower,
+      )
     );
   }
   if (getStrongSkillSynonyms(skill).some((t) => tokenMatches(lower, t))) return true;
@@ -1392,32 +1777,107 @@ export function ageDays(iso?: string | null): number | null {
 
 const BUYER_SIGNALS = [
   // explicit hiring
-  "looking for", "need a", "need an", "need someone", "need help with",
-  "hiring", "we are hiring", "we're hiring", "now hiring", "[hiring]",
-  "we need", "i need", "our team needs", "our startup needs", "our company needs",
-  "searching for", "seeking a", "seeking an", "want to hire", "looking to hire",
-  "want to bring on", "bring someone on", "join our team", "join my team",
+  "looking for",
+  "need a",
+  "need an",
+  "need someone",
+  "need help with",
+  "hiring",
+  "we are hiring",
+  "we're hiring",
+  "now hiring",
+  "[hiring]",
+  "we need",
+  "i need",
+  "our team needs",
+  "our startup needs",
+  "our company needs",
+  "searching for",
+  "seeking a",
+  "seeking an",
+  "want to hire",
+  "looking to hire",
+  "want to bring on",
+  "bring someone on",
+  "join our team",
+  "join my team",
   // recommendations / referrals
-  "can anyone recommend", "anyone know a good", "recommend a", "recommend an",
-  "who do you use", "who should i hire", "suggestions?", "referral",
+  "can anyone recommend",
+  "anyone know a good",
+  "recommend a",
+  "recommend an",
+  "who do you use",
+  "who should i hire",
+  "suggestions?",
+  "referral",
   // freelance / gig
-  "freelancer needed", "freelance gig", "freelance opportunity", "help wanted",
-  "project available", "work available", "paid gig", "paid project", "paid work",
+  "freelancer needed",
+  "freelance gig",
+  "freelance opportunity",
+  "help wanted",
+  "project available",
+  "work available",
+  "paid gig",
+  "paid project",
+  "paid work",
   // budget / money
-  "budget", "budget:", "paying for", "compensation", "salary:", "rate:", "hourly",
-  "up to $", "pay $", "$ /hr", "/hour", "/year",
+  "budget",
+  "budget:",
+  "paying for",
+  "compensation",
+  "salary:",
+  "rate:",
+  "hourly",
+  "up to $",
+  "pay $",
+  "$ /hr",
+  "/hour",
+  "/year",
   // contract / role
-  "contract work", "contract position", "contract available", "open role", "open position",
-  "position available", "job opportunity", "job posting", "remote position",
-  "short term project", "long term", "part time", "full time", "contract",
+  "contract work",
+  "contract position",
+  "contract available",
+  "open role",
+  "open position",
+  "position available",
+  "job opportunity",
+  "job posting",
+  "remote position",
+  "short term project",
+  "long term",
+  "part time",
+  "full time",
+  "contract",
   // want/demand phrasing (non-job-post buyers)
-  "i want a", "i want to build", "want someone", "who can build", "who can help",
-  "willing to pay", "can someone build", "can someone help", "need this built",
+  "i want a",
+  "i want to build",
+  "want someone",
+  "who can build",
+  "who can help",
+  "willing to pay",
+  "can someone build",
+  "can someone help",
+  "need this built",
   // urgency / action
-  "asap", "urgent", "urgently", "immediately", "this week", "starting soon", "right away",
-  "dm me", "dm to apply", "reach out if", "apply here", "apply at",
+  "asap",
+  "urgent",
+  "urgently",
+  "immediately",
+  "this week",
+  "starting soon",
+  "right away",
+  "dm me",
+  "dm to apply",
+  "reach out if",
+  "apply here",
+  "apply at",
   // procurement / RFP
-  "rfp", "request for proposal", "tender", "bid", "scope of work", "statement of work",
+  "rfp",
+  "request for proposal",
+  "tender",
+  "bid",
+  "scope of work",
+  "statement of work",
 ];
 
 export function isBuyerContent(text: string, negativePhrases: string[]): boolean {
@@ -1429,7 +1889,11 @@ export function isBuyerContent(text: string, negativePhrases: string[]): boolean
       text,
     )
   ) {
-    if (!/\b(need someone to|our (startup|company|team) needs|looking to hire|willing to pay|who can (build|help|make))\b/i.test(text)) {
+    if (
+      !/\b(need someone to|our (startup|company|team) needs|looking to hire|willing to pay|who can (build|help|make))\b/i.test(
+        text,
+      )
+    ) {
       return false;
     }
   }
@@ -1444,14 +1908,14 @@ export function isBuyerContent(text: string, negativePhrases: string[]): boolean
       !/\bdm me your\b/i.test(text) &&
       !/\bpartner to find\b/i.test(text));
 
-  const otherBuyer = BUYER_SIGNALS.some(
-    (s) => s !== "looking for" && lower.includes(s),
-  );
+  const otherBuyer = BUYER_SIGNALS.some((s) => s !== "looking for" && lower.includes(s));
   return otherBuyer || hireLooking;
 }
 
 export function detectDecisionMaker(text: string): boolean {
-  return /\b(ceo|cto|coo|founder|co-?founder|owner|director|vp|head of|managing|principal|hiring manager|recruiter|talent)\b/i.test(text || "");
+  return /\b(ceo|cto|coo|founder|co-?founder|owner|director|vp|head of|managing|principal|hiring manager|recruiter|talent)\b/i.test(
+    text || "",
+  );
 }
 
 export const URL_BLOCKLIST = [

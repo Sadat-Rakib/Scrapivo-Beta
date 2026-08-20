@@ -63,10 +63,7 @@ const samples: Lead[] = [
 ];
 
 for (const l of samples) {
-  ok(
-    `${l.source} not off-skill`,
-    !isOffSkillRole(l, cq.coreSkill, cq.relatedSkills),
-  );
+  ok(`${l.source} not off-skill`, !isOffSkillRole(l, cq.coreSkill, cq.relatedSkills));
 }
 
 const kept = validateLeads(samples, cq, ex, {
@@ -78,7 +75,10 @@ ok(
   "validate keeps graphic designer serp",
   kept.some((l) => l.source === "serpapi"),
 );
-ok("validate keeps upwork", kept.some((l) => l.source === "upwork"));
+ok(
+  "validate keeps upwork",
+  kept.some((l) => l.source === "upwork"),
+);
 
 if (fail.length) {
   console.error("FAIL:", fail.join("; "));

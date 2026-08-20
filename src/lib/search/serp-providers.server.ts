@@ -186,8 +186,7 @@ export async function searchGoogleSerp(
   if (!paidDiscoveryEnabled()) return null;
   const tbs = opts?.tbs ?? "qdr:d";
   const num = opts?.num ?? 20;
-  const emptyFallback =
-    opts?.allowEmptyProviderFallback === true || searxngUnavailable();
+  const emptyFallback = opts?.allowEmptyProviderFallback === true || searxngUnavailable();
 
   const serper = await fetchSerper(q, tbs, num);
   if (serper && serper.organic_results.length > 0) return serper;

@@ -1,15 +1,8 @@
 import type { Lead } from "./scoring";
 import type { ClassifiedQuery } from "./search/query-classifier";
 import type { ExpandedQueries } from "./search/query-expander";
-import {
-  isStronglyRelevantToSkill,
-  getStrongSkillSynonyms,
-} from "./search/query-expander";
-import {
-  detectDemandBuckets,
-  scoreUrgency,
-  mentionsRemoteText,
-} from "./search/intent-lexicon";
+import { isStronglyRelevantToSkill, getStrongSkillSynonyms } from "./search/query-expander";
+import { detectDemandBuckets, scoreUrgency, mentionsRemoteText } from "./search/intent-lexicon";
 
 const EXPIRED_PHRASES = [
   "position filled",
@@ -110,55 +103,155 @@ export function mentionsRemote(lead: Lead): boolean {
 }
 
 const STRONG_BUYER_SIGNALS = [
-  "need a ", "need an ", "need someone", "need help with",
-  "hiring", "we are hiring", "we're hiring", "seeking a", "want to hire",
-  "looking to hire", "our team needs", "our startup needs", "our company needs",
-  "job posting", "position available", "open role", "paid project",
-  "paid gig", "work available", "contract available", "freelance needed",
-  "help wanted", "can anyone recommend", "anyone know a good",
-  "recommend a", "refer me", "dm me if", "apply here", "apply at",
-  "[hiring]", "now hiring",
+  "need a ",
+  "need an ",
+  "need someone",
+  "need help with",
+  "hiring",
+  "we are hiring",
+  "we're hiring",
+  "seeking a",
+  "want to hire",
+  "looking to hire",
+  "our team needs",
+  "our startup needs",
+  "our company needs",
+  "job posting",
+  "position available",
+  "open role",
+  "paid project",
+  "paid gig",
+  "work available",
+  "contract available",
+  "freelance needed",
+  "help wanted",
+  "can anyone recommend",
+  "anyone know a good",
+  "recommend a",
+  "refer me",
+  "dm me if",
+  "apply here",
+  "apply at",
+  "[hiring]",
+  "now hiring",
   // Hire-polarity "looking for" shapes only (not bare "looking for")
-  "looking for a freelancer", "looking for an freelancer",
-  "looking for a developer", "looking for an developer",
-  "looking for a designer", "looking for someone to",
-  "looking for a contractor", "looking for help with",
-  "looking for a sales", "looking for an sales",
-  "looking for a salesperson", "looking for a sales rep",
-  "looking for a sales manager", "looking for a sales closer",
-  "looking for a sales executive", "looking for an sdr", "looking for a bdr",
+  "looking for a freelancer",
+  "looking for an freelancer",
+  "looking for a developer",
+  "looking for an developer",
+  "looking for a designer",
+  "looking for someone to",
+  "looking for a contractor",
+  "looking for help with",
+  "looking for a sales",
+  "looking for an sales",
+  "looking for a salesperson",
+  "looking for a sales rep",
+  "looking for a sales manager",
+  "looking for a sales closer",
+  "looking for a sales executive",
+  "looking for an sdr",
+  "looking for a bdr",
 ];
 
 const SOFT_BUYER_SIGNALS = [
-  "building", "launching", "working on", "starting", "founded",
-  "we need", "i need", "anyone who", "someone who can",
-  "recommendations", "suggestions", "any good", "does anyone know",
-  "who should i", "which", "best for", "advice on",
-  "help", "assist", "support", "budget", "pay", "paid",
-  "project", "contract", "remote", "freelance",
+  "building",
+  "launching",
+  "working on",
+  "starting",
+  "founded",
+  "we need",
+  "i need",
+  "anyone who",
+  "someone who can",
+  "recommendations",
+  "suggestions",
+  "any good",
+  "does anyone know",
+  "who should i",
+  "which",
+  "best for",
+  "advice on",
+  "help",
+  "assist",
+  "support",
+  "budget",
+  "pay",
+  "paid",
+  "project",
+  "contract",
+  "remote",
+  "freelance",
 ];
 
 const PROVIDER_SIGNALS = [
-  "available for hire", "open to work", "i am a", "i'm a", "i am an", "i'm an",
-  "hire me", "my portfolio", "my services", "i offer", "i provide",
-  "i specialize", "check out my work", "my github", "my rates", "my rate is",
-  "dm me for clients", "seeking clients", "looking for clients",
-  "i will build", "i'll build", "i can build", "gig for you",
+  "available for hire",
+  "open to work",
+  "i am a",
+  "i'm a",
+  "i am an",
+  "i'm an",
+  "hire me",
+  "my portfolio",
+  "my services",
+  "i offer",
+  "i provide",
+  "i specialize",
+  "check out my work",
+  "my github",
+  "my rates",
+  "my rate is",
+  "dm me for clients",
+  "seeking clients",
+  "looking for clients",
+  "i will build",
+  "i'll build",
+  "i can build",
+  "gig for you",
   "looking for a website or web application? i'm",
-  "looking for a website? i'm", "hire me to",
-  "dm me for work", "dm for projects", "taking on clients", "accepting clients",
-  "book a call with me", "check out my gig", "order my gig", "i build websites for",
-  "i design websites for", "freelance developer available", "developer for hire",
-  "designer for hire", "available for freelance", "open for freelance",
-  "commission open", "commissions open", "slots open for",
-  "dm me your requirements", "dm me your project", "dm me your details",
-  "partner to find", "find website clients", "commission-based partner",
+  "looking for a website? i'm",
+  "hire me to",
+  "dm me for work",
+  "dm for projects",
+  "taking on clients",
+  "accepting clients",
+  "book a call with me",
+  "check out my gig",
+  "order my gig",
+  "i build websites for",
+  "i design websites for",
+  "freelance developer available",
+  "developer for hire",
+  "designer for hire",
+  "available for freelance",
+  "open for freelance",
+  "commission open",
+  "commissions open",
+  "slots open for",
+  "dm me your requirements",
+  "dm me your project",
+  "dm me your details",
+  "partner to find",
+  "find website clients",
+  "commission-based partner",
   "commission based partner",
-  "starting at $", "from only $", "book now", "slots available",
-  "let's fix that room", "fix that room", "starting at $99",
-  "try our agent", "try my agent", "i built an agent", "i built a tool",
-  "check out our tool", "our ai agent", "pitching our", "we built a tool that",
-  "introducing our", "launching our (new )?service",
+  "starting at $",
+  "from only $",
+  "book now",
+  "slots available",
+  "let's fix that room",
+  "fix that room",
+  "starting at $99",
+  "try our agent",
+  "try my agent",
+  "i built an agent",
+  "i built a tool",
+  "check out our tool",
+  "our ai agent",
+  "pitching our",
+  "we built a tool that",
+  "introducing our",
+  "launching our (new )?service",
 ];
 
 /** Seller ads that open with a buyer hook then pitch themselves. */
@@ -214,7 +307,10 @@ export function isSalesTalentHireAsk(text: string): boolean {
   return (
     /\b(hiring|looking\s+for|looking\s+to\s+hire|need(?:ing)?\s+(?:a|an)|seeking|recommend(?:\s+a)?|join\s+our|wanted|needed|open\s+role|we(?:'| a)?re\s+hiring)\b/i.test(
       text,
-    ) || /\b(?:rep|manager|closer|executive|sdr|bdr).{0,40}\b(?:to\s+join|for\s+our|join\s+our)\b/i.test(text)
+    ) ||
+    /\b(?:rep|manager|closer|executive|sdr|bdr).{0,40}\b(?:to\s+join|for\s+our|join\s+our)\b/i.test(
+      text,
+    )
   );
 }
 
@@ -286,15 +382,38 @@ const DESIGN_FAMILY_RE =
   /\b(design|designer|web design|ui|ux|ui\/?ux|product design|graphic design|branding|figma|logo)\b/i;
 
 const PRODUCT_BUYER_SIGNALS = [
-  "recommend", "recommendation", "suggestions", "any good", "best tool",
-  "alternative to", "need a", "anyone use", "what do you use",
+  "recommend",
+  "recommendation",
+  "suggestions",
+  "any good",
+  "best tool",
+  "alternative to",
+  "need a",
+  "anyone use",
+  "what do you use",
 ];
 
 export const JOB_BOARD_SOURCES = new Set([
-  "upwork", "remoteok", "greenhouse", "lever", "indeed",
-  "glassdoor", "google_jobs", "wellfound", "weworkremotely",
-  "remotive", "jobicy", "arbeitnow", "themuse", "usajobs", "samgov",
-  "ashby", "smartrecruiters", "workable", "recruitee", "githubjobs",
+  "upwork",
+  "remoteok",
+  "greenhouse",
+  "lever",
+  "indeed",
+  "glassdoor",
+  "google_jobs",
+  "wellfound",
+  "weworkremotely",
+  "remotive",
+  "jobicy",
+  "arbeitnow",
+  "themuse",
+  "usajobs",
+  "samgov",
+  "ashby",
+  "smartrecruiters",
+  "workable",
+  "recruitee",
+  "githubjobs",
 ]);
 
 export function detectBuyerIntent(text: string): {
@@ -309,7 +428,11 @@ export function detectBuyerIntent(text: string): {
     return { isBuyer: true, confidence: "high", matchedSignals: ["sales talent hire"] };
   }
   // Seller/provider wins over buyer-hook phrasing ("Looking for a Website? I'm…").
-  if (PROVIDER_SIGNALS.some((s) => lower.includes(s)) || SELLER_HOOK_RE.test(text) || SALES_PARTNER_TITLE_RE.test(text)) {
+  if (
+    PROVIDER_SIGNALS.some((s) => lower.includes(s)) ||
+    SELLER_HOOK_RE.test(text) ||
+    SALES_PARTNER_TITLE_RE.test(text)
+  ) {
     const clearThirdParty =
       /\b(need someone to|who can (build|help|make)|willing to pay|our (startup|company|team) needs|looking to hire)\b/i.test(
         text,
@@ -325,7 +448,10 @@ export function detectBuyerIntent(text: string): {
     return {
       isBuyer: true,
       confidence: "high",
-      matchedSignals: [...urgency.phrases.slice(0, 2), ...(demand.phrases[demand.primary!] ?? []).slice(0, 2)],
+      matchedSignals: [
+        ...urgency.phrases.slice(0, 2),
+        ...(demand.phrases[demand.primary!] ?? []).slice(0, 2),
+      ],
     };
   }
 
@@ -370,9 +496,22 @@ export function detectProductIntent(text: string): boolean {
 }
 
 const GENERIC_ROLE_TOKENS = new Set([
-  "engineer", "developer", "designer", "manager", "specialist",
-  "consultant", "analyst", "architect", "freelancer", "contractor",
-  "professional", "expert", "lead", "senior", "junior", "intern",
+  "engineer",
+  "developer",
+  "designer",
+  "manager",
+  "specialist",
+  "consultant",
+  "analyst",
+  "architect",
+  "freelancer",
+  "contractor",
+  "professional",
+  "expert",
+  "lead",
+  "senior",
+  "junior",
+  "intern",
 ]);
 
 /** Role queries must match the core skill or a primary related term — not generic role words alone. */
@@ -384,9 +523,7 @@ export function isRelevantToRoleQuery(
   const lower = text.toLowerCase();
   const syns = getStrongSkillSynonyms(coreSkill);
   const matchedSyns = syns.filter((t) => lower.includes(t.toLowerCase()));
-  const specificMatches = matchedSyns.filter(
-    (t) => !GENERIC_ROLE_TOKENS.has(t.toLowerCase()),
-  );
+  const specificMatches = matchedSyns.filter((t) => !GENERIC_ROLE_TOKENS.has(t.toLowerCase()));
   if (specificMatches.length > 0) return true;
   return relatedSkills.slice(0, 5).some((s) => {
     const sl = s.toLowerCase();
@@ -403,7 +540,9 @@ export function isRelevantToQuery(
   const text = `${lead.title} ${lead.snippet} ${lead.ai_summary ?? ""}`;
   // Startup feeds for investor deal-flow — identity is the signal.
   if (
-    (lead.source === "dealroom" || lead.source === "neuronfeed" || lead.source === "startupsgallery") &&
+    (lead.source === "dealroom" ||
+      lead.source === "neuronfeed" ||
+      lead.source === "startupsgallery") &&
     /investor|fundraising|raising/i.test(`${coreSkill} ${classified?.raw || ""}`)
   ) {
     return true;
@@ -441,12 +580,14 @@ export function isRelevantToQuery(
     }
     if (isStronglyRelevantToSkill(text, coreSkill)) return true;
     // Use more related skills — "design" expands to web/UI/graphic/logo/Figma.
-    return relatedSkills.slice(0, 8).some(
-      (s) =>
-        s.length > 3 &&
-        !/^(lead|leads|generation|service|services|client|clients)$/i.test(s) &&
-        isStronglyRelevantToSkill(text, s),
-    );
+    return relatedSkills
+      .slice(0, 8)
+      .some(
+        (s) =>
+          s.length > 3 &&
+          !/^(lead|leads|generation|service|services|client|clients)$/i.test(s) &&
+          isStronglyRelevantToSkill(text, s),
+      );
   }
   if (classified?.type === "product") {
     const terms = [coreSkill, ...relatedSkills].filter(Boolean);
@@ -457,9 +598,9 @@ export function isRelevantToQuery(
       if (tl.length < 4) return false;
       if (/^(lead|leads|generation|service|services|client|clients)$/i.test(tl)) return false;
       if (/\s/.test(tl) || tl.length >= 8) return lower.includes(tl);
-      return new RegExp(`(?<![a-z0-9+#])${tl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![a-z0-9])`).test(
-        lower,
-      );
+      return new RegExp(
+        `(?<![a-z0-9+#])${tl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![a-z0-9])`,
+      ).test(lower);
     });
     if (phraseHit) return true;
     const tokens = new Set<string>();
@@ -546,7 +687,11 @@ export function isJobListPage(lead: Lead): boolean {
   ) {
     return true;
   }
-  if (/\/jobs?[\/?#]/.test(url) && !/linkedin\.com\/posts\//.test(url) && !/@/.test(lead.title || "")) {
+  if (
+    /\/jobs?[\/?#]/.test(url) &&
+    !/linkedin\.com\/posts\//.test(url) &&
+    !/@/.test(lead.title || "")
+  ) {
     // Keep named Role @ Company; drop bare list pages
     if (!/\b(inc|llc|ltd|labs|studio|agency|corp)\b/i.test(text)) {
       return JOB_LIST_PAGE_RE.test(text) || /\/jobs\/?$/.test(url.split("?")[0]);
@@ -568,10 +713,16 @@ export function isMarketplaceOrListicle(lead: Lead): boolean {
   ) {
     return true;
   }
-  if (/linkedin\.com\/in\//i.test(url) && !/\b(hiring|looking for|need a|we're hiring)\b/i.test(text)) {
+  if (
+    /linkedin\.com\/in\//i.test(url) &&
+    !/\b(hiring|looking for|need a|we're hiring)\b/i.test(text)
+  ) {
     return true;
   }
-  if (/\/(tag|category|topics?|search)\//i.test(url) && !/\b(hiring|need a|looking for)\b/i.test(text)) {
+  if (
+    /\/(tag|category|topics?|search)\//i.test(url) &&
+    !/\b(hiring|need a|looking for)\b/i.test(text)
+  ) {
     return true;
   }
   return false;
@@ -588,7 +739,10 @@ export function isSellerOrProviderLead(
   const title = lead.title || "";
   const url = (lead.full_post_url || "").toLowerCase();
   const salesCraft = isSalesFamilyCraft(coreSkill || "", relatedSkills);
-  if (/fiverr\.com\/[^/]+\/[^/?#]+/.test(url) && !/\b(need|looking for|hiring|request)\b/i.test(text)) {
+  if (
+    /fiverr\.com\/[^/]+\/[^/?#]+/.test(url) &&
+    !/\b(need|looking for|hiring|request)\b/i.test(text)
+  ) {
     return true;
   }
   if (/fiverr\.com\/categories\//.test(url)) return true;
@@ -617,7 +771,9 @@ export function isSellerOrProviderLead(
     /\b(our|my|introducing|meet|check out)\b.{0,40}\b(lead\s*gen(?:eration)?|social listening|finds buyers)\b/i.test(
       text,
     ) ||
-    /\b(lead\s*gen(?:eration)?|social listening)\b.{0,40}\b(tool|platform|software|saas|app)\b/i.test(text)
+    /\b(lead\s*gen(?:eration)?|social listening)\b.{0,40}\b(tool|platform|software|saas|app)\b/i.test(
+      text,
+    )
   ) {
     if (!/\b(need|looking for|hiring|willing to pay|who can)\b/i.test(title)) return true;
   }
@@ -646,7 +802,9 @@ export function isOffSkillRole(
     /\b(full[- ]?stack|software engineer|frontend|front[- ]end|backend|back[- ]end|react developer|next\.?js|vue|angular|devops|machine learning|data scientist|ui\/?ux|graphic design(?:er)?|web developer|mobile (dev|developer)|ios engineer|android engineer|guitarist|bassist|drummer|vocalist|keyboard(?:ist)?|rhythm guitar|lead guitar|band seeking|band wants)\b/i.test(
       title,
     ) &&
-    !/\b(sales|sdr|bdr|closer|account executive|ae\b|business development|lead\s*gen)\b/i.test(title)
+    !/\b(sales|sdr|bdr|closer|account executive|ae\b|business development|lead\s*gen)\b/i.test(
+      title,
+    )
   ) {
     return true;
   }
@@ -665,9 +823,7 @@ export function isOffSkillRole(
   if (designFamily) {
     if (DESIGN_ADJACENCY_DENY_RE.test(body)) return true;
     if (
-      /\b((web|ui|ux|ui\/ux|product|graphic|visual|brand|logo)\s*)?design(?:er|ing)?\b/i.test(
-        title,
-      )
+      /\b((web|ui|ux|ui\/ux|product|graphic|visual|brand|logo)\s*)?design(?:er|ing)?\b/i.test(title)
     ) {
       return false;
     }
@@ -725,7 +881,9 @@ export function isPersonalStoryNoise(lead: Lead): boolean {
   if (/reddit\.com\/r\/\w*workers/i.test(lead.full_post_url || "")) return true;
   // Title is clearly a personal essay / notes dump, not an opportunity ask.
   if (
-    /\b(notes|thoughts|reflections|journal|diary|memoir|perspective|pov)\b/i.test(lead.title || "") &&
+    /\b(notes|thoughts|reflections|journal|diary|memoir|perspective|pov)\b/i.test(
+      lead.title || "",
+    ) &&
     !/\b(hiring|looking for|need a|need an|who can|willing to pay|\[hiring\]|budget)\b/i.test(
       `${lead.title} ${lead.snippet}`,
     )
@@ -737,31 +895,123 @@ export function isPersonalStoryNoise(lead: Lead): boolean {
 
 const LOCATION_ALLOW: Record<string, string[]> = {
   india: [
-    "india", "indian", "bharat", "mumbai", "bangalore", "bengaluru", "delhi",
-    "new delhi", "hyderabad", "chennai", "pune", "kolkata", "gurgaon", "gurugram",
-    "noida", "ahmedabad", "jaipur", "kochi", "chandigarh", ".in/", "🇮🇳",
+    "india",
+    "indian",
+    "bharat",
+    "mumbai",
+    "bangalore",
+    "bengaluru",
+    "delhi",
+    "new delhi",
+    "hyderabad",
+    "chennai",
+    "pune",
+    "kolkata",
+    "gurgaon",
+    "gurugram",
+    "noida",
+    "ahmedabad",
+    "jaipur",
+    "kochi",
+    "chandigarh",
+    ".in/",
+    "🇮🇳",
   ],
   "united states": [
-    "united states", "usa", "u.s.", "u.s.a", "america", "american",
-    "new york", "boston", "san francisco", "los angeles", "chicago", "austin",
-    "seattle", "denver", "texas", "california", "florida", "arizona",
-    "atlanta", "miami", "dallas", "houston", "philadelphia", "san diego",
-    "portland", "las vegas", "washington", "nyc", ".us/", "🇺🇸",
+    "united states",
+    "usa",
+    "u.s.",
+    "u.s.a",
+    "america",
+    "american",
+    "new york",
+    "boston",
+    "san francisco",
+    "los angeles",
+    "chicago",
+    "austin",
+    "seattle",
+    "denver",
+    "texas",
+    "california",
+    "florida",
+    "arizona",
+    "atlanta",
+    "miami",
+    "dallas",
+    "houston",
+    "philadelphia",
+    "san diego",
+    "portland",
+    "las vegas",
+    "washington",
+    "nyc",
+    ".us/",
+    "🇺🇸",
   ],
   "united kingdom": [
-    "united kingdom", "uk", "u.k.", "britain", "british", "england", "scotland",
-    "wales", "london", "manchester", "birmingham", "edinburgh", ".uk/", "🇬🇧",
+    "united kingdom",
+    "uk",
+    "u.k.",
+    "britain",
+    "british",
+    "england",
+    "scotland",
+    "wales",
+    "london",
+    "manchester",
+    "birmingham",
+    "edinburgh",
+    ".uk/",
+    "🇬🇧",
   ],
   europe: [
-    "europe", "european", "eu", "germany", "france", "spain", "italy",
-    "netherlands", "belgium", "sweden", "norway", "denmark", "finland",
-    "poland", "portugal", "ireland", "austria", "switzerland", "berlin",
-    "paris", "amsterdam", "dublin", "madrid", "barcelona", "lisbon",
-    "stockholm", "copenhagen", "munich", "zurich", ".eu/",
+    "europe",
+    "european",
+    "eu",
+    "germany",
+    "france",
+    "spain",
+    "italy",
+    "netherlands",
+    "belgium",
+    "sweden",
+    "norway",
+    "denmark",
+    "finland",
+    "poland",
+    "portugal",
+    "ireland",
+    "austria",
+    "switzerland",
+    "berlin",
+    "paris",
+    "amsterdam",
+    "dublin",
+    "madrid",
+    "barcelona",
+    "lisbon",
+    "stockholm",
+    "copenhagen",
+    "munich",
+    "zurich",
+    ".eu/",
   ],
   canada: [
-    "canada", "canadian", "toronto", "vancouver", "montreal", "ottawa", "calgary",
-    "edmonton", "winnipeg", "quebec", "victoria", "halifax", "mississauga", ".ca/",
+    "canada",
+    "canadian",
+    "toronto",
+    "vancouver",
+    "montreal",
+    "ottawa",
+    "calgary",
+    "edmonton",
+    "winnipeg",
+    "quebec",
+    "victoria",
+    "halifax",
+    "mississauga",
+    ".ca/",
   ],
   australia: ["australia", "sydney", "melbourne", ".au/"],
   germany: ["germany", "german", "berlin", "munich", "deutschland", ".de/"],
@@ -772,14 +1022,47 @@ const LOCATION_ALLOW: Record<string, string[]> = {
 };
 
 const GLOBAL_DENY_TOKENS = [
-  "israel", "tel aviv", "tel-aviv", "germany", "deutschland", "berlin", "munich",
-  "new york", "boston", "san francisco", "los angeles", "london", "paris",
-  "singapore", "dubai", "sydney", "melbourne", "tokyo", "seoul",
-  "phoenix", "arizona", " az ", ", az", "texas", "california", "florida",
-  "chicago", "seattle", "denver", "austin", "atlanta", "miami", "dallas",
-  "houston", "philadelphia", "san diego", "portland", "las vegas",
+  "israel",
+  "tel aviv",
+  "tel-aviv",
+  "germany",
+  "deutschland",
+  "berlin",
+  "munich",
+  "new york",
+  "boston",
+  "san francisco",
+  "los angeles",
+  "london",
+  "paris",
+  "singapore",
+  "dubai",
+  "sydney",
+  "melbourne",
+  "tokyo",
+  "seoul",
+  "phoenix",
+  "arizona",
+  " az ",
+  ", az",
+  "texas",
+  "california",
+  "florida",
+  "chicago",
+  "seattle",
+  "denver",
+  "austin",
+  "atlanta",
+  "miami",
+  "dallas",
+  "houston",
+  "philadelphia",
+  "san diego",
+  "portland",
+  "las vegas",
   "praktikum",
-  "israeltechjobs", "r/israel",
+  "israeltechjobs",
+  "r/israel",
 ];
 
 export function locationAllowTokens(location: string): string[] {
@@ -801,7 +1084,8 @@ export function locationAllowTokens(location: string): string[] {
 export function passesLocationFilter(lead: Lead, location: string | null | undefined): boolean {
   if (!location) return true;
   // Directory Places results already geo-scoped
-  if (lead.source === "geoapify" || lead.source === "foursquare" || lead.source === "osm") return true;
+  if (lead.source === "geoapify" || lead.source === "foursquare" || lead.source === "osm")
+    return true;
 
   const text = `${lead.title} ${lead.snippet} ${lead.full_post_url} ${lead.platform}`.toLowerCase();
   const allow = locationAllowTokens(location);
@@ -826,7 +1110,9 @@ export function passesLocationFilter(lead: Lead, location: string | null | undef
   }
   if (deny.some((d) => text.includes(d))) return false;
 
-  const anyGeoMention = Object.values(LOCATION_ALLOW).flat().some((t) => t.length >= 5 && text.includes(t));
+  const anyGeoMention = Object.values(LOCATION_ALLOW)
+    .flat()
+    .some((t) => t.length >= 5 && text.includes(t));
   if (anyGeoMention && !hasAllow) return false;
 
   // Country-level gate: require allow OR remote without foreign geo OR no geo mention.
@@ -851,7 +1137,8 @@ export function passesDirectoryIcp(lead: Lead, classified: ClassifiedQuery): boo
   if (lead.source === "geoapify" || lead.source === "foursquare") return true;
   const text = `${lead.title} ${lead.snippet}`.toLowerCase();
   const icp = (classified.icpNoun || "").toLowerCase();
-  if (/\b(agenc(?:y|ies)|firm|studio|consultancy|company|llc|pvt|private limited)\b/.test(text)) return true;
+  if (/\b(agenc(?:y|ies)|firm|studio|consultancy|company|llc|pvt|private limited)\b/.test(text))
+    return true;
   if (icp && text.includes(icp)) return true;
   // Reject bare role titles / personal stories
   if (/^marketing lead\b/i.test(lead.title) && !/\bagenc/i.test(text)) return false;
@@ -1015,7 +1302,10 @@ export function validateLeads(
     { name: "educational", reject: (l) => isEducationalNoise(l) },
     { name: "jobListPage", reject: (l) => isJobListPage(l) },
     { name: "listicle", reject: (l) => isMarketplaceOrListicle(l) },
-    { name: "seller", reject: (l) => isSellerOrProviderLead(l, classified.coreSkill, classified.relatedSkills) },
+    {
+      name: "seller",
+      reject: (l) => isSellerOrProviderLead(l, classified.coreSkill, classified.relatedSkills),
+    },
     {
       name: "offSkillRole",
       reject: (l) => isOffSkillRole(l, classified.coreSkill, classified.relatedSkills),
@@ -1065,13 +1355,16 @@ export function validateLeads(
       if (/\bagenc/i.test(classified.icpNoun || classified.raw || "")) {
         const text = `${lead.title} ${lead.snippet}`.toLowerCase();
         if (
-          /\b(gas|lpg|petrol|cycle|bicycle|news|travel|insurance|estate|real\s*estate|property|milk|oil|ply|trading|sales|tour)\b/.test(text) &&
+          /\b(gas|lpg|petrol|cycle|bicycle|news|travel|insurance|estate|real\s*estate|property|milk|oil|ply|trading|sales|tour)\b/.test(
+            text,
+          ) &&
           !/\b(marketing|advertis|digital|media|seo|brand|creative)\b/.test(text)
         ) {
           return false;
         }
-        const marketingish =
-          /\b(marketing|advertis|digital|media|seo|brand|creative)\b/i.test(text);
+        const marketingish = /\b(marketing|advertis|digital|media|seo|brand|creative)\b/i.test(
+          text,
+        );
         if (!marketingish) return false;
       }
       return true;

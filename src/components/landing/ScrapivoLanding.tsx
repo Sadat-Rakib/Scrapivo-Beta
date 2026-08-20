@@ -214,7 +214,10 @@ const DEMO_STATES = [
     h: "61 active advertisers detected",
     c: "Glow Naturals",
     b: [
-      { l: "Signals", u: ["New Meta campaigns launched", "Pixel detected", "Landing pages updated"] },
+      {
+        l: "Signals",
+        u: ["New Meta campaigns launched", "Pixel detected", "Landing pages updated"],
+      },
       { l: "Estimated monthly spend", d: "$2k-$3k" },
     ],
   },
@@ -449,7 +452,15 @@ function AiDemoSection() {
           pointerEvents: "none",
         }}
       />
-      <div style={{ position: "relative", zIndex: 2, maxWidth: 640, margin: "0 auto", textAlign: "center" }}>
+      <div
+        style={{
+          position: "relative",
+          zIndex: 2,
+          maxWidth: 640,
+          margin: "0 auto",
+          textAlign: "center",
+        }}
+      >
         <h2
           style={{
             margin: 0,
@@ -621,7 +632,9 @@ function FaqSection() {
           pointerEvents: "none",
         }}
       />
-      <div style={{ position: "relative", zIndex: 2, width: "100%", maxWidth: 560, margin: "0 auto" }}>
+      <div
+        style={{ position: "relative", zIndex: 2, width: "100%", maxWidth: 560, margin: "0 auto" }}
+      >
         <h2
           style={{
             fontSize: "clamp(1.8rem,3.5vw,2.4rem)",
@@ -677,10 +690,7 @@ function FaqSection() {
                     <Plus size={14} />
                   </span>
                 </button>
-                <div
-                  className="faq-body"
-                  style={{ maxHeight: isOpen ? 480 : 0 }}
-                >
+                <div className="faq-body" style={{ maxHeight: isOpen ? 480 : 0 }}>
                   <div className="faq-body-inner">{item.a}</div>
                 </div>
               </div>
@@ -691,7 +701,6 @@ function FaqSection() {
     </section>
   );
 }
-
 
 export function ScrapivoLanding({ cta }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -807,8 +816,7 @@ export function ScrapivoLanding({ cta }: Props) {
       outlineSvg.setAttribute("height", String(h));
     };
     update();
-    const ro =
-      typeof ResizeObserver !== "undefined" ? new ResizeObserver(update) : null;
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(update) : null;
     ro?.observe(nav);
     window.addEventListener("resize", update);
     document.fonts?.ready?.then(update);
@@ -842,12 +850,7 @@ export function ScrapivoLanding({ cta }: Props) {
       </a>
 
       <nav className="floating-nav" aria-label="Main navigation" id="nav-pill" ref={navRef}>
-        <svg
-          className="nav-pill-outline"
-          aria-hidden
-          focusable="false"
-          ref={outlineSvgRef}
-        >
+        <svg className="nav-pill-outline" aria-hidden focusable="false" ref={outlineSvgRef}>
           <path id="nav-pill-outline-path" ref={outlineRef} />
         </svg>
         <div className="nav-pill-links">
@@ -908,8 +911,7 @@ export function ScrapivoLanding({ cta }: Props) {
             border: "1px solid rgba(255, 255, 255, 0.15)",
             borderRadius: 20,
             padding: 20,
-            boxShadow:
-              "0 20px 60px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25)",
+            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25)",
           }}
         >
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -976,10 +978,7 @@ export function ScrapivoLanding({ cta }: Props) {
             className="hero-reveal-layer absolute inset-0 z-[42] pointer-events-none"
             aria-hidden
           />
-          <div
-            className="pointer-events-none absolute inset-0 z-20 overflow-hidden"
-            aria-hidden
-          >
+          <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden" aria-hidden>
             <video
               ref={heroVideoRef}
               src={HERO_VIDEO}

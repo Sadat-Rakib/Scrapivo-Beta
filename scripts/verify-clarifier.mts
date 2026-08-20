@@ -32,23 +32,21 @@ console.log("\n── When to ask ───────────────�
   const vague = classifyQuery("designer");
   check("bare craft is worth clarifying", shouldClarify(vague));
 
-  const messy = classifyQuery("I am a writer I am acitvely looking for people, companies, posts etc");
+  const messy = classifyQuery(
+    "I am a writer I am acitvely looking for people, companies, posts etc",
+  );
   check("messy sentence is worth clarifying", shouldClarify(messy));
 
   const precise = classifyQuery("Shopify stores hiring copywriters in Toronto");
   check("precise query is NOT interrupted", !shouldClarify(precise), precise.coreSkill);
 
-  const dual = classifyQuery(
-    "companies and people looking for lead generation services",
-  );
+  const dual = classifyQuery("companies and people looking for lead generation services");
   check("companies+people lead-gen still clarifies (missing place)", shouldClarify(dual));
 }
 
 console.log("\n── Stated audience skips redundant ask ───────────────────");
 {
-  const dual = classifyQuery(
-    "companies and people looking for lead generation services",
-  );
+  const dual = classifyQuery("companies and people looking for lead generation services");
   check(
     "infers audience=all from companies and people",
     extractStatedAudience(dual.raw) === "all",
@@ -114,10 +112,15 @@ console.log("\n── Stated audience skips redundant ask ───────�
 
 console.log("\n── Skill question construction ──────────────────────────");
 {
-  const messy = classifyQuery("I am a writer I am acitvely looking for people, companies, posts etc");
+  const messy = classifyQuery(
+    "I am a writer I am acitvely looking for people, companies, posts etc",
+  );
   const qs = buildClarifyingQuestions(messy);
   check("asks at most 4", qs.length > 0 && qs.length <= 4, qs.length);
-  check("every question has a recommended default", qs.every((q) => q.options.some((o) => o.recommended)));
+  check(
+    "every question has a recommended default",
+    qs.every((q) => q.options.some((o) => o.recommended)),
+  );
   check(
     "messy people+companies skips audience re-ask",
     !qs.some((q) => q.id === "audience"),
@@ -153,13 +156,15 @@ console.log("\n── Product question construction ─────────�
 
   const qs = buildClarifyingQuestions(pitch, { hasLocation: true });
   check("product asks at most 4", qs.length > 0 && qs.length <= 4, qs.length);
-  check("product asks signal focus instead of YoE", qs.some((q) => q.id === "signal_focus"));
+  check(
+    "product asks signal focus instead of YoE",
+    qs.some((q) => q.id === "signal_focus"),
+  );
   check("product does NOT ask years of experience", !qs.some((q) => q.id === "experience"));
   check(
     "product audience copy mentions tools/pain",
-    qs
-      .find((q) => q.id === "audience")
-      ?.options.some((o) => /tool|pain|recommend/i.test(o.hint)) ?? false,
+    qs.find((q) => q.id === "audience")?.options.some((o) => /tool|pain|recommend/i.test(o.hint)) ??
+      false,
   );
   check(
     "product buyer question says customer",
@@ -170,16 +175,26 @@ console.log("\n── Product question construction ─────────�
   const svc = classifyQuery("CRM software for freelancers");
   check("crm software uses product path", isProductClarifyPath(svc), svc.type);
   const svcQs = buildClarifyingQuestions(svc);
-  check("crm software asks signal focus", svcQs.some((q) => q.id === "signal_focus"));
+  check(
+    "crm software asks signal focus",
+    svcQs.some((q) => q.id === "signal_focus"),
+  );
   check("crm software skips YoE", !svcQs.some((q) => q.id === "experience"));
 
   const skill = classifyQuery("sales");
   check("bare skill is NOT product path", !isProductClarifyPath(skill), skill.type);
   const skillQs = buildClarifyingQuestions(skill);
-  check("bare skill asks experience", skillQs.some((q) => q.id === "experience"));
+  check(
+    "bare skill asks experience",
+    skillQs.some((q) => q.id === "experience"),
+  );
 
   const leadGen = classifyQuery("lead generation services");
-  check("lead generation services is NOT product clarifier", !isProductClarifyPath(leadGen), leadGen.type);
+  check(
+    "lead generation services is NOT product clarifier",
+    !isProductClarifyPath(leadGen),
+    leadGen.type,
+  );
   const leadGenQs = buildClarifyingQuestions(leadGen);
   check(
     "lead generation services skips YoE (clients craft)",
@@ -200,7 +215,11 @@ console.log("\n── Applying answers ─────────────�
   );
   check("skipped search defaults to worldwide", skipped.location === null);
   check("skill skip defaults YoE to 0-1", skipped.experience === "0-1");
-  check("skill summary includes experience", /years experience/.test(skipped.summary), skipped.summary);
+  check(
+    "skill summary includes experience",
+    /years experience/.test(skipped.summary),
+    skipped.summary,
+  );
 
   const dual = classifyQuery("companies and people looking for lead generation services");
   const dualSkip = applyClarifyAnswers(dual);
@@ -230,7 +249,11 @@ console.log("\n── Applying answers ─────────────�
     experience: "3-4",
   });
   check("audience carried through", answered.audience === "companies");
-  check("buyer type adds targeting terms", answered.buyerTerms.includes("startup"), answered.buyerTerms);
+  check(
+    "buyer type adds targeting terms",
+    answered.buyerTerms.includes("startup"),
+    answered.buyerTerms,
+  );
   check("buyer type adds subreddits", answered.extraSubreddits.includes("startups"));
   check("geography maps to a location", answered.location === "United States");
   check("experience carried through", answered.experience === "3-4");
@@ -253,7 +276,10 @@ console.log("\n── Applying answers ─────────────�
   check("product summary omits years experience", !/years experience/.test(productSkip.summary));
 
   const productFocus = applyClarifyAnswers(product, { signal_focus: "pain" });
-  check("signal focus adds pain terms", productFocus.signalTerms.some((t) => /struggling/i.test(t)));
+  check(
+    "signal focus adds pain terms",
+    productFocus.signalTerms.some((t) => /struggling/i.test(t)),
+  );
   check(
     "signal focus appears in summary",
     /pain/i.test(productFocus.summary),

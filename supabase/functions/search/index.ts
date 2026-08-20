@@ -29,8 +29,7 @@ import { searchTavily } from "./sources/tavily.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 serve(async (req) => {
@@ -46,7 +45,10 @@ serve(async (req) => {
 
     const authHeader = req.headers.get("Authorization") || "";
     const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error } = await supabase.auth.getUser(token);
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser(token);
     if (error || !user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
@@ -62,7 +64,7 @@ serve(async (req) => {
 
     const resetAt = new Date(profile?.searches_reset_at || 0);
     const hoursSince = (Date.now() - resetAt.getTime()) / 3600000;
-    let searchesUsed = hoursSince >= 24 ? 0 : (profile?.searches_used || 0);
+    let searchesUsed = hoursSince >= 24 ? 0 : profile?.searches_used || 0;
     if (hoursSince >= 24) {
       await supabase
         .from("profiles")
@@ -72,13 +74,10 @@ serve(async (req) => {
     const plan = profile?.plan || "free";
     const limit = plan === "pro" || plan === "studio" ? 100 : 5;
     if (searchesUsed >= limit) {
-      return new Response(
-        JSON.stringify({ error: "Daily search limit reached", limit }),
-        {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        },
-      );
+      return new Response(JSON.stringify({ error: "Daily search limit reached", limit }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const body = await req.json();

@@ -1,13 +1,9 @@
 // Foursquare Places fallback when Geoapify returns thin coverage.
 import type { ExpandedQueries } from "./query-expander";
 import type { Lead } from "../scoring";
-import {
-  agencyRelevanceRank,
-  extractLocationHint,
-  geocodePlace,
-  majorCitiesForCountry,
-} from "./geoapify-places.server";
+import { agencyRelevanceRank, extractLocationHint, geocodePlace } from "./geoapify-places.server";
 import { extractLocationFromQuery, isCountryLocation } from "./query-classifier";
+import { fanOutCitiesForCountry, normalizeLocalLocation } from "@/lib/local/city-gazetteer";
 
 export type SourceLead = Lead & { intentBoost?: number };
 
@@ -25,15 +21,19 @@ function queryText(qx: ExpandedQueries): string {
   if (/\bplumb/.test(blob)) return "plumber";
   if (/\broof/.test(blob)) return "roofer";
   if (/\belectric/.test(blob)) return "electrician";
-  if (/\bhvac|heating/.test(blob)) return "hvac";
+  if (/\bhvac|heating|cooling|air.?cond/.test(blob)) return "hvac service";
   if (/\bdentist|dental/.test(blob)) return "dentist";
+  if (/\blaw|attorney|legal/.test(blob)) return "law firm";
+  if (/\bgym|fitness/.test(blob)) return "gym";
+  if (/\bsalon|beauty|spa/.test(blob)) return "beauty salon";
+  if (/\brestaurant|cafe|coffee/.test(blob)) return "restaurant";
+  if (/\baccount/.test(blob)) return "accountant";
+  if (/\breal.?estate/.test(blob)) return "real estate";
   return qx.skill || qx.role || "business";
 }
 
 function wantsAgencyIcp(qx: ExpandedQueries): boolean {
-  return /agenc|advertis|marketing|seo|brand|pr\b|media/i.test(
-    `${qx.role} ${qx.skill} ${qx.raw}`,
-  );
+  return /agenc|advertis|marketing|seo|brand|pr\b|media/i.test(`${qx.role} ${qx.skill} ${qx.raw}`);
 }
 
 async function foursquareSearch(ll: string, query: string, radius: number): Promise<any[]> {
@@ -121,10 +121,12 @@ export async function searchFoursquarePlaces(
 ): Promise<SourceLead[]> {
   if (!process.env.FOURSQUARE_API_KEY) return [];
 
-  const locText =
+  const locText = normalizeLocalLocation(
     (locationHint && locationHint.trim()) ||
-    extractLocationFromQuery(qx.raw) ||
-    extractLocationHint(`${qx.skill} ${qx.role}`);
+      extractLocationFromQuery(qx.raw) ||
+      extractLocationHint(`${qx.skill} ${qx.role}`) ||
+      "",
+  );
   // Never invent Denver — empty location → empty results
   if (!locText) return [];
 
@@ -132,8 +134,8 @@ export async function searchFoursquarePlaces(
   const preferAgency = wantsAgencyIcp(qx);
 
   // Country directory: fan out metros with near=City, Country
-  if (opts?.directoryMode && isCountryLocation(locText)) {
-    const cities = majorCitiesForCountry(locText);
+  if (isCountryLocation(locText)) {
+    const cities = fanOutCitiesForCountry(locText, 6);
     if (cities.length) {
       const batches = await Promise.all(
         cities.slice(0, 6).map(async (city) => {
@@ -176,6 +178,13 @@ function mapResults(
   for (const r of results) {
     const name = r.name;
     if (!name) continue;
+    if (
+      r.closed === true ||
+      r.permanently_closed === true ||
+      r.closed_bucket === "PermanentlyClosed"
+    )
+      continue;
+    if (/\b(permanently closed|closed down)\b/i.test(name)) continue;
     const cats = (r.categories || []).map((c: any) => c.name || c.short_name).filter(Boolean);
     const rank = preferAgency ? agencyRelevanceRank(name, cats) : 1;
     if (preferAgency && rank < 0) continue;
@@ -184,9 +193,7 @@ function mapResults(
     // Real website only — never Foursquare venue pages.
     const websiteRaw = r.website || undefined;
     const website =
-      websiteRaw &&
-      /^https?:\/\//i.test(websiteRaw) &&
-      !/foursquare\.com/i.test(websiteRaw)
+      websiteRaw && /^https?:\/\//i.test(websiteRaw) && !/foursquare\.com/i.test(websiteRaw)
         ? websiteRaw
         : undefined;
     const loc = r.location || {};
@@ -214,6 +221,7 @@ function mapResults(
       signal_type: "direct_intent",
       why_match: address || `${name} in ${locality || city}`,
       match_reasons: [`Match in ${locality || city}`, ...(agencyHit ? ["Agency signal"] : [])],
+      address: address || undefined,
     } as SourceLead);
   }
   return out;

@@ -63,7 +63,13 @@ function ContactBlock({
 }) {
   const actions = (
     <div className="flex flex-wrap gap-1.5">
-      <Button size="sm" variant="outline" className="h-8 text-xs" disabled={busy} onClick={onResolve}>
+      <Button
+        size="sm"
+        variant="outline"
+        className="h-8 text-xs"
+        disabled={busy}
+        onClick={onResolve}
+      >
         <Mail className="size-3 mr-1" />
         <Phone className="size-3 mr-1" />
         {busy ? "Resolving…" : "Resolve contact"}
@@ -87,9 +93,7 @@ function ContactBlock({
   if (!contact) {
     return (
       <div className="space-y-1.5">
-        {hasProfile && (
-          <div className="text-xs text-muted-foreground">Profile available</div>
-        )}
+        {hasProfile && <div className="text-xs text-muted-foreground">Profile available</div>}
         {actions}
       </div>
     );
@@ -112,7 +116,9 @@ function ContactBlock({
         {contact.email && (
           <div className="flex items-center gap-1.5 text-sm">
             <Mail className="size-3.5 text-emerald-400 shrink-0" />
-            <a href={`mailto:${contact.email}`} className="hover:underline truncate">{contact.email}</a>
+            <a href={`mailto:${contact.email}`} className="hover:underline truncate">
+              {contact.email}
+            </a>
           </div>
         )}
         {contact.phone && (
@@ -135,13 +141,27 @@ function ContactBlock({
         )}
         {contact.socials && (
           <div className="flex flex-wrap gap-x-3 gap-y-1 pt-1">
-            {contact.socials.linkedin && <LinkOut href={contact.socials.linkedin} label="LinkedIn" icon={Linkedin} />}
-            {contact.socials.twitter && <LinkOut href={contact.socials.twitter} label="X" icon={Twitter} />}
-            {contact.socials.facebook && <LinkOut href={contact.socials.facebook} label="Facebook" icon={Facebook} />}
-            {contact.socials.instagram && <LinkOut href={contact.socials.instagram} label="Instagram" icon={Globe} />}
-            {contact.socials.youtube && <LinkOut href={contact.socials.youtube} label="YouTube" icon={Globe} />}
-            {contact.socials.tiktok && <LinkOut href={contact.socials.tiktok} label="TikTok" icon={Globe} />}
-            {contact.socials.github && <LinkOut href={contact.socials.github} label="GitHub" icon={Github} />}
+            {contact.socials.linkedin && (
+              <LinkOut href={contact.socials.linkedin} label="LinkedIn" icon={Linkedin} />
+            )}
+            {contact.socials.twitter && (
+              <LinkOut href={contact.socials.twitter} label="X" icon={Twitter} />
+            )}
+            {contact.socials.facebook && (
+              <LinkOut href={contact.socials.facebook} label="Facebook" icon={Facebook} />
+            )}
+            {contact.socials.instagram && (
+              <LinkOut href={contact.socials.instagram} label="Instagram" icon={Globe} />
+            )}
+            {contact.socials.youtube && (
+              <LinkOut href={contact.socials.youtube} label="YouTube" icon={Globe} />
+            )}
+            {contact.socials.tiktok && (
+              <LinkOut href={contact.socials.tiktok} label="TikTok" icon={Globe} />
+            )}
+            {contact.socials.github && (
+              <LinkOut href={contact.socials.github} label="GitHub" icon={Github} />
+            )}
           </div>
         )}
       </div>
@@ -213,9 +233,13 @@ export function EntityDetailPanel({
             <Row label="Links">
               <div className="flex flex-wrap gap-y-1">
                 {c.website && <LinkOut href={c.website} label="Website" icon={Globe} />}
-                {c.linkedin_url && <LinkOut href={c.linkedin_url} label="LinkedIn" icon={Linkedin} />}
+                {c.linkedin_url && (
+                  <LinkOut href={c.linkedin_url} label="LinkedIn" icon={Linkedin} />
+                )}
                 {c.twitter_url && <LinkOut href={c.twitter_url} label="X" icon={Twitter} />}
-                {c.facebook_url && <LinkOut href={c.facebook_url} label="Facebook" icon={Facebook} />}
+                {c.facebook_url && (
+                  <LinkOut href={c.facebook_url} label="Facebook" icon={Facebook} />
+                )}
               </div>
             </Row>
           </>
@@ -249,8 +273,12 @@ export function EntityDetailPanel({
             )}
             <Row label="Links">
               <div className="flex flex-wrap gap-y-1">
-                {p.author_url && <LinkOut href={p.author_url} label="Profile" icon={ExternalLink} />}
-                {p.linkedin_url && <LinkOut href={p.linkedin_url} label="LinkedIn" icon={Linkedin} />}
+                {p.author_url && (
+                  <LinkOut href={p.author_url} label="Profile" icon={ExternalLink} />
+                )}
+                {p.linkedin_url && (
+                  <LinkOut href={p.linkedin_url} label="LinkedIn" icon={Linkedin} />
+                )}
                 {p.github_url && <LinkOut href={p.github_url} label="GitHub" icon={Github} />}
               </div>
             </Row>

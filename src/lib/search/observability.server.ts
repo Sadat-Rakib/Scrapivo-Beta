@@ -45,7 +45,14 @@ export function buildSourceHealthRows(
         ran_at: ranAt,
       });
     } else {
-      rows.push({ run_id: runId, query, source: name, result_count: 0, error_count: 1, ran_at: ranAt });
+      rows.push({
+        run_id: runId,
+        query,
+        source: name,
+        result_count: 0,
+        error_count: 1,
+        ran_at: ranAt,
+      });
     }
   }
   return rows;

@@ -341,6 +341,8 @@ export type DeriveOptions = {
   limit?: number;
   /** Skip candidates whose local part is a role inbox. */
   roleLocalParts?: ReadonlySet<string>;
+  /** Learned pattern ids (verified hits) — boosted in ranking / probed early. */
+  learnedPatterns?: PatternId[];
 };
 
 /**
@@ -368,6 +370,7 @@ export function deriveEmailCandidates(
   const firsts = umlautVariants(parsed.first, personName);
   const lasts = parsed.last ? umlautVariants(parsed.last, personName) : [""];
   const inferred = opts.inference;
+  const learned = new Set(opts.learnedPatterns || []);
   const limit = opts.limit ?? 5;
 
   const out: EmailCandidate[] = [];
@@ -380,14 +383,20 @@ export function deriveEmailCandidates(
     let weight = p.prior;
     let reason = `${p.label} (base rate ${Math.round(p.prior * 100)}%)`;
 
+    if (learned.has(p.id)) {
+      // Learned-from-verify beats base rate; still below a high-confidence harvest inference.
+      weight = Math.max(weight, 0.72);
+      reason = `${p.label} — learned for this domain from prior verified hits`;
+    }
+
     if (inferred?.pattern === p.id && inferred.confidence > 0) {
       weight = 0.4 + 0.55 * inferred.confidence;
       reason = `matches this company's observed ${p.label} format (${Math.round(inferred.confidence * 100)}% confidence)`;
-    } else if (inferred?.pattern && inferred.confidence >= 0.6) {
+    } else if (inferred?.pattern && inferred.confidence >= 0.6 && !learned.has(p.id)) {
       // A confident inference actively demotes the alternatives.
       weight = p.prior * 0.2;
       reason = `${p.label} — company appears to use ${inferred.pattern}, so this is a long shot`;
-    } else if (inferred?.shape_hint) {
+    } else if (inferred?.shape_hint && !learned.has(p.id)) {
       const shapeOk =
         (inferred.shape_hint === "dotted" && p.id.includes(".")) ||
         (inferred.shape_hint === "underscored" && p.id.includes("_")) ||

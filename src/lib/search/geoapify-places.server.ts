@@ -2,10 +2,12 @@
 // Categories are request params — one GEOAPIFY_API_KEY unlocks Places + Geocoding.
 import type { ExpandedQueries } from "./query-expander";
 import type { Lead } from "../scoring";
+import { extractLocationFromQuery, isCountryLocation } from "./query-classifier";
 import {
-  extractLocationFromQuery,
-  isCountryLocation,
-} from "./query-classifier";
+  fanOutCitiesForCountry,
+  majorCitiesForCountry as gazetteerCities,
+  normalizeLocalLocation,
+} from "@/lib/local/city-gazetteer";
 
 export type SourceLead = Lead & { intentBoost?: number };
 
@@ -24,32 +26,17 @@ const PLACES_LIMIT_DEFAULT = 40;
 const PLACES_LIMIT_DIRECTORY = 80;
 const PLACES_LIMIT_PER_CITY = 20;
 
-/** Major metros for country-scale directory fan-out (Geoapify place:country is too sparse/noisy). */
-export const COUNTRY_MAJOR_CITIES: Record<string, string[]> = {
-  india: [
-    "Mumbai", "Bengaluru", "Delhi", "Hyderabad", "Chennai", "Pune", "Gurugram", "Kolkata",
-  ],
-  "united states": [
-    "New York", "Los Angeles", "Chicago", "Austin", "Seattle", "San Francisco", "Denver", "Miami",
-  ],
-  "united kingdom": ["London", "Manchester", "Birmingham", "Edinburgh"],
-  canada: ["Toronto", "Vancouver", "Montreal", "Calgary"],
-  australia: ["Sydney", "Melbourne", "Brisbane"],
-  germany: ["Berlin", "Munich", "Hamburg", "Frankfurt"],
-  singapore: ["Singapore"],
-  france: ["Paris", "Lyon"],
-  "united arab emirates": ["Dubai", "Abu Dhabi"],
-};
-
 export function majorCitiesForCountry(location: string): string[] {
-  return COUNTRY_MAJOR_CITIES[location.toLowerCase().trim()] ?? [];
+  return gazetteerCities(normalizeLocalLocation(location));
 }
 
 /** Map ICP / skill keywords → Geoapify Places categories. */
 export function categoriesForQuery(qx: ExpandedQueries): string[] {
   const blob = `${qx.skill} ${qx.role} ${qx.raw ?? ""}`.toLowerCase();
-  if (/restaurant|cafe|food|catering|bakery/.test(blob)) return ["catering.restaurant", "catering.cafe"];
-  if (/salon|spa|beauty|barber|med.?spa/.test(blob)) return ["service.beauty", "service.hairdresser"];
+  if (/restaurant|cafe|food|catering|bakery/.test(blob))
+    return ["catering.restaurant", "catering.cafe"];
+  if (/salon|spa|beauty|barber|med.?spa/.test(blob))
+    return ["service.beauty", "service.hairdresser"];
   if (/dentist|doctor|clinic|health|medical/.test(blob)) return ["healthcare"];
   if (/lawyer|legal|attorney/.test(blob)) return ["office.lawyer", "office"];
   if (/accountant|bookkeep|cpa/.test(blob)) return ["office.accountant", "office"];
@@ -61,7 +48,8 @@ export function categoriesForQuery(qx: ExpandedQueries): string[] {
   if (/\bplumb/.test(blob)) return ["service.plumbing", "craft.plumber", "service"];
   if (/\broof/.test(blob)) return ["craft.roofer", "service"];
   if (/\belectric/.test(blob)) return ["craft.electrician", "service"];
-  if (/\bhvac|heating|cooling|furnace/.test(blob)) return ["craft.hvac", "service"];
+  if (/\bhvac|heating|cooling|furnace/.test(blob))
+    return ["service", "craft.plumber", "craft.electrician"];
   if (/\b(contractor|handyman|remodel)/.test(blob)) return ["craft", "service"];
   if (/market|seo|advertis|agency|design|consult|brand|content|social media/.test(blob)) {
     return ["office", "service", "commercial"];
@@ -75,7 +63,7 @@ export function nameFilterForQuery(qx: ExpandedQueries): string | undefined {
   if (/\bplumb/.test(blob)) return "plumber";
   if (/\broof/.test(blob)) return "roofer";
   if (/\belectric/.test(blob)) return "electrician";
-  if (/\bhvac|heating/.test(blob)) return "hvac";
+  if (/\bhvac|heating/.test(blob)) return undefined;
   if (/\bdentist|dental/.test(blob)) return "dentist";
   if (/\blaw|attorney/.test(blob)) return "lawyer";
   if (/\bgym|fitness/.test(blob)) return "gym";
@@ -116,7 +104,11 @@ export async function geocodePlace(query: string): Promise<GeoPoint | null> {
       if (/usa$/i.test(q) && cc === "us") s += 50;
       if (/, australia$/i.test(q) && cc === "au") s += 50;
       // Penalize tiny US places when user typed a bare major-city name
-      if (cc === "us" && /toronto|london|paris|berlin/i.test(query) && !/usa|us\b|united states/i.test(query)) {
+      if (
+        cc === "us" &&
+        /toronto|london|paris|berlin/i.test(query) &&
+        !/usa|us\b|united states/i.test(query)
+      ) {
         s -= 80;
       }
       return s;
@@ -139,9 +131,7 @@ export async function geocodePlace(query: string): Promise<GeoPoint | null> {
 }
 
 function wantsAgencyIcp(qx: ExpandedQueries): boolean {
-  return /agenc|advertis|marketing|seo|brand|pr\b|media/i.test(
-    `${qx.role} ${qx.skill} ${qx.raw}`,
-  );
+  return /agenc|advertis|marketing|seo|brand|pr\b|media/i.test(`${qx.role} ${qx.skill} ${qx.raw}`);
 }
 
 /** Score how well a place name matches marketing/agency ICP (not gas/cycle “agency”). */
@@ -151,7 +141,9 @@ export function agencyRelevanceRank(name: string, categories?: string[]): number
   let rank = 0;
   // Non-marketing “agency” businesses common in India OSM
   if (
-    /\b(gas|lpg|petrol|diesel|cycle|bicycle|news|travel|insurance|recruit|estate|real\s*estate|property|milk|oil|ply|trading|sales|tour|ticket|railway)\b/.test(n) &&
+    /\b(gas|lpg|petrol|diesel|cycle|bicycle|news|travel|insurance|recruit|estate|real\s*estate|property|milk|oil|ply|trading|sales|tour|ticket|railway)\b/.test(
+      n,
+    ) &&
     !/\b(marketing|digital|advertis|seo|media|brand|creative)\b/.test(n)
   ) {
     return -20;
@@ -206,9 +198,7 @@ function featuresToLeads(
   const scored = features.map((f: any) => {
     const p = f?.properties ?? {};
     const name = p.name || p.address_line1 || "";
-    const rank = preferAgency
-      ? agencyRelevanceRank(name, p.categories || [])
-      : 0;
+    const rank = preferAgency ? agencyRelevanceRank(name, p.categories || []) : 0;
     return { f, rank, name };
   });
   scored.sort((a, b) => b.rank - a.rank);
@@ -226,6 +216,8 @@ function featuresToLeads(
     const p = f?.properties ?? {};
     const name = p.name || p.address_line1;
     if (!name) continue;
+    if (p.closed === true || p.permanently_closed === true) continue;
+    if (/\b(permanently closed|closed down|disused)\b/i.test(name)) continue;
     const key = name.toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);
@@ -243,9 +235,7 @@ function featuresToLeads(
     const address = p.formatted || p.address_line1 || "";
 
     const agencyHit = rank > 0;
-    const snippet = [address || city, phone ? `Phone: ${phone}` : ""]
-      .filter(Boolean)
-      .join(" · ");
+    const snippet = [address || city, phone ? `Phone: ${phone}` : ""].filter(Boolean).join(" · ");
 
     out.push({
       source: "geoapify",
@@ -256,6 +246,7 @@ function featuresToLeads(
       author: name,
       company: name,
       phones: phone ? [phone] : undefined,
+      emails: p.email || p.contact?.email ? [p.email || p.contact.email] : undefined,
       posted_at: undefined,
       engagement: agencyHit ? 55 : 30,
       is_decision_maker: true,
@@ -267,6 +258,7 @@ function featuresToLeads(
         ...(website ? ["Has website"] : []),
         ...(agencyHit ? ["Agency/marketing name signal"] : []),
       ],
+      address: address || undefined,
     } as SourceLead);
   }
   return out;
@@ -299,14 +291,13 @@ async function searchCityCircle(
           nameFilter: preferAgency ? "agency" : tradeName,
         })
       : [];
-  if (features.length < 4) {
+  if (features.length < 10) {
     const broad = await fetchPlacesFeatures({
       filter,
       bias: `${point.lon},${point.lat}`,
       limit: PLACES_LIMIT_PER_CITY,
       cats,
       key,
-      nameFilter: tradeName,
     });
     const seen = new Set(features.map((f) => f?.properties?.place_id || f?.id));
     for (const f of broad) {
@@ -317,11 +308,16 @@ async function searchCityCircle(
     }
   }
 
-  return featuresToLeads(features, country, { ...point, city }, {
-    directoryMode: opts?.directoryMode,
-    preferAgency,
-    craftAsk: qx.skill || qx.role,
-  });
+  return featuresToLeads(
+    features,
+    country,
+    { ...point, city },
+    {
+      directoryMode: opts?.directoryMode,
+      preferAgency,
+      craftAsk: qx.skill || qx.role,
+    },
+  );
 }
 
 /**
@@ -336,19 +332,21 @@ export async function searchGeoapifyPlaces(
   const key = process.env.GEOAPIFY_API_KEY;
   if (!key) return [];
 
-  const locText =
+  const locText = normalizeLocalLocation(
     (locationHint && locationHint.trim()) ||
-    extractLocationFromQuery(qx.raw) ||
-    extractLocationFromQuery(`${qx.skill} ${qx.role}`);
+      extractLocationFromQuery(qx.raw) ||
+      extractLocationFromQuery(`${qx.skill} ${qx.role}`) ||
+      "",
+  );
 
   // Directory / location searches must not silently search a random default city.
   if (!locText) return [];
 
   const preferAgency = wantsAgencyIcp(qx);
 
-  // Country-scale directory: fan out major metros (place:country returns random offices).
-  if (opts?.directoryMode && isCountryLocation(locText)) {
-    const cities = majorCitiesForCountry(locText);
+  // Country-scale: fan out gazetteer cities (place:country is sparse/noisy and USA bbox times out).
+  if (isCountryLocation(locText)) {
+    const cities = fanOutCitiesForCountry(locText, opts?.directoryMode ? 8 : 6);
     if (cities.length) {
       const batches = await Promise.all(
         cities.map((city) => searchCityCircle(qx, city, locText, opts)),
@@ -363,7 +361,10 @@ export async function searchGeoapifyPlaces(
           merged.push(lead);
         }
       }
-      merged.sort((a, b) => (b.intentBoost ?? 0) - (a.intentBoost ?? 0) || (b.engagement ?? 0) - (a.engagement ?? 0));
+      merged.sort(
+        (a, b) =>
+          (b.intentBoost ?? 0) - (a.intentBoost ?? 0) || (b.engagement ?? 0) - (a.engagement ?? 0),
+      );
       if (preferAgency) {
         const good = merged.filter((l) => (l.intentBoost ?? 0) >= 20);
         if (good.length >= 5) return good.slice(0, PLACES_LIMIT_DIRECTORY);
@@ -377,21 +378,13 @@ export async function searchGeoapifyPlaces(
 
   const limit = opts?.directoryMode ? PLACES_LIMIT_DIRECTORY : PLACES_LIMIT_DEFAULT;
   const cats = categoriesForQuery(qx).join(",");
-
-  let filter: string;
-  if (isCountryLocation(locText) && point.place_id) {
-    filter = `place:${point.place_id}`;
-  } else if (point.place_id && /country|state|county/i.test(point.result_type || "")) {
-    filter = `place:${point.place_id}`;
-  } else {
-    filter = `circle:${point.lon},${point.lat},${CITY_RADIUS_M}`;
-  }
+  const filter = `circle:${point.lon},${point.lat},${CITY_RADIUS_M}`;
 
   let features =
-    (preferAgency || nameFilterForQuery(qx)) && !filter.startsWith("place:")
+    preferAgency || nameFilterForQuery(qx)
       ? await fetchPlacesFeatures({
           filter,
-          bias: filter.startsWith("circle:") ? `${point.lon},${point.lat}` : undefined,
+          bias: `${point.lon},${point.lat}`,
           limit,
           cats,
           key,
@@ -399,15 +392,13 @@ export async function searchGeoapifyPlaces(
         })
       : [];
 
-  if (features.length < 6) {
-    const tradeName = nameFilterForQuery(qx);
+  if (features.length < 10) {
     const broad = await fetchPlacesFeatures({
       filter,
-      bias: filter.startsWith("circle:") ? `${point.lon},${point.lat}` : undefined,
+      bias: `${point.lon},${point.lat}`,
       limit,
       cats,
       key,
-      nameFilter: tradeName,
     });
     const seen = new Set(features.map((f) => f?.properties?.place_id || f?.id));
     for (const f of broad) {

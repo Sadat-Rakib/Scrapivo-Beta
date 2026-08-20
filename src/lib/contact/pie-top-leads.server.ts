@@ -36,12 +36,7 @@ function stripHtmlNoise(html: string): string {
     .slice(0, 12_000);
 }
 
-function mergeInline(
-  lead: Lead,
-  emails: string[],
-  phones: string[],
-  links: string[] = [],
-): Lead {
+function mergeInline(lead: Lead, emails: string[], phones: string[], links: string[] = []): Lead {
   const prev = lead.inline_contacts ?? { emails: [], phones: [], links: [] };
   const nextEmails = [...new Set([...prev.emails, ...emails.map((e) => e.toLowerCase())])]
     .filter((e) => !/example\.com|yourdomain|noreply|no-reply/i.test(e))
@@ -86,9 +81,7 @@ function regexHarvest(text: string): { emails: string[]; phones: string[] } {
   }
   // Broader NA/EU digit patterns if extractInline was thin
   if (!phones.length) {
-    for (const m of text.matchAll(
-      /(?:\+?\d{1,3}[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b/g,
-    )) {
+    for (const m of text.matchAll(/(?:\+?\d{1,3}[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b/g)) {
       const p = parsePhone(m[0]);
       if (p.status === "valid" || p.status === "possible") {
         phones.push(p.formatted || p.e164 || m[0]);
@@ -136,11 +129,7 @@ async function enrichFromLinkedInUrl(
   if (enrichmentKey && /linkedin\.com\/in\//i.test(profileUrl)) {
     budget.used++;
     try {
-      const linkedinId = profileUrl
-        .replace(/\/$/, "")
-        .split("/in/")[1]
-        ?.split(/[/?#]/)[0]
-        ?.trim();
+      const linkedinId = profileUrl.replace(/\/$/, "").split("/in/")[1]?.split(/[/?#]/)[0]?.trim();
       if (linkedinId) {
         const params = new URLSearchParams({
           api_key: enrichmentKey,
@@ -156,10 +145,7 @@ async function enrichFromLinkedInUrl(
           const emailArr = data.email;
           if (Array.isArray(emailArr)) {
             for (const row of emailArr) {
-              const e =
-                typeof row === "string"
-                  ? row
-                  : (row as { email?: string })?.email;
+              const e = typeof row === "string" ? row : (row as { email?: string })?.email;
               if (e) emails.push(e);
             }
           } else if (typeof emailArr === "string") {
@@ -232,7 +218,7 @@ async function llmPieExtract(cleanedText: string): Promise<{ emails: string[]; p
     const raw = await aiComplete({
       task: "extract",
       system:
-        "Extract publicly listed contact details from the document. Return JSON only: {\"email\":\"\",\"phone\":\"\"}. Use empty strings when not found. Do not invent contacts.",
+        'Extract publicly listed contact details from the document. Return JSON only: {"email":"","phone":""}. Use empty strings when not found. Do not invent contacts.',
       user: cleanedText.slice(0, 6000),
       json: true,
       temperature: 0,
@@ -303,9 +289,7 @@ async function enrichOneLead(lead: Lead, paidBudget: { used: number }): Promise<
 
   // 5) LLM last resort
   if (!hasContact()) {
-    const pageText =
-      (await fetchPublicPageText(lead.full_post_url || "")) ||
-      stripHtmlNoise(blob);
+    const pageText = (await fetchPublicPageText(lead.full_post_url || "")) || stripHtmlNoise(blob);
     const llm = await llmPieExtract(pageText || blob);
     current = mergeInline(current, llm.emails, llm.phones);
   }
@@ -335,7 +319,9 @@ export async function enrichTopLeadContacts(leads: Lead[]): Promise<Lead[]> {
     socialTargets.length >= 1
       ? [
           ...socialTargets,
-          ...leads.filter((l) => !socialTargets.includes(l)).slice(0, Math.max(0, MAX_TOP - socialTargets.length)),
+          ...leads
+            .filter((l) => !socialTargets.includes(l))
+            .slice(0, Math.max(0, MAX_TOP - socialTargets.length)),
         ].slice(0, MAX_TOP)
       : leads.slice(0, MAX_TOP);
 
@@ -348,5 +334,7 @@ export async function enrichTopLeadContacts(leads: Lead[]): Promise<Lead[]> {
     }),
   );
 
-  return leads.map((l) => (targetUrls.has(l.full_post_url) ? enrichedMap.get(l.full_post_url) ?? l : l));
+  return leads.map((l) =>
+    targetUrls.has(l.full_post_url) ? (enrichedMap.get(l.full_post_url) ?? l) : l,
+  );
 }

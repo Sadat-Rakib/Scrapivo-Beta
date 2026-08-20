@@ -1,14 +1,22 @@
 // Standalone smoke checks mirroring the classifier / segment fixes (no vite).
 function detectSignalFamily(text) {
   const t = (text || "").toLowerCase();
-  if (/\b(i need|i want|we need|we want|need someone|want someone|can someone|who can|willing to pay|looking for someone|looking for a|looking for an|need a|need an)\b/.test(t)) {
+  if (
+    /\b(i need|i want|we need|we want|need someone|want someone|can someone|who can|willing to pay|looking for someone|looking for a|looking for an|need a|need an)\b/.test(
+      t,
+    )
+  ) {
     return "custom";
   }
   return null;
 }
 
 function extractForIcpNoun(raw) {
-  const forM = (raw || "").toLowerCase().match(/\bfor\s+(startups?|agenc(?:y|ies)|small businesses|smbs?|founders?|companies|businesses|freelancers?)\b/i);
+  const forM = (raw || "")
+    .toLowerCase()
+    .match(
+      /\bfor\s+(startups?|agenc(?:y|ies)|small businesses|smbs?|founders?|companies|businesses|freelancers?)\b/i,
+    );
   if (!forM) return null;
   const n = forM[1].toLowerCase();
   if (/^startup/.test(n)) return "startups";

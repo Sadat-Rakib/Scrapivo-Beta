@@ -30,7 +30,10 @@ const check = (name: string, ok: boolean) => {
 const c = classifyQuery("sales teams");
 const x = expandFromClassified(c);
 console.log("classified", { core: c.coreSkill, role: c.roleTitle, type: c.type, skill: x.skill });
-check("coreSkill is sales (not sales team)", c.coreSkill === "sales" || c.coreSkill.startsWith("sales"));
+check(
+  "coreSkill is sales (not sales team)",
+  c.coreSkill === "sales" || c.coreSkill.startsWith("sales"),
+);
 check("personNoun is sales rep-ish", /sales\s*rep|salesperson/i.test(personNoun(x.skill, x.role)));
 check(
   "matches 'Hiring a sales rep'",
@@ -47,9 +50,17 @@ console.log(
     .slice(0, 15),
 );
 const socialRaw = raw.filter((l) =>
-  ["linkedin", "instagram", "facebook", "twitter", "threads", "quora", "reddit", "hn", "github"].includes(
-    l.source,
-  ),
+  [
+    "linkedin",
+    "instagram",
+    "facebook",
+    "twitter",
+    "threads",
+    "quora",
+    "reddit",
+    "hn",
+    "github",
+  ].includes(l.source),
 );
 check(`social/community raw >= 2 (got ${socialRaw.length})`, socialRaw.length >= 2);
 

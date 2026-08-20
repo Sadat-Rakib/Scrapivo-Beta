@@ -2,20 +2,72 @@ import type { Lead, SearchQuery } from "../types.ts";
 import { isWithin14Days, relativeTime, scoreIntent } from "../intent-filter.ts";
 
 const GREENHOUSE_BOARDS = [
-  "airbnb", "stripe", "figma", "notion", "linear", "vercel", "supabase",
-  "openai", "anthropic", "replicate", "huggingface", "databricks",
-  "github", "shopify", "square", "twilio", "datadog", "segment",
-  "amplitude", "mixpanel", "intercom", "zendesk", "freshworks",
-  "atlassian", "typeform", "webflow", "framer", "retool", "airtable",
-  "clickup", "asana", "monday", "coda", "miro", "pitch",
-  "loom", "calendly", "descript", "riverside", "beehiiv", "ghost",
+  "airbnb",
+  "stripe",
+  "figma",
+  "notion",
+  "linear",
+  "vercel",
+  "supabase",
+  "openai",
+  "anthropic",
+  "replicate",
+  "huggingface",
+  "databricks",
+  "github",
+  "shopify",
+  "square",
+  "twilio",
+  "datadog",
+  "segment",
+  "amplitude",
+  "mixpanel",
+  "intercom",
+  "zendesk",
+  "freshworks",
+  "atlassian",
+  "typeform",
+  "webflow",
+  "framer",
+  "retool",
+  "airtable",
+  "clickup",
+  "asana",
+  "monday",
+  "coda",
+  "miro",
+  "pitch",
+  "loom",
+  "calendly",
+  "descript",
+  "riverside",
+  "beehiiv",
+  "ghost",
 ];
 
 const LEVER_COMPANIES = [
-  "netflix", "uber", "lyft", "airbnb", "pinterest", "reddit",
-  "discord", "slack", "zoom", "dropbox", "box", "hubspot",
-  "salesforce", "workday", "servicenow", "okta", "crowdstrike",
-  "elastic", "hashicorp", "confluent", "dbt-labs", "fivetran",
+  "netflix",
+  "uber",
+  "lyft",
+  "airbnb",
+  "pinterest",
+  "reddit",
+  "discord",
+  "slack",
+  "zoom",
+  "dropbox",
+  "box",
+  "hubspot",
+  "salesforce",
+  "workday",
+  "servicenow",
+  "okta",
+  "crowdstrike",
+  "elastic",
+  "hashicorp",
+  "confluent",
+  "dbt-labs",
+  "fivetran",
 ];
 
 export async function searchGreenhouse(query: SearchQuery): Promise<Lead[]> {
@@ -43,13 +95,18 @@ export async function searchGreenhouse(query: SearchQuery): Promise<Lead[]> {
           if (seen.has(jobId)) return;
           seen.add(jobId);
 
-          const postedAt = job.updated_at || job.first_published
-            ? new Date(job.updated_at || job.first_published).toISOString()
-            : null;
+          const postedAt =
+            job.updated_at || job.first_published
+              ? new Date(job.updated_at || job.first_published).toISOString()
+              : null;
           if (!postedAt || !isWithin14Days(postedAt)) return;
 
           const fullText =
-            job.title + " at " + board + ". " + (job.content || "").replace(/<[^>]+>/g, "").slice(0, 300);
+            job.title +
+            " at " +
+            board +
+            ". " +
+            (job.content || "").replace(/<[^>]+>/g, "").slice(0, 300);
           const { score, tier, hasBudget, hasUrgency } = scoreIntent({
             text: fullText,
             platform: "greenhouse",

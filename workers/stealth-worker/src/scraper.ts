@@ -48,7 +48,8 @@ async function scrapeInstagram(page: Page, query: string, max: number): Promise<
     for (const { href, text } of links) {
       if (posts.length >= max) break;
       const combined = `${text} ${query}`;
-      if (!BUYER_RE.test(combined) && !combined.toLowerCase().includes(query.toLowerCase())) continue;
+      if (!BUYER_RE.test(combined) && !combined.toLowerCase().includes(query.toLowerCase()))
+        continue;
       posts.push({
         platform: "Instagram",
         title: text.slice(0, 120) || `#${tag} post`,

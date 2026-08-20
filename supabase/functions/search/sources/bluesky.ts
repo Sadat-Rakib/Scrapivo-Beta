@@ -12,9 +12,11 @@ export async function searchBluesky(query: SearchQuery): Promise<Lead[]> {
   ];
   for (const t of terms.slice(0, 3)) {
     try {
-      const url =
-        `https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts?q=${encodeURIComponent(t)}&limit=20&sort=latest`;
-      const data = await safe(fetch(url).then((r) => ok<Record<string, unknown>>(r)), null);
+      const url = `https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts?q=${encodeURIComponent(t)}&limit=20&sort=latest`;
+      const data = await safe(
+        fetch(url).then((r) => ok<Record<string, unknown>>(r)),
+        null,
+      );
       for (const p of (data?.posts as Array<Record<string, unknown>>) ?? []) {
         const record = p.record as Record<string, unknown> | undefined;
         const text = String(record?.text || "");
@@ -23,7 +25,10 @@ export async function searchBluesky(query: SearchQuery): Promise<Lead[]> {
         if (!hasBuyerIntent(text, query.negativePhrases)) continue;
         const author = p.author as Record<string, unknown> | undefined;
         const handle = String(author?.handle || "");
-        const rkey = String(p.uri || "").split("/").pop() || "";
+        const rkey =
+          String(p.uri || "")
+            .split("/")
+            .pop() || "";
 
         const lead = buildLead({
           id: `bluesky-${rkey}`,

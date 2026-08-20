@@ -1,13 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { runLocalBusinessSearch } from "@/lib/local-businesses.functions";
 import type { LocalBusinessRow, OpportunityTag } from "@/lib/search/lead-segments";
-import { LocalBusinessesGrid } from "@/components/discover/result-tabs";
-import { Button } from "@/components/ui/button";
-import { Store, Search, Download } from "lucide-react";
+import { ViewToggle, type ViewMode } from "@/components/shared/view-toggle";
+import { EntityCard } from "@/components/shared/entity-card";
+import { EntityTable, type ColumnDef } from "@/components/shared/entity-table";
+import { FilterPanel } from "@/components/shared/filter-panel";
+import { getRemainingSearches } from "@/lib/search.functions";
+import { saveRouteSearchState, loadRouteSearchState } from "@/lib/store/search-store";
+import { Store, Search, Download, MapPin, Phone, Mail, Globe, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
+import { Company360View, type Company360Data } from "@/components/shared/company-360-view";
 
 export const Route = createFileRoute("/_authenticated/local-businesses")({
   head: () => ({
@@ -29,55 +34,58 @@ const CATEGORY_SUGGESTIONS = [
   "restaurants",
   "cafes",
   "salons",
-  "auto repair",
-  "real estate agents",
-  "accountants",
-  "chiropractors",
 ];
 
 const LOCATION_SUGGESTIONS = [
+  "Dhaka",
   "Austin TX",
   "Toronto",
   "London",
   "New York",
   "Los Angeles",
-  "Chicago",
   "Miami",
-  "Vancouver",
-  "San Francisco",
-  "Dallas",
 ];
 
-const FILTERS: { id: OpportunityTag | "all"; label: string }[] = [
+const OPPORTUNITY_FILTERS: { id: OpportunityTag | "all"; label: string }[] = [
   { id: "all", label: "All" },
   { id: "no_website", label: "No website" },
+  { id: "poor_design", label: "Poor design" },
+  { id: "not_mobile_friendly", label: "Not mobile" },
   { id: "seo_poor", label: "SEO poor" },
   { id: "has_email", label: "Has email" },
   { id: "has_phone", label: "Has phone" },
   { id: "sales_ready", label: "Sales ready" },
-  { id: "has_website", label: "Has website" },
 ];
-
-function chipClass(active: boolean) {
-  return `text-[11px] px-2.5 py-1 rounded-full border transition-colors ${
-    active
-      ? "border-primary bg-primary/10 text-foreground"
-      : "border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
-  }`;
-}
 
 function LocalBusinessesPage() {
   const qc = useQueryClient();
   const searchFn = useServerFn(runLocalBusinessSearch);
-  const [category, setCategory] = useState("");
-  const [location, setLocation] = useState("");
-  const [rows, setRows] = useState<LocalBusinessRow[]>([]);
+  const getUsage = useServerFn(getRemainingSearches);
+  const usageQuery = useQuery({ queryKey: ["usage"], queryFn: () => getUsage() });
+
+  const initialState = useMemo(() => loadRouteSearchState<LocalBusinessRow>("local-businesses"), []);
+
+  const [category, setCategory] = useState(initialState?.filters?.category ?? "");
+  const [location, setLocation] = useState(initialState?.filters?.location ?? "");
+  const [rows, setRows] = useState<LocalBusinessRow[]>(initialState?.results ?? []);
   const [filter, setFilter] = useState<OpportunityTag | "all">("all");
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [bookmarkedKeys, setBookmarkedKeys] = useState<Set<string>>(new Set());
+  const [selectedEntity, setSelectedEntity] = useState<Company360Data | null>(null);
+
+  const [filtersCollapsed, setFiltersCollapsed] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem("scrapivo:businesses-filters-collapsed") === "1";
+  });
 
   const filtered = useMemo(() => {
     if (filter === "all") return rows;
     return rows.filter((r) => r.opportunity_tags?.includes(filter));
   }, [rows, filter]);
+
+  if (typeof window !== "undefined") {
+    window.localStorage.setItem("scrapivo:businesses-filters-collapsed", filtersCollapsed ? "1" : "0");
+  }
 
   const mut = useMutation({
     mutationFn: () =>
@@ -94,49 +102,63 @@ function LocalBusinessesPage() {
         toast.error(res.message ?? "Search limit reached");
         return;
       }
-      setRows(res.businesses ?? []);
+      const fetchedRows = res.businesses ?? [];
+      setRows(fetchedRows);
       setFilter("all");
-      const withEmail = (res.businesses ?? []).filter((b) => b.email).length;
-      const withPhone = (res.businesses ?? []).filter((b) => b.phone).length;
-      const noWeb = (res.businesses ?? []).filter((b) =>
-        b.opportunity_tags?.includes("no_website"),
-      ).length;
-      toast.success(
-        `${res.businesses?.length ?? 0} local businesses` +
-          (withEmail ? ` · ${withEmail} with email` : "") +
-          (withPhone ? ` · ${withPhone} with phone` : "") +
-          (noWeb ? ` · ${noWeb} no website` : ""),
-      );
+      saveRouteSearchState("local-businesses", {
+        query: `${category} in ${location}`,
+        filters: { category, location },
+        results: fetchedRows,
+        timestamp: Date.now(),
+      });
+      if (!fetchedRows.length) {
+        toast.message(res.message || "No live listings found");
+        return;
+      }
+      toast.success(`${fetchedRows.length} local businesses found`);
     },
     onError: (e: Error) => toast.error(e.message || "Search failed"),
   });
 
+  const toggleBookmark = (key: string) => {
+    setBookmarkedKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  const openDetailView = (r: LocalBusinessRow) => {
+    setSelectedEntity({
+      domain: "business",
+      name: r.name,
+      category: r.category || "Local Business",
+      location: r.address || undefined,
+      phone: r.phone || undefined,
+      email: r.email || undefined,
+      website: r.website || undefined,
+      description: r.description || undefined,
+      opportunity_tags: r.opportunity_tags || [],
+    });
+  };
+
   const exportCsv = () => {
     if (!filtered.length) return;
-    const header = [
-      "name",
-      "category",
-      "phone",
-      "email",
-      "verified",
-      "website",
-      "tags",
-      "description",
-    ];
+    const header = ["name", "category", "address", "phone", "email", "website", "tags"];
     const lines = [
       header.join(","),
       ...filtered.map((r) =>
         [
           r.name,
           r.category ?? "",
+          r.address ?? "",
           r.phone ?? "",
           r.email ?? "",
-          r.email_verified ? "yes" : "",
           r.website ?? "",
           (r.opportunity_tags ?? []).join("|"),
-          (r.description ?? "").replace(/"/g, '""'),
         ]
-          .map((c) => `"${String(c).replace(/\n/g, " ")}"`)
+          .map((c) => `"${String(c).replace(/"/g, '""')}"`)
           .join(","),
       ),
     ];
@@ -144,155 +166,268 @@ function LocalBusinessesPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `scrapivo-local-${category.replace(/\s+/g, "-")}-${location.replace(/\s+/g, "-")}.csv`;
+    a.download = `scrapivo-local-${category || "businesses"}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
 
-  return (
-    <div className="h-full overflow-y-auto p-6 sm:p-8 max-w-5xl mx-auto w-full">
-      <div className="mb-8">
-        <div className="inline-flex items-center gap-2 text-muted-foreground mb-2">
-          <Store className="size-4" />
-          <span className="text-xs uppercase tracking-wide">Local business leads</span>
-        </div>
-        <h1 className="text-2xl font-semibold tracking-tight mb-2">Local businesses</h1>
-        <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
-          Pick a category and place — Scrapivo finds live listings, scrapes emails and phones, and
-          tags opportunities so you can filter for the right pitch.
-        </p>
-      </div>
-
-      <div className="rounded-2xl border border-border bg-card p-4 sm:p-5 space-y-4 mb-8">
-        <div className="grid sm:grid-cols-2 gap-3">
-          <label className="block space-y-1.5">
-            <span className="text-xs font-medium text-muted-foreground">Business category</span>
-            <input
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              placeholder="e.g. dentists, roofers, marketing agencies"
-              className="w-full h-10 px-3 rounded-lg border border-border bg-background text-sm"
-            />
-          </label>
-          <label className="block space-y-1.5">
-            <span className="text-xs font-medium text-muted-foreground">Where to look</span>
-            <input
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="e.g. Austin TX, Toronto, London"
-              className="w-full h-10 px-3 rounded-lg border border-border bg-background text-sm"
-            />
-          </label>
-        </div>
-
-        <div className="space-y-2">
-          <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
-            Quick categories
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {CATEGORY_SUGGESTIONS.map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => setCategory(c)}
-                className={chipClass(category.toLowerCase() === c.toLowerCase())}
-              >
-                {c}
-              </button>
-            ))}
+  const tableColumns: ColumnDef<LocalBusinessRow>[] = [
+    {
+      header: "Business Name",
+      accessor: (r) => (
+        <div className="flex items-center gap-3">
+          <div className="size-9 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center font-semibold text-white text-xs shrink-0">
+            {r.name[0]?.toUpperCase()}
+          </div>
+          <div className="min-w-0">
+            <div className="font-semibold text-white truncate">{r.name}</div>
+            <div className="text-[11px] text-white/50 truncate">{r.category || "Local Business"}</div>
           </div>
         </div>
-
-        <div className="space-y-2">
-          <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
-            Quick locations
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {LOCATION_SUGGESTIONS.map((loc) => (
-              <button
-                key={loc}
-                type="button"
-                onClick={() => setLocation(loc)}
-                className={chipClass(location.toLowerCase() === loc.toLowerCase())}
-              >
-                {loc}
-              </button>
-            ))}
-          </div>
+      ),
+    },
+    {
+      header: "Address / Location",
+      accessor: (r) => (
+        <div className="text-xs text-white/70 truncate flex items-center gap-1">
+          <MapPin className="size-3 text-white/40 shrink-0" />
+          <span className="truncate">{r.address || "Not listed"}</span>
         </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            onClick={() => {
-              if (category.trim().length < 2 || location.trim().length < 2) {
-                toast.error("Enter a category and a location");
-                return;
-              }
-              mut.mutate();
-            }}
-            disabled={mut.isPending}
-          >
-            <Search className={`size-3.5 mr-1.5 ${mut.isPending ? "animate-pulse" : ""}`} />
-            {mut.isPending ? "Searching live…" : "Find local businesses"}
-          </Button>
-          {rows.length > 0 && (
-            <Button type="button" variant="outline" onClick={exportCsv}>
-              <Download className="size-3.5 mr-1.5" />
-              Export CSV
-            </Button>
+      ),
+    },
+    {
+      header: "Contact Info",
+      accessor: (r) => (
+        <div className="space-y-0.5 text-xs text-white/80">
+          {r.email && (
+            <div className="flex items-center gap-1 truncate text-emerald-400">
+              <Mail className="size-3 shrink-0" />
+              <span className="truncate">{r.email}</span>
+            </div>
           )}
+          {r.phone && (
+            <div className="flex items-center gap-1 truncate text-white/60">
+              <Phone className="size-3 shrink-0" />
+              <span className="truncate">{r.phone}</span>
+            </div>
+          )}
+          {!r.email && !r.phone && <span className="text-white/40">—</span>}
+        </div>
+      ),
+    },
+    {
+      header: "Opportunity Tags",
+      accessor: (r) => (
+        <div className="flex flex-wrap gap-1">
+          {(r.opportunity_tags || []).slice(0, 2).map((t, i) => (
+            <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.06] text-white/70 border border-white/10">
+              {t.replace("_", " ")}
+            </span>
+          ))}
+        </div>
+      ),
+    },
+  ];
+
+  const FilterForm = (
+    <>
+      <label className="block space-y-1.5">
+        <span className="text-xs font-medium text-white/70">Business Category</span>
+        <input
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          placeholder="dentists, roofers, law firms..."
+          className="w-full h-9 px-3 rounded-lg border border-white/10 bg-white/[0.03] text-xs text-white placeholder:text-white/30 outline-none focus:border-white/30"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") mut.mutate();
+          }}
+        />
+      </label>
+
+      <label className="block space-y-1.5">
+        <span className="text-xs font-medium text-white/70">City / Location</span>
+        <input
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          placeholder="Austin TX, Toronto, Dhaka..."
+          className="w-full h-9 px-3 rounded-lg border border-white/10 bg-white/[0.03] text-xs text-white placeholder:text-white/30 outline-none focus:border-white/30"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") mut.mutate();
+          }}
+        />
+      </label>
+
+      <div className="space-y-1.5 pt-2">
+        <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">Quick Categories</span>
+        <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto no-scrollbar">
+          {CATEGORY_SUGGESTIONS.map((c) => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => setCategory(c)}
+              className={`glass-pill px-2.5 py-1 text-[11px] font-medium ${
+                category.toLowerCase() === c.toLowerCase() ? "bg-white/20 text-white" : "text-white/60 hover:text-white"
+              }`}
+            >
+              {c}
+            </button>
+          ))}
         </div>
       </div>
+    </>
+  );
 
-      {mut.isPending && (
-        <p className="text-sm text-muted-foreground mb-4">
-          Collecting listings and harvesting contacts — this can take up to a minute…
-        </p>
-      )}
-
-      {!mut.isPending && rows.length > 0 && (
-        <div className="space-y-3 pb-8">
-          <div className="space-y-2">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
-              Opportunity filters
+  return (
+    <div className="h-full flex overflow-hidden bg-[#0a0a0b] text-white">
+      {/* Main Content Area */}
+      <div className="flex-1 min-w-0 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+        {/* Header Title & Actions */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-1.5 text-xs text-white/50 uppercase tracking-wider font-semibold mb-1">
+              <Store className="size-3.5" />
+              <span>Business Lead Generation</span>
+            </div>
+            <h1 className="text-2xl font-semibold tracking-tight text-white">Businesses</h1>
+            <p className="text-xs text-white/60 mt-1 max-w-xl">
+              Live listings with scraped emails, phone numbers, website status, and outreach signals.
             </p>
-            <div className="flex flex-wrap gap-1.5">
-              {FILTERS.map((f) => (
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            {rows.length > 0 && (
+              <button
+                type="button"
+                onClick={exportCsv}
+                className="glass-pill px-3.5 py-1.5 text-xs font-medium text-white/80 hover:text-white flex items-center gap-1.5"
+              >
+                <Download className="size-3.5" />
+                <span>Export CSV</span>
+              </button>
+            )}
+            <ViewToggle mode={viewMode} onChange={setViewMode} />
+          </div>
+        </div>
+
+        {/* Opportunity Filter Chips */}
+        {rows.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {OPPORTUNITY_FILTERS.map((f) => {
+              const active = filter === f.id;
+              const count = f.id === "all" ? rows.length : rows.filter((r) => r.opportunity_tags?.includes(f.id as OpportunityTag)).length;
+              return (
                 <button
                   key={f.id}
                   type="button"
                   onClick={() => setFilter(f.id)}
-                  className={chipClass(filter === f.id)}
+                  className={`glass-pill px-3 py-1.5 text-xs font-medium transition-all ${
+                    active ? "bg-white/20 text-white border-white/30" : "text-white/60 hover:text-white hover:bg-white/10"
+                  }`}
                 >
-                  {f.label}
-                  {f.id !== "all" && (
-                    <span className="opacity-60 ml-1">
-                      {rows.filter((r) => r.opportunity_tags?.includes(f.id as OpportunityTag)).length}
-                    </span>
-                  )}
+                  <span>{f.label}</span>
+                  <span className="ml-1.5 text-[10px] opacity-60">({count})</span>
                 </button>
-              ))}
-            </div>
+              );
+            })}
           </div>
-          <p className="text-sm text-muted-foreground">
-            {filtered.length} businesses
-            {filtered.filter((r) => r.email).length
-              ? ` · ${filtered.filter((r) => r.email).length} with email`
-              : ""}
-            {filtered.filter((r) => r.phone).length
-              ? ` · ${filtered.filter((r) => r.phone).length} with phone`
-              : ""}
-          </p>
-          <LocalBusinessesGrid rows={filtered} />
-        </div>
-      )}
+        )}
 
-      {!mut.isPending && !rows.length && (
-        <p className="text-sm text-muted-foreground">
-          Tap a category and location above, then search. After results load, filter by no website /
-          SEO poor to find businesses that need your services.
-        </p>
-      )}
+        {/* Loading State */}
+        {mut.isPending && (
+          <div className="liquid-glass rounded-2xl p-12 text-center text-sm text-white/60">
+            <RefreshCw className="size-5 animate-spin mx-auto mb-3 text-white/40" />
+            <p>Collecting local listings & harvesting contacts...</p>
+          </div>
+        )}
+
+        {/* Results */}
+        {!mut.isPending && rows.length > 0 && (
+          <div>
+            <div className="text-xs text-white/50 mb-3">{filtered.length} local businesses listed</div>
+            {viewMode === "grid" ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {filtered.map((r, idx) => {
+                  const key = `${r.name}-${r.address || idx}`;
+                  const tags = (r.opportunity_tags || []).map((t) => t.replace("_", " "));
+                  return (
+                      <EntityCard
+                        key={key}
+                        id={key}
+                        title={r.name}
+                        subtitle={r.category || "Local Business"}
+                        category={r.email ? "Has Email" : "Listing"}
+                        location={r.address || undefined}
+                        stats={[
+                          { label: "Phone", value: r.phone ? "Available" : "None" },
+                          { label: "Email", value: r.email ? "Verified" : "None" },
+                          { label: "Website", value: r.website ? "Yes" : "No" },
+                        ]}
+                        tags={tags}
+                        description={r.description || undefined}
+                        saved={bookmarkedKeys.has(key)}
+                        onSaveToggle={() => toggleBookmark(key)}
+                        primaryActionLabel="View Details"
+                        onViewDetails={() => openDetailView(r)}
+                        onClick={() => openDetailView(r)}
+                      />
+                    );
+                  })}
+                </div>
+              ) : (
+                <EntityTable
+                  rows={filtered}
+                  keyExtractor={(r) => `${r.name}-${r.address || ""}`}
+                  columns={tableColumns}
+                  onBookmark={(r) => toggleBookmark(`${r.name}-${r.address || ""}`)}
+                  isBookmarked={(r) => bookmarkedKeys.has(`${r.name}-${r.address || ""}`)}
+                  onRowClick={openDetailView}
+                />
+              )}
+
+          </div>
+        )}
+
+        {!mut.isPending && !rows.length && (
+          <div className="liquid-glass rounded-2xl p-12 text-center text-sm text-white/60 space-y-3">
+            <Store className="size-8 mx-auto text-white/30" />
+            <h3 className="text-base font-semibold text-white">Find Businesses</h3>
+            <p className="max-w-md mx-auto text-xs text-white/50 leading-relaxed">
+              Enter a category and city on the right to discover businesses with public contact info.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Right Rail Filter Panel */}
+      <div
+        className={`hidden lg:block relative shrink-0 border-l border-white/10 bg-black/20 transition-all duration-300 ${
+          filtersCollapsed ? "w-48 p-4" : "w-80 max-w-[28vw] p-5"
+        }`}
+      >
+        <div className="w-full h-full">
+          <FilterPanel
+            title="Find Businesses"
+            subtitle="Search category & location"
+            onApply={() => {
+              if (category.trim().length < 2 || location.trim().length < 2) {
+                toast.error("Enter a category and location");
+                return;
+              }
+              mut.mutate();
+            }}
+            isPending={mut.isPending}
+            applyLabel="Search Businesses"
+            usage={usageQuery.data ?? undefined}
+            onToggleCollapse={() => setFiltersCollapsed(!filtersCollapsed)}
+            isCollapsed={filtersCollapsed}
+          >
+            {FilterForm}
+          </FilterPanel>
+        </div>
+      </div>
+
+      {/* Detail View Drawer */}
+      <Company360View data={selectedEntity} onClose={() => setSelectedEntity(null)} />
     </div>
   );
 }

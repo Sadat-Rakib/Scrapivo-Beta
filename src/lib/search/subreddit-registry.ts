@@ -19,7 +19,8 @@ export const SUBREDDIT_REGISTRY: SubredditSource[] = [
     subreddit: "forhire",
     requireFlair: "Hiring",
     intentSignalStrength: "very_high",
-    notes: "Best buyer-intent source on Reddit. Must filter [Hiring] flair or results are polluted with provider posts.",
+    notes:
+      "Best buyer-intent source on Reddit. Must filter [Hiring] flair or results are polluted with provider posts.",
   },
   { subreddit: "hiring", intentSignalStrength: "very_high" },
   { subreddit: "WorkOnline", intentSignalStrength: "high" },
@@ -74,7 +75,11 @@ export const SUBREDDIT_REGISTRY: SubredditSource[] = [
   { subreddit: "SideProject", requireBuyerIntent: true, intentSignalStrength: "low" },
   // Tutor / student demand — HomeworkHelp titles rarely say "tutor"; treat as
   // help-seeking communities (no Hiring flair required).
-  { subreddit: "HomeworkHelp", intentSignalStrength: "high", notes: "Students stuck on homework — buyer for tutors" },
+  {
+    subreddit: "HomeworkHelp",
+    intentSignalStrength: "high",
+    notes: "Students stuck on homework — buyer for tutors",
+  },
   { subreddit: "tutors", intentSignalStrength: "high" },
   { subreddit: "Teachers", requireBuyerIntent: true, intentSignalStrength: "medium" },
   { subreddit: "learnprogramming", requireBuyerIntent: true, intentSignalStrength: "medium" },

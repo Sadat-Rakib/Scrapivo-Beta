@@ -15,8 +15,7 @@ export function buildProjectQuery(p: ProjectQueryInput): string {
   const svc = (p.service || "").trim();
   // "all" / "anyone" / "any niche" → no niche clause (search all categories).
   const niche = normalizeNiche(p.niche);
-  const loc =
-    p.location && !isAnywhereLocation(p.location) ? ` in ${p.location.trim()}` : "";
+  const loc = p.location && !isAnywhereLocation(p.location) ? ` in ${p.location.trim()}` : "";
   if (!svc && !niche) return "";
 
   if (p.goal === "jobs") {

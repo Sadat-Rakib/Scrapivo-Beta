@@ -23,7 +23,10 @@ export function Footer({ cta }: { cta: string }) {
       speed: 0.2 + Math.random() * 0.6,
       alpha: 0.05 + Math.random() * 0.1,
     }));
-    const resize = () => { c.width = c.offsetWidth; c.height = c.offsetHeight; };
+    const resize = () => {
+      c.width = c.offsetWidth;
+      c.height = c.offsetHeight;
+    };
     resize();
     window.addEventListener("resize", resize);
     const tick = () => {
@@ -36,13 +39,18 @@ export function Footer({ cta }: { cta: string }) {
         ctx.lineTo(c.width, l.y);
         ctx.stroke();
         l.y += l.speed;
-        if (l.y > c.height) { l.y = -10; l.alpha = 0.05 + Math.random() * 0.1; }
+        if (l.y > c.height) {
+          l.y = -10;
+          l.alpha = 0.05 + Math.random() * 0.1;
+        }
       }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", resize); };
-
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", resize);
+    };
   }, []);
 
   // 2) Parallax wordmark
@@ -67,7 +75,10 @@ export function Footer({ cta }: { cta: string }) {
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("scroll", onScroll); };
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   // 3) Live UTC clock
@@ -106,8 +117,8 @@ export function Footer({ cta }: { cta: string }) {
             className="text-2xl sm:text-3xl md:text-4xl font-light tracking-tight max-w-2xl"
             style={{ color: "var(--text-primary)" }}
           >
-            Scrapivo finds buyers before they find you — scanning the open web
-            for real, active intent, every single day.
+            Scrapivo finds buyers before they find you — scanning the open web for real, active
+            intent, every single day.
           </p>
           <div className="flex flex-col gap-4">
             <Link to={cta}>
@@ -134,33 +145,51 @@ export function Footer({ cta }: { cta: string }) {
         </div>
 
         {/* Nav columns */}
-        <div className="grid gap-10 md:grid-cols-4 py-12 border-b" style={{ borderColor: "var(--border-subtle)" }}>
-          <FooterCol heading="Product" links={[
-            { l: "Features", h: "#features" },
-            { l: "Testimonials", h: "#testimonials" },
-            { l: "FAQ", h: "#faq" },
-            { l: "Pricing", h: "#" },
-          ]} />
-          <FooterCol heading="Resources" links={[
-            { l: "Blog", h: "#" },
-            { l: "Source coverage", h: "#features" },
-            { l: "Changelog", h: "#" },
-            { l: "Status", h: "#" },
-          ]} />
-          <FooterCol heading="Company" links={[
-            { l: "About", h: "#" },
-            { l: "Contact", h: "mailto:hello@scrapivo.app" },
-            { l: "Privacy", h: "#" },
-            { l: "Terms", h: "#" },
-          ]} />
+        <div
+          className="grid gap-10 md:grid-cols-4 py-12 border-b"
+          style={{ borderColor: "var(--border-subtle)" }}
+        >
+          <FooterCol
+            heading="Product"
+            links={[
+              { l: "Features", h: "#features" },
+              { l: "Testimonials", h: "#testimonials" },
+              { l: "FAQ", h: "#faq" },
+              { l: "Pricing", h: "#" },
+            ]}
+          />
+          <FooterCol
+            heading="Resources"
+            links={[
+              { l: "Blog", h: "#" },
+              { l: "Source coverage", h: "#features" },
+              { l: "Changelog", h: "#" },
+              { l: "Status", h: "#" },
+            ]}
+          />
+          <FooterCol
+            heading="Company"
+            links={[
+              { l: "About", h: "#" },
+              { l: "Contact", h: "mailto:hello@scrapivo.app" },
+              { l: "Privacy", h: "#" },
+              { l: "Terms", h: "#" },
+            ]}
+          />
           <div>
-            <div className="text-[10px] uppercase tracking-[0.22em] mb-4" style={{ color: "var(--text-tertiary)" }}>
+            <div
+              className="text-[10px] uppercase tracking-[0.22em] mb-4"
+              style={{ color: "var(--text-tertiary)" }}
+            >
               Newsletter
             </div>
             <form
               onSubmit={(e) => e.preventDefault()}
               className="flex items-center rounded-full border overflow-hidden"
-              style={{ borderColor: "var(--border-default)", backgroundColor: "var(--bg-elevated)" }}
+              style={{
+                borderColor: "var(--border-default)",
+                backgroundColor: "var(--bg-elevated)",
+              }}
             >
               <input
                 type="email"
@@ -168,17 +197,30 @@ export function Footer({ cta }: { cta: string }) {
                 className="flex-1 bg-transparent px-4 py-2.5 text-sm outline-none"
                 style={{ color: "var(--text-primary)" }}
               />
-              <button type="submit" className="px-4 py-2.5" aria-label="Subscribe" style={{ color: "var(--accent-warm)" }}>
+              <button
+                type="submit"
+                className="px-4 py-2.5"
+                aria-label="Subscribe"
+                style={{ color: "var(--accent-warm)" }}
+              >
                 <ArrowUpRight className="size-4" />
               </button>
             </form>
             <div className="flex items-center gap-2 mt-5">
-              <a href="#" aria-label="X" className="size-9 rounded-full border flex items-center justify-center"
-                 style={{ borderColor: "var(--border-subtle)", color: "var(--text-secondary)" }}>
+              <a
+                href="#"
+                aria-label="X"
+                className="size-9 rounded-full border flex items-center justify-center"
+                style={{ borderColor: "var(--border-subtle)", color: "var(--text-secondary)" }}
+              >
                 <Twitter className="size-4" />
               </a>
-              <a href="#" aria-label="GitHub" className="size-9 rounded-full border flex items-center justify-center"
-                 style={{ borderColor: "var(--border-subtle)", color: "var(--text-secondary)" }}>
+              <a
+                href="#"
+                aria-label="GitHub"
+                className="size-9 rounded-full border flex items-center justify-center"
+                style={{ borderColor: "var(--border-subtle)", color: "var(--text-secondary)" }}
+              >
                 <Github className="size-4" />
               </a>
             </div>
@@ -186,7 +228,10 @@ export function Footer({ cta }: { cta: string }) {
         </div>
 
         {/* Layered wordmark */}
-        <div ref={wordmarkRef} className="relative h-[160px] sm:h-[220px] my-10 select-none overflow-hidden">
+        <div
+          ref={wordmarkRef}
+          className="relative h-[160px] sm:h-[220px] my-10 select-none overflow-hidden"
+        >
           {[0, 1, 2, 3].map((i) => (
             <span
               key={i}
@@ -195,10 +240,13 @@ export function Footer({ cta }: { cta: string }) {
               style={{
                 fontSize: "clamp(80px, 18vw, 220px)",
                 color:
-                  i === 0 ? "rgba(255,255,255,0.06)" :
-                  i === 1 ? "rgba(255,255,255,0.10)" :
-                  i === 2 ? "rgba(245,245,247,0.18)" :
-                            "var(--text-primary)",
+                  i === 0
+                    ? "rgba(255,255,255,0.06)"
+                    : i === 1
+                      ? "rgba(255,255,255,0.10)"
+                      : i === 2
+                        ? "rgba(245,245,247,0.18)"
+                        : "var(--text-primary)",
                 WebkitTextStroke: i === 2 ? "0.5px rgba(245,245,247,0.3)" : "0",
                 zIndex: i,
                 mixBlendMode: i === 3 ? "normal" : "screen",
@@ -207,7 +255,6 @@ export function Footer({ cta }: { cta: string }) {
               SCRAPIVO
             </span>
           ))}
-
         </div>
 
         {/* Bottom row */}
@@ -231,18 +278,23 @@ export function Footer({ cta }: { cta: string }) {
   );
 }
 
-function FooterCol({
-  heading, links,
-}: { heading: string; links: { l: string; h: string }[] }) {
+function FooterCol({ heading, links }: { heading: string; links: { l: string; h: string }[] }) {
   return (
     <div>
-      <div className="text-[10px] uppercase tracking-[0.22em] mb-4" style={{ color: "var(--text-tertiary)" }}>
+      <div
+        className="text-[10px] uppercase tracking-[0.22em] mb-4"
+        style={{ color: "var(--text-tertiary)" }}
+      >
         {heading}
       </div>
       <ul className="space-y-2.5">
         {links.map((n) => (
           <li key={n.l}>
-            <a href={n.h} className="text-sm transition-colors" style={{ color: "var(--text-secondary)" }}>
+            <a
+              href={n.h}
+              className="text-sm transition-colors"
+              style={{ color: "var(--text-secondary)" }}
+            >
               {n.l}
             </a>
           </li>

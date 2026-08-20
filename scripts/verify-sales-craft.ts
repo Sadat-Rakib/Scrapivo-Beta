@@ -9,11 +9,7 @@
  *
  *   npx tsx scripts/verify-sales-craft.ts
  */
-import {
-  isOffSkillRole,
-  isSellerOrProviderLead,
-  validateLeads,
-} from "../src/lib/validation";
+import { isOffSkillRole, isSellerOrProviderLead, validateLeads } from "../src/lib/validation";
 import type { Lead } from "../src/lib/scoring";
 import { classifyQuery } from "../src/lib/search/query-classifier";
 import { expandFromClassified } from "../src/lib/search/query-expander";
@@ -25,7 +21,8 @@ function lead(over: Partial<Lead> & { title: string }): Lead {
     title: over.title,
     snippet: over.snippet ?? over.title,
     full_post_url:
-      over.full_post_url ?? `https://linkedin.com/posts/demo_${Math.random().toString(36).slice(2)}`,
+      over.full_post_url ??
+      `https://linkedin.com/posts/demo_${Math.random().toString(36).slice(2)}`,
     author: over.author ?? "Jane Founder",
     demand_verified: over.demand_verified ?? true,
     ...over,
@@ -53,10 +50,7 @@ const check = (name: string, ok: boolean) => {
 
 console.log("\nSales craft — sales titles must KEEP ─────────────────────");
 for (const t of salesKeep) {
-  check(
-    `offSkill "${t}"`,
-    !isOffSkillRole(lead({ title: t }), "sales", ["selling", "sdr", "bdr"]),
-  );
+  check(`offSkill "${t}"`, !isOffSkillRole(lead({ title: t }), "sales", ["selling", "sdr", "bdr"]));
   check(
     `seller  "${t}"`,
     !isSellerOrProviderLead(lead({ title: t, source: "linkedin" }), "sales", ["selling", "sdr"]),
@@ -65,7 +59,10 @@ for (const t of salesKeep) {
 
 console.log("\nDesign craft — sales-at-design-agency must DROP ──────────");
 for (const t of designDrop) {
-  check(`offSkill "${t}"`, isOffSkillRole(lead({ title: t, source: "reddit" }), "design", ["logo"]));
+  check(
+    `offSkill "${t}"`,
+    isOffSkillRole(lead({ title: t, source: "reddit" }), "design", ["logo"]),
+  );
 }
 
 console.log("\nFull validate on a sales search keeps social ─────────────");

@@ -86,12 +86,26 @@ export type OpportunityTag =
   | "has_email"
   | "has_phone"
   | "seo_poor"
-  | "sales_ready";
+  | "sales_ready"
+  | "verified_no_website"
+  | "website_unreachable"
+  | "weak_https"
+  | "poor_design"
+  | "not_mobile_friendly"
+  | "no_social"
+  | "weak_presence"
+  | "incomplete_listing"
+  | "no_email_public"
+  | "no_contact_form";
+
+/** Provenance for website presence — not the same as “no URL in listing”. */
+export type WebsiteStatus = "listed" | "verified_no_website" | "unreachable" | "unknown";
 
 export type LocalBusinessRow = {
   key: string;
   name: string;
   category?: string;
+  address?: string;
   phone?: string;
   email?: string;
   website?: string;
@@ -102,31 +116,60 @@ export type LocalBusinessRow = {
   email_verified?: boolean;
   verify_note?: string;
   score: number;
-  /** Opportunity filters for agency ICP (no website, SEO-poor, contacts, …). */
+  /** Opportunity filters — evidence-only, never invented rank/traffic. */
   opportunity_tags?: OpportunityTag[];
+  /** Explicit website evidence for agency outreach. */
+  website_status?: WebsiteStatus;
+  /** Evidence claims for personalization / opportunity scoring. */
+  evidence?: import("@/lib/intelligence/evidence").EvidenceClaim[];
+  /** Canonical entity id when resolved. */
+  entity_id?: string;
 };
 
-/** Derive filterable opportunity tags from a local business row. */
+/** Derive filterable opportunity tags from observed fields only. */
 export function deriveOpportunityTags(
-  row: Pick<LocalBusinessRow, "website" | "email" | "phone" | "email_verified"> & {
+  row: Pick<
+    LocalBusinessRow,
+    "website" | "email" | "phone" | "email_verified" | "website_status" | "address"
+  > & {
     https?: boolean;
     thinPage?: boolean;
     missingMeta?: boolean;
+    noViewport?: boolean;
+    hasSocial?: boolean;
+    hasForm?: boolean;
   },
 ): OpportunityTag[] {
   const tags: OpportunityTag[] = [];
+  const status = row.website_status;
   if (row.website) tags.push("has_website");
+  else if (status === "verified_no_website") tags.push("verified_no_website", "no_website");
+  else if (status === "unreachable") tags.push("website_unreachable", "no_website");
   else tags.push("no_website");
   if (row.email) tags.push("has_email");
   if (row.phone) tags.push("has_phone");
-  if (
-    !row.website ||
-    row.https === false ||
-    row.thinPage === true ||
-    row.missingMeta === true
-  ) {
-    if (row.website) tags.push("seo_poor");
+  if (row.https === false && row.website) tags.push("weak_https", "seo_poor");
+  else if (row.website && (row.thinPage === true || row.missingMeta === true)) {
+    tags.push("seo_poor");
   }
+  if (
+    row.website &&
+    (row.thinPage === true || row.noViewport === true || row.missingMeta === true)
+  ) {
+    tags.push("poor_design");
+  }
+  if (row.website && row.noViewport === true) tags.push("not_mobile_friendly");
+  if (row.website && row.hasSocial === false) tags.push("no_social");
+  if (row.website && row.hasForm === false) tags.push("no_contact_form");
+  if (
+    row.website &&
+    !row.email &&
+    (row.hasForm !== undefined || row.thinPage !== undefined || row.missingMeta !== undefined)
+  ) {
+    tags.push("no_email_public");
+  }
+  if (!row.address || !row.phone) tags.push("incomplete_listing");
+  if (!row.website && !row.email && !row.phone) tags.push("weak_presence");
   if ((row.email || row.phone) && (row.email_verified || row.phone)) {
     tags.push("sales_ready");
   }
@@ -155,10 +198,17 @@ export function buildLocalBusinesses(rawLeads: Lead[]): LocalBusinessRow[] {
   }
   return Array.from(by.entries())
     .map(([key, l]) => {
-      const ext = l as Lead & { company?: string; company_domain?: string; emails?: string[]; phones?: string[] };
-      const website = l.full_post_url?.startsWith("http") && !/openstreetmap\.org/i.test(l.full_post_url)
-        ? l.full_post_url
-        : undefined;
+      const ext = l as Lead & {
+        company?: string;
+        company_domain?: string;
+        emails?: string[];
+        phones?: string[];
+        address?: string;
+      };
+      const website =
+        l.full_post_url?.startsWith("http") && !/openstreetmap\.org/i.test(l.full_post_url)
+          ? l.full_post_url
+          : undefined;
       const domain =
         ext.company_domain ||
         (website
@@ -170,15 +220,18 @@ export function buildLocalBusinesses(rawLeads: Lead[]): LocalBusinessRow[] {
               }
             })()
           : undefined);
+      const address = ext.address || undefined;
       return {
         key,
         name: ext.company || l.author || l.title || key,
         category: l.platform_label || l.platform,
+        address,
         phone: ext.phones?.[0],
         email: ext.emails?.[0],
         website,
         domain,
         description:
+          address ||
           l.why_match ||
           l.snippet ||
           `${ext.company || l.title} — local business listing`,
@@ -189,6 +242,7 @@ export function buildLocalBusinesses(rawLeads: Lead[]): LocalBusinessRow[] {
           website,
           email: ext.emails?.[0],
           phone: ext.phones?.[0],
+          address,
         }),
       } satisfies LocalBusinessRow;
     })
@@ -215,6 +269,9 @@ const COMPANY_AUTHOR_SOURCES = new Set([
   "recruitee",
   "greenhouse",
   "lever",
+  "githubjobs",
+  "githubhiring",
+  "jobcatalog",
   "google_jobs",
   "wellfound",
   "workatastartup",
@@ -1042,8 +1099,7 @@ function relativeAge(iso?: string): string | undefined {
   return d === 1 ? "1 day ago" : `${d} days ago`;
 }
 
-const BUYER_ASK_RE =
-  /\b(looking for|need a|need an|hiring|who can|willing to pay|asking for)\b/i;
+const BUYER_ASK_RE = /\b(looking for|need a|need an|hiring|who can|willing to pay|asking for)\b/i;
 
 /** Compose a short About line for company drawers from the best signal lead. */
 function companyDescription(name: string, best: Lead, craftHint?: string): string {

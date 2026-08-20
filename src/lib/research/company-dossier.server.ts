@@ -6,10 +6,7 @@
 import { resolveCompanyDomain, domainsInText } from "@/lib/contact/contact-finder.server";
 import { fetchPageContent } from "@/lib/search/page-enrichment.server";
 import { resilientText } from "@/lib/search/http-fetch.server";
-import {
-  condensePageText,
-  validateFetchedPage,
-} from "@/lib/search/fetch-gate.server";
+import { condensePageText, validateFetchedPage } from "@/lib/search/fetch-gate.server";
 
 export type VerifiedHook = {
   claim: string;
@@ -67,19 +64,23 @@ async function fetchPlainPage(
 }
 
 function guessCompanyName(leadTitle: string, leadAuthor?: string, leadSnippet?: string): string {
-  if (leadAuthor && leadAuthor.length > 1 && leadAuthor.length < 80 && !/anon|unknown|reddit/i.test(leadAuthor)) {
+  if (
+    leadAuthor &&
+    leadAuthor.length > 1 &&
+    leadAuthor.length < 80 &&
+    !/anon|unknown|reddit/i.test(leadAuthor)
+  ) {
     return leadAuthor.trim();
   }
   const fromTitle = leadTitle.split(/[@—|:-]/)[0]?.trim();
   if (fromTitle && fromTitle.length > 1 && fromTitle.length < 80) return fromTitle;
-  const m = (leadSnippet || "").match(/\b(?:at|@)\s+([A-Z][\w&.-]{1,40}(?:\s+[A-Z][\w&.-]{1,30}){0,2})/);
+  const m = (leadSnippet || "").match(
+    /\b(?:at|@)\s+([A-Z][\w&.-]{1,40}(?:\s+[A-Z][\w&.-]{1,30}){0,2})/,
+  );
   return m?.[1]?.trim() || fromTitle || "Unknown company";
 }
 
-async function collectDomainPages(
-  domain: string,
-  companyName?: string,
-): Promise<DossierPage[]> {
+async function collectDomainPages(domain: string, companyName?: string): Promise<DossierPage[]> {
   const paths: Array<{ path: string; source_type: VerifiedHook["source_type"] }> = [
     { path: "/", source_type: "website" },
     { path: "/about", source_type: "about" },

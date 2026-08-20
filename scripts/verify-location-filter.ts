@@ -22,7 +22,10 @@ function check(name: string, ok: boolean, detail?: string) {
   if (!ok) fails++;
 }
 
-check("no location always pass", passesLocationFilter(lead({ title: "Need writer in Berlin" }), null));
+check(
+  "no location always pass",
+  passesLocationFilter(lead({ title: "Need writer in Berlin" }), null),
+);
 check(
   "India match",
   passesLocationFilter(lead({ title: "Need writer in Mumbai, India" }), "India"),

@@ -39,7 +39,11 @@ export function SavedRail({
             <span className="font-medium text-sm">Saved</span>
             <span className="text-xs text-muted-foreground">({leads.length})</span>
           </div>
-          <Link to="/saved" aria-label="Open all saved" className="p-1 rounded hover:bg-accent text-muted-foreground">
+          <Link
+            to="/saved"
+            aria-label="Open all saved"
+            className="p-1 rounded hover:bg-accent text-muted-foreground"
+          >
             <MoreHorizontal className="size-4" />
           </Link>
         </div>

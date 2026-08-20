@@ -23,20 +23,20 @@
 // anywhere in the post, which converts better on formal platforms.
 // ---------------------------------------------------------------------
 export const INTENT_TEMPLATES: string[] = [
-  'looking for a {role}',
-  'need a {role}',
-  'hiring a {role}',
-  'hiring {role}s',
-  'anyone know a good {role}',
-  'can anyone recommend a {role}',
-  '{role} needed',
-  '{role} wanted',
+  "looking for a {role}",
+  "need a {role}",
+  "hiring a {role}",
+  "hiring {role}s",
+  "anyone know a good {role}",
+  "can anyone recommend a {role}",
+  "{role} needed",
+  "{role} wanted",
   '"we\'re hiring" "{role}"',
   '"we are hiring" "{role}"',
   '"open role" "{role}"',
   // Want/need demand phrasing — buyers who aren't posting a formal job:
   // "I need someone to build…", "willing to pay", "who can help with…".
-  'i need a {role}',
+  "i need a {role}",
   '"i want" "{role}"',
   '"willing to pay" "{role}"',
   '"who can help" "{role}"',
@@ -78,7 +78,7 @@ export const PLATFORM_SCOPES: Record<string, string> = {
   // YouTube videos/channels indexed by search engines + captions
   youtube: "site:youtube.com",
   // Company About / careers pages (public firmographic signals)
-  company_pages: 'inurl:about OR inurl:careers OR inurl:jobs',
+  company_pages: "inurl:about OR inurl:careers OR inurl:jobs",
   // Software review sites — competitor-comparison / dissatisfaction signals
   reviews: "site:g2.com OR site:capterra.com",
 };
@@ -151,11 +151,7 @@ export const PLATFORM_PHRASE_PRIORITY: Record<string, number[]> = {
 // exclusion, NOT a host exclusion. Callers wanting a true host filter should
 // pass `-site:indeed.com` etc. via `exclusions`. Kept as spec'd by default,
 // caller-overridable.
-export const DEFAULT_EXCLUSIONS: string[] = [
-  '-"open to work"',
-  "-jobs.com",
-  "-indeed.com",
-];
+export const DEFAULT_EXCLUSIONS: string[] = ['-"open to work"', "-jobs.com", "-indeed.com"];
 
 // SearXNG time_range values. dateRange maps onto these.
 export type DateRange = "day" | "week" | "month" | "year" | "";
@@ -210,14 +206,16 @@ export interface DorkQueryPlanEntry {
  * `AI "engineer` from breaking phrase matching.
  */
 export function sanitizeRole(role: string): string {
-  return (role || "")
-    .replace(/["'()]/g, " ")
-    .replace(/\bOR\b|\bAND\b/gi, " ")
-    // Strip any leaked search operators so a garbled role can't inject scope.
-    .replace(/-?\b(?:site|intitle|inurl|intext|filetype|around)\s*:/gi, " ")
-    .replace(/around\s*\(\s*\d+\s*\)/gi, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  return (
+    (role || "")
+      .replace(/["'()]/g, " ")
+      .replace(/\bOR\b|\bAND\b/gi, " ")
+      // Strip any leaked search operators so a garbled role can't inject scope.
+      .replace(/-?\b(?:site|intitle|inurl|intext|filetype|around)\s*:/gi, " ")
+      .replace(/around\s*\(\s*\d+\s*\)/gi, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+  );
 }
 
 function fillTemplate(tpl: string, role: string): string {
@@ -252,11 +250,7 @@ function scopePriority(key: string): number {
   return PLATFORM_CONVERSION_PRIORITY[key] ?? 3;
 }
 
-function orderTemplatesForScope(
-  scopeKey: string,
-  templates: string[],
-  tuned: boolean,
-): string[] {
+function orderTemplatesForScope(scopeKey: string, templates: string[], tuned: boolean): string[] {
   if (!tuned) return templates;
   const order = PLATFORM_PHRASE_PRIORITY[scopeKey];
   if (!order) return templates;

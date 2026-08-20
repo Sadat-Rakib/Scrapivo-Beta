@@ -99,8 +99,8 @@ export function ScrapivoLandingFooter({
           <div className="cta-eyebrow">SCRAPIVO</div>
           <h2 className="cta-title">Find buyers who already want you</h2>
           <p className="cta-desc">
-            Scan live public intent across the open web, scored Hot and Warm, segmented into
-            Posts, Companies, and People. Outreach stays draft-only until you send.
+            Scan live public intent across the open web, scored Hot and Warm, segmented into Posts,
+            Companies, and People. Outreach stays draft-only until you send.
           </p>
           <div className="cta-actions">
             <div className="cta-btn-wrap">

@@ -41,5 +41,9 @@ const nonReddit = Object.keys(by).filter((s) => s !== "reddit" && s !== "redditr
 const ok = dropped && (leads.length === 0 || nonReddit.length > 0);
 // Empty SerpAPI is a quota/network issue, not a code failure — still require seller drop.
 console.log(dropped ? "PASS seller" : "FAIL seller");
-console.log(leads.length > 0 ? `PASS serpapi volume (${leads.length})` : "WARN serpapi empty (quota/network?)");
+console.log(
+  leads.length > 0
+    ? `PASS serpapi volume (${leads.length})`
+    : "WARN serpapi empty (quota/network?)",
+);
 process.exit(dropped ? 0 : 1);

@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { buildProjectQuery } from "@/lib/project-query";
 import { displaySearchLabel, scrapyAckReply, toPlainSearchQuery } from "@/lib/display-query";
-import { runSearch } from "@/lib/search.functions";
+import { runSearch, getRemainingSearches } from "@/lib/search.functions";
 import { aiChat } from "@/lib/ai-chat.functions";
 import { saveLead, listSavedLeads } from "@/lib/leads.functions";
 import { createSignalWatch } from "@/lib/campaigns.functions";
@@ -20,7 +20,8 @@ import { OnboardingWizard, type OnboardingAnswers } from "@/components/discover/
 import type { Lead } from "@/lib/scoring";
 import type { CompanyRow, PersonRow, LocalBusinessRow } from "@/lib/search/lead-segments";
 import { LeadDetailPanel } from "@/components/lead-detail-panel";
-import { WelcomeHero } from "@/components/discover/welcome-hero";
+import { DiscoverWelcomeHero } from "@/components/discover/discover-welcome-hero";
+
 import {
   UnifiedComposer,
   type ComposerHandle,
@@ -40,7 +41,6 @@ import {
   type ResolvedContactInfo,
 } from "@/components/discover/result-tabs";
 import { EntityDetailPanel, type SelectedEntity } from "@/components/discover/entity-detail-panel";
-import { SavedRail } from "@/components/discover/saved-rail";
 import { Bell, Plus, X } from "lucide-react";
 import { SearchingSteps } from "@/components/discover/searching-steps";
 import { ClarifyPanel } from "@/components/discover/clarify-panel";
@@ -50,6 +50,7 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { mySupabase } from "@/integrations/my-supabase/client";
 
 export const Route = createFileRoute("/_authenticated/discover")({
   head: () => ({
@@ -73,12 +74,14 @@ function DiscoverPage() {
   const setActiveProj = useServerFn(setActiveProject);
   const getProfile = useServerFn(getMyProfile);
   const patchProfile = useServerFn(updateMyProfile);
+  const getUsage = useServerFn(getRemainingSearches);
 
   const savedQuery = useQuery({ queryKey: ["saved-leads"], queryFn: () => getSaved() });
   const savedLeads = savedQuery.data ?? [];
   const savedByUrl = new Map<string, any>(savedLeads.map((l: any) => [l.full_post_url, l]));
 
   const profileQuery = useQuery({ queryKey: ["my-profile"], queryFn: () => getProfile() });
+  const usageQuery = useQuery({ queryKey: ["usage"], queryFn: () => getUsage() });
 
   // ── Projects ("the 75% info") ────────────────────────────────────────────
   const projectsQuery = useQuery({ queryKey: ["projects"], queryFn: () => getProjects() });
@@ -159,8 +162,7 @@ function DiscoverPage() {
     };
     try {
       if (a.business_name?.trim() || a.service?.trim() || a.location?.trim()) {
-        const yoe =
-          a.experience_level === "5+" ? 6 : a.experience_level === "2-4" ? 3 : 1;
+        const yoe = a.experience_level === "5+" ? 6 : a.experience_level === "2-4" ? 3 : 1;
         void getProfile()
           .then((existing) => {
             const existingName = existing?.full_name?.trim() || "";
@@ -259,7 +261,6 @@ function DiscoverPage() {
   const [chatLog, setChatLog] = useState<ChatTurn[]>([]);
   const [chatOpen, setChatOpen] = useState(false);
   const returnChatOpenedRef = useRef(false);
-  const [railOpen, setRailOpen] = useState(false);
   const [contactBusyKey, setContactBusyKey] = useState<string | null>(null);
   const [contactByKey, setContactByKey] = useState<Record<string, ResolvedContactInfo>>({});
   const [selectedEntity, setSelectedEntity] = useState<SelectedEntity | null>(null);
@@ -420,8 +421,7 @@ function DiscoverPage() {
   const runSearchMut = useMutation({
     mutationFn: async (vars: string | { query: string; clarify?: ClarifyAnswers | null }) => {
       const q = typeof vars === "string" ? vars : vars.query;
-      const clarify =
-        typeof vars === "string" ? clarifyAnswers : (vars.clarify ?? clarifyAnswers);
+      const clarify = typeof vars === "string" ? clarifyAnswers : (vars.clarify ?? clarifyAnswers);
       const plain = toPlainSearchQuery(q) || q.trim();
       return search({
         data: {
@@ -708,52 +708,14 @@ function DiscoverPage() {
     returnChatKey,
   ]);
 
-  return (
-    <div className="flex h-full min-h-0">
-      <div className="flex-1 min-w-0 flex flex-col min-h-0">
-        <header className="h-14 md:h-16 px-4 md:px-6 flex items-center justify-between gap-2 shrink-0">
-          <h1 className="text-base md:text-lg font-semibold tracking-tight truncate">
-            AI Discover
-          </h1>
-          {projects.length > 0 && (
-            <div className="flex items-center gap-1.5 min-w-0">
-              <select
-                value={activeProject?.id ?? ""}
-                onChange={async (e) => {
-                  const id = e.target.value;
-                  const next = projects.find((p) => p.id === id);
-                  if (next) setInput(buildProjectQuery(next));
-                  if (id === "local" || projects.every((p) => p.id === "local")) return;
-                  try {
-                    await setActiveProj({ data: { id } });
-                    qc.invalidateQueries({ queryKey: ["projects"] });
-                  } catch (err: any) {
-                    toast.error(err?.message || "Could not switch project");
-                  }
-                }}
-                className="max-w-[180px] truncate rounded-lg border border-border bg-card px-2 py-1.5 text-xs outline-none"
-                title="Active project"
-              >
-                {projects.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-7 px-2 text-xs shrink-0"
-                title="Start the setup Q&A again for a new project"
-                onClick={() => setWizardOpen(true)}
-              >
-                <Plus className="size-3.5 mr-1" /> New project
-              </Button>
-            </div>
-          )}
-        </header>
+  const navigate = AuthRoute.useNavigate();
 
+  return (
+    <div className="h-full flex min-h-0 bg-[#0a0a0b] text-white">
+      <div className="flex-1 min-w-0 flex flex-col min-h-0">
         <div className="flex-1 min-h-0 overflow-y-auto px-4 md:px-6">
+
+
           {showOnboarding ? (
             <div className="h-full flex items-center justify-center py-6 md:py-10">
               <OnboardingWizard
@@ -769,7 +731,7 @@ function DiscoverPage() {
             </div>
           ) : showHero ? (
             <div className="h-full flex items-center justify-center py-6 md:py-10">
-              <WelcomeHero
+              <DiscoverWelcomeHero
                 greetingName={greetingName || undefined}
                 onFocusComposer={() => {
                   setMode("search");
@@ -804,87 +766,90 @@ function DiscoverPage() {
                 clarifyQs.length === 0 &&
                 !runSearchMut.isPending &&
                 (leads.length > 0 || companies.length > 0 || people.length > 0) && (
-                <div className="flex items-center justify-between gap-2">
-                  <div className="text-sm min-w-0">
-                    <span className="text-muted-foreground">Results for </span>
-                    <span className="font-medium">"{displaySearchLabel(activeQuery)}"</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-sm min-w-0">
+                      <span className="text-muted-foreground">Results for </span>
+                      <span className="font-medium">"{displaySearchLabel(activeQuery)}"</span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-7 text-xs"
+                        disabled={watchMut.isPending}
+                        onClick={() => watchMut.mutate(activeQuery)}
+                      >
+                        <Bell className="size-3 mr-1" /> Watch signal
+                      </Button>
+                      <button
+                        onClick={() => {
+                          clearWorkspace();
+                          setActiveQuery(null);
+                          setClarifyAnswers(null);
+                          setClarifyQs([]);
+                          setPendingQuery(null);
+                          setDefaultSummary("");
+                        }}
+                        className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+                      >
+                        <X className="size-3" /> Clear
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-7 text-xs"
-                      disabled={watchMut.isPending}
-                      onClick={() => watchMut.mutate(activeQuery)}
-                    >
-                      <Bell className="size-3 mr-1" /> Watch signal
-                    </Button>
-                    <button
-                      onClick={() => {
-                        clearWorkspace();
-                        setActiveQuery(null);
-                        setClarifyAnswers(null);
-                        setClarifyQs([]);
-                        setPendingQuery(null);
-                        setDefaultSummary("");
-                      }}
-                      className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
-                    >
-                      <X className="size-3" /> Clear
-                    </button>
-                  </div>
-                </div>
-              )}
+                )}
 
               {activeQuery &&
                 clarifyQs.length === 0 &&
                 !runSearchMut.isPending &&
-                (leads.length > 0 || companies.length > 0 || people.length > 0 || localRows.length > 0) && (
-                <div className="flex flex-wrap items-center gap-2">
-                  <ResultTabPills
-                    tab={resultTab}
-                    onChange={setResultTab}
-                    counts={{
-                      posts: shownLeads.length,
-                      companies: shownCompanies.length,
-                      people: shownPeople.length,
-                      local: localRows.length,
-                    }}
-                    visible={
-                      searchContext?.audience === "people"
-                        ? ["people"]
-                        : searchContext?.audience === "companies" ||
-                            searchContext?.audience === "agencies"
-                          ? ["companies", "local"]
-                          : undefined
-                    }
-                  />
-                  {(resultTab === "companies" || resultTab === "people") && (
-                    <ViewToggle view={viewMode} onChange={setViewMode} />
-                  )}
-                  <div className="inline-flex rounded-full border border-border p-0.5 bg-muted/40 ml-auto">
-                    {(
-                      [
-                        ["24h", "24h"],
-                        ["all", "All"],
-                      ] as const
-                    ).map(([id, label]) => (
-                      <button
-                        key={id}
-                        type="button"
-                        onClick={() => setFreshness(id)}
-                        className={`px-2.5 py-1 rounded-full text-[11px] transition-colors ${
-                          freshness === id
-                            ? "bg-background text-foreground shadow-sm"
-                            : "text-muted-foreground hover:text-foreground"
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    ))}
+                (leads.length > 0 ||
+                  companies.length > 0 ||
+                  people.length > 0 ||
+                  localRows.length > 0) && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <ResultTabPills
+                      tab={resultTab}
+                      onChange={setResultTab}
+                      counts={{
+                        posts: shownLeads.length,
+                        companies: shownCompanies.length,
+                        people: shownPeople.length,
+                        local: localRows.length,
+                      }}
+                      visible={
+                        searchContext?.audience === "people"
+                          ? ["people"]
+                          : searchContext?.audience === "companies" ||
+                              searchContext?.audience === "agencies"
+                            ? ["companies", "local"]
+                            : undefined
+                      }
+                    />
+                    {(resultTab === "companies" || resultTab === "people") && (
+                      <ViewToggle view={viewMode} onChange={setViewMode} />
+                    )}
+                    <div className="inline-flex rounded-full border border-border p-0.5 bg-muted/40 ml-auto">
+                      {(
+                        [
+                          ["24h", "24h"],
+                          ["all", "All"],
+                        ] as const
+                      ).map(([id, label]) => (
+                        <button
+                          key={id}
+                          type="button"
+                          onClick={() => setFreshness(id)}
+                          className={`px-2.5 py-1 rounded-full text-[11px] transition-colors ${
+                            freshness === id
+                              ? "bg-background text-foreground shadow-sm"
+                              : "text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
               {clarifyQs.length > 0 && !runSearchMut.isPending && (
                 <ClarifyPanel
@@ -926,90 +891,90 @@ function DiscoverPage() {
                   hunting steps — that was the reported bug. */}
               {clarifyQs.length === 0 && !runSearchMut.isPending && (
                 <>
-              {resultTab === "posts" && (
-                <PostsGrid
-                  leads={shownLeads}
-                  savedByUrl={savedByUrl}
-                  onOpen={setSelected}
-                  onSave={(l) => saveMut.mutate(l)}
-                />
-              )}
-              {resultTab === "companies" &&
-                (viewMode === "table" && shownCompanies.length ? (
-                  <div className="pb-4">
-                    <CompanyTable
-                      rows={shownCompanies}
-                      onOpen={(row) => {
-                        setSelected(null);
-                        setSelectedEntity({ type: "company", company: row });
-                      }}
+                  {resultTab === "posts" && (
+                    <PostsGrid
+                      leads={shownLeads}
+                      savedByUrl={savedByUrl}
+                      onOpen={setSelected}
+                      onSave={(l) => saveMut.mutate(l)}
                     />
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 pb-4">
-                    {shownCompanies.map((c) => (
-                      <CompanyCard
-                        key={c.key}
-                        row={c}
-                        onOpen={(row) => {
-                          setSelected(null);
-                          setSelectedEntity({ type: "company", company: row });
-                        }}
-                        contactBusy={contactBusyKey === `co:${c.key}`}
-                        contact={contactByKey[`co:${c.key}`]}
-                        onResolveContact={resolveCompanyContact}
-                      />
+                  )}
+                  {resultTab === "companies" &&
+                    (viewMode === "table" && shownCompanies.length ? (
+                      <div className="pb-4">
+                        <CompanyTable
+                          rows={shownCompanies}
+                          onOpen={(row) => {
+                            setSelected(null);
+                            setSelectedEntity({ type: "company", company: row });
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 pb-4">
+                        {shownCompanies.map((c) => (
+                          <CompanyCard
+                            key={c.key}
+                            row={c}
+                            onOpen={(row) => {
+                              setSelected(null);
+                              setSelectedEntity({ type: "company", company: row });
+                            }}
+                            contactBusy={contactBusyKey === `co:${c.key}`}
+                            contact={contactByKey[`co:${c.key}`]}
+                            onResolveContact={resolveCompanyContact}
+                          />
+                        ))}
+                        {!companies.length && (
+                          <p className="text-sm text-muted-foreground col-span-full">
+                            No companies could be confidently identified from these signals yet.
+                          </p>
+                        )}
+                      </div>
                     ))}
-                    {!companies.length && (
-                      <p className="text-sm text-muted-foreground col-span-full">
-                        No companies could be confidently identified from these signals yet.
-                      </p>
-                    )}
-                  </div>
-                ))}
-              {resultTab === "people" &&
-                (viewMode === "table" && shownPeople.length ? (
-                  <div className="pb-4">
-                    <PersonTable
-                      rows={shownPeople}
-                      onOpen={(row) => {
-                        setSelected(null);
-                        setSelectedEntity({ type: "person", person: row });
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 pb-4">
-                    {shownPeople.map((p) => (
-                      <PersonCard
-                        key={p.key}
-                        row={p}
-                        onOpen={(row) => {
-                          setSelected(null);
-                          setSelectedEntity({ type: "person", person: row });
-                        }}
-                        contactBusy={contactBusyKey === p.key}
-                        contact={contactByKey[p.key]}
-                        onAccessContact={resolvePersonContact}
-                      />
+                  {resultTab === "people" &&
+                    (viewMode === "table" && shownPeople.length ? (
+                      <div className="pb-4">
+                        <PersonTable
+                          rows={shownPeople}
+                          onOpen={(row) => {
+                            setSelected(null);
+                            setSelectedEntity({ type: "person", person: row });
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 pb-4">
+                        {shownPeople.map((p) => (
+                          <PersonCard
+                            key={p.key}
+                            row={p}
+                            onOpen={(row) => {
+                              setSelected(null);
+                              setSelectedEntity({ type: "person", person: row });
+                            }}
+                            contactBusy={contactBusyKey === p.key}
+                            contact={contactByKey[p.key]}
+                            onAccessContact={resolvePersonContact}
+                          />
+                        ))}
+                        {!people.length && (
+                          <p className="text-sm text-muted-foreground col-span-full">
+                            No people identified yet — job-board listings are company-authored, so
+                            people show up when signals come from posts by real authors.
+                          </p>
+                        )}
+                      </div>
                     ))}
-                    {!people.length && (
-                      <p className="text-sm text-muted-foreground col-span-full">
-                        No people identified yet — job-board listings are company-authored, so
-                        people show up when signals come from posts by real authors.
+                  {resultTab === "local" &&
+                    (localRows.length ? (
+                      <LocalBusinessesGrid rows={localRows} />
+                    ) : (
+                      <p className="text-sm text-muted-foreground pb-4">
+                        No local businesses in this search. Try a place + category (e.g. plumbers in
+                        Texas), or use the Local businesses page for a dedicated hunt.
                       </p>
-                    )}
-                  </div>
-                ))}
-              {resultTab === "local" &&
-                (localRows.length ? (
-                  <LocalBusinessesGrid rows={localRows} />
-                ) : (
-                  <p className="text-sm text-muted-foreground pb-4">
-                    No local businesses in this search. Try a place + category (e.g. plumbers in
-                    Texas), or use the Local businesses page for a dedicated hunt.
-                  </p>
-                ))}
+                    ))}
                 </>
               )}
 
@@ -1088,22 +1053,11 @@ function DiscoverPage() {
               onSubmit={onSubmit}
               pending={pending}
             />
-            <p className="hidden sm:block text-[11px] text-muted-foreground text-center mt-2">
-              Scrapivo searches social media platforms, government public databases, public
-              directories & the open web for buyer-intent posts.
-            </p>
           </div>
         </div>
       </div>
 
-      <SavedRail
-        leads={savedLeads}
-        onOpen={(l) => {
-          setSelected(l);
-        }}
-        open={railOpen}
-        onToggle={() => setRailOpen((v) => !v)}
-      />
+
 
       {selected && (
         <div className="hidden lg:block w-[420px] border-l border-border shrink-0 bg-card overflow-y-auto">
@@ -1157,3 +1111,4 @@ function DiscoverPage() {
     </div>
   );
 }
+

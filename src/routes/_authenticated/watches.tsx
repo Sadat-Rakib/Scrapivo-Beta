@@ -9,12 +9,14 @@ import {
   runSignalWatch,
   type CampaignIcp,
 } from "@/lib/campaigns.functions";
-import { Button } from "@/components/ui/button";
 import { Bell, Play, Trash2, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/watches")({
+  head: () => ({
+    meta: [{ title: "Scrapivo — Signal watches" }],
+  }),
   component: WatchesPage,
 });
 
@@ -79,102 +81,112 @@ function WatchesPage() {
   });
 
   return (
-    <div className="p-6 sm:p-8 max-w-2xl mx-auto w-full">
-      <div className="flex items-start justify-between gap-4 mb-8">
-        <div className="min-w-0">
-          <h1 className="text-2xl font-semibold tracking-tight mb-2">Signal watches</h1>
-          <p className="text-sm text-muted-foreground leading-relaxed max-w-xl">
-            Save a buying signal once. Scrapivo re-runs it on your schedule and brings fresh matches back into Discover. Outreach stays draft-only — nothing sends automatically.
+    <div className="h-full overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-3xl mx-auto w-full space-y-6 text-white no-scrollbar">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <div className="inline-flex items-center gap-1.5 text-xs text-white/50 uppercase tracking-wider font-semibold mb-1">
+            <Bell className="size-3.5" />
+            <span>Automated Ingestion</span>
+          </div>
+          <h1 className="text-2xl font-semibold tracking-tight text-white">Signal Watches</h1>
+          <p className="text-xs text-white/60 mt-1 max-w-xl leading-relaxed">
+            Save a buying signal once. Scrapivo re-runs it on your schedule and brings fresh matches back into Discover.
           </p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          className="shrink-0"
+
+        <button
+          type="button"
           onClick={() => dueMut.mutate()}
           disabled={dueMut.isPending}
+          className="glass-pill px-3.5 py-1.5 text-xs font-medium text-white/80 hover:text-white flex items-center gap-1.5 shrink-0"
         >
-          <RefreshCw className={`size-3.5 mr-1.5 ${dueMut.isPending ? "animate-spin" : ""}`} />
-          Run due
-        </Button>
+          <RefreshCw className={`size-3.5 ${dueMut.isPending ? "animate-spin" : ""}`} />
+          <span>Run Due</span>
+        </button>
       </div>
 
+      {/* New Watch Creation Card */}
       <form
-        className="rounded-2xl border border-border/80 bg-card/80 p-5 space-y-4 mb-8 shadow-sm"
+        className="liquid-glass rounded-2xl p-6 space-y-4"
         onSubmit={(e) => {
           e.preventDefault();
           if (!newQuery.trim()) return;
           createMut.mutate();
         }}
       >
-        <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          <Bell className="size-3.5" /> New watch
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white/50">
+          <Bell className="size-3.5 text-white/70" />
+          <span>New Signal Watch</span>
         </div>
         <input
           value={newQuery}
           onChange={(e) => setNewQuery(e.target.value)}
-          placeholder='e.g. Currently hiring 3+ engineers with experience in Next.js'
-          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-primary"
+          placeholder="e.g. Currently hiring 3+ engineers with experience in Next.js"
+          className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-xs text-white placeholder:text-white/30 outline-none focus:border-white/30"
         />
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3 pt-1">
           <select
             value={schedule}
             onChange={(e) => setSchedule(e.target.value as "daily" | "weekly")}
-            className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
+            className="rounded-lg border border-white/10 bg-[#131316] px-3 py-2 text-xs text-white outline-none focus:border-white/30"
           >
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
+            <option value="daily">Daily Schedule</option>
+            <option value="weekly">Weekly Schedule</option>
           </select>
-          <Button type="submit" size="sm" disabled={createMut.isPending || !newQuery.trim()}>
-            Save watch
-          </Button>
+          <button
+            type="submit"
+            disabled={createMut.isPending || !newQuery.trim()}
+            className="glass-pill px-4 py-2 text-xs font-semibold text-white bg-white/15 hover:bg-white/25 border border-white/20"
+          >
+            Save Watch
+          </button>
         </div>
       </form>
 
+      {/* Empty State */}
       {!q.data?.length && (
-        <div className="text-sm text-muted-foreground text-center py-6 rounded-xl border border-dashed border-border">
-          No watches yet. Save a signal from Discover or create one above.
+        <div className="liquid-glass rounded-2xl p-8 text-center text-xs text-white/50">
+          No signal watches saved yet. Create one above or save from Discover.
         </div>
       )}
 
-      <div className="space-y-2">
+      {/* Active Watches List */}
+      <div className="space-y-3">
         {q.data?.map((w: any) => {
           const icp = (w.icp || {}) as CampaignIcp;
           return (
             <div
               key={w.id}
-              className="flex items-center justify-between gap-3 p-3 rounded-lg border border-border bg-card"
+              className="liquid-glass rounded-xl p-4 flex items-center justify-between gap-4 hover:bg-white/[0.03] transition-all"
             >
               <div className="min-w-0">
-                <div className="text-sm font-medium truncate">{w.name || w.query}</div>
-                <div className="text-xs text-muted-foreground">
+                <div className="text-sm font-semibold text-white truncate">{w.name || w.query}</div>
+                <div className="text-xs text-white/50 mt-0.5">
                   {icp.schedule || "daily"}
                   {icp.signal_family ? ` · ${icp.signal_family}` : ""}
-                  {typeof icp.last_results_count === "number"
-                    ? ` · last ${icp.last_results_count} leads`
-                    : ""}
-                  {w.last_run_at
-                    ? ` · ran ${new Date(w.last_run_at).toLocaleString()}`
-                    : " · never run"}
+                  {typeof icp.last_results_count === "number" ? ` · last ${icp.last_results_count} leads` : ""}
+                  {w.last_run_at ? ` · ran ${new Date(w.last_run_at).toLocaleString()}` : " · never run"}
                 </div>
               </div>
-              <div className="flex items-center gap-1 shrink-0">
-                <Button
-                  variant="ghost"
-                  size="sm"
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
                   disabled={runMut.isPending}
                   onClick={() => runMut.mutate(w.id)}
+                  className="glass-pill px-3 py-1.5 text-xs font-medium text-white/80 hover:text-white flex items-center gap-1.5"
                 >
-                  <Play className="size-3.5 mr-1" /> Run
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
+                  <Play className="size-3.5" />
+                  <span>Run</span>
+                </button>
+                <button
+                  type="button"
                   onClick={() => delMut.mutate(w.id)}
                   disabled={delMut.isPending}
+                  className="p-2 rounded-xl text-white/40 hover:text-rose-400 hover:bg-white/10 transition-colors"
                 >
                   <Trash2 className="size-3.5" />
-                </Button>
+                </button>
               </div>
             </div>
           );

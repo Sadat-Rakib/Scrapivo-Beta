@@ -822,8 +822,7 @@ export function diversifiedTop12(
         if (result.length >= frontPage || !canAdd(lead)) {
           const replaceIdx = result.findIndex(
             (r) =>
-              !isSocialLead(r) &&
-              (isFreelancer(r) || isJobBoardLead(r) || isCompanyAtsLead(r)),
+              !isSocialLead(r) && (isFreelancer(r) || isJobBoardLead(r) || isCompanyAtsLead(r)),
           );
           if (replaceIdx === -1) break;
           const removed = result[replaceIdx];
@@ -844,7 +843,11 @@ export function diversifiedTop12(
     }
 
     // Pin non-Reddit social into the first viewport (demo + relevance signal).
-    const pinTarget = Math.min(6, socialTarget, result.filter((l) => isSocialLead(l) && !isReddit(l)).length);
+    const pinTarget = Math.min(
+      6,
+      socialTarget,
+      result.filter((l) => isSocialLead(l) && !isReddit(l)).length,
+    );
     if (pinTarget > 0) {
       const pinned: Lead[] = [];
       const rest: Lead[] = [];
@@ -861,7 +864,8 @@ export function diversifiedTop12(
         if (ri < rest.length && interleaved.length < result.length) interleaved.push(rest[ri++]);
       }
       while (ri < rest.length && interleaved.length < result.length) interleaved.push(rest[ri++]);
-      while (pi < pinned.length && interleaved.length < result.length) interleaved.push(pinned[pi++]);
+      while (pi < pinned.length && interleaved.length < result.length)
+        interleaved.push(pinned[pi++]);
       result.length = 0;
       result.push(...interleaved);
     }

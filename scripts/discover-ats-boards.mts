@@ -66,7 +66,7 @@ const PROBES: Record<Provider, Probe> = {
   },
   smartrecruiters: {
     url: (t) => `https://api.smartrecruiters.com/v1/companies/${t}/postings?limit=1`,
-    count: (d) => ((d as { totalFound?: number })?.totalFound ?? 0),
+    count: (d) => (d as { totalFound?: number })?.totalFound ?? 0,
   },
   workable: {
     url: (t) => `https://apply.workable.com/api/v1/widget/accounts/${t}?details=true`,
@@ -172,7 +172,8 @@ async function main() {
 
   const top = [...hits].sort((a, b) => b.job_count - a.job_count).slice(0, 10);
   console.log("\nBiggest boards found:");
-  for (const h of top) console.log(`  ${String(h.job_count).padStart(5)}  ${h.provider}/${h.board_id}`);
+  for (const h of top)
+    console.log(`  ${String(h.job_count).padStart(5)}  ${h.provider}/${h.board_id}`);
 
   if (DRY) {
     console.log("\n--dry: no database writes.");

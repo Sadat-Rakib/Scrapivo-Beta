@@ -77,14 +77,14 @@ export function expandSynonyms(role: string): string[] {
 // canonical INTENT_TEMPLATES so there's a single source of truth.
 const T = INTENT_TEMPLATES;
 export const PLATFORM_INTENT_PHRASES: Record<PlatformScopeKey, string[]> = {
-  reddit: [T[6], T[7], T[1], T[2], T[3]],                 // needed/wanted, need a, hiring a/hiring {role}s
-  linkedin_posts: [T[8], T[9], T[10], T[2], T[0]],        // we're/we are hiring, open role, need a, looking for
-  twitter_x: [T[6], T[7], T[2], T[3]],                    // needed/wanted, hiring
-  facebook_groups: [T[4], T[5], T[0], T[1]],              // anyone know a good, recommend, looking for, need a
-  quora: [T[4], T[5], T[0]],                              // recommendation framing
-  indie_forums: [T[1], T[0], T[5], T[8]],                 // need a, looking for, recommend, we're hiring
-  discord_public: [T[2], T[3], T[6]],                     // hiring, needed
-  fiverr_public: [T[1], T[0], T[6], T[7]],               // need a / looking for / needed
+  reddit: [T[6], T[7], T[1], T[2], T[3]], // needed/wanted, need a, hiring a/hiring {role}s
+  linkedin_posts: [T[8], T[9], T[10], T[2], T[0]], // we're/we are hiring, open role, need a, looking for
+  twitter_x: [T[6], T[7], T[2], T[3]], // needed/wanted, hiring
+  facebook_groups: [T[4], T[5], T[0], T[1]], // anyone know a good, recommend, looking for, need a
+  quora: [T[4], T[5], T[0]], // recommendation framing
+  indie_forums: [T[1], T[0], T[5], T[8]], // need a, looking for, recommend, we're hiring
+  discord_public: [T[2], T[3], T[6]], // hiring, needed
+  fiverr_public: [T[1], T[0], T[6], T[7]], // need a / looking for / needed
 };
 
 /** The preferred buyer-phrase templates for a given platform scope. */

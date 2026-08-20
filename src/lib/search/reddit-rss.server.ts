@@ -257,8 +257,7 @@ const ARCTIC_SHIFT_IDS = "https://arctic-shift.photon-reddit.com/api/posts/ids";
 export async function dropRemovedPosts<T extends { full_post_url?: string }>(
   entries: T[],
 ): Promise<T[]> {
-  const idOf = (u: string) =>
-    /\/comments\/([a-z0-9]+)/i.exec(u)?.[1]?.toLowerCase() ?? "";
+  const idOf = (u: string) => /\/comments\/([a-z0-9]+)/i.exec(u)?.[1]?.toLowerCase() ?? "";
   const withIds = entries.map((e) => ({ e, id: idOf(e.full_post_url ?? "") })).filter((x) => x.id);
   if (!withIds.length) return entries;
 
@@ -615,7 +614,9 @@ export async function searchRedditRss(
         // is the thing keeping us under the 429 threshold.
         if (state.blocked >= STOP_AFTER_429) return;
         await sleep(
-          fast ? 120 + Math.floor(Math.random() * 80) : INTER_FETCH_MS + Math.floor(Math.random() * 600),
+          fast
+            ? 120 + Math.floor(Math.random() * 80)
+            : INTER_FETCH_MS + Math.floor(Math.random() * 600),
         );
       }
     }),
@@ -742,7 +743,6 @@ export async function searchRedditRss(
         why_match: `${verdict.reason} — r/${entry.subreddit}`,
       });
     }
-
   }
 
   // Final liveness pass: a post moderators removed after the archive ingested

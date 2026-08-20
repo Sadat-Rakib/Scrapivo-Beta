@@ -26,11 +26,7 @@ export async function searchReddit(query: SearchQuery): Promise<Lead[]> {
   const out: Lead[] = [];
   const seen = new Set<string>();
 
-  const pushPost = (
-    p: Record<string, unknown>,
-    platformLabel: string,
-    trusted: boolean,
-  ) => {
+  const pushPost = (p: Record<string, unknown>, platformLabel: string, trusted: boolean) => {
     const id = String(p.id || "");
     if (!id || seen.has(id)) return;
     const date = new Date(((p.created_utc as number) ?? 0) * 1000).toISOString();
@@ -65,8 +61,7 @@ export async function searchReddit(query: SearchQuery): Promise<Lead[]> {
   };
 
   try {
-    const url =
-      `https://www.reddit.com/r/forhire/search.json?q=${encodeURIComponent(`flair:Hiring ${query.skill}`)}&restrict_sr=1&sort=new&t=week&limit=25`;
+    const url = `https://www.reddit.com/r/forhire/search.json?q=${encodeURIComponent(`flair:Hiring ${query.skill}`)}&restrict_sr=1&sort=new&t=week&limit=25`;
     const data = (await safe(fetchRedditJson(url), null)) as {
       data?: { children?: Array<{ data?: Record<string, unknown> }> };
     } | null;
@@ -75,8 +70,9 @@ export async function searchReddit(query: SearchQuery): Promise<Lead[]> {
       if (!p) continue;
       const title = String(p.title || "").toLowerCase();
       const isHiring =
-        String(p.link_flair_text || "").toLowerCase().includes("hiring") ||
-        title.includes("[hiring]");
+        String(p.link_flair_text || "")
+          .toLowerCase()
+          .includes("hiring") || title.includes("[hiring]");
       if (!isHiring) continue;
       pushPost(p, "Reddit r/forhire [Hiring]", true);
     }
@@ -85,8 +81,7 @@ export async function searchReddit(query: SearchQuery): Promise<Lead[]> {
   }
 
   try {
-    const url =
-      `https://www.reddit.com/r/hiring/search.json?q=${encodeURIComponent(query.skill)}&restrict_sr=1&sort=new&t=week&limit=25`;
+    const url = `https://www.reddit.com/r/hiring/search.json?q=${encodeURIComponent(query.skill)}&restrict_sr=1&sort=new&t=week&limit=25`;
     const data = (await safe(fetchRedditJson(url), null)) as {
       data?: { children?: Array<{ data?: Record<string, unknown> }> };
     } | null;
@@ -99,10 +94,8 @@ export async function searchReddit(query: SearchQuery): Promise<Lead[]> {
 
   for (const sub of ["Entrepreneur", "smallbusiness", "startups"]) {
     try {
-      const q =
-        `${query.skill} (hiring OR "looking for" OR "need a" OR "seeking")`;
-      const url =
-        `https://www.reddit.com/r/${sub}/search.json?q=${encodeURIComponent(q)}&restrict_sr=1&sort=new&t=week&limit=15`;
+      const q = `${query.skill} (hiring OR "looking for" OR "need a" OR "seeking")`;
+      const url = `https://www.reddit.com/r/${sub}/search.json?q=${encodeURIComponent(q)}&restrict_sr=1&sort=new&t=week&limit=15`;
       const data = (await safe(fetchRedditJson(url), null)) as {
         data?: { children?: Array<{ data?: Record<string, unknown> }> };
       } | null;
@@ -117,8 +110,7 @@ export async function searchReddit(query: SearchQuery): Promise<Lead[]> {
 
   if (out.length < 2) {
     try {
-      const searchUrl =
-        `https://www.reddit.com/r/forhire/search/?q=${encodeURIComponent(`[Hiring] ${query.skill}`)}&restrict_sr=1&sort=new`;
+      const searchUrl = `https://www.reddit.com/r/forhire/search/?q=${encodeURIComponent(`[Hiring] ${query.skill}`)}&restrict_sr=1&sort=new`;
       const jinaText = await safe(jinaRead(searchUrl), "");
       if (jinaText && hasBuyerIntent(jinaText, query.negativePhrases)) {
         const now = new Date().toISOString();

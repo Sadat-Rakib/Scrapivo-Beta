@@ -91,7 +91,10 @@ function AgencyNav({ cta, ctaLabel }: { cta: string; ctaLabel: string }) {
           </a>
 
           <div className="hidden md:flex items-center gap-1 bg-white/[0.03] border border-white/5 rounded-full p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-md">
-            <a href="#product" className="relative px-4 py-1.5 text-sm font-medium text-gray-400 hover:text-white transition-colors rounded-full group">
+            <a
+              href="#product"
+              className="relative px-4 py-1.5 text-sm font-medium text-gray-400 hover:text-white transition-colors rounded-full group"
+            >
               <span className="relative z-10">Product</span>
               <div className="absolute inset-0 bg-white/10 scale-50 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 rounded-full" />
             </a>
@@ -106,13 +109,17 @@ function AgencyNav({ cta, ctaLabel }: { cta: string; ctaLabel: string }) {
               >
                 <span className="relative z-10 flex items-center gap-1">
                   Sources
-                  <ChevronDown className={`w-3.5 h-3.5 opacity-50 transition-transform ${communityOpen ? "-rotate-180" : ""}`} />
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 opacity-50 transition-transform ${communityOpen ? "-rotate-180" : ""}`}
+                  />
                 </span>
                 <div className="absolute inset-0 bg-white/10 scale-50 opacity-0 group-hover/dropdown:scale-100 group-hover/dropdown:opacity-100 transition-all duration-300 rounded-full" />
               </button>
               <div
                 className={`absolute top-full left-1/2 -translate-x-1/2 pt-4 z-50 transition-all duration-300 ${
-                  communityOpen ? "opacity-100 visible translate-y-0 scale-100" : "opacity-0 invisible translate-y-2 scale-[0.98]"
+                  communityOpen
+                    ? "opacity-100 visible translate-y-0 scale-100"
+                    : "opacity-0 invisible translate-y-2 scale-[0.98]"
                 }`}
               >
                 <div className="w-[420px] bg-[#090a0d]/95 backdrop-blur-2xl border border-white/10 rounded-3xl p-3 shadow-[0_24px_48px_rgba(0,0,0,0.5)] grid grid-cols-2 gap-2 text-left">
@@ -136,7 +143,10 @@ function AgencyNav({ cta, ctaLabel }: { cta: string; ctaLabel: string }) {
                 </div>
               </div>
             </div>
-            <a href="#faq" className="relative px-4 py-1.5 text-sm font-medium text-gray-400 hover:text-white transition-colors rounded-full group">
+            <a
+              href="#faq"
+              className="relative px-4 py-1.5 text-sm font-medium text-gray-400 hover:text-white transition-colors rounded-full group"
+            >
               <span className="relative z-10">FAQ</span>
               <div className="absolute inset-0 bg-white/10 scale-50 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300 rounded-full" />
             </a>
@@ -201,12 +211,18 @@ function DiscoverMock() {
               key={i}
               type="button"
               className={`relative w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
-                i === 3 ? "bg-white/10 text-white" : "text-white/40 hover:text-white hover:bg-white/5"
+                i === 3
+                  ? "bg-white/10 text-white"
+                  : "text-white/40 hover:text-white hover:bg-white/5"
               }`}
             >
               <Icon className="w-5 h-5" strokeWidth={1.5} />
-              {i === 0 && <div className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-orange-500 rounded-full border border-[#090a0d]" />}
-              {i === 3 && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-white rounded-r-full" />}
+              {i === 0 && (
+                <div className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-orange-500 rounded-full border border-[#090a0d]" />
+              )}
+              {i === 3 && (
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-white rounded-r-full" />
+              )}
             </button>
           ))}
         </div>
@@ -216,7 +232,10 @@ function DiscoverMock() {
       <div className="w-56 bg-[#121318]/90 border-r border-white/5 p-4 flex-col shrink-0 hidden md:flex z-10">
         <h2 className="text-xl font-medium text-white mb-6 tracking-tight">Discover</h2>
         <div className="relative mb-6">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#797d86] w-4 h-4" strokeWidth={1.5} />
+          <Search
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#797d86] w-4 h-4"
+            strokeWidth={1.5}
+          />
           <input
             readOnly
             type="text"
@@ -230,14 +249,18 @@ function DiscoverMock() {
               key={label}
               type="button"
               className={`w-full flex items-center gap-3 px-2 py-1.5 rounded-md text-sm transition-colors ${
-                i === 0 ? "text-white bg-white/5" : "text-white/70 hover:bg-white/5 hover:text-white"
+                i === 0
+                  ? "text-white bg-white/5"
+                  : "text-white/70 hover:bg-white/5 hover:text-white"
               }`}
             >
               {label}
             </button>
           ))}
         </div>
-        <div className="text-[10px] font-medium text-white/40 px-2 mb-2 tracking-wider">SOURCES</div>
+        <div className="text-[10px] font-medium text-white/40 px-2 mb-2 tracking-wider">
+          SOURCES
+        </div>
         <div className="space-y-1">
           {[
             { c: "border-orange-500", t: "Reddit" },
@@ -275,13 +298,22 @@ function DiscoverMock() {
           </div>
           <h2 className="text-2xl font-normal text-white tracking-tight">Live leads</h2>
           <div className="flex gap-6 border-b border-white/5 pb-2 -mb-5">
-            <button type="button" className="flex items-center gap-2 text-sm font-medium text-white pb-2 border-b-2 border-white">
+            <button
+              type="button"
+              className="flex items-center gap-2 text-sm font-medium text-white pb-2 border-b-2 border-white"
+            >
               <Flame className="w-4 h-4 text-[#ff8964]" /> Hot
             </button>
-            <button type="button" className="flex items-center gap-2 text-sm font-medium text-white/40 pb-2">
+            <button
+              type="button"
+              className="flex items-center gap-2 text-sm font-medium text-white/40 pb-2"
+            >
               Warm
             </button>
-            <button type="button" className="flex items-center gap-2 text-sm font-medium text-white/40 pb-2">
+            <button
+              type="button"
+              className="flex items-center gap-2 text-sm font-medium text-white/40 pb-2"
+            >
               Signal
             </button>
           </div>
@@ -346,14 +378,18 @@ function MomentumSection() {
   ];
 
   return (
-    <section id="product" className="agency-section overflow-hidden text-white bg-[#050507] pt-28 pb-24 px-6 relative">
+    <section
+      id="product"
+      className="agency-section overflow-hidden text-white bg-[#050507] pt-28 pb-24 px-6 relative"
+    >
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-gradient-to-b from-blue-900/10 via-purple-900/5 to-transparent blur-[120px] rounded-full pointer-events-none" />
       <div className="z-10 max-w-[80rem] mx-auto relative">
         <h2 className="md:text-7xl lg:text-[80px] font-normal tracking-tight leading-none mb-6 text-center text-balance text-5xl sm:text-6xl">
           Buyer-intent momentum
         </h2>
         <p className="md:text-2xl text-balance text-xl font-light text-gray-400 text-center max-w-3xl mx-auto mb-16">
-          Scrapivo brings discovery, scoring, outreach, and pipeline into one refined system for operators who sell to people already asking.
+          Scrapivo brings discovery, scoring, outreach, and pipeline into one refined system for
+          operators who sell to people already asking.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {cards.map((c) => (
@@ -391,18 +427,33 @@ function CollabSection() {
           <h2 className="md:text-7xl font-semibold tracking-tighter text-gray-900 leading-[1.05] mb-6 text-4xl sm:text-5xl">
             Find, score, and
             <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">reach together.</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">
+              reach together.
+            </span>
           </h2>
           <p className="text-lg md:text-xl text-gray-500 font-normal leading-relaxed max-w-2xl mx-auto">
-            Posts, companies, and people — segmented from the same search — so your team can jump from signal to conversation in one place.
+            Posts, companies, and people — segmented from the same search — so your team can jump
+            from signal to conversation in one place.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-16 max-w-6xl mx-auto">
           {[
-            { n: "01", t: "Search once", d: "Natural language in. Scrapivo fans out across public sources and returns ranked intent." },
-            { n: "02", t: "Segment cleanly", d: "Posts, companies, and decision-makers — recovered and enriched without the noise." },
-            { n: "03", t: "Outreach in context", d: "Every lead links back to the original post so your reply sounds human, not automated." },
+            {
+              n: "01",
+              t: "Search once",
+              d: "Natural language in. Scrapivo fans out across public sources and returns ranked intent.",
+            },
+            {
+              n: "02",
+              t: "Segment cleanly",
+              d: "Posts, companies, and decision-makers — recovered and enriched without the noise.",
+            },
+            {
+              n: "03",
+              t: "Outreach in context",
+              d: "Every lead links back to the original post so your reply sounds human, not automated.",
+            },
           ].map((f) => (
             <div
               key={f.n}
@@ -412,7 +463,9 @@ function CollabSection() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-gray-200/80 bg-white/70 text-gray-700 shadow-sm">
                   <Zap className="h-5 w-5" />
                 </div>
-                <span className="rounded-full border border-gray-200/80 bg-white/60 px-2.5 py-1 text-xs text-gray-500">{f.n}</span>
+                <span className="rounded-full border border-gray-200/80 bg-white/60 px-2.5 py-1 text-xs text-gray-500">
+                  {f.n}
+                </span>
               </div>
               <h3 className="mb-2 text-xl font-medium tracking-tight text-gray-950">{f.t}</h3>
               <p className="text-base font-normal leading-relaxed text-gray-500">{f.d}</p>
@@ -431,9 +484,11 @@ function AgencyFooterCta({ cta }: { cta: string }) {
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: "radial-gradient(circle, rgba(249, 115, 22, 0.42) 1.4px, transparent 1.4px)",
+            backgroundImage:
+              "radial-gradient(circle, rgba(249, 115, 22, 0.42) 1.4px, transparent 1.4px)",
             backgroundSize: "8px 8px",
-            maskImage: "linear-gradient(105deg, transparent 0%, black 18%, black 68%, transparent 100%)",
+            maskImage:
+              "linear-gradient(105deg, transparent 0%, black 18%, black 68%, transparent 100%)",
           }}
         />
       </div>
@@ -450,20 +505,25 @@ function AgencyFooterCta({ cta }: { cta: string }) {
               style={{
                 background:
                   "conic-gradient(from 292deg, transparent 0deg, transparent 10deg, rgba(96,165,250,0.75) 42deg, rgba(255,255,255,1) 64deg, transparent 76deg)",
-                maskImage: "radial-gradient(circle, transparent 61%, black 62%, black 65%, transparent 66%)",
-                WebkitMaskImage: "radial-gradient(circle, transparent 61%, black 62%, black 65%, transparent 66%)",
+                maskImage:
+                  "radial-gradient(circle, transparent 61%, black 62%, black 65%, transparent 66%)",
+                WebkitMaskImage:
+                  "radial-gradient(circle, transparent 61%, black 62%, black 65%, transparent 66%)",
               }}
             />
           </div>
         </div>
 
         <div className="flex-1 flex flex-col items-start">
-          <div className="text-xs font-medium text-gray-400 tracking-widest uppercase mb-5">SCRAPIVO</div>
+          <div className="text-xs font-medium text-gray-400 tracking-widest uppercase mb-5">
+            SCRAPIVO
+          </div>
           <h2 className="md:text-6xl lg:text-7xl leading-[1.05] text-balance font-normal text-white tracking-tight mb-6 text-4xl sm:text-5xl">
             Find buyers who already want you
           </h2>
           <p className="text-xl md:text-2xl text-gray-400 font-light leading-relaxed mb-10 max-w-xl">
-            Scan public intent across Reddit, HN, GitHub, and more — scored, segmented, and ready to reach.
+            Scan public intent across Reddit, HN, GitHub, and more — scored, segmented, and ready to
+            reach.
           </p>
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
             <div className="relative group w-full sm:w-auto">
@@ -480,7 +540,10 @@ function AgencyFooterCta({ cta }: { cta: string }) {
               href="#product"
               className="w-full sm:w-auto px-8 py-4 rounded-full border border-white/10 text-white text-base font-medium flex items-center justify-center gap-3 hover:bg-white/[0.03] hover:border-white/20 transition-all"
             >
-              <span className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-400 to-orange-400" style={{ animation: "agencyPulseBadge 2s infinite" }} />
+              <span
+                className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-400 to-orange-400"
+                style={{ animation: "agencyPulseBadge 2s infinite" }}
+              />
               See how it works
             </a>
           </div>
@@ -513,7 +576,10 @@ export function AgencyLanding({ cta, ctaLabel, children }: Props) {
     <div className="agency-theme antialiased selection:bg-[#ff8964] selection:text-white min-h-screen">
       <AgencyNav cta={cta} ctaLabel={ctaLabel} />
 
-      <div id="top" className="flex flex-col z-10 max-w-[80rem] mx-auto pt-32 px-6 pb-12 relative items-start">
+      <div
+        id="top"
+        className="flex flex-col z-10 max-w-[80rem] mx-auto pt-32 px-6 pb-12 relative items-start"
+      >
         <div className="agency-eyebrow inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium uppercase tracking-[0.28em] text-white/70 mb-6">
           <span className="h-1.5 w-1.5 rounded-full bg-[#ff8964] shadow-[0_0_18px_rgba(255,137,100,.9)]" />
           Search · Score · Reach
@@ -524,7 +590,8 @@ export function AgencyLanding({ cta, ctaLabel, children }: Props) {
           who already want you
         </h1>
         <p className="md:text-xl text-[#95979e] leading-relaxed text-lg font-light max-w-2xl mb-10">
-          Scrapivo scans Reddit, Hacker News, GitHub, Bluesky and more to surface people actively asking for what you sell — scored and ready to reach.
+          Scrapivo scans Reddit, Hacker News, GitHub, Bluesky and more to surface people actively
+          asking for what you sell — scored and ready to reach.
         </p>
 
         <GlowCta to={cta} label={ctaLabel === "Open app" ? "Open app" : "See in action"} />
@@ -536,7 +603,13 @@ export function AgencyLanding({ cta, ctaLabel, children }: Props) {
             Everything you need to close warm leads:
           </span>
           <div className="flex flex-wrap font-medium gap-x-4 gap-y-2 text-sm sm:text-base justify-center md:justify-end">
-            {["Buyer-Intent Search", "AI Scoring", "1-Click Outreach", "Pipeline", "Saved Leads"].map((t, i, arr) => (
+            {[
+              "Buyer-Intent Search",
+              "AI Scoring",
+              "1-Click Outreach",
+              "Pipeline",
+              "Saved Leads",
+            ].map((t, i, arr) => (
               <span key={t} className="flex items-center gap-4">
                 <span className="text-white">{t}</span>
                 {i < arr.length - 1 && <span className="text-[#797d86]">·</span>}

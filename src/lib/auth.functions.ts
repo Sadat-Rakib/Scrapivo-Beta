@@ -47,7 +47,9 @@ export const registerInnerCircle = createServerFn({ method: "POST" })
       if (msg.includes("already") || msg.includes("registered") || msg.includes("exists")) {
         const existingId = await findUserIdByEmail(email);
         if (!existingId) {
-          throw new Error("That email already has an account, but we could not update it. Try Sign in.");
+          throw new Error(
+            "That email already has an account, but we could not update it. Try Sign in.",
+          );
         }
         // Early-access Inner Circle: signing up again with the same email
         // sets the password they just typed so they can get in immediately.

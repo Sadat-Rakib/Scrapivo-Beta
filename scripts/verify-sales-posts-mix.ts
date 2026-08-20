@@ -33,17 +33,32 @@ import { detectDemandBuckets, scoreUrgency } from "../src/lib/search/intent-lexi
 
 const classified = classifyQuery("sales");
 const expanded = expandFromClassified(classified);
-console.log("goal/signal", classified.goal, classified.signalMode, "SEARXNG", process.env.SEARXNG_URL);
+console.log(
+  "goal/signal",
+  classified.goal,
+  classified.signalMode,
+  "SEARXNG",
+  process.env.SEARXNG_URL,
+);
 
 const { leads: raw } = await searchAllSources({ classified, expanded });
 const by: Record<string, number> = {};
 for (const l of raw) by[l.source] = (by[l.source] ?? 0) + 1;
-console.log("\nraw sources (top):", Object.entries(by).sort((a, b) => b[1] - a[1]).slice(0, 12));
+console.log(
+  "\nraw sources (top):",
+  Object.entries(by)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 12),
+);
 
 const socialRaw = raw.filter((l) =>
   ["linkedin", "instagram", "facebook", "twitter", "threads", "quora"].includes(l.source),
 );
-console.log("social raw:", socialRaw.length, socialRaw.map((l) => l.source));
+console.log(
+  "social raw:",
+  socialRaw.length,
+  socialRaw.map((l) => l.source),
+);
 
 const validated = validateLeads(raw as Lead[], classified, expanded, { preferJunior: false });
 const socialVal = validated.filter((l) =>
@@ -56,13 +71,23 @@ const skillOkFor = (text: string) =>
   classified.relatedSkills.slice(0, 8).some((s) => isStronglyRelevantToSkill(text, s));
 
 const quality = validated.filter((l) => {
-  if (["greenhouse", "ashby", "lever", "jobicy", "arbeitnow", "smartrecruiters"].includes(l.source)) {
+  if (
+    ["greenhouse", "ashby", "lever", "jobicy", "arbeitnow", "smartrecruiters"].includes(l.source)
+  ) {
     return skillOkFor(l.title || "");
   }
   const text = `${l.title} ${l.snippet}`;
   if (!skillOkFor(text) && !l.demand_verified) return false;
-  if (["linkedin", "instagram", "facebook", "twitter", "threads", "quora", "reddit"].includes(l.source)) {
-    return l.demand_verified === true || scoreUrgency(text).hasUrgency || detectDemandBuckets(text).buckets.length > 0;
+  if (
+    ["linkedin", "instagram", "facebook", "twitter", "threads", "quora", "reddit"].includes(
+      l.source,
+    )
+  ) {
+    return (
+      l.demand_verified === true ||
+      scoreUrgency(text).hasUrgency ||
+      detectDemandBuckets(text).buckets.length > 0
+    );
   }
   return true;
 });
@@ -81,7 +106,9 @@ const inWindow = (l: Lead) => {
     const t = new Date(l.posted_at).getTime();
     return Number.isFinite(t) && Date.now() - t <= 86_400_000;
   }
-  return l.demand_verified === true || l.freshness_window === "day" || l.freshness_window === "week";
+  return (
+    l.demand_verified === true || l.freshness_window === "day" || l.freshness_window === "week"
+  );
 };
 const shown = segments.posts.filter(inWindow);
 const shownSrc: Record<string, number> = {};
@@ -89,12 +116,19 @@ for (const l of shown) shownSrc[l.source] = (shownSrc[l.source] ?? 0) + 1;
 console.log("\nPosts after 24h-equivalent filter:", shown.length, shownSrc);
 
 const platforms = new Set(
-  shown.map((l) => l.source).filter((s) => !["arbeitnow", "jobicy", "greenhouse", "ashby", "lever", "remoteok"].includes(s)),
+  shown
+    .map((l) => l.source)
+    .filter(
+      (s) => !["arbeitnow", "jobicy", "greenhouse", "ashby", "lever", "remoteok"].includes(s),
+    ),
 );
 const hasSocial = ["linkedin", "instagram", "facebook", "twitter", "threads", "quora"].some((s) =>
   shown.some((l) => l.source === s),
 );
 const ok = hasSocial || (socialVal.length >= 2 && shown.some((l) => l.demand_verified));
-console.log(`\n${ok ? "PASS" : "FAIL"} — non-company platforms in filtered Posts:`, [...platforms].join(", ") || "none");
+console.log(
+  `\n${ok ? "PASS" : "FAIL"} — non-company platforms in filtered Posts:`,
+  [...platforms].join(", ") || "none",
+);
 console.log("hasSocialPlatform", hasSocial, "socialValidated", socialVal.length);
 process.exit(ok ? 0 : 1);

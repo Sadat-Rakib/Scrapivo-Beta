@@ -236,6 +236,13 @@ export async function discoverContacts(opts: DiscoverOptions): Promise<ContactDi
       if (result.catch_all === null && verification.catch_all !== null)
         result.catch_all = verification.catch_all;
 
+      if (verification.tier === "verified" && h.name && opts.domain) {
+        const { recordPatternHit, inferPatternKeyFromEmail } =
+          await import("./domain-memory.server");
+        const pk = inferPatternKeyFromEmail(h.email, h.name);
+        if (pk) await recordPatternHit(opts.domain, pk);
+      }
+
       const provenance = [h.provenance];
       const consent = assessConsent({ provenance, role_title: h.role_title });
       emailRecords.push({
@@ -284,10 +291,13 @@ export async function discoverContacts(opts: DiscoverOptions): Promise<ContactDi
   }
 
   if (result.harvest && targetName && !alreadyHaveTarget && parsePersonName(targetName).ok) {
+    const { getLearnedPatterns } = await import("./domain-memory.server");
+    const learnedPatterns = await getLearnedPatterns(result.harvest.domain);
     const candidates = deriveEmailCandidates(targetName, result.harvest.domain, {
       inference: result.pattern ?? undefined,
       limit: MAX_DERIVED_CANDIDATES,
       roleLocalParts: ROLE_LOCALPARTS,
+      learnedPatterns,
     });
 
     if (candidates.length) {
@@ -298,11 +308,26 @@ export async function discoverContacts(opts: DiscoverOptions): Promise<ContactDi
         notes.push(
           `${result.harvest.domain} is a catch-all domain: it accepts mail for addresses that don't exist, so a derived address can never be confirmed there. Marked inferred, not verified.`,
         );
+        const { updateDomainVerifyState } = await import("./domain-memory.server");
+        await updateDomainVerifyState(result.harvest.domain, {
+          is_catch_all: true,
+          last_status: "catch_all",
+        });
       }
 
       if (best && best.tier !== "invalid") {
         const candidate = candidates.find((c) => c.email === best.email);
         const person = people.find((p) => p.name.toLowerCase() === targetName.toLowerCase());
+        if (best.tier === "verified" && candidate?.pattern) {
+          const { recordPatternHit, updateDomainVerifyState } =
+            await import("./domain-memory.server");
+          await recordPatternHit(result.harvest.domain, candidate.pattern);
+          await updateDomainVerifyState(result.harvest.domain, {
+            valid_hits: 1,
+            risky_streak: 0,
+            last_status: "verified",
+          });
+        }
         const provenance = [
           provenanceEntry("pattern_derived", {
             locator: `pattern:${candidate?.pattern ?? "unknown"}`,

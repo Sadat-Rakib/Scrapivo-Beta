@@ -54,9 +54,9 @@ console.log(`suspended engines: first ask ${firstAsk} upstream calls, repeat ask
 //    cached copy is what a later refusal serves.
 mode = "results";
 await new Promise((r) => setTimeout(r, 100));
-const warm = await withSearxngBudget(() =>
+const warm = (await withSearxngBudget(() =>
   searchSearxng([`${DORK} v2`], 1, "", "linkedin"),
-) as unknown[];
+)) as unknown[];
 mode = "empty";
 const afterSuspend = (await withSearxngBudget(() =>
   searchSearxng([`${DORK} v2`], 1, "", "linkedin"),

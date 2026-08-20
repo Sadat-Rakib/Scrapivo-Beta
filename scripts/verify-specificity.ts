@@ -2,7 +2,11 @@
  * Unit checks for Discover specificity plan.
  *   npx tsx scripts/verify-specificity.ts
  */
-import { extractDateFromText, isRecent, CLIENTS_SOCIAL_MAX_AGE_DAYS } from "../src/lib/search/query-expander";
+import {
+  extractDateFromText,
+  isRecent,
+  CLIENTS_SOCIAL_MAX_AGE_DAYS,
+} from "../src/lib/search/query-expander";
 import {
   isPersonalStoryNoise,
   isEducationalNoise,
@@ -51,7 +55,9 @@ check("undated fails 24h", !undatedPass);
 // Noise / off-skill
 check(
   "POV educational",
-  isEducationalNoise(lead({ title: "Unpaid design tests: a hiring trend", snippet: "strong belief" })),
+  isEducationalNoise(
+    lead({ title: "Unpaid design tests: a hiring trend", snippet: "strong belief" }),
+  ),
 );
 check(
   "removed moderator expired",
@@ -98,10 +104,7 @@ check(
   "experience question present",
   qs.some((q) => q.id === "experience"),
 );
-check(
-  "no freshness question",
-  !qs.some((q) => (q.id as string) === "freshness"),
-);
+check("no freshness question", !qs.some((q) => (q.id as string) === "freshness"));
 const ref = applyClarifyAnswers(classified, { experience: "5+", geography: "us" });
 check("experience in refinement", ref.experience === "5+");
 check("location applied", ref.location === "United States");
