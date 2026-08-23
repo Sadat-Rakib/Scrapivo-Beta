@@ -13,6 +13,7 @@
     "smoke": "tsx scripts/smoke-all-features.mts",
     "probe:keys": "tsx scripts/probe-api-keys.mts",
     "test": "vitest --run",
+    "typecheck": "tsc --noEmit",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "verify:semantic": "tsx scripts/verify-semantic-matcher.mts"
