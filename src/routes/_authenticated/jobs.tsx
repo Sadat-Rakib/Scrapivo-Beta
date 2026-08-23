@@ -1,28 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { runJobSearch } from "@/lib/jobs.functions";
 import type { JobPosting, JobRegion } from "@/lib/jobs/types";
 import { ALL_JOB_SOURCE_IDS } from "@/lib/jobs/types";
 import { ViewToggle, type ViewMode } from "@/components/shared/view-toggle";
 import { EntityCard } from "@/components/shared/entity-card";
 import { EntityTable, type ColumnDef } from "@/components/shared/entity-table";
-import { FilterPanel } from "@/components/shared/filter-panel";
-import { MobileFilterSheet } from "@/components/shared/mobile-filter-sheet";
+import { PageComposer, ResultsBar } from "@/components/shared/search-dock";
+import type { ComposerHandle } from "@/components/discover/unified-composer";
 import { LoadMoreSentinel } from "@/components/shared/load-more-sentinel";
 import { useProgressiveCount } from "@/hooks/use-progressive-count";
 import { getRemainingSearches } from "@/lib/search.functions";
-import {
-  Briefcase,
-  Search,
-  Download,
-  ExternalLink,
-  MapPin,
-  RefreshCw,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { Briefcase, Search, Download, ExternalLink, MapPin, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { Company360View, type Company360Data } from "@/components/shared/company-360-view";
 
@@ -82,15 +73,17 @@ function JobsPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const [selectedEntity, setSelectedEntity] = useState<Company360Data | null>(null);
+  const [refineOpen, setRefineOpen] = useState(false);
+  const composerRef = useRef<ComposerHandle>(null);
 
-  const [filtersCollapsed, setFiltersCollapsed] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return window.localStorage.getItem("scrapivo:jobs-filters-collapsed") === "1";
-  });
-
-  if (typeof window !== "undefined") {
-    window.localStorage.setItem("scrapivo:jobs-filters-collapsed", filtersCollapsed ? "1" : "0");
-  }
+  // How many guided-questionnaire answers differ from their defaults.
+  const activeRefineCount = [
+    location.trim() !== "",
+    remoteOnly,
+    seniority !== "any",
+    contactRoles.trim() !== "",
+    region !== "any",
+  ].filter(Boolean).length;
 
   // Reset clears the form fields without firing a search (searches are quota-limited).
   const resetFilters = () => {
@@ -347,193 +340,192 @@ function JobsPage() {
   );
 
   return (
-    <div className="h-full flex overflow-hidden bg-[#0a0a0b] text-white">
-      {/* Main Content Area */}
-      <div className="flex-1 min-w-0 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
-        {/* Header Title & Actions */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-1.5 text-xs text-white/50 uppercase tracking-wider font-semibold mb-1">
-              <Briefcase className="size-3.5" />
-              <span>Live Job Listings</span>
-            </div>
-            <h1 className="text-2xl font-semibold tracking-tight text-white">Jobs</h1>
-            <p className="text-xs text-white/60 mt-1 max-w-xl">
-              Real-time active postings from company career pages, ATS Boards, Job sites, ATS sites,
-              etc.
-            </p>
-          </div>
+    <div className="h-full flex min-h-0 bg-[#0a0a0b] text-white">
+      {/* Main column: scrollable results + bottom-docked composer (Discover-style) */}
+      <div className="flex-1 min-w-0 flex flex-col min-h-0">
+        <div className="flex-1 min-h-0 overflow-y-auto px-4 md:px-6">
+          <div className="max-w-5xl mx-auto py-6 space-y-6">
+            {/* Header Title & Actions */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <div className="inline-flex items-center gap-1.5 text-xs text-white/50 uppercase tracking-wider font-semibold mb-1">
+                  <Briefcase className="size-3.5" />
+                  <span>Live Job Listings</span>
+                </div>
+                <h1 className="text-2xl font-semibold tracking-tight text-white">Jobs</h1>
+                <p className="text-xs text-white/60 mt-1 max-w-xl">
+                  Real-time active postings from company career pages, ATS Boards, Job sites, ATS
+                  sites, etc.
+                </p>
+              </div>
 
-          <div className="flex items-center gap-3 shrink-0 flex-wrap">
-            {/* Mobile filter entry — desktop uses the persistent right rail below */}
-            <MobileFilterSheet
-              title="Filter Jobs"
-              subtitle="Refine role, seniority & region"
-              onApply={() => mut.mutate()}
-              onReset={resetFilters}
-              isPending={mut.isPending}
-              applyLabel="Find Jobs"
-              usage={usageQuery.data ?? undefined}
-            >
-              {FilterForm}
-            </MobileFilterSheet>
-            {rows.length > 0 && (
-              <button
-                type="button"
-                onClick={exportCsv}
-                className="glass-pill px-3.5 py-1.5 text-xs font-medium text-white/80 hover:text-white flex items-center gap-1.5"
-              >
-                <Download className="size-3.5" />
-                <span>Export CSV</span>
-              </button>
-            )}
-            <ViewToggle mode={viewMode} onChange={setViewMode} />
-          </div>
-        </div>
-
-        {/* Loading State */}
-        {mut.isPending && (
-          <div className="liquid-glass rounded-2xl p-12 text-center text-sm text-white/60">
-            <RefreshCw className="size-5 animate-spin mx-auto mb-3 text-white/40" />
-            <p>Ingesting active postings across ATS sources...</p>
-          </div>
-        )}
-
-        {/* Results */}
-        {!mut.isPending && searched && rows.length > 0 && (
-          <div>
-            <div className="text-xs text-white/50 mb-3">
-              {rows.length} active jobs loaded{hasMore ? ` — showing ${shown}` : ""}
-            </div>
-            {/* Per-source status strip: failed sources are reported without
-                losing the jobs that other sources returned (PRD §10). */}
-            {sourceStatuses.length > 0 && (
-              <div className="flex flex-wrap items-center gap-1.5 mb-4">
-                <span className="text-[10px] uppercase tracking-wider text-white/40 mr-1">
-                  Sources
-                </span>
-                {sourceStatuses.map((s) => (
-                  <span
-                    key={s.id}
-                    title={
-                      s.status === "error"
-                        ? (s.error ?? "Source failed")
-                        : `${s.count} postings from ${s.label}`
-                    }
-                    className={`inline-flex items-center gap-1.5 text-[10px] px-2 py-1 rounded-full border ${
-                      s.status === "error"
-                        ? "bg-red-500/10 text-red-300 border-red-500/25"
-                        : "bg-white/[0.04] text-white/70 border-white/10"
-                    }`}
+              <div className="flex items-center gap-3 shrink-0 flex-wrap">
+                {rows.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={exportCsv}
+                    className="glass-pill px-3.5 py-1.5 text-xs font-medium text-white/80 hover:text-white flex items-center gap-1.5"
                   >
-                    <span
-                      className={`size-1.5 rounded-full ${
-                        s.status === "error" ? "bg-red-400" : "bg-emerald-400"
-                      }`}
-                    />
-                    {s.label}
-                    {s.status === "error" ? " · failed" : ` · ${s.count}`}
-                  </span>
-                ))}
+                    <Download className="size-3.5" />
+                    <span>Export CSV</span>
+                  </button>
+                )}
+                <ViewToggle mode={viewMode} onChange={setViewMode} />
+              </div>
+            </div>
+
+            {/* Loading State */}
+            {mut.isPending && (
+              <div className="liquid-glass rounded-2xl p-12 text-center text-sm text-white/60">
+                <RefreshCw className="size-5 animate-spin mx-auto mb-3 text-white/40" />
+                <p>Ingesting active postings across ATS sources...</p>
               </div>
             )}
-            {viewMode === "grid" ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                {visible.map((j) => (
-                  <EntityCard
-                    key={j.id}
-                    id={j.id}
-                    title={j.title}
-                    subtitle={j.company}
-                    category={j.remote ? "Remote" : "Job"}
-                    location={j.location || (j.remote ? "Remote" : undefined)}
-                    stats={[
-                      ...(j.seniority ? [{ label: "Seniority", value: j.seniority }] : []),
-                      ...(j.employment_type
-                        ? [{ label: "Employment type", value: j.employment_type }]
-                        : []),
-                      ...(j.salary ? [{ label: "Compensation", value: j.salary }] : []),
-                      { label: "Source", value: sourceLabel(j.source) },
-                      ...(fmtDate(j.posted_at)
-                        ? [{ label: "Posted", value: fmtDate(j.posted_at) as string }]
-                        : []),
-                    ]}
-                    description={j.description || undefined}
-                    saved={bookmarkedIds.has(j.id)}
-                    onSaveToggle={() => toggleBookmark(j.id)}
-                    primaryActionLabel="Apply"
-                    primaryActionUrl={j.url}
-                    onViewDetails={() => openDetailView(j)}
-                    onClick={() => openDetailView(j)}
+
+            {/* Results */}
+            {!mut.isPending && searched && rows.length > 0 && (
+              <div className="space-y-3">
+                <ResultsBar
+                  count={rows.length}
+                  unit="active jobs loaded"
+                  shown={shown}
+                  hasMore={hasMore}
+                  onClear={() => {
+                    setRows([]);
+                    setSearched(false);
+                    setSourceStatuses([]);
+                    composerRef.current?.focus();
+                  }}
+                />
+                {/* Per-source status strip: failed sources are reported without
+                losing the jobs that other sources returned (PRD §10). */}
+                {sourceStatuses.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-1.5 mb-4">
+                    <span className="text-[10px] uppercase tracking-wider text-white/40 mr-1">
+                      Sources
+                    </span>
+                    {sourceStatuses.map((s) => (
+                      <span
+                        key={s.id}
+                        title={
+                          s.status === "error"
+                            ? (s.error ?? "Source failed")
+                            : `${s.count} postings from ${s.label}`
+                        }
+                        className={`inline-flex items-center gap-1.5 text-[10px] px-2 py-1 rounded-full border ${
+                          s.status === "error"
+                            ? "bg-red-500/10 text-red-300 border-red-500/25"
+                            : "bg-white/[0.04] text-white/70 border-white/10"
+                        }`}
+                      >
+                        <span
+                          className={`size-1.5 rounded-full ${
+                            s.status === "error" ? "bg-red-400" : "bg-emerald-400"
+                          }`}
+                        />
+                        {s.label}
+                        {s.status === "error" ? " · failed" : ` · ${s.count}`}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                {viewMode === "grid" ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {visible.map((j) => (
+                      <EntityCard
+                        key={j.id}
+                        id={j.id}
+                        title={j.title}
+                        subtitle={j.company}
+                        category={j.remote ? "Remote" : "Job"}
+                        location={j.location || (j.remote ? "Remote" : undefined)}
+                        stats={[
+                          ...(j.seniority ? [{ label: "Seniority", value: j.seniority }] : []),
+                          ...(j.employment_type
+                            ? [{ label: "Employment type", value: j.employment_type }]
+                            : []),
+                          ...(j.salary ? [{ label: "Compensation", value: j.salary }] : []),
+                          { label: "Source", value: sourceLabel(j.source) },
+                          ...(fmtDate(j.posted_at)
+                            ? [{ label: "Posted", value: fmtDate(j.posted_at) as string }]
+                            : []),
+                        ]}
+                        description={j.description || undefined}
+                        saved={bookmarkedIds.has(j.id)}
+                        onSaveToggle={() => toggleBookmark(j.id)}
+                        primaryActionLabel="Apply"
+                        primaryActionUrl={j.url}
+                        onViewDetails={() => openDetailView(j)}
+                        onClick={() => openDetailView(j)}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <EntityTable
+                    rows={visible}
+                    keyExtractor={(j) => j.id}
+                    columns={tableColumns}
+                    onBookmark={(j) => toggleBookmark(j.id)}
+                    isBookmarked={(j) => bookmarkedIds.has(j.id)}
+                    onRowClick={openDetailView}
                   />
-                ))}
+                )}
+                <LoadMoreSentinel
+                  hasMore={hasMore}
+                  onLoadMore={loadMore}
+                  shown={shown}
+                  total={rows.length}
+                />
               </div>
-            ) : (
-              <EntityTable
-                rows={visible}
-                keyExtractor={(j) => j.id}
-                columns={tableColumns}
-                onBookmark={(j) => toggleBookmark(j.id)}
-                isBookmarked={(j) => bookmarkedIds.has(j.id)}
-                onRowClick={openDetailView}
-              />
             )}
-            <LoadMoreSentinel
-              hasMore={hasMore}
-              onLoadMore={loadMore}
-              shown={shown}
-              total={rows.length}
-            />
-          </div>
-        )}
 
-        {!mut.isPending && searched && !rows.length && (
-          <div className="liquid-glass rounded-2xl p-12 text-center text-sm text-white/50">
-            No active jobs matched those filters. Try broadening location or seniority.
-          </div>
-        )}
+            {!mut.isPending && searched && !rows.length && (
+              <div className="liquid-glass rounded-2xl p-12 text-center text-sm text-white/50">
+                No active jobs matched those filters. Try broadening location or seniority.
+              </div>
+            )}
 
-        {!mut.isPending && !searched && (
-          <div className="liquid-glass rounded-2xl p-12 text-center text-sm text-white/60 space-y-3">
-            <Briefcase className="size-8 mx-auto text-white/30" />
-            <h3 className="text-base font-semibold text-white">Search Active Job Postings</h3>
-            <p className="max-w-md mx-auto text-xs text-white/50 leading-relaxed">
-              Use the Filters panel to search across company career pages, ATS boards, and job
-              sites.
-            </p>
-            <button
-              type="button"
-              onClick={() => mut.mutate()}
-              className="glass-pill px-5 py-2 text-xs font-semibold text-white bg-white/10 hover:bg-white/20 inline-flex items-center gap-2"
-            >
-              <Search className="size-3.5" />
-              <span>Fetch Live Jobs</span>
-            </button>
+            {!mut.isPending && !searched && (
+              <div className="liquid-glass rounded-2xl p-12 text-center text-sm text-white/60 space-y-3">
+                <Briefcase className="size-8 mx-auto text-white/30" />
+                <h3 className="text-base font-semibold text-white">Search Active Job Postings</h3>
+                <p className="max-w-md mx-auto text-xs text-white/50 leading-relaxed">
+                  Search across company career pages, ATS boards, and job sites — refine with the
+                  guided questions below.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => composerRef.current?.focus()}
+                  className="glass-pill px-5 py-2 text-xs font-semibold text-white bg-white/10 hover:bg-white/20 inline-flex items-center gap-2"
+                >
+                  <Search className="size-3.5" />
+                  <span>Start Searching</span>
+                </button>
+              </div>
+            )}
           </div>
-        )}
-      </div>
-
-      {/* Right Rail Filter Panel */}
-      <div
-        className={`hidden lg:block relative shrink-0 border-l border-white/10 bg-black/20 transition-all duration-300 ${
-          filtersCollapsed ? "w-48 p-4" : "w-80 max-w-[28vw] p-5"
-        }`}
-      >
-        <div className="w-full h-full">
-          <FilterPanel
-            title="Filter Jobs"
-            subtitle="Refine role, seniority & region"
-            onApply={() => mut.mutate()}
-            onReset={resetFilters}
-            isPending={mut.isPending}
-            applyLabel="Find Jobs"
-            usage={usageQuery.data ?? undefined}
-            onToggleCollapse={() => setFiltersCollapsed(!filtersCollapsed)}
-            isCollapsed={filtersCollapsed}
-          >
-            {FilterForm}
-          </FilterPanel>
         </div>
+
+        {/* Bottom-docked composer + guided questionnaire */}
+        <PageComposer
+          ref={composerRef}
+          value={query}
+          onChange={setQuery}
+          onSubmit={() => mut.mutate()}
+          pending={mut.isPending}
+          refine={FilterForm}
+          refineOpen={refineOpen}
+          onToggleRefine={() => setRefineOpen(!refineOpen)}
+          activeRefineCount={activeRefineCount}
+          onApplyRefine={() => {
+            setRefineOpen(false);
+            mut.mutate();
+          }}
+          onResetRefine={resetFilters}
+          applyLabel="Find Jobs"
+          applyPending={mut.isPending}
+          usage={usageQuery.data ?? undefined}
+        />
       </div>
 
       {/* Detail View Drawer */}

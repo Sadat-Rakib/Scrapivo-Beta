@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { runInvestorSearch, refreshInvestorVerification } from "@/lib/investors.functions";
 import type { InvestorWithMetadata } from "@/lib/investors/search";
 import { hasProfileImage, investorImageUrl } from "@/lib/investors/search";
@@ -18,20 +18,12 @@ import {
 import { ViewToggle, type ViewMode } from "@/components/shared/view-toggle";
 import { EntityCard } from "@/components/shared/entity-card";
 import { EntityTable, type ColumnDef } from "@/components/shared/entity-table";
-import { FilterPanel } from "@/components/shared/filter-panel";
-import { MobileFilterSheet } from "@/components/shared/mobile-filter-sheet";
+import { PageComposer, ResultsBar } from "@/components/shared/search-dock";
+import type { ComposerHandle } from "@/components/discover/unified-composer";
 import { LoadMoreSentinel } from "@/components/shared/load-more-sentinel";
 import { useProgressiveCount } from "@/hooks/use-progressive-count";
 import { getRemainingSearches } from "@/lib/search.functions";
-import {
-  Landmark,
-  Search,
-  RefreshCw,
-  Download,
-  MapPin,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { Landmark, Search, RefreshCw, Download, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { Company360View, type Company360Data } from "@/components/shared/company-360-view";
 import { humanLabel, isInternalKey } from "@/lib/records/field-labels";
@@ -145,18 +137,17 @@ function InvestorsPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const [selectedEntity, setSelectedEntity] = useState<Company360Data | null>(null);
+  const [refineOpen, setRefineOpen] = useState(false);
+  const composerRef = useRef<ComposerHandle>(null);
 
-  const [filtersCollapsed, setFiltersCollapsed] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return window.localStorage.getItem("scrapivo:investors-filters-collapsed") === "1";
-  });
-
-  if (typeof window !== "undefined") {
-    window.localStorage.setItem(
-      "scrapivo:investors-filters-collapsed",
-      filtersCollapsed ? "1" : "0",
-    );
-  }
+  // How many guided-questionnaire answers differ from their defaults.
+  const activeRefineCount = [
+    stage !== "any",
+    sector.trim() !== "",
+    checkBand !== "any",
+    location.trim() !== "",
+    entityType !== "any",
+  ].filter(Boolean).length;
 
   const runSearch = () => {
     const filters: SearchFilters = {
@@ -544,147 +535,143 @@ function InvestorsPage() {
   );
 
   return (
-    <div className="h-full flex overflow-hidden bg-[#0a0a0b] text-white">
-      {/* Main Content Area */}
-      <div className="flex-1 min-w-0 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
-        {/* Header Title & Actions */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-1.5 text-xs text-white/50 uppercase tracking-wider font-semibold mb-1">
-              <Landmark className="size-3.5" />
-              <span>VC & Angel Outreach</span>
-            </div>
-            <h1 className="text-2xl font-semibold tracking-tight text-white">
-              Investors Directory
-            </h1>
-            <p className="text-xs text-white/60 mt-1 max-w-xl">
-              Match VCs and angels by sector, stage, check size, and geographic focus.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3 shrink-0 flex-wrap">
-            {/* Mobile filter entry — desktop uses the persistent right rail below */}
-            <MobileFilterSheet
-              title="Filter Investors"
-              subtitle="Refine stage, check size, & region"
-              onApply={runSearch}
-              onReset={resetFilters}
-              isPending={mut.isPending}
-              applyLabel="Find Investors"
-              usage={usageQuery.data ?? undefined}
-            >
-              {FilterForm}
-            </MobileFilterSheet>
-            {rows.length > 0 && (
-              <button
-                type="button"
-                onClick={exportCsv}
-                className="glass-pill px-3.5 py-1.5 text-xs font-medium text-white/80 hover:text-white flex items-center gap-1.5"
-              >
-                <Download className="size-3.5" />
-                <span>Export CSV</span>
-              </button>
-            )}
-            <ViewToggle mode={viewMode} onChange={setViewMode} />
-          </div>
-        </div>
-
-        {/* Removed Category Chips */}
-
-        {/* Loading / Searching State */}
-        {mut.isPending && (
-          <div className="liquid-glass rounded-2xl p-12 text-center text-sm text-white/60">
-            <RefreshCw className="size-5 animate-spin mx-auto mb-3 text-white/40" />
-            <p>Searching investors directory...</p>
-          </div>
-        )}
-
-        {/* Results */}
-        {!mut.isPending && searched && rows.length > 0 && (
-          <div>
-            <div className="text-xs text-white/50 mb-3">
-              {rows.length} investors matched{hasMore ? ` — showing ${shown}` : ""}
-            </div>
-            {viewMode === "grid" ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                {visible.map((r) => (
-                  <InvestorGridCard
-                    key={investorRowKey(r)}
-                    row={r}
-                    saved={bookmarkedIds.has(investorRowKey(r))}
-                    searchFilters={searchFilters}
-                    onToggleBookmark={toggleBookmark}
-                    onOpen={openDetailView}
-                    onAvatarError={markBrokenImage}
-                  />
-                ))}
+    <div className="h-full flex min-h-0 bg-[#0a0a0b] text-white">
+      {/* Main column: scrollable results + bottom-docked composer (Discover-style) */}
+      <div className="flex-1 min-w-0 flex flex-col min-h-0">
+        <div className="flex-1 min-h-0 overflow-y-auto px-4 md:px-6">
+          <div className="max-w-5xl mx-auto py-6 space-y-6">
+            {/* Header Title & Actions */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <div className="inline-flex items-center gap-1.5 text-xs text-white/50 uppercase tracking-wider font-semibold mb-1">
+                  <Landmark className="size-3.5" />
+                  <span>VC & Angel Outreach</span>
+                </div>
+                <h1 className="text-2xl font-semibold tracking-tight text-white">
+                  Investors Directory
+                </h1>
+                <p className="text-xs text-white/60 mt-1 max-w-xl">
+                  Match VCs and angels by sector, stage, check size, and geographic focus.
+                </p>
               </div>
-            ) : (
-              <EntityTable
-                rows={visible}
-                keyExtractor={(r) => investorRowKey(r)}
-                columns={tableColumns}
-                onBookmark={(r) => toggleBookmark(investorRowKey(r))}
-                isBookmarked={(r) => bookmarkedIds.has(investorRowKey(r))}
-                onRowClick={openDetailView}
-              />
+
+              <div className="flex items-center gap-3 shrink-0 flex-wrap">
+                {rows.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={exportCsv}
+                    className="glass-pill px-3.5 py-1.5 text-xs font-medium text-white/80 hover:text-white flex items-center gap-1.5"
+                  >
+                    <Download className="size-3.5" />
+                    <span>Export CSV</span>
+                  </button>
+                )}
+                <ViewToggle mode={viewMode} onChange={setViewMode} />
+              </div>
+            </div>
+
+            {/* Loading / Searching State */}
+            {mut.isPending && (
+              <div className="liquid-glass rounded-2xl p-12 text-center text-sm text-white/60">
+                <RefreshCw className="size-5 animate-spin mx-auto mb-3 text-white/40" />
+                <p>Searching investors directory...</p>
+              </div>
             )}
-            <LoadMoreSentinel
-              hasMore={hasMore}
-              onLoadMore={loadMore}
-              shown={shown}
-              total={rows.length}
-            />
-          </div>
-        )}
 
-        {!mut.isPending && searched && !rows.length && (
-          <div className="liquid-glass rounded-2xl p-12 text-center text-sm text-white/50">
-            No investors matched those filters. Try broadening location or check size.
-          </div>
-        )}
+            {/* Results */}
+            {!mut.isPending && searched && rows.length > 0 && (
+              <div className="space-y-3">
+                <ResultsBar
+                  count={rows.length}
+                  unit="investors matched"
+                  shown={shown}
+                  hasMore={hasMore}
+                  onClear={() => {
+                    setRows([]);
+                    setSearched(false);
+                    composerRef.current?.focus();
+                  }}
+                />
+                {viewMode === "grid" ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {visible.map((r) => (
+                      <InvestorGridCard
+                        key={investorRowKey(r)}
+                        row={r}
+                        saved={bookmarkedIds.has(investorRowKey(r))}
+                        searchFilters={searchFilters}
+                        onToggleBookmark={toggleBookmark}
+                        onOpen={openDetailView}
+                        onAvatarError={markBrokenImage}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <EntityTable
+                    rows={visible}
+                    keyExtractor={(r) => investorRowKey(r)}
+                    columns={tableColumns}
+                    onBookmark={(r) => toggleBookmark(investorRowKey(r))}
+                    isBookmarked={(r) => bookmarkedIds.has(investorRowKey(r))}
+                    onRowClick={openDetailView}
+                  />
+                )}
+                <LoadMoreSentinel
+                  hasMore={hasMore}
+                  onLoadMore={loadMore}
+                  shown={shown}
+                  total={rows.length}
+                />
+              </div>
+            )}
 
-        {!mut.isPending && !searched && (
-          <div className="liquid-glass rounded-2xl p-12 text-center text-sm text-white/60 space-y-3">
-            <Landmark className="size-8 mx-auto text-white/30" />
-            <h3 className="text-base font-semibold text-white">Find Active Investors</h3>
-            <p className="max-w-md mx-auto text-xs text-white/50 leading-relaxed">
-              Use the Filters panel (or tap Browse) to search VCs and angels by sector, stage, and
-              location.
-            </p>
-            <button
-              type="button"
-              onClick={runSearch}
-              className="glass-pill px-5 py-2 text-xs font-semibold text-white bg-white/10 hover:bg-white/20 inline-flex items-center gap-2"
-            >
-              <Search className="size-3.5" />
-              <span>Browse All Investors</span>
-            </button>
-          </div>
-        )}
-      </div>
+            {!mut.isPending && searched && !rows.length && (
+              <div className="liquid-glass rounded-2xl p-12 text-center text-sm text-white/50">
+                No investors matched those filters. Try broadening location or check size.
+              </div>
+            )}
 
-      {/* Right Rail Filter Panel */}
-      <div
-        className={`hidden lg:block relative shrink-0 border-l border-white/10 bg-black/20 transition-all duration-300 ${
-          filtersCollapsed ? "w-48 p-4" : "w-80 max-w-[28vw] p-5"
-        }`}
-      >
-        <div className="w-full h-full">
-          <FilterPanel
-            title="Filter Investors"
-            subtitle="Refine stage, check size, & region"
-            onApply={runSearch}
-            onReset={resetFilters}
-            isPending={mut.isPending}
-            applyLabel="Find Investors"
-            usage={usageQuery.data ?? undefined}
-            onToggleCollapse={() => setFiltersCollapsed(!filtersCollapsed)}
-            isCollapsed={filtersCollapsed}
-          >
-            {FilterForm}
-          </FilterPanel>
+            {!mut.isPending && !searched && (
+              <div className="liquid-glass rounded-2xl p-12 text-center text-sm text-white/60 space-y-3">
+                <Landmark className="size-8 mx-auto text-white/30" />
+                <h3 className="text-base font-semibold text-white">Find Active Investors</h3>
+                <p className="max-w-md mx-auto text-xs text-white/50 leading-relaxed">
+                  Search VCs and angels by sector, stage, and location — refine with the guided
+                  questions below.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => composerRef.current?.focus()}
+                  className="glass-pill px-5 py-2 text-xs font-semibold text-white bg-white/10 hover:bg-white/20 inline-flex items-center gap-2"
+                >
+                  <Search className="size-3.5" />
+                  <span>Start Searching</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Bottom-docked composer + guided questionnaire */}
+        <PageComposer
+          ref={composerRef}
+          value={query}
+          onChange={setQuery}
+          onSubmit={runSearch}
+          pending={mut.isPending}
+          refine={FilterForm}
+          refineOpen={refineOpen}
+          onToggleRefine={() => setRefineOpen(!refineOpen)}
+          activeRefineCount={activeRefineCount}
+          onApplyRefine={() => {
+            setRefineOpen(false);
+            runSearch();
+          }}
+          onResetRefine={resetFilters}
+          applyLabel="Find Investors"
+          applyPending={mut.isPending}
+          usage={usageQuery.data ?? undefined}
+        />
       </div>
 
       {/* Detail View Drawer */}

@@ -15,6 +15,8 @@ type Props = {
   onSubmit: () => void;
   pending: boolean;
   maxChars?: number;
+  /** Hide the Search/Chat pills for search-only contexts (directory pages). */
+  hideModeToggle?: boolean;
 };
 
 const AUTOTYPE_EXAMPLES = [
@@ -83,7 +85,7 @@ function useAutotypePlaceholder(paused: boolean) {
 }
 
 export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function UnifiedComposer(
-  { value, onChange, mode, onModeChange, onSubmit, pending, maxChars = 3000 },
+  { value, onChange, mode, onModeChange, onSubmit, pending, maxChars = 3000, hideModeToggle },
   ref,
 ) {
   const textRef = useRef<HTMLTextAreaElement>(null);
@@ -98,10 +100,7 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
   const isPaused = focused || value.trim().length > 0;
   const autotypeText = useAutotypePlaceholder(isPaused);
 
-  const placeholder =
-    mode === "search"
-      ? autotypeText
-      : "Ask Scrapivo to help you craft a search…";
+  const placeholder = mode === "search" ? autotypeText : "Ask Scrapivo to help you craft a search…";
 
   return (
     <div className="rounded-2xl border border-border bg-card shadow-sm">
@@ -133,28 +132,30 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
       </div>
       <div className="flex items-center gap-2 px-3 pb-2.5 pt-0.5 text-xs text-muted-foreground">
         <div className="flex items-center gap-1">
-          <div className="inline-flex rounded-full border border-border p-0.5">
-            <button
-              onClick={() => onModeChange("search")}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-colors ${
-                mode === "search"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground"
-              }`}
-            >
-              <Search className="size-3" /> Search
-            </button>
-            <button
-              onClick={() => onModeChange("chat")}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-colors ${
-                mode === "chat"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground"
-              }`}
-            >
-              <Sparkles className="size-3" /> Chat
-            </button>
-          </div>
+          {!hideModeToggle && (
+            <div className="inline-flex rounded-full border border-border p-0.5">
+              <button
+                onClick={() => onModeChange("search")}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-colors ${
+                  mode === "search"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground"
+                }`}
+              >
+                <Search className="size-3" /> Search
+              </button>
+              <button
+                onClick={() => onModeChange("chat")}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-colors ${
+                  mode === "chat"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground"
+                }`}
+              >
+                <Sparkles className="size-3" /> Chat
+              </button>
+            </div>
+          )}
           <VoiceInputButton
             onResult={(t) => {
               const next = value.trim() ? `${value.trim()} ${t}` : t;
