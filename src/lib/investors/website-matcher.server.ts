@@ -34,7 +34,15 @@ const INDUSTRY_KEYWORDS: Record<string, string[]> = {
   healthtech: ["health", "medical", "biotech", "telemedicine", "pharma", "clinical", "healthcare"],
   edtech: ["education", "edtech", "learning", "lms", "courseware", "e-learning"],
   saas: ["saas", "software as a service", "cloud platform", "subscription", "b2b software"],
-  ai: ["artificial intelligence", "machine learning", "deep learning", "ai-powered", "llm", "gpt", "nlp"],
+  ai: [
+    "artificial intelligence",
+    "machine learning",
+    "deep learning",
+    "ai-powered",
+    "llm",
+    "gpt",
+    "nlp",
+  ],
   climate: ["climate", "cleantech", "carbon", "sustainability", "renewable", "green energy"],
   ecommerce: ["ecommerce", "e-commerce", "marketplace", "shopify", "retail tech", "dtc"],
   web3: ["web3", "blockchain", "crypto", "defi", "nft", "token", "smart contract", "dao"],
@@ -78,12 +86,14 @@ export async function extractWebsiteSignals(url: string): Promise<WebsiteSignals
   const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
   const title = titleMatch?.[1]?.trim() || "";
 
-  const descMatch = html.match(/name=["']description["'][^>]*content=["']([^"']+)["']/i)
-    || html.match(/content=["']([^"']+)["'][^>]*name=["']description["']/i);
+  const descMatch =
+    html.match(/name=["']description["'][^>]*content=["']([^"']+)["']/i) ||
+    html.match(/content=["']([^"']+)["'][^>]*name=["']description["']/i);
   const description = descMatch?.[1]?.trim() || "";
 
-  const kwMatch = html.match(/name=["']keywords["'][^>]*content=["']([^"']+)["']/i)
-    || html.match(/content=["']([^"']+)["'][^>]*name=["']keywords["']/i);
+  const kwMatch =
+    html.match(/name=["']keywords["'][^>]*content=["']([^"']+)["']/i) ||
+    html.match(/content=["']([^"']+)["'][^>]*name=["']keywords["']/i);
   const rawKeywords = kwMatch?.[1]?.trim() || "";
 
   // Strip HTML tags for body text analysis
@@ -115,17 +125,41 @@ export async function extractWebsiteSignals(url: string): Promise<WebsiteSignals
 
   // Extract keywords from meta + title
   const keywords = rawKeywords
-    ? rawKeywords.split(",").map((k) => k.trim().toLowerCase()).filter(Boolean)
+    ? rawKeywords
+        .split(",")
+        .map((k) => k.trim().toLowerCase())
+        .filter(Boolean)
     : [];
   // Add title words as supplementary
-  const titleWords = title.toLowerCase().split(/\s+/).filter((w) => w.length > 3);
+  const titleWords = title
+    .toLowerCase()
+    .split(/\s+/)
+    .filter((w) => w.length > 3);
   keywords.push(...titleWords);
 
   // Detect tech mentions
   const techTerms = [
-    "react", "vue", "angular", "next.js", "node", "python", "django",
-    "kubernetes", "docker", "aws", "gcp", "azure", "terraform", "graphql",
-    "typescript", "rust", "golang", "swift", "flutter", "tensorflow", "pytorch",
+    "react",
+    "vue",
+    "angular",
+    "next.js",
+    "node",
+    "python",
+    "django",
+    "kubernetes",
+    "docker",
+    "aws",
+    "gcp",
+    "azure",
+    "terraform",
+    "graphql",
+    "typescript",
+    "rust",
+    "golang",
+    "swift",
+    "flutter",
+    "tensorflow",
+    "pytorch",
   ];
   const techMentions = techTerms.filter((t) => blob.includes(t));
 
@@ -163,10 +197,7 @@ export async function extractWebsiteSignals(url: string): Promise<WebsiteSignals
 
 // ─── Matching engine ────────────────────────────────────────────────────────
 
-export function matchInvestorsToSignals(
-  signals: WebsiteSignals,
-  limit = 50,
-): MatchedInvestor[] {
+export function matchInvestorsToSignals(signals: WebsiteSignals, limit = 50): MatchedInvestor[] {
   const all = getAllInvestors();
   const scored: MatchedInvestor[] = [];
 
@@ -177,12 +208,12 @@ export function matchInvestorsToSignals(
     // Stringify investor data for matching
     const invBlob = [
       inv.name,
-      "sectors" in inv ? (inv.sectors || []).join(" ") : "",
+      "sectors" in inv ? ((inv as any).sectors || []).join(" ") : "",
       "focus_areas" in inv ? ((inv as any).focus_areas || []).join(" ") : "",
       "thesis" in inv ? (inv as any).thesis || "" : "",
       "description" in inv ? (inv as any).description || "" : "",
       "portfolio_companies" in inv ? ((inv as any).portfolio_companies || []).join(" ") : "",
-      "stages" in inv ? (inv.stages || []).join(" ") : "",
+      "stages" in inv ? ((inv as any).stages || []).join(" ") : "",
     ]
       .join(" ")
       .toLowerCase();

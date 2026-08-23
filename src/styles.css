@@ -266,3 +266,38 @@
   scrollbar-width: none;
 }
 
+/* ── Integrated dark scrollbar (PRD §2) ─────────────────────────────── */
+/* Track + thumb use Scrapivo's dark tokens so every scroll region — the  */
+/* page, filter panels, card/list containers, and the Details drawer —     */
+/* shares one subtle rounded thumb instead of the browser's white bar.     */
+/* Native scrolling (wheel, touch, keyboard, assistive tech) is untouched. */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-elevated-2) var(--bg-base);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-elevated-2) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent; /* rides on the dark surface underneath */
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+

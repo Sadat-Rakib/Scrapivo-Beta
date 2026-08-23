@@ -30,10 +30,14 @@ export function normalizeJob(raw: RawJobPosting): JobPosting {
     source: raw.source,
     board_id: raw.board_id,
     posted_at: raw.posted_at || null,
+    updated_at: raw.updated_at || null,
+    fetched_at: new Date().toISOString(),
     description: raw.description?.slice(0, 1200) || null,
     salary: raw.salary || null,
     remote: Boolean(raw.remote),
     seniority: raw.seniority || null,
+    department: raw.department || null,
+    employment_type: raw.employment_type || null,
   };
 }
 
@@ -93,28 +97,58 @@ export async function fetchAllJobSources(filters: JobSearchFilters): Promise<Job
   return deduped.filter((j) => matchesJobFilters(j, filters));
 }
 
+/** Per-source fetch outcome — a failed source never erases other sources'
+ *  jobs, and its status/error is reported to the UI (PRD §10). */
+export interface JobSourceStatus {
+  id: string;
+  label: string;
+  status: "ok" | "error";
+  /** Raw job count returned by this source on this fetch. */
+  count: number;
+  error?: string;
+  fetchedAt: number;
+}
+
 export async function fetchAllJobSourcesWithMeta(filters: JobSearchFilters): Promise<{
   jobs: JobPosting[];
   fetched: number;
+  sourceStatuses: JobSourceStatus[];
 }> {
   const wanted = new Set<string>(
     (filters.sources?.length ? filters.sources : ALL_JOB_SOURCE_IDS) as JobSourceId[],
   );
   const adapters = REGISTRY.filter((a) => adapterMatches(a, wanted));
-  const chunks = await Promise.all(
+  const results = await Promise.all(
     adapters.map(async (a) => {
+      const fetchedAt = Date.now();
       try {
-        return await a.fetch(filters);
-      } catch {
-        return [] as RawJobPosting[];
+        const raw = await a.fetch(filters);
+        return { adapter: a, raw, fetchedAt, error: undefined as string | undefined };
+      } catch (e) {
+        console.warn(`[jobs] ${a.id} failed`, e);
+        return {
+          adapter: a,
+          raw: [] as RawJobPosting[],
+          fetchedAt,
+          error: e instanceof Error ? e.message : String(e),
+        };
       }
     }),
   );
-  const raw = chunks.flat();
+  const sourceStatuses: JobSourceStatus[] = results.map((r) => ({
+    id: r.adapter.id,
+    label: r.adapter.label,
+    status: r.error ? "error" : "ok",
+    count: r.raw.length,
+    ...(r.error ? { error: r.error } : {}),
+    fetchedAt: r.fetchedAt,
+  }));
+  const raw = results.flatMap((r) => r.raw);
   const active = raw.filter(isActiveJob).map(normalizeJob);
   const deduped = dedupeJobs(active);
   return {
     fetched: deduped.length,
     jobs: deduped.filter((j) => matchesJobFilters(j, filters)),
+    sourceStatuses,
   };
 }

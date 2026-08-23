@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Bookmark, ExternalLink, MapPin } from "lucide-react";
 
 export interface EntityCardStat {
@@ -14,6 +14,8 @@ export interface EntityCardProps {
   location?: string;
   avatarUrl?: string;
   avatarFallback?: string;
+  /** Called when avatarUrl fails to load (caller can re-rank the row). */
+  onAvatarError?: () => void;
   stats?: EntityCardStat[];
   tags?: string[];
   description?: string;
@@ -34,6 +36,7 @@ export function EntityCard({
   location,
   avatarUrl,
   avatarFallback,
+  onAvatarError,
   stats,
   tags,
   description,
@@ -47,6 +50,12 @@ export function EntityCard({
 }: EntityCardProps) {
   const fallback = avatarFallback || (title ? title[0]?.toUpperCase() : "?");
 
+  // A broken avatar URL drops to the initials fallback (and notifies the
+  // caller so the row can be re-ranked into the no-image group).
+  const [avatarBroken, setAvatarBroken] = useState(false);
+  useEffect(() => setAvatarBroken(false), [avatarUrl]);
+  const showAvatar = Boolean(avatarUrl) && !avatarBroken;
+
   return (
     <div
       onClick={onClick}
@@ -55,10 +64,15 @@ export function EntityCard({
       {/* Top Header */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
-          {avatarUrl ? (
+          {showAvatar ? (
             <img
               src={avatarUrl}
               alt={title}
+              loading="lazy"
+              onError={() => {
+                setAvatarBroken(true);
+                onAvatarError?.();
+              }}
               className="size-11 rounded-xl object-cover border border-white/10 shrink-0"
             />
           ) : (
@@ -99,7 +113,6 @@ export function EntityCard({
                 ? "bg-white/15 text-white border border-white/20"
                 : "text-white/40 hover:text-white hover:bg-white/10"
             }`}
-
           >
             <Bookmark className={`size-4 ${saved ? "fill-current" : ""}`} />
           </button>

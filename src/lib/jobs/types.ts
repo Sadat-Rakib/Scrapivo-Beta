@@ -79,10 +79,15 @@ export type JobPosting = {
   source: JobSourceKind;
   board_id: string;
   posted_at: string | null;
+  updated_at?: string | null;
+  /** When this record was fetched (provenance timestamp). */
+  fetched_at: string;
   description: string | null;
   salary: string | null;
   remote: boolean;
   seniority: string | null;
+  department?: string | null;
+  employment_type?: string | null;
   company_domain?: string | null;
   contacts?: Array<{ name?: string; title?: string; email?: string }>;
 };
@@ -95,8 +100,11 @@ export type RawJobPosting = {
   source: JobSourceKind;
   board_id: string;
   posted_at?: string | null;
+  updated_at?: string | null;
   description?: string | null;
   salary?: string | null;
   remote?: boolean;
   seniority?: string | null;
+  department?: string | null;
+  employment_type?: string | null;
 };

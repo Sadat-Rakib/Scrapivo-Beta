@@ -35,7 +35,7 @@ export const runJobSearch = createServerFn({ method: "POST" })
     await awaitProviderSlot("lever", { n: 1 });
     await awaitProviderSlot("ashby", { n: 1 });
 
-    const { jobs, fetched } = await fetchAllJobSourcesWithMeta({
+    const { jobs, fetched, sourceStatuses } = await fetchAllJobSourcesWithMeta({
       query: data.query,
       location: data.location,
       remoteOnly: data.remoteOnly,
@@ -83,5 +83,8 @@ export const runJobSearch = createServerFn({ method: "POST" })
       fetched,
       contactRoles: data.contactRoles,
       sources: listJobSources().map((s) => ({ id: s.id, label: s.label })),
+      /** Per-source outcome so the UI can report failures without losing
+       *  other sources' jobs (status, count, error, fetch time). */
+      sourceStatuses,
     };
   });

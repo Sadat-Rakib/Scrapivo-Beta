@@ -107,7 +107,10 @@ export function secondaryDedupeKey(job: JobPosting): string {
   const isRem = job.remote || /remote|anywhere|wfh/i.test(locRaw);
   const normLoc = isRem
     ? "remote"
-    : locRaw.replace(/[^a-z0-9]+/g, " ").trim().slice(0, 30);
+    : locRaw
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim()
+        .slice(0, 30);
 
   return `${normCompany}|${normTitle}|${normLoc}`;
 }

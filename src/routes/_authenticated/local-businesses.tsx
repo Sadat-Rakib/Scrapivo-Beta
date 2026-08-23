@@ -27,6 +27,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Company360View, type Company360Data } from "@/components/shared/company-360-view";
+import { populatedFields } from "@/lib/records/populated-fields";
+import { humanLabel, isInternalKey } from "@/lib/records/field-labels";
 
 export const Route = createFileRoute("/_authenticated/local-businesses")({
   head: () => ({
@@ -159,6 +161,11 @@ function LocalBusinessesPage() {
   };
 
   const openDetailView = (r: LocalBusinessRow) => {
+    // Full record: every populated business field reaches the drawer with a
+    // human-friendly label; internal scoring metadata stays hidden.
+    const recordFields = populatedFields(r)
+      .filter((f) => !isInternalKey(f.key))
+      .map((f) => ({ label: humanLabel(f.key), value: f.value }));
     setSelectedEntity({
       domain: "business",
       name: r.name,
@@ -169,6 +176,11 @@ function LocalBusinessesPage() {
       website: r.website || undefined,
       description: r.description || undefined,
       opportunity_tags: r.opportunity_tags || [],
+      links: [
+        ...(r.website ? [{ label: "Website", href: r.website }] : []),
+        ...(r.sample_url ? [{ label: "Listing source", href: r.sample_url }] : []),
+      ],
+      record_fields: recordFields,
     });
   };
 
@@ -423,7 +435,10 @@ function LocalBusinessesPage() {
                       location={r.address || undefined}
                       stats={[
                         { label: "Phone", value: r.phone ? "Available" : "None" },
-                        { label: "Email", value: r.email ? "Verified" : "None" },
+                        {
+                          label: "Email",
+                          value: r.email ? (r.email_verified ? "Verified" : "Listed") : "None",
+                        },
                         { label: "Website", value: r.website ? "Yes" : "No" },
                       ]}
                       tags={tags}

@@ -206,6 +206,21 @@ export function getInvestorSectors(rec: InvestorEntity | InvestorRecord): string
   if ("focus_areas" in rec && Array.isArray(rec.focus_areas)) {
     return dedupeLabels(rec.focus_areas.map((f) => f?.sector));
   }
+  // Enriched records store sectors under schema-specific keys.
+  const loose = rec as {
+    consolidated_categories?: unknown;
+    target_sectors?: unknown;
+    investment_profile?: { sectors?: unknown } | null;
+  };
+  if (Array.isArray(loose.consolidated_categories)) {
+    return dedupeLabels(loose.consolidated_categories as (string | undefined)[]);
+  }
+  if (Array.isArray(loose.target_sectors)) {
+    return dedupeLabels(loose.target_sectors as (string | undefined)[]);
+  }
+  if (Array.isArray(loose.investment_profile?.sectors)) {
+    return dedupeLabels(loose.investment_profile.sectors as (string | undefined)[]);
+  }
   return [];
 }
 
@@ -216,6 +231,21 @@ export function getInvestorStages(rec: InvestorEntity | InvestorRecord): string[
   }
   if ("stages" in rec && Array.isArray(rec.stages)) {
     return dedupeLabels(rec.stages);
+  }
+  // Enriched records store stages under schema-specific keys.
+  const loose = rec as {
+    investment_stages?: unknown;
+    vc_investment_types?: unknown;
+    investment_profile?: { stages?: unknown } | null;
+  };
+  if (Array.isArray(loose.investment_stages)) {
+    return dedupeLabels(loose.investment_stages as (string | undefined)[]);
+  }
+  if (Array.isArray(loose.investment_profile?.stages)) {
+    return dedupeLabels(loose.investment_profile.stages as (string | undefined)[]);
+  }
+  if (Array.isArray(loose.vc_investment_types)) {
+    return dedupeLabels(loose.vc_investment_types as (string | undefined)[]);
   }
   return [];
 }

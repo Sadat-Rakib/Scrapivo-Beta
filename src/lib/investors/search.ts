@@ -26,6 +26,8 @@ export type InvestorWithMetadata = (InvestorEntity | InvestorRecord) & {
   _matchMetadata?: {
     locationMatch?: LocationMatchResult;
   };
+  /** Ranking scores attached by searchInvestors (image-first ordering). */
+  _ranking?: { hasImage: boolean; completeness: number; relevance: number };
 };
 
 const data = investorsFile as InvestorsFile;
@@ -127,15 +129,205 @@ function stageMatches(investorStages: string[], filterStage: string): boolean {
   const normalizedFilter = stageNorm(filterStage);
   return investorStages.some((s) => {
     // Split combined stages (e.g. "Pre-seed / Seed" -> ["pre-seed", "seed"])
-    const parts = s.split(/[\/,]|\band\b/i).map(p => stageNorm(p));
-    
-    return parts.some(p => {
+    const parts = s.split(/[/,]|\band\b/i).map((p) => stageNorm(p));
+
+    return parts.some((p) => {
       if (p === normalizedFilter) return true;
       // Fix stage-matching overlap: searching for "seed" should not match "pre-seed"
       if (normalizedFilter === "seed" && p.includes("pre-seed")) return false;
       return p.includes(normalizedFilter);
     });
   });
+}
+
+// ---------------------------------------------------------------------------
+// Ranking: image availability first, then search relevance, then completeness.
+// ---------------------------------------------------------------------------
+
+type LooseInvestor = {
+  name?: unknown;
+  website?: unknown;
+  location?: unknown;
+  email?: unknown;
+  role?: unknown;
+  title?: unknown;
+  firm?: unknown;
+  firm_name?: unknown;
+  thesis?: unknown;
+  image_url?: unknown;
+  information_completeness_score?: unknown;
+  links?: { linkedin?: unknown; twitter?: unknown; website?: unknown; image_url?: unknown } | null;
+  investment_locations?: unknown;
+  locations?: unknown;
+  investment_categories?: unknown;
+  focus_areas?: unknown;
+  stages?: unknown;
+  sweet_spot?: { sweet_spot?: unknown } | null;
+  check_sweet_spot_usd?: unknown;
+  check_min_usd?: unknown;
+  check_max_usd?: unknown;
+  // Enriched record schemas (record_type firm/investor).
+  consolidated_categories?: unknown;
+  target_sectors?: unknown;
+  investment_stages?: unknown;
+  vc_investment_types?: unknown;
+  investment_profile?: { stages?: unknown; sectors?: unknown } | null;
+};
+
+const asLoose = (rec: InvestorEntity | InvestorRecord): LooseInvestor => rec as LooseInvestor;
+
+const isStr = (v: unknown): v is string => typeof v === "string" && v.trim().length > 0;
+
+const PROFILE_IMAGE_RE = /\.(png|jpe?g|webp|gif|avif)$/i;
+
+function isValidImagePath(raw: unknown): raw is string {
+  if (!isStr(raw)) return false;
+  const url = raw.trim();
+  return PROFILE_IMAGE_RE.test(url) || url.startsWith("/") || /^https?:\/\//i.test(url);
+}
+
+/**
+ * The record's usable profile image URL — `image_url` first, legacy
+ * `links.image_url` fallback. Null when the record is not image-backed.
+ */
+export function investorImageUrl(rec: InvestorEntity | InvestorRecord): string | null {
+  const r = asLoose(rec);
+  if (isValidImagePath(r.image_url)) return r.image_url.trim();
+  if (isValidImagePath(r.links?.image_url)) return (r.links.image_url as string).trim();
+  return null;
+}
+
+/** True when the record carries a usable profile image path/URL. */
+export function hasProfileImage(rec: InvestorEntity | InvestorRecord): boolean {
+  return investorImageUrl(rec) !== null;
+}
+
+/** Completeness ranking: the dataset's own information_completeness_score
+ *  when present, otherwise a count of populated profile fields. */
+function completenessScore(rec: InvestorEntity | InvestorRecord): number {
+  const r = asLoose(rec);
+  const own = Number(r.information_completeness_score);
+  if (Number.isFinite(own) && own > 0) return own;
+  let score = 0;
+  if (isStr(r.name)) score += 1;
+  if (isStr(r.website) || isStr(r.links?.website)) score += 1;
+  if (isStr(r.links?.linkedin)) score += 1;
+  if (isStr(r.links?.twitter)) score += 1;
+  if (isStr(r.email)) score += 1;
+  if (isStr(r.location)) score += 1;
+  const investLocs = Array.isArray(r.investment_locations)
+    ? r.investment_locations
+    : Array.isArray(r.locations)
+      ? r.locations
+      : [];
+  if (investLocs.length > 0) score += 1;
+  const cats = Array.isArray(r.investment_categories)
+    ? r.investment_categories
+    : Array.isArray(r.focus_areas)
+      ? r.focus_areas
+      : [];
+  if (cats.length > 0) score += 1;
+  if (r.sweet_spot && isStr(r.sweet_spot.sweet_spot)) score += 1;
+  else if (
+    Number(r.check_sweet_spot_usd || 0) > 0 ||
+    Number(r.check_min_usd || 0) > 0 ||
+    Number(r.check_max_usd || 0) > 0
+  )
+    score += 1;
+  if (isStr(r.role) || isStr(r.title)) score += 1;
+  if (isStr(r.firm) || isStr(r.firm_name)) score += 1;
+  if (isStr(r.thesis)) score += 1;
+  return score;
+}
+
+/** Stage prefixes, extracted the same way the stage filter extracts them. */
+function stagesOf(rec: InvestorEntity | InvestorRecord): string[] {
+  const r = asLoose(rec);
+  if (Array.isArray(r.investment_categories)) {
+    return (r.investment_categories as unknown[]).map((cat) => {
+      const m = String(cat).match(/^([^(]+)/);
+      return m ? m[1].trim() : String(cat);
+    });
+  }
+  if (Array.isArray(r.investment_stages)) return r.investment_stages as string[];
+  if (Array.isArray(r.investment_profile?.stages)) {
+    return r.investment_profile.stages as unknown as string[];
+  }
+  if (Array.isArray(r.vc_investment_types)) return r.vc_investment_types as string[];
+  return Array.isArray(r.stages) ? (r.stages as string[]) : [];
+}
+
+/** Lowercased sector parts, extracted the same way the sector filter does. */
+function sectorPartsOf(rec: InvestorEntity | InvestorRecord): string[] {
+  const r = asLoose(rec);
+  if (Array.isArray(r.investment_categories)) {
+    return (r.investment_categories as unknown[]).map((cat) => {
+      const m = String(cat).match(/\(([^)]+)\)/);
+      return (m ? m[1] : String(cat)).toLowerCase();
+    });
+  }
+  if (Array.isArray(r.focus_areas)) {
+    return (r.focus_areas as { sector?: unknown }[]).map((f) =>
+      typeof f?.sector === "string" ? f.sector.toLowerCase() : "",
+    );
+  }
+  if (Array.isArray(r.consolidated_categories)) {
+    return (r.consolidated_categories as unknown[]).map((c) => String(c).toLowerCase());
+  }
+  if (Array.isArray(r.target_sectors)) {
+    return (r.target_sectors as unknown[]).map((c) => String(c).toLowerCase());
+  }
+  if (Array.isArray(r.investment_profile?.sectors)) {
+    return (r.investment_profile.sectors as unknown[]).map((c) => String(c).toLowerCase());
+  }
+  return [];
+}
+
+type RankingContext = {
+  qTokens: string[];
+  stage: string;
+  hasSector: boolean;
+  sectorTerms: string[];
+  hasLocation: boolean;
+  checkBand: InvestorSearchFilters["checkBand"];
+};
+
+/** Match quality against the active filters (0 when browsing with no filters). */
+function relevanceScore(rec: InvestorWithMetadata, ctx: RankingContext): number {
+  const r = asLoose(rec);
+  let score = 0;
+
+  if (ctx.qTokens.length > 0) {
+    const name = isStr(r.name) ? r.name.toLowerCase() : "";
+    const roleFields = [r.firm, r.firm_name, r.role, r.title].filter(isStr).join(" ").toLowerCase();
+    const hay = [r.name, r.firm, r.firm_name, r.role, r.title, r.location, r.email]
+      .filter(isStr)
+      .join(" ")
+      .toLowerCase();
+    for (const tok of ctx.qTokens) {
+      if (name.includes(tok)) score += 3;
+      else if (roleFields.includes(tok)) score += 2;
+      else if (hay.includes(tok)) score += 1;
+    }
+  }
+
+  if (ctx.stage && stageMatches(stagesOf(rec), ctx.stage)) score += 2;
+
+  if (ctx.hasSector) {
+    const parts = sectorPartsOf(rec);
+    let hits = 0;
+    for (const term of ctx.sectorTerms) {
+      const t = term.toLowerCase();
+      if (parts.some((p) => p.includes(t))) hits += 1;
+    }
+    score += Math.min(hits, 3);
+  }
+
+  if (ctx.hasLocation && rec._matchMetadata?.locationMatch?.matches) score += 2;
+
+  if (ctx.checkBand && ctx.checkBand !== "any" && checkBandMatch(rec, ctx.checkBand)) score += 1;
+
+  return score;
 }
 
 export async function searchInvestors(
@@ -151,6 +343,8 @@ export async function searchInvestors(
   const limit = filters.limit ?? 5000; // Increased default limit to show more results
 
   let rows = getAllInvestors();
+  // Sector synonyms resolved during filtering, reused for relevance scoring.
+  let sectorTerms: string[] = [];
 
   // Filter by entity type (individual vs firm)
   if (entityType !== "any") {
@@ -182,7 +376,7 @@ export async function searchInvestors(
   // Filter by stage - using exact matching after normalization
   if (stage) {
     rows = rows.filter((r) => {
-      if ("investment_categories" in r) {
+      if ("investment_categories" in r && Array.isArray(r.investment_categories)) {
         // investment_categories format: "Stage (Sector)" e.g. "Pre-seed (AI)"
         // Extract stage part before parenthesis
         const stages = r.investment_categories.map((cat) => {
@@ -191,7 +385,7 @@ export async function searchInvestors(
         });
         return stageMatches(stages, stage);
       }
-      if ("stages" in r) {
+      if ("stages" in r && Array.isArray(r.stages)) {
         return stageMatches(r.stages, stage);
       }
       return false;
@@ -203,10 +397,11 @@ export async function searchInvestors(
     // Get semantic matcher and expand sector term
     const matcher = getSemanticMatcher();
     const matchResult = await matcher.expandSectorTerm(sector);
-    const searchTerms = matchResult.success ? matchResult.synonyms : [sector];
+    sectorTerms = matchResult.success ? matchResult.synonyms : [sector];
+    const searchTerms = sectorTerms;
 
     rows = rows.filter((r) => {
-      if ("investment_categories" in r) {
+      if ("investment_categories" in r && Array.isArray(r.investment_categories)) {
         // investment_categories format: "Stage (Sector)" e.g. "Pre-seed (AI)"
         // Extract sector part inside parentheses
         return r.investment_categories.some((cat) => {
@@ -215,9 +410,11 @@ export async function searchInvestors(
           return searchTerms.some((term) => sectorPart.includes(term.toLowerCase()));
         });
       }
-      if ("focus_areas" in r) {
-        return r.focus_areas.some((f) =>
-          searchTerms.some((term) => f.sector.toLowerCase().includes(term.toLowerCase())),
+      if ("focus_areas" in r && Array.isArray(r.focus_areas)) {
+        return r.focus_areas.some(
+          (f) =>
+            typeof f?.sector === "string" &&
+            searchTerms.some((term) => f.sector.toLowerCase().includes(term.toLowerCase())),
         );
       }
       return false;
@@ -258,10 +455,10 @@ export async function searchInvestors(
 
       const locs =
         "investment_locations" in r ? r.investment_locations : "locations" in r ? r.locations : [];
-      fields.push(...locs);
+      fields.push(...(Array.isArray(locs) ? locs : []));
 
       const cats = "investment_categories" in r ? r.investment_categories : [];
-      fields.push(...cats);
+      fields.push(...(Array.isArray(cats) ? cats : []));
 
       const hay = fields.join(" ").toLowerCase();
       return q.split(/\s+/).every((tok) => {
@@ -274,21 +471,37 @@ export async function searchInvestors(
     });
   }
 
-  return rows
-    .sort((a, b) => {
-      // Sort by check size (no firm prioritization)
-      const getSweetSpot = (r: InvestorEntity | InvestorRecord) => {
-        if ("sweet_spot" in r && r.sweet_spot) {
-          return parseMoney(r.sweet_spot.sweet_spot);
-        }
-        if ("check_sweet_spot_usd" in r) {
-          return r.check_sweet_spot_usd || 0;
-        }
-        return 0;
-      };
+  // STRICT ranking order (not a tie-break): hasImage DESC →
+  // completeness DESC → relevance DESC → name ASC. Every image-backed
+  // record precedes every image-less record; image-less records are never
+  // hidden, they follow with the same completeness → relevance → name order.
+  const ctx: RankingContext = {
+    qTokens: q ? q.split(/\s+/) : [],
+    stage,
+    hasSector: sector.length > 0,
+    sectorTerms,
+    hasLocation: location.length > 0,
+    checkBand: filters.checkBand,
+  };
 
-      return getSweetSpot(b) - getSweetSpot(a);
+  return rows
+    .map((rec) => {
+      const ranking = {
+        hasImage: hasProfileImage(rec),
+        completeness: completenessScore(rec),
+        relevance: relevanceScore(rec, ctx),
+      };
+      rec._ranking = ranking; // shipped to the client for load-failure re-rank
+      return { rec, ...ranking };
     })
+    .sort(
+      (a, b) =>
+        Number(b.hasImage) - Number(a.hasImage) ||
+        b.completeness - a.completeness ||
+        b.relevance - a.relevance ||
+        a.rec.name.localeCompare(b.rec.name),
+    )
+    .map((s) => s.rec)
     .slice(0, limit);
 }
 

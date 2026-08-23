@@ -1,11 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { memo, useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { runInvestorSearch, refreshInvestorVerification } from "@/lib/investors.functions";
 import type { InvestorWithMetadata } from "@/lib/investors/search";
-import { getInvestorSectors, getInvestorStages } from "@/lib/investors/types";
-import { effectiveInvestLocations } from "@/lib/investors/location-hierarchy";
+import { hasProfileImage, investorImageUrl } from "@/lib/investors/search";
+import {
+  buildInvestorCardModel,
+  checkSizeOf,
+  hasExplicitAngel,
+  investorRowKey,
+  isFirmRecord,
+  populatedFields,
+} from "@/lib/investors/card-adapters";
 import { generateRelevantBecause, type SearchFilters } from "@/lib/investors/relevance-explainer";
 import { ViewToggle, type ViewMode } from "@/components/shared/view-toggle";
 import { EntityCard } from "@/components/shared/entity-card";
@@ -26,6 +33,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Company360View, type Company360Data } from "@/components/shared/company-360-view";
+import { humanLabel, isInternalKey } from "@/lib/records/field-labels";
 
 export const Route = createFileRoute("/_authenticated/investors")({
   head: () => ({
@@ -34,81 +42,33 @@ export const Route = createFileRoute("/_authenticated/investors")({
   component: InvestorsPage,
 });
 
-function formatUsd(n: number): string {
-  if (!n) return "—";
-  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
-  if (n >= 1_000) return `$${Math.round(n / 1_000)}K`;
-  return `$${n}`;
-}
-
-const CATEGORY_CHIPS = [
-  "All",
-  "AI",
-  "Fintech",
-  "Climate",
-  "Healthcare",
-  "SaaS",
-  "Consumer",
-  "Web3",
-]; // leaving the comment to not break line nums
-
-function checkRangeOf(r: InvestorWithMetadata): string {
-  return "sweet_spot" in r && r.sweet_spot
-    ? `${r.sweet_spot.range_min}\u2013${r.sweet_spot.range_max}`
-    : "check_min_usd" in r && "check_max_usd" in r
-      ? `${formatUsd(r.check_min_usd)}\u2013${formatUsd(r.check_max_usd)}`
-      : "\u2014";
-}
-
 function buildInvestorEntity(r: InvestorWithMetadata): Company360Data {
-  const isFirm = "type" in r && r.type === "firm";
-  const firm = "firm" in r ? r.firm : "";
-  const role = "role" in r ? r.role : "title" in r ? r.title : "";
-  const email = "email" in r ? r.email : undefined;
-  const website = "website" in r ? r.website : undefined;
-  const physicalLocation =
-    "location" in r && typeof r.location === "string" ? r.location : undefined;
-  const categories = getInvestorSectors(r).slice(0, 3);
-  const stages = getInvestorStages(r);
-  const investorType =
-    "entity_type" in r ? String(r.entity_type) : "investor_type" in r ? r.investor_type : undefined;
-  const thesis =
-    ("thesis" in r && r.thesis) || ("investment_thesis" in r && r.investment_thesis) || undefined;
-  const checkRange = checkRangeOf(r);
-
-  const description =
-    ("bio" in r && r.bio) ||
-    ("description" in r && r.description) ||
-    ("thesis" in r && r.thesis) ||
-    ("investment_thesis" in r && r.investment_thesis) ||
-    `${r.name} is ${isFirm ? "a venture capital firm" : "an angel investor"} focusing on ${categories.slice(0, 3).join(", ") || "technology investments"}.`;
-
-  const descriptionStr =
-    typeof description === "string"
-      ? description
-      : `${r.name} is ${isFirm ? "a venture capital firm" : "an angel investor"}.`;
-
+  const m = buildInvestorCardModel(r);
   return {
     domain: "investor",
     name: r.name,
-    subtitle: isFirm ? "VC Firm" : `${role}${firm ? ` \u00b7 ${firm}` : ""}`,
-    category: isFirm ? "Firm" : "Angel",
-    location: physicalLocation || undefined,
-    description: descriptionStr,
-    email,
-    website,
-    tags: categories,
-    check_size: checkRange,
-    sectors: categories,
-    firm: firm || undefined,
-    investor_type: investorType,
-    stage: stages.length ? stages.join(", ") : undefined,
-    thesis: typeof thesis === "string" ? thesis : undefined,
-    stats: [
-      { label: "Check Size", value: checkRange },
-      { label: "Type", value: isFirm ? "Firm" : "Individual" },
-      { label: "Status", value: "Verified" },
-    ],
+    subtitle: m.subtitle,
+    category: m.category,
+    location: m.location,
+    description: m.description,
+    email: m.email,
+    website: m.website,
+    phone: m.phone,
+    logo_url: investorImageUrl(r) ?? undefined,
+    tags: m.tags,
+    check_size: m.checkSize,
+    sectors: m.sectors,
+    firm: m.isFirm ? undefined : m.firmName,
+    investor_type: m.typeBadges.join(", ") || undefined,
+    stage: m.stages.length ? m.stages.join(", ") : undefined,
+    stats: m.detailStats,
+    links: m.links,
+    // Full Record: every populated field with human-friendly labels; internal
+    // parser metadata (id, record_type, source_file, image_url, score) is
+    // surfaced via badges/images, never as raw rows.
+    record_fields: populatedFields(r)
+      .filter((f) => !isInternalKey(f.key))
+      .map((f) => ({ label: humanLabel(f.key), value: f.value })),
   };
 }
 
@@ -120,38 +80,36 @@ const InvestorGridCard = memo(function InvestorGridCard({
   searchFilters,
   onToggleBookmark,
   onOpen,
+  onAvatarError,
 }: {
   row: InvestorWithMetadata;
   saved: boolean;
   searchFilters: SearchFilters;
   onToggleBookmark: (id: string) => void;
   onOpen: (row: InvestorWithMetadata) => void;
+  onAvatarError: (id: string) => void;
 }) {
-  const isFirm = "type" in row && row.type === "firm";
-  const firm = "firm" in row ? row.firm : "";
-  const role = "role" in row ? row.role : "title" in row ? row.title : "";
-  const physicalLocation =
-    "location" in row && typeof row.location === "string" ? row.location : "";
-  const categories = getInvestorSectors(row).slice(0, 3);
-  const checkRange = checkRangeOf(row);
+  // Data-driven card model: classification, badges, stats, and tags all
+  // come from the record's own fields (record_type first) — never defaults.
+  const model = buildInvestorCardModel(row);
   const relevantBecause = generateRelevantBecause(row, searchFilters, row._matchMetadata || {});
+  const avatarUrl = investorImageUrl(row);
 
   return (
     <EntityCard
-      id={row.id}
+      id={model.key}
       title={row.name}
-      subtitle={isFirm ? "VC Firm" : `${role}${firm ? ` \u00b7 ${firm}` : ""}`}
-      category={isFirm ? "Firm" : "Angel"}
-      location={physicalLocation || undefined}
-      stats={[
-        { label: "Check Size", value: checkRange },
-        { label: "Type", value: isFirm ? "Firm" : "Individual" },
-        { label: "Status", value: "Verified" },
-      ]}
-      tags={categories}
+      subtitle={model.subtitle}
+      category={model.category}
+      location={model.location}
+      avatarUrl={avatarUrl ?? undefined}
+      onAvatarError={() => onAvatarError(model.key)}
+      stats={model.cardStats}
+      tags={model.tags}
+      description={model.description}
       relevantBecause={searchFilters.location ? relevantBecause : undefined}
       saved={saved}
-      onSaveToggle={() => onToggleBookmark(row.id)}
+      onSaveToggle={() => onToggleBookmark(model.key)}
       primaryActionLabel="View Details"
       onViewDetails={() => onOpen(row)}
       onClick={() => onOpen(row)}
@@ -254,9 +212,110 @@ function InvestorsPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  // Records whose profile image failed to load drop into the no-image
+  // group (initials fallback shown); re-rank with the server's _ranking
+  // scores so the strict image → completeness → relevance → name order holds.
+  const [brokenImages, setBrokenImages] = useState<ReadonlySet<string>>(() => new Set());
+  const markBrokenImage = useCallback((id: string) => {
+    setBrokenImages((prev) => {
+      if (prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+  }, []);
+
+  const rankedRows = useMemo(() => {
+    if (brokenImages.size === 0) return rows;
+    const key = (r: InvestorWithMetadata) => ({
+      img: hasProfileImage(r) && !brokenImages.has(investorRowKey(r)) ? 1 : 0,
+      comp: r._ranking?.completeness ?? 0,
+      rel: r._ranking?.relevance ?? 0,
+    });
+    return [...rows].sort((a, b) => {
+      const ka = key(a);
+      const kb = key(b);
+      return (
+        kb.img - ka.img || kb.comp - ka.comp || kb.rel - ka.rel || a.name.localeCompare(b.name)
+      );
+    });
+  }, [rows, brokenImages]);
+
+  // Debug check (dev only): log the first 20 rendered records with their
+  // source classification and the badges actually rendered, then verify two
+  // invariants over the full result set — no firm record renders an
+  // Angel/Individual badge, and no individual renders Angel unless the
+  // source investor_type explicitly includes it — plus the image-first order.
+  useEffect(() => {
+    if (!import.meta.env.DEV || rankedRows.length === 0) return;
+    let lastImg = -1;
+    let firstNoImg = -1;
+    rankedRows.forEach((r, i) => {
+      if (hasProfileImage(r)) lastImg = i;
+      else if (firstNoImg < 0) firstNoImg = i;
+    });
+    let badgeViolations = 0;
+    let uncoveredFields = 0;
+    for (const r of rankedRows) {
+      const m = buildInvestorCardModel(r);
+      const rendered = [m.category, ...m.typeBadges].filter(Boolean);
+      if (m.isFirm && rendered.some((b) => b === "Angel" || b === "Individual")) {
+        badgeViolations++;
+      }
+      if (!m.isFirm && rendered.includes("Angel") && !hasExplicitAngel(r)) {
+        badgeViolations++;
+      }
+      // Field audit: every populated source field must be rendered in the
+      // Details drawer (record_fields) or surfaced on the card/list model.
+      const fields = populatedFields(r);
+      const detailKeys = new Set(fields.map((f) => f.key));
+      const cardJson = JSON.stringify(m);
+      for (const f of fields) {
+        // Internal metadata is intentionally rendered as badges/images,
+        // not as rows — exclude it from the coverage audit.
+        if (isInternalKey(f.key)) continue;
+        const snippet = f.value.length > 32 ? f.value.slice(0, 32) : f.value;
+        if (!detailKeys.has(f.key) && !cardJson.includes(snippet)) {
+          uncoveredFields++;
+          if (uncoveredFields <= 5) {
+            console.warn(`[investors-audit] populated field not rendered: ${r.name} → ${f.key}`);
+          }
+        }
+      }
+    }
+    console.info(
+      "[investors-cards] first 20:",
+      rankedRows.slice(0, 20).map((r) => {
+        const rec = r as Record<string, unknown>;
+        const m = buildInvestorCardModel(r);
+        return {
+          name: r.name,
+          record_type: rec.record_type ?? null,
+          investor_type: rec.investor_type ?? rec.investor_types ?? null,
+          firm_type: rec.firm_type ?? null,
+          title: rec.title ?? null,
+          current_role: rec.current_role ?? null,
+          firm_name: rec.firm_name ?? null,
+          image_url: investorImageUrl(r),
+          populatedFields: populatedFields(r).map((f) => f.key),
+          renderedBadges: [m.category, ...m.typeBadges].filter(Boolean),
+        };
+      }),
+      badgeViolations === 0
+        ? "| OK: no firm renders Angel/Individual; Angel only when the source says so"
+        : `| BADGE VIOLATIONS: ${badgeViolations}`,
+      uncoveredFields === 0
+        ? "| OK: every populated source field is rendered"
+        : `| UNRENDERED FIELDS: ${uncoveredFields}`,
+      firstNoImg >= 0 && lastImg > firstNoImg
+        ? `ORDERING VIOLATION at index ${firstNoImg}`
+        : "| OK: no image-less record before an image-backed one",
+    );
+  }, [rankedRows]);
+
   // Progressive rendering: only mount a window of cards and grow it as the
   // user scrolls, instead of rendering thousands of cards at once.
-  const { visible, hasMore, loadMore, shown } = useProgressiveCount(rows, 24);
+  const { visible, hasMore, loadMore, shown } = useProgressiveCount(rankedRows, 24);
 
   // Stable callbacks so memoized cards don't re-render on unrelated state changes.
   const toggleBookmark = useCallback((id: string) => {
@@ -287,20 +346,14 @@ function InvestorsPage() {
     const lines = [
       header.join(","),
       ...rows.map((r) => {
-        const isFirm = "type" in r && r.type === "firm";
-        const firm = "firm" in r ? r.firm : "";
-        const role = "role" in r ? r.role : "title" in r ? r.title : "";
-        const email = "email" in r ? r.email : "";
-        const website = "website" in r ? r.website : "";
-        const linkedIn = r.links?.linkedin || "";
-        const physicalLocation =
-          "location" in r && typeof r.location === "string" ? r.location : "";
-        const checkRange =
-          "sweet_spot" in r && r.sweet_spot
-            ? `${r.sweet_spot.range_min}–${r.sweet_spot.range_max}`
-            : "check_min_usd" in r && "check_max_usd" in r
-              ? `${formatUsd(r.check_min_usd)}–${formatUsd(r.check_max_usd)}`
-              : "";
+        const m = buildInvestorCardModel(r);
+        const firm = m.isFirm ? "" : (m.firmName ?? "");
+        const role = m.isFirm ? (m.subtitle ?? "") : (m.role ?? m.title ?? "");
+        const email = m.email ?? "";
+        const website = m.website ?? "";
+        const linkedIn = m.linkedin ?? "";
+        const physicalLocation = m.location ?? "";
+        const checkRange = m.checkSize ?? "";
         return [r.name, firm, role, checkRange, physicalLocation, email, website, linkedIn]
           .map((c) => `"${String(c).replace(/"/g, '""')}"`)
           .join(",");
@@ -319,26 +372,32 @@ function InvestorsPage() {
     {
       header: "Investor / Firm",
       accessor: (r) => {
-        const isFirm = "type" in r && r.type === "firm";
-        const role = "role" in r ? r.role : "title" in r ? r.title : "";
-        const firm = "firm" in r ? r.firm : "";
+        const m = buildInvestorCardModel(r);
+        const avatarUrl = investorImageUrl(r);
         return (
           <div className="flex items-center gap-3">
-            <div className="size-9 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center font-semibold text-white text-xs shrink-0">
-              {r.name[0]?.toUpperCase()}
-            </div>
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={r.name}
+                loading="lazy"
+                className="size-9 rounded-xl object-cover border border-white/15 shrink-0"
+              />
+            ) : (
+              <div className="size-9 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center font-semibold text-white text-xs shrink-0">
+                {r.name[0]?.toUpperCase()}
+              </div>
+            )}
             <div className="min-w-0">
               <div className="font-semibold text-white truncate flex items-center gap-1.5">
                 <span>{r.name}</span>
-                {isFirm && (
+                {m.isFirm && (
                   <span className="text-[9px] px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-300 font-medium">
                     Firm
                   </span>
                 )}
               </div>
-              <div className="text-[11px] text-white/50 truncate">
-                {isFirm ? "VC Firm" : `${role}${firm ? ` · ${firm}` : ""}`}
-              </div>
+              <div className="text-[11px] text-white/50 truncate">{m.subtitle ?? ""}</div>
             </div>
           </div>
         );
@@ -347,12 +406,11 @@ function InvestorsPage() {
     {
       header: "Location",
       accessor: (r) => {
-        const physicalLocation =
-          "location" in r && typeof r.location === "string" ? r.location : "";
+        const m = buildInvestorCardModel(r);
         return (
           <div className="text-xs text-white/70 truncate flex items-center gap-1">
             <MapPin className="size-3 text-white/40" />
-            <span>{physicalLocation || "Not specified"}</span>
+            <span>{m.location ?? "Not specified"}</span>
           </div>
         );
       },
@@ -360,19 +418,14 @@ function InvestorsPage() {
     {
       header: "Check Size",
       accessor: (r) => {
-        const checkRange =
-          "sweet_spot" in r && r.sweet_spot
-            ? `${r.sweet_spot.range_min}–${r.sweet_spot.range_max}`
-            : "check_min_usd" in r && "check_max_usd" in r
-              ? `${formatUsd(r.check_min_usd)}–${formatUsd(r.check_max_usd)}`
-              : "—";
+        const checkRange = checkSizeOf(r) ?? "—";
         return <span className="font-mono text-xs text-white/90">{checkRange}</span>;
       },
     },
     {
       header: "Sectors",
       accessor: (r) => {
-        const categories = getInvestorSectors(r).slice(0, 2);
+        const categories = buildInvestorCardModel(r).sectors.slice(0, 2);
         return (
           <div className="flex flex-wrap gap-1">
             {categories.map((c, i) => (
@@ -537,22 +590,23 @@ function InvestorsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {visible.map((r) => (
                   <InvestorGridCard
-                    key={r.id}
+                    key={investorRowKey(r)}
                     row={r}
-                    saved={bookmarkedIds.has(r.id)}
+                    saved={bookmarkedIds.has(investorRowKey(r))}
                     searchFilters={searchFilters}
                     onToggleBookmark={toggleBookmark}
                     onOpen={openDetailView}
+                    onAvatarError={markBrokenImage}
                   />
                 ))}
               </div>
             ) : (
               <EntityTable
                 rows={visible}
-                keyExtractor={(r) => r.id}
+                keyExtractor={(r) => investorRowKey(r)}
                 columns={tableColumns}
-                onBookmark={(r) => toggleBookmark(r.id)}
-                isBookmarked={(r) => bookmarkedIds.has(r.id)}
+                onBookmark={(r) => toggleBookmark(investorRowKey(r))}
+                isBookmarked={(r) => bookmarkedIds.has(investorRowKey(r))}
                 onRowClick={openDetailView}
               />
             )}

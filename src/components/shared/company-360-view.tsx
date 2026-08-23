@@ -70,6 +70,11 @@ export interface Company360Data {
   // Shared
   tags?: string[];
   stats?: { label: string; value: string | number }[];
+  /** Every populated source-record field, rendered dynamically so no
+   *  populated value is silently lost (investors adapter supplies these). */
+  record_fields?: { label: string; value: string }[];
+  /** Human-readable links: label + full destination URL preserved. */
+  links?: { label: string; href: string }[];
 
   // Enrichment data (placeholder for future)
   technologies?: string[];
@@ -87,6 +92,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { draftEntityOutreach } from "@/lib/outreach.functions";
+import { splitParagraphs } from "@/lib/records/text";
 
 export function Company360View({ data, onClose }: Company360ViewProps) {
   const [showFullDesc, setShowFullDesc] = useState(false);
@@ -156,8 +162,11 @@ export function Company360View({ data, onClose }: Company360ViewProps) {
   };
 
   const desc = data.description ?? "";
-  const isLongDesc = desc.length > 280;
-  const displayDesc = isLongDesc && !showFullDesc ? `${desc.slice(0, 280)}...` : desc;
+  // Preserve source paragraph breaks; dense single blocks are split at
+  // sentence boundaries by the shared text module (PRD §8).
+  const paragraphs = splitParagraphs(desc);
+  const isLongDesc = desc.length > 480 || paragraphs.length > 2;
+  const visibleParagraphs = isLongDesc && !showFullDesc ? paragraphs.slice(0, 2) : paragraphs;
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
@@ -207,11 +216,16 @@ export function Company360View({ data, onClose }: Company360ViewProps) {
         <div className="px-6 py-5 space-y-6 min-w-0 max-w-full overflow-x-hidden">
           {/* § Overview */}
           <Section title="Overview" icon={<Building2 className="size-4" />}>
-            {desc ? (
-              <div className="space-y-2">
-                <p className="text-xs text-white/70 leading-relaxed break-words whitespace-pre-line">
-                  {displayDesc}
-                </p>
+            {paragraphs.length ? (
+              <div className="space-y-2.5">
+                {visibleParagraphs.map((p, i) => (
+                  <p
+                    key={i}
+                    className="text-xs text-white/70 leading-relaxed break-words [overflow-wrap:anywhere] whitespace-pre-line"
+                  >
+                    {p}
+                  </p>
+                ))}
                 {isLongDesc && (
                   <button
                     type="button"
@@ -230,16 +244,52 @@ export function Company360View({ data, onClose }: Company360ViewProps) {
             {data.stats && data.stats.length > 0 && (
               <div className="grid grid-cols-3 gap-3 mt-3">
                 {data.stats.map((s, i) => (
-                  <div key={i} className="rounded-xl bg-white/[0.03] border border-white/5 p-3">
-                    <div className="text-[10px] uppercase tracking-wider text-white/40">
+                  <div
+                    key={i}
+                    className="rounded-xl bg-white/[0.03] border border-white/5 p-3 min-w-0 overflow-hidden"
+                  >
+                    <div
+                      className="text-[10px] uppercase tracking-wider text-white/40 truncate"
+                      title={String(s.label)}
+                    >
                       {s.label}
                     </div>
-                    <div className="text-sm font-semibold text-white mt-1">{s.value || "—"}</div>
+                    <div className="text-sm font-semibold text-white mt-1 break-words [overflow-wrap:anywhere]">
+                      {s.value || "—"}
+                    </div>
                   </div>
                 ))}
               </div>
             )}
           </Section>
+
+          {/* § Full Record: every populated source field, rendered
+              dynamically from the record so real values are never dropped. */}
+          {data.record_fields && data.record_fields.length > 0 && (
+            <Section title="Full Record" icon={<Briefcase className="size-4" />}>
+              <div className="space-y-1.5 min-w-0">
+                {data.record_fields.map((f, i) => (
+                  <div key={`${f.label}-${i}`} className="flex gap-3 text-xs min-w-0">
+                    <span className="text-white/40 shrink-0 w-36 truncate" title={f.label}>
+                      {f.label}
+                    </span>
+                    {/^https?:\/\//i.test(f.value) ? (
+                      <a
+                        href={f.value}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-emerald-300 hover:underline break-all min-w-0"
+                      >
+                        {f.value}
+                      </a>
+                    ) : (
+                      <span className="text-white/80 break-words min-w-0">{f.value}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </Section>
+          )}
 
           {/* § Contacts */}
           <Section title="Contact Information" icon={<Users className="size-4" />}>
@@ -298,6 +348,28 @@ export function Company360View({ data, onClose }: Company360ViewProps) {
               </div>
             )}
           </Section>
+
+          {/* § Links: human-readable labels; full destination URL preserved
+              in the clickable element, exposed via tooltip (PRD §9). */}
+          {data.links && data.links.length > 0 && (
+            <Section title="Links" icon={<ExternalLink className="size-4" />}>
+              <div className="space-y-1.5 min-w-0">
+                {data.links.map((l, i) => (
+                  <a
+                    key={i}
+                    href={l.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    title={l.href}
+                    className="flex items-center gap-2 min-w-0 rounded-lg px-2.5 py-2 bg-white/[0.02] border border-white/5 text-xs text-emerald-300 hover:text-emerald-200 hover:bg-white/[0.05] focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-400 transition-colors"
+                  >
+                    <ExternalLink className="size-3 shrink-0" />
+                    <span className="truncate">{l.label}</span>
+                  </a>
+                ))}
+              </div>
+            </Section>
+          )}
 
           {/* § Technology Stack (Local Businesses & Jobs only, when data exists) */}
           {data.domain !== "investor" && data.technologies && data.technologies.length > 0 && (
@@ -442,7 +514,7 @@ export function Company360View({ data, onClose }: Company360ViewProps) {
               {data.source
                 ? `Ingested via ${data.source}`
                 : data.domain === "investor"
-                  ? "Verified through multiple sources"
+                  ? "No provenance data in source record."
                   : data.domain === "job"
                     ? "Aggregated ATS Provider Pipeline"
                     : "Local Business Directory & Web Scraper"}
@@ -584,7 +656,9 @@ function ContactRow({
       className="flex items-center gap-2.5 p-2 rounded-lg bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-colors group"
     >
       {icon}
-      <span className="text-xs text-white/80 truncate group-hover:text-white">{value}</span>
+      <span className="text-xs text-white/80 truncate min-w-0 group-hover:text-white" title={value}>
+        {value}
+      </span>
       {external && <ExternalLink className="size-3 text-white/30 ml-auto shrink-0" />}
     </a>
   );
@@ -594,7 +668,9 @@ function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-2 py-1.5 border-b border-white/5 last:border-0">
       <span className="text-white/40 shrink-0">{label}</span>
-      <span className="text-white/80 text-right truncate">{value}</span>
+      <span className="text-white/80 text-right truncate min-w-0" title={value}>
+        {value}
+      </span>
     </div>
   );
 }

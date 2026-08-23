@@ -43,6 +43,26 @@ const REGIONS: { id: JobRegion; label: string }[] = [
   { id: "asia", label: "Asia" },
 ];
 
+/** Per-source fetch outcome reported by the server (PRD §10). */
+type JobSourceStatus = {
+  id: string;
+  label: string;
+  status: "ok" | "error";
+  count: number;
+  error?: string;
+  fetchedAt: number;
+};
+
+const fmtDate = (iso: string | null | undefined): string | null => {
+  if (!iso) return null;
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime())
+    ? null
+    : d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+};
+
+const sourceLabel = (s: string): string => s.replace(/^source-(ats-)?/, "");
+
 function JobsPage() {
   const searchFn = useServerFn(runJobSearch);
   const getUsage = useServerFn(getRemainingSearches);
@@ -58,6 +78,7 @@ function JobsPage() {
   const [region, setRegion] = useState<JobRegion>(initialState?.filters?.region ?? "any");
   const [rows, setRows] = useState<JobPosting[]>(initialState?.results ?? []);
   const [searched, setSearched] = useState(!!initialState?.results?.length);
+  const [sourceStatuses, setSourceStatuses] = useState<JobSourceStatus[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const [selectedEntity, setSelectedEntity] = useState<Company360Data | null>(null);
@@ -103,6 +124,7 @@ function JobsPage() {
       const fetchedJobs = res.jobs ?? [];
       setRows(fetchedJobs);
       setSearched(true);
+      setSourceStatuses(res.sourceStatuses ?? []);
       saveRouteSearchState("jobs", {
         query,
         filters: { query, location, remoteOnly, seniority, region, contactRoles },
@@ -131,18 +153,41 @@ function JobsPage() {
   };
 
   const openDetailView = (j: JobPosting) => {
+    // Full normalized job record — every populated field reaches the drawer.
+    const recordFields = [
+      { label: "Title", value: j.title },
+      { label: "Company", value: j.company },
+      ...(j.location ? [{ label: "Location", value: j.location }] : []),
+      { label: "Remote", value: j.remote ? "Yes" : "No" },
+      ...(j.seniority ? [{ label: "Seniority", value: j.seniority }] : []),
+      ...(j.department ? [{ label: "Department", value: j.department }] : []),
+      ...(j.employment_type ? [{ label: "Employment type", value: j.employment_type }] : []),
+      ...(j.salary ? [{ label: "Compensation", value: j.salary }] : []),
+      { label: "Source", value: sourceLabel(j.source) },
+      { label: "Board", value: j.board_id },
+      ...(fmtDate(j.posted_at) ? [{ label: "Posted", value: fmtDate(j.posted_at) as string }] : []),
+      ...(fmtDate(j.updated_at)
+        ? [{ label: "Updated", value: fmtDate(j.updated_at) as string }]
+        : []),
+      ...(fmtDate(j.fetched_at)
+        ? [{ label: "Fetched", value: fmtDate(j.fetched_at) as string }]
+        : []),
+    ];
     setSelectedEntity({
       domain: "job",
-      name: j.company,
+      name: j.title,
+      subtitle: j.company,
       role_title: j.title,
       company_name: j.company,
       location: j.location || (j.remote ? "Remote" : undefined),
       seniority: j.seniority || undefined,
       salary: j.salary || undefined,
-      source: j.source,
+      source: sourceLabel(j.source),
       job_url: j.url,
       remote: j.remote,
       description: j.description || undefined,
+      links: [{ label: "Application URL", href: j.url }],
+      record_fields: recordFields,
     });
   };
 
@@ -230,7 +275,7 @@ function JobsPage() {
       header: "Source",
       accessor: (j) => (
         <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.06] text-white/70 border border-white/10 uppercase tracking-wider font-mono">
-          {j.source.replace(/^source-(ats-)?/, "")}
+          {sourceLabel(j.source)}
         </span>
       ),
     },
@@ -365,6 +410,38 @@ function JobsPage() {
             <div className="text-xs text-white/50 mb-3">
               {rows.length} active jobs loaded{hasMore ? ` — showing ${shown}` : ""}
             </div>
+            {/* Per-source status strip: failed sources are reported without
+                losing the jobs that other sources returned (PRD §10). */}
+            {sourceStatuses.length > 0 && (
+              <div className="flex flex-wrap items-center gap-1.5 mb-4">
+                <span className="text-[10px] uppercase tracking-wider text-white/40 mr-1">
+                  Sources
+                </span>
+                {sourceStatuses.map((s) => (
+                  <span
+                    key={s.id}
+                    title={
+                      s.status === "error"
+                        ? (s.error ?? "Source failed")
+                        : `${s.count} postings from ${s.label}`
+                    }
+                    className={`inline-flex items-center gap-1.5 text-[10px] px-2 py-1 rounded-full border ${
+                      s.status === "error"
+                        ? "bg-red-500/10 text-red-300 border-red-500/25"
+                        : "bg-white/[0.04] text-white/70 border-white/10"
+                    }`}
+                  >
+                    <span
+                      className={`size-1.5 rounded-full ${
+                        s.status === "error" ? "bg-red-400" : "bg-emerald-400"
+                      }`}
+                    />
+                    {s.label}
+                    {s.status === "error" ? " · failed" : ` · ${s.count}`}
+                  </span>
+                ))}
+              </div>
+            )}
             {viewMode === "grid" ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {visible.map((j) => (
@@ -376,9 +453,15 @@ function JobsPage() {
                     category={j.remote ? "Remote" : "Job"}
                     location={j.location || (j.remote ? "Remote" : undefined)}
                     stats={[
-                      { label: "Seniority", value: j.seniority || "Any" },
-                      { label: "Salary", value: j.salary || "—" },
-                      { label: "Source", value: j.source.replace(/^source-(ats-)?/, "") },
+                      ...(j.seniority ? [{ label: "Seniority", value: j.seniority }] : []),
+                      ...(j.employment_type
+                        ? [{ label: "Employment type", value: j.employment_type }]
+                        : []),
+                      ...(j.salary ? [{ label: "Compensation", value: j.salary }] : []),
+                      { label: "Source", value: sourceLabel(j.source) },
+                      ...(fmtDate(j.posted_at)
+                        ? [{ label: "Posted", value: fmtDate(j.posted_at) as string }]
+                        : []),
                     ]}
                     description={j.description || undefined}
                     saved={bookmarkedIds.has(j.id)}

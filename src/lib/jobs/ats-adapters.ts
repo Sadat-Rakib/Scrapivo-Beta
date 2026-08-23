@@ -5,6 +5,11 @@ import { tenantBoardsFor } from "./tenants";
 import { guessSeniority, looksRemote } from "./filters";
 import type { JobSearchFilters, RawJobPosting } from "./types";
 
+/** ATS JSON payloads have provider-specific shapes; adapters validate the
+ *  fields they actually consume. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyJson = any;
+
 function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
   return new Promise((resolve) => {
     const t = setTimeout(() => resolve(fallback), ms);
@@ -36,7 +41,7 @@ async function fetchGreenhouse(_filters: JobSearchFilters): Promise<RawJobPostin
   const pages = await Promise.all(
     boards.map(async (board) => {
       const data = await withTimeout(
-        resilientJson<{ jobs?: any[] }>(
+        resilientJson<{ jobs?: AnyJson[] }>(
           `https://boards-api.greenhouse.io/v1/boards/${encodeURIComponent(board)}/jobs?content=true`,
         ).catch(() => null),
         9000,
@@ -60,11 +65,13 @@ async function fetchGreenhouse(_filters: JobSearchFilters): Promise<RawJobPostin
         url,
         source: "source-ats-greenhouse",
         board_id: board,
-        posted_at: j.updated_at || j.first_published || null,
+        posted_at: j.first_published || j.updated_at || null,
+        updated_at: j.updated_at || null,
         description: desc,
         salary: null,
         remote: looksRemote(loc, title, desc),
         seniority: guessSeniority(title),
+        department: sanitizeJobText(j.departments?.[0]?.name) || null,
       });
     }
   }
@@ -77,7 +84,7 @@ async function fetchLever(_filters: JobSearchFilters): Promise<RawJobPosting[]> 
   const pages = await Promise.all(
     boards.map(async (board) => {
       const data = await withTimeout(
-        resilientJson<any[]>(
+        resilientJson<AnyJson[]>(
           `https://api.lever.co/v0/postings/${encodeURIComponent(board)}?mode=json`,
         ).catch(() => null),
         9000,
@@ -102,7 +109,7 @@ async function fetchLever(_filters: JobSearchFilters): Promise<RawJobPosting[]> 
       const desc = sanitizeJobText(j.descriptionPlain || j.description).slice(0, 800) || null;
       out.push({
         title,
-        company: sanitizeJobText(j.categories?.team || board),
+        company: sanitizeJobText(j.categories?.company || board),
         location: loc || null,
         url,
         source: "source-ats-lever",
@@ -112,6 +119,8 @@ async function fetchLever(_filters: JobSearchFilters): Promise<RawJobPosting[]> 
         salary: null,
         remote: looksRemote(loc, title, desc) || Boolean(j.workplaceType === "remote"),
         seniority: guessSeniority(title),
+        department: sanitizeJobText(j.categories?.department || j.categories?.team) || null,
+        employment_type: sanitizeJobText(j.categories?.commitment) || null,
       });
     }
   }
@@ -124,7 +133,7 @@ async function fetchAshby(_filters: JobSearchFilters): Promise<RawJobPosting[]> 
   const pages = await Promise.all(
     boards.map(async (board) => {
       const data = await withTimeout(
-        resilientJson<{ jobs?: any[] }>(
+        resilientJson<{ jobs?: AnyJson[] }>(
           `https://api.ashbyhq.com/posting-api/job-board/${encodeURIComponent(board)}?includeCompensation=true`,
         ).catch(() => null),
         9000,
@@ -152,10 +161,13 @@ async function fetchAshby(_filters: JobSearchFilters): Promise<RawJobPosting[]> 
         source: "source-ats-ashby",
         board_id: board,
         posted_at: j.publishedAt || j.updatedAt || null,
+        updated_at: j.updatedAt || null,
         description: desc,
         salary: salary ? salary.slice(0, 200) : null,
         remote: looksRemote(loc, title, desc) || Boolean(j.isRemote),
         seniority: guessSeniority(title),
+        department: sanitizeJobText(j.department) || null,
+        employment_type: sanitizeJobText(j.employmentType) || null,
       });
     }
   }
@@ -167,7 +179,7 @@ async function fetchSmartRecruiters(_filters: JobSearchFilters): Promise<RawJobP
   const out: RawJobPosting[] = [];
   for (const company of boards) {
     const data = await withTimeout(
-      resilientJson<{ content?: any[] }>(
+      resilientJson<{ content?: AnyJson[] }>(
         `https://api.smartrecruiters.com/v1/companies/${encodeURIComponent(company)}/postings?limit=100`,
       ).catch(() => null),
       9000,
@@ -193,6 +205,8 @@ async function fetchSmartRecruiters(_filters: JobSearchFilters): Promise<RawJobP
         salary: null,
         remote: looksRemote(loc, title),
         seniority: guessSeniority(title),
+        department: typeof p.department === "string" ? p.department : null,
+        employment_type: typeof p.typeOfEmployment === "string" ? p.typeOfEmployment : null,
       });
     }
   }
@@ -204,7 +218,7 @@ async function fetchWorkable(_filters: JobSearchFilters): Promise<RawJobPosting[
   const out: RawJobPosting[] = [];
   for (const account of boards) {
     const data = await withTimeout(
-      resilientJson<{ jobs?: any[] }>(
+      resilientJson<{ jobs?: AnyJson[] }>(
         `https://apply.workable.com/api/v1/widget/accounts/${encodeURIComponent(account)}`,
       ).catch(() => null),
       9000,
@@ -237,7 +251,7 @@ async function fetchRecruitee(_filters: JobSearchFilters): Promise<RawJobPosting
   const out: RawJobPosting[] = [];
   for (const company of boards) {
     const data = await withTimeout(
-      resilientJson<{ offers?: any[] }>(
+      resilientJson<{ offers?: AnyJson[] }>(
         `https://${encodeURIComponent(company)}.recruitee.com/api/offers`,
       ).catch(() => null),
       9000,
