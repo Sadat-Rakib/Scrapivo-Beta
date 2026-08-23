@@ -145,6 +145,9 @@ export function humanLabel(key: string): string {
  * Internal parser/ingest metadata that must stay out of the ordinary UI.
  * These values are still available to provenance sections, badges, image
  * rendering, and the dev-mode audit — they just never render as raw rows.
+ * Verification/ingest internals (email_verified, website_status, verify_note,
+ * sample_url/listing_url, fetched_at) surface only through curated UI
+ * elements (links, status chips), never as key/value rows.
  */
 export const INTERNAL_HIDDEN_KEYS = new Set([
   "id",
@@ -157,6 +160,12 @@ export const INTERNAL_HIDDEN_KEYS = new Set([
   "entity_id",
   "_ranking",
   "_matchMetadata",
+  "verify_note",
+  "email_verified",
+  "website_status",
+  "sample_url",
+  "listing_url",
+  "fetched_at",
 ]);
 
 /** True when a dotted populated-field key is internal metadata. */

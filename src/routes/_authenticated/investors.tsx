@@ -8,12 +8,13 @@ import { hasProfileImage, investorImageUrl } from "@/lib/investors/search";
 import {
   buildInvestorCardModel,
   checkSizeOf,
+  generateRelevantBecause,
   hasExplicitAngel,
   investorRowKey,
   isFirmRecord,
   populatedFields,
+  type SearchFilters,
 } from "@/lib/investors/card-adapters";
-import { generateRelevantBecause, type SearchFilters } from "@/lib/investors/relevance-explainer";
 import { ViewToggle, type ViewMode } from "@/components/shared/view-toggle";
 import { EntityCard } from "@/components/shared/entity-card";
 import { EntityTable, type ColumnDef } from "@/components/shared/entity-table";

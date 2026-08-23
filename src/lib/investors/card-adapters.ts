@@ -11,6 +11,7 @@
 
 import type { InvestorEntity, InvestorRecord } from "./types";
 import { getInvestorSectors, getInvestorStages } from "./types";
+import type { LocationMatchResult } from "./location-hierarchy";
 import { displayMoney, displayMoneyRange, formatUsd } from "@/lib/records/money";
 import { populatedFields as walkPopulatedFields } from "@/lib/records/populated-fields";
 import type { PopulatedField } from "@/lib/records/populated-fields";
@@ -214,7 +215,10 @@ export function checkSizeOf(rec: InvestorRow): string | undefined {
   }
   const minUsd = fmtUsd(r.check_min_usd);
   const maxUsd = fmtUsd(r.check_max_usd);
-  if (minUsd || maxUsd) return `${minUsd ?? "?"}–${maxUsd ?? "?"}`;
+  if (minUsd || maxUsd) {
+    // Show only the sides the source actually provides — never a "?" placeholder.
+    return minUsd && maxUsd ? `${minUsd}–${maxUsd}` : (minUsd ?? maxUsd ?? undefined);
+  }
   const stated = str(r.stated_investment_range);
   if (stated) return displayMoney(stated) ?? stated;
   const sweetNum = typeof ss === "number" ? fmtUsd(ss) : fmtUsd(r.investment_profile?.sweet_spot);
@@ -233,6 +237,112 @@ export type { PopulatedField };
  *  so no populated value can be silently lost. */
 export function populatedFields(rec: InvestorRow): PopulatedField[] {
   return walkPopulatedFields(rec);
+}
+
+/* ── "Relevant because" explanations ────────────────────────────────────
+ * Explains WHY an investor matches the user's search criteria. All money
+ * rendering flows through records/money — never a local formatter, so no
+ * "$0" fallback can appear when a check bound is absent. */
+
+export interface SearchFilters {
+  location?: string;
+  stage?: string;
+  sector?: string;
+  checkBand?: "angel" | "seed" | "growth" | "any";
+  query?: string;
+}
+
+export interface MatchMetadata {
+  locationMatch?: LocationMatchResult;
+}
+
+function formatCheckRange(investor: InvestorEntity | InvestorRecord): string | null {
+  if ("sweet_spot" in investor && investor.sweet_spot) {
+    const { range_min, range_max } = investor.sweet_spot as {
+      range_min?: unknown;
+      range_max?: unknown;
+    };
+    if (range_min && range_max) return `${String(range_min)}–${String(range_max)}`;
+  }
+
+  if ("check_min_usd" in investor && "check_max_usd" in investor) {
+    const min = formatUsd(investor.check_min_usd);
+    const max = formatUsd(investor.check_max_usd);
+    if (min && max) return `${min}–${max}`;
+    if (min || max) return min ?? max; // single-sided: show what the source states
+  }
+
+  return null;
+}
+
+function extractStageAndSector(
+  investor: InvestorEntity | InvestorRecord,
+  filters: SearchFilters,
+): { stage?: string; sector?: string } {
+  let stage: string | undefined;
+  let sector: string | undefined;
+
+  // New format: investment_categories like "Pre-seed (AI)"
+  if ("investment_categories" in investor && investor.investment_categories.length > 0) {
+    const match = investor.investment_categories[0].match(/^([^(]+)\(([^)]+)\)/);
+    if (match) {
+      stage = match[1].trim();
+      sector = match[2].trim();
+    }
+  }
+
+  // Old format
+  if ("stages" in investor && investor.stages.length > 0) stage = investor.stages[0];
+  if ("focus_areas" in investor && investor.focus_areas.length > 0) {
+    sector = investor.focus_areas[0].sector;
+  }
+
+  if (filters.stage && stage) {
+    const normalizeStage = (s: string) => s.toLowerCase().replace(/\s+/g, "-");
+    if (normalizeStage(stage) !== normalizeStage(filters.stage)) stage = undefined;
+  }
+
+  if (filters.sector && sector) {
+    if (!sector.toLowerCase().includes(filters.sector.toLowerCase())) sector = undefined;
+  }
+
+  return { stage, sector };
+}
+
+/** Generates a concise "Relevant Because" explanation for a matched row. */
+export function generateRelevantBecause(
+  investor: InvestorRow,
+  filters: SearchFilters,
+  metadata: MatchMetadata,
+): string {
+  const parts: string[] = [];
+
+  if (filters.location && metadata.locationMatch?.matches) {
+    const { matchType, matchedRegion } = metadata.locationMatch;
+
+    if (matchType === "direct") {
+      if (matchedRegion?.toLowerCase() === filters.location.toLowerCase()) {
+        parts.push(`Directly invests in ${filters.location}`);
+      } else {
+        parts.push(`Invests in ${matchedRegion ?? filters.location}`);
+      }
+    } else if (matchType === "region") {
+      parts.push(`Invests in ${matchedRegion} region (includes ${filters.location})`);
+    } else if (matchType === "continent") {
+      parts.push(`Invests in ${matchedRegion} (includes ${filters.location})`);
+    }
+  }
+
+  const { stage, sector } = extractStageAndSector(investor, filters);
+
+  if (stage && sector) parts.push(`Focus on ${stage} ${sector} startups`);
+  else if (stage) parts.push(`Focus on ${stage} stage`);
+  else if (sector) parts.push(`Focus on ${sector}`);
+
+  const range = formatCheckRange(investor);
+  if (range) parts.push(`(${range})`);
+
+  return parts.length ? parts.join(". ").replace(/\. \(/, " (") : "Matches your search criteria";
 }
 
 /** A human-readable link with its full destination URL preserved. */
