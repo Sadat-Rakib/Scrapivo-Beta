@@ -154,6 +154,8 @@ function JobsPage() {
 
   const openDetailView = (j: JobPosting) => {
     // Full normalized job record — every populated field reaches the drawer.
+    // Ingest metadata (board_id, updated_at, fetched_at) stays internal:
+    // users get a single "Posted" date, not pipeline bookkeeping.
     const recordFields = [
       { label: "Title", value: j.title },
       { label: "Company", value: j.company },
@@ -164,14 +166,7 @@ function JobsPage() {
       ...(j.employment_type ? [{ label: "Employment type", value: j.employment_type }] : []),
       ...(j.salary ? [{ label: "Compensation", value: j.salary }] : []),
       { label: "Source", value: sourceLabel(j.source) },
-      { label: "Board", value: j.board_id },
       ...(fmtDate(j.posted_at) ? [{ label: "Posted", value: fmtDate(j.posted_at) as string }] : []),
-      ...(fmtDate(j.updated_at)
-        ? [{ label: "Updated", value: fmtDate(j.updated_at) as string }]
-        : []),
-      ...(fmtDate(j.fetched_at)
-        ? [{ label: "Fetched", value: fmtDate(j.fetched_at) as string }]
-        : []),
     ];
     setSelectedEntity({
       domain: "job",

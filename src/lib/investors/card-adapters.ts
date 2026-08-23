@@ -106,7 +106,9 @@ const joinList = (v: unknown): string | null => {
 
 const fmtUsd = (v: unknown): string | null => formatUsd(v);
 
-/** Entity types that describe organizations rather than people. */
+/** Entity types that describe organizations rather than people.
+ *  `angel_investor` deliberately absent — angels are people, and classifying
+ *  them as firms was the source of the David Sargeant mislabel. */
 const FIRM_ENTITY_TYPES = new Set([
   "venture_capital_firm",
   "micro_vc",
@@ -115,12 +117,11 @@ const FIRM_ENTITY_TYPES = new Set([
   "investment_entity",
   "corporate_venture",
   "corporate_venture_or_investor",
-  "angel_investor",
 ]);
 
 /** Primary classification: the dataset's record_type wins, then legacy
  *  type/entity_type fields. Records with no classification at all are
- *  legacy person rows. */
+ *  classified by shape: fund-machinery fields ⇒ firm, otherwise person. */
 export function isFirmRecord(rec: InvestorRow): boolean {
   const r = asLoose(rec);
   if (str(r.record_type) === "firm") return true;
@@ -128,7 +129,18 @@ export function isFirmRecord(rec: InvestorRow): boolean {
   if (str(r.type) === "firm") return true;
   if (str(r.type) === "individual") return false;
   const et = str(r.entity_type);
-  return et !== null && FIRM_ENTITY_TYPES.has(et);
+  if (et !== null) return FIRM_ENTITY_TYPES.has(et);
+  // Untyped legacy rows (~100 in the merged dataset): classify by shape.
+  return (
+    str(r.firm_type) !== null ||
+    str(r.lp_type) !== null ||
+    r.aum != null ||
+    (Array.isArray(r.offices) && r.offices.length > 0) ||
+    str(r.founded) !== null ||
+    str(r.employees) !== null ||
+    (Array.isArray(r.asset_classes) && r.asset_classes.length > 0) ||
+    str(r.address) !== null
+  );
 }
 
 const TYPE_LABELS: Record<string, string> = {

@@ -59,6 +59,29 @@ describe("classification (PRD §4)", () => {
     expect(isFirmRecord(individualRecord as unknown as InvestorRow)).toBe(false);
   });
 
+  it("angel_investor entity_type classifies as a person, never a firm", () => {
+    // The David Sargeant mislabel: an angel was org-classified.
+    const angel = {
+      id: "firm-abc",
+      name: "David Sargeant",
+      record_type: "investor",
+      entity_type: "angel_investor",
+    };
+    expect(isFirmRecord(angel as unknown as InvestorRow)).toBe(false);
+    const m = buildInvestorCardModel(angel as unknown as InvestorRow);
+    expect(m.isFirm).toBe(false);
+    expect(m.typeBadges).toContain("Angel");
+  });
+
+  it("untyped legacy rows classify by shape", () => {
+    // Fund-machinery fields ⇒ firm, even with no classification field at all.
+    const firmShaped = { name: "Mystery Capital", aum: "$2B", offices: ["London"] };
+    expect(isFirmRecord(firmShaped as unknown as InvestorRow)).toBe(true);
+    // Person-shaped rows (role at a firm) stay individuals.
+    const personShaped = { name: "Saam Motamedi", role: "General Partner", firm: "Greylock" };
+    expect(isFirmRecord(personShaped as unknown as InvestorRow)).toBe(false);
+  });
+
   it("a firm never renders Angel or Individual", () => {
     const firms = [
       firmRecord,
@@ -121,6 +144,15 @@ describe("currency magnitude in the model (PRD §6)", () => {
     const m = buildIndividualCardModel(individualRecord as unknown as InvestorRow);
     const ss = m.detailStats.find((s) => s.label === "Sweet spot");
     expect(ss?.value).toBe("$250K");
+  });
+
+  it("single-sided check bounds never render a ? placeholder", () => {
+    const half = checkSizeOf({ check_max_usd: 5_000_000 } as unknown as InvestorRow);
+    expect(half).toBe("$5M");
+    const otherHalf = checkSizeOf({ check_min_usd: 100_000 } as unknown as InvestorRow);
+    expect(otherHalf).toBe("$100K");
+    expect(half && half.includes("?")).toBe(false);
+    expect(otherHalf && otherHalf.includes("?")).toBe(false);
   });
 });
 

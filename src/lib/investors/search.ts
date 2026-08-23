@@ -20,6 +20,7 @@ import {
   type LocationMatchResult,
 } from "./location-hierarchy";
 import { getSemanticMatcher } from "./semantic-matcher";
+import { isFirmRecord } from "./card-adapters";
 
 // Extended investor type with match metadata
 export type InvestorWithMetadata = (InvestorEntity | InvestorRecord) & {
@@ -346,15 +347,12 @@ export async function searchInvestors(
   // Sector synonyms resolved during filtering, reused for relevance scoring.
   let sectorTerms: string[] = [];
 
-  // Filter by entity type (individual vs firm)
+  // Filter by entity type (individual vs firm) through the SAME classifier
+  // the cards use, so a record can never be filtered as one type while
+  // rendering as the other. Shape-classified untyped rows are included.
   if (entityType !== "any") {
-    rows = rows.filter((r) => {
-      if ("type" in r) {
-        return r.type === entityType;
-      }
-      // Old format is always individual
-      return entityType === "individual";
-    });
+    const wantFirm = entityType === "firm";
+    rows = rows.filter((r) => isFirmRecord(r) === wantFirm);
   }
 
   // Filter by investor type (vc, angel, scout)

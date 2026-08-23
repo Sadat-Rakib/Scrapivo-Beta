@@ -267,7 +267,7 @@ function LocalBusinessesPage() {
               key={i}
               className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.06] text-white/70 border border-white/10"
             >
-              {t.replace("_", " ")}
+              {t.replace(/_/g, " ")}
             </span>
           ))}
         </div>
@@ -424,7 +424,7 @@ function LocalBusinessesPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {visible.map((r, idx) => {
                   const key = `${r.name}-${r.address || idx}`;
-                  const tags = (r.opportunity_tags || []).map((t) => t.replace("_", " "));
+                  const tags = (r.opportunity_tags || []).map((t) => t.replace(/_/g, " "));
                   return (
                     <EntityCard
                       key={key}

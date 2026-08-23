@@ -33,9 +33,9 @@ const readClaim = (obj: Record<string, unknown>): string | null => {
   if (!claim) return null;
   let out = claim;
   const firstEvidence = Array.isArray(obj.evidence)
-    ? (obj.evidence.find(
-        (e) => e != null && typeof e === "object",
-      ) as Record<string, unknown> | undefined)
+    ? (obj.evidence.find((e) => e != null && typeof e === "object") as
+        | Record<string, unknown>
+        | undefined)
     : undefined;
   const host = hostnameOf(obj.url) ?? hostnameOf(firstEvidence?.url);
   if (host) out += ` (${host})`;
@@ -61,16 +61,19 @@ const formatLeaf = (v: unknown): string | null => {
   if (typeof v === "string") return v.trim() ? v.trim() : null;
   if (typeof v === "number") return String(v);
   if (Array.isArray(v)) {
-    const parts = v
-      .map((x) => {
-        if (x == null) return null;
-        if (typeof x === "boolean") return x ? "Yes" : "No";
-        if (typeof x !== "object") return String(x);
-        const rec = x as Record<string, unknown>;
-        return readClaim(rec) ?? summarizeObject(rec);
-      })
-      .filter((s): s is string => !!s && !!s.trim());
-    return parts.length ? parts.join("; ") : null;
+    const parts = v.map((x) => {
+      if (x == null) return null;
+      if (typeof x === "boolean") return x ? "Yes" : "No";
+      if (typeof x !== "object") return String(x);
+      const rec = x as Record<string, unknown>;
+      return readClaim(rec) ?? summarizeObject(rec);
+    });
+    const filled = parts.filter((s): s is string => !!s && !!s.trim());
+    if (!filled.length) return null;
+    // Plain scalar lists keep the historical ", " join; claim/object bullets
+    // separate with "; " so each claim stays visually distinct.
+    const hasObjectItems = v.some((x) => x != null && typeof x === "object");
+    return filled.join(hasObjectItems ? "; " : ", ");
   }
   return null;
 };

@@ -135,6 +135,9 @@ function InvestorsPage() {
     initialState?.filters?.checkBand ?? "any",
   );
   const [location, setLocation] = useState(initialState?.filters?.location ?? "");
+  const [entityType, setEntityType] = useState<"individual" | "firm" | "any">(
+    initialState?.filters?.entityType ?? "any",
+  );
   const [rows, setRows] = useState<InvestorWithMetadata[]>(initialState?.results ?? []);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [searchFilters, setSearchFilters] = useState<SearchFilters>(initialState?.filters ?? {});
@@ -174,6 +177,7 @@ function InvestorsPage() {
     setSector("");
     setCheckBand("any");
     setLocation("");
+    setEntityType("any");
   };
 
   const mut = useMutation({
@@ -185,6 +189,7 @@ function InvestorsPage() {
           location: location.trim() || undefined,
           sector: sector.trim() || undefined,
           checkBand,
+          entityType,
           limit: 5000,
         },
       }),
@@ -194,7 +199,7 @@ function InvestorsPage() {
       setSearched(true);
       saveRouteSearchState("investors", {
         query: query.trim(),
-        filters: { query, stage, sector, checkBand, location },
+        filters: { query, stage, sector, checkBand, location, entityType },
         // Cap what we persist: serializing thousands of rich investor objects
         // into sessionStorage on every search was a major source of lag.
         results: fetchedRows.slice(0, 300),
@@ -469,6 +474,19 @@ function InvestorsPage() {
             if (e.key === "Enter") runSearch();
           }}
         />
+      </label>
+
+      <label className="block space-y-1.5">
+        <span className="text-xs font-medium text-white/70">Investor Type</span>
+        <select
+          value={entityType}
+          onChange={(e) => setEntityType(e.target.value as typeof entityType)}
+          className="w-full h-9 px-3 rounded-lg border border-white/10 bg-[#131316] text-xs text-white outline-none focus:border-white/30"
+        >
+          <option value="any">Firms & individuals</option>
+          <option value="firm">Firms only</option>
+          <option value="individual">Individuals only</option>
+        </select>
       </label>
 
       <label className="block space-y-1.5">

@@ -57,6 +57,15 @@ describe("internal-field suppression", () => {
     expect(isInternalKey("investment_profile.image_url")).toBe(true);
   });
 
+  it("hides verification/ingest internals from ordinary UI", () => {
+    expect(isInternalKey("verify_note")).toBe(true);
+    expect(isInternalKey("email_verified")).toBe(true);
+    expect(isInternalKey("website_status")).toBe(true);
+    expect(isInternalKey("sample_url")).toBe(true);
+    expect(isInternalKey("listing_url")).toBe(true);
+    expect(isInternalKey("fetched_at")).toBe(true);
+  });
+
   it("keeps user-relevant keys visible", () => {
     expect(isInternalKey("name")).toBe(false);
     expect(isInternalKey("website")).toBe(false);
@@ -107,6 +116,48 @@ describe("populatedFields (lossless walker)", () => {
   it("skips null/empty leaves", () => {
     const fields = populatedFields({ a: null, b: "", c: "  ", d: "x", e: [] });
     expect(fields.map((f) => f.key)).toEqual(["d"]);
+  });
+
+  it("renders booleans as Yes/No, never 1/0 or true/false", () => {
+    const map = Object.fromEntries(
+      populatedFields({ remote: true, verified: false, flags: [true, false] }).map((f) => [
+        f.key,
+        f.value,
+      ]),
+    );
+    expect(map.remote).toBe("Yes");
+    expect(map.verified).toBe("No");
+    expect(map.flags).toBe("Yes, No");
+  });
+
+  it("renders evidence claim arrays as readable bullets, never JSON", () => {
+    const rec = {
+      evidence: [
+        {
+          claim: "invests in / covers Southeast Asia",
+          evidence: [{ source: "investors_seed", data: "Southeast Asia" }],
+          confidence: "high",
+          observedAt: "2026-08-22T00:00:00.000Z",
+        },
+        {
+          claim: "has public email",
+          evidence: [{ source: "contact_intelligence", url: "https://example.com/x" }],
+          confidence: "high",
+          observedAt: "2026-08-22T00:00:00.000Z",
+        },
+      ],
+    };
+    const fields = populatedFields(rec);
+    expect(fields).toHaveLength(1);
+    expect(fields[0].key).toBe("evidence");
+    expect(fields[0].value).toContain("invests in / covers Southeast Asia");
+    expect(fields[0].value).toContain("has public email (example.com)");
+    expect(fields[0].value).not.toMatch(/[{"[]/); // no JSON punctuation
+  });
+
+  it("summarizes unknown object arrays from their primitive leaves, never JSON", () => {
+    const fields = populatedFields({ offices: [{ city: "London" }, { city: "NYC" }] });
+    expect(fields[0].value).toBe("London; NYC");
   });
 });
 

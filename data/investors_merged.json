@@ -11262,7 +11262,8 @@
       "total_investments": null,
       "team_size": 0,
       "verification_status": "source_evidenced_active",
-      "source": "ai_ready"
+      "source": "ai_ready",
+      "record_type": "investor"
     },
     {
       "id": "firm-508e6a30de8b5a1d",

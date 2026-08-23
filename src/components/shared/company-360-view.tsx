@@ -87,7 +87,7 @@ interface Company360ViewProps {
   onClose: () => void;
 }
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -136,6 +136,24 @@ export function Company360View({ data, onClose }: Company360ViewProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [entityKey]);
 
+  const desc = data?.description ?? "";
+  // Preserve source paragraph breaks; dense single blocks are split at
+  // sentence boundaries by the shared text module (PRD §8).
+  const paragraphs = splitParagraphs(desc);
+
+  // "Show more" only when the description genuinely overflows its collapsed
+  // box — measured from the real DOM, never guessed from character counts.
+  // Hooks stay above the `if (!data)` guard: they must run unconditionally.
+  const descRef = useRef<HTMLDivElement | null>(null);
+  const [descOverflows, setDescOverflows] = useState(false);
+  // useEffect (not useLayoutEffect): this drawer is server-rendered; the
+  // measurement lands one paint later, which is invisible in practice.
+  useEffect(() => {
+    if (showFullDesc) return; // keep the last collapsed measurement while expanded
+    const el = descRef.current;
+    setDescOverflows(!!el && el.scrollHeight > el.clientHeight + 1);
+  }, [showFullDesc, desc, entityKey]);
+
   if (!data) return null;
 
   const draftLabel =
@@ -161,12 +179,7 @@ export function Company360View({ data, onClose }: Company360ViewProps) {
     }
   };
 
-  const desc = data.description ?? "";
-  // Preserve source paragraph breaks; dense single blocks are split at
-  // sentence boundaries by the shared text module (PRD §8).
-  const paragraphs = splitParagraphs(desc);
-  const isLongDesc = desc.length > 480 || paragraphs.length > 2;
-  const visibleParagraphs = isLongDesc && !showFullDesc ? paragraphs.slice(0, 2) : paragraphs;
+  const visibleParagraphs = paragraphs; // clipping handled by max-height below
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
@@ -218,15 +231,24 @@ export function Company360View({ data, onClose }: Company360ViewProps) {
           <Section title="Overview" icon={<Building2 className="size-4" />}>
             {paragraphs.length ? (
               <div className="space-y-2.5">
-                {visibleParagraphs.map((p, i) => (
-                  <p
-                    key={i}
-                    className="text-xs text-white/70 leading-relaxed break-words [overflow-wrap:anywhere] whitespace-pre-line"
-                  >
-                    {p}
-                  </p>
-                ))}
-                {isLongDesc && (
+                <div
+                  ref={descRef}
+                  className={`space-y-2.5 overflow-hidden ${
+                    showFullDesc
+                      ? ""
+                      : "max-h-32 [mask-image:linear-gradient(to_bottom,black_75%,transparent)]"
+                  }`}
+                >
+                  {visibleParagraphs.map((p, i) => (
+                    <p
+                      key={i}
+                      className="text-xs text-white/70 leading-relaxed break-words [overflow-wrap:anywhere] whitespace-pre-line"
+                    >
+                      {p}
+                    </p>
+                  ))}
+                </div>
+                {descOverflows && (
                   <button
                     type="button"
                     onClick={() => setShowFullDesc(!showFullDesc)}
@@ -291,63 +313,61 @@ export function Company360View({ data, onClose }: Company360ViewProps) {
             </Section>
           )}
 
-          {/* § Contacts */}
-          <Section title="Contact Information" icon={<Users className="size-4" />}>
-            <div className="space-y-2">
-              {data.email && (
-                <ContactRow
-                  icon={<Mail className="size-3.5 text-emerald-400" />}
-                  value={data.email}
-                  href={`mailto:${data.email}`}
-                />
-              )}
-              {data.phone && (
-                <ContactRow
-                  icon={<Phone className="size-3.5 text-blue-400" />}
-                  value={data.phone}
-                  href={`tel:${data.phone}`}
-                />
-              )}
-              {data.website && (
-                <ContactRow
-                  icon={<Globe className="size-3.5 text-violet-400" />}
-                  value={data.website.replace(/^https?:\/\//, "")}
-                  href={data.website}
-                  external
-                />
-              )}
-              {!data.email && !data.phone && !data.website && (
-                <p className="text-xs text-white/40 italic">
-                  No contact info found. Use enrichment to discover contacts.
-                </p>
-              )}
-            </div>
-
-            {/* People to contact (future enrichment) */}
-            {data.contacts && data.contacts.length > 0 && (
-              <div className="mt-3 space-y-2">
-                <div className="text-[10px] uppercase tracking-wider text-white/40">
-                  People to Contact
-                </div>
-                {data.contacts.map((c, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-2 text-xs text-white/70 p-2 rounded-lg bg-white/[0.02] border border-white/5"
-                  >
-                    <div className="size-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-semibold text-white shrink-0">
-                      {c.name[0]?.toUpperCase()}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="font-medium text-white truncate">{c.name}</div>
-                      {c.title && (
-                        <div className="text-[11px] text-white/40 truncate">{c.title}</div>
-                      )}
-                    </div>
-                  </div>
-                ))}
+          {/* § Contacts — omitted entirely when the source supplies nothing;
+              a bare "no contact info" stub is noise, not information. */}
+          {(data.email || data.phone || data.website || (data.contacts?.length ?? 0) > 0) && (
+            <Section title="Contact Information" icon={<Users className="size-4" />}>
+              <div className="space-y-2">
+                {data.email && (
+                  <ContactRow
+                    icon={<Mail className="size-3.5 text-emerald-400" />}
+                    value={data.email}
+                    href={`mailto:${data.email}`}
+                  />
+                )}
+                {data.phone && (
+                  <ContactRow
+                    icon={<Phone className="size-3.5 text-blue-400" />}
+                    value={data.phone}
+                    href={`tel:${data.phone}`}
+                  />
+                )}
+                {data.website && (
+                  <ContactRow
+                    icon={<Globe className="size-3.5 text-violet-400" />}
+                    value={data.website.replace(/^https?:\/\//, "")}
+                    href={data.website}
+                    external
+                  />
+                )}
               </div>
-            )}
-          </Section>
+
+              {/* People to contact (future enrichment) */}
+              {data.contacts && data.contacts.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  <div className="text-[10px] uppercase tracking-wider text-white/40">
+                    People to Contact
+                  </div>
+                  {data.contacts.map((c, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-2 text-xs text-white/70 p-2 rounded-lg bg-white/[0.02] border border-white/5"
+                    >
+                      <div className="size-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-semibold text-white shrink-0">
+                        {c.name[0]?.toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-medium text-white truncate">{c.name}</div>
+                        {c.title && (
+                          <div className="text-[11px] text-white/40 truncate">{c.title}</div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Section>
+          )}
 
           {/* § Links: human-readable labels; full destination URL preserved
               in the clickable element, exposed via tooltip (PRD §9). */}

@@ -111,7 +111,8 @@ export const runInvestorSearch = createServerFn({ method: "POST" })
     return {
       error: null as string | null,
       investors: withMeta,
-      total: getAllInvestors().length,
+      // Count of rows that matched the filters — never the dataset size.
+      total: withMeta.length,
     };
   });
 
@@ -138,9 +139,8 @@ export const matchFromWebsite = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data }) => {
-    const { extractWebsiteSignals, matchInvestorsToSignals } = await import(
-      "./investors/website-matcher.server"
-    );
+    const { extractWebsiteSignals, matchInvestorsToSignals } =
+      await import("./investors/website-matcher.server");
 
     const signals = await extractWebsiteSignals(data.url);
     const matches = matchInvestorsToSignals(signals, data.limit);
