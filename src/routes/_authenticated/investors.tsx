@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { runInvestorSearch, refreshInvestorVerification } from "@/lib/investors.functions";
@@ -11,19 +11,26 @@ import {
   generateRelevantBecause,
   hasExplicitAngel,
   investorRowKey,
-  isFirmRecord,
   populatedFields,
   type SearchFilters,
 } from "@/lib/investors/card-adapters";
+import {
+  buildGuidedQuestions,
+  parseSearchIntent,
+  type FlowAnswers,
+  type FlowQuestion,
+  type ParsedIntent,
+} from "@/lib/search/guided-intent";
 import { ViewToggle, type ViewMode } from "@/components/shared/view-toggle";
 import { EntityCard } from "@/components/shared/entity-card";
 import { EntityTable, type ColumnDef } from "@/components/shared/entity-table";
 import { PageComposer, ResultsBar } from "@/components/shared/search-dock";
 import type { ComposerHandle } from "@/components/discover/unified-composer";
+import { GuidedQuestionnaire, PageHeroCard } from "@/components/shared/guided-search";
 import { LoadMoreSentinel } from "@/components/shared/load-more-sentinel";
 import { useProgressiveCount } from "@/hooks/use-progressive-count";
-import { getRemainingSearches } from "@/lib/search.functions";
-import { Landmark, Search, RefreshCw, Download, MapPin } from "lucide-react";
+import { saveRouteSearchState, loadRouteSearchState } from "@/lib/store/search-store";
+import { Landmark, RefreshCw, Download, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { Company360View, type Company360Data } from "@/components/shared/company-360-view";
 import { humanLabel, isInternalKey } from "@/lib/records/field-labels";
@@ -34,6 +41,15 @@ export const Route = createFileRoute("/_authenticated/investors")({
   }),
   component: InvestorsPage,
 });
+
+/** Composer autotype examples — investors-only, never businesses/jobs. */
+const COMPOSER_EXAMPLES = [
+  "seed VCs investing in AI startups…",
+  "angel investors in New York…",
+  "fintech investors with $100K–$5M checks…",
+  "pre-seed investors in Europe…",
+  "healthcare VCs in Boston…",
+];
 
 function buildInvestorEntity(r: InvestorWithMetadata): Company360Data {
   const m = buildInvestorCardModel(r);
@@ -110,87 +126,85 @@ const InvestorGridCard = memo(function InvestorGridCard({
   );
 });
 
-import { saveRouteSearchState, loadRouteSearchState } from "@/lib/store/search-store";
-
 function InvestorsPage() {
   const searchFn = useServerFn(runInvestorSearch);
   const verifyFn = useServerFn(refreshInvestorVerification);
-  const getUsage = useServerFn(getRemainingSearches);
-  const usageQuery = useQuery({ queryKey: ["usage"], queryFn: () => getUsage() });
 
   const initialState = useMemo(() => loadRouteSearchState<InvestorWithMetadata>("investors"), []);
 
-  const [query, setQuery] = useState(initialState?.filters?.query ?? "");
-  const [stage, setStage] = useState(initialState?.filters?.stage ?? "any");
-  const [sector, setSector] = useState(initialState?.filters?.sector ?? "");
-  const [checkBand, setCheckBand] = useState<"angel" | "seed" | "growth" | "any">(
-    initialState?.filters?.checkBand ?? "any",
-  );
-  const [location, setLocation] = useState(initialState?.filters?.location ?? "");
-  const [entityType, setEntityType] = useState<"individual" | "firm" | "any">(
-    initialState?.filters?.entityType ?? "any",
-  );
+  const [input, setInput] = useState("");
   const [rows, setRows] = useState<InvestorWithMetadata[]>(initialState?.results ?? []);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [flow, setFlow] = useState<{
+    input: string;
+    parsed: ParsedIntent;
+    questions: FlowQuestion[];
+  } | null>(null);
   const [searchFilters, setSearchFilters] = useState<SearchFilters>(initialState?.filters ?? {});
   const [searched, setSearched] = useState(Boolean(initialState?.results?.length));
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const [selectedEntity, setSelectedEntity] = useState<Company360Data | null>(null);
-  const [refineOpen, setRefineOpen] = useState(false);
   const composerRef = useRef<ComposerHandle>(null);
 
-  // How many guided-questionnaire answers differ from their defaults.
-  const activeRefineCount = [
-    stage !== "any",
-    sector.trim() !== "",
-    checkBand !== "any",
-    location.trim() !== "",
-    entityType !== "any",
-  ].filter(Boolean).length;
-
-  const runSearch = () => {
-    const filters: SearchFilters = {
-      query: query.trim(),
-      stage: stage === "any" ? undefined : stage,
-      location: location.trim() || undefined,
-      sector: sector.trim() || undefined,
-      checkBand,
-    };
-    setSearchFilters(filters);
-    mut.mutate();
+  type InvestorSearchVars = SearchFilters & {
+    checkBand: "angel" | "seed" | "growth" | "any";
+    entityType: "individual" | "firm" | "any";
   };
 
-  // Reset clears the form fields without firing a search (searches are quota-limited).
-  const resetFilters = () => {
-    setQuery("");
-    setStage("any");
-    setSector("");
-    setCheckBand("any");
-    setLocation("");
-    setEntityType("any");
+  // Guided flow: parse the free-form ask deterministically, then ask ONLY for
+  // the dimensions the text did not state (stage, check size, geography…).
+  const launchSearch = (parsed: ParsedIntent, answers?: FlowAnswers) => {
+    const stage = answers?.stage ?? parsed.stage ?? "any";
+    const checkBand = (answers?.checkBand ??
+      parsed.checkBand ??
+      "any") as InvestorSearchVars["checkBand"];
+    const location = (answers?.location ?? parsed.location ?? "").trim();
+    const sector = (answers?.sector ?? parsed.sector ?? "").trim();
+    const vars: InvestorSearchVars = {
+      query: (parsed.query ?? "").trim(),
+      stage: stage === "any" ? undefined : stage,
+      location: location || undefined,
+      sector: sector || undefined,
+      checkBand,
+      entityType: parsed.entityType ?? "any",
+    };
+    setSearchFilters(vars);
+    setFlow(null);
+    mut.mutate(vars);
+  };
+
+  const handleSubmit = () => {
+    const text = input.trim();
+    if (!text) return;
+    const parsed = parseSearchIntent("investors", text);
+    const questions = buildGuidedQuestions("investors", parsed);
+    if (questions.length) {
+      setFlow({ input: text, parsed, questions });
+      return;
+    }
+    launchSearch(parsed);
   };
 
   const mut = useMutation({
-    mutationFn: () =>
+    mutationFn: (vars: InvestorSearchVars) =>
       searchFn({
         data: {
-          query: query.trim(),
-          stage: stage === "any" ? undefined : stage,
-          location: location.trim() || undefined,
-          sector: sector.trim() || undefined,
-          checkBand,
-          entityType,
+          query: vars.query ?? "",
+          stage: vars.stage,
+          location: vars.location,
+          sector: vars.sector,
+          checkBand: vars.checkBand,
+          entityType: vars.entityType,
           limit: 5000,
         },
       }),
-    onSuccess: (res) => {
+    onSuccess: (res, vars) => {
       const fetchedRows = res.investors ?? [];
       setRows(fetchedRows);
       setSearched(true);
       saveRouteSearchState("investors", {
-        query: query.trim(),
-        filters: { query, stage, sector, checkBand, location, entityType },
+        query: vars.query ?? "",
+        filters: vars,
         // Cap what we persist: serializing thousands of rich investor objects
         // into sessionStorage on every search was a major source of lag.
         results: fetchedRows.slice(0, 300),
@@ -439,101 +453,6 @@ function InvestorsPage() {
     },
   ];
 
-  const FilterForm = (
-    <>
-      <label className="block space-y-1.5">
-        <span className="text-xs font-medium text-white/70">Keyword Search</span>
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="e.g. Enterprise, Health, DevTools"
-          className="w-full h-9 px-3 rounded-lg border border-white/10 bg-white/[0.03] text-xs text-white placeholder:text-white/30 outline-none focus:border-white/30"
-          onKeyDown={(e) => {
-            if (e.key === "Enter") runSearch();
-          }}
-        />
-      </label>
-
-      <label className="block space-y-1.5">
-        <span className="text-xs font-medium text-white/70">Sector / Focus</span>
-        <input
-          value={sector}
-          onChange={(e) => setSector(e.target.value)}
-          placeholder="e.g. AI, Fintech, Climate"
-          className="w-full h-9 px-3 rounded-lg border border-white/10 bg-white/[0.03] text-xs text-white placeholder:text-white/30 outline-none focus:border-white/30"
-          onKeyDown={(e) => {
-            if (e.key === "Enter") runSearch();
-          }}
-        />
-      </label>
-
-      <label className="block space-y-1.5">
-        <span className="text-xs font-medium text-white/70">Investor Type</span>
-        <select
-          value={entityType}
-          onChange={(e) => setEntityType(e.target.value as typeof entityType)}
-          className="w-full h-9 px-3 rounded-lg border border-white/10 bg-[#131316] text-xs text-white outline-none focus:border-white/30"
-        >
-          <option value="any">Firms & individuals</option>
-          <option value="firm">Firms only</option>
-          <option value="individual">Individuals only</option>
-        </select>
-      </label>
-
-      <label className="block space-y-1.5">
-        <span className="text-xs font-medium text-white/70">Stage</span>
-        <select
-          value={stage}
-          onChange={(e) => setStage(e.target.value)}
-          className="w-full h-9 px-3 rounded-lg border border-white/10 bg-[#131316] text-xs text-white outline-none focus:border-white/30"
-        >
-          <option value="any">Any stage</option>
-          <option value="Pre-seed">Pre-seed</option>
-          <option value="Seed">Seed</option>
-          <option value="Series A">Series A</option>
-          <option value="Series B">Series B</option>
-        </select>
-      </label>
-
-      <label className="block space-y-1.5">
-        <span className="text-xs font-medium text-white/70">Check Size</span>
-        <select
-          value={checkBand}
-          onChange={(e) => setCheckBand(e.target.value as typeof checkBand)}
-          className="w-full h-9 px-3 rounded-lg border border-white/10 bg-[#131316] text-xs text-white outline-none focus:border-white/30"
-        >
-          <option value="any">Any check size</option>
-          <option value="angel">Angel (&lt;$100K)</option>
-          <option value="seed">$100K–$5M</option>
-          <option value="growth">$5M+</option>
-        </select>
-      </label>
-
-      <label className="block space-y-1.5">
-        <span className="text-xs font-medium text-white/70">Location / Region</span>
-        <input
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          placeholder="Dhaka, New York, Asia..."
-          className="w-full h-9 px-3 rounded-lg border border-white/10 bg-white/[0.03] text-xs text-white placeholder:text-white/30 outline-none focus:border-white/30"
-          onKeyDown={(e) => {
-            if (e.key === "Enter") runSearch();
-          }}
-        />
-      </label>
-
-      <button
-        type="button"
-        onClick={() => verifyMut.mutate()}
-        disabled={verifyMut.isPending}
-        className="w-full glass-pill py-2 px-3 text-xs font-medium text-white/70 hover:text-white flex items-center justify-center gap-1.5 mt-2"
-      >
-        <RefreshCw className={`size-3.5 ${verifyMut.isPending ? "animate-spin" : ""}`} />
-        <span>Refresh Status</span>
-      </button>
-    </>
-  );
-
   return (
     <div className="h-full flex min-h-0 bg-[#0a0a0b] text-white">
       {/* Main column: scrollable results + bottom-docked composer (Discover-style) */}
@@ -556,6 +475,15 @@ function InvestorsPage() {
               </div>
 
               <div className="flex items-center gap-3 shrink-0 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => verifyMut.mutate()}
+                  disabled={verifyMut.isPending}
+                  className="glass-pill px-3.5 py-1.5 text-xs font-medium text-white/80 hover:text-white flex items-center gap-1.5 disabled:opacity-60"
+                >
+                  <RefreshCw className={`size-3.5 ${verifyMut.isPending ? "animate-spin" : ""}`} />
+                  <span>Refresh Status</span>
+                </button>
                 {rows.length > 0 && (
                   <button
                     type="button"
@@ -589,6 +517,7 @@ function InvestorsPage() {
                   onClear={() => {
                     setRows([]);
                     setSearched(false);
+                    setFlow(null);
                     composerRef.current?.focus();
                   }}
                 />
@@ -627,50 +556,43 @@ function InvestorsPage() {
 
             {!mut.isPending && searched && !rows.length && (
               <div className="liquid-glass rounded-2xl p-12 text-center text-sm text-white/50">
-                No investors matched those filters. Try broadening location or check size.
+                No investors matched. Try broadening location or check size.
               </div>
             )}
 
-            {!mut.isPending && !searched && (
-              <div className="liquid-glass rounded-2xl p-12 text-center text-sm text-white/60 space-y-3">
-                <Landmark className="size-8 mx-auto text-white/30" />
-                <h3 className="text-base font-semibold text-white">Find Active Investors</h3>
-                <p className="max-w-md mx-auto text-xs text-white/50 leading-relaxed">
-                  Search VCs and angels by sector, stage, and location — refine with the guided
-                  questions below.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => composerRef.current?.focus()}
-                  className="glass-pill px-5 py-2 text-xs font-semibold text-white bg-white/10 hover:bg-white/20 inline-flex items-center gap-2"
-                >
-                  <Search className="size-3.5" />
-                  <span>Start Searching</span>
-                </button>
-              </div>
+            {/* Guided questionnaire: opens after the user submits an ask that
+                is missing stage / check size / geography. */}
+            {!mut.isPending && flow && (
+              <GuidedQuestionnaire
+                title="Find Investors"
+                input={flow.input}
+                questions={flow.questions}
+                pending={mut.isPending}
+                onDone={(answers) => launchSearch(flow.parsed, answers)}
+                onCancel={() => setFlow(null)}
+              />
+            )}
+
+            {/* Compact entry card (home-page style) — only before a search. */}
+            {!mut.isPending && !flow && !searched && (
+              <PageHeroCard
+                icon={Landmark}
+                title="Find Investors"
+                description="Describe your raise — we'll ask a couple of quick questions, then match you with active VCs & angels."
+                onStart={() => composerRef.current?.focus()}
+              />
             )}
           </div>
         </div>
 
-        {/* Bottom-docked composer + guided questionnaire */}
+        {/* Bottom-docked composer */}
         <PageComposer
           ref={composerRef}
-          value={query}
-          onChange={setQuery}
-          onSubmit={runSearch}
+          value={input}
+          onChange={setInput}
+          onSubmit={handleSubmit}
           pending={mut.isPending}
-          refine={FilterForm}
-          refineOpen={refineOpen}
-          onToggleRefine={() => setRefineOpen(!refineOpen)}
-          activeRefineCount={activeRefineCount}
-          onApplyRefine={() => {
-            setRefineOpen(false);
-            runSearch();
-          }}
-          onResetRefine={resetFilters}
-          applyLabel="Find Investors"
-          applyPending={mut.isPending}
-          usage={usageQuery.data ?? undefined}
+          examples={COMPOSER_EXAMPLES}
         />
       </div>
 

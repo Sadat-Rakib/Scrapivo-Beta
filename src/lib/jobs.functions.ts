@@ -18,6 +18,7 @@ export const runJobSearch = createServerFn({ method: "POST" })
         location: z.string().max(120).optional().default(""),
         remoteOnly: z.boolean().optional().default(false),
         seniority: z.string().max(40).optional().default("any"),
+        employmentType: z.string().max(40).optional().default("any"),
         region: z
           .enum(["any", "remote", "north_america", "europe", "asia", "middle_east"])
           .optional()
@@ -40,6 +41,7 @@ export const runJobSearch = createServerFn({ method: "POST" })
       location: data.location,
       remoteOnly: data.remoteOnly,
       seniority: data.seniority === "any" ? undefined : data.seniority,
+      employmentType: data.employmentType === "any" ? undefined : data.employmentType,
       region: data.region,
       sources: data.sources as typeof ALL_JOB_SOURCE_IDS,
       limit: data.limit,

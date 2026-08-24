@@ -8,6 +8,7 @@ import type {
 } from "./types";
 import { ALL_JOB_SOURCE_IDS } from "./types";
 import { matchesJobFilters } from "./filters";
+import { rankJobs } from "./relevance";
 import { isActiveJob, preferAtsUrl, recencyRank, secondaryDedupeKey } from "./hygiene";
 
 export type JobSourceAdapter = {
@@ -94,7 +95,11 @@ export async function fetchAllJobSources(filters: JobSearchFilters): Promise<Job
 
   const active = chunks.flat().filter(isActiveJob).map(normalizeJob);
   const deduped = dedupeJobs(active);
-  return deduped.filter((j) => matchesJobFilters(j, filters));
+  // Relevance-first ranking: query-matched roles lead, recency breaks ties.
+  return rankJobs(
+    deduped.filter((j) => matchesJobFilters(j, filters)),
+    filters,
+  );
 }
 
 /** Per-source fetch outcome — a failed source never erases other sources'
@@ -146,9 +151,10 @@ export async function fetchAllJobSourcesWithMeta(filters: JobSearchFilters): Pro
   const raw = results.flatMap((r) => r.raw);
   const active = raw.filter(isActiveJob).map(normalizeJob);
   const deduped = dedupeJobs(active);
+  const filtered = deduped.filter((j) => matchesJobFilters(j, filters));
   return {
     fetched: deduped.length,
-    jobs: deduped.filter((j) => matchesJobFilters(j, filters)),
+    jobs: rankJobs(filtered, filters),
     sourceStatuses,
   };
 }

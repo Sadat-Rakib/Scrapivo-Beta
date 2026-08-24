@@ -1,19 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useRef, useState } from "react";
 import { runLocalBusinessSearch } from "@/lib/local-businesses.functions";
 import type { LocalBusinessRow, OpportunityTag } from "@/lib/search/lead-segments";
+import {
+  buildGuidedQuestions,
+  parseSearchIntent,
+  type FlowAnswers,
+  type FlowQuestion,
+  type ParsedIntent,
+} from "@/lib/search/guided-intent";
 import { ViewToggle, type ViewMode } from "@/components/shared/view-toggle";
 import { EntityCard } from "@/components/shared/entity-card";
 import { EntityTable, type ColumnDef } from "@/components/shared/entity-table";
 import { PageComposer, ResultsBar } from "@/components/shared/search-dock";
 import type { ComposerHandle } from "@/components/discover/unified-composer";
+import { GuidedQuestionnaire, PageHeroCard } from "@/components/shared/guided-search";
 import { LoadMoreSentinel } from "@/components/shared/load-more-sentinel";
 import { useProgressiveCount } from "@/hooks/use-progressive-count";
-import { getRemainingSearches } from "@/lib/search.functions";
 import { saveRouteSearchState, loadRouteSearchState } from "@/lib/store/search-store";
-import { Store, Search, Download, MapPin, Phone, Mail, Globe, RefreshCw } from "lucide-react";
+import { Store, Download, MapPin, Phone, Mail, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { Company360View, type Company360Data } from "@/components/shared/company-360-view";
 import { populatedFields } from "@/lib/records/populated-fields";
@@ -26,29 +33,13 @@ export const Route = createFileRoute("/_authenticated/local-businesses")({
   component: LocalBusinessesPage,
 });
 
-const CATEGORY_SUGGESTIONS = [
-  "dentists",
-  "roofers",
-  "law firms",
-  "gyms",
-  "med spas",
-  "plumbers",
-  "electricians",
-  "HVAC",
-  "marketing agencies",
-  "restaurants",
-  "cafes",
-  "salons",
-];
-
-const LOCATION_SUGGESTIONS = [
-  "Dhaka",
-  "Austin TX",
-  "Toronto",
-  "London",
-  "New York",
-  "Los Angeles",
-  "Miami",
+/** Composer autotype examples — businesses-only, never investors/jobs. */
+const COMPOSER_EXAMPLES = [
+  "dentists in Austin, TX…",
+  "10 roofers in Toronto…",
+  "med spas in Miami…",
+  "law firms in London…",
+  "gyms in New York…",
 ];
 
 const OPPORTUNITY_FILTERS: { id: OpportunityTag | "all"; label: string }[] = [
@@ -65,35 +56,50 @@ const OPPORTUNITY_FILTERS: { id: OpportunityTag | "all"; label: string }[] = [
 function LocalBusinessesPage() {
   const qc = useQueryClient();
   const searchFn = useServerFn(runLocalBusinessSearch);
-  const getUsage = useServerFn(getRemainingSearches);
-  const usageQuery = useQuery({ queryKey: ["usage"], queryFn: () => getUsage() });
 
   const initialState = useMemo(
     () => loadRouteSearchState<LocalBusinessRow>("local-businesses"),
     [],
   );
 
+  const [input, setInput] = useState("");
   const [category, setCategory] = useState(initialState?.filters?.category ?? "");
   const [location, setLocation] = useState(initialState?.filters?.location ?? "");
   const [rows, setRows] = useState<LocalBusinessRow[]>(initialState?.results ?? []);
+  const [flow, setFlow] = useState<{
+    input: string;
+    parsed: ParsedIntent;
+    questions: FlowQuestion[];
+  } | null>(null);
   const [filter, setFilter] = useState<OpportunityTag | "all">("all");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [bookmarkedKeys, setBookmarkedKeys] = useState<Set<string>>(new Set());
   const [selectedEntity, setSelectedEntity] = useState<Company360Data | null>(null);
-  const [refineOpen, setRefineOpen] = useState(false);
   const composerRef = useRef<ComposerHandle>(null);
 
-  // How many guided-questionnaire answers differ from their defaults.
-  const activeRefineCount = [location.trim() !== ""].filter(Boolean).length;
+  // Guided flow: parse the free-form ask deterministically, then ask ONLY for
+  // the dimensions the text did not state. A fully-specified ask ("10 dentist
+  // shops in Austin, Texas") runs immediately with zero questions.
+  const launchSearch = (parsed: ParsedIntent, answers?: FlowAnswers) => {
+    const nextCategory = (answers?.category ?? parsed.category ?? "").trim();
+    const nextLocation = (answers?.location ?? parsed.location ?? "").trim();
+    if (nextCategory.length < 2 || nextLocation.length < 2) return;
+    setCategory(nextCategory);
+    setLocation(nextLocation);
+    setFlow(null);
+    mut.mutate({ category: nextCategory, location: nextLocation });
+  };
 
-  // Composer submit + Refine "Search Businesses" share this entry point;
-  // the server needs both a category and a location to scope listings.
-  const runSearch = () => {
-    if (category.trim().length < 2 || location.trim().length < 2) {
-      toast.error("Enter a category and location");
+  const handleSubmit = () => {
+    const text = input.trim();
+    if (!text) return;
+    const parsed = parseSearchIntent("businesses", text);
+    const questions = buildGuidedQuestions("businesses", parsed);
+    if (questions.length) {
+      setFlow({ input: text, parsed, questions });
       return;
     }
-    mut.mutate();
+    launchSearch(parsed);
   };
 
   const filtered = useMemo(() => {
@@ -104,22 +110,16 @@ function LocalBusinessesPage() {
   // Progressive rendering: keep the mounted card count small and grow on scroll.
   const { visible, hasMore, loadMore, shown } = useProgressiveCount(filtered, 24);
 
-  // Reset clears the form fields without firing a search (searches are quota-limited).
-  const resetFilters = () => {
-    setCategory("");
-    setLocation("");
-  };
-
   const mut = useMutation({
-    mutationFn: () =>
+    mutationFn: (vars: { category: string; location: string }) =>
       searchFn({
         data: {
-          category: category.trim(),
-          location: location.trim(),
+          category: vars.category.trim(),
+          location: vars.location.trim(),
           enrichEmails: true,
         },
       }),
-    onSuccess: (res) => {
+    onSuccess: (res, vars) => {
       qc.invalidateQueries({ queryKey: ["usage"] });
       if (res.error === "limit") {
         toast.error(res.message ?? "Search limit reached");
@@ -129,8 +129,8 @@ function LocalBusinessesPage() {
       setRows(fetchedRows);
       setFilter("all");
       saveRouteSearchState("local-businesses", {
-        query: `${category} in ${location}`,
-        filters: { category, location },
+        query: `${vars.category} in ${vars.location}`,
+        filters: { category: vars.category, location: vars.location },
         results: fetchedRows,
         timestamp: Date.now(),
       });
@@ -350,6 +350,7 @@ function LocalBusinessesPage() {
                   onClear={() => {
                     setRows([]);
                     setFilter("all");
+                    setFlow(null);
                     composerRef.current?.focus();
                   }}
                 />
@@ -404,83 +405,39 @@ function LocalBusinessesPage() {
               </div>
             )}
 
-            {!mut.isPending && !rows.length && (
-              <div className="liquid-glass rounded-2xl p-12 text-center text-sm text-white/60 space-y-3">
-                <Store className="size-8 mx-auto text-white/30" />
-                <h3 className="text-base font-semibold text-white">Find Businesses</h3>
-                <p className="max-w-md mx-auto text-xs text-white/50 leading-relaxed">
-                  Search a category and city below to discover businesses with public contact info —
-                  refine with the guided questions.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => composerRef.current?.focus()}
-                  className="glass-pill px-5 py-2 text-xs font-semibold text-white bg-white/10 hover:bg-white/20 inline-flex items-center gap-2"
-                >
-                  <Search className="size-3.5" />
-                  <span>Start Searching</span>
-                </button>
-              </div>
+            {/* Guided questionnaire: opens after the user submits an ask that
+                is missing a category or a location. */}
+            {!mut.isPending && flow && (
+              <GuidedQuestionnaire
+                title="Find Businesses"
+                input={flow.input}
+                questions={flow.questions}
+                pending={mut.isPending}
+                onDone={(answers) => launchSearch(flow.parsed, answers)}
+                onCancel={() => setFlow(null)}
+              />
+            )}
+
+            {/* Compact entry card (home-page style) — only before a search. */}
+            {!mut.isPending && !flow && !rows.length && (
+              <PageHeroCard
+                icon={Store}
+                title="Find Businesses"
+                description="Describe what you need — we'll ask a couple of quick questions, then pull live listings with emails and phone numbers."
+                onStart={() => composerRef.current?.focus()}
+              />
             )}
           </div>
         </div>
 
-        {/* Bottom-docked composer + guided questionnaire */}
+        {/* Bottom-docked composer */}
         <PageComposer
           ref={composerRef}
-          value={category}
-          onChange={setCategory}
-          onSubmit={runSearch}
+          value={input}
+          onChange={setInput}
+          onSubmit={handleSubmit}
           pending={mut.isPending}
-          refine={
-            <>
-              <label className="block space-y-1.5">
-                <span className="text-xs font-medium text-white/70">City / Location</span>
-                <input
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Austin TX, Toronto, Dhaka..."
-                  className="w-full h-9 px-3 rounded-lg border border-white/10 bg-white/[0.03] text-xs text-white placeholder:text-white/30 outline-none focus:border-white/30"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") runSearch();
-                  }}
-                />
-              </label>
-
-              <div className="space-y-1.5">
-                <span className="text-[11px] font-medium text-white/40 uppercase tracking-wider">
-                  Quick Categories
-                </span>
-                <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto no-scrollbar">
-                  {CATEGORY_SUGGESTIONS.map((c) => (
-                    <button
-                      key={c}
-                      type="button"
-                      onClick={() => setCategory(c)}
-                      className={`glass-pill px-2.5 py-1 text-[11px] font-medium ${
-                        category.toLowerCase() === c.toLowerCase()
-                          ? "bg-white/20 text-white"
-                          : "text-white/60 hover:text-white"
-                      }`}
-                    >
-                      {c}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </>
-          }
-          refineOpen={refineOpen}
-          onToggleRefine={() => setRefineOpen(!refineOpen)}
-          activeRefineCount={activeRefineCount}
-          onApplyRefine={() => {
-            setRefineOpen(false);
-            runSearch();
-          }}
-          onResetRefine={resetFilters}
-          applyLabel="Search Businesses"
-          applyPending={mut.isPending}
-          usage={usageQuery.data ?? undefined}
+          examples={COMPOSER_EXAMPLES}
         />
       </div>
 

@@ -2,111 +2,31 @@
  * Scrapivo — unified search-page shell (M2).
  *
  * Brings the Discover page's structure — scrollable results with a
- * bottom-docked composer — to every directory page. Filters become a guided
- * questionnaire docked above the composer; each control maps 1:1 onto the
- * params the page's server function already accepts. No new backend.
+ * bottom-docked composer — to every directory page. There is no pre-search
+ * filter panel: the user types a free-form ask and the page's guided
+ * questionnaire collects whatever is missing (see guided-intent.ts).
  */
 
 import { forwardRef, type ReactNode } from "react";
-import { ChevronDown, Loader2, RotateCcw, SlidersHorizontal } from "lucide-react";
 import { UnifiedComposer, type ComposerHandle } from "@/components/discover/unified-composer";
-
-type Usage = { used: number; cap: number | null };
 
 interface PageComposerProps {
   value: string;
   onChange: (v: string) => void;
   onSubmit: () => void;
   pending: boolean;
-  placeholder?: string;
-  /** Guided questionnaire fields (existing filter controls). */
-  refine?: ReactNode;
-  refineOpen: boolean;
-  onToggleRefine: () => void;
-  /** How many answers differ from their defaults — shown on the toggle. */
-  activeRefineCount?: number;
-  onApplyRefine?: () => void;
-  onResetRefine?: () => void;
-  applyLabel?: string;
-  applyPending?: boolean;
-  usage?: Usage;
+  /** Page-specific autotype examples shown in the composer placeholder. */
+  examples?: string[];
 }
 
-/** Bottom-docked composer + guided questionnaire, Discover-style. */
+/** Bottom-docked composer, Discover-style. */
 export const PageComposer = forwardRef<ComposerHandle, PageComposerProps>(function PageComposer(
-  {
-    value,
-    onChange,
-    onSubmit,
-    pending,
-    refine,
-    refineOpen,
-    onToggleRefine,
-    activeRefineCount = 0,
-    onApplyRefine,
-    onResetRefine,
-    applyLabel = "Search",
-    applyPending,
-    usage,
-  },
+  { value, onChange, onSubmit, pending, examples },
   ref,
 ) {
   return (
     <div className="px-4 md:px-6 pb-4 md:pb-6 pt-2">
-      <div className="max-w-3xl mx-auto space-y-2">
-        {refine != null && (
-          <div>
-            <button
-              type="button"
-              onClick={onToggleRefine}
-              aria-expanded={refineOpen}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-card hover:bg-accent text-xs text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <SlidersHorizontal className="size-3" />
-              <span>Refine</span>
-              {activeRefineCount > 0 && (
-                <span className="ml-0.5 inline-flex items-center justify-center min-w-4 h-4 px-1 rounded-full bg-primary/15 text-[10px] font-semibold text-primary">
-                  {activeRefineCount}
-                </span>
-              )}
-              <ChevronDown
-                className={`size-3 transition-transform ${refineOpen ? "rotate-180" : ""}`}
-              />
-            </button>
-
-            {refineOpen && (
-              <div className="mt-2 rounded-2xl border border-border bg-card shadow-sm p-4 space-y-3">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">{refine}</div>
-                <div className="flex items-center gap-2 pt-1">
-                  <button
-                    type="button"
-                    onClick={onApplyRefine}
-                    disabled={applyPending}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 disabled:opacity-60 transition-colors"
-                  >
-                    {applyPending && <Loader2 className="size-3 animate-spin" />}
-                    {applyLabel}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={onResetRefine}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-                  >
-                    <RotateCcw className="size-3" />
-                    Reset
-                  </button>
-                  {usage && (
-                    <span className="ml-auto text-[11px] text-muted-foreground">
-                      {usage.used}
-                      {usage.cap ? `/${usage.cap}` : ""} searches used
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
+      <div className="max-w-3xl mx-auto">
         <UnifiedComposer
           ref={ref}
           value={value}
@@ -116,6 +36,7 @@ export const PageComposer = forwardRef<ComposerHandle, PageComposerProps>(functi
           onSubmit={onSubmit}
           pending={pending}
           hideModeToggle
+          examples={examples}
         />
       </div>
     </div>

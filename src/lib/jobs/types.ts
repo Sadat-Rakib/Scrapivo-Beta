@@ -16,7 +16,10 @@ export type JobSourceKind =
   | "source-themuse"
   | "source-githubjobs"
   | "source-hn"
-  | "source-workatastartup";
+  | "source-workatastartup"
+  | "source-himalayas"
+  | "source-4dayweek"
+  | "source-nodesk";
 
 export type JobRegion = "any" | "remote" | "north_america" | "europe" | "asia" | "middle_east";
 
@@ -37,7 +40,10 @@ export type JobSourceId =
   | "themuse"
   | "githubjobs"
   | "hn"
-  | "workatastartup";
+  | "workatastartup"
+  | "himalayas"
+  | "4dayweek"
+  | "nodesk";
 
 export const ALL_JOB_SOURCE_IDS: JobSourceId[] = [
   "greenhouse",
@@ -57,6 +63,9 @@ export const ALL_JOB_SOURCE_IDS: JobSourceId[] = [
   "githubjobs",
   "hn",
   "workatastartup",
+  "himalayas",
+  "4dayweek",
+  "nodesk",
 ];
 
 export type JobSearchFilters = {
@@ -64,6 +73,8 @@ export type JobSearchFilters = {
   location?: string;
   remoteOnly?: boolean;
   seniority?: string;
+  /** full-time | contract | part-time | internship | any (free text normalized). */
+  employmentType?: string;
   region?: JobRegion;
   sources?: JobSourceId[];
   limit?: number;

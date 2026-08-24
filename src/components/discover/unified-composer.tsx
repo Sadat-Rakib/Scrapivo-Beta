@@ -17,9 +17,12 @@ type Props = {
   maxChars?: number;
   /** Hide the Search/Chat pills for search-only contexts (directory pages). */
   hideModeToggle?: boolean;
+  /** Page-specific autotype examples (directory pages); defaults to the
+   *  cross-domain Discover list so the home page is untouched. */
+  examples?: string[];
 };
 
-const AUTOTYPE_EXAMPLES = [
+const DEFAULT_EXAMPLES = [
   "businesses looking for web development services…",
   "companies searching for marketing agencies…",
   "startups expanding into new markets…",
@@ -27,7 +30,7 @@ const AUTOTYPE_EXAMPLES = [
   "investors backing pre-seed startups…",
 ];
 
-function useAutotypePlaceholder(paused: boolean) {
+function useAutotypePlaceholder(paused: boolean, examples: string[]) {
   const [text, setText] = useState("");
   const stateRef = useRef({
     index: 0,
@@ -37,13 +40,13 @@ function useAutotypePlaceholder(paused: boolean) {
   });
 
   useEffect(() => {
-    if (paused) return;
+    if (paused || examples.length === 0) return;
 
     let timeoutId: number;
 
     const tick = () => {
       const state = stateRef.current;
-      const currentString = AUTOTYPE_EXAMPLES[state.index];
+      const currentString = examples[state.index % examples.length];
 
       if (state.isDwell) {
         timeoutId = window.setTimeout(() => {
@@ -60,7 +63,7 @@ function useAutotypePlaceholder(paused: boolean) {
           setText(currentString.substring(0, state.charIndex));
           if (state.charIndex <= 0) {
             state.isDeleting = false;
-            state.index = (state.index + 1) % AUTOTYPE_EXAMPLES.length;
+            state.index = (state.index + 1) % examples.length;
           }
           tick();
         }, 20); // fast backspace
@@ -79,13 +82,23 @@ function useAutotypePlaceholder(paused: boolean) {
     tick();
 
     return () => clearTimeout(timeoutId);
-  }, [paused]);
+  }, [paused, examples]);
 
   return text || "Search...";
 }
 
 export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function UnifiedComposer(
-  { value, onChange, mode, onModeChange, onSubmit, pending, maxChars = 3000, hideModeToggle },
+  {
+    value,
+    onChange,
+    mode,
+    onModeChange,
+    onSubmit,
+    pending,
+    maxChars = 3000,
+    hideModeToggle,
+    examples = DEFAULT_EXAMPLES,
+  },
   ref,
 ) {
   const textRef = useRef<HTMLTextAreaElement>(null);
@@ -98,7 +111,7 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
   };
 
   const isPaused = focused || value.trim().length > 0;
-  const autotypeText = useAutotypePlaceholder(isPaused);
+  const autotypeText = useAutotypePlaceholder(isPaused, examples);
 
   const placeholder = mode === "search" ? autotypeText : "Ask Scrapivo to help you craft a search…";
 

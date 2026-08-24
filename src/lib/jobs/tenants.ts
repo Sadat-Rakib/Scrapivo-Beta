@@ -6,6 +6,33 @@ export type AtsTenant = { company: string; provider: string; board: string };
 
 let cached: AtsTenant[] | null = null;
 
+/** Curated board catalog generated from the freehire board lists
+ *  (scripts/build-job-board-catalog.mts → data/job_boards_catalog.json). */
+let catalogCache: Record<string, string[]> | null = null;
+
+function loadBoardCatalog(): Record<string, string[]> {
+  if (catalogCache) return catalogCache;
+  catalogCache = {};
+  const candidates = [
+    resolve(process.cwd(), "data/job_boards_catalog.json"),
+    resolve(process.cwd(), "../data/job_boards_catalog.json"),
+  ];
+  for (const p of candidates) {
+    if (!existsSync(p)) continue;
+    try {
+      catalogCache = JSON.parse(readFileSync(p, "utf8")) as Record<string, string[]>;
+      break;
+    } catch {
+      /* try next */
+    }
+  }
+  return catalogCache;
+}
+
+export function catalogBoardsFor(provider: AtsProvider | string): string[] {
+  return loadBoardCatalog()[provider] ?? [];
+}
+
 export function loadCompanyAtsTenants(): AtsTenant[] {
   if (cached) return cached;
   const candidates = [

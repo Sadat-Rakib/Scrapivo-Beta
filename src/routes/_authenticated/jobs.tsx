@@ -1,23 +1,30 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useMemo, useRef } from "react";
 import { runJobSearch } from "@/lib/jobs.functions";
 import type { JobPosting, JobRegion } from "@/lib/jobs/types";
 import { ALL_JOB_SOURCE_IDS } from "@/lib/jobs/types";
+import {
+  buildGuidedQuestions,
+  parseSearchIntent,
+  REMOTE_OPTION,
+  type FlowAnswers,
+  type FlowQuestion,
+  type ParsedIntent,
+} from "@/lib/search/guided-intent";
 import { ViewToggle, type ViewMode } from "@/components/shared/view-toggle";
 import { EntityCard } from "@/components/shared/entity-card";
 import { EntityTable, type ColumnDef } from "@/components/shared/entity-table";
 import { PageComposer, ResultsBar } from "@/components/shared/search-dock";
 import type { ComposerHandle } from "@/components/discover/unified-composer";
+import { GuidedQuestionnaire, PageHeroCard } from "@/components/shared/guided-search";
 import { LoadMoreSentinel } from "@/components/shared/load-more-sentinel";
 import { useProgressiveCount } from "@/hooks/use-progressive-count";
-import { getRemainingSearches } from "@/lib/search.functions";
-import { Briefcase, Search, Download, ExternalLink, MapPin, RefreshCw } from "lucide-react";
+import { saveRouteSearchState, loadRouteSearchState } from "@/lib/store/search-store";
+import { Briefcase, Download, ExternalLink, MapPin, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { Company360View, type Company360Data } from "@/components/shared/company-360-view";
-
-import { saveRouteSearchState, loadRouteSearchState } from "@/lib/store/search-store";
 
 export const Route = createFileRoute("/_authenticated/jobs")({
   head: () => ({
@@ -26,12 +33,13 @@ export const Route = createFileRoute("/_authenticated/jobs")({
   component: JobsPage,
 });
 
-const REGIONS: { id: JobRegion; label: string }[] = [
-  { id: "any", label: "All Regions" },
-  { id: "remote", label: "Remote" },
-  { id: "north_america", label: "North America" },
-  { id: "europe", label: "Europe" },
-  { id: "asia", label: "Asia" },
+/** Composer autotype examples — jobs-only, never businesses/investors. */
+const COMPOSER_EXAMPLES = [
+  "senior designer roles in New York…",
+  "remote React developer jobs…",
+  "marketing jobs in London…",
+  "junior data analyst jobs in Toronto…",
+  "nurse practitioner jobs in Austin, TX…",
 ];
 
 /** Per-source fetch outcome reported by the server (PRD §10). */
@@ -42,6 +50,14 @@ type JobSourceStatus = {
   count: number;
   error?: string;
   fetchedAt: number;
+};
+
+type JobSearchVars = {
+  query: string;
+  location: string;
+  remoteOnly: boolean;
+  seniority: string;
+  region: JobRegion;
 };
 
 const fmtDate = (iso: string | null | undefined): string | null => {
@@ -56,76 +72,80 @@ const sourceLabel = (s: string): string => s.replace(/^source-(ats-)?/, "");
 
 function JobsPage() {
   const searchFn = useServerFn(runJobSearch);
-  const getUsage = useServerFn(getRemainingSearches);
-  const usageQuery = useQuery({ queryKey: ["usage"], queryFn: () => getUsage() });
 
   const initialState = useMemo(() => loadRouteSearchState<JobPosting>("jobs"), []);
 
-  const [query, setQuery] = useState(initialState?.filters?.query ?? "");
-  const [location, setLocation] = useState(initialState?.filters?.location ?? "");
-  const [remoteOnly, setRemoteOnly] = useState(initialState?.filters?.remoteOnly ?? false);
-  const [seniority, setSeniority] = useState(initialState?.filters?.seniority ?? "any");
-  const [contactRoles, setContactRoles] = useState(initialState?.filters?.contactRoles ?? "");
-  const [region, setRegion] = useState<JobRegion>(initialState?.filters?.region ?? "any");
+  const [input, setInput] = useState("");
   const [rows, setRows] = useState<JobPosting[]>(initialState?.results ?? []);
   const [searched, setSearched] = useState(!!initialState?.results?.length);
+  const [flow, setFlow] = useState<{
+    input: string;
+    parsed: ParsedIntent;
+    questions: FlowQuestion[];
+  } | null>(null);
   const [sourceStatuses, setSourceStatuses] = useState<JobSourceStatus[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const [selectedEntity, setSelectedEntity] = useState<Company360Data | null>(null);
-  const [refineOpen, setRefineOpen] = useState(false);
   const composerRef = useRef<ComposerHandle>(null);
 
-  // How many guided-questionnaire answers differ from their defaults.
-  const activeRefineCount = [
-    location.trim() !== "",
-    remoteOnly,
-    seniority !== "any",
-    contactRoles.trim() !== "",
-    region !== "any",
-  ].filter(Boolean).length;
+  // Guided flow: parse the free-form ask deterministically, then ask ONLY for
+  // the dimensions the text did not state (role, place, seniority…).
+  const launchSearch = (parsed: ParsedIntent, answers?: FlowAnswers) => {
+    const rawLocation = (answers?.location ?? parsed.location ?? "").trim();
+    const wantsRemote =
+      rawLocation === REMOTE_OPTION ||
+      rawLocation.toLowerCase() === "remote" ||
+      parsed.remoteOnly === true;
+    const vars: JobSearchVars = {
+      query: (answers?.query ?? parsed.query ?? "").trim(),
+      location: wantsRemote || rawLocation === "" ? "" : rawLocation,
+      remoteOnly: wantsRemote,
+      seniority: answers?.seniority ?? parsed.seniority ?? "any",
+      region: wantsRemote ? "remote" : (parsed.region ?? "any"),
+    };
+    setFlow(null);
+    mut.mutate(vars);
+  };
 
-  // Reset clears the form fields without firing a search (searches are quota-limited).
-  const resetFilters = () => {
-    setQuery("");
-    setLocation("");
-    setRemoteOnly(false);
-    setSeniority("any");
-    setContactRoles("");
-    setRegion("any");
+  const handleSubmit = () => {
+    const text = input.trim();
+    if (!text) return;
+    const parsed = parseSearchIntent("jobs", text);
+    const questions = buildGuidedQuestions("jobs", parsed);
+    if (questions.length) {
+      setFlow({ input: text, parsed, questions });
+      return;
+    }
+    launchSearch(parsed);
   };
 
   const mut = useMutation({
-    mutationFn: () =>
+    mutationFn: (vars: JobSearchVars) =>
       searchFn({
         data: {
-          query: query.trim(),
-          location: location.trim(),
-          remoteOnly,
-          seniority,
-          region,
+          query: vars.query.trim(),
+          location: vars.location.trim(),
+          remoteOnly: vars.remoteOnly,
+          seniority: vars.seniority,
+          region: vars.region,
           sources: [...ALL_JOB_SOURCE_IDS],
           limit: 120,
-          contactRoles: contactRoles
-            .split(",")
-            .map((s: string) => s.trim())
-            .filter(Boolean)
-            .slice(0, 8),
         },
       }),
-    onSuccess: (res) => {
+    onSuccess: (res, vars) => {
       const fetchedJobs = res.jobs ?? [];
       setRows(fetchedJobs);
       setSearched(true);
       setSourceStatuses(res.sourceStatuses ?? []);
       saveRouteSearchState("jobs", {
-        query,
-        filters: { query, location, remoteOnly, seniority, region, contactRoles },
+        query: vars.query,
+        filters: vars,
         results: fetchedJobs,
         timestamp: Date.now(),
       });
       if (!fetchedJobs.length) {
-        toast.message("No active jobs matched those filters");
+        toast.message("No active jobs matched");
       } else {
         toast.success(`${fetchedJobs.length} active jobs fetched`);
       }
@@ -212,7 +232,7 @@ function JobsPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `scrapivo-jobs-${query || "postings"}.csv`;
+    a.download = `scrapivo-jobs-${input.trim() || "postings"}.csv`.replace(/\s+/g, "-");
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -269,76 +289,6 @@ function JobsPage() {
     },
   ];
 
-  const FilterForm = (
-    <>
-      <label className="block space-y-1.5">
-        <span className="text-xs font-medium text-white/70">Role / Skill</span>
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="engineer, designer, product..."
-          className="w-full h-9 px-3 rounded-lg border border-white/10 bg-white/[0.03] text-xs text-white placeholder:text-white/30 outline-none focus:border-white/30"
-          onKeyDown={(e) => {
-            if (e.key === "Enter") mut.mutate();
-          }}
-        />
-      </label>
-
-      <label className="block space-y-1.5">
-        <span className="text-xs font-medium text-white/70">Location</span>
-        <input
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          placeholder="Remote, New York, San Francisco..."
-          className="w-full h-9 px-3 rounded-lg border border-white/10 bg-white/[0.03] text-xs text-white placeholder:text-white/30 outline-none focus:border-white/30"
-          onKeyDown={(e) => {
-            if (e.key === "Enter") mut.mutate();
-          }}
-        />
-      </label>
-
-      <label className="block space-y-1.5">
-        <span className="text-xs font-medium text-white/70">Seniority Level</span>
-        <select
-          value={seniority}
-          onChange={(e) => setSeniority(e.target.value)}
-          className="w-full h-9 px-3 rounded-lg border border-white/10 bg-[#131316] text-xs text-white outline-none focus:border-white/30"
-        >
-          <option value="any">Any seniority</option>
-          <option value="junior">Junior</option>
-          <option value="mid">Mid</option>
-          <option value="senior">Senior</option>
-          <option value="lead">Lead / Manager</option>
-        </select>
-      </label>
-
-      <label className="block space-y-1.5">
-        <span className="text-xs font-medium text-white/70">Region</span>
-        <select
-          value={region}
-          onChange={(e) => setRegion(e.target.value as JobRegion)}
-          className="w-full h-9 px-3 rounded-lg border border-white/10 bg-[#131316] text-xs text-white outline-none focus:border-white/30"
-        >
-          {REGIONS.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.label}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <label className="flex items-center gap-2 text-xs text-white/80 cursor-pointer pt-1">
-        <input
-          type="checkbox"
-          checked={remoteOnly}
-          onChange={(e) => setRemoteOnly(e.target.checked)}
-          className="rounded border-white/20 bg-white/5 text-white"
-        />
-        <span>Remote jobs only</span>
-      </label>
-    </>
-  );
-
   return (
     <div className="h-full flex min-h-0 bg-[#0a0a0b] text-white">
       {/* Main column: scrollable results + bottom-docked composer (Discover-style) */}
@@ -394,6 +344,7 @@ function JobsPage() {
                     setRows([]);
                     setSearched(false);
                     setSourceStatuses([]);
+                    setFlow(null);
                     composerRef.current?.focus();
                   }}
                 />
@@ -481,50 +432,43 @@ function JobsPage() {
 
             {!mut.isPending && searched && !rows.length && (
               <div className="liquid-glass rounded-2xl p-12 text-center text-sm text-white/50">
-                No active jobs matched those filters. Try broadening location or seniority.
+                No active jobs matched. Try broadening location or seniority.
               </div>
             )}
 
-            {!mut.isPending && !searched && (
-              <div className="liquid-glass rounded-2xl p-12 text-center text-sm text-white/60 space-y-3">
-                <Briefcase className="size-8 mx-auto text-white/30" />
-                <h3 className="text-base font-semibold text-white">Search Active Job Postings</h3>
-                <p className="max-w-md mx-auto text-xs text-white/50 leading-relaxed">
-                  Search across company career pages, ATS boards, and job sites — refine with the
-                  guided questions below.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => composerRef.current?.focus()}
-                  className="glass-pill px-5 py-2 text-xs font-semibold text-white bg-white/10 hover:bg-white/20 inline-flex items-center gap-2"
-                >
-                  <Search className="size-3.5" />
-                  <span>Start Searching</span>
-                </button>
-              </div>
+            {/* Guided questionnaire: opens after the user submits an ask that
+                is missing a role, place, or seniority. */}
+            {!mut.isPending && flow && (
+              <GuidedQuestionnaire
+                title="Find Jobs"
+                input={flow.input}
+                questions={flow.questions}
+                pending={mut.isPending}
+                onDone={(answers) => launchSearch(flow.parsed, answers)}
+                onCancel={() => setFlow(null)}
+              />
+            )}
+
+            {/* Compact entry card (home-page style) — only before a search. */}
+            {!mut.isPending && !flow && !searched && (
+              <PageHeroCard
+                icon={Briefcase}
+                title="Find Jobs"
+                description="Describe the role you want — we'll ask where and what level, then pull live postings from career pages and ATS boards."
+                onStart={() => composerRef.current?.focus()}
+              />
             )}
           </div>
         </div>
 
-        {/* Bottom-docked composer + guided questionnaire */}
+        {/* Bottom-docked composer */}
         <PageComposer
           ref={composerRef}
-          value={query}
-          onChange={setQuery}
-          onSubmit={() => mut.mutate()}
+          value={input}
+          onChange={setInput}
+          onSubmit={handleSubmit}
           pending={mut.isPending}
-          refine={FilterForm}
-          refineOpen={refineOpen}
-          onToggleRefine={() => setRefineOpen(!refineOpen)}
-          activeRefineCount={activeRefineCount}
-          onApplyRefine={() => {
-            setRefineOpen(false);
-            mut.mutate();
-          }}
-          onResetRefine={resetFilters}
-          applyLabel="Find Jobs"
-          applyPending={mut.isPending}
-          usage={usageQuery.data ?? undefined}
+          examples={COMPOSER_EXAMPLES}
         />
       </div>
 

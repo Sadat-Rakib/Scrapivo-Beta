@@ -1,7 +1,7 @@
 import { resilientJson } from "@/lib/search/http-fetch.server";
 import { loadAtsBoards, type AtsProvider } from "@/lib/search/ats-sources.server";
 import { registerJobSource } from "./registry";
-import { tenantBoardsFor } from "./tenants";
+import { catalogBoardsFor, tenantBoardsFor } from "./tenants";
 import { guessSeniority, looksRemote } from "./filters";
 import type { JobSearchFilters, RawJobPosting } from "./types";
 
@@ -23,14 +23,45 @@ function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
   });
 }
 
+/** Per-provider board caps — sized from the curated catalog so a search
+ *  covers hundreds of boards without hammering any single ATS API. */
+const BOARD_CAPS: Record<AtsProvider, number> = {
+  greenhouse: 220,
+  ashby: 90,
+  lever: 90,
+  smartrecruiters: 60,
+  workable: 40,
+  recruitee: 40,
+};
+
+/** Run async work over boards in small batches so hundreds of parallel
+ *  requests never fire at once (politeness + 429 avoidance). */
+async function mapInBatches<T, R>(
+  items: T[],
+  size: number,
+  fn: (item: T) => Promise<R>,
+  staggerMs = 25,
+): Promise<R[]> {
+  const out: R[] = [];
+  for (let i = 0; i < items.length; i += size) {
+    const batch = items.slice(i, i + size);
+    const results = await Promise.all(batch.map(fn));
+    out.push(...results);
+    if (i + size < items.length && staggerMs > 0) {
+      await new Promise((r) => setTimeout(r, staggerMs));
+    }
+  }
+  return out;
+}
+
 async function boardsFor(provider: AtsProvider): Promise<string[]> {
   const fromDb = await loadAtsBoards(provider).catch(() => [] as string[]);
   const extra = tenantBoardsFor(provider);
-  const merged = [...new Set([...fromDb, ...extra])].filter(
+  const catalog = catalogBoardsFor(provider);
+  const merged = [...new Set([...fromDb, ...catalog, ...extra])].filter(
     (b) => b && b !== "netflix" && b !== "notion",
   );
-  if (provider === "greenhouse") return merged.slice(0, 24);
-  return merged;
+  return merged.slice(0, BOARD_CAPS[provider] ?? 60);
 }
 
 import { sanitizeJobText } from "./hygiene";
@@ -38,18 +69,16 @@ import { sanitizeJobText } from "./hygiene";
 async function fetchGreenhouse(_filters: JobSearchFilters): Promise<RawJobPosting[]> {
   const boards = await boardsFor("greenhouse");
   const out: RawJobPosting[] = [];
-  const pages = await Promise.all(
-    boards.map(async (board) => {
-      const data = await withTimeout(
-        resilientJson<{ jobs?: AnyJson[] }>(
-          `https://boards-api.greenhouse.io/v1/boards/${encodeURIComponent(board)}/jobs?content=true`,
-        ).catch(() => null),
-        9000,
-        null,
-      );
-      return { board, data };
-    }),
-  );
+  const pages = await mapInBatches(boards, 24, async (board) => {
+    const data = await withTimeout(
+      resilientJson<{ jobs?: AnyJson[] }>(
+        `https://boards-api.greenhouse.io/v1/boards/${encodeURIComponent(board)}/jobs?content=true`,
+      ).catch(() => null),
+      9000,
+      null,
+    );
+    return { board, data };
+  });
   for (const { board, data } of pages) {
     for (const j of data?.jobs || []) {
       const title = sanitizeJobText(j.title);
@@ -81,18 +110,16 @@ async function fetchGreenhouse(_filters: JobSearchFilters): Promise<RawJobPostin
 async function fetchLever(_filters: JobSearchFilters): Promise<RawJobPosting[]> {
   const boards = await boardsFor("lever");
   const out: RawJobPosting[] = [];
-  const pages = await Promise.all(
-    boards.map(async (board) => {
-      const data = await withTimeout(
-        resilientJson<AnyJson[]>(
-          `https://api.lever.co/v0/postings/${encodeURIComponent(board)}?mode=json`,
-        ).catch(() => null),
-        9000,
-        null,
-      );
-      return { board, data };
-    }),
-  );
+  const pages = await mapInBatches(boards, 24, async (board) => {
+    const data = await withTimeout(
+      resilientJson<AnyJson[]>(
+        `https://api.lever.co/v0/postings/${encodeURIComponent(board)}?mode=json`,
+      ).catch(() => null),
+      9000,
+      null,
+    );
+    return { board, data };
+  });
   for (const { board, data } of pages) {
     if (!Array.isArray(data)) continue;
     for (const j of data) {
@@ -130,18 +157,16 @@ async function fetchLever(_filters: JobSearchFilters): Promise<RawJobPosting[]> 
 async function fetchAshby(_filters: JobSearchFilters): Promise<RawJobPosting[]> {
   const boards = await boardsFor("ashby");
   const out: RawJobPosting[] = [];
-  const pages = await Promise.all(
-    boards.map(async (board) => {
-      const data = await withTimeout(
-        resilientJson<{ jobs?: AnyJson[] }>(
-          `https://api.ashbyhq.com/posting-api/job-board/${encodeURIComponent(board)}?includeCompensation=true`,
-        ).catch(() => null),
-        9000,
-        null,
-      );
-      return { board, data };
-    }),
-  );
+  const pages = await mapInBatches(boards, 24, async (board) => {
+    const data = await withTimeout(
+      resilientJson<{ jobs?: AnyJson[] }>(
+        `https://api.ashbyhq.com/posting-api/job-board/${encodeURIComponent(board)}?includeCompensation=true`,
+      ).catch(() => null),
+      9000,
+      null,
+    );
+    return { board, data };
+  });
   for (const { board, data } of pages) {
     for (const j of data?.jobs || []) {
       const title = sanitizeJobText(j.title);
@@ -177,7 +202,7 @@ async function fetchAshby(_filters: JobSearchFilters): Promise<RawJobPosting[]> 
 async function fetchSmartRecruiters(_filters: JobSearchFilters): Promise<RawJobPosting[]> {
   const boards = await boardsFor("smartrecruiters");
   const out: RawJobPosting[] = [];
-  for (const company of boards) {
+  const pages = await mapInBatches(boards, 10, async (company) => {
     const data = await withTimeout(
       resilientJson<{ content?: AnyJson[] }>(
         `https://api.smartrecruiters.com/v1/companies/${encodeURIComponent(company)}/postings?limit=100`,
@@ -185,6 +210,9 @@ async function fetchSmartRecruiters(_filters: JobSearchFilters): Promise<RawJobP
       9000,
       null,
     );
+    return { company, data };
+  });
+  for (const { company, data } of pages) {
     for (const p of data?.content || []) {
       const title = String(p.name || "");
       if (!title) continue;
@@ -216,7 +244,7 @@ async function fetchSmartRecruiters(_filters: JobSearchFilters): Promise<RawJobP
 async function fetchWorkable(_filters: JobSearchFilters): Promise<RawJobPosting[]> {
   const boards = await boardsFor("workable");
   const out: RawJobPosting[] = [];
-  for (const account of boards) {
+  const pages = await mapInBatches(boards, 10, async (account) => {
     const data = await withTimeout(
       resilientJson<{ jobs?: AnyJson[] }>(
         `https://apply.workable.com/api/v1/widget/accounts/${encodeURIComponent(account)}`,
@@ -224,6 +252,9 @@ async function fetchWorkable(_filters: JobSearchFilters): Promise<RawJobPosting[
       9000,
       null,
     );
+    return { account, data };
+  });
+  for (const { account, data } of pages) {
     for (const j of data?.jobs || []) {
       const title = String(j.title || "");
       if (!title || !j.url) continue;
@@ -249,7 +280,7 @@ async function fetchWorkable(_filters: JobSearchFilters): Promise<RawJobPosting[
 async function fetchRecruitee(_filters: JobSearchFilters): Promise<RawJobPosting[]> {
   const boards = await boardsFor("recruitee");
   const out: RawJobPosting[] = [];
-  for (const company of boards) {
+  const pages = await mapInBatches(boards, 10, async (company) => {
     const data = await withTimeout(
       resilientJson<{ offers?: AnyJson[] }>(
         `https://${encodeURIComponent(company)}.recruitee.com/api/offers`,
@@ -257,6 +288,9 @@ async function fetchRecruitee(_filters: JobSearchFilters): Promise<RawJobPosting
       9000,
       null,
     );
+    return { company, data };
+  });
+  for (const { company, data } of pages) {
     for (const o of data?.offers || []) {
       const title = String(o.title || "");
       if (!title) continue;

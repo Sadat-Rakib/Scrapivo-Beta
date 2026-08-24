@@ -1,4 +1,5 @@
 import type { JobPosting, JobRegion, JobSearchFilters } from "./types";
+import { hasWord, normalizeEmploymentType, parseQuery } from "./relevance";
 
 const QUERY_SYNONYMS: Record<string, string[]> = {
   developer: [
@@ -9,11 +10,16 @@ const QUERY_SYNONYMS: Record<string, string[]> = {
     "swe",
     "software developer",
   ],
-  engineer: ["engineer", "software engineer", "developer"],
+  engineer: ["engineer", "developer"],
   designer: ["designer", "product designer", "ux designer", "ui designer", "ux/ui designer"],
   design: ["designer", "product designer", "ux designer", "ui designer"],
   marketing: ["marketing", "marketer", "growth"],
   sales: ["sales", "account executive", "business development"],
+  analyst: ["analyst", "analytics"],
+  nurse: ["nurse", "nursing", "rn"],
+  accountant: ["accountant", "accounting", "bookkeeper"],
+  welder: ["welder", "welding"],
+  teacher: ["teacher", "tutor", "instructor"],
 };
 
 const LOCATION_ALIASES: Record<string, string[]> = {
@@ -107,6 +113,9 @@ const REMOTE_BOARDS = new Set([
   "source-jobicy",
   "source-weworkremotely",
   "source-workingnomads",
+  "source-himalayas",
+  "source-4dayweek",
+  "source-nodesk",
 ]);
 
 export function looksRemote(loc: string, title: string, description?: string | null): boolean {
@@ -125,15 +134,28 @@ export function guessSeniority(title: string): string | null {
 }
 
 function queryNeedles(q: string): string[] {
-  const extra = QUERY_SYNONYMS[q] || [];
-  const out = new Set<string>([q, ...extra]);
-  for (const [key, syns] of Object.entries(QUERY_SYNONYMS)) {
-    if (q.includes(key) || syns.some((s) => q.includes(s))) {
-      syns.forEach((s) => out.add(s));
-      out.add(key);
+  // Word-level expansion only: a token must EQUAL a synonym key to expand.
+  // The old substring trigger turned "designer" into the bare needle "design",
+  // which substring-matched "Design Systems Intern" style titles.
+  const pq = parseQuery(q);
+  const out = new Set<string>();
+  for (const t of pq.tokens) {
+    out.add(t);
+    for (const s of QUERY_SYNONYMS[t] ?? []) {
+      // Multi-word synonyms are matched via their own word-boundary regexes.
+      out.add(s);
     }
   }
+  if (out.size === 0 && q.trim()) out.add(q.trim().toLowerCase());
   return [...out];
+}
+
+/** Word-boundary needle test; multi-word needles match as a phrase. */
+function needleHit(haystack: string, needle: string): boolean {
+  if (needle.includes(" ")) {
+    return new RegExp(`\\b${needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(haystack);
+  }
+  return hasWord(haystack, needle);
 }
 
 function locationNeedles(loc: string): string[] {
@@ -154,11 +176,14 @@ function matchesRegion(job: JobPosting, region: JobRegion): boolean {
 }
 
 export function matchesJobFilters(job: JobPosting, filters: JobSearchFilters): boolean {
-  // ── Query matching (title must contain at least one synonym needle) ──
+  // ── Query gate: title or department must contain a role token/needle ──
+  // Word-boundary matching only; the description never passes the gate on its
+  // own (it contributes to the relevance score instead).
   const q = filters.query?.trim().toLowerCase();
   if (q) {
     const needles = queryNeedles(q);
-    const titleMatch = needles.some((n) => job.title.toLowerCase().includes(n));
+    const titleBlob = `${job.title} ${job.department || ""}`;
+    const titleMatch = needles.some((n) => needleHit(titleBlob, n));
     if (!titleMatch) return false;
   }
 
@@ -230,6 +255,31 @@ export function matchesJobFilters(job: JobPosting, filters: JobSearchFilters): b
       if (jobSen !== "junior" && jobSen !== "intern") return false;
     } else if (jobSen !== sen) {
       return false;
+    }
+  }
+
+  // ── Employment-type filter (full-time / contract / part-time / internship) ──
+  const wantType = normalizeEmploymentType(filters.employmentType);
+  if (wantType) {
+    const titleLower = job.title.toLowerCase();
+    const jobType =
+      normalizeEmploymentType(job.employment_type) ??
+      (/\bintern(ship)?\b/.test(titleLower)
+        ? "internship"
+        : /\bcontract(or)?\b|\bfreelance\b|\bc2c\b|\b1099\b/.test(titleLower)
+          ? "contract"
+          : /\bpart[- ]time\b/.test(titleLower)
+            ? "part-time"
+            : /\bfull[- ]time\b|\bpermanent\b/.test(titleLower)
+              ? "full-time"
+              : null);
+    // Only enforce when the job states a type somewhere; silent jobs stay in
+    // (ATS boards rarely label commitment consistently).
+    if (jobType && jobType !== wantType) {
+      // "internship" also accepts jobs the seniority guess calls intern.
+      if (!(wantType === "internship" && jobSen === "intern" && !job.employment_type)) {
+        return false;
+      }
     }
   }
   return true;
