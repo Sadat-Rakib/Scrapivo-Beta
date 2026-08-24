@@ -20,6 +20,7 @@ import { GuidedQuestionnaire, PageHeroCard } from "@/components/shared/guided-se
 import { LoadMoreSentinel } from "@/components/shared/load-more-sentinel";
 import { useProgressiveCount } from "@/hooks/use-progressive-count";
 import { saveRouteSearchState, loadRouteSearchState } from "@/lib/store/search-store";
+import { friendlyErrorText } from "@/lib/friendly-error";
 import { Store, Download, MapPin, Phone, Mail, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { Company360View, type Company360Data } from "@/components/shared/company-360-view";
@@ -209,8 +210,8 @@ function LocalBusinessesPage() {
         toast.message(
           fetched.length
             ? vars.opportunity === "any"
-              ? "No businesses matched your contact requirement — try 'No requirement'"
-              : "No businesses matched that signal — try 'Any business'"
+              ? "No businesses matched your contact requirement, try 'No requirement'"
+              : "No businesses matched that signal, try 'Any business'"
             : (res.message || "No live listings found"),
         );
         return;

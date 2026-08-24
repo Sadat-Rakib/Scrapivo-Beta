@@ -71,7 +71,7 @@ const STEPS: Step[] = [
   },
   {
     id: "website",
-    prompt: () => "Got a website or portfolio? Paste the link — or skip.",
+    prompt: () => "Got a website or portfolio? Paste the link, or skip.",
     input: "text",
     placeholder: "https://…",
     optional: true,
@@ -80,7 +80,7 @@ const STEPS: Step[] = [
   {
     id: "about",
     prompt: () =>
-      "Tell me about you — what you've done, your strengths, or past work. The more detail, the better your matches.",
+      "Tell me about you: what you've done, your strengths, or past work. The more detail, the better your matches.",
     input: "textarea",
     placeholder: "e.g. 3 years building web apps, 20+ client projects, strongest in React/Next.js…",
     optional: true,
@@ -142,8 +142,8 @@ const STEPS: Step[] = [
     id: "audience",
     prompt: (a) =>
       a.goal === "jobs"
-        ? "Focus on companies hiring, agencies, people posting roles — or all?"
-        : "Focus on companies, agencies, people — or all of them?",
+        ? "Focus on companies hiring, agencies, people posting roles, or all?"
+        : "Focus on companies, agencies, people, or all of them?",
     chips: [
       { label: "Companies", value: "companies" },
       { label: "Agencies", value: "agencies" },
@@ -154,6 +154,20 @@ const STEPS: Step[] = [
 ];
 
 type TranscriptItem = { role: "scrapy" | "user"; text: string };
+
+/** Rotating save confirmations so repeat users never see the same line twice. */
+const SAVE_CONFIRMATIONS = [
+  "All set, project saved! Every search now starts from this context. Let's find opportunities! 🚀",
+  "Locked in! Your project context is saved and every search just got sharper. 🚀",
+  "Done! Project saved. From here on, searches are tailored to you. 🚀",
+  "Project saved! I'll use this context on every hunt. Let's go find them! 🚀",
+  "Saved and ready. Every search starts from this context now. 🚀",
+];
+
+function saveConfirmation(goal?: string): string {
+  const base = SAVE_CONFIRMATIONS[Math.floor(Math.random() * SAVE_CONFIRMATIONS.length)]!;
+  return goal === "jobs" ? base : base.replace("opportunities", "leads").replace("find them", "find your leads");
+}
 
 export function OnboardingWizard({
   onComplete,
@@ -196,10 +210,7 @@ export function OnboardingWizard({
     } else {
       items.push({
         role: "scrapy",
-        text:
-          next.goal === "jobs"
-            ? "Perfect — project saved! Every search starts from this context. Let's find opportunities! 🚀"
-            : "Perfect — project saved! Every search starts from this context. Let's find your leads! 🚀",
+        text: saveConfirmation(next.goal),
       });
       setTranscript(items);
       const nicheRaw = (next.niche || "").trim();

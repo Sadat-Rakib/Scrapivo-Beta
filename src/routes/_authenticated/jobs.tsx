@@ -22,6 +22,7 @@ import { GuidedQuestionnaire, PageHeroCard } from "@/components/shared/guided-se
 import { LoadMoreSentinel } from "@/components/shared/load-more-sentinel";
 import { useProgressiveCount } from "@/hooks/use-progressive-count";
 import { saveRouteSearchState, loadRouteSearchState } from "@/lib/store/search-store";
+import { friendlyErrorText } from "@/lib/friendly-error";
 import { Briefcase, Download, ExternalLink, MapPin, RefreshCw, SearchCheck } from "lucide-react";
 import { toast } from "sonner";
 import { Company360View, type Company360Data } from "@/components/shared/company-360-view";

@@ -46,6 +46,7 @@ import { SearchingSteps } from "@/components/discover/searching-steps";
 import { ClarifyPanel } from "@/components/discover/clarify-panel";
 import type { ClarifyQuestion, ClarifyAnswers } from "@/lib/search/clarifier";
 import { detectSearchVertical } from "@/lib/search/clarifier";
+import { friendlyErrorText } from "@/lib/friendly-error";
 import { type ChatTurn } from "@/components/discover/scrapy-chat-panel";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -217,10 +218,10 @@ function DiscoverPage() {
         } as Project;
         localStorage.setItem("scrapivo:local-project", JSON.stringify(local));
         setLocalProject(local);
-        toast.info("Saved on this device — apply the projects migration to sync across devices.");
+        toast.info("Saved on this device. Apply the projects migration to sync across devices.");
       } else {
         qc.invalidateQueries({ queryKey: ["projects"] });
-        toast.success("Project saved — searches now start from this context");
+        toast.success("Project saved. Searches now start from this context");
       }
       markReturnChatAsked();
     } catch (e: unknown) {
@@ -525,7 +526,7 @@ function DiscoverPage() {
       setChatLog((m) => [...m, { role: "assistant", content: scrapyAckReply(cleaned) }]);
       if (res.query) {
         const q = toPlainSearchQuery(res.query) || res.query;
-        toast.success("On it — searching now");
+        toast.success("On it, searching now");
         // Through beginSearch, so a search Scrapy starts from the chat gets the
         // same clarifier a typed one does. Calling the mutation directly here
         // was a second way to reach results with the questions skipped.
@@ -715,7 +716,7 @@ function DiscoverPage() {
     setChatLog((prev) =>
       prev.length > 0
         ? prev
-        : [{ role: "assistant", content: `Hey ${name} — what do you want to find now?` }],
+        : [{ role: "assistant", content: `Hey ${name}! What do you want to find now?` }],
     );
   }, [
     showOnboarding,

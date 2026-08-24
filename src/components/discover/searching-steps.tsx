@@ -88,9 +88,9 @@ const HOLDING_LINES = [
   "Cross-checking sources for better matches…",
   "Filtering noise so you only see real demand…",
   "Scoring volume and quality together…",
-  "Almost there — packing the strongest leads…",
+  "Almost there, packing the strongest leads…",
   "Double-checking recency and relevance…",
-  "Still working — good searches take a moment…",
+  "Still working, good searches take a moment…",
 ];
 
 function delayForStep(index: number, total: number): number {

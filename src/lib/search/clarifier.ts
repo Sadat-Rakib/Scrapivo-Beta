@@ -30,7 +30,8 @@ export type ClarifyQuestionId =
   | "signal_focus"
   | "local_opportunity"
   | "investor_stage"
-  | "investor_check";
+  | "investor_check"
+  | "investor_sector";
 
 export type ClarifyQuestion = {
   id: ClarifyQuestionId;
@@ -56,6 +57,8 @@ export type ClarifyAnswers = {
   investor_stage?: "pre-seed" | "seed" | "series-a" | "series-b" | "any";
   /** Investor hunt: check-size band. */
   investor_check?: "angel" | "seed" | "growth" | "any";
+  /** Investor hunt: sector focus (free text or canonical label). */
+  investor_sector?: string;
   /** Free-text the user typed instead of picking. */
   other?: Partial<Record<ClarifyQuestionId, string>>;
 };
@@ -508,13 +511,13 @@ function investorSectorQuestion(): ClarifyQuestion {
     question: "What sector is your startup in?",
     allowOther: true,
     options: [
-      { id: "AI", label: "AI / ML", recommended: true },
-      { id: "Fintech", label: "Fintech" },
-      { id: "Healthcare", label: "Healthcare" },
-      { id: "Climate", label: "Climate" },
-      { id: "SaaS", label: "SaaS" },
-      { id: "DevTools", label: "DevTools" },
-      { id: "any", label: "No sector filter" },
+      { id: "AI", label: "AI / ML", hint: "Model, applied AI, infra", recommended: true },
+      { id: "Fintech", label: "Fintech", hint: "Payments, lending, infra" },
+      { id: "Healthcare", label: "Healthcare", hint: "Biohealth, digital health" },
+      { id: "Climate", label: "Climate", hint: "Energy, sustainability" },
+      { id: "SaaS", label: "SaaS", hint: "B2B software" },
+      { id: "DevTools", label: "DevTools", hint: "Developer platforms" },
+      { id: "any", label: "No sector filter", hint: "Match any thesis" },
     ],
   };
 }
@@ -614,6 +617,8 @@ export type SearchRefinement = {
   localOpportunity?: ClarifyAnswers["local_opportunity"];
   investorStage?: ClarifyAnswers["investor_stage"];
   investorCheck?: ClarifyAnswers["investor_check"];
+  /** Investor hunt: sector focus (canonical label or free text). */
+  investorSector?: string;
   /** True when query is find-investors outreach, not startups-raising. */
   findInvestors?: boolean;
   /** Human-readable summary, shown back so the user can see what we assumed. */
@@ -761,6 +766,10 @@ export function applyClarifyAnswers(
     answers.investor_check ||
     (answers.other?.investor_check as ClarifyAnswers["investor_check"]) ||
     undefined;
+  const investorSector =
+    (answers.investor_sector as string | undefined) ||
+    (answers.other?.investor_sector as string | undefined) ||
+    undefined;
 
   const noun = craft || classified.coreSkill || (product ? "your product" : "work");
   const parts: string[] = [];
@@ -768,6 +777,7 @@ export function applyClarifyAnswers(
     parts.push("Finding investors / VCs");
     if (investorStage && investorStage !== "any") parts.push(investorStage);
     if (investorCheck && investorCheck !== "any") parts.push(`check: ${investorCheck}`);
+    if (investorSector && investorSector !== "any") parts.push(`sector: ${investorSector}`);
   } else {
     parts.push(product ? `Looking for customers for ${noun}` : `Looking for ${noun}`);
   }
@@ -797,6 +807,7 @@ export function applyClarifyAnswers(
     localOpportunity,
     investorStage,
     investorCheck,
+    investorSector,
     findInvestors,
     summary: parts.join(" · "),
   };
