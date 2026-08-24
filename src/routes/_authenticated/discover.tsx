@@ -259,9 +259,9 @@ function DiscoverPage() {
   const [localRows, setLocalRows] = useState<LocalBusinessRow[]>([]);
   const [resultTab, setResultTab] = useState<ResultTab>("posts");
   const [activeQuery, setActiveQuery] = useState<string | null>(null);
-  const [activeVertical, setActiveVertical] = useState<
-    "investors" | "local" | undefined
-  >(undefined);
+  const [activeVertical, setActiveVertical] = useState<"investors" | "local" | undefined>(
+    undefined,
+  );
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [queryType, setQueryType] = useState<string | null>(null);
   // Clarifying-question flow. Questions are computed BEFORE the search runs and

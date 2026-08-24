@@ -5,7 +5,10 @@
  * issue array like `[{"code":"too_big","maximum":80,"path":["name"]}]`. That
  * blob used to land verbatim in toasts. This maps it to plain language.
  */
-export function friendlyErrorText(e: unknown, fallback = "Something went wrong. Try again."): string {
+export function friendlyErrorText(
+  e: unknown,
+  fallback = "Something went wrong. Try again.",
+): string {
   const raw = e instanceof Error ? e.message : typeof e === "string" ? e : "";
   if (!raw) return fallback;
 
@@ -18,8 +21,7 @@ export function friendlyErrorText(e: unknown, fallback = "Something went wrong. 
         | { path?: (string | number)[]; message?: string; code?: string; maximum?: number }
         | undefined;
       if (first?.message) {
-        const field =
-          Array.isArray(first.path) && first.path.length ? String(first.path[0]) : "";
+        const field = Array.isArray(first.path) && first.path.length ? String(first.path[0]) : "";
         const label = field ? `${field.charAt(0).toUpperCase()}${field.slice(1)}` : "That value";
         if (first.code === "too_big") {
           return `${label} is too long${first.maximum ? ` (max ${first.maximum} characters)` : ""}`;

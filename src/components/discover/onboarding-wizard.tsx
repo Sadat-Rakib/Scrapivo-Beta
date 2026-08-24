@@ -166,7 +166,9 @@ const SAVE_CONFIRMATIONS = [
 
 function saveConfirmation(goal?: string): string {
   const base = SAVE_CONFIRMATIONS[Math.floor(Math.random() * SAVE_CONFIRMATIONS.length)]!;
-  return goal === "jobs" ? base : base.replace("opportunities", "leads").replace("find them", "find your leads");
+  return goal === "jobs"
+    ? base
+    : base.replace("opportunities", "leads").replace("find them", "find your leads");
 }
 
 export function OnboardingWizard({

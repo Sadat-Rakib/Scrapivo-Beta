@@ -685,7 +685,11 @@ export function buildGuidedQuestions(domain: GuidedDomain, parsed: ParsedIntent)
         { value: "any", label: "Any business", hint: "No signal filter", recommended: true },
         { value: "no_website", label: "Businesses with no website", hint: "Need one built" },
         { value: "poor_design", label: "Outdated / poor design", hint: "Redesign prospects" },
-        { value: "not_mobile_friendly", label: "Not mobile-friendly", hint: "Losing mobile visitors" },
+        {
+          value: "not_mobile_friendly",
+          label: "Not mobile-friendly",
+          hint: "Losing mobile visitors",
+        },
         { value: "seo_poor", label: "Weak SEO", hint: "Ranking poorly on Google" },
         { value: "sales_ready", label: "Sales-ready", hint: "Reachable with a live site" },
       ],

@@ -14,10 +14,7 @@ import type {
   isFirm,
   isNewFormat,
 } from "./types";
-import {
-  matchLocation,
-  type LocationMatchResult,
-} from "./location-hierarchy";
+import { matchLocation, type LocationMatchResult } from "./location-hierarchy";
 import { getSemanticMatcher } from "./semantic-matcher";
 import { isFirmRecord } from "./card-adapters";
 
@@ -279,7 +276,12 @@ function geographyStringsOf(rec: InvestorEntity | InvestorRecord): string[] {
     for (const o of offices) {
       if (isStr(o)) out.push(o.trim());
       else if (o && typeof o === "object") {
-        const office = o as { city?: unknown; country?: unknown; region?: unknown; address?: unknown };
+        const office = o as {
+          city?: unknown;
+          country?: unknown;
+          region?: unknown;
+          address?: unknown;
+        };
         for (const v of [office.city, office.country, office.region, office.address]) {
           if (isStr(v)) out.push(v.trim());
         }

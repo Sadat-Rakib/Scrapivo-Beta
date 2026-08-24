@@ -156,7 +156,7 @@ export const matchFromWebsite = createServerFn({ method: "POST" })
         matchScore: m.score,
         matchReasons: m.reasons,
         evidence: [
-          ...((m.investor as any).evidence || []),
+          ...((m.investor as { evidence?: ReturnType<typeof makeClaim>[] }).evidence || []),
           ...m.reasons.map((r) =>
             makeClaim(r, [{ source: "website_matcher", data: data.url }], "medium"),
           ),

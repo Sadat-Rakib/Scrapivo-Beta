@@ -212,7 +212,7 @@ function LocalBusinessesPage() {
             ? vars.opportunity === "any"
               ? "No businesses matched your contact requirement, try 'No requirement'"
               : "No businesses matched that signal, try 'Any business'"
-            : (res.message || "No live listings found"),
+            : res.message || "No live listings found",
         );
         return;
       }

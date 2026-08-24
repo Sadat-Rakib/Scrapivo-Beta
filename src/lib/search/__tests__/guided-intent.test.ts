@@ -10,6 +10,7 @@ describe("parseSearchIntent — businesses", () => {
     expect(buildGuidedQuestions("businesses", p).map((q) => q.id)).toEqual([
       "service",
       "requirement",
+      "opportunity",
       "count",
     ]);
   });
@@ -30,6 +31,7 @@ describe("parseSearchIntent — businesses", () => {
       "location",
       "service",
       "requirement",
+      "opportunity",
       "count",
     ]);
     // Required questions have no skip value.
@@ -42,7 +44,13 @@ describe("parseSearchIntent — businesses", () => {
     expect(p.category).toBe("dentists");
     expect(p.location).toBeUndefined();
     const qs = buildGuidedQuestions("businesses", p);
-    expect(qs.map((q) => q.id)).toEqual(["location", "service", "requirement", "count"]);
+    expect(qs.map((q) => q.id)).toEqual([
+      "location",
+      "service",
+      "requirement",
+      "opportunity",
+      "count",
+    ]);
   });
 
   it("runs immediately when both category and location are stated", () => {
@@ -53,6 +61,7 @@ describe("parseSearchIntent — businesses", () => {
     expect(buildGuidedQuestions("businesses", p).map((q) => q.id)).toEqual([
       "service",
       "requirement",
+      "opportunity",
       "count",
     ]);
   });
@@ -65,6 +74,7 @@ describe("parseSearchIntent — businesses", () => {
       "category",
       "service",
       "requirement",
+      "opportunity",
       "count",
     ]);
   });
@@ -73,6 +83,7 @@ describe("parseSearchIntent — businesses", () => {
     const qs = buildGuidedQuestions("businesses", parseSearchIntent("businesses", "dentists"));
     const byId = new Map(qs.map((q) => [q.id, q]));
     expect(byId.get("requirement")?.options.find((o) => o.recommended)?.value).toBe("contact");
+    expect(byId.get("opportunity")?.options.find((o) => o.recommended)?.value).toBe("any");
     expect(byId.get("count")?.options.find((o) => o.recommended)?.value).toBe("any");
   });
 

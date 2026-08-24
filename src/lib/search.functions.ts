@@ -274,6 +274,7 @@ export const runSearch = createServerFn({ method: "POST" })
         stage: refinement.investorStage,
         location: refinement.location || undefined,
         checkBand: refinement.investorCheck,
+        sector: refinement.investorSector || undefined,
         limit: 40,
       });
 

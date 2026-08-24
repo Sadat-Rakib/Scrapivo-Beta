@@ -428,9 +428,7 @@ function isLocalBusinessHunt(classified: ClassifiedQuery): boolean {
 
 /** Which specialized directory (if any) this raw ask targets — used to route
  *  clarifying questions and progress narration before classification runs. */
-export function detectSearchVertical(
-  raw: string,
-): "investors" | "local" | undefined {
+export function detectSearchVertical(raw: string): "investors" | "local" | undefined {
   const classified = { raw } as ClassifiedQuery;
   if (isFindInvestorHunt(classified)) return "investors";
   if (isLocalBusinessHunt(classified)) return "local";

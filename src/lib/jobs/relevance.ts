@@ -86,7 +86,13 @@ function canonicalSeniority(word: string): string {
     return "junior";
   }
   if (word === "staff" || word === "principal" || word === "sr") return "senior";
-  if (word === "manager" || word === "director" || word === "head" || word === "chief" || word === "vp") {
+  if (
+    word === "manager" ||
+    word === "director" ||
+    word === "head" ||
+    word === "chief" ||
+    word === "vp"
+  ) {
     return "lead";
   }
   return word;
@@ -94,7 +100,10 @@ function canonicalSeniority(word: string): string {
 
 export function parseQuery(q: string | null | undefined): ParsedQuery {
   const raw = (q || "").trim();
-  const words = raw.toLowerCase().split(/[^a-z0-9+#.]+/).filter(Boolean);
+  const words = raw
+    .toLowerCase()
+    .split(/[^a-z0-9+#.]+/)
+    .filter(Boolean);
   const seniorityWord = words.find((w) => SENIORITY_WORDS.has(w));
   const tokens = words.filter((w) => !SENIORITY_WORDS.has(w) && !STOPWORDS.has(w) && w.length > 1);
   return {
@@ -118,7 +127,7 @@ const EMP_TYPE_NORM: Record<string, string> = {
   contract: "contract",
   contractor: "contract",
   freelance: "contract",
-  "temporary": "contract",
+  temporary: "contract",
   internship: "internship",
   intern: "internship",
   "working student": "internship",
@@ -140,7 +149,11 @@ function employmentTypeFromTitle(title: string): string | null {
 }
 
 /** Relevance score for one job against the parsed query + filters. Higher = better. */
-export function jobRelevanceScore(job: JobPosting, pq: ParsedQuery, filters: JobSearchFilters): number {
+export function jobRelevanceScore(
+  job: JobPosting,
+  pq: ParsedQuery,
+  filters: JobSearchFilters,
+): number {
   let score = 0;
   const title = job.title || "";
   const dept = job.department || "";
@@ -164,7 +177,10 @@ export function jobRelevanceScore(job: JobPosting, pq: ParsedQuery, filters: Job
   const jobType = normalizeEmploymentType(job.employment_type) ?? employmentTypeFromTitle(title);
   if (wantType) {
     if (jobType === wantType) score += 3;
-    else if (wantType === "internship" && (job.seniority === "intern" || guessSeniority(title) === "intern")) {
+    else if (
+      wantType === "internship" &&
+      (job.seniority === "intern" || guessSeniority(title) === "intern")
+    ) {
       score += 2;
     }
   }
