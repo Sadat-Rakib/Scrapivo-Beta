@@ -1,22 +1,20 @@
-import { fetchRemotiveJobs, fetchWwrJobs, fetchTheMuseJobs, fetchWorkingNomadsJobs, fetchHimalayasJobs } from "../src/lib/jobs/remote-fetchers.server";
+const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
 
 async function main() {
-  const r = await fetchRemotiveJobs("senior designer");
-  console.log("remotive:", r.length, r[0]?.title);
-  const w = await fetchWwrJobs("senior designer");
-  console.log("wwr:", w.length, w[0]?.title);
-  const m = await fetchTheMuseJobs("senior designer");
-  console.log("muse:", m.length, m[0]?.title);
-  const wn = await fetchWorkingNomadsJobs("senior designer");
-  console.log("workingnomads:", wn.length, wn[0]?.title);
-  const h = await fetchHimalayasJobs("designer");
-  console.log("himalayas(designer):", h.length, h[0]?.title);
+  // Remotive raw
+  const r = await fetch("https://remotive.com/api/remote-jobs?search=senior%20designer&limit=10", { headers: { "user-agent": UA } });
+  const j = await r.json();
+  console.log("remotive search 'senior designer':", r.status, "jobs:", j.jobs?.length);
+  console.log("  first titles:", (j.jobs ?? []).slice(0, 5).map((x: unknown) => (x as { title: string }).title));
+  const r2 = await fetch("https://remotive.com/api/remote-jobs?search=designer&limit=10", { headers: { "user-agent": UA } });
+  const j2 = await r2.json();
+  console.log("remotive search 'designer':", r2.status, "jobs:", j2.jobs?.length, (j2.jobs ?? []).slice(0, 3).map((x: unknown) => (x as { title: string }).title));
 
-  // Raw body probes for the zero-yield APIs
-  const muse = await fetch("https://www.themuse.com/api/public/jobs?category=Design&page=0").then((r) => r.json());
-  console.log("muse raw:", muse.results?.length ?? "no results field", muse.results?.[0]?.name);
-  const wnRaw = await fetch("https://www.workingnomads.com/api/exposed_jobs/").then((r) => r.json());
-  console.log("wn raw type:", Array.isArray(wnRaw), "len:", wnRaw?.length, JSON.stringify(wnRaw?.[0]).slice(0, 300));
+  // WWR with Accept header
+  const w = await fetch("https://weworkremotely.com/remote-jobs/search.rss?term=designer", {
+    headers: { "user-agent": UA, Accept: "application/rss+xml, application/xml, text/xml" },
+  });
+  console.log("wwr with accept:", w.status, (await w.text()).slice(0, 120).replace(/\n/g, " "));
 }
 
 main().catch((e) => console.error(e));
