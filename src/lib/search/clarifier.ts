@@ -408,15 +408,48 @@ function productCraftQuestion(classified: ClassifiedQuery): ClarifyQuestion {
 }
 
 function isLocalBusinessHunt(classified: ClassifiedQuery): boolean {
-  return /\b(local businesses?|plumbers?|dentists?|roofers?|restaurants?|gyms?|med spas?|law firms?|near me|in (texas|london|austin|toronto))\b/i.test(
-    classified.raw || "",
+  const raw = classified.raw || "";
+  // Named trade / category + a place ("HVAC in Austin, Texas") is a local
+  // business hunt even when the trade word is not in the short list below.
+  const tradeAndPlace =
+    /\b(plumbers?|electricians?|hvac|roofers?|dentists?|med spas?|salons?|barbers?|gyms?|fitness|law firms?|attorneys?|restaurants?|cafes?|cafés|bakers?|florists?|landscapers?|tattoo|chiropract\w*|vets?|veterinar\w*|accountants?|photographers?|real estate agenc\w*)\b/i.test(
+      raw,
+    ) && mentionsPlace(raw);
+  return (
+    tradeAndPlace ||
+    /\b(local businesses?|plumbers?|dentists?|roofers?|restaurants?|gyms?|med spas?|law firms?|near me|in (texas|london|austin|toronto))\b/i.test(
+      raw,
+    )
   );
 }
 
+/** Which specialized directory (if any) this raw ask targets — used to route
+ *  clarifying questions and progress narration before classification runs. */
+export function detectSearchVertical(
+  raw: string,
+): "investors" | "local" | undefined {
+  const classified = { raw } as ClassifiedQuery;
+  if (isFindInvestorHunt(classified)) return "investors";
+  if (isLocalBusinessHunt(classified)) return "local";
+  return undefined;
+}
+
 function isFindInvestorHunt(classified: ClassifiedQuery): boolean {
+  const raw = classified.raw || "";
   // Finding VCs/angels for the founder — not "startups raising" deal-flow.
-  return /\b(find (an? )?investors?|need (an? )?investors?|looking for (an? )?(vc|angel|venture)|raise from|pitch (to )?(vcs?|investors?))\b/i.test(
-    classified.raw || "",
+  // Founder-voice raises ("I am trying to raise for pre-seed round",
+  // "raising our seed") are investor hunts too; bare "raise" needs funding
+  // context nearby so "companies raising prices" never misroutes here.
+  return (
+    /\b(find (an? )?investors?|need (an? )?investors?|looking for (an? )?(vc|angel|venture|investors?)|raise from|pitch (to )?(vcs?|investors?))\b/i.test(
+      raw,
+    ) ||
+    /\brais(?:e|ing|ed)\b[^.?!]{0,40}\b(round|capital|fund(?:s|ing)?|money|pre-?seed|seed|series)\b/i.test(
+      raw,
+    ) ||
+    /\b(pre-?seed|seed round|series [abc] round|funding round|venture capital|angel investors?)\b/i.test(
+      raw,
+    )
   );
 }
 
@@ -469,6 +502,23 @@ function investorCheckQuestion(): ClarifyQuestion {
   };
 }
 
+function investorSectorQuestion(): ClarifyQuestion {
+  return {
+    id: "investor_sector",
+    question: "What sector is your startup in?",
+    allowOther: true,
+    options: [
+      { id: "AI", label: "AI / ML", recommended: true },
+      { id: "Fintech", label: "Fintech" },
+      { id: "Healthcare", label: "Healthcare" },
+      { id: "Climate", label: "Climate" },
+      { id: "SaaS", label: "SaaS" },
+      { id: "DevTools", label: "DevTools" },
+      { id: "any", label: "No sector filter" },
+    ],
+  };
+}
+
 export function buildClarifyingQuestions(
   classified: ClassifiedQuery,
   opts: { hasLocation?: boolean } = {},
@@ -486,6 +536,7 @@ export function buildClarifyingQuestions(
   if (isFindInvestorHunt(classified)) {
     out.push(investorStageQuestion());
     out.push(investorCheckQuestion());
+    out.push(investorSectorQuestion());
     if (!hasLocation) out.push(geographyQuestion());
     return out.slice(0, 4);
   }

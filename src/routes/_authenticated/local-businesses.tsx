@@ -77,22 +77,78 @@ function LocalBusinessesPage() {
   const [selectedEntity, setSelectedEntity] = useState<Company360Data | null>(null);
   const composerRef = useRef<ComposerHandle>(null);
 
-  // Guided flow: parse the free-form ask deterministically, then ask ONLY for
-  // the dimensions the text did not state. A fully-specified ask ("10 dentist
-  // shops in Austin, Texas") runs immediately with zero questions.
+  type BusinessSearchVars = {
+    category: string;
+    location: string;
+    /** Contact-quality floor every delivered row must meet. */
+    requirement: "contact" | "email" | "phone" | "website" | "any";
+    /** Pain-signal the user is hunting (maps to OpportunityTag chips). */
+    opportunity: OpportunityTag | "any";
+    /** Exact list size the user asked for; null = as many as possible. */
+    count: number | null;
+    /** What the user sells — recorded for context in saved state. */
+    service: string;
+  };
+
+  const OPPORTUNITY_VALUES: OpportunityTag[] = [
+    "no_website",
+    "poor_design",
+    "not_mobile_friendly",
+    "seo_poor",
+    "has_email",
+    "has_phone",
+    "sales_ready",
+  ];
+
+  const meetsRequirement = (
+    r: LocalBusinessRow,
+    requirement: BusinessSearchVars["requirement"],
+  ): boolean => {
+    switch (requirement) {
+      case "email":
+        return Boolean(r.email);
+      case "phone":
+        return Boolean(r.phone);
+      case "website":
+        return Boolean(r.website);
+      case "contact":
+        return Boolean(r.email || r.phone);
+      default:
+        return true;
+    }
+  };
+
+  // Guided flow: parse the free-form ask deterministically, then confirm the
+  // missing target dimensions (category/location) plus the ICP questions
+  // (service, contact requirement, pain signal, list size) which describe the
+  // USER and are therefore always collected.
   const launchSearch = (parsed: ParsedIntent, answers?: FlowAnswers) => {
     const nextCategory = (answers?.category ?? parsed.category ?? "").trim();
     const nextLocation = (answers?.location ?? parsed.location ?? "").trim();
     if (nextCategory.length < 2 || nextLocation.length < 2) return;
+    const rawCount = answers?.count ?? "any";
+    const rawOpportunity = answers?.opportunity ?? "any";
     setCategory(nextCategory);
     setLocation(nextLocation);
     setFlow(null);
-    mut.mutate({ category: nextCategory, location: nextLocation });
+    mut.mutate({
+      category: nextCategory,
+      location: nextLocation,
+      requirement: (answers?.requirement ?? "contact") as BusinessSearchVars["requirement"],
+      opportunity: (OPPORTUNITY_VALUES.includes(rawOpportunity as OpportunityTag)
+        ? rawOpportunity
+        : "any") as BusinessSearchVars["opportunity"],
+      count: /^\d+$/.test(rawCount) ? Number(rawCount) : null,
+      service: (answers?.service ?? "").trim(),
+    });
   };
 
   const handleSubmit = () => {
     const text = input.trim();
     if (!text) return;
+    // Chat-style UX: the ask moves up into the flow/results area, the
+    // composer clears for the next input.
+    setInput("");
     const parsed = parseSearchIntent("businesses", text);
     const questions = buildGuidedQuestions("businesses", parsed);
     if (questions.length) {
@@ -111,7 +167,7 @@ function LocalBusinessesPage() {
   const { visible, hasMore, loadMore, shown } = useProgressiveCount(filtered, 24);
 
   const mut = useMutation({
-    mutationFn: (vars: { category: string; location: string }) =>
+    mutationFn: (vars: BusinessSearchVars) =>
       searchFn({
         data: {
           category: vars.category.trim(),
@@ -125,22 +181,43 @@ function LocalBusinessesPage() {
         toast.error(res.message ?? "Search limit reached");
         return;
       }
-      const fetchedRows = res.businesses ?? [];
+      // Requirement and pain-signal first, then cap: deliver exactly the
+      // requested list size from rows that actually meet the ICP floor.
+      const fetched = res.businesses ?? [];
+      const qualified = fetched
+        .filter((r) => meetsRequirement(r, vars.requirement))
+        .filter((r) =>
+          vars.opportunity === "any" ? true : r.opportunity_tags?.includes(vars.opportunity),
+        );
+      const fetchedRows = vars.count != null ? qualified.slice(0, vars.count) : qualified;
       setRows(fetchedRows);
-      setFilter("all");
+      setFilter(vars.opportunity === "any" ? "all" : vars.opportunity);
       saveRouteSearchState("local-businesses", {
         query: `${vars.category} in ${vars.location}`,
-        filters: { category: vars.category, location: vars.location },
+        filters: {
+          category: vars.category,
+          location: vars.location,
+          requirement: vars.requirement,
+          opportunity: vars.opportunity,
+          count: vars.count,
+          service: vars.service,
+        },
         results: fetchedRows,
         timestamp: Date.now(),
       });
       if (!fetchedRows.length) {
-        toast.message(res.message || "No live listings found");
+        toast.message(
+          fetched.length
+            ? vars.opportunity === "any"
+              ? "No businesses matched your contact requirement — try 'No requirement'"
+              : "No businesses matched that signal — try 'Any business'"
+            : (res.message || "No live listings found"),
+        );
         return;
       }
       toast.success(`${fetchedRows.length} local businesses found`);
     },
-    onError: (e: Error) => toast.error(e.message || "Search failed"),
+    onError: (e: Error) => toast.error(friendlyErrorText(e, "Search failed")),
   });
 
   const toggleBookmark = (key: string) => {

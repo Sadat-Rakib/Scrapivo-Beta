@@ -479,7 +479,6 @@ export function Company360View({ data, onClose }: Company360ViewProps) {
                 {data.company_name && <DetailRow label="Company" value={data.company_name} />}
                 {data.seniority && <DetailRow label="Seniority" value={data.seniority} />}
                 {data.salary && <DetailRow label="Salary" value={data.salary} />}
-                {data.source && <DetailRow label="Source" value={data.source} />}
                 {data.remote !== undefined && (
                   <DetailRow label="Remote" value={data.remote ? "Yes" : "No"} />
                 )}
@@ -528,16 +527,15 @@ export function Company360View({ data, onClose }: Company360ViewProps) {
             )}
           </div>
 
-          {/* § Source Evidence (provenance) */}
+          {/* § Source Evidence (provenance) — generic pipeline description
+              only; backend source names stay internal. */}
           <Section title="Source Evidence" icon={<Shield className="size-4" />}>
             <p className="text-xs text-white/70 leading-relaxed font-mono text-[11px] bg-white/[0.02] p-2.5 rounded-lg border border-white/5">
-              {data.source
-                ? `Ingested via ${data.source}`
-                : data.domain === "investor"
-                  ? "No provenance data in source record."
-                  : data.domain === "job"
-                    ? "Aggregated ATS Provider Pipeline"
-                    : "Local Business Directory & Web Scraper"}
+              {data.domain === "investor"
+                ? "No provenance data in source record."
+                : data.domain === "job"
+                  ? "Aggregated Provider Pipeline"
+                  : "Local Business Directory & Web Scraper"}
             </p>
           </Section>
         </div>

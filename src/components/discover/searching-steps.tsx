@@ -3,13 +3,15 @@ import { Loader2, Check } from "lucide-react";
 
 type Goal = "jobs" | "clients" | "both";
 type Audience = "companies" | "agencies" | "people" | "all";
+export type SearchVertical = "leads" | "investors" | "local";
 
 // =====================================================================
 // Search progress — steps APPEAR one at a time, then keep talking while
 // the real search is still running (searches often outlast the step list).
+// Steps are vertical-aware: an investor hunt must never narrate job boards.
 // =====================================================================
 
-function stepsFor(goal?: Goal, audience?: Audience): string[] {
+function stepsFor(goal?: Goal, audience?: Audience, vertical?: SearchVertical): string[] {
   const base = ["Reading your request"];
   const peopleSteps = [
     "Searching social platforms",
@@ -52,11 +54,32 @@ function stepsFor(goal?: Goal, audience?: Audience): string[] {
     "Ranking by how strong the signal is",
     "Writing why each one matches",
   ];
+  const investorsAll = [
+    "Matching investor theses",
+    "Checking stage and check-size fit",
+    "Scanning geography and sector focus",
+    "Ranking by fit to your raise",
+  ];
+  const localAll = [
+    "Mapping local listings",
+    "Checking websites and contact info",
+    "Scoring opportunity signals",
+    "Ranking by outreach potential",
+  ];
 
+  if (vertical === "investors") return [...base, ...investorsAll];
+  if (vertical === "local") return [...base, ...localAll];
   if (audience === "people") return [...base, ...peopleSteps];
   if (audience === "companies" || audience === "agencies") return [...base, ...companySteps];
   if (goal === "clients") return [...base, ...clientsAll];
   return [...base, ...jobsAll];
+}
+
+/** Header copy for the progress card, per vertical. */
+function headerFor(vertical?: SearchVertical): string {
+  if (vertical === "investors") return "Matching investors";
+  if (vertical === "local") return "Scanning local businesses";
+  return "Hunting leads";
 }
 
 /** Extra lines that keep appearing after the main list while search continues. */
@@ -80,12 +103,14 @@ export function SearchingSteps({
   query,
   goal,
   audience,
+  vertical,
 }: {
   query: string;
   goal?: Goal;
   audience?: Audience;
+  vertical?: SearchVertical;
 }) {
-  const steps = useMemo(() => stepsFor(goal, audience), [goal, audience]);
+  const steps = useMemo(() => stepsFor(goal, audience, vertical), [goal, audience, vertical]);
   const [shown, setShown] = useState(1);
   const [holdingIdx, setHoldingIdx] = useState(-1);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -133,7 +158,7 @@ export function SearchingSteps({
     <div className="rounded-2xl border border-border bg-card/60 p-4 md:p-5">
       <div className="mb-3 flex items-center gap-2 text-sm">
         <Loader2 className="size-4 animate-spin text-primary" />
-        <span className="text-muted-foreground">Hunting leads</span>
+        <span className="text-muted-foreground">{headerFor(vertical)}</span>
         {query && !/\b(AND|OR|NOT)\b/i.test(query) ? (
           <span className="truncate font-medium">for "{query}"</span>
         ) : (

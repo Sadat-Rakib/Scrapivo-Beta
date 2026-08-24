@@ -4,9 +4,12 @@
  * Directory pages (Businesses / Investors / Jobs) no longer expose a filter
  * panel. Instead the user types a free-form ask ("10 dentist shops in Austin,
  * Texas"), we extract every dimension we can CONFIRM from the text, and the
- * questionnaire asks only for what is genuinely missing. No model is in the
- * loop: the same input always yields the same structured intent, so the flow
- * cannot hallucinate a category or a city the user never wrote.
+ * questionnaire asks only for what is genuinely missing — plus a few
+ * fixed ICP questions (service, contact requirement, list size, engagement
+ * type) that describe the searcher and can never be read from the text.
+ * No model is in the loop: the same input always yields the same structured
+ * intent, so the flow cannot hallucinate a category or a city the user never
+ * wrote.
  */
 
 export type GuidedDomain = "businesses" | "investors" | "jobs";
@@ -23,7 +26,7 @@ export interface ParsedIntent {
   checkBand?: "angel" | "seed" | "growth";
   entityType?: "individual" | "firm";
   /** Jobs dimensions. */
-  seniority?: "junior" | "mid" | "senior" | "lead";
+  seniority?: "intern" | "junior" | "mid" | "senior" | "lead";
   remoteOnly?: boolean;
   /** Jobs: coarse region derived from explicit region words (not cities). */
   region?: "remote" | "north_america" | "europe" | "asia" | "middle_east";
@@ -472,7 +475,10 @@ export function parseSearchIntent(domain: GuidedDomain, raw: string): ParsedInte
   // 5) Jobs seniority (jobs only — "senior care homes" must stay a category).
   if (domain === "jobs") {
     const seniorityPatterns: [RegExp, ParsedIntent["seniority"]][] = [
-      [/\b(?:junior|entry[ -]?level|entry level|graduate|intern)\b/i, "junior"],
+      // "internship(s)" must win before junior — it is its own level, not a
+      // junior alias, and leaving it in the query breaks title matching.
+      [/\b(?:intern|interns|internship|internships|trainee)\b/i, "intern"],
+      [/\b(?:junior|entry[ -]?level|entry level|graduate)\b/i, "junior"],
       [/\b(?:mid[ -]?level|mid level|intermediate)\b/i, "mid"],
       [/\b(?:senior|sr\.?)\b/i, "senior"],
       [/\b(?:lead|principal|staff|head of|manager|director)\b/i, "lead"],
@@ -569,7 +575,13 @@ export function parseSearchIntent(domain: GuidedDomain, raw: string): ParsedInte
 
 // ── questionnaire ───────────────────────────────────────────────────────────
 
-export type FlowOption = { value: string; label: string; hint?: string };
+export type FlowOption = {
+  value: string;
+  label: string;
+  hint?: string;
+  /** Rendered as a badge so users can trust the default. */
+  recommended?: boolean;
+};
 
 export type FlowQuestion = {
   id: string;
@@ -590,8 +602,10 @@ export const REMOTE_OPTION = "__remote__";
 
 /**
  * Questions for whatever the parser could NOT confirm. Fully-specified inputs
- * (e.g. "10 designer shops in Austin, Texas") produce an empty list and the
- * search runs immediately without a single question.
+ * (e.g. "dentists in Austin, Texas") skip the target questions, but the
+ * businesses flow always appends its ICP questions — what the user sells,
+ * their contact requirement, and list size describe the person searching, so
+ * they cannot be read from the ask itself.
  */
 export function buildGuidedQuestions(domain: GuidedDomain, parsed: ParsedIntent): FlowQuestion[] {
   const qs: FlowQuestion[] = [];
@@ -633,6 +647,61 @@ export function buildGuidedQuestions(domain: GuidedDomain, parsed: ParsedIntent)
         required: true,
       });
     }
+    // ICP questions — what the user sells shapes which businesses are worth
+    // contacting, and the requirement answer becomes an automatic filter.
+    qs.push({
+      id: "service",
+      question: "What do you sell / what's your service?",
+      options: [
+        { value: "web design", label: "Web design / development" },
+        { value: "marketing", label: "Marketing / ads" },
+        { value: "seo", label: "SEO" },
+        { value: "software", label: "Software / apps" },
+        { value: "photography", label: "Photography / video" },
+        { value: "accounting", label: "Accounting / bookkeeping" },
+      ],
+      allowOther: true,
+      otherPlaceholder: "e.g. coffee equipment supply, HR consulting…",
+      skipValue: "",
+    });
+    qs.push({
+      id: "requirement",
+      question: "What should every business on this list have?",
+      options: [
+        { value: "contact", label: "Email or phone", hint: "Ready to contact", recommended: true },
+        { value: "email", label: "Email address" },
+        { value: "phone", label: "Phone number" },
+        { value: "website", label: "A website I can review" },
+        { value: "any", label: "No requirement" },
+      ],
+      skipValue: "contact",
+    });
+    // Pain-signal question — the answer becomes the ICP opportunity filter
+    // (same tags as the post-search chips, applied up front).
+    qs.push({
+      id: "opportunity",
+      question: "What kind of businesses do you want on this list?",
+      options: [
+        { value: "any", label: "Any business", hint: "No signal filter", recommended: true },
+        { value: "no_website", label: "Businesses with no website", hint: "Need one built" },
+        { value: "poor_design", label: "Outdated / poor design", hint: "Redesign prospects" },
+        { value: "not_mobile_friendly", label: "Not mobile-friendly", hint: "Losing mobile visitors" },
+        { value: "seo_poor", label: "Weak SEO", hint: "Ranking poorly on Google" },
+        { value: "sales_ready", label: "Sales-ready", hint: "Reachable with a live site" },
+      ],
+      skipValue: "any",
+    });
+    qs.push({
+      id: "count",
+      question: "How many businesses do you need?",
+      options: [
+        { value: "10", label: "10" },
+        { value: "25", label: "25" },
+        { value: "50", label: "50" },
+        { value: "any", label: "As many as possible", recommended: true },
+      ],
+      skipValue: "any",
+    });
     return qs;
   }
 
@@ -683,9 +752,9 @@ export function buildGuidedQuestions(domain: GuidedDomain, parsed: ParsedIntent)
     if (!parsed.sector && !parsed.query) {
       qs.push({
         id: "sector",
-        question: "What sector is your company in?",
+        question: "What does your startup do? (helps us rank sector matches)",
         options: [
-          { value: "AI", label: "AI" },
+          { value: "AI", label: "AI / ML" },
           { value: "Fintech", label: "Fintech" },
           { value: "Healthcare", label: "Healthcare" },
           { value: "Climate", label: "Climate" },
@@ -693,8 +762,20 @@ export function buildGuidedQuestions(domain: GuidedDomain, parsed: ParsedIntent)
           { value: "DevTools", label: "DevTools" },
         ],
         allowOther: true,
-        otherPlaceholder: "e.g. Crypto, Gaming, Logistics…",
+        otherPlaceholder: "e.g. Crypto, Gaming, logistics software…",
         skipValue: "",
+      });
+    }
+    if (!parsed.entityType) {
+      qs.push({
+        id: "entityType",
+        question: "Who do you want to reach?",
+        options: [
+          { value: "any", label: "Both", hint: "Firms and individual angels", recommended: true },
+          { value: "firm", label: "VC firms", hint: "Institutional checks" },
+          { value: "individual", label: "Angel investors", hint: "Individual checks" },
+        ],
+        skipValue: "any",
       });
     }
     return qs;
@@ -739,6 +820,7 @@ export function buildGuidedQuestions(domain: GuidedDomain, parsed: ParsedIntent)
       id: "seniority",
       question: "What seniority level?",
       options: [
+        { value: "intern", label: "Intern / Entry-level" },
         { value: "junior", label: "Junior" },
         { value: "mid", label: "Mid" },
         { value: "senior", label: "Senior" },
@@ -748,5 +830,17 @@ export function buildGuidedQuestions(domain: GuidedDomain, parsed: ParsedIntent)
       skipValue: "any",
     });
   }
+  qs.push({
+    id: "employmentType",
+    question: "What kind of engagement?",
+    options: [
+      { value: "any", label: "Any", recommended: true },
+      { value: "full-time", label: "Full-time" },
+      { value: "contract", label: "Contract / freelance" },
+      { value: "part-time", label: "Part-time" },
+      { value: "internship", label: "Internship" },
+    ],
+    skipValue: "any",
+  });
   return qs;
 }

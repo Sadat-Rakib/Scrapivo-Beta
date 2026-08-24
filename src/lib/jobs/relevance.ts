@@ -75,20 +75,33 @@ export type ParsedQuery = {
   phrase: string;
   /** Role tokens ("product", "designer") — seniority + stop words removed. */
   tokens: string[];
-  /** Seniority token if the query stated one ("senior"). */
+  /** Canonical seniority bucket if the query stated one ("senior", "intern"). */
   seniority?: string;
 };
+
+/** Map a level word from the query to the canonical bucket used on job rows. */
+function canonicalSeniority(word: string): string {
+  if (word === "intern" || word === "internship") return "intern";
+  if (word === "entry" || word === "entry-level" || word === "graduate" || word === "jr") {
+    return "junior";
+  }
+  if (word === "staff" || word === "principal" || word === "sr") return "senior";
+  if (word === "manager" || word === "director" || word === "head" || word === "chief" || word === "vp") {
+    return "lead";
+  }
+  return word;
+}
 
 export function parseQuery(q: string | null | undefined): ParsedQuery {
   const raw = (q || "").trim();
   const words = raw.toLowerCase().split(/[^a-z0-9+#.]+/).filter(Boolean);
-  const seniority = words.find((w) => SENIORITY_WORDS.has(w));
+  const seniorityWord = words.find((w) => SENIORITY_WORDS.has(w));
   const tokens = words.filter((w) => !SENIORITY_WORDS.has(w) && !STOPWORDS.has(w) && w.length > 1);
   return {
     raw,
     phrase: tokens.join(" ").trim(),
     tokens,
-    ...(seniority ? { seniority } : {}),
+    ...(seniorityWord ? { seniority: canonicalSeniority(seniorityWord) } : {}),
   };
 }
 
@@ -156,10 +169,18 @@ export function jobRelevanceScore(job: JobPosting, pq: ParsedQuery, filters: Job
     }
   }
 
-  // Seniority alignment (already hard-filtered; a match ranks higher).
-  if (pq.seniority && pq.seniority !== "any") {
+  // Seniority alignment (already hard-filtered; a match ranks higher). The
+  // questionnaire bucket and the query word are reconciled to one target.
+  const wantSen =
+    pq.seniority && pq.seniority !== "any"
+      ? pq.seniority
+      : filters.seniority && filters.seniority !== "any"
+        ? filters.seniority
+        : null;
+  if (wantSen) {
     const jobSen = job.seniority || guessSeniority(title);
-    if (jobSen === pq.seniority) score += 2;
+    if (jobSen === wantSen) score += 2;
+    else if (wantSen === "intern" && jobType === "internship") score += 2;
   } else if (!filters.seniority || filters.seniority === "any") {
     // No level requested: mildly prefer non-intern roles for craft queries.
     const jobSen = job.seniority || guessSeniority(title);

@@ -36,14 +36,26 @@ const SCRAPY_ACKS = [
   "Roger that, boss.",
   "Got it, captain.",
   "On it, boss.",
-  "Copy that — hunting now.",
-  "Aye aye — searching.",
+  "Copy that, hunting now.",
+  "Aye aye, searching.",
   "Locked in. Searching.",
 ];
 
+/** Strip em/en dashes and tidy spacing so Scrapy never replies with them. */
+function stripDashes(s: string): string {
+  return s
+    .replace(/\s*[—–]\s*/g, ", ")
+    .replace(/-{2,}/g, ", ")
+    .replace(/,\s*,/g, ",")
+    .replace(/\s+,/g, ",")
+    .replace(/,\s*\./g, ".")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
 /** Prefer a short action ack over “search for X / try this query” lectures. */
 export function scrapyAckReply(cleaned: string): string {
-  const t = (cleaned || "").trim();
+  const t = stripDashes((cleaned || "").trim());
   if (
     !t ||
     t.length > 140 ||

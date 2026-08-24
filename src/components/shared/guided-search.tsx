@@ -121,7 +121,14 @@ export function GuidedQuestionnaire({
             className="flex items-center justify-between gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-left transition-colors hover:border-white/30 hover:bg-white/[0.07] disabled:opacity-50"
           >
             <span className="min-w-0">
-              <span className="block text-xs font-medium text-white truncate">{o.label}</span>
+              <span className="flex items-center gap-1.5 text-xs font-medium text-white">
+                <span className="truncate">{o.label}</span>
+                {o.recommended && (
+                  <span className="shrink-0 rounded bg-emerald-400/15 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-300">
+                    Recommended
+                  </span>
+                )}
+              </span>
               {o.hint && <span className="block text-[10px] text-white/40 truncate">{o.hint}</span>}
             </span>
             <Check className="size-3.5 shrink-0 text-white/25" />

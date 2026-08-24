@@ -7,9 +7,50 @@ import type {
   RawJobPosting,
 } from "./types";
 import { ALL_JOB_SOURCE_IDS } from "./types";
-import { matchesJobFilters } from "./filters";
+import { matchesJobFilters, type FilterRelaxation } from "./filters";
 import { rankJobs } from "./relevance";
 import { isActiveJob, preferAtsUrl, recencyRank, secondaryDedupeKey } from "./hygiene";
+
+/** Below this many strict matches, filters are progressively relaxed so the
+ *  user always gets a usable list instead of 1-2 orphan rows. */
+const MIN_RESULTS = 25;
+
+/** Relaxation tiers, cheapest semantic distortion first. */
+const RELAXATION_TIERS: { label: string; relax: FilterRelaxation[] }[] = [
+  { label: "", relax: [] },
+  { label: "seniority", relax: ["seniority"] },
+  { label: "role match", relax: ["seniority", "query"] },
+  { label: "location", relax: ["seniority", "query", "location"] },
+  { label: "employment type", relax: ["seniority", "query", "location", "employment"] },
+];
+
+export function filterJobsWithFallback(
+  deduped: JobPosting[],
+  filters: JobSearchFilters,
+): { jobs: JobPosting[]; relaxed: string[] } {
+  let lastPass: JobPosting[] = [];
+  let lastLabel = "";
+  const applied: string[] = [];
+  for (const tier of RELAXATION_TIERS) {
+    const pass = deduped.filter((j) => matchesJobFilters(j, filters, tier.relax));
+    if (pass.length >= MIN_RESULTS) {
+      return {
+        jobs: rankJobs(pass, filters),
+        relaxed: tier.label ? [...applied, tier.label] : [],
+      };
+    }
+    if (pass.length > lastPass.length) {
+      lastPass = pass;
+      lastLabel = tier.label;
+    }
+    if (tier.label) applied.push(tier.label);
+  }
+  // Even the loosest tier is thin — deliver it, flagged as broadened.
+  return {
+    jobs: rankJobs(lastPass, filters),
+    relaxed: lastLabel ? applied.slice(0, applied.indexOf(lastLabel) + 1) : [],
+  };
+}
 
 export type JobSourceAdapter = {
   id: JobSourceKind;
@@ -96,10 +137,8 @@ export async function fetchAllJobSources(filters: JobSearchFilters): Promise<Job
   const active = chunks.flat().filter(isActiveJob).map(normalizeJob);
   const deduped = dedupeJobs(active);
   // Relevance-first ranking: query-matched roles lead, recency breaks ties.
-  return rankJobs(
-    deduped.filter((j) => matchesJobFilters(j, filters)),
-    filters,
-  );
+  // Thin strict passes are progressively widened (see filterJobsWithFallback).
+  return filterJobsWithFallback(deduped, filters).jobs;
 }
 
 /** Per-source fetch outcome — a failed source never erases other sources'
@@ -118,6 +157,7 @@ export async function fetchAllJobSourcesWithMeta(filters: JobSearchFilters): Pro
   jobs: JobPosting[];
   fetched: number;
   sourceStatuses: JobSourceStatus[];
+  relaxed: string[];
 }> {
   const wanted = new Set<string>(
     (filters.sources?.length ? filters.sources : ALL_JOB_SOURCE_IDS) as JobSourceId[],
@@ -151,10 +191,11 @@ export async function fetchAllJobSourcesWithMeta(filters: JobSearchFilters): Pro
   const raw = results.flatMap((r) => r.raw);
   const active = raw.filter(isActiveJob).map(normalizeJob);
   const deduped = dedupeJobs(active);
-  const filtered = deduped.filter((j) => matchesJobFilters(j, filters));
+  const { jobs, relaxed } = filterJobsWithFallback(deduped, filters);
   return {
     fetched: deduped.length,
-    jobs: rankJobs(filtered, filters),
+    jobs,
+    relaxed,
     sourceStatuses,
   };
 }

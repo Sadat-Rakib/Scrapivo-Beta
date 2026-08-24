@@ -22,7 +22,7 @@ import { GuidedQuestionnaire, PageHeroCard } from "@/components/shared/guided-se
 import { LoadMoreSentinel } from "@/components/shared/load-more-sentinel";
 import { useProgressiveCount } from "@/hooks/use-progressive-count";
 import { saveRouteSearchState, loadRouteSearchState } from "@/lib/store/search-store";
-import { Briefcase, Download, ExternalLink, MapPin, RefreshCw } from "lucide-react";
+import { Briefcase, Download, ExternalLink, MapPin, RefreshCw, SearchCheck } from "lucide-react";
 import { toast } from "sonner";
 import { Company360View, type Company360Data } from "@/components/shared/company-360-view";
 
@@ -42,21 +42,12 @@ const COMPOSER_EXAMPLES = [
   "nurse practitioner jobs in Austin, TX…",
 ];
 
-/** Per-source fetch outcome reported by the server (PRD §10). */
-type JobSourceStatus = {
-  id: string;
-  label: string;
-  status: "ok" | "error";
-  count: number;
-  error?: string;
-  fetchedAt: number;
-};
-
 type JobSearchVars = {
   query: string;
   location: string;
   remoteOnly: boolean;
   seniority: string;
+  employmentType: string;
   region: JobRegion;
 };
 
@@ -67,8 +58,6 @@ const fmtDate = (iso: string | null | undefined): string | null => {
     ? null
     : d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 };
-
-const sourceLabel = (s: string): string => s.replace(/^source-(ats-)?/, "");
 
 function JobsPage() {
   const searchFn = useServerFn(runJobSearch);
@@ -83,7 +72,7 @@ function JobsPage() {
     parsed: ParsedIntent;
     questions: FlowQuestion[];
   } | null>(null);
-  const [sourceStatuses, setSourceStatuses] = useState<JobSourceStatus[]>([]);
+  const [broadened, setBroadened] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const [selectedEntity, setSelectedEntity] = useState<Company360Data | null>(null);
@@ -97,11 +86,15 @@ function JobsPage() {
       rawLocation === REMOTE_OPTION ||
       rawLocation.toLowerCase() === "remote" ||
       parsed.remoteOnly === true;
+    const seniority = answers?.seniority ?? parsed.seniority ?? "any";
     const vars: JobSearchVars = {
       query: (answers?.query ?? parsed.query ?? "").trim(),
       location: wantsRemote || rawLocation === "" ? "" : rawLocation,
       remoteOnly: wantsRemote,
-      seniority: answers?.seniority ?? parsed.seniority ?? "any",
+      seniority,
+      // An intern-level ask is an internship ask unless the user picked a
+      // different engagement explicitly.
+      employmentType: answers?.employmentType ?? (seniority === "intern" ? "internship" : "any"),
       region: wantsRemote ? "remote" : (parsed.region ?? "any"),
     };
     setFlow(null);
@@ -111,6 +104,9 @@ function JobsPage() {
   const handleSubmit = () => {
     const text = input.trim();
     if (!text) return;
+    // Chat-style UX: the ask moves up into the flow/results area, the
+    // composer clears for the next input.
+    setInput("");
     const parsed = parseSearchIntent("jobs", text);
     const questions = buildGuidedQuestions("jobs", parsed);
     if (questions.length) {
@@ -128,16 +124,17 @@ function JobsPage() {
           location: vars.location.trim(),
           remoteOnly: vars.remoteOnly,
           seniority: vars.seniority,
+          employmentType: vars.employmentType,
           region: vars.region,
           sources: [...ALL_JOB_SOURCE_IDS],
-          limit: 120,
+          limit: 200,
         },
       }),
     onSuccess: (res, vars) => {
       const fetchedJobs = res.jobs ?? [];
       setRows(fetchedJobs);
       setSearched(true);
-      setSourceStatuses(res.sourceStatuses ?? []);
+      setBroadened(res.relaxed ?? []);
       saveRouteSearchState("jobs", {
         query: vars.query,
         filters: vars,
@@ -150,7 +147,7 @@ function JobsPage() {
         toast.success(`${fetchedJobs.length} active jobs fetched`);
       }
     },
-    onError: (e: Error) => toast.error(e.message || "Job search failed"),
+    onError: (e: Error) => toast.error(friendlyErrorText(e, "Job search failed")),
   });
 
   // Progressive rendering: keep the mounted card count small and grow on scroll.
@@ -178,7 +175,6 @@ function JobsPage() {
       ...(j.department ? [{ label: "Department", value: j.department }] : []),
       ...(j.employment_type ? [{ label: "Employment type", value: j.employment_type }] : []),
       ...(j.salary ? [{ label: "Compensation", value: j.salary }] : []),
-      { label: "Source", value: sourceLabel(j.source) },
       ...(fmtDate(j.posted_at) ? [{ label: "Posted", value: fmtDate(j.posted_at) as string }] : []),
     ];
     setSelectedEntity({
@@ -190,7 +186,6 @@ function JobsPage() {
       location: j.location || (j.remote ? "Remote" : undefined),
       seniority: j.seniority || undefined,
       salary: j.salary || undefined,
-      source: sourceLabel(j.source),
       job_url: j.url,
       remote: j.remote,
       description: j.description || undefined,
@@ -280,11 +275,9 @@ function JobsPage() {
       ),
     },
     {
-      header: "Source",
+      header: "Posted",
       accessor: (j) => (
-        <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.06] text-white/70 border border-white/10 uppercase tracking-wider font-mono">
-          {sourceLabel(j.source)}
-        </span>
+        <div className="text-xs text-white/70">{fmtDate(j.posted_at) ?? "Recent"}</div>
       ),
     },
   ];
@@ -343,41 +336,21 @@ function JobsPage() {
                   onClear={() => {
                     setRows([]);
                     setSearched(false);
-                    setSourceStatuses([]);
                     setFlow(null);
+                    setBroadened([]);
                     composerRef.current?.focus();
                   }}
                 />
-                {/* Per-source status strip: failed sources are reported without
-                losing the jobs that other sources returned (PRD §10). */}
-                {sourceStatuses.length > 0 && (
-                  <div className="flex flex-wrap items-center gap-1.5 mb-4">
-                    <span className="text-[10px] uppercase tracking-wider text-white/40 mr-1">
-                      Sources
+                {broadened.length > 0 && (
+                  <div className="flex items-center gap-2 rounded-lg border border-amber-400/20 bg-amber-400/[0.06] px-3 py-2 text-[11px] text-amber-200/90">
+                    <SearchCheck className="size-3.5 shrink-0" />
+                    <span>
+                      Few exact matches, so we widened{" "}
+                      {broadened.length === 1
+                        ? broadened[0]
+                        : `${broadened.slice(0, -1).join(", ")} and ${broadened[broadened.length - 1]}`}
+                      . Results are ranked by relevance.
                     </span>
-                    {sourceStatuses.map((s) => (
-                      <span
-                        key={s.id}
-                        title={
-                          s.status === "error"
-                            ? (s.error ?? "Source failed")
-                            : `${s.count} postings from ${s.label}`
-                        }
-                        className={`inline-flex items-center gap-1.5 text-[10px] px-2 py-1 rounded-full border ${
-                          s.status === "error"
-                            ? "bg-red-500/10 text-red-300 border-red-500/25"
-                            : "bg-white/[0.04] text-white/70 border-white/10"
-                        }`}
-                      >
-                        <span
-                          className={`size-1.5 rounded-full ${
-                            s.status === "error" ? "bg-red-400" : "bg-emerald-400"
-                          }`}
-                        />
-                        {s.label}
-                        {s.status === "error" ? " · failed" : ` · ${s.count}`}
-                      </span>
-                    ))}
                   </div>
                 )}
                 {viewMode === "grid" ? (
@@ -396,7 +369,6 @@ function JobsPage() {
                             ? [{ label: "Employment type", value: j.employment_type }]
                             : []),
                           ...(j.salary ? [{ label: "Compensation", value: j.salary }] : []),
-                          { label: "Source", value: sourceLabel(j.source) },
                           ...(fmtDate(j.posted_at)
                             ? [{ label: "Posted", value: fmtDate(j.posted_at) as string }]
                             : []),

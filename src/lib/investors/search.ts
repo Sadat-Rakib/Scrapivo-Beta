@@ -16,7 +16,6 @@ import type {
 } from "./types";
 import {
   matchLocation,
-  effectiveInvestLocations,
   type LocationMatchResult,
 } from "./location-hierarchy";
 import { getSemanticMatcher } from "./semantic-matcher";
@@ -258,6 +257,42 @@ function stagesOf(rec: InvestorEntity | InvestorRecord): string[] {
   return Array.isArray(r.stages) ? (r.stages as string[]) : [];
 }
 
+/** Every geography string the record carries, across both dataset schemas.
+ *  matchLocation() canonicalizes each (city→country→region→continent), so
+ *  raw office addresses and city lists are fine to feed in. */
+function geographyStringsOf(rec: InvestorEntity | InvestorRecord): string[] {
+  const r = asLoose(rec);
+  const out: string[] = [];
+  const pushAll = (v: unknown) => {
+    if (Array.isArray(v)) for (const x of v) if (isStr(x)) out.push(x.trim());
+  };
+  pushAll(r.investment_locations);
+  pushAll(r.locations);
+  if (isStr(r.location)) out.push(r.location);
+  // Enriched-record geography (no investment_locations/location fields).
+  pushAll((r as { active_regions?: unknown }).active_regions);
+  pushAll((r as { target_regions?: unknown }).target_regions);
+  pushAll((r as { countries?: unknown }).countries);
+  pushAll((r as { cities?: unknown }).cities);
+  const offices = (r as { offices?: unknown }).offices;
+  if (Array.isArray(offices)) {
+    for (const o of offices) {
+      if (isStr(o)) out.push(o.trim());
+      else if (o && typeof o === "object") {
+        const office = o as { city?: unknown; country?: unknown; region?: unknown; address?: unknown };
+        for (const v of [office.city, office.country, office.region, office.address]) {
+          if (isStr(v)) out.push(v.trim());
+        }
+      }
+    }
+  }
+  if (!isStr(r.location)) {
+    const address = (r as { address?: unknown }).address;
+    if (isStr(address)) out.push(address.trim());
+  }
+  return out;
+}
+
 /** Lowercased sector parts, extracted the same way the sector filter does. */
 function sectorPartsOf(rec: InvestorEntity | InvestorRecord): string[] {
   const r = asLoose(rec);
@@ -331,20 +366,39 @@ function relevanceScore(rec: InvestorWithMetadata, ctx: RankingContext): number 
   return score;
 }
 
-export async function searchInvestors(
-  filters: InvestorSearchFilters = {},
+/** Gates the zero-result fallback may relax, monotonic in distortion. */
+type InvestorRelaxation = {
+  dropSector?: boolean;
+  dropCheckBand?: boolean;
+  /** Widen the stage gate to neighboring rounds before dropping it. */
+  stageWiden?: boolean;
+  dropStage?: boolean;
+};
+
+/** Neighboring rounds used when an exact stage pass is too thin. */
+const STAGE_NEIGHBORS: Record<string, string[]> = {
+  "pre-seed": ["pre-seed", "seed"],
+  seed: ["seed", "pre-seed", "series-a"],
+  "series-a": ["series-a", "seed", "series-b"],
+  "series-b": ["series-b", "series-a"],
+};
+
+async function runInvestorPipeline(
+  filters: InvestorSearchFilters,
+  relax: InvestorRelaxation,
 ): Promise<InvestorWithMetadata[]> {
   const q = (filters.query || "").toLowerCase().trim();
-  const stage = filters.stage && filters.stage !== "any" ? stageNorm(filters.stage) : "";
-  const sector = (filters.sector || "").toLowerCase().trim();
+  const stageRaw = filters.stage && filters.stage !== "any" ? filters.stage : "";
+  const stage = stageRaw ? stageNorm(stageRaw) : "";
+  const sector = relax.dropSector ? "" : (filters.sector || "").toLowerCase().trim();
   const location = (filters.location || "").trim();
   const status = filters.status ?? "any";
   const type = filters.investorType ?? "any";
   const entityType = filters.entityType ?? "any";
-  const limit = filters.limit ?? 5000; // Increased default limit to show more results
+  const checkBand = relax.dropCheckBand ? "any" : (filters.checkBand ?? "any");
+  const limit = filters.limit ?? 5000;
 
   let rows = getAllInvestors();
-  // Sector synonyms resolved during filtering, reused for relevance scoring.
   let sectorTerms: string[] = [];
 
   // Filter by entity type (individual vs firm) through the SAME classifier
@@ -369,25 +423,15 @@ export async function searchInvestors(
   }
 
   // Filter by check size band
-  rows = rows.filter((r) => checkBandMatch(r, filters.checkBand));
+  rows = rows.filter((r) => checkBandMatch(r, checkBand));
 
-  // Filter by stage - using exact matching after normalization
-  if (stage) {
-    rows = rows.filter((r) => {
-      if ("investment_categories" in r && Array.isArray(r.investment_categories)) {
-        // investment_categories format: "Stage (Sector)" e.g. "Pre-seed (AI)"
-        // Extract stage part before parenthesis
-        const stages = r.investment_categories.map((cat) => {
-          const match = cat.match(/^([^(]+)/);
-          return match ? match[1].trim() : cat;
-        });
-        return stageMatches(stages, stage);
-      }
-      if ("stages" in r && Array.isArray(r.stages)) {
-        return stageMatches(r.stages, stage);
-      }
-      return false;
-    });
+  // Filter by stage — through stagesOf(), which reads every schema variant
+  // (investment_categories, investment_stages, investment_profile.stages,
+  // vc_investment_types, stages). The old inline copy missed the enriched
+  // "AI-ready" records whose stages live in vc_investment_types.
+  if (stage && !relax.dropStage) {
+    const accepted = relax.stageWiden ? (STAGE_NEIGHBORS[stage] ?? [stage]) : [stage];
+    rows = rows.filter((r) => accepted.some((s) => stageMatches(stagesOf(r), s)));
   }
 
   // Filter by sector - WITH SEMANTIC MATCHING
@@ -415,21 +459,22 @@ export async function searchInvestors(
             searchTerms.some((term) => f.sector.toLowerCase().includes(term.toLowerCase())),
         );
       }
+      if (Array.isArray(sectorPartsOf(r)) && sectorPartsOf(r).length) {
+        const parts = sectorPartsOf(r);
+        return searchTerms.some((term) => parts.some((p) => p.includes(term.toLowerCase())));
+      }
       return false;
     });
   }
 
-  // Filter by location (ancestor expansion only) + HQ fallback when invest locs empty
+  // Filter by location — every geography field across both dataset schemas:
+  // investment_locations/locations/location (v2) plus active_regions,
+  // countries, target_regions, cities, offices and address (enriched
+  // "AI-ready" records). The old copy read only the v2 fields, so entire
+  // batches of new-schema records were unmatchable on ANY located search.
   if (location) {
     rows = rows.filter((r) => {
-      const invest =
-        "investment_locations" in r
-          ? (r.investment_locations as string[])
-          : "locations" in r
-            ? (r.locations as string[])
-            : [];
-      const hq = "location" in r && typeof r.location === "string" ? r.location : null;
-      const locs = effectiveInvestLocations(invest, hq);
+      const locs = geographyStringsOf(r);
       const matchResult = matchLocation(location, locs);
 
       if (matchResult.matches) {
@@ -451,9 +496,7 @@ export async function searchInvestors(
       if ("location" in r) fields.push(r.location);
       if ("email" in r && r.email) fields.push(r.email);
 
-      const locs =
-        "investment_locations" in r ? r.investment_locations : "locations" in r ? r.locations : [];
-      fields.push(...(Array.isArray(locs) ? locs : []));
+      fields.push(...geographyStringsOf(r));
 
       const cats = "investment_categories" in r ? r.investment_categories : [];
       fields.push(...(Array.isArray(cats) ? cats : []));
@@ -479,7 +522,7 @@ export async function searchInvestors(
     hasSector: sector.length > 0,
     sectorTerms,
     hasLocation: location.length > 0,
-    checkBand: filters.checkBand,
+    checkBand: checkBand as InvestorSearchFilters["checkBand"],
   };
 
   return rows
@@ -501,6 +544,62 @@ export async function searchInvestors(
     )
     .map((s) => s.rec)
     .slice(0, limit);
+}
+
+/**
+ * Search with a zero-result fallback: when the strict AND of every filter
+ * returns nothing, the soft preference gates (sector → check size → stage)
+ * are relaxed stepwise and the result is flagged with what was widened.
+ * Location and free-text are never dropped — they are the user's hard
+ * intent. Only real dataset rows are ever returned; nothing is fabricated.
+ */
+export async function searchInvestorsWithMeta(
+  filters: InvestorSearchFilters = {},
+): Promise<{ investors: InvestorWithMetadata[]; broadened: string[] }> {
+  const strict = await runInvestorPipeline(filters, {});
+  if (strict.length) return { investors: strict, broadened: [] };
+
+  const broadened: string[] = [];
+  let best: InvestorWithMetadata[] = [];
+  const tryPass = async (relax: InvestorRelaxation, label: string) => {
+    const pass = await runInvestorPipeline(filters, relax);
+    if (pass.length > best.length) best = pass;
+    if (pass.length) broadened.push(label);
+    return pass;
+  };
+
+  if (filters.sector) {
+    const pass = await tryPass({ dropSector: true }, "sector");
+    if (pass.length) return { investors: pass, broadened };
+  }
+  if (filters.checkBand && filters.checkBand !== "any") {
+    const pass = await tryPass(
+      { dropSector: true, dropCheckBand: true },
+      filters.sector ? "check size" : "sector and check size",
+    );
+    if (pass.length) return { investors: pass, broadened };
+  }
+  if (filters.stage && filters.stage !== "any") {
+    const pass = await tryPass(
+      { dropSector: true, dropCheckBand: true, stageWiden: true },
+      "stage (nearby rounds)",
+    );
+    if (pass.length) return { investors: pass, broadened };
+    const pass2 = await tryPass(
+      { dropSector: true, dropCheckBand: true, dropStage: true },
+      "stage",
+    );
+    if (pass2.length) return { investors: pass2, broadened };
+  }
+
+  return { investors: best, broadened };
+}
+
+export async function searchInvestors(
+  filters: InvestorSearchFilters = {},
+): Promise<InvestorWithMetadata[]> {
+  const { investors } = await searchInvestorsWithMeta(filters);
+  return investors;
 }
 
 /** Mark incomplete / zero-check rows for review (verification pass). */

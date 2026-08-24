@@ -126,8 +126,10 @@ export function looksRemote(loc: string, title: string, description?: string | n
 
 export function guessSeniority(title: string): string | null {
   const t = title.toLowerCase();
-  if (/\bintern\b/.test(t)) return "intern";
-  if (/\bjunior\b|\bjr\b|entry/.test(t)) return "junior";
+  // "internship(s)" titles are intern roles too — the plain \bintern\b above
+  // missed them (no word boundary before the "s").
+  if (/\bintern(?:ship)?s?\b/.test(t)) return "intern";
+  if (/\bjunior\b|\bjr\b|\bentry[ -]?level\b|\bgraduate\b|\btrainee\b/.test(t)) return "junior";
   if (/\bsenior\b|\bsr\b|\bstaff\b|\bprincipal\b/.test(t)) return "senior";
   if (/\blead\b|\bmanager\b|\bdirector\b|\bhead\b|\bvp\b/.test(t)) return "lead";
   return "mid";
@@ -175,16 +177,39 @@ function matchesRegion(job: JobPosting, region: JobRegion): boolean {
   return false;
 }
 
-export function matchesJobFilters(job: JobPosting, filters: JobSearchFilters): boolean {
+/**
+ * Gates that can be progressively relaxed when a strict pass would return
+ * too few results. Order matters: the cheapest semantic distortion first.
+ */
+export type FilterRelaxation = "seniority" | "query" | "location" | "employment";
+
+/** Adjacent seniority buckets accepted when the seniority gate is relaxed. */
+const SENIORITY_NEIGHBORS: Record<string, string[]> = {
+  intern: ["intern", "junior"],
+  junior: ["junior", "intern", "mid"],
+  mid: ["mid", "junior", "senior"],
+  senior: ["senior", "mid", "lead"],
+  lead: ["lead", "senior"],
+};
+
+export function matchesJobFilters(
+  job: JobPosting,
+  filters: JobSearchFilters,
+  relax: FilterRelaxation[] = [],
+): boolean {
   // ── Query gate: title or department must contain a role token/needle ──
   // Word-boundary matching only; the description never passes the gate on its
-  // own (it contributes to the relevance score instead).
+  // own (it contributes to the relevance score instead) — unless relaxed.
   const q = filters.query?.trim().toLowerCase();
   if (q) {
     const needles = queryNeedles(q);
     const titleBlob = `${job.title} ${job.department || ""}`;
     const titleMatch = needles.some((n) => needleHit(titleBlob, n));
-    if (!titleMatch) return false;
+    if (!titleMatch) {
+      if (!relax.includes("query")) return false;
+      const descHit = needles.some((n) => needleHit(job.description || "", n));
+      if (!descHit) return false;
+    }
   }
 
   // ── Compute job-level "is remote" flag once ──
@@ -199,49 +224,56 @@ export function matchesJobFilters(job: JobPosting, filters: JobSearchFilters): b
   // Location + Remote together → remote jobs scoped to that region
   //   (e.g. "Remote" + "Asia" = remote roles open to candidates in Asia).
   // "Worldwide" + Remote → remote jobs with no regional restriction.
+  // When "location" is relaxed the geo scope is dropped but a remote-only
+  // ask is still honored (work-mode is a hard promise, geography is not).
   const loc = filters.location?.trim().toLowerCase();
   const wantRemote = Boolean(filters.remoteOnly);
   const hasRegion = filters.region && filters.region !== "any";
   const regionIsRemote = filters.region === "remote";
+  const relaxLocation = relax.includes("location");
 
-  if (wantRemote && loc) {
-    // Combined: must be remote AND match the location
-    if (!jobIsRemote) return false;
-    // If location is "worldwide" / "anywhere", skip location matching
-    if (!/worldwide|anywhere|global/i.test(loc)) {
+  if (!relaxLocation) {
+    if (wantRemote && loc) {
+      // Combined: must be remote AND match the location
+      if (!jobIsRemote) return false;
+      // If location is "worldwide" / "anywhere", skip location matching
+      if (!/worldwide|anywhere|global/i.test(loc)) {
+        const jloc = (job.location || "").toLowerCase();
+        const needles = locationNeedles(loc);
+        const locHit = needles.some(
+          (n) => jloc.includes(n) || (loc.includes(n) && jloc.includes(n.split(" ")[0])),
+        );
+        // For remote jobs, also accept if location field is empty (global remote)
+        if (!locHit && !jloc.includes(loc) && jloc.length > 0) return false;
+      }
+    } else if (wantRemote) {
+      // Remote only, no location constraint
+      if (!jobIsRemote) return false;
+    } else if (loc) {
+      // Location only (any work-mode)
       const jloc = (job.location || "").toLowerCase();
       const needles = locationNeedles(loc);
       const locHit = needles.some(
         (n) => jloc.includes(n) || (loc.includes(n) && jloc.includes(n.split(" ")[0])),
       );
-      // For remote jobs, also accept if location field is empty (global remote)
-      if (!locHit && !jloc.includes(loc) && jloc.length > 0) return false;
+      const remoteLoc = jobIsRemote && /remote|anywhere|worldwide/i.test(loc);
+      if (!locHit && !remoteLoc && !jloc.includes(loc)) return false;
     }
-  } else if (wantRemote) {
-    // Remote only, no location constraint
-    if (!jobIsRemote) return false;
-  } else if (loc) {
-    // Location only (any work-mode)
-    const jloc = (job.location || "").toLowerCase();
-    const needles = locationNeedles(loc);
-    const locHit = needles.some(
-      (n) => jloc.includes(n) || (loc.includes(n) && jloc.includes(n.split(" ")[0])),
-    );
-    const remoteLoc = jobIsRemote && /remote|anywhere|worldwide/i.test(loc);
-    if (!locHit && !remoteLoc && !jloc.includes(loc)) return false;
-  }
 
-  // ── Region filter ──
-  // When remoteOnly + region (not "remote"), treat as: remote jobs scoped to region
-  if (hasRegion && !regionIsRemote) {
-    if (wantRemote) {
-      // Must be remote AND match the region
+    // ── Region filter ──
+    // When remoteOnly + region (not "remote"), treat as: remote jobs scoped to region
+    if (hasRegion && !regionIsRemote) {
+      if (wantRemote) {
+        // Must be remote AND match the region
+        if (!jobIsRemote) return false;
+        if (!matchesRegion(job, filters.region!)) return false;
+      } else {
+        if (!matchesRegion(job, filters.region!)) return false;
+      }
+    } else if (regionIsRemote) {
       if (!jobIsRemote) return false;
-      if (!matchesRegion(job, filters.region!)) return false;
-    } else {
-      if (!matchesRegion(job, filters.region!)) return false;
     }
-  } else if (regionIsRemote) {
+  } else if (wantRemote || regionIsRemote) {
     if (!jobIsRemote) return false;
   }
 
@@ -249,7 +281,16 @@ export function matchesJobFilters(job: JobPosting, filters: JobSearchFilters): b
   const sen = filters.seniority?.trim().toLowerCase();
   if (sen && sen !== "any") {
     const jobSen = (job.seniority || guessSeniority(job.title) || "mid").toLowerCase();
-    if (sen === "mid") {
+    if (sen === "intern" && !relax.includes("seniority")) {
+      // Intern is its own level: intern-titled roles, or roles the board
+      // itself labeled as an internship.
+      const typedInternship =
+        normalizeEmploymentType(job.employment_type) === "internship" ||
+        /\bintern(?:ship)?s?\b/.test(job.title.toLowerCase());
+      if (jobSen !== "intern" && !typedInternship) return false;
+    } else if (relax.includes("seniority")) {
+      if (!(SENIORITY_NEIGHBORS[sen] ?? [sen]).includes(jobSen)) return false;
+    } else if (sen === "mid") {
       if (jobSen === "intern" || jobSen === "junior") return false;
     } else if (sen === "junior") {
       if (jobSen !== "junior" && jobSen !== "intern") return false;
@@ -260,8 +301,9 @@ export function matchesJobFilters(job: JobPosting, filters: JobSearchFilters): b
 
   // ── Employment-type filter (full-time / contract / part-time / internship) ──
   const wantType = normalizeEmploymentType(filters.employmentType);
-  if (wantType) {
+  if (wantType && !relax.includes("employment")) {
     const titleLower = job.title.toLowerCase();
+    const guessedSeniority = (job.seniority || guessSeniority(job.title) || "mid").toLowerCase();
     const jobType =
       normalizeEmploymentType(job.employment_type) ??
       (/\bintern(ship)?\b/.test(titleLower)
@@ -277,7 +319,7 @@ export function matchesJobFilters(job: JobPosting, filters: JobSearchFilters): b
     // (ATS boards rarely label commitment consistently).
     if (jobType && jobType !== wantType) {
       // "internship" also accepts jobs the seniority guess calls intern.
-      if (!(wantType === "internship" && jobSen === "intern" && !job.employment_type)) {
+      if (!(wantType === "internship" && guessedSeniority === "intern" && !job.employment_type)) {
         return false;
       }
     }

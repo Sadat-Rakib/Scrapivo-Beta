@@ -4,7 +4,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireMyAuth } from "@/integrations/my-supabase/auth-middleware";
-import { searchInvestors, getAllInvestors } from "@/lib/investors/search";
+import { searchInvestorsWithMeta, getAllInvestors } from "@/lib/investors/search";
 import { makeClaim } from "@/lib/intelligence/evidence";
 
 export const runInvestorSearch = createServerFn({ method: "POST" })
@@ -27,7 +27,7 @@ export const runInvestorSearch = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data }) => {
-    const investors = await searchInvestors({
+    const { investors, broadened } = await searchInvestorsWithMeta({
       query: data.query,
       stage: data.stage,
       sector: data.sector,
@@ -113,6 +113,9 @@ export const runInvestorSearch = createServerFn({ method: "POST" })
       investors: withMeta,
       // Count of rows that matched the filters — never the dataset size.
       total: withMeta.length,
+      /** Soft gates that were widened to avoid a zero-result wall
+       *  ("sector", "check size"…). Empty when the strict pass matched. */
+      broadened,
     };
   });
 

@@ -66,12 +66,38 @@ export function isJunkLocalListing(name: string, categoryAsk: string): boolean {
 }
 
 /**
+ * Profession signatures: [name pattern, tokens that identify the SAME
+ * profession in a category ask]. Used for a generic cross-category guard —
+ * e.g. "Lawyer Referral Service" must never survive an HVAC ask.
+ */
+const PROFESSION_SIGNATURES: RegExp[] = [
+  /\b(lawyer|attorney|legal|law firm|advocate)\b/,
+  /\b(dentist|dental|orthodontis)\b/,
+  /\b(veterinar|animal hospital|vet clinic)\b/,
+  /\b(optometr|optical|eye care|vision center)\b/,
+  /\b(chiropract)\b/,
+  /\b(salon|barber|hairstyl)\b/,
+  /\b(plumb)\b/,
+  /\b(roof)\b/,
+  /\b(hvac|heating|air conditioning|cooling|furnace)\b/,
+  /\b(electrician|electrical)\b/,
+  /\b(landscap|lawn|garden)\b/,
+  /\b(tattoo|piercing)\b/,
+];
+
+/**
  * For trades and local categories, enforce strict category matching and reject clear category mismatches.
  */
 export function matchesLocalCraft(name: string, categoryAsk: string): boolean {
   const ask = (categoryAsk || "").toLowerCase().trim();
   const n = (name || "").toLowerCase();
   if (!ask) return true;
+
+  // Generic cross-category guard: the name names a specific profession the
+  // user never asked for, and carries no trace of the requested craft.
+  for (const sig of PROFESSION_SIGNATURES) {
+    if (sig.test(n) && !sig.test(ask) && !n.includes(ask)) return false;
+  }
 
   // Anti-matches for trades & medical categories
   if (/\b(dentist|dentists|dental)\b/.test(ask)) {
@@ -98,6 +124,15 @@ export function matchesLocalCraft(name: string, categoryAsk: string): boolean {
     if (
       /\b(plumb|electric|hvac|solar|painter|lawyer|gym|spa)\b/.test(n) &&
       !/\b(roof|shingle|gutters)\b/.test(n)
+    ) {
+      return false;
+    }
+  }
+
+  if (/\b(hvac|heating|air conditioning|cooling|furnace|ac repair)\b/.test(ask)) {
+    if (
+      /\b(plumb|electric|solar|painter|lawyer|attorney|salon|barber|dental|vet)\b/.test(n) &&
+      !/\b(hvac|heat|air cond|cooling|furnace|vent)\b/.test(n)
     ) {
       return false;
     }

@@ -45,6 +45,7 @@ import { Bell, Plus, X } from "lucide-react";
 import { SearchingSteps } from "@/components/discover/searching-steps";
 import { ClarifyPanel } from "@/components/discover/clarify-panel";
 import type { ClarifyQuestion, ClarifyAnswers } from "@/lib/search/clarifier";
+import { detectSearchVertical } from "@/lib/search/clarifier";
 import { type ChatTurn } from "@/components/discover/scrapy-chat-panel";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -149,8 +150,19 @@ function DiscoverPage() {
   };
 
   const completeOnboarding = async (a: OnboardingAnswers) => {
+    // The projects table caps names at 80 chars; a long business name used to
+    // blow past it and surface raw Zod JSON in a toast. Clamp + de-dash here.
+    const suffix = a.goal === "jobs" ? "jobs" : a.goal === "clients" ? "clients" : "leads";
+    const baseName = (a.business_name || "My project")
+      .replace(/[—–]/g, "-")
+      .replace(/\s+/g, " ")
+      .trim();
+    const projectName =
+      `${baseName} ${suffix}`.length <= 80
+        ? `${baseName} ${suffix}`
+        : `${baseName.slice(0, 80 - suffix.length - 1).trim()} ${suffix}`;
     const payload = {
-      name: `${a.business_name} — ${a.goal === "jobs" ? "jobs" : a.goal === "clients" ? "clients" : "leads"}`,
+      name: projectName,
       kind: a.kind,
       business_name: a.business_name,
       website: a.website,
@@ -212,7 +224,7 @@ function DiscoverPage() {
       }
       markReturnChatAsked();
     } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : "Could not save project");
+      toast.error(friendlyErrorText(e, "Could not save project"));
     } finally {
       setWizardOpen(false);
       setPendingAutoSearch(true);
@@ -246,6 +258,9 @@ function DiscoverPage() {
   const [localRows, setLocalRows] = useState<LocalBusinessRow[]>([]);
   const [resultTab, setResultTab] = useState<ResultTab>("posts");
   const [activeQuery, setActiveQuery] = useState<string | null>(null);
+  const [activeVertical, setActiveVertical] = useState<
+    "investors" | "local" | undefined
+  >(undefined);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [queryType, setQueryType] = useState<string | null>(null);
   // Clarifying-question flow. Questions are computed BEFORE the search runs and
@@ -340,7 +355,7 @@ function DiscoverPage() {
         setContactByKey((m) => ({ ...m, [key]: { status: "none" } }));
       }
     } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : "Contact resolve failed");
+      toast.error(friendlyErrorText(e, "Contact resolve failed"));
     } finally {
       setContactBusyKey(null);
     }
@@ -500,7 +515,7 @@ function DiscoverPage() {
         toast.info("No buyer-signal posts found. Try a different angle.");
       }
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(friendlyErrorText(e)),
   });
 
   const chatMut = useMutation({
@@ -517,13 +532,13 @@ function DiscoverPage() {
         setTimeout(() => void beginSearch(q), 200);
       }
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(friendlyErrorText(e)),
   });
 
   const saveMut = useMutation({
     mutationFn: async (lead: Lead) => save({ data: lead }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["saved-leads"] }),
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(friendlyErrorText(e)),
   });
 
   const watchMut = useMutation({
@@ -532,7 +547,7 @@ function DiscoverPage() {
       qc.invalidateQueries({ queryKey: ["signal-watches"] });
       toast.success("Signal watch saved — see Watches in the sidebar");
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(friendlyErrorText(e)),
   });
 
   // Auto-search effect: runs once the (possibly just-created) active project
@@ -626,6 +641,7 @@ function DiscoverPage() {
     // hunting while the old sales cards were still on screen.
     setClarifyAnswers(null);
     setDefaultSummary("");
+    setActiveVertical(detectSearchVertical(trimmed));
     try {
       const plain = toPlainSearchQuery(trimmed) || trimmed;
       const [{ classifyQuery }, { shouldClarify, buildClarifyingQuestions, applyClarifyAnswers }] =
@@ -888,6 +904,7 @@ function DiscoverPage() {
                   )}
                   goal={searchContext?.goal}
                   audience={searchContext?.audience}
+                  vertical={activeVertical}
                 />
               )}
 

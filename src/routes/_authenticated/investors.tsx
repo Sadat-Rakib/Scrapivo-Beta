@@ -30,7 +30,7 @@ import { GuidedQuestionnaire, PageHeroCard } from "@/components/shared/guided-se
 import { LoadMoreSentinel } from "@/components/shared/load-more-sentinel";
 import { useProgressiveCount } from "@/hooks/use-progressive-count";
 import { saveRouteSearchState, loadRouteSearchState } from "@/lib/store/search-store";
-import { Landmark, RefreshCw, Download, MapPin } from "lucide-react";
+import { Landmark, RefreshCw, Download, MapPin, SearchCheck } from "lucide-react";
 import { toast } from "sonner";
 import { Company360View, type Company360Data } from "@/components/shared/company-360-view";
 import { humanLabel, isInternalKey } from "@/lib/records/field-labels";
@@ -141,6 +141,7 @@ function InvestorsPage() {
   } | null>(null);
   const [searchFilters, setSearchFilters] = useState<SearchFilters>(initialState?.filters ?? {});
   const [searched, setSearched] = useState(Boolean(initialState?.results?.length));
+  const [broadened, setBroadened] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const [selectedEntity, setSelectedEntity] = useState<Company360Data | null>(null);
@@ -160,13 +161,16 @@ function InvestorsPage() {
       "any") as InvestorSearchVars["checkBand"];
     const location = (answers?.location ?? parsed.location ?? "").trim();
     const sector = (answers?.sector ?? parsed.sector ?? "").trim();
+    const entityType = (answers?.entityType ??
+      parsed.entityType ??
+      "any") as InvestorSearchVars["entityType"];
     const vars: InvestorSearchVars = {
       query: (parsed.query ?? "").trim(),
       stage: stage === "any" ? undefined : stage,
       location: location || undefined,
       sector: sector || undefined,
       checkBand,
-      entityType: parsed.entityType ?? "any",
+      entityType,
     };
     setSearchFilters(vars);
     setFlow(null);
@@ -176,6 +180,9 @@ function InvestorsPage() {
   const handleSubmit = () => {
     const text = input.trim();
     if (!text) return;
+    // Chat-style UX: the ask moves up into the flow/results area, the
+    // composer clears for the next input.
+    setInput("");
     const parsed = parseSearchIntent("investors", text);
     const questions = buildGuidedQuestions("investors", parsed);
     if (questions.length) {
@@ -202,6 +209,7 @@ function InvestorsPage() {
       const fetchedRows = res.investors ?? [];
       setRows(fetchedRows);
       setSearched(true);
+      setBroadened(res.broadened ?? []);
       saveRouteSearchState("investors", {
         query: vars.query ?? "",
         filters: vars,
@@ -210,9 +218,9 @@ function InvestorsPage() {
         results: fetchedRows.slice(0, 300),
         timestamp: Date.now(),
       });
-      toast.success(`${fetchedRows.length} investors matched`);
+      if (fetchedRows.length) toast.success(`${fetchedRows.length} investors matched`);
     },
-    onError: (e: Error) => toast.error(e.message || "Search failed"),
+    onError: (e: Error) => toast.error(friendlyErrorText(e, "Search failed")),
   });
 
   const verifyMut = useMutation({
@@ -220,7 +228,7 @@ function InvestorsPage() {
     onSuccess: (res) => {
       toast.success(`Checked ${res.checked}: ${res.active} active`);
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(friendlyErrorText(e)),
   });
 
   // Records whose profile image failed to load drop into the no-image
@@ -518,9 +526,22 @@ function InvestorsPage() {
                     setRows([]);
                     setSearched(false);
                     setFlow(null);
+                    setBroadened([]);
                     composerRef.current?.focus();
                   }}
                 />
+                {broadened.length > 0 && (
+                  <div className="flex items-center gap-2 rounded-lg border border-amber-400/20 bg-amber-400/[0.06] px-3 py-2 text-[11px] text-amber-200/90">
+                    <SearchCheck className="size-3.5 shrink-0" />
+                    <span>
+                      No exact matches for every filter, so we relaxed{" "}
+                      {broadened.length === 1
+                        ? broadened[0]
+                        : `${broadened.slice(0, -1).join(", ")} and ${broadened[broadened.length - 1]}`}
+                      . These are real dataset entries ranked by fit.
+                    </span>
+                  </div>
+                )}
                 {viewMode === "grid" ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                     {visible.map((r) => (
@@ -556,7 +577,8 @@ function InvestorsPage() {
 
             {!mut.isPending && searched && !rows.length && (
               <div className="liquid-glass rounded-2xl p-12 text-center text-sm text-white/50">
-                No investors matched. Try broadening location or check size.
+                No investors matched even after relaxing stage, sector, and check size. Try a
+                broader location.
               </div>
             )}
 

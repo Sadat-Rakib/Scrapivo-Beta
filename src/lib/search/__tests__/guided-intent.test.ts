@@ -6,8 +6,12 @@ describe("parseSearchIntent — businesses", () => {
     const p = parseSearchIntent("businesses", "I need to find 10 designer shops in Austin, Texas");
     expect(p.category).toBe("designer shops");
     expect(p.location).toBe("Austin, Texas");
-    // Fully specified → no questionnaire.
-    expect(buildGuidedQuestions("businesses", p)).toEqual([]);
+    // Target dimensions are known, but the ICP questions always apply.
+    expect(buildGuidedQuestions("businesses", p).map((q) => q.id)).toEqual([
+      "service",
+      "requirement",
+      "count",
+    ]);
   });
 
   it("extracts category and city without a prep word", () => {
@@ -21,7 +25,13 @@ describe("parseSearchIntent — businesses", () => {
     expect(p.category).toBeUndefined();
     expect(p.location).toBeUndefined();
     const qs = buildGuidedQuestions("businesses", p);
-    expect(qs.map((q) => q.id)).toEqual(["category", "location"]);
+    expect(qs.map((q) => q.id)).toEqual([
+      "category",
+      "location",
+      "service",
+      "requirement",
+      "count",
+    ]);
     // Required questions have no skip value.
     expect(qs[0].required).toBe(true);
     expect(qs[1].required).toBe(true);
@@ -32,21 +42,38 @@ describe("parseSearchIntent — businesses", () => {
     expect(p.category).toBe("dentists");
     expect(p.location).toBeUndefined();
     const qs = buildGuidedQuestions("businesses", p);
-    expect(qs.map((q) => q.id)).toEqual(["location"]);
+    expect(qs.map((q) => q.id)).toEqual(["location", "service", "requirement", "count"]);
   });
 
   it("runs immediately when both category and location are stated", () => {
     const p = parseSearchIntent("businesses", "dentists in Toronto");
     expect(p.category).toBe("dentists");
     expect(p.location).toBe("Toronto");
-    expect(buildGuidedQuestions("businesses", p)).toEqual([]);
+    // ICP questions remain — they describe the user, not the target.
+    expect(buildGuidedQuestions("businesses", p).map((q) => q.id)).toEqual([
+      "service",
+      "requirement",
+      "count",
+    ]);
   });
 
   it("does not treat a generic noun as a category", () => {
     const p = parseSearchIntent("businesses", "10 businesses in Miami");
     expect(p.category).toBeUndefined();
     expect(p.location).toBe("Miami");
-    expect(buildGuidedQuestions("businesses", p).map((q) => q.id)).toEqual(["category"]);
+    expect(buildGuidedQuestions("businesses", p).map((q) => q.id)).toEqual([
+      "category",
+      "service",
+      "requirement",
+      "count",
+    ]);
+  });
+
+  it("marks recommended defaults on the ICP questions", () => {
+    const qs = buildGuidedQuestions("businesses", parseSearchIntent("businesses", "dentists"));
+    const byId = new Map(qs.map((q) => [q.id, q]));
+    expect(byId.get("requirement")?.options.find((o) => o.recommended)?.value).toBe("contact");
+    expect(byId.get("count")?.options.find((o) => o.recommended)?.value).toBe("any");
   });
 
   it("keeps investor/jobs keywords inside business categories", () => {
@@ -67,7 +94,8 @@ describe("parseSearchIntent — jobs", () => {
     expect(p.query).toBe("designer");
     expect(p.seniority).toBe("senior");
     expect(p.location).toBe("New York");
-    expect(buildGuidedQuestions("jobs", p)).toEqual([]);
+    // Engagement type is always confirmed with the user.
+    expect(buildGuidedQuestions("jobs", p).map((q) => q.id)).toEqual(["employmentType"]);
   });
 
   it("detects remote-only asks", () => {
@@ -75,15 +103,18 @@ describe("parseSearchIntent — jobs", () => {
     expect(p.query).toBe("react developer");
     expect(p.remoteOnly).toBe(true);
     expect(p.region).toBe("remote");
-    // Role + place known → only seniority remains.
-    expect(buildGuidedQuestions("jobs", p).map((q) => q.id)).toEqual(["seniority"]);
+    // Role + place known → seniority and engagement remain.
+    expect(buildGuidedQuestions("jobs", p).map((q) => q.id)).toEqual([
+      "seniority",
+      "employmentType",
+    ]);
   });
 
   it("strips self-description filler and asks for place + level", () => {
     const p = parseSearchIntent("jobs", "I'm a designer looking for a job");
     expect(p.query).toBe("designer");
     const qs = buildGuidedQuestions("jobs", p);
-    expect(qs.map((q) => q.id)).toEqual(["location", "seniority"]);
+    expect(qs.map((q) => q.id)).toEqual(["location", "seniority", "employmentType"]);
   });
 
   it("maps experience wording to seniority buckets", () => {
@@ -91,6 +122,29 @@ describe("parseSearchIntent — jobs", () => {
       "junior",
     );
     expect(parseSearchIntent("jobs", "lead engineer positions in Berlin").seniority).toBe("lead");
+  });
+
+  it("treats internships as their own seniority level, not junior", () => {
+    expect(parseSearchIntent("jobs", "intern").seniority).toBe("intern");
+    expect(parseSearchIntent("jobs", "internships").seniority).toBe("intern");
+    const p = parseSearchIntent("jobs", "frontend developer internship in Berlin");
+    expect(p.seniority).toBe("intern");
+    expect(p.location).toBe("Berlin");
+    // The internship word must not leak into the role query.
+    expect(p.query).toBe("frontend developer");
+  });
+
+  it("offers an intern option in the seniority question", () => {
+    const p = parseSearchIntent("jobs", "remote react developer jobs");
+    const seniorityQ = buildGuidedQuestions("jobs", p).find((q) => q.id === "seniority");
+    expect(seniorityQ?.options.map((o) => o.value)).toEqual([
+      "intern",
+      "junior",
+      "mid",
+      "senior",
+      "lead",
+      "any",
+    ]);
   });
 
   it("derives the coarse region from region words", () => {
@@ -103,7 +157,11 @@ describe("parseSearchIntent — jobs", () => {
     // Simulates the questionnaire answer flowing through launch logic inputs.
     const p = parseSearchIntent("jobs", "nurse practitioner jobs");
     expect(p.query).toBe("nurse practitioner");
-    expect(buildGuidedQuestions("jobs", p).map((q) => q.id)).toEqual(["location", "seniority"]);
+    expect(buildGuidedQuestions("jobs", p).map((q) => q.id)).toEqual([
+      "location",
+      "seniority",
+      "employmentType",
+    ]);
     expect(REMOTE_OPTION).toBe("__remote__");
   });
 });
@@ -134,12 +192,23 @@ describe("parseSearchIntent — investors", () => {
     expect(p.query).toBeUndefined();
   });
 
-  it("asks stage / check / geography / sector for a bare ask", () => {
+  it("asks stage / check / geography / sector / firm type for a bare ask", () => {
     const p = parseSearchIntent("investors", "find me investors");
     const qs = buildGuidedQuestions("investors", p);
-    expect(qs.map((q) => q.id)).toEqual(["stage", "checkBand", "location", "sector"]);
+    expect(qs.map((q) => q.id)).toEqual(["stage", "checkBand", "location", "sector", "entityType"]);
     // All investor questions are skippable with defaults.
     for (const q of qs) expect(q.skipValue).toBeDefined();
+  });
+
+  it("skips the entity-type question when the ask names the investor kind", () => {
+    const p = parseSearchIntent("investors", "angel investors in New York");
+    expect(buildGuidedQuestions("investors", p).map((q) => q.id)).not.toContain("entityType");
+  });
+
+  it("recommends reaching both firms and angels by default", () => {
+    const p = parseSearchIntent("investors", "find me investors");
+    const entityTypeQ = buildGuidedQuestions("investors", p).find((q) => q.id === "entityType");
+    expect(entityTypeQ?.options.find((o) => o.recommended)?.value).toBe("any");
   });
 
   it("never leaves filler words in the query", () => {

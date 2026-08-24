@@ -33,19 +33,17 @@ function epochFresh(sec: number | null | undefined): boolean {
 }
 
 /**
- * Title relevance gate: every role token from the query must appear in the
- * title (word-boundary) — or, when the title has no token, at least one token
- * must appear AND the query must be a single token (broad queries like
- * "design" keep tag/category matches alive). Empty query → no gate.
+ * Title relevance gate: at least one role token from the query must appear in
+ * the title (word-boundary). Requiring ALL tokens ("react" AND "developer")
+ * starved the pipeline — a 100-row recency feed rarely contains the exact
+ * multi-word phrase, so specific asks collapsed to zero rows before the
+ * ranking stage could sort near-matches below exact ones. Empty query →
+ * no gate.
  */
 function titleGate(title: string, query: string | undefined): boolean {
   const pq = parseQuery(query);
   if (!pq.tokens.length) return true;
-  const hits = pq.tokens.filter((t) => hasWord(title, t));
-  if (hits.length === pq.tokens.length) return true;
-  if (pq.tokens.length === 1) return hits.length === 1;
-  // Multi-token queries need the phrase or all tokens in the title.
-  return pq.phrase ? new RegExp(`\\b${pq.phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(title) : false;
+  return pq.tokens.some((t) => hasWord(title, t));
 }
 
 function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
@@ -64,10 +62,11 @@ function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
 // ── Remotive ────────────────────────────────────────────────────────────────
 
 export async function fetchRemotiveJobs(query: string | undefined): Promise<RawJobPosting[]> {
+  // Remotive's `search` param is server-side fuzzy and returns unrelated roles
+  // ("designer" → "Golang Developer"), so pull the recency feed and gate on
+  // title tokens locally instead.
   const q = query?.trim();
-  const url = q
-    ? `https://remotive.com/api/remote-jobs?search=${encodeURIComponent(q)}&limit=${CAP}`
-    : `https://remotive.com/api/remote-jobs?limit=${CAP}`;
+  const url = `https://remotive.com/api/remote-jobs?limit=${CAP}`;
   const data = await withTimeout(
     resilientJson<{ jobs?: AnyJson[] }>(url).catch(() => null),
     12_000,
@@ -79,11 +78,7 @@ export async function fetchRemotiveJobs(query: string | undefined): Promise<RawJ
     const url2 = String(j.url || "");
     if (!title || !url2) continue;
     if (!freshEnough(j.publication_date)) continue;
-    if (q && !titleGate(title, q)) {
-      // Remotive's server-side search matches descriptions too; keep only
-      // title-relevant rows for precision.
-      continue;
-    }
+    if (q && !titleGate(title, q)) continue;
     const loc = sanitizeJobText(j.candidate_required_location);
     const desc = sanitizeJobText(j.description).slice(0, 800);
     out.push({
@@ -111,7 +106,11 @@ export async function fetchJobicyJobs(query: string | undefined): Promise<RawJob
   const url = q
     ? `https://jobicy.com/api/v2/remote-jobs?count=${CAP}&tag=${encodeURIComponent(q)}`
     : `https://jobicy.com/api/v2/remote-jobs?count=${CAP}`;
-  const data = await withTimeout(resilientJson<{ jobs?: AnyJson[] }>(url).catch(() => null), 12_000, null);
+  const data = await withTimeout(
+    resilientJson<{ jobs?: AnyJson[] }>(url).catch(() => null),
+    12_000,
+    null,
+  );
   const out: RawJobPosting[] = [];
   for (const j of data?.jobs ?? []) {
     const title = sanitizeJobText(j.jobTitle);
@@ -315,8 +314,10 @@ export async function fetchWorkingNomadsJobs(query: string | undefined): Promise
 export async function fetchHimalayasJobs(query: string | undefined): Promise<RawJobPosting[]> {
   const q = query?.trim();
   const out: RawJobPosting[] = [];
-  // 3 pages × 20 (API caps page size at 20; recency-ordered feed).
-  for (let page = 0; page < 3; page++) {
+  // The feed is recency-ordered across ALL categories, so a targeted query
+  // needs more pages to surface its roles (API caps page size at 20).
+  const pages = q ? 5 : 3;
+  for (let page = 0; page < pages; page++) {
     const data = await withTimeout(
       resilientJson<{ jobs?: AnyJson[] }>(
         `https://himalayas.app/jobs/api?limit=20&offset=${page * 20}`,
@@ -379,7 +380,8 @@ export async function fetch4DayWeekJobs(query: string | undefined): Promise<RawJ
     if (!title || !j.slug) continue;
     if (!epochFresh(j.posted)) continue;
     if (q && !titleGate(title, q)) continue;
-    const primary = (j.locations || []).find((l: AnyJson) => l.is_primary) || (j.locations || [])[0];
+    const primary =
+      (j.locations || []).find((l: AnyJson) => l.is_primary) || (j.locations || [])[0];
     const loc = primary
       ? sanitizeJobText([primary.city, primary.country].filter(Boolean).join(", "))
       : "";
