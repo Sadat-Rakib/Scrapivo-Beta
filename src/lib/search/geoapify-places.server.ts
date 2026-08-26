@@ -30,39 +30,54 @@ export function majorCitiesForCountry(location: string): string[] {
   return gazetteerCities(normalizeLocalLocation(location));
 }
 
-/** Map ICP / skill keywords → Geoapify Places categories. */
+/** Map ICP / skill keywords → Geoapify Places categories.
+ *  NOTE: Geoapify 400s the ENTIRE request on any unknown category token, and
+ *  its taxonomy has no plumbing/HVAC/roofing/"craft" section — those used to
+ *  return silent zeros for every trade ask. Only verified-valid keys below
+ *  (probed against the live API): trades resolve through trade-adjacent
+ *  service categories + the OSM/Overpass source, not invented craft tokens. */
 export function categoriesForQuery(qx: ExpandedQueries): string[] {
   const blob = `${qx.skill} ${qx.role} ${qx.raw ?? ""}`.toLowerCase();
   if (/restaurant|cafe|food|catering|bakery/.test(blob))
     return ["catering.restaurant", "catering.cafe"];
   if (/salon|spa|beauty|barber|med.?spa/.test(blob))
-    return ["service.beauty", "service.hairdresser"];
+    return ["service.beauty", "service.beauty.hairdresser"];
   if (/dentist|doctor|clinic|health|medical/.test(blob)) return ["healthcare"];
-  if (/lawyer|legal|attorney/.test(blob)) return ["office.lawyer", "office"];
-  if (/accountant|bookkeep|cpa/.test(blob)) return ["office.accountant", "office"];
+  if (/lawyer|legal|attorney/.test(blob)) return ["office.lawyer", "office.company"];
+  if (/accountant|bookkeep|cpa/.test(blob)) return ["office.accountant", "office.company"];
   if (/real.?estate|realtor|property/.test(blob)) return ["office.estate_agent", "commercial"];
   if (/gym|fitness|yoga/.test(blob)) return ["sport.fitness", "sport"];
   if (/hotel|lodging|airbnb/.test(blob)) return ["accommodation"];
   if (/retail|shop|store/.test(blob)) return ["commercial"];
-  // Trades — never fall through to bare office/service/commercial (post/fire/banks).
-  if (/\bplumb/.test(blob)) return ["service.plumbing", "craft.plumber", "service"];
-  if (/\broof/.test(blob)) return ["craft.roofer", "service"];
-  if (/\belectric/.test(blob)) return ["craft.electrician", "service"];
-  if (/\bhvac|heating|cooling|furnace/.test(blob))
-    return ["service", "craft.plumber", "craft.electrician"];
-  if (/\b(contractor|handyman|remodel)/.test(blob)) return ["craft", "service"];
+  // Trades — Geoapify has no plumber/roofer/HVAC categories; these are the
+  // closest valid trade-adjacent buckets. OSM (craft=*) covers the rest.
+  const tradesFill = [
+    "office.company",
+    "commercial",
+    "service.electrician",
+    "service.carpenter",
+    "service.metal_construction",
+  ];
+  if (/\bplumb/.test(blob)) return [...tradesFill, "service.locksmith", "service.cleaning"];
+  if (/\broof/.test(blob)) return [...tradesFill, "service.chimney_sweeper"];
+  if (/\belectric/.test(blob)) return ["service.electrician", ...tradesFill];
+  if (/\bhvac|heating|cooling|furnace/.test(blob)) return tradesFill;
+  if (/\b(contractor|handyman|remodel)/.test(blob)) return tradesFill;
   if (/market|seo|advertis|agency|design|consult|brand|content|social media/.test(blob)) {
-    return ["office", "service", "commercial"];
+    return ["office.advertising_agency", "office.consulting", "office.company", "commercial"];
   }
-  return ["office", "service", "commercial"];
+  return ["office.company", "commercial"];
 }
 
-/** Name filter for Places API when searching a specific trade/category. */
+/** Name filter for Places API when searching a specific trade/category.
+ *  The Geoapify `name` param is exact-ish and rarely matches trade businesses
+ *  ("ABC Plumbing" ≠ name=plumber), so trades rely on categories + OSM; the
+ *  name filter only stays where it demonstrably helps. */
 export function nameFilterForQuery(qx: ExpandedQueries): string | undefined {
   const blob = `${qx.skill} ${qx.role}`.toLowerCase().trim();
-  if (/\bplumb/.test(blob)) return "plumber";
-  if (/\broof/.test(blob)) return "roofer";
-  if (/\belectric/.test(blob)) return "electrician";
+  if (/\bplumb/.test(blob)) return "plumbing";
+  if (/\broof/.test(blob)) return "roofing";
+  if (/\belectric/.test(blob)) return "electric";
   if (/\bhvac|heating/.test(blob)) return undefined;
   if (/\bdentist|dental/.test(blob)) return "dentist";
   if (/\blaw|attorney/.test(blob)) return "lawyer";
@@ -77,58 +92,11 @@ export function extractLocationHint(text: string): string | null {
   return extractLocationFromQuery(text);
 }
 
-export async function geocodePlace(query: string): Promise<GeoPoint | null> {
-  const key = process.env.GEOAPIFY_API_KEY;
-  if (!key || !query?.trim()) return null;
-  const { disambiguatePlaceQuery } = await import("./place-disambiguate.server");
-  const q = disambiguatePlaceQuery(query);
-  const url =
-    `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(q)}` +
-    `&limit=5&format=json&apiKey=${key}`;
-  try {
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const data = (await res.json()) as any;
-    const results = (data?.results ?? []) as any[];
-    if (!results.length) return null;
-
-    const score = (r: any): number => {
-      let s = Number(r.rank?.confidence ?? r.rank?.importance ?? 0) * 100;
-      const type = String(r.result_type || r.type || "").toLowerCase();
-      if (/city|municipality|town/.test(type)) s += 40;
-      if (/village|hamlet|suburb/.test(type)) s -= 20;
-      // Prefer known major countries when query was disambiguated to them
-      const cc = String(r.country_code || "").toLowerCase();
-      if (/, canada$/i.test(q) && cc === "ca") s += 50;
-      if (/, uk$/i.test(q) && cc === "gb") s += 50;
-      if (/usa$/i.test(q) && cc === "us") s += 50;
-      if (/, australia$/i.test(q) && cc === "au") s += 50;
-      // Penalize tiny US places when user typed a bare major-city name
-      if (
-        cc === "us" &&
-        /toronto|london|paris|berlin/i.test(query) &&
-        !/usa|us\b|united states/i.test(query)
-      ) {
-        s -= 80;
-      }
-      return s;
-    };
-
-    const best = [...results].sort((a, b) => score(b) - score(a))[0];
-    if (!best || best.lon == null || best.lat == null) return null;
-    return {
-      lon: best.lon,
-      lat: best.lat,
-      city: best.city,
-      country_code: (best.country_code || "").toLowerCase(),
-      state_code: (best.state_code || "").toLowerCase(),
-      place_id: best.place_id,
-      result_type: best.result_type || best.type,
-    };
-  } catch {
-    return null;
-  }
-}
+// Geocoding moved to the free-first neutral chain (Nominatim → Photon →
+// Geoapify-if-key). Re-exported here so existing importers keep working
+// without any module needing GEOAPIFY_API_KEY to resolve places.
+import { geocodePlace } from "./geocode.server";
+export { geocodePlace };
 
 function wantsAgencyIcp(qx: ExpandedQueries): boolean {
   return /agenc|advertis|marketing|seo|brand|pr\b|media/i.test(`${qx.role} ${qx.skill} ${qx.raw}`);
@@ -280,7 +248,7 @@ async function searchCityCircle(
 
   // Try agency-biased or trade name filter first, then broad category fill
   const tradeName = nameFilterForQuery(qx);
-  let features =
+  const features =
     preferAgency || tradeName
       ? await fetchPlacesFeatures({
           filter,
@@ -380,7 +348,7 @@ export async function searchGeoapifyPlaces(
   const cats = categoriesForQuery(qx).join(",");
   const filter = `circle:${point.lon},${point.lat},${CITY_RADIUS_M}`;
 
-  let features =
+  const features =
     preferAgency || nameFilterForQuery(qx)
       ? await fetchPlacesFeatures({
           filter,

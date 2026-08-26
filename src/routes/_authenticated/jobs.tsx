@@ -26,6 +26,7 @@ import { friendlyErrorText } from "@/lib/friendly-error";
 import { Briefcase, Download, ExternalLink, MapPin, RefreshCw, SearchCheck } from "lucide-react";
 import { toast } from "sonner";
 import { Company360View, type Company360Data } from "@/components/shared/company-360-view";
+import { UrlIntelBox } from "@/components/url-intel-box";
 
 export const Route = createFileRoute("/_authenticated/jobs")({
   head: () => ({
@@ -74,6 +75,10 @@ function JobsPage() {
     questions: FlowQuestion[];
   } | null>(null);
   const [broadened, setBroadened] = useState<string[]>([]);
+  const [sourceHealth, setSourceHealth] = useState<
+    Array<{ id: string; label: string; status: string; count: number }>
+  >([]);
+  const [quotaLeft, setQuotaLeft] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const [selectedEntity, setSelectedEntity] = useState<Company360Data | null>(null);
@@ -136,6 +141,8 @@ function JobsPage() {
       setRows(fetchedJobs);
       setSearched(true);
       setBroadened(res.relaxed ?? []);
+      setSourceHealth(res.sourceStatuses ?? []);
+      setQuotaLeft(typeof res.quota?.remaining === "number" ? res.quota.remaining : null);
       saveRouteSearchState("jobs", {
         query: vars.query,
         filters: vars,
@@ -342,6 +349,31 @@ function JobsPage() {
                     composerRef.current?.focus();
                   }}
                 />
+                {sourceHealth.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
+                    <span className="font-medium text-white/70">
+                      Sources
+                      {quotaLeft != null && (
+                        <span className="ml-2 text-white/40">· {quotaLeft} searches left today</span>
+                      )}
+                    </span>
+                    {sourceHealth.map((s) => (
+                      <span key={s.id} className="inline-flex items-center gap-1">
+                        <span
+                          className={
+                            s.status === "ok"
+                              ? s.count > 0
+                                ? "size-1.5 rounded-full bg-emerald-400"
+                                : "size-1.5 rounded-full bg-white/30"
+                              : "size-1.5 rounded-full bg-red-400"
+                          }
+                        />
+                        {s.label}
+                        <span className="text-white/40">{s.status === "ok" ? s.count : "err"}</span>
+                      </span>
+                    ))}
+                  </div>
+                )}
                 {broadened.length > 0 && (
                   <div className="flex items-center gap-2 rounded-lg border border-amber-400/20 bg-amber-400/[0.06] px-3 py-2 text-[11px] text-amber-200/90">
                     <SearchCheck className="size-3.5 shrink-0" />
@@ -429,6 +461,32 @@ function JobsPage() {
                 title="Find Jobs"
                 description="Describe the role you want — we'll ask where and what level, then pull live postings from career pages and ATS boards."
                 onStart={() => composerRef.current?.focus()}
+              />
+            )}
+
+            {/* Paste-a-URL intelligence — under the cards: extract a profile,
+                confirm the details, then run a real search with them. */}
+            {!mut.isPending && (
+              <UrlIntelBox
+                variant="jobs"
+                onConfirm={(intel) => {
+                  const query =
+                    intel.skills.slice(0, 3).join(" ") || intel.industry || intel.name || "";
+                  if (!query.trim()) {
+                    toast.message("Nothing usable in that URL — type a role instead.");
+                    return;
+                  }
+                  const remote =
+                    /remote|global/i.test(intel.location || "") && intel.skills.length > 0;
+                  mut.mutate({
+                    query,
+                    location: remote ? "" : (intel.location || "").trim(),
+                    remoteOnly: remote,
+                    seniority: "any",
+                    employmentType: "any",
+                    region: remote ? "remote" : "any",
+                  });
+                }}
               />
             )}
           </div>

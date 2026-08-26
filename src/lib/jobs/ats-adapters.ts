@@ -34,16 +34,25 @@ const BOARD_CAPS: Record<AtsProvider, number> = {
   recruitee: 40,
 };
 
+/** Wall-clock budget shared by every ATS fan-out. Vercel kills functions that
+ *  stream hundreds of board fetches; stopping between batches returns real
+ *  partials instead of nothing. Tune with JOBS_ATS_BUDGET_MS. */
+const ATS_BUDGET_MS = Number(process.env.JOBS_ATS_BUDGET_MS ?? 18_000);
+
 /** Run async work over boards in small batches so hundreds of parallel
- *  requests never fire at once (politeness + 429 avoidance). */
+ *  requests never fire at once (politeness + 429 avoidance). Stops launching
+ *  new batches once the wall-clock budget is spent — earlier batches'
+ *  results are still returned, so slow sources degrade to partials. */
 async function mapInBatches<T, R>(
   items: T[],
   size: number,
   fn: (item: T) => Promise<R>,
   staggerMs = 25,
 ): Promise<R[]> {
+  const started = Date.now();
   const out: R[] = [];
   for (let i = 0; i < items.length; i += size) {
+    if (i > 0 && Date.now() - started > ATS_BUDGET_MS) break;
     const batch = items.slice(i, i + size);
     const results = await Promise.all(batch.map(fn));
     out.push(...results);

@@ -30,8 +30,37 @@ export const runJobSearch = createServerFn({ method: "POST" })
       })
       .parse(d),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
     ensureJobCatalogRegistered();
+
+    const { loadCachedJobs, upsertCachedJobs, peekJobSearchQuota } = await import(
+      "./jobs/quota-cache.server"
+    );
+    const { dedupeJobs } = await import("./jobs/registry");
+    const quota = await peekJobSearchQuota(supabase, context.userId);
+
+    // Quota exhausted → read-only cached results so the page still works.
+    if (quota.exhausted) {
+      const cached = await loadCachedJobs(supabase);
+      return {
+        error: "limit" as const,
+        message: `Free plan: ${quota.limit} job searches per day. Showing recent cached jobs — try again tomorrow.`,
+        jobs: dedupeJobs(cached).slice(0, data.limit).map((j) => ({
+          ...j,
+          company_domain: j.company_domain ?? null,
+          contacts: j.contacts ?? [],
+        })),
+        total: Math.min(cached.length, data.limit),
+        fetched: 0,
+        contactRoles: data.contactRoles,
+        sources: listJobSources().map((s) => ({ id: s.id, label: s.label })),
+        sourceStatuses: [],
+        relaxed: [],
+        quota,
+      };
+    }
+
     await awaitProviderSlot("greenhouse", { n: 1 });
     await awaitProviderSlot("lever", { n: 1 });
     await awaitProviderSlot("ashby", { n: 1 });
@@ -47,11 +76,21 @@ export const runJobSearch = createServerFn({ method: "POST" })
       limit: data.limit,
       contactRoles: data.contactRoles,
     });
-    const limited = jobs.slice(0, data.limit).map((j) => ({
+
+    // Merge with the <7-day cache — bigger lists, fewer refetches.
+    const cached = await loadCachedJobs(supabase);
+    void upsertCachedJobs(supabase, jobs); // fire-and-forget persistence
+    const merged = dedupeJobs([...jobs, ...cached]);
+    const limited = merged.slice(0, data.limit).map((j) => ({
       ...j,
       company_domain: j.company_domain ?? null,
       contacts: j.contacts ?? [],
     }));
+
+    // Consume one unit of budget AFTER a successful fetch.
+    const consumed = await (
+      await import("./jobs/quota-cache.server")
+    ).consumeJobSearchQuota(supabase, context.userId);
 
     if (data.enrichEmployers && data.contactRoles.length) {
       const { discoverContactsForDomain } =
@@ -91,5 +130,6 @@ export const runJobSearch = createServerFn({ method: "POST" })
       /** Human labels of the gates that were widened to reach a usable
        *  volume ("seniority", "location"…). Empty when strict pass sufficed. */
       relaxed,
+      quota: consumed,
     };
   });

@@ -33,6 +33,7 @@ import { saveRouteSearchState, loadRouteSearchState } from "@/lib/store/search-s
 import { friendlyErrorText } from "@/lib/friendly-error";
 import { Landmark, RefreshCw, Download, MapPin, SearchCheck } from "lucide-react";
 import { toast } from "sonner";
+import { UrlIntelBox } from "@/components/url-intel-box";
 import { Company360View, type Company360Data } from "@/components/shared/company-360-view";
 import { humanLabel, isInternalKey } from "@/lib/records/field-labels";
 
@@ -603,6 +604,41 @@ function InvestorsPage() {
                 title="Find Investors"
                 description="Describe your raise — we'll ask a couple of quick questions, then match you with active VCs & angels."
                 onStart={() => composerRef.current?.focus()}
+              />
+            )}
+
+            {/* Paste-a-URL intelligence — under the cards: confirm the extracted
+                fund/startup profile, then run a real investor search with it. */}
+            {!mut.isPending && (
+              <UrlIntelBox
+                variant="investors"
+                onConfirm={(intel) => {
+                  const sector = (intel.sectors[0] || intel.industry || "").trim();
+                  if (!sector && !(intel.location || "").trim()) {
+                    toast.message(
+                      "No sector or location found in that URL — edit them in and search again.",
+                    );
+                    return;
+                  }
+                  const stageHint = (intel.stage_hint || "").trim().toLowerCase();
+                  const checkBand = /pre.?seed|angel/.test(stageHint)
+                    ? ("angel" as const)
+                    : /seed/.test(stageHint)
+                      ? ("seed" as const)
+                      : /series [b-c]|growth|later/.test(stageHint)
+                        ? ("growth" as const)
+                        : ("any" as const);
+                  const vars = {
+                    query: "",
+                    sector: sector || undefined,
+                    location: (intel.location || "").trim() || undefined,
+                    stage: /pre.?seed|seed|series [a-c]/.test(stageHint) ? stageHint : undefined,
+                    checkBand,
+                    entityType: "any" as const,
+                  };
+                  setSearchFilters(vars);
+                  mut.mutate(vars);
+                }}
               />
             )}
           </div>

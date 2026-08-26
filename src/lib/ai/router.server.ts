@@ -13,6 +13,33 @@ type Provider = {
   json?: boolean;
 };
 
+// ── Circuit breaker ────────────────────────────────────────────────────────
+// Consecutive failures trip a cooldown so dead providers stop costing latency
+// on every call; successes clear the count. In-memory per serverless instance.
+const BREAKER_THRESHOLD = 3;
+const BREAKER_COOLDOWN_MS = 5 * 60_000;
+const breaker = new Map<string, { fails: number; until: number }>();
+
+function breakerOpen(id: string): boolean {
+  const b = breaker.get(id);
+  return !!b && b.until > Date.now();
+}
+
+function breakerFail(id: string): void {
+  const b = breaker.get(id) ?? { fails: 0, until: 0 };
+  b.fails += 1;
+  if (b.fails >= BREAKER_THRESHOLD) {
+    b.until = Date.now() + BREAKER_COOLDOWN_MS;
+    b.fails = 0;
+    console.warn(`[ai-router] ${id} cooling down ${BREAKER_COOLDOWN_MS / 1000}s after repeated failures`);
+  }
+  breaker.set(id, b);
+}
+
+function breakerSuccess(id: string): void {
+  breaker.delete(id);
+}
+
 function providersFor(task: Task): Provider[] {
   const list: Provider[] = [];
 
@@ -54,6 +81,48 @@ function providersFor(task: Task): Provider[] {
           "x-title": "Scrapivo",
         }),
         model: "google/gemma-4-31b-it:free",
+        json: true,
+      });
+    if (openrouter)
+      list.push({
+        id: "openrouter:llama33-free",
+        available: true,
+        endpoint: "https://openrouter.ai/api/v1/chat/completions",
+        headers: () => ({
+          authorization: `Bearer ${openrouter}`,
+          "content-type": "application/json",
+          "http-referer": "https://scrapivo.app",
+          "x-title": "Scrapivo",
+        }),
+        model: "meta-llama/llama-3.3-70b-instruct:free",
+        json: true,
+      });
+    if (openrouter)
+      list.push({
+        id: "openrouter:mistral-small-free",
+        available: true,
+        endpoint: "https://openrouter.ai/api/v1/chat/completions",
+        headers: () => ({
+          authorization: `Bearer ${openrouter}`,
+          "content-type": "application/json",
+          "http-referer": "https://scrapivo.app",
+          "x-title": "Scrapivo",
+        }),
+        model: "mistralai/mistral-small-3.2-24b-instruct:free",
+        json: true,
+      });
+    if (openrouter)
+      list.push({
+        id: "openrouter:qwen-free",
+        available: true,
+        endpoint: "https://openrouter.ai/api/v1/chat/completions",
+        headers: () => ({
+          authorization: `Bearer ${openrouter}`,
+          "content-type": "application/json",
+          "http-referer": "https://scrapivo.app",
+          "x-title": "Scrapivo",
+        }),
+        model: "qwen/qwen3-30b-a3b:free",
         json: true,
       });
   }
@@ -107,6 +176,20 @@ function providersFor(task: Task): Provider[] {
         model: "z-ai/glm-5.2:free",
         json: true,
       });
+    if (openrouter)
+      list.push({
+        id: "openrouter:deepseek-free",
+        available: true,
+        endpoint: "https://openrouter.ai/api/v1/chat/completions",
+        headers: () => ({
+          authorization: `Bearer ${openrouter}`,
+          "content-type": "application/json",
+          "http-referer": "https://scrapivo.app",
+          "x-title": "Scrapivo",
+        }),
+        model: "deepseek/deepseek-chat-v3-0324:free",
+        json: true,
+      });
     if (groq)
       list.push({
         id: "groq:gpt-oss-120b",
@@ -118,7 +201,7 @@ function providersFor(task: Task): Provider[] {
       });
   }
 
-  return list.filter((p) => p.available);
+  return list.filter((p) => p.available && !breakerOpen(p.id));
 }
 
 export type AiCall = {
@@ -145,6 +228,7 @@ export async function aiComplete(call: AiCall): Promise<string> {
 
   let lastErr: unknown = null;
   for (const p of providers) {
+    if (breakerOpen(p.id)) continue;
     try {
       const body: Record<string, unknown> = {
         model: p.model,
@@ -165,18 +249,22 @@ export async function aiComplete(call: AiCall): Promise<string> {
       if (!res.ok) {
         const txt = await res.text();
         lastErr = new Error(`${p.id} ${res.status}: ${txt.slice(0, 200)}`);
+        breakerFail(p.id);
         continue;
       }
       const j = await res.json();
       const content: string = j.choices?.[0]?.message?.content ?? "";
       if (!content) {
         lastErr = new Error(`${p.id}: empty response`);
+        breakerFail(p.id);
         continue;
       }
+      breakerSuccess(p.id);
       if (useCache) void putCached(ck, call.task, content);
       return content;
     } catch (err) {
       lastErr = err;
+      breakerFail(p.id);
       continue;
     }
   }

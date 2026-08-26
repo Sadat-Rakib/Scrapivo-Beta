@@ -36,9 +36,70 @@ function wantsAgencyIcp(qx: ExpandedQueries): boolean {
   return /agenc|advertis|marketing|seo|brand|pr\b|media/i.test(`${qx.role} ${qx.skill} ${qx.raw}`);
 }
 
+/** Warn once per process when Foursquare rejects the key (401). Legacy
+ *  `fsq3…` API keys that were revoked or not migrated are rejected by BOTH
+ *  hosts; the fix is a Service API Key from the Foursquare developer console
+ *  (https://docs.foursquare.com/developer/docs/manage-service-api-keys). */
+let warnedInvalidKey = false;
+function warnInvalidKeyOnce(status: number, body: string): void {
+  if (warnedInvalidKey) return;
+  warnedInvalidKey = true;
+  console.warn(
+    `[foursquare] ${status} from Places API (${body.slice(0, 80)}) — FOURSQUARE_API_KEY is ` +
+      `invalid or revoked. Create a Service API Key in the Foursquare developer ` +
+      `console and update FOURSQUARE_API_KEY; until then Foursquare contributes 0 rows.`,
+  );
+}
+
+// ── Self-throttling (Foursquare is a FALLBACK source on a shared quota) ────
+// Geoapify + OSM are the primary local sources; Foursquare only fires when
+// they come back thin. These caps keep one busy day from draining the whole
+// monthly bucket. The remote `x-ratelimit-remaining` header is honored too.
+const FSQ_DAILY_CAP = Number(process.env.FOURSQUARE_DAILY_CAP ?? 40);
+const FSQ_MONTHLY_CAP = Number(process.env.FOURSQUARE_MONTHLY_CAP ?? 400);
+const FSQ_MIN_REMOTE_REMAINING = 100;
+let fsqDayKey = "";
+let fsqMonthKey = "";
+let fsqDailyCount = 0;
+let fsqMonthlyCount = 0;
+let fsqRemoteRemaining = Number.POSITIVE_INFINITY;
+let warnedQuota = false;
+
+function fsqQuotaAvailable(): boolean {
+  const today = new Date().toISOString().slice(0, 10);
+  if (today !== fsqDayKey) {
+    fsqDayKey = today;
+    fsqDailyCount = 0;
+  }
+  const month = today.slice(0, 7);
+  if (month !== fsqMonthKey) {
+    fsqMonthKey = month;
+    fsqMonthlyCount = 0;
+  }
+  const ok =
+    fsqDailyCount < FSQ_DAILY_CAP &&
+    fsqMonthlyCount < FSQ_MONTHLY_CAP &&
+    fsqRemoteRemaining > FSQ_MIN_REMOTE_REMAINING;
+  if (!ok && !warnedQuota) {
+    warnedQuota = true;
+    console.info(
+      `[foursquare] quota guard engaged (day ${fsqDailyCount}/${FSQ_DAILY_CAP}, ` +
+        `month ${fsqMonthlyCount}/${FSQ_MONTHLY_CAP}, remote remaining ${Number.isFinite(fsqRemoteRemaining) ? fsqRemoteRemaining : "?"}) — skipping Foursquare calls.`,
+    );
+  }
+  return ok;
+}
+
+function fsqRecordCall(remainingHeader: string | null): void {
+  fsqDailyCount += 1;
+  fsqMonthlyCount += 1;
+  const n = Number(remainingHeader);
+  if (Number.isFinite(n) && n > 0) fsqRemoteRemaining = n;
+}
+
 async function foursquareSearch(ll: string, query: string, radius: number): Promise<any[]> {
   const key = process.env.FOURSQUARE_API_KEY;
-  if (!key) return [];
+  if (!key || !fsqQuotaAvailable()) return [];
 
   const params = new URLSearchParams({
     ll,
@@ -68,7 +129,15 @@ async function foursquareSearch(ll: string, query: string, radius: number): Prom
   for (const a of attempts) {
     try {
       const res = await fetch(a.url, { headers: a.headers });
-      if (!res.ok) continue;
+      if (!res.ok) {
+        // A dead/revoked key 401s on BOTH hosts; say so once instead of
+        // silently degrading to zero Foursquare results forever.
+        if (res.status === 401) {
+          warnInvalidKeyOnce(res.status, await res.text().catch(() => ""));
+        }
+        continue;
+      }
+      fsqRecordCall(res.headers.get("x-ratelimit-remaining"));
       const data = (await res.json()) as any;
       const results = data?.results ?? data?.places ?? [];
       if (Array.isArray(results) && results.length) return results;
@@ -81,7 +150,7 @@ async function foursquareSearch(ll: string, query: string, radius: number): Prom
 
 async function foursquareNear(near: string, query: string): Promise<any[]> {
   const key = process.env.FOURSQUARE_API_KEY;
-  if (!key) return [];
+  if (!key || !fsqQuotaAvailable()) return [];
   const params = new URLSearchParams({ near, query, limit: "50" });
   const attempts: Array<{ url: string; headers: Record<string, string> }> = [
     {
@@ -103,7 +172,13 @@ async function foursquareNear(near: string, query: string): Promise<any[]> {
   for (const a of attempts) {
     try {
       const res = await fetch(a.url, { headers: a.headers });
-      if (!res.ok) continue;
+      if (!res.ok) {
+        if (res.status === 401) {
+          warnInvalidKeyOnce(res.status, await res.text().catch(() => ""));
+        }
+        continue;
+      }
+      fsqRecordCall(res.headers.get("x-ratelimit-remaining"));
       const data = (await res.json()) as any;
       const results = data?.results ?? data?.places ?? [];
       if (Array.isArray(results) && results.length) return results;
@@ -227,7 +302,9 @@ function mapResults(
   return out;
 }
 
-/** Geoapify + Foursquare (+ CoreClaw Maps Lead Finder when keyed). */
+/** OSM (Nominatim+Overpass) is PRIMARY and fully free. Geoapify/Foursquare
+ *  run only when OSM comes back thin AND their keys exist; CoreClaw only when
+ *  USE_PAID_SOURCES=true. Zero paid calls happen without explicit keys. */
 export async function searchLocalBusinesses(
   qx: ExpandedQueries,
   locationHint?: string | null,
@@ -235,7 +312,7 @@ export async function searchLocalBusinesses(
 ): Promise<SourceLead[]> {
   const min = opts?.min ?? (opts?.directoryMode ? 20 : 10);
   const directoryMode = !!opts?.directoryMode;
-  const { searchGeoapifyPlaces } = await import("./geoapify-places.server");
+  const anyPlacesKey = !!(process.env.GEOAPIFY_API_KEY || process.env.FOURSQUARE_API_KEY);
 
   /** CoreClaw Maps — paid Discover opt-in only; never stall the free path. */
   const coreclawMaps = async () => {
@@ -243,9 +320,8 @@ export async function searchLocalBusinesses(
       const { paidDiscoveryEnabled } = await import("./paid-discovery");
       if (!paidDiscoveryEnabled()) return [] as SourceLead[];
       const { searchCoreClawMapsLeads } = await import("./coreclaw-sources.server");
-      const p = searchCoreClawMapsLeads(qx, locationHint);
       return await Promise.race([
-        p,
+        searchCoreClawMapsLeads(qx, locationHint) as Promise<SourceLead[]>,
         new Promise<SourceLead[]>((resolve) => setTimeout(() => resolve([]), 6_000)),
       ]);
     } catch {
@@ -253,16 +329,37 @@ export async function searchLocalBusinesses(
     }
   };
 
+  // ── Free primary: OpenStreetMap ──────────────────────────────────────────
+  const { searchOsmLocalBusinesses } = await import("./osm-local-businesses.server");
+  const osm = await searchOsmLocalBusinesses(qx, locationHint ?? "").catch(
+    () => [] as SourceLead[],
+  );
+  if (osm.length >= Math.min(min, 12) || !anyPlacesKey) {
+    if (!anyPlacesKey && directoryMode) {
+      // No keys at all → still allow CoreClaw behind its paid flag.
+      const maps = await coreclawMaps();
+      if (maps.length) {
+        const seen = new Set(osm.map((l) => (l.author || l.title).toLowerCase()));
+        for (const m of maps) {
+          if (seen.has((m.author || m.title).toLowerCase())) continue;
+          osm.push(m);
+        }
+      }
+    }
+    return osm.slice(0, 120);
+  }
+
+  // ── Thin OSM + keys present: paid-optional top-up ───────────────────────
+  const { searchGeoapifyPlaces } = await import("./geoapify-places.server");
+  const merged: SourceLead[] = [...osm];
+  const seen = new Set(osm.map((l) => (l.author || l.title).toLowerCase()));
+
   if (directoryMode) {
-    const [primary, secondary, maps] = await Promise.all([
+    const [primary, maps] = await Promise.all([
       searchGeoapifyPlaces(qx, locationHint, { directoryMode: true }),
-      searchFoursquarePlaces(qx, locationHint, { directoryMode: true }),
       coreclawMaps(),
     ]);
-    const merged: SourceLead[] = [];
-    const seen = new Set<string>();
-    // Prefer CoreClaw maps (contact-rich) then higher intentBoost
-    const ordered = [...maps, ...primary, ...secondary].sort(
+    const ordered = [...maps, ...primary].sort(
       (a, b) => (b.intentBoost ?? 0) - (a.intentBoost ?? 0),
     );
     for (const l of ordered) {
@@ -271,22 +368,37 @@ export async function searchLocalBusinesses(
       seen.add(k);
       merged.push(l);
     }
-    const strong = merged.filter((l) => (l.intentBoost ?? 0) >= 18);
+    const strong = merged.filter((l) => (l.intentBoost ?? 0) >= 18 || l.source === "osm");
     if (strong.length >= min) return strong.slice(0, 120);
+    if (merged.length >= min) return merged.slice(0, 120);
+
+    const secondary = await searchFoursquarePlaces(qx, locationHint, { directoryMode: true });
+    for (const l of secondary) {
+      const k = (l.author || l.title).toLowerCase().replace(/\s+/g, " ");
+      if (seen.has(k)) continue;
+      seen.add(k);
+      merged.push(l);
+    }
     return merged.slice(0, 120);
   }
 
   const primary = await searchGeoapifyPlaces(qx, locationHint, { directoryMode: false });
-  if (primary.length >= min) return primary;
+  for (const l of primary) {
+    const k = l.title.toLowerCase();
+    if (seen.has(k)) continue;
+    seen.add(k);
+    merged.push(l);
+  }
+  if (merged.length >= min) return merged;
   const [secondary, maps] = await Promise.all([
     searchFoursquarePlaces(qx, locationHint, { directoryMode: false }),
     coreclawMaps(),
   ]);
-  const seen = new Set(primary.map((l) => l.title.toLowerCase()));
   for (const l of [...maps, ...secondary]) {
-    if (seen.has(l.title.toLowerCase())) continue;
-    seen.add(l.title.toLowerCase());
-    primary.push(l);
+    const k = l.title.toLowerCase();
+    if (seen.has(k)) continue;
+    seen.add(k);
+    merged.push(l);
   }
-  return primary;
+  return merged;
 }

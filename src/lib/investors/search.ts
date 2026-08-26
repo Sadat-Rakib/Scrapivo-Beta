@@ -30,7 +30,9 @@ export type InvestorWithMetadata = (InvestorEntity | InvestorRecord) & {
 const data = investorsFile as InvestorsFile;
 
 export function getAllInvestors(): InvestorWithMetadata[] {
-  return data.investors ?? [];
+  // `entities` is the fallback alias some dataset builds use for the same
+  // array — read it when `investors` is missing so renames never blank search.
+  return data.investors ?? data.entities ?? [];
 }
 
 export type InvestorSearchFilters = {

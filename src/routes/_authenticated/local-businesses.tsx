@@ -23,6 +23,7 @@ import { saveRouteSearchState, loadRouteSearchState } from "@/lib/store/search-s
 import { friendlyErrorText } from "@/lib/friendly-error";
 import { Store, Download, MapPin, Phone, Mail, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { UrlIntelBox } from "@/components/url-intel-box";
 import { Company360View, type Company360Data } from "@/components/shared/company-360-view";
 import { populatedFields } from "@/lib/records/populated-fields";
 import { humanLabel, isInternalKey } from "@/lib/records/field-labels";
@@ -503,6 +504,34 @@ function LocalBusinessesPage() {
                 title="Find Businesses"
                 description="Describe what you need — we'll ask a couple of quick questions, then pull live listings with emails and phone numbers."
                 onStart={() => composerRef.current?.focus()}
+              />
+            )}
+
+            {/* Paste-a-URL intelligence — under the cards: confirm the extracted
+                profile, then run a real businesses search with it. */}
+            {!mut.isPending && (
+              <UrlIntelBox
+                variant="local"
+                onConfirm={(intel) => {
+                  const category = (intel.industry || intel.sectors[0] || intel.name || "").trim();
+                  const location = (intel.location || "").trim();
+                  if (category.length < 2 || location.length < 2) {
+                    toast.message(
+                      "Need both an industry and a location from that URL — edit them in and search again.",
+                    );
+                    return;
+                  }
+                  setCategory(category);
+                  setLocation(location);
+                  mut.mutate({
+                    category,
+                    location,
+                    requirement: "contact",
+                    opportunity: "any",
+                    count: null,
+                    service: "",
+                  });
+                }}
               />
             )}
           </div>

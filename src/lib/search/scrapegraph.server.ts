@@ -16,8 +16,10 @@ function apiKey(): string | undefined {
   return k || undefined;
 }
 
+/** OFF by default — ScrapeGraph is a PAID managed API. Set SGAI_ENABLED=1 to
+ *  opt in explicitly; the free path (cheerio + AI router) covers extraction. */
 export function scrapegraphEnabled(): boolean {
-  return !!apiKey();
+  return process.env.SGAI_ENABLED === "1" && !!apiKey();
 }
 
 const EXTRACT_PROMPT =

@@ -92,6 +92,9 @@ export type InvestorsFile = {
   firms?: number;
   individuals?: number;
   investors: (InvestorRecord | InvestorEntity)[];
+  /** Alias used by some dataset builds; search falls back to it when
+   *  `investors` is absent so a renamed array can never empty the app. */
+  entities?: (InvestorRecord | InvestorEntity)[];
 };
 
 // Type guards

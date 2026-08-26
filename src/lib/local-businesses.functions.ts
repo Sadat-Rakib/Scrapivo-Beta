@@ -156,24 +156,31 @@ export const runLocalBusinessSearch = createServerFn({ method: "POST" })
     const qx = toQx(category, location);
 
     const { searchOsmLocalBusinesses } = await import("./search/osm-local-businesses.server");
-    const { searchLocalBusinesses } = await import("./search/foursquare-places.server");
 
-    const [osm, places] = await Promise.all([
-      searchOsmLocalBusinesses(qx, location).catch((err) => {
-        console.warn(`[local-businesses] OSM search failed for ${category} in ${location}:`, err);
-        return [];
-      }),
-      searchLocalBusinesses(qx, location, { directoryMode: true, min: 10 }).catch((err) => {
-        console.warn(
-          `[local-businesses] Places search failed for ${category} in ${location}:`,
-          err,
-        );
-        return [];
-      }),
-    ]);
+    // OSM (Nominatim + Overpass) is PRIMARY and fully free. The paid-optional
+    // Places chain only fires when OSM comes back thin AND a key exists.
+    const osm = await searchOsmLocalBusinesses(qx, location).catch((err) => {
+      console.warn(`[local-businesses] OSM search failed for ${category} in ${location}:`, err);
+      return [];
+    });
+
+    let places: Awaited<ReturnType<typeof import("./search/foursquare-places.server")["searchLocalBusinesses"]>> = [];
+    const anyPlacesKey = !!(process.env.GEOAPIFY_API_KEY || process.env.FOURSQUARE_API_KEY);
+    if (osm.length < 12 && anyPlacesKey) {
+      const { searchLocalBusinesses } = await import("./search/foursquare-places.server");
+      places = await searchLocalBusinesses(qx, location, { directoryMode: true, min: 10 }).catch(
+        (err) => {
+          console.warn(
+            `[local-businesses] Places top-up failed for ${category} in ${location}:`,
+            err,
+          );
+          return [] as typeof places;
+        },
+      );
+    }
 
     console.info(
-      `[local-businesses] ${category} in ${location}: OSM=${osm.length}, Places=${places.length}`,
+      `[local-businesses] ${category} in ${location}: OSM=${osm.length}, PlacesTopUp=${places.length}`,
     );
 
     const byKey = new Map<string, LocalBusinessRow>();
@@ -379,11 +386,9 @@ export const runLocalBusinessSearch = createServerFn({ method: "POST" })
       });
     }
 
-    const sources = [
-      ...new Set([
-        ...(osm.length ? ["osm"] : []),
-        ...(places.length ? ["geoapify", "foursquare"] : []),
-      ]),
+    // Honest labels: only sources that actually contributed rows.
+    const sources: string[] = [
+      ...new Set([...osm, ...places].map((l) => (l as { source?: string }).source || "osm")),
     ];
 
     await supabase

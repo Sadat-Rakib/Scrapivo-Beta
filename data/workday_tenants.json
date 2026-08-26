@@ -1,0 +1,18 @@
+{
+  "note": "Workday CXS endpoints verified live by scripts/probe-workday-tenants.mts. Only responding tenant/site pairs are kept — the adapter skips dead rows silently.",
+  "verified": [
+    {
+      "tenant": "intel",
+      "host": "wd1.myworkdayjobs.com",
+      "site": "External",
+      "total": 627
+    },
+    {
+      "tenant": "workday",
+      "host": "wd5.myworkdayjobs.com",
+      "site": "Workday",
+      "total": 367
+    }
+  ],
+  "candidates": []
+}

@@ -16,9 +16,16 @@ export type SourceLead = Lead & { intentBoost?: number; address?: string };
 
 const OVERPASS_MIRRORS = [
   "https://overpass-api.de/api/interpreter",
+  "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+  "https://overpass.osm.ch/api/interpreter",
   "https://overpass.kumi.systems/api/interpreter",
+  "https://overpass.private.coffee/api/interpreter",
   "https://overpass.openstreetmap.ru/api/interpreter",
 ];
+
+/** Last mirror that answered OK — tried first next time (mirrors differ a lot
+ *  in uptime/latency; probing dead ones costs seconds per query). */
+let preferredOverpass = 0;
 
 function craftTags(skill: string): string[] {
   const s = (skill || "").toLowerCase();
@@ -73,6 +80,10 @@ type GeoHit = {
 };
 
 function isBroadAdmin(hit: GeoHit): boolean {
+  // Nominatim labels single-tier municipalities (e.g. Toronto, Ottawa) as
+  // "administrative boundary" classes even when the addresstype is city —
+  // those are real searchable cities, not broad admin areas.
+  if (/city|town|municipality/.test(hit.type)) return false;
   return /country|state|region|province|boundary/i.test(hit.type);
 }
 
@@ -155,48 +166,72 @@ async function geocodeNominatimPoint(place: string): Promise<GeoHit | null> {
 }
 
 async function overpass(query: string): Promise<any[]> {
-  for (const mirror of OVERPASS_MIRRORS) {
-    try {
-      const res = await fetch(mirror, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `data=${encodeURIComponent(query)}`,
-        signal: AbortSignal.timeout(28_000),
-      });
-      if (!res.ok) continue;
-      const data = (await res.json()) as { elements?: any[] };
-      if (Array.isArray(data.elements) && data.elements.length) return data.elements;
-    } catch {
-      /* try next mirror */
+  // Round 0 tries every mirror once (preferred mirror first). A second round
+  // runs ONLY when no mirror gave a usable HTTP response (transient outage) —
+  // legitimate empty results are final, otherwise sparse areas double latency.
+  const order = [
+    ...OVERPASS_MIRRORS.slice(preferredOverpass),
+    ...OVERPASS_MIRRORS.slice(0, preferredOverpass),
+  ];
+  let sawResponse = false;
+  for (let round = 0; round < 2; round++) {
+    if (round > 0) {
+      if (sawResponse) break;
+      await new Promise((r) => setTimeout(r, 900));
+    }
+    for (const mirror of order) {
+      try {
+        const res = await fetch(mirror, {
+          method: "POST",
+          // Node (undici) sends NO default User-Agent — Overpass mirrors
+          // answer 406 without one, so always identify ourselves.
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "User-Agent": "Scrapivo/1.0 (local-business discovery; contact: support@scrapivo.app)",
+            Accept: "*/*",
+          },
+          body: `data=${encodeURIComponent(query)}`,
+          signal: AbortSignal.timeout(round === 0 ? 22_000 : 14_000),
+        });
+        if (!res.ok) continue;
+        sawResponse = true;
+        const idx = OVERPASS_MIRRORS.indexOf(mirror);
+        if (idx >= 0) preferredOverpass = idx;
+        const data = (await res.json()) as { elements?: any[] };
+        if (Array.isArray(data.elements)) return data.elements;
+      } catch {
+        /* try next mirror */
+      }
     }
   }
   return [];
 }
 
-function aroundQuery(
-  tags: string[],
-  needle: string,
-  lat: number,
-  lon: number,
-  radiusM: number,
-): string {
+/** Tag-only query — fast and reliable. NEVER mix name-regex statements into
+ *  the same union: Overpass's planner turns `name~"x",i` + around into a
+ *  multi-minute scan that returns 0 elements (verified against 2 mirrors). */
+function tagQuery(tags: string[], lat: number, lon: number, radiusM: number): string {
   const tagFilter = tags
     .flatMap((t) => [`nwr[${t}](around:${radiusM},${lat},${lon});`])
     .join("\n  ");
-  const nameFallback = needle
-    ? `nwr["name"~"${needle}",i]["craft"](around:${radiusM},${lat},${lon});
-  nwr["name"~"${needle}",i]["shop"](around:${radiusM},${lat},${lon});
-  nwr["name"~"${needle}",i]["office"](around:${radiusM},${lat},${lon});
-  nwr["name"~"${needle}",i]["amenity"](around:${radiusM},${lat},${lon});
-  nwr["name"~"${needle}",i](around:${radiusM},${lat},${lon});`
-    : "";
   return `
 [out:json][timeout:25];
 (
   ${tagFilter}
-  ${nameFallback}
 );
 out center 150;
+`;
+}
+
+/** Name-regex fallback — separate query, separately timeboxed by the caller. */
+function nameQuery(needle: string, lat: number, lon: number, radiusM: number): string {
+  return `
+[out:json][timeout:15];
+(
+  nwr["name"~"${needle}",i]["craft"](around:${radiusM},${lat},${lon});
+  nwr["name"~"${needle}",i]["office"](around:${radiusM},${lat},${lon});
+);
+out center 60;
 `;
 }
 
@@ -270,21 +305,36 @@ async function searchAroundCity(
   locLabel: string,
   lat: number,
   lon: number,
+  deadlineMs = 55_000,
 ): Promise<SourceLead[]> {
   const tags = craftTags(skill);
   const needle = nameNeedleFor(skill);
+  const start = Date.now();
   // Try smaller radius first (12km)
-  let elements = await overpass(aroundQuery(tags, needle, lat, lon, 12_000));
-  let leads = elementsToLeads(elements, locLabel, skill, 150);
-  // If insufficient results, expand to 25km
-  if (leads.length < 15) {
-    elements = await overpass(aroundQuery(tags, needle, lat, lon, 25_000));
-    leads = elementsToLeads(elements, locLabel, skill, 150);
+  let leads = elementsToLeads(await overpass(tagQuery(tags, lat, lon, 12_000)), locLabel, skill, 150);
+  // If insufficient results, expand to 25km — but never blow the wall-clock.
+  if (leads.length < 15 && Date.now() - start < deadlineMs * 0.45) {
+    leads = elementsToLeads(
+      await overpass(tagQuery(tags, lat, lon, 25_000)),
+      locLabel,
+      skill,
+      150,
+    );
   }
-  // If still insufficient, try 50km for sparse regions
-  if (leads.length < 10) {
-    elements = await overpass(aroundQuery(tags, needle, lat, lon, 50_000));
-    leads = elementsToLeads(elements, locLabel, skill, 150);
+  // Still thin → separately-timeboxed name-regex sweep at 25km.
+  if (leads.length < 10 && needle && Date.now() - start < deadlineMs * 0.75) {
+    const extra = await Promise.race([
+      overpass(nameQuery(needle, lat, lon, 25_000)),
+      new Promise<any[]>((r) => setTimeout(() => r([]), 18_000)),
+    ]);
+    const merged = [...elementsToLeads(extra, locLabel, skill, 60), ...leads];
+    const seen = new Set<string>();
+    leads = merged.filter((l) => {
+      const k = (l.author || l.title).toLowerCase();
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
   }
   return leads;
 }

@@ -113,16 +113,15 @@ function phonesFromHtml(html: string): string[] {
     .slice(0, 5);
 }
 
-async function fetchHtmlViaScrapingBee(url: string): Promise<string> {
-  const key = (process.env.SCRAPINGBEE_API_KEY || "").trim();
-  if (!key) return "";
+/** Free JS-render fallback: Crawl4AI / stealth workers (self-hosted). Text is
+ *  wrapped in a minimal HTML shell so the regex/cheerio extractors still run. */
+async function fetchHtmlViaWorkers(url: string): Promise<string> {
   try {
-    const api =
-      `https://app.scrapingbee.com/api/v1/?api_key=${encodeURIComponent(key)}` +
-      `&url=${encodeURIComponent(url)}&render_js=false&premium_proxy=false`;
-    const res = await fetch(api, { signal: AbortSignal.timeout(20_000) });
-    if (!res.ok) return "";
-    return (await res.text()).slice(0, 400_000);
+    const { fetchPageContent } = await import("@/lib/search/page-enrichment.server");
+    const page = await fetchPageContent(url);
+    if (!page) return "";
+    const text = (page.text || page.markdown || "").trim();
+    return text ? `<html><body>${text.replace(/[<>]/g, " ")}</body></html>` : "";
   } catch {
     return "";
   }
@@ -147,9 +146,9 @@ async function fetchHtml(url: string): Promise<string> {
       }
     }
   } catch {
-    /* fall through to ScrapingBee */
+    /* fall through to self-hosted workers */
   }
-  return fetchHtmlViaScrapingBee(url);
+  return fetchHtmlViaWorkers(url);
 }
 
 function contactPaths(base: string): string[] {
