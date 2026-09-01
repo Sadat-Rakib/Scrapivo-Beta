@@ -185,15 +185,43 @@ function isValidImagePath(raw: unknown): raw is string {
   return PROFILE_IMAGE_RE.test(url) || url.startsWith("/") || /^https?:\/\//i.test(url);
 }
 
+const FIRM_LOGO_FILE_RE =
+  /(?:ventures?|capital|partners?|fund|vc|llc|inc|group|holdings|advisors?|management|\.ico|clearbit|favicon)/i;
+
+/** True when a stored image path on an individual record is likely a firm logo. */
+function looksLikeFirmLogoForPerson(
+  rec: InvestorEntity | InvestorRecord,
+  url: string,
+): boolean {
+  const r = asLoose(rec);
+  const file = url.split("/").pop()?.toLowerCase() ?? "";
+  const person = (r.name || "").toLowerCase();
+  const firm = String(r.firm_name || r.firm || "")
+    .toLowerCase()
+    .trim();
+  const personTokens = person.split(/\s+/).filter((t) => t.length > 2);
+  if (personTokens.some((t) => file.includes(t.replace(/[^a-z0-9]/g, "")))) return false;
+  if (firm) {
+    const firmSlug = firm.replace(/[^a-z0-9]+/g, "");
+    if (firmSlug.length >= 4 && file.replace(/[^a-z0-9]+/g, "").includes(firmSlug.slice(0, 10))) {
+      return true;
+    }
+  }
+  return FIRM_LOGO_FILE_RE.test(file);
+}
+
 /**
  * The record's usable profile image URL — `image_url` first, legacy
- * `links.image_url` fallback. Null when the record is not image-backed.
+ * `links.image_url` fallback. Individuals never show inferred firm logos.
  */
 export function investorImageUrl(rec: InvestorEntity | InvestorRecord): string | null {
   const r = asLoose(rec);
-  if (isValidImagePath(r.image_url)) return r.image_url.trim();
-  if (isValidImagePath(r.links?.image_url)) return (r.links.image_url as string).trim();
-  return null;
+  let url: string | null = null;
+  if (isValidImagePath(r.image_url)) url = r.image_url.trim();
+  else if (isValidImagePath(r.links?.image_url)) url = (r.links.image_url as string).trim();
+  if (!url) return null;
+  if (!isFirmRecord(rec) && looksLikeFirmLogoForPerson(rec, url)) return null;
+  return url;
 }
 
 /** True when the record carries a usable profile image path/URL. */

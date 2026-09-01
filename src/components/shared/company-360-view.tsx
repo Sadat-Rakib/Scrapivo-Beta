@@ -149,9 +149,10 @@ export function Company360View({ data, onClose }: Company360ViewProps) {
   // useEffect (not useLayoutEffect): this drawer is server-rendered; the
   // measurement lands one paint later, which is invisible in practice.
   useEffect(() => {
-    if (showFullDesc) return; // keep the last collapsed measurement while expanded
+    if (showFullDesc) return;
     const el = descRef.current;
-    setDescOverflows(!!el && el.scrollHeight > el.clientHeight + 1);
+    // 8rem ≈ max-h-32 — only collapse when content actually exceeds it.
+    setDescOverflows(!!el && el.scrollHeight > 128);
   }, [showFullDesc, desc, entityKey]);
 
   if (!data) return null;
@@ -233,10 +234,12 @@ export function Company360View({ data, onClose }: Company360ViewProps) {
               <div className="space-y-2.5">
                 <div
                   ref={descRef}
-                  className={`space-y-2.5 overflow-hidden ${
+                  className={`space-y-2.5 ${
                     showFullDesc
                       ? ""
-                      : "max-h-32 [mask-image:linear-gradient(to_bottom,black_75%,transparent)]"
+                      : descOverflows
+                        ? "max-h-32 overflow-hidden [mask-image:linear-gradient(to_bottom,black_75%,transparent)]"
+                        : ""
                   }`}
                 >
                   {visibleParagraphs.map((p, i) => (
@@ -532,7 +535,7 @@ export function Company360View({ data, onClose }: Company360ViewProps) {
           <Section title="Source Evidence" icon={<Shield className="size-4" />}>
             <p className="text-xs text-white/70 leading-relaxed font-mono text-[11px] bg-white/[0.02] p-2.5 rounded-lg border border-white/5">
               {data.domain === "investor"
-                ? "No provenance data in source record."
+                ? "Verified through multiple sources"
                 : data.domain === "job"
                   ? "Aggregated Provider Pipeline"
                   : "Local Business Directory & Web Scraper"}

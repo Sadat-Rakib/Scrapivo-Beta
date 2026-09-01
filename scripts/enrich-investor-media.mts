@@ -69,17 +69,32 @@ async function downloadTo(url: string, dest: string): Promise<boolean> {
   return true;
 }
 
-/** Candidate image URLs, best-first, per record. */
-function imageCandidates(r: Rec, domain: string | null): string[] {
+/** Candidate image URLs, best-first, per record. Firms → logos; people → headshots. */
+async function wikipediaThumb(name: string): Promise<string | null> {
+  if (!name || name.length < 3) return null;
+  const res = await fetchWithUa(
+    `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(name.replace(/\s+/g, "_"))}`,
+    8_000,
+  );
+  if (!res?.ok) return null;
+  try {
+    const data = (await res.json()) as { thumbnail?: { source?: string } };
+    return data.thumbnail?.source ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function imageCandidates(r: Rec, domain: string | null, isFirm: boolean): string[] {
   const links = (r.links ?? {}) as Rec;
   const out: string[] = [];
-  const name = str(r.name);
-  if (domain) {
+  if (isFirm && domain) {
     out.push(`https://logo.clearbit.com/${domain}`);
     out.push(`https://icons.duckduckgo.com/ip3/${domain}.ico`);
     out.push(`https://www.google.com/s2/favicons?domain=${domain}&sz=128`);
     out.push(`https://${domain}/favicon.ico`);
     out.push(`http://${domain}/favicon.ico`);
+    return out;
   }
   const email = str(r.email).toLowerCase();
   if (email) out.push(`https://www.gravatar.com/avatar/${md5(email)}?d=404&s=256`);
@@ -89,7 +104,6 @@ function imageCandidates(r: Rec, domain: string | null): string[] {
   if (gh) out.push(`https://unavatar.io/github/${gh.split("/").pop()}`);
   const li = str(links.linkedin);
   if (li) out.push(`https://unavatar.io/linkedin/${li.split("/").pop()}?fallback=false`);
-  void name;
   return out;
 }
 
@@ -212,7 +226,12 @@ async function enrichOne(r: Rec): Promise<void> {
   }
 
   let placed: string | null = null;
-  for (const cand of imageCandidates(r, domain)) {
+  const candidates = [...imageCandidates(r, domain, isFirm)];
+  if (!isFirm) {
+    const wiki = await wikipediaThumb(name);
+    if (wiki) candidates.unshift(wiki);
+  }
+  for (const cand of candidates) {
     const safeName = name.replace(/[\\/:*?"<>|]/g, "_").trim();
     const dest = resolve(PIC_DIR, `${safeName}.png`);
     if (await downloadTo(cand, dest)) {
@@ -222,7 +241,7 @@ async function enrichOne(r: Rec): Promise<void> {
   }
   if (placed) {
     (r as Record<string, unknown>).image_url = placed;
-    links.image_url_source = "validated-free-source";
+    links.image_url_source = isFirm ? "firm-logo" : "person-photo";
     imagesFound++;
   }
 

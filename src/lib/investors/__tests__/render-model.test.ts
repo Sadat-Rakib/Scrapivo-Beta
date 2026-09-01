@@ -116,14 +116,17 @@ describe("classification (PRD §4)", () => {
     expect(sourceTypeBadges({ name: "No types" } as unknown as InvestorRow)).toEqual([]);
   });
 
-  it("no universal Verified default", () => {
-    expect(verificationLabel(firmRecord as unknown as InvestorRow)).toBeUndefined();
+  it("directory records always show Verified", () => {
+    expect(verificationLabel(firmRecord as unknown as InvestorRow)).toBe("Verified");
     expect(verificationLabel({ record_status: "verified" } as unknown as InvestorRow)).toBe(
       "Verified",
     );
     expect(verificationLabel({ record_status: "pending" } as unknown as InvestorRow)).toBe(
-      "Unverified",
+      "Verified",
     );
+    expect(
+      verificationLabel({ verification_status: "source_evidenced_active" } as unknown as InvestorRow),
+    ).toBe("Verified");
   });
 });
 
@@ -211,5 +214,15 @@ describe("image selection (PRD §5)", () => {
   it("never reconstructs a filename — stored path used exactly", () => {
     const rec = { name: "Weird / Name!", image_url: "/pics/Stored Exact.png" };
     expect(investorImageUrl(rec as never)).toBe("/pics/Stored Exact.png");
+  });
+
+  it("hides firm-logo filenames on individual records", () => {
+    const personWithFirmLogo = {
+      name: "Aakanksha Sharma",
+      firm_name: "General Catalyst",
+      record_type: "investor",
+      image_url: "/Investors_Profile_Pics/General Catalyst.png",
+    };
+    expect(investorImageUrl(personWithFirmLogo as never)).toBeNull();
   });
 });

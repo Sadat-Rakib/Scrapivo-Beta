@@ -7,12 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Mail, Lock } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
-const LOGO_SRC =
-  "https://ytjbrwnwdlsituevqkys.supabase.co/storage/v1/object/public/Scrapivo%20Assets/unnamed__1_-removebg-preview.png";
+import heroLogoAsset from "@/assets/hero-logo.jpg";
+import authColumnsAsset from "@/assets/auth-columns.png";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -196,214 +196,185 @@ function AuthPage() {
     }
   };
 
-  const inputClass = "bg-white/10 border-white/15 text-white placeholder:text-white/40";
-  const inputErrorClass = "bg-white/10 border-red-400/60 text-white placeholder:text-white/40";
+  const inputClass = "bg-white/5 border-white/10 text-white placeholder:text-white/40 focus-visible:ring-1 focus-visible:ring-white/20";
+  const inputErrorClass = "bg-white/5 border-red-400/50 text-white placeholder:text-white/40 focus-visible:ring-1 focus-visible:ring-red-500/50";
 
   return (
-    <div
-      className="min-h-screen flex flex-col px-4 relative overflow-hidden"
-      style={{ background: "#050505", color: "#fff" }}
-    >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse at 50% 20%, rgba(191,238,255,.10), transparent 42%), radial-gradient(ellipse at 80% 80%, rgba(216,194,255,.06), transparent 40%)",
-        }}
-      />
-      <div className="pt-6 relative z-10">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-1.5 text-sm transition-colors"
-          style={{ color: "rgba(255,255,255,0.55)" }}
-        >
-          <ArrowLeft className="size-4" /> Back to home
-        </Link>
-      </div>
-      <div className="flex-1 flex items-center justify-center relative z-10 py-10">
-        <div
-          className="w-full max-w-sm rounded-[28px] p-8"
-          style={{
-            background: "rgba(255, 255, 255, 0.08)",
-            backdropFilter: "blur(32px) saturate(180%)",
-            WebkitBackdropFilter: "blur(32px) saturate(180%)",
-            border: "1px solid rgba(255, 255, 255, 0.15)",
-            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25)",
-          }}
-        >
-          <div className="flex items-center gap-2 justify-center mb-2">
-            <img src={LOGO_SRC} alt="" style={{ height: 36, width: "auto" }} />
-            <span
-              style={{
-                fontFamily: '"Instrument Serif", "Times New Roman", serif',
-                fontStyle: "italic",
-                fontSize: 28,
-                letterSpacing: "-0.04em",
-              }}
-            >
-              Scrapivo
-            </span>
+    <div className="h-screen w-screen flex items-center justify-center bg-[#050505] text-white relative overflow-hidden font-sans">
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: "radial-gradient(ellipse at 50% -20%, rgba(191,238,255,0.06), transparent 50%)"
+      }} />
+
+      <div className="w-full h-full flex flex-col md:flex-row bg-[#080808] relative z-10">
+        
+        {/* LEFT HALF (Form) */}
+        <div className="w-full md:w-[45%] lg:w-1/2 p-8 md:p-14 lg:p-20 flex flex-col h-full overflow-y-auto relative z-10 custom-scrollbar">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 text-sm text-white/50 hover:text-white/80 transition-colors mb-12"
+          >
+            <ArrowLeft className="size-4" /> Back to home
+          </Link>
+
+          <div className="flex items-center gap-2.5 mb-10 shrink-0">
+            <img src={heroLogoAsset} alt="" className="h-8 w-auto filter invert brightness-0 saturate-100 contrast-100 opacity-90 mix-blend-screen" />
+            <span className="font-['Instrument_Serif','Times_New_Roman',serif] italic text-[1.75rem] tracking-[-0.04em]">Scrapivo</span>
           </div>
-          <p
-            className="text-center mb-6"
-            style={{
-              fontFamily: '"Instrument Serif", serif',
-              fontStyle: "italic",
-              fontSize: 22,
-              color: "rgba(255,255,255,0.9)",
-            }}
-          >
-            Join the Inner Circle
-          </p>
-          <Tabs
-            value={tab}
-            onValueChange={(v) => setMode(v as "signin" | "signup")}
-            className="w-full"
-          >
-            <TabsList className="grid grid-cols-2 w-full bg-white/10 border border-white/10">
-              <TabsTrigger value="signin" className="data-[state=active]:bg-white/15">
-                Sign in
-              </TabsTrigger>
-              <TabsTrigger value="signup" className="data-[state=active]:bg-white/15">
-                Sign up
-              </TabsTrigger>
-            </TabsList>
 
-            <TabsContent value="signin" className="m-0 mt-6 space-y-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="signin-email" className="text-white/70">
-                  Email
-                </Label>
-                <Input
-                  id="signin-email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="you@gmail.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onBlur={() => setEmailTouched(true)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") void signIn();
-                  }}
-                  className={emailTouched && emailError ? inputErrorClass : inputClass}
-                />
-                {emailTouched && emailError ? (
-                  <p className="text-xs text-red-300">{emailError}</p>
-                ) : (
-                  <p className="text-xs text-white/40">Must include @domain, e.g. you@gmail.com</p>
-                )}
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="signin-password" className="text-white/70">
-                  Password
-                </Label>
-                <Input
-                  id="signin-password"
-                  type="password"
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") void signIn();
-                  }}
-                  className={inputClass}
-                />
-              </div>
-              <Button
-                className="w-full mt-2 bg-white text-black hover:bg-white/90"
-                disabled={loading || !emailOk || password.length < 6}
-                onClick={() => void signIn()}
-              >
-                {loading ? "Signing in…" : "Sign in"}
-              </Button>
-              <button
-                type="button"
-                className="w-full text-center text-xs text-white/45 hover:text-white/75 mt-1"
-                onClick={() => setMode("signup")}
-              >
-                Forgot password? Use Sign up to set a new one
-              </button>
-            </TabsContent>
+          <div className="relative bg-white/5 border border-white/10 p-1 rounded-full w-full max-w-[240px] mb-8 shrink-0 flex items-center">
+            <motion.div
+              className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white rounded-full pointer-events-none"
+              initial={false}
+              animate={{ left: tab === "signin" ? "4px" : "calc(50%)" }}
+              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+            />
+            <button
+              onClick={() => setMode("signin")}
+              className={`flex-1 text-sm font-medium py-1.5 z-10 text-center transition-colors ${tab === "signin" ? "text-black" : "text-white/70 hover:text-white"}`}
+            >
+              Sign in
+            </button>
+            <button
+              onClick={() => setMode("signup")}
+              className={`flex-1 text-sm font-medium py-1.5 z-10 text-center transition-colors ${tab === "signup" ? "text-black" : "text-white/70 hover:text-white"}`}
+            >
+              Sign up
+            </button>
+          </div>
 
-            <TabsContent value="signup" className="m-0 mt-6 space-y-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="signup-name" className="text-white/70">
-                  Your name
-                </Label>
-                <Input
-                  id="signup-name"
-                  type="text"
-                  autoComplete="name"
-                  placeholder="Your name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className={inputClass}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="signup-issue" className="text-white/70">
-                  What issue do you have finding leads?
-                </Label>
-                <Textarea
-                  id="signup-issue"
-                  rows={3}
-                  placeholder="What's your biggest frustration finding leads right now?"
-                  value={leadIssue}
-                  onChange={(e) => setLeadIssue(e.target.value)}
-                  className={`${inputClass} resize-none`}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="signup-email" className="text-white/70">
-                  Email
-                </Label>
-                <Input
-                  id="signup-email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="you@gmail.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onBlur={() => setEmailTouched(true)}
-                  className={emailTouched && emailError ? inputErrorClass : inputClass}
-                />
-                {emailTouched && emailError ? (
-                  <p className="text-xs text-red-300">{emailError}</p>
-                ) : (
-                  <p className="text-xs text-white/40">Must include @domain, e.g. you@gmail.com</p>
-                )}
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="signup-password" className="text-white/70">
-                  Password
-                </Label>
-                <Input
-                  id="signup-password"
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder="At least 6 characters"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") void signUp();
-                  }}
-                  className={inputClass}
-                />
-              </div>
-              <Button
-                className="w-full mt-2 bg-white text-black hover:bg-white/90"
-                disabled={
-                  loading || !name.trim() || !leadIssue.trim() || !emailOk || password.length < 6
-                }
-                onClick={() => void signUp()}
+          <div className="flex-1 flex flex-col">
+            <h2 className="text-3xl font-medium tracking-tight mb-8 shrink-0 font-['Times_New_Roman_MT_Condensed','Times_New_Roman',Times,serif]">
+              {tab === "signin" ? "Welcome back" : "Join the Inner Circle"}
+            </h2>
+
+            <AnimatePresence mode="popLayout" initial={false}>
+              <motion.div
+                key={tab}
+                initial={{ opacity: 0, x: tab === "signin" ? -20 : 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: tab === "signin" ? 20 : -20 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="space-y-4 shrink-0 flex flex-col"
               >
-                {loading ? "Joining…" : "Join Inner Circle"}
-              </Button>
-            </TabsContent>
-          </Tabs>
+                {tab === "signup" && (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="signup-name" className="text-white/70 text-sm">Your name</Label>
+                    <Input
+                      id="signup-name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Your name"
+                      className={inputClass}
+                    />
+                  </div>
+                )}
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="email" className="text-white/70 text-sm">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+                    <Input
+                      id="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      onBlur={() => setEmailTouched(true)}
+                      placeholder="hello@scrapivo.com"
+                      className={`${emailTouched && emailError ? inputErrorClass : inputClass} pl-10`}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          tab === "signin" ? void signIn() : void signUp();
+                        }
+                      }}
+                    />
+                  </div>
+                  {emailTouched && emailError && <p className="text-xs text-red-400 mt-1">{emailError}</p>}
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="password" className="text-white/70 text-sm">Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+                    <Input
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Your password"
+                      className={`${inputClass} pl-10`}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          tab === "signin" ? void signIn() : void signUp();
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {tab === "signup" && (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="signup-issue" className="text-white/70 text-sm">What issue do you have finding leads?</Label>
+                    <Textarea
+                      id="signup-issue"
+                      value={leadIssue}
+                      onChange={(e) => setLeadIssue(e.target.value)}
+                      placeholder="What's your biggest frustration finding leads right now?"
+                      rows={3}
+                      className={`${inputClass} resize-none min-h-[80px]`}
+                    />
+                  </div>
+                )}
+
+                <div className="pt-4 mt-auto">
+                  <Button
+                    onClick={tab === "signin" ? () => void signIn() : () => void signUp()}
+                    disabled={loading || (tab === "signup" ? (!name.trim() || !leadIssue.trim() || !emailOk || password.length < 6) : (!emailOk || password.length < 6))}
+                    className="w-full bg-white text-black hover:bg-white/90 font-semibold py-6 rounded-xl transition-transform active:scale-[0.98]"
+                  >
+                    {loading ? "Please wait..." : (tab === "signin" ? "Sign In" : "Create Account")}
+                  </Button>
+                </div>
+                
+                <div className="text-center mt-2 pb-4">
+                  <button
+                    type="button"
+                    onClick={() => setMode(tab === "signin" ? "signup" : "signin")}
+                    className="text-xs text-white/50 hover:text-white/90 transition-colors"
+                  >
+                    {tab === "signin" ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+                  </button>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
+
+        {/* RIGHT HALF (Columns Image) */}
+        <div className="hidden md:block md:w-[55%] lg:w-1/2 relative h-full bg-[#050505]">
+          <img 
+            src={authColumnsAsset} 
+            alt="" 
+            className="w-full h-full object-cover mix-blend-screen opacity-90" 
+          />
+          <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#080808] to-transparent pointer-events-none" />
+        </div>
+
       </div>
+
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.2);
+        }
+      `}</style>
       <link
         rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap"

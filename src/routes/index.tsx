@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { mySupabase } from "@/integrations/my-supabase/client";
-import { ScrapivoLanding } from "@/components/landing/ScrapivoLanding";
+import { HeroSection } from "@/components/landing/HeroSection";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -48,5 +48,5 @@ function Landing() {
   const cta = authed ? "/discover" : "/auth";
   const ctaLabel = authed ? "Open app" : "Get Started";
 
-  return <ScrapivoLanding cta={cta} ctaLabel={ctaLabel} />;
+  return <HeroSection cta={cta} ctaLabel={ctaLabel} />;
 }

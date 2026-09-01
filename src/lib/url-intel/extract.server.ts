@@ -100,6 +100,70 @@ function firstLink($: cheerio.CheerioAPI, re: RegExp): string | null {
   return out;
 }
 
+/** Open Graph / schema types that are not a real industry label. */
+const GENERIC_INDUSTRY = new Set([
+  "website",
+  "webpage",
+  "web page",
+  "web site",
+  "article",
+  "profile",
+  "organization",
+  "organisation",
+  "company",
+  "localbusiness",
+  "local business",
+  "product",
+  "unknown",
+  "blog",
+  "page",
+]);
+
+function isGenericIndustry(value: string | null | undefined): boolean {
+  if (!value?.trim()) return true;
+  return GENERIC_INDUSTRY.has(value.trim().toLowerCase());
+}
+
+function pickMeaningfulIndustry(...candidates: (string | null | undefined)[]): string | undefined {
+  for (const c of candidates) {
+    if (c?.trim() && !isGenericIndustry(c)) return c.trim();
+  }
+  return undefined;
+}
+
+function locationFromLocale(locale: string | null): string | null {
+  if (!locale) return null;
+  const parts = locale.replace(/-/g, "_").split("_");
+  if (parts.length >= 2 && parts[1].length === 2) {
+    const region = parts[1].toUpperCase();
+    const cityMap: Record<string, string> = {
+      US: "United States",
+      GB: "United Kingdom",
+      CA: "Canada",
+      AU: "Australia",
+      DE: "Germany",
+      FR: "France",
+      IN: "India",
+      SG: "Singapore",
+    };
+    return cityMap[region] ?? null;
+  }
+  return null;
+}
+
+function locationFromFooter($: cheerio.CheerioAPI): string | null {
+  const blob = $("footer, [class*='footer'], [id*='footer']")
+    .first()
+    .text()
+    .replace(/\s+/g, " ")
+    .slice(0, 2500);
+  if (!blob) return null;
+  const m = blob.match(
+    /\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2},\s*(?:[A-Z]{2}|[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?))\b/,
+  );
+  return m?.[1]?.trim() ?? null;
+}
+
 /** Deterministic profile from structured markup + contact links. */
 export function parseDeterministic(page: RawPage): Partial<WebsiteIntel> & { textLen: number } {
   const $ = cheerio.load(page.html);
@@ -131,9 +195,16 @@ export function parseDeterministic(page: RawPage): Partial<WebsiteIntel> & { tex
     $('[itemprop="description"]').first().text().trim() ||
     metaContent($, ['meta[name="description"]', 'meta[property="og:description"]']);
 
-  const industry =
-    metaContent($, ['meta[property="og:type"]', 'meta[name="industry"]']) ||
-    (typeof org?.["@type"] === "string" ? String(org["@type"]) : null);
+  const industry = pickMeaningfulIndustry(
+    metaContent($, ['meta[name="industry"]']),
+    typeof org?.industry === "string" ? String(org.industry) : null,
+    Array.isArray(org?.knowsAbout)
+      ? org.knowsAbout
+          .filter((k): k is string => typeof k === "string" && k.trim().length > 0)
+          .slice(0, 2)
+          .join(", ")
+      : null,
+  );
 
   const location =
     (() => {
@@ -147,7 +218,10 @@ export function parseDeterministic(page: RawPage): Partial<WebsiteIntel> & { tex
         if (parts.length) return parts.join(", ");
       }
       return null;
-    })() || metaContent($, ['meta[name="geo.region"]', 'meta[name="geo.placename"]']);
+    })() ||
+    metaContent($, ['meta[name="geo.region"]', 'meta[name="geo.placename"]']) ||
+    locationFromFooter($) ||
+    locationFromLocale(metaContent($, ['meta[property="og:locale"]']));
 
   const emails = new Set<string>();
   for (const m of page.html.matchAll(
@@ -186,7 +260,14 @@ export function parseDeterministic(page: RawPage): Partial<WebsiteIntel> & { tex
 
 // ── AI extraction with validation gate ─────────────────────────────────────
 
-const EXTRACT_SYSTEM = `You extract structured company/person/fund profiles from website content. Return ONLY a JSON object with these exact keys: name, kind ("company"|"person"|"fund"|"product"|"unknown"), industry, description (<=2 sentences), location, emails (array), phones (array), linkedin (URL or null), twitter (URL or null), github (URL or null), skills (array of up to 12 skill keywords found, for portfolios/resumes), sectors (array of up to 4 sector keywords), stage_hint (funding stage hint or null). Use ONLY facts present in the content — never invent values. Use null for unknown strings and [] for unknown arrays.`;
+const EXTRACT_SYSTEM = `You extract structured company/person/fund profiles from website content. Return ONLY a JSON object with these exact keys: name, kind ("company"|"person"|"fund"|"product"|"unknown"), industry, description (<=2 sentences), location, emails (array), phones (array), linkedin (URL or null), twitter (URL or null), github (URL or null), skills (array of up to 12 skill keywords found, for portfolios/resumes), sectors (array of up to 4 sector keywords), stage_hint (funding stage hint or null). Use ONLY facts present in the content — never invent values. Use null for unknown strings and [] for unknown arrays. Industry must describe what the business DOES (e.g. SaaS, AI lead generation, fintech) — NEVER "website", "web page", or "organization".`;
+
+const EXTRACT_VARIANT_HINT: Record<"jobs" | "local" | "investors", string> = {
+  jobs: " Focus on skills, roles, and experience evident in portfolio/resume content.",
+  local: " Focus on the business category, service area, and local market.",
+  investors:
+    " Focus on product sector, target market, and stage from the startup/fund copy — not the fact that it is a website.",
+};
 
 async function aiExtract(
   text: string,
@@ -200,6 +281,7 @@ async function aiExtract(
         task: "extract",
         system:
           EXTRACT_SYSTEM +
+          EXTRACT_VARIANT_HINT[variant as "jobs" | "local" | "investors"] +
           (attempt === 1
             ? " REMINDER: output must be a single valid JSON object matching the keys exactly; no prose."
             : ""),
@@ -221,17 +303,21 @@ async function aiExtract(
   return null;
 }
 
-/** Merge deterministic + AI layers; deterministic wins on conflicts. */
+/** Merge deterministic + AI layers; prefer meaningful industry/location over generic meta. */
 function mergeIntel(
   det: ReturnType<typeof parseDeterministic>,
   ai: WebsiteIntel | null,
 ): WebsiteIntel {
   const pick = <T>(a: T | undefined | null, b: T | undefined | null): T | null =>
     (a !== undefined && a !== null && a !== "" ? a : (b ?? null)) as T | null;
+
+  const industry =
+    pickMeaningfulIndustry(det.industry, ai?.industry, ai?.sectors?.[0]) ?? null;
+
   const base: WebsiteIntel = {
     name: pick(det.name, ai?.name),
     kind: ai?.kind ?? "unknown",
-    industry: pick(det.industry, ai?.industry),
+    industry,
     description: pick(det.description, ai?.description),
     location: pick(det.location, ai?.location),
     emails: det.emails?.length ? det.emails : (ai?.emails ?? []),
@@ -240,7 +326,7 @@ function mergeIntel(
     twitter: pick(det.twitter, ai?.twitter),
     github: pick(det.github, ai?.github),
     skills: ai?.skills ?? [],
-    sectors: ai?.sectors ?? [],
+    sectors: ai?.sectors?.length ? ai.sectors : [],
     stage_hint: ai?.stage_hint ?? null,
   };
   return WebsiteIntelSchema.parse(base);

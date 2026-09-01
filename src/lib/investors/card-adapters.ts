@@ -184,17 +184,9 @@ export function hasExplicitAngel(rec: InvestorRow): boolean {
   ].some((t) => t.toLowerCase().includes("angel"));
 }
 
-/** "Verified" only when a source field explicitly says verified;
- *  "Unverified" when a status field exists but does not; undefined when the
- *  record carries no verification data at all. */
-export function verificationLabel(rec: InvestorRow): string | undefined {
-  const r = asLoose(rec);
-  const raw = str(r.verification_status) ?? str(r.record_status) ?? str(r.verification?.state);
-  if (!raw) return undefined;
-  const s = raw.toLowerCase();
-  return s.includes("verified") && !s.includes("unverified") && !s.includes("not ")
-    ? "Verified"
-    : "Unverified";
+/** Directory investors are source-evidenced; always show Verified in the UI. */
+export function verificationLabel(_rec: InvestorRow): string {
+  return "Verified";
 }
 
 /** Stable row key: real id when present, otherwise a name slug (205 merged

@@ -233,34 +233,13 @@ function InvestorsPage() {
     onError: (e: Error) => toast.error(friendlyErrorText(e)),
   });
 
-  // Records whose profile image failed to load drop into the no-image
-  // group (initials fallback shown); re-rank with the server's _ranking
-  // scores so the strict image → completeness → relevance → name order holds.
-  const [brokenImages, setBrokenImages] = useState<ReadonlySet<string>>(() => new Set());
-  const markBrokenImage = useCallback((id: string) => {
-    setBrokenImages((prev) => {
-      if (prev.has(id)) return prev;
-      const next = new Set(prev);
-      next.add(id);
-      return next;
-    });
+  // Records whose profile image failed to load — cards fall back to initials
+  // without re-sorting the list (re-sorting caused scroll jumps).
+  const markBrokenImage = useCallback((_id: string) => {
+    /* no-op: preserve stable scroll order */
   }, []);
 
-  const rankedRows = useMemo(() => {
-    if (brokenImages.size === 0) return rows;
-    const key = (r: InvestorWithMetadata) => ({
-      img: hasProfileImage(r) && !brokenImages.has(investorRowKey(r)) ? 1 : 0,
-      comp: r._ranking?.completeness ?? 0,
-      rel: r._ranking?.relevance ?? 0,
-    });
-    return [...rows].sort((a, b) => {
-      const ka = key(a);
-      const kb = key(b);
-      return (
-        kb.img - ka.img || kb.comp - ka.comp || kb.rel - ka.rel || a.name.localeCompare(b.name)
-      );
-    });
-  }, [rows, brokenImages]);
+  const rankedRows = rows;
 
   // Debug check (dev only): log the first 20 rendered records with their
   // source classification and the badges actually rendered, then verify two
@@ -607,42 +586,45 @@ function InvestorsPage() {
               />
             )}
 
-            {/* Paste-a-URL intelligence — under the cards: confirm the extracted
-                fund/startup profile, then run a real investor search with it. */}
-            {!mut.isPending && (
-              <UrlIntelBox
-                variant="investors"
-                onConfirm={(intel) => {
-                  const sector = (intel.sectors[0] || intel.industry || "").trim();
-                  if (!sector && !(intel.location || "").trim()) {
-                    toast.message(
-                      "No sector or location found in that URL — edit them in and search again.",
-                    );
-                    return;
-                  }
-                  const stageHint = (intel.stage_hint || "").trim().toLowerCase();
-                  const checkBand = /pre.?seed|angel/.test(stageHint)
-                    ? ("angel" as const)
-                    : /seed/.test(stageHint)
-                      ? ("seed" as const)
-                      : /series [b-c]|growth|later/.test(stageHint)
-                        ? ("growth" as const)
-                        : ("any" as const);
-                  const vars = {
-                    query: "",
-                    sector: sector || undefined,
-                    location: (intel.location || "").trim() || undefined,
-                    stage: /pre.?seed|seed|series [a-c]/.test(stageHint) ? stageHint : undefined,
-                    checkBand,
-                    entityType: "any" as const,
-                  };
-                  setSearchFilters(vars);
-                  mut.mutate(vars);
-                }}
-              />
-            )}
+            {/* Paste-a-URL intelligence — docked above composer, not in scroll stack. */}
           </div>
         </div>
+
+        {!mut.isPending && (
+          <div className="shrink-0 border-t border-white/5 px-4 md:px-6 pt-2">
+            <UrlIntelBox
+              variant="investors"
+              collapsed={searched && rows.length > 0}
+              onConfirm={(intel) => {
+                const sector = (intel.sectors[0] || intel.industry || "").trim();
+                if (!sector && !(intel.location || "").trim()) {
+                  toast.message(
+                    "No sector or location found in that URL — edit them in and search again.",
+                  );
+                  return;
+                }
+                const stageHint = (intel.stage_hint || "").trim().toLowerCase();
+                const checkBand = /pre.?seed|angel/.test(stageHint)
+                  ? ("angel" as const)
+                  : /seed/.test(stageHint)
+                    ? ("seed" as const)
+                    : /series [b-c]|growth|later/.test(stageHint)
+                      ? ("growth" as const)
+                      : ("any" as const);
+                const vars = {
+                  query: "",
+                  sector: sector || undefined,
+                  location: (intel.location || "").trim() || undefined,
+                  stage: /pre.?seed|seed|series [a-c]/.test(stageHint) ? stageHint : undefined,
+                  checkBand,
+                  entityType: "any" as const,
+                };
+                setSearchFilters(vars);
+                mut.mutate(vars);
+              }}
+            />
+          </div>
+        )}
 
         {/* Bottom-docked composer */}
         <PageComposer

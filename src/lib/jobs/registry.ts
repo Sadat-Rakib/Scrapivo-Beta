@@ -24,14 +24,27 @@ const RELAXATION_TIERS: { label: string; relax: FilterRelaxation[] }[] = [
   { label: "employment type", relax: ["seniority", "query", "location", "employment"] },
 ];
 
+/** Intern + role queries widen title matching before seniority distortion. */
+const INTERN_RELAXATION_TIERS: { label: string; relax: FilterRelaxation[] }[] = [
+  { label: "", relax: [] },
+  { label: "role match", relax: ["query"] },
+  { label: "seniority", relax: ["query", "seniority"] },
+  { label: "location", relax: ["query", "seniority", "location"] },
+  { label: "employment type", relax: ["query", "seniority", "location", "employment"] },
+];
+
 export function filterJobsWithFallback(
   deduped: JobPosting[],
   filters: JobSearchFilters,
 ): { jobs: JobPosting[]; relaxed: string[] } {
+  const tiers =
+    filters.seniority?.trim().toLowerCase() === "intern"
+      ? INTERN_RELAXATION_TIERS
+      : RELAXATION_TIERS;
   let lastPass: JobPosting[] = [];
   let lastLabel = "";
   const applied: string[] = [];
-  for (const tier of RELAXATION_TIERS) {
+  for (const tier of tiers) {
     const pass = deduped.filter((j) => matchesJobFilters(j, filters, tier.relax));
     if (pass.length >= MIN_RESULTS) {
       return {

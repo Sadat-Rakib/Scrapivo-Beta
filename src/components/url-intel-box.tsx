@@ -67,11 +67,15 @@ function Pill({ text }: { text: string }) {
 export function UrlIntelBox({
   variant,
   onConfirm,
+  collapsed = false,
 }: {
   variant: "jobs" | "local" | "investors";
   onConfirm: (intel: UrlIntel) => void;
+  /** When true, show a compact toggle until the user opens the extractor. */
+  collapsed?: boolean;
 }) {
   const extractFn = useServerFn(extractWebsiteIntelFn);
+  const [open, setOpen] = useState(!collapsed);
   const [url, setUrl] = useState("");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
@@ -123,6 +127,19 @@ export function UrlIntelBox({
   };
 
   // ── Step A: paste URL ────────────────────────────────────────────────────
+  if (collapsed && !open && !intel) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-medium text-white/60 hover:bg-white/[0.05] hover:text-white/80"
+      >
+        <Link2 className="size-3.5" />
+        Extract from URL
+      </button>
+    );
+  }
+
   if (!intel) {
     return (
       <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">

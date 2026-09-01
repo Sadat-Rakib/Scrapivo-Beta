@@ -128,7 +128,7 @@ function LocalBusinessesPage() {
     const nextCategory = (answers?.category ?? parsed.category ?? "").trim();
     const nextLocation = (answers?.location ?? parsed.location ?? "").trim();
     if (nextCategory.length < 2 || nextLocation.length < 2) return;
-    const rawCount = answers?.count ?? "any";
+    const rawCount = answers?.count ?? (parsed.count != null ? String(parsed.count) : "any");
     const rawOpportunity = answers?.opportunity ?? "any";
     setCategory(nextCategory);
     setLocation(nextLocation);
@@ -136,7 +136,7 @@ function LocalBusinessesPage() {
     mut.mutate({
       category: nextCategory,
       location: nextLocation,
-      requirement: (answers?.requirement ?? "contact") as BusinessSearchVars["requirement"],
+      requirement: (answers?.requirement ?? "any") as BusinessSearchVars["requirement"],
       opportunity: (OPPORTUNITY_VALUES.includes(rawOpportunity as OpportunityTag)
         ? rawOpportunity
         : "any") as BusinessSearchVars["opportunity"],
@@ -507,35 +507,38 @@ function LocalBusinessesPage() {
               />
             )}
 
-            {/* Paste-a-URL intelligence — under the cards: confirm the extracted
-                profile, then run a real businesses search with it. */}
-            {!mut.isPending && (
-              <UrlIntelBox
-                variant="local"
-                onConfirm={(intel) => {
-                  const category = (intel.industry || intel.sectors[0] || intel.name || "").trim();
-                  const location = (intel.location || "").trim();
-                  if (category.length < 2 || location.length < 2) {
-                    toast.message(
-                      "Need both an industry and a location from that URL — edit them in and search again.",
-                    );
-                    return;
-                  }
-                  setCategory(category);
-                  setLocation(location);
-                  mut.mutate({
-                    category,
-                    location,
-                    requirement: "contact",
-                    opportunity: "any",
-                    count: null,
-                    service: "",
-                  });
-                }}
-              />
-            )}
+            {/* Paste-a-URL intelligence — docked above composer. */}
           </div>
         </div>
+
+        {!mut.isPending && (
+          <div className="shrink-0 border-t border-white/5 px-4 md:px-6 pt-2">
+            <UrlIntelBox
+              variant="local"
+              collapsed={rows.length > 0}
+              onConfirm={(intel) => {
+                const category = (intel.industry || intel.sectors[0] || intel.name || "").trim();
+                const location = (intel.location || "").trim();
+                if (category.length < 2 || location.length < 2) {
+                  toast.message(
+                    "Need both an industry and a location from that URL — edit them in and search again.",
+                  );
+                  return;
+                }
+                setCategory(category);
+                setLocation(location);
+                mut.mutate({
+                  category,
+                  location,
+                  requirement: "any",
+                  opportunity: "any",
+                  count: null,
+                  service: "",
+                });
+              }}
+            />
+          </div>
+        )}
 
         {/* Bottom-docked composer */}
         <PageComposer

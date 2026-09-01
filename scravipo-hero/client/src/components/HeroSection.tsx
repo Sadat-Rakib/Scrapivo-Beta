@@ -1,0 +1,1819 @@
+import { useState } from "react";
+
+/**
+ * Scravipo visual direction: dark editorial monument.
+ * Preserve the reference's graphite texture, chalk-ivory Times New Roman MT Condensed-style
+ * headline, compact frosted nav, asymmetric statue crop, and restrained tactile motion.
+ */
+
+const statueAsset = "/manus-storage/image-removebg-preview(7)_61322290.png";
+const textureAsset = "/manus-storage/scravipo-charcoal-texture_a48f9559.jpg";
+const brandMarkAsset = "/manus-storage/scravipo-mark_fcd2bf4f.png";
+const favicon = (domain: string) => `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+
+const navItems = [
+  { label: "Home", href: "#home" },
+  { label: "About", href: "#about" },
+  { label: "How it Works", href: "#how-it-works" },
+  { label: "Pricing", href: "#pricing" },
+];
+
+type DashboardCategory = "Investor" | "Local Business" | "Company" | "Person" | "Venture Capital";
+
+type LeadRecord = {
+  id: string;
+  name: string;
+  secondary: string;
+  initials: string;
+  image?: string;
+  imageAlt?: string;
+  fields: Record<string, string>;
+  tags?: string[];
+};
+
+type CategoryConfig = {
+  title: string;
+  subtitle: string;
+  columns: { key: string; label: string }[];
+  rows: LeadRecord[];
+};
+
+const dashboardConfigs: Record<DashboardCategory, CategoryConfig> = {
+  Investor: {
+    title: "Investors",
+    subtitle: "High-intent investor leads",
+    columns: [
+      { key: "name", label: "Investor / Firm" },
+      { key: "location", label: "Location" },
+      { key: "phone", label: "Public phone / route" },
+      { key: "email", label: "Public email / route" },
+      { key: "checkSize", label: "Check size" },
+      { key: "sectors", label: "Sectors" },
+    ],
+    rows: [
+      { id: "investor-1", name: "Alfred Lin", secondary: "Partner · Sequoia Capital", initials: "AL", image: "https://framerusercontent.com/images/qN8j54q8Vi2GA6Fqt0OG8fQSJw.webp?width=880&height=880", imageAlt: "Alfred Lin", fields: { location: "San Francisco, CA", phone: "Firm directory", email: "Early-AL@sequoiacap.com", checkSize: "$1M–$25M" }, tags: ["Consumer", "SaaS"] },
+      { id: "investor-2", name: "Aileen Lee", secondary: "Founder · Cowboy Ventures", initials: "AL", image: "https://cdn.prod.website-files.com/637b82f903cd694c0b0f7546/63ce452d8de9f286395dac25_Aileen_profile_pic.webp", imageAlt: "Aileen Lee", fields: { location: "Palo Alto, CA", phone: "Firm directory", email: "hello@cowboy.vc", checkSize: "$250K–$5M" }, tags: ["Enterprise", "Seed"] },
+      { id: "investor-3", name: "Josh Kopelman", secondary: "Partner · First Round", initials: "JK", image: "https://cdn.sanity.io/images/m6i10uln/production/eb12eb2d830fd3e3b118a6c326d0d1692003c4d4-1024x1256.png?fm=webp&w=3840&q=80", imageAlt: "Josh Kopelman", fields: { location: "Philadelphia, PA", phone: "Firm directory", email: "First Round contact", checkSize: "$100K–$20M" }, tags: ["AI", "B2B"] },
+      { id: "investor-4", name: "Sarah Tavel", secondary: "General Partner · Benchmark", initials: "ST", image: favicon("benchmark.com"), imageAlt: "Benchmark official mark", fields: { location: "San Francisco, CA", phone: "Firm directory", email: "Benchmark contact", checkSize: "$1M–$25M" }, tags: ["Marketplaces", "Fintech"] },
+    ],
+  },
+  "Local Business": {
+    title: "Local Businesses",
+    subtitle: "Businesses discovered across global markets",
+    columns: [
+      { key: "name", label: "Business" },
+      { key: "location", label: "Location" },
+      { key: "category", label: "Category" },
+      { key: "phone", label: "Phone" },
+      { key: "email", label: "Email" },
+      { key: "website", label: "Website" },
+    ],
+    rows: [
+      { id: "business-1", name: "Blue Bottle Coffee", secondary: "Specialty coffee", initials: "BB", image: favicon("bluebottlecoffee.com"), imageAlt: "Blue Bottle Coffee official mark", fields: { location: "San Francisco, US", category: "Cafe", phone: "+1 (510) 661-3510", email: "support@bluebottlecoffee.com", website: "bluebottlecoffee.com" }, tags: ["Verified"] },
+      { id: "business-2", name: "Monocle Café", secondary: "Independent hospitality", initials: "MC", image: favicon("monocle.com"), imageAlt: "Monocle official mark", fields: { location: "London, UK", category: "Cafe", phone: "+44 20 7135 2040", email: "ma@monocle.com", website: "monocle.com" }, tags: ["Verified"] },
+      { id: "business-3", name: "Borough Market", secondary: "Food market & traders", initials: "BM", image: favicon("boroughmarket.org.uk"), imageAlt: "Borough Market official mark", fields: { location: "London, UK", category: "Market", phone: "020 7407 1002", email: "info@boroughmarket.org.uk", website: "boroughmarket.org.uk" }, tags: ["Verified"] },
+      { id: "business-4", name: "The Hoxton Paris", secondary: "Design-led hospitality", initials: "HP", image: favicon("thehoxton.com"), imageAlt: "The Hoxton official mark", fields: { location: "Paris, France", category: "Hotel", phone: "+33 1 85 65 75 00", email: "hello.paris@thehox.com", website: "thehoxton.com" }, tags: ["Verified"] },
+    ],
+  },
+  Company: {
+    title: "Companies",
+    subtitle: "Company intelligence & prospecting",
+    columns: [
+      { key: "name", label: "Company" },
+      { key: "hq", label: "HQ" },
+      { key: "industry", label: "Industry" },
+      { key: "size", label: "Size" },
+      { key: "email", label: "Public email / route" },
+      { key: "website", label: "Website" },
+    ],
+    rows: [
+      { id: "company-1", name: "OpenAI", secondary: "Artificial intelligence", initials: "OA", image: favicon("openai.com"), imageAlt: "OpenAI official mark", fields: { hq: "San Francisco, US", industry: "AI", size: "Enterprise", email: "legal@openai.com", website: "openai.com" }, tags: ["High"] },
+      { id: "company-2", name: "Stripe", secondary: "Financial infrastructure", initials: "ST", image: favicon("stripe.com"), imageAlt: "Stripe official mark", fields: { hq: "San Francisco, US", industry: "Fintech", size: "Enterprise", email: "Stripe newsroom", website: "stripe.com" }, tags: ["Verified"] },
+      { id: "company-3", name: "Linear", secondary: "Product development software", initials: "LI", image: favicon("linear.app"), imageAlt: "Linear official mark", fields: { hq: "San Francisco, US", industry: "SaaS", size: "Growth", email: "hello@linear.app", website: "linear.app" }, tags: ["Product"] },
+      { id: "company-4", name: "Vanta", secondary: "Trust management platform", initials: "VA", image: favicon("vanta.com"), imageAlt: "Vanta official mark", fields: { hq: "San Francisco, US", industry: "Security", size: "Growth", email: "support@vanta.com", website: "vanta.com" }, tags: ["Security"] },
+    ],
+  },
+  Person: {
+    title: "People",
+    subtitle: "Decision makers & professional contacts",
+    columns: [
+      { key: "name", label: "Person" },
+      { key: "title", label: "Title" },
+      { key: "company", label: "Company" },
+      { key: "location", label: "Location" },
+      { key: "phone", label: "Phone" },
+      { key: "email", label: "Email" },
+    ],
+    rows: [
+      { id: "person-1", name: "Dario Amodei", secondary: "Chief executive officer", initials: "DA", image: favicon("anthropic.com"), imageAlt: "Anthropic official mark", fields: { title: "CEO", company: "Anthropic", location: "San Francisco, US", phone: "Anthropic newsroom", email: "press@anthropic.com" }, tags: ["Verified"] },
+      { id: "person-2", name: "Brian Chesky", secondary: "Co-founder & CEO", initials: "BC", image: "https://news.airbnb.com/wp-content/uploads/sites/4/2016/10/Brian-Chesky-Headshot-IR-Crop-Airbnb-2.jpg?w=624", imageAlt: "Brian Chesky", fields: { title: "CEO", company: "Airbnb", location: "San Francisco, US", phone: "Airbnb newsroom", email: "contact.press@airbnb.com" }, tags: ["Leadership"] },
+      { id: "person-3", name: "Jensen Huang", secondary: "Founder & CEO", initials: "JH", image: "https://iprsoftwaremedia.com/219/files/202604/f0e9efa72f909f3f08cdd0a48ff92880/69e6b9293d633260eec67804_jensen-1920x1920/jensen-1920x1920_6a7e6ad5-c215-4503-b70d-fe6e5e9de205-prv.jpg?v=6a7e6ad5-c215-4503-b70d-fe6e5e9de205", imageAlt: "Jensen Huang", fields: { title: "CEO", company: "NVIDIA", location: "Santa Clara, US", phone: "+1 (408) 486-2000", email: "info@nvidia.com" }, tags: ["Leadership"] },
+      { id: "person-4", name: "Melanie Perkins", secondary: "Co-founder & CEO", initials: "MP", image: favicon("canva.com"), imageAlt: "Canva official mark", fields: { title: "CEO", company: "Canva", location: "Sydney, AU", phone: "Canva newsroom", email: "comms@canva.com" }, tags: ["Design"] },
+    ],
+  },
+  "Venture Capital": {
+    title: "Venture Capital",
+    subtitle: "VC firms, funds & investment organizations",
+    columns: [
+      { key: "name", label: "VC firm" },
+      { key: "location", label: "Location" },
+      { key: "stage", label: "Stage" },
+      { key: "sectors", label: "Sectors" },
+      { key: "website", label: "Website" },
+      { key: "email", label: "Email / route" },
+    ],
+    rows: [
+      { id: "vc-1", name: "Accel", secondary: "Global venture firm", initials: "AC", image: favicon("accel.com"), imageAlt: "Accel official mark", fields: { location: "Palo Alto, US", stage: "Seed–Growth", website: "accel.com", email: "Accel contact form", phone: "+1 650 614 4800" }, tags: ["Enterprise", "AI"] },
+      { id: "vc-2", name: "Index Ventures", secondary: "Technology investor", initials: "IV", image: favicon("indexventures.com"), imageAlt: "Index Ventures official mark", fields: { location: "London, UK", stage: "Seed–Growth", website: "indexventures.com", email: "press@indexventures.com", phone: "+44 20 7154 2020" }, tags: ["Fintech", "SaaS"] },
+      { id: "vc-3", name: "General Catalyst", secondary: "Transformation investor", initials: "GC", image: favicon("generalcatalyst.com"), imageAlt: "General Catalyst official mark", fields: { location: "Cambridge, US", stage: "Early–Growth", website: "generalcatalyst.com", email: "General Catalyst contact form", phone: "+1 415 659 5000" }, tags: ["Healthcare", "AI"] },
+      { id: "vc-4", name: "Bessemer Venture Partners", secondary: "Cloud & technology investor", initials: "BV", image: favicon("bvp.com"), imageAlt: "Bessemer Venture Partners official mark", fields: { location: "Menlo Park, US", stage: "Seed–Growth", website: "bvp.com", email: "Bessemer contact form", phone: "Firm directory" }, tags: ["Cloud", "Security"] },
+    ],
+  },
+};
+
+export default function HeroSection() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<DashboardCategory>("Investor");
+  const [query, setQuery] = useState("");
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+
+  const activeConfig = dashboardConfigs[activeCategory];
+  const visibleRows = activeConfig.rows.filter((row) => {
+    const searchable = [row.name, row.secondary, ...Object.values(row.fields), ...(row.tags ?? [])].join(" ").toLowerCase();
+    return searchable.includes(query.trim().toLowerCase());
+  });
+  const allVisibleSelected = visibleRows.length > 0 && visibleRows.every((row) => selectedRows.includes(row.id));
+
+  const toggleRow = (id: string) => {
+    setSelectedRows((current) => current.includes(id) ? current.filter((rowId) => rowId !== id) : [...current, id]);
+  };
+
+  const toggleAllVisible = () => {
+    setSelectedRows((current) => {
+      if (allVisibleSelected) return current.filter((id) => !visibleRows.some((row) => row.id === id));
+      return Array.from(new Set([...current, ...visibleRows.map((row) => row.id)]));
+    });
+  };
+
+  const handleBackToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  return (
+    <>
+      <section className="scravipo-hero" id="home" aria-label="Scravipo hero section">
+      <div className="scravipo-hero__texture" aria-hidden="true" />
+      <div className="scravipo-hero__vignette" aria-hidden="true" />
+      <div className="scravipo-hero__grain" aria-hidden="true" />
+
+      <header className="scravipo-nav-wrap">
+        <nav className="scravipo-nav" aria-label="Primary navigation">
+          <a className="scravipo-brand" href="#home" aria-label="Scravipo home">
+            <img className="scravipo-brand__mark" src={brandMarkAsset} alt="" aria-hidden="true" />
+            <span>Scravipo</span>
+          </a>
+
+          <div className="scravipo-nav__links" aria-label="Desktop links">
+            {navItems.map((item) => (
+              <a key={item.href} href={item.href}>
+                {item.label}
+              </a>
+            ))}
+          </div>
+
+          <a className="scravipo-join scravipo-join--nav" href="#join">
+            Join
+          </a>
+
+          <button
+            className="scravipo-menu-toggle"
+            type="button"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            <span />
+            <span />
+          </button>
+        </nav>
+
+        <div className={`scravipo-mobile-menu${menuOpen ? " is-open" : ""}`}>
+          {navItems.map((item) => (
+            <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)}>
+              {item.label}
+            </a>
+          ))}
+          <a href="#join" onClick={() => setMenuOpen(false)}>
+            Join
+          </a>
+        </div>
+      </header>
+
+      <img className="scravipo-statue" src={statueAsset} alt="" aria-hidden="true" />
+
+      <main className="scravipo-hero__content">
+        <p className="scravipo-eyebrow">Scravipo</p>
+        <h1>
+          <span>Get</span>
+          <span>Opportunities</span>
+          <span>that matter</span>
+        </h1>
+        <p className="scravipo-description">
+          Scravipo turns live web signals into verified business
+          <br className="scravipo-description__desktop-break" /> opportunities; clients, talent, and deals worth pursuing.
+        </p>
+        <p className="scravipo-signals" aria-label="Real-time signals, verified contacts, no random leads">
+          <span>Real-time signals</span>
+          <i aria-hidden="true">·</i>
+          <span>Verified contacts</span>
+          <i aria-hidden="true">·</i>
+          <span>No random leads</span>
+        </p>
+        <a className="scravipo-join scravipo-join--hero" href="#join">
+          Join
+        </a>
+      </main>
+
+      <span className="scravipo-scratch" aria-hidden="true" />
+
+      <style>{`
+        .scravipo-hero {
+          --chalk: #f3f1ec;
+          --muted-chalk: rgba(243, 241, 236, 0.74);
+          --quiet-chalk: rgba(243, 241, 236, 0.46);
+          --charcoal: #0d0d0f;
+          position: relative;
+          isolation: isolate;
+          min-height: 100svh;
+          overflow: hidden;
+          background: #0d0d0f;
+          color: var(--chalk);
+          font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .scravipo-hero,
+        .scravipo-hero * {
+          box-sizing: border-box;
+        }
+
+        .scravipo-hero a,
+        .scravipo-hero button {
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        .scravipo-hero__texture,
+        .scravipo-hero__vignette,
+        .scravipo-hero__grain {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+
+        .scravipo-hero__texture {
+          z-index: -4;
+          background-image: url('${textureAsset}');
+          background-position: center;
+          background-size: cover;
+          opacity: 0.34;
+          filter: grayscale(1) contrast(1.08) brightness(0.52);
+        }
+
+        .scravipo-hero__vignette {
+          z-index: -3;
+          background:
+            radial-gradient(circle at 49% 44%, rgba(18, 18, 20, 0.08) 0%, rgba(8, 8, 10, 0.38) 48%, rgba(4, 4, 5, 0.92) 100%),
+            linear-gradient(90deg, rgba(5, 5, 7, 0.66) 0%, rgba(10, 10, 12, 0.24) 59%, rgba(5, 5, 6, 0.24) 100%);
+        }
+
+        .scravipo-hero__grain {
+          z-index: -2;
+          opacity: 0.22;
+          mix-blend-mode: screen;
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.86' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.13'/%3E%3C/svg%3E");
+          background-size: 220px 220px;
+        }
+
+        .scravipo-nav-wrap {
+          position: relative;
+          z-index: 5;
+          padding: clamp(1.25rem, 3.1vw, 3.15rem) clamp(1rem, 6vw, 5.5rem) 0;
+        }
+
+        .scravipo-nav {
+          display: grid;
+          grid-template-columns: minmax(160px, 1fr) auto minmax(160px, 1fr);
+          align-items: center;
+          min-height: 3.5rem;
+          padding: 0.65rem 1.25rem 0.65rem 1.55rem;
+          border: 1px solid rgba(255, 255, 255, 0.055);
+          border-radius: 0.92rem;
+          background: rgba(28, 28, 31, 0.67);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035), 0 1.4rem 4rem rgba(0, 0, 0, 0.15);
+          backdrop-filter: blur(18px);
+          -webkit-backdrop-filter: blur(18px);
+          animation: scravipo-rise 0.72s cubic-bezier(0.23, 1, 0.32, 1) both;
+        }
+
+        .scravipo-brand {
+          display: inline-flex;
+          align-items: center;
+          justify-self: start;
+          gap: 0.56rem;
+          color: var(--chalk);
+          font-family: Georgia, "Times New Roman", serif;
+          font-size: 0.94rem;
+          font-weight: 600;
+          letter-spacing: -0.045em;
+          text-decoration: none;
+        }
+
+        .scravipo-brand__mark {
+          width: 1.32rem;
+          height: 1.32rem;
+          object-fit: contain;
+          filter: brightness(0) invert(1);
+        }
+
+        .scravipo-nav__links {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: clamp(1.8rem, 3.8vw, 4rem);
+        }
+
+        .scravipo-nav__links a,
+        .scravipo-mobile-menu a {
+          color: rgba(243, 241, 236, 0.86);
+          font-size: 0.72rem;
+          font-weight: 500;
+          letter-spacing: -0.01em;
+          text-decoration: none;
+          transition: color 160ms ease-out, transform 160ms ease-out;
+        }
+
+        .scravipo-nav__links a:hover,
+        .scravipo-mobile-menu a:hover {
+          color: var(--chalk);
+          transform: translateY(-1px);
+        }
+
+        .scravipo-join {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border: 0;
+          border-radius: 0.56rem;
+          background: var(--chalk);
+          color: #111113;
+          font-family: Arial, Helvetica, sans-serif;
+          font-size: 0.72rem;
+          font-weight: 600;
+          line-height: 1;
+          text-decoration: none;
+          transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), background-color 160ms ease-out, box-shadow 160ms ease-out;
+        }
+
+        .scravipo-join:hover {
+          background: #fffefa;
+          box-shadow: 0 0.4rem 1.25rem rgba(243, 241, 236, 0.12);
+          transform: translateY(-1px);
+        }
+
+        .scravipo-join:active {
+          transform: scale(0.97);
+        }
+
+        .scravipo-join:focus-visible,
+        .scravipo-brand:focus-visible,
+        .scravipo-nav__links a:focus-visible,
+        .scravipo-mobile-menu a:focus-visible,
+        .scravipo-menu-toggle:focus-visible {
+          outline: 2px solid var(--chalk);
+          outline-offset: 4px;
+        }
+
+        .scravipo-join--nav {
+          justify-self: end;
+          width: 3.85rem;
+          height: 2rem;
+        }
+
+        .scravipo-menu-toggle {
+          display: none;
+          width: 2.5rem;
+          height: 2.5rem;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          gap: 0.34rem;
+          border: 1px solid rgba(243, 241, 236, 0.16);
+          border-radius: 0.5rem;
+          background: transparent;
+          color: var(--chalk);
+        }
+
+        .scravipo-menu-toggle span {
+          width: 0.95rem;
+          height: 1px;
+          background: currentColor;
+          transition: transform 180ms ease-out;
+        }
+
+        .scravipo-mobile-menu {
+          display: none;
+        }
+
+        .scravipo-hero__content {
+          position: relative;
+          z-index: 2;
+          display: flex;
+          align-items: center;
+          flex-direction: column;
+          width: min(46rem, calc(100% - 2rem));
+          margin: clamp(7rem, 14.5vh, 10.2rem) auto 0;
+          text-align: center;
+          animation: scravipo-rise 0.84s 80ms cubic-bezier(0.23, 1, 0.32, 1) both;
+        }
+
+        .scravipo-eyebrow {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          overflow: hidden;
+          clip: rect(0 0 0 0);
+          white-space: nowrap;
+        }
+
+        .scravipo-hero h1 {
+          display: flex;
+          align-items: center;
+          flex-direction: column;
+          margin: 0;
+          color: var(--chalk);
+          font-family: "Times New Roman MT Condensed", "Times New Roman", Times, serif;
+          font-size: clamp(4rem, 7.65vw, 7.2rem);
+          font-weight: 400;
+          letter-spacing: -0.085em;
+          line-height: 1.1;
+          text-wrap: balance;
+        }
+
+        .scravipo-hero h1 span {
+          display: block;
+          white-space: nowrap;
+        }
+
+        .scravipo-description {
+          max-width: 29rem;
+          margin: 2.05rem 0 0;
+          color: var(--muted-chalk);
+          font-size: clamp(0.78rem, 1vw, 0.9rem);
+          font-weight: 400;
+          letter-spacing: -0.035em;
+          line-height: 1.36;
+        }
+
+        .scravipo-signals {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 0.58rem;
+          margin: 0.72rem 0 0;
+          color: var(--quiet-chalk);
+          font-size: 0.54rem;
+          font-weight: 700;
+          letter-spacing: 0.145em;
+          line-height: 1.3;
+          text-transform: uppercase;
+        }
+
+        .scravipo-signals i {
+          color: rgba(243, 241, 236, 0.4);
+          font-style: normal;
+        }
+
+        .scravipo-join--hero {
+          width: 3.9rem;
+          height: 2.02rem;
+          margin-top: 2.12rem;
+        }
+
+        .scravipo-statue {
+          position: absolute;
+          z-index: 1;
+          right: clamp(-4.8rem, -3.4vw, -1.35rem);
+          bottom: clamp(-4.8rem, -3.9vw, -1.1rem);
+          width: min(39rem, 42vw);
+          height: auto;
+          pointer-events: none;
+          user-select: none;
+          filter: saturate(0.72) contrast(0.96) brightness(0.88);
+          opacity: 0.96;
+          animation: scravipo-statue-in 1.2s 140ms cubic-bezier(0.23, 1, 0.32, 1) both;
+        }
+
+        .scravipo-scratch {
+          position: absolute;
+          z-index: 0;
+          right: 8%;
+          bottom: 15%;
+          width: 13rem;
+          height: 22rem;
+          border-radius: 50%;
+          opacity: 0.16;
+          background: radial-gradient(ellipse at center, rgba(141, 141, 148, 0.25) 0%, transparent 67%);
+          filter: blur(2.2rem);
+          pointer-events: none;
+          transform: rotate(-18deg);
+        }
+
+        @keyframes scravipo-rise {
+          from { opacity: 0; transform: translateY(0.7rem); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes scravipo-statue-in {
+          from { opacity: 0; transform: translate3d(1.1rem, 1.8rem, 0) scale(0.985); }
+          to { opacity: 0.96; transform: translate3d(0, 0, 0) scale(1); }
+        }
+
+        @media (max-width: 760px) {
+          .scravipo-nav-wrap {
+            padding-top: 1rem;
+          }
+
+          .scravipo-nav {
+            grid-template-columns: 1fr auto;
+            min-height: 3.3rem;
+            padding: 0.56rem 0.72rem 0.56rem 1rem;
+          }
+
+          .scravipo-nav__links,
+          .scravipo-join--nav {
+            display: none;
+          }
+
+          .scravipo-menu-toggle {
+            display: inline-flex;
+            justify-self: end;
+          }
+
+          .scravipo-mobile-menu {
+            display: flex;
+            align-items: stretch;
+            flex-direction: column;
+            gap: 1.1rem;
+            max-height: 0;
+            overflow: hidden;
+            margin-top: 0.45rem;
+            padding: 0 1.1rem;
+            border: 1px solid transparent;
+            border-radius: 0.75rem;
+            background: rgba(24, 24, 27, 0.82);
+            backdrop-filter: blur(18px);
+            transition: max-height 220ms ease-out, padding 220ms ease-out, border-color 220ms ease-out;
+          }
+
+          .scravipo-mobile-menu.is-open {
+            max-height: 18rem;
+            padding: 1.1rem;
+            border-color: rgba(255, 255, 255, 0.07);
+          }
+
+          .scravipo-mobile-menu a:last-child {
+            color: var(--chalk);
+          }
+
+          .scravipo-hero__content {
+            width: calc(100% - 2rem);
+            margin-top: clamp(6.7rem, 16vh, 9rem);
+          }
+
+          .scravipo-hero h1 {
+            font-size: clamp(3.5rem, 15vw, 6.1rem);
+            letter-spacing: -0.085em;
+          }
+
+          .scravipo-description {
+            max-width: 21rem;
+            margin-top: 1.55rem;
+            font-size: 0.77rem;
+          }
+
+          .scravipo-description__desktop-break {
+            display: none;
+          }
+
+          .scravipo-signals {
+            max-width: 18rem;
+            font-size: 0.48rem;
+          }
+
+          .scravipo-statue {
+            right: -6.5rem;
+            bottom: -2rem;
+            width: min(34rem, 89vw);
+            opacity: 0.8;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .scravipo-nav,
+          .scravipo-hero__content,
+          .scravipo-statue {
+            animation: none;
+          }
+
+          .scravipo-nav__links a,
+          .scravipo-mobile-menu a,
+          .scravipo-join,
+          .scravipo-menu-toggle span,
+          .scravipo-mobile-menu {
+            transition-duration: 0.01ms;
+          }
+        }
+        html,
+        body,
+        #root {
+          width: 100%;
+          min-width: 0;
+          background: #0a0a0a;
+          overflow-x: hidden;
+        }
+
+        .scravipo-dashboard {
+          position: relative;
+          width: 100%;
+          box-sizing: border-box;
+          z-index: 3;
+          min-height: 100svh;
+          padding: clamp(5rem, 10vw, 9.5rem) clamp(1rem, 6vw, 5.5rem) clamp(4.2rem, 7vw, 6.6rem);
+          background:
+            radial-gradient(circle at 50% 20%, rgba(104, 130, 151, 0.08), transparent 38%),
+            linear-gradient(180deg, #0b0d0f 0%, #090a0b 42%, #0a0a0a 100%);
+          color: #f3f1ec;
+          font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .scravipo-dashboard,
+        .scravipo-dashboard * {
+          box-sizing: border-box;
+        }
+
+        .scravipo-dashboard::before {
+          position: absolute;
+          top: 0;
+          right: 6vw;
+          left: 6vw;
+          height: 1px;
+          background: rgba(255, 255, 255, 0.08);
+          content: "";
+        }
+
+        .scravipo-dashboard__intro {
+          display: flex;
+          align-items: end;
+          justify-content: space-between;
+          gap: 2rem;
+          max-width: 79rem;
+          margin: 0 auto 2.4rem;
+        }
+
+        .scravipo-dashboard__kicker {
+          margin: 0 0 0.8rem;
+          color: rgba(243, 241, 236, 0.43);
+          font-size: 0.62rem;
+          font-weight: 600;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+        }
+
+        .scravipo-dashboard__kicker span {
+          padding: 0 0.35rem;
+          color: rgba(243, 241, 236, 0.23);
+        }
+
+        .scravipo-dashboard h2 {
+          margin: 0;
+          color: #f3f1ec;
+          font-family: "Times New Roman MT Condensed", "Times New Roman", Times, serif;
+          font-size: clamp(2.65rem, 5.1vw, 5.3rem);
+          font-weight: 400;
+          letter-spacing: -0.075em;
+          line-height: 0.93;
+        }
+
+        .scravipo-dashboard__subtitle {
+          max-width: 27rem;
+          margin: 0.85rem 0 0;
+          color: rgba(243, 241, 236, 0.47);
+          font-size: 0.77rem;
+          letter-spacing: -0.02em;
+          line-height: 1.45;
+        }
+
+        .scravipo-dashboard__pulse {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.58rem 0.76rem;
+          border: 1px solid rgba(255, 255, 255, 0.07);
+          border-radius: 999px;
+          color: rgba(243, 241, 236, 0.56);
+          font-size: 0.62rem;
+          letter-spacing: 0.03em;
+          white-space: nowrap;
+        }
+
+        .scravipo-dashboard__pulse-dot {
+          width: 0.38rem;
+          height: 0.38rem;
+          border-radius: 50%;
+          background: #7cc49c;
+          box-shadow: 0 0 0 3px rgba(124, 196, 156, 0.1);
+        }
+
+        .scravipo-category-nav {
+          display: flex;
+          align-items: center;
+          gap: 0.3rem;
+          max-width: 79rem;
+          margin: 0 auto 0.85rem;
+          overflow-x: auto;
+          scrollbar-width: none;
+        }
+
+        .scravipo-category-nav::-webkit-scrollbar { display: none; }
+
+        .scravipo-category-nav button,
+        .scravipo-tool-button,
+        .scravipo-table-more button,
+        .scravipo-load-more {
+          border: 1px solid transparent;
+          background: transparent;
+          color: rgba(243, 241, 236, 0.47);
+          font-family: Arial, Helvetica, sans-serif;
+          cursor: pointer;
+          transition: color 150ms ease-out, border-color 150ms ease-out, background-color 150ms ease-out, transform 150ms ease-out;
+        }
+
+        .scravipo-category-nav button {
+          flex: 0 0 auto;
+          padding: 0.68rem 0.86rem;
+          border-radius: 0.72rem;
+          background: rgba(255, 255, 255, 0.025);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+          backdrop-filter: blur(18px) saturate(1.15);
+          -webkit-backdrop-filter: blur(18px) saturate(1.15);
+          font-size: 0.69rem;
+          font-weight: 600;
+          letter-spacing: -0.02em;
+        }
+
+        .scravipo-category-nav button:hover { color: #f3f1ec; }
+
+        .scravipo-category-nav button.is-active {
+          border-color: rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.06);
+          color: #f3f1ec;
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+        }
+
+        .scravipo-lead-panel {
+          max-width: 79rem;
+          margin: 0 auto;
+          overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 1.15rem;
+          background:
+            linear-gradient(145deg, rgba(48, 57, 64, 0.52), rgba(18, 21, 24, 0.68) 48%, rgba(9, 10, 11, 0.82)),
+            rgba(20, 22, 24, 0.54);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 0 0 1px rgba(137, 174, 194, 0.06), 0 2rem 5rem rgba(0, 0, 0, 0.24);
+          backdrop-filter: blur(28px) saturate(1.22);
+          -webkit-backdrop-filter: blur(28px) saturate(1.22);
+        }
+
+        .scravipo-lead-panel__header,
+        .scravipo-lead-panel__footer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+          padding: 1.35rem 1.35rem 1.15rem;
+        }
+
+        .scravipo-lead-panel__header {
+          min-height: 5.4rem;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .scravipo-lead-panel__header h3 {
+          margin: 0;
+          color: rgba(243, 241, 236, 0.95);
+          font-size: 0.96rem;
+          font-weight: 600;
+          letter-spacing: -0.035em;
+        }
+
+        .scravipo-lead-panel__header p {
+          margin: 0.34rem 0 0;
+          color: rgba(243, 241, 236, 0.4);
+          font-size: 0.67rem;
+          letter-spacing: -0.01em;
+        }
+
+        .scravipo-lead-panel__actions {
+          display: flex;
+          align-items: center;
+          justify-content: end;
+          gap: 0.44rem;
+        }
+
+        .scravipo-search {
+          display: flex;
+          align-items: center;
+          width: min(15rem, 25vw);
+          height: 2.15rem;
+          padding: 0 0.52rem 0 0.72rem;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 0.68rem;
+          background: rgba(255, 255, 255, 0.045);
+          color: rgba(243, 241, 236, 0.48);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 0.7rem 2rem rgba(0, 0, 0, 0.08);
+          backdrop-filter: blur(22px) saturate(1.2);
+          -webkit-backdrop-filter: blur(22px) saturate(1.2);
+        }
+
+        .scravipo-search__icon {
+          margin-right: 0.45rem;
+          font-size: 1rem;
+          line-height: 1;
+          transform: translateY(-1px) rotate(-20deg);
+        }
+
+        .scravipo-search input {
+          min-width: 0;
+          flex: 1;
+          border: 0;
+          outline: 0;
+          background: transparent;
+          color: #f3f1ec;
+          font: inherit;
+          font-size: 0.67rem;
+        }
+
+        .scravipo-search input::placeholder { color: rgba(243, 241, 236, 0.35); }
+
+        .scravipo-search kbd {
+          padding: 0.2rem 0.28rem;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 0.25rem;
+          color: rgba(243, 241, 236, 0.32);
+          font-size: 0.53rem;
+          white-space: nowrap;
+        }
+
+        .scravipo-tool-button {
+          height: 2.15rem;
+          padding: 0 0.65rem;
+          border-color: rgba(255, 255, 255, 0.07);
+          border-radius: 0.48rem;
+          font-size: 0.63rem;
+        }
+
+        .scravipo-tool-button span {
+          display: inline-block;
+          margin-right: 0.24rem;
+          color: rgba(243, 241, 236, 0.7);
+          font-size: 0.84rem;
+          vertical-align: -1px;
+        }
+
+        .scravipo-tool-button:hover { border-color: rgba(255, 255, 255, 0.15); color: #f3f1ec; }
+
+        .scravipo-table-scroll {
+          width: 100%;
+          max-width: 100%;
+          overflow-x: auto;
+          overscroll-behavior-x: contain;
+        }
+
+        .scravipo-lead-table {
+          width: 100%;
+          min-width: 720px;
+          border-collapse: collapse;
+          table-layout: auto;
+        }
+
+        .scravipo-lead-table th {
+          padding: 0.78rem 0.78rem;
+          color: rgba(243, 241, 236, 0.34);
+          font-size: 0.54rem;
+          font-weight: 600;
+          letter-spacing: 0.12em;
+          text-align: left;
+          text-transform: uppercase;
+          white-space: nowrap;
+        }
+
+        .scravipo-lead-table td {
+          padding: 0.92rem 0.78rem;
+          border-top: 1px solid rgba(255, 255, 255, 0.055);
+          color: rgba(243, 241, 236, 0.63);
+          font-size: 0.68rem;
+          letter-spacing: -0.01em;
+          white-space: nowrap;
+        }
+
+        .scravipo-lead-table tbody tr { transition: background-color 140ms ease-out; }
+        .scravipo-lead-table tbody tr:hover { background: rgba(255, 255, 255, 0.025); }
+        .scravipo-lead-table tbody tr.is-selected { background: rgba(116, 151, 185, 0.07); }
+
+        .scravipo-table-check {
+          width: 3rem;
+          padding-right: 0.24rem !important;
+          padding-left: 1.35rem !important;
+          text-align: center;
+        }
+
+        .scravipo-table-more {
+          width: 3rem;
+          padding-right: 1.35rem !important;
+          text-align: right !important;
+        }
+
+        .scravipo-table-more button {
+          padding: 0.2rem;
+          color: rgba(243, 241, 236, 0.38);
+          font-size: 0.7rem;
+          letter-spacing: 0.08em;
+        }
+
+        .scravipo-table-more button:hover { color: #f3f1ec; }
+
+        .scravipo-lead-table input[type="checkbox"] {
+          width: 0.85rem;
+          height: 0.85rem;
+          margin: 0;
+          appearance: none;
+          border: 1px solid rgba(243, 241, 236, 0.23);
+          border-radius: 0.22rem;
+          background: transparent;
+          cursor: pointer;
+          vertical-align: middle;
+        }
+
+        .scravipo-lead-table input[type="checkbox"]:checked {
+          border-color: #b8d0dc;
+          background: #b8d0dc;
+          box-shadow: inset 0 0 0 3px #16191a;
+        }
+
+        .scravipo-identity {
+          display: inline-flex;
+          align-items: center;
+          min-width: 13.5rem;
+          gap: 0.66rem;
+        }
+
+        .scravipo-avatar {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 1.8rem;
+          height: 1.8rem;
+          flex: 0 0 1.8rem;
+          overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          border-radius: 50%;
+          background: linear-gradient(145deg, #36383a, #171819);
+          color: rgba(243, 241, 236, 0.76);
+          font-size: 0.55rem;
+          font-weight: 700;
+          letter-spacing: -0.04em;
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+        }
+
+        .scravipo-avatar.has-image img {
+          display: block;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          filter: saturate(0.82) contrast(1.05);
+        }
+
+        .scravipo-identity strong,
+        .scravipo-identity small {
+          display: block;
+        }
+
+        .scravipo-identity strong {
+          color: rgba(243, 241, 236, 0.91);
+          font-size: 0.71rem;
+          font-weight: 600;
+          letter-spacing: -0.025em;
+        }
+
+        .scravipo-identity small {
+          margin-top: 0.23rem;
+          color: rgba(243, 241, 236, 0.36);
+          font-size: 0.58rem;
+          letter-spacing: -0.01em;
+        }
+
+        .scravipo-tags {
+          display: inline-flex;
+          flex-wrap: wrap;
+          gap: 0.3rem;
+          max-width: 12rem;
+        }
+
+        .scravipo-tags em {
+          padding: 0.25rem 0.42rem;
+          border: 1px solid rgba(145, 181, 192, 0.13);
+          border-radius: 999px;
+          background: rgba(112, 151, 165, 0.08);
+          color: rgba(192, 221, 227, 0.66);
+          font-size: 0.54rem;
+          font-style: normal;
+          letter-spacing: -0.01em;
+        }
+
+        .scravipo-mono {
+          color: rgba(243, 241, 236, 0.52);
+          font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+          font-size: 0.59rem;
+        }
+
+        .scravipo-linkish { color: rgba(166, 199, 206, 0.7); }
+
+        .scravipo-empty {
+          padding: 3rem 1rem !important;
+          color: rgba(243, 241, 236, 0.4) !important;
+          text-align: center;
+        }
+
+        .scravipo-lead-panel__footer {
+          min-height: 3.7rem;
+          border-top: 1px solid rgba(255, 255, 255, 0.06);
+          color: rgba(243, 241, 236, 0.31);
+          font-size: 0.6rem;
+        }
+
+        .scravipo-load-more {
+          padding: 0.42rem 0.62rem;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 0.38rem;
+          color: rgba(243, 241, 236, 0.55);
+          font-size: 0.61rem;
+        }
+
+        .scravipo-load-more span { margin-left: 0.25rem; color: rgba(243, 241, 236, 0.75); }
+        .scravipo-load-more:hover { border-color: rgba(255, 255, 255, 0.16); color: #f3f1ec; }
+
+        .sr-only {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border: 0;
+        }
+
+        @media (max-width: 860px) {
+          .scravipo-dashboard__intro { align-items: start; flex-direction: column; }
+          .scravipo-dashboard__pulse { align-self: start; }
+          .scravipo-lead-panel__header { align-items: start; flex-direction: column; }
+          .scravipo-lead-panel__actions { width: 100%; justify-content: start; }
+          .scravipo-search { width: min(18rem, 100%); }
+        }
+
+        @media (max-width: 560px) {
+          .scravipo-dashboard { padding-right: 1rem; padding-left: 1rem; }
+          .scravipo-dashboard::before { right: 1rem; left: 1rem; }
+          .scravipo-dashboard__intro { margin-bottom: 1.6rem; }
+          .scravipo-dashboard h2 { font-size: clamp(3rem, 15vw, 4.6rem); }
+          .scravipo-dashboard__subtitle { max-width: 20rem; }
+          .scravipo-category-nav { margin-right: -1rem; margin-left: -0.3rem; padding-right: 1rem; }
+          .scravipo-lead-panel__header { padding: 1rem; }
+          .scravipo-lead-panel__actions { flex-wrap: wrap; }
+          .scravipo-lead-panel__footer { padding: 1rem; }
+          .scravipo-table-check { padding-left: 1rem !important; }
+          .scravipo-table-more { padding-right: 1rem !important; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .scravipo-category-nav button,
+          .scravipo-tool-button,
+          .scravipo-table-more button,
+          .scravipo-load-more,
+          .scravipo-lead-table tbody tr { transition-duration: 0.01ms; }
+        }
+        .scravipo-bento {
+          position: relative;
+          width: 100%;
+          min-height: auto;
+          padding: clamp(4.5rem, 8vw, 7rem) clamp(1rem, 6vw, 5.5rem) clamp(2rem, 3.8vw, 3.7rem);
+          overflow: hidden;
+          box-sizing: border-box;
+          background: #0a0a0a;
+          color: #f3f1ec;
+          font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .scravipo-bento,
+        .scravipo-bento * { box-sizing: border-box; }
+
+        .scravipo-bento::before {
+          position: absolute;
+          top: 0;
+          right: 6vw;
+          left: 6vw;
+          height: 1px;
+          background: rgba(255, 255, 255, 0.08);
+          content: "";
+        }
+
+        .scravipo-bento::after {
+          position: absolute;
+          top: -12rem;
+          left: 50%;
+          width: 52rem;
+          height: 26rem;
+          border-radius: 50%;
+          background: radial-gradient(ellipse, rgba(117, 143, 166, 0.13), transparent 68%);
+          content: "";
+          filter: blur(3rem);
+          pointer-events: none;
+          transform: translateX(-50%);
+        }
+
+        .scravipo-bento__heading {
+          position: relative;
+          z-index: 1;
+          max-width: 79rem;
+          margin: 0 auto 2.7rem;
+          text-align: center;
+        }
+
+        .scravipo-bento__kicker {
+          margin: 0 0 0.85rem;
+          color: rgba(243, 241, 236, 0.42);
+          font-size: 0.61rem;
+          font-weight: 600;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+        }
+
+        .scravipo-bento__kicker span { padding: 0 0.35rem; color: rgba(243, 241, 236, 0.21); }
+
+        .scravipo-bento__heading h2 {
+          margin: 0;
+          color: #f3f1ec;
+          font-family: "Times New Roman MT Condensed", "Times New Roman", Times, serif;
+          font-size: clamp(3.05rem, 6vw, 6.2rem);
+          font-weight: 400;
+          letter-spacing: -0.08em;
+          line-height: 0.92;
+        }
+
+        .scravipo-bento__heading > p:last-child {
+          margin: 1rem auto 0;
+          color: rgba(243, 241, 236, 0.45);
+          font-size: 0.76rem;
+          letter-spacing: -0.02em;
+        }
+
+        .scravipo-bento__grid {
+          position: relative;
+          z-index: 1;
+          display: grid;
+          grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.42fr);
+          grid-template-rows: minmax(21rem, 0.95fr) minmax(16rem, 0.72fr);
+          gap: 1.15rem;
+          max-width: 79rem;
+          min-height: 0;
+          margin: 0 auto;
+        }
+
+        .scravipo-bento-card {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          min-width: 0;
+          overflow: hidden;
+          padding: clamp(1.25rem, 2.2vw, 2rem);
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          border-radius: 1.15rem;
+          background:
+            linear-gradient(145deg, rgba(75, 86, 95, 0.48), rgba(25, 29, 33, 0.56) 47%, rgba(10, 11, 12, 0.76)),
+            rgba(23, 26, 29, 0.56);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13), inset 0 0 0 1px rgba(138, 180, 205, 0.09), 0 1.7rem 4.5rem rgba(0, 0, 0, 0.26);
+          backdrop-filter: blur(30px) saturate(1.25);
+          -webkit-backdrop-filter: blur(30px) saturate(1.25);
+          isolation: isolate;
+          transition: border-color 180ms ease-out, transform 180ms ease-out, box-shadow 180ms ease-out;
+        }
+
+        .scravipo-bento-card::before {
+          position: absolute;
+          inset: 1px;
+          z-index: -1;
+          border-radius: inherit;
+          background:
+            linear-gradient(135deg, rgba(206, 230, 240, 0.13), transparent 31%, transparent 68%, rgba(255, 255, 255, 0.05)),
+            radial-gradient(circle at 16% 0%, rgba(255, 255, 255, 0.11), transparent 36%);
+          content: "";
+          pointer-events: none;
+        }
+
+        .scravipo-bento-card:hover {
+          border-color: rgba(178, 210, 224, 0.23);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1.8rem 4.8rem rgba(0, 0, 0, 0.27), 0 0 2rem rgba(127, 166, 185, 0.06);
+          transform: translateY(-2px);
+        }
+
+        .scravipo-bento-card--tall { grid-column: 1; grid-row: 1; }
+        .scravipo-bento-card--qualify { grid-column: 2; grid-row: 1; }
+        .scravipo-bento-card--verified { grid-column: 1; grid-row: 2; }
+        .scravipo-bento-card--outreach { grid-column: 2; grid-row: 2; min-height: 0; }
+
+        .scravipo-bento-card__copy { position: relative; z-index: 2; max-width: 28rem; }
+
+        .scravipo-bento-card__label {
+          display: flex;
+          align-items: center;
+          gap: 0.52rem;
+          margin: 0 0 1.2rem;
+          color: rgba(190, 219, 228, 0.68);
+          font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+          font-size: 0.55rem;
+          letter-spacing: 0.11em;
+          text-transform: uppercase;
+        }
+
+        .scravipo-bento-card__label span { color: rgba(243, 241, 236, 0.35); letter-spacing: 0.07em; }
+
+        .scravipo-bento-card h3 {
+          max-width: 19rem;
+          margin: 0;
+          color: rgba(247, 246, 241, 0.93);
+          font-family: "Times New Roman MT Condensed", "Times New Roman", Times, serif;
+          font-size: clamp(1.85rem, 3vw, 3.35rem);
+          font-weight: 400;
+          letter-spacing: -0.07em;
+          line-height: 0.94;
+        }
+
+        .scravipo-bento-card__copy > p:last-child {
+          max-width: 25rem;
+          margin: 1rem 0 0;
+          color: rgba(243, 241, 236, 0.58);
+          font-size: 0.7rem;
+          letter-spacing: -0.018em;
+          line-height: 1.5;
+        }
+
+        .scravipo-flow {
+          position: relative;
+          z-index: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 0.22rem;
+          margin-top: auto;
+          padding: 0.9rem 0.95rem;
+          border: 1px solid rgba(177, 213, 228, 0.18);
+          border-radius: 0.75rem;
+          background: linear-gradient(145deg, rgba(97, 120, 137, 0.27), rgba(23, 27, 30, 0.52));
+          box-shadow: inset 0 1px 0 rgba(211, 233, 239, 0.14), 0 1.2rem 2.8rem rgba(0, 0, 0, 0.17);
+        }
+
+        .scravipo-flow__step {
+          display: grid;
+          grid-template-columns: 1.8rem 1fr auto;
+          align-items: center;
+          min-height: 2.8rem;
+          gap: 0.6rem;
+        }
+
+        .scravipo-flow__number {
+          color: rgba(181, 213, 225, 0.55);
+          font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+          font-size: 0.53rem;
+        }
+
+        .scravipo-flow__step strong,
+        .scravipo-flow__step small { display: block; }
+        .scravipo-flow__step strong { color: rgba(243, 241, 236, 0.84); font-size: 0.66rem; font-weight: 600; }
+        .scravipo-flow__step small { margin-top: 0.18rem; color: rgba(243, 241, 236, 0.36); font-size: 0.56rem; }
+        .scravipo-flow__step i { color: rgba(172, 210, 222, 0.53); font-size: 0.75rem; font-style: normal; }
+
+        .scravipo-signal-window,
+        .scravipo-contact-proof,
+        .scravipo-outreach-strip {
+          margin-top: auto;
+          border: 1px solid rgba(177, 213, 228, 0.16);
+          background: rgba(85, 108, 124, 0.16);
+          box-shadow: inset 0 1px 0 rgba(211, 233, 239, 0.12);
+        }
+
+        .scravipo-signal-window { padding: 0.6rem 0.8rem; border-radius: 0.67rem; }
+        .scravipo-signal-window__line { display: grid; grid-template-columns: 0.55rem 1fr auto; align-items: center; gap: 0.48rem; min-height: 2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.055); color: rgba(243, 241, 236, 0.6); font-size: 0.61rem; }
+        .scravipo-signal-window__line:last-child { border-bottom: 0; }
+        .scravipo-signal-window__line strong { color: rgba(192, 224, 232, 0.8); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.57rem; font-weight: 500; }
+        .scravipo-signal-window__dot { width: 0.36rem; height: 0.36rem; border-radius: 50%; }
+        .scravipo-signal-window__dot.is-blue { background: #91b9db; box-shadow: 0 0 0 3px rgba(145, 185, 219, 0.11); }
+        .scravipo-signal-window__dot.is-green { background: #86c5a0; box-shadow: 0 0 0 3px rgba(134, 197, 160, 0.1); }
+        .scravipo-signal-window__dot.is-amber { background: #c9a978; box-shadow: 0 0 0 3px rgba(201, 169, 120, 0.1); }
+
+        .scravipo-contact-proof { display: flex; align-items: center; gap: 0.58rem; padding: 0.75rem; border-radius: 0.67rem; }
+        .scravipo-contact-proof__avatar { display: inline-flex; align-items: center; justify-content: center; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: linear-gradient(145deg, #717e85, #283039); color: rgba(243, 241, 236, 0.83); font-size: 0.55rem; font-weight: 700; }
+        .scravipo-contact-proof__identity { flex: 1; }
+        .scravipo-contact-proof__identity strong,
+        .scravipo-contact-proof__identity small { display: block; }
+        .scravipo-contact-proof__identity strong { color: rgba(243, 241, 236, 0.82); font-size: 0.63rem; font-weight: 600; }
+        .scravipo-contact-proof__identity small { margin-top: 0.18rem; color: rgba(243, 241, 236, 0.38); font-size: 0.55rem; }
+        .scravipo-contact-proof__check { display: inline-flex; align-items: center; justify-content: center; width: 1.15rem; height: 1.15rem; border: 1px solid rgba(134, 197, 160, 0.36); border-radius: 50%; color: #9fd1ac; font-size: 0.65rem; }
+
+        .scravipo-outreach-strip { display: flex; align-items: center; flex-wrap: wrap; gap: 0.55rem; margin-top: 1.25rem; padding: 0.6rem 0.75rem; border-radius: 0.6rem; color: rgba(243, 241, 236, 0.36); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.54rem; }
+        .scravipo-outreach-strip b { color: rgba(243, 241, 236, 0.78); font-size: 0.58rem; font-weight: 500; }
+        .scravipo-outreach-strip b.is-accent { color: #acd2de; }
+
+        .scravipo-adapts { display: flex; align-items: start; gap: 0.65rem; max-width: 25rem; margin-top: auto; padding-top: 1.1rem; border-top: 1px solid rgba(255, 255, 255, 0.07); }
+        .scravipo-adapts__icon { display: inline-flex; align-items: center; justify-content: center; width: 1.45rem; height: 1.45rem; border: 1px solid rgba(172, 210, 222, 0.22); border-radius: 50%; color: rgba(172, 210, 222, 0.8); font-size: 0.75rem; }
+        .scravipo-adapts strong,
+        .scravipo-adapts small { display: block; }
+        .scravipo-adapts strong { color: rgba(243, 241, 236, 0.82); font-size: 0.65rem; font-weight: 600; }
+        .scravipo-adapts small { max-width: 18rem; margin-top: 0.25rem; color: rgba(243, 241, 236, 0.4); font-size: 0.57rem; line-height: 1.4; }
+
+        @media (max-width: 860px) {
+          .scravipo-bento__grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; min-height: 0; }
+          .scravipo-bento-card--tall { grid-column: auto; grid-row: auto; }
+          .scravipo-bento-card--qualify,
+          .scravipo-bento-card--verified { grid-column: auto; }
+          .scravipo-bento-card--outreach { grid-column: 1 / span 2; grid-row: auto; min-height: 19rem; }
+        }
+
+        @media (max-width: 580px) {
+          .scravipo-bento { padding-right: 1rem; padding-left: 1rem; }
+          .scravipo-bento::before { right: 1rem; left: 1rem; }
+          .scravipo-bento__heading { margin-bottom: 2rem; text-align: left; }
+          .scravipo-bento__heading h2 { font-size: clamp(3.1rem, 15vw, 4.5rem); }
+          .scravipo-bento__heading > p:last-child { max-width: 18rem; margin-left: 0; line-height: 1.4; }
+          .scravipo-bento__grid { display: flex; flex-direction: column; gap: 0.8rem; }
+          .scravipo-bento-card { min-height: 26rem; padding: 1.15rem; }
+          .scravipo-bento-card--tall { min-height: 34rem; }
+          .scravipo-bento-card--outreach { min-height: 29rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .scravipo-bento-card { transition-duration: 0.01ms; }
+        }
+
+        .scravipo-footer {
+          position: relative;
+          width: calc(100% - clamp(2rem, 8vw, 7rem));
+          min-height: clamp(44rem, 72vw, 64rem);
+          margin: 0 auto clamp(1.25rem, 3vw, 3rem);
+          overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.045);
+          background: #020202;
+          color: #f3f1ec;
+          font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .scravipo-footer::before {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(180deg, rgba(255, 255, 255, 0.018), transparent 13%, transparent 100%);
+          content: "";
+          pointer-events: none;
+        }
+
+        .scravipo-footer__atmosphere {
+          position: absolute;
+          top: 25%;
+          left: 50%;
+          width: min(70vw, 62rem);
+          height: min(36vw, 32rem);
+          border-radius: 50%;
+          background: radial-gradient(ellipse at center, rgba(112, 116, 121, 0.14) 0%, rgba(41, 43, 45, 0.07) 32%, transparent 70%);
+          filter: blur(2.7rem);
+          pointer-events: none;
+          transform: translateX(-50%);
+        }
+
+        .scravipo-footer__content {
+          position: absolute;
+          right: clamp(1.5rem, 5vw, 5.5rem);
+          bottom: clamp(6rem, 9vw, 8rem);
+          left: clamp(1.5rem, 5vw, 5.5rem);
+          z-index: 2;
+          display: grid;
+          grid-template-columns: 40% 1fr;
+          gap: 2rem;
+        }
+
+        .scravipo-footer__label {
+          margin: 0 0 1rem;
+          color: rgba(243, 241, 236, 0.42);
+          font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+          font-size: 0.59rem;
+          font-weight: 500;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+        }
+
+        .scravipo-footer__copy {
+          margin: 0;
+          color: rgba(243, 241, 236, 0.93);
+          font-family: "Times New Roman MT Condensed", "Times New Roman", Times, serif;
+          font-size: clamp(1.55rem, 2.55vw, 3rem);
+          font-weight: 400;
+          letter-spacing: -0.06em;
+          line-height: 0.98;
+        }
+
+        .scravipo-footer__email {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.58rem;
+          margin-top: 1.45rem;
+          padding: 0.6rem 0.78rem;
+          border: 1px solid rgba(243, 241, 236, 0.22);
+          color: rgba(243, 241, 236, 0.78);
+          font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+          font-size: 0.59rem;
+          letter-spacing: 0.07em;
+          text-decoration: none;
+          text-transform: uppercase;
+          transition: color 150ms ease-out, border-color 150ms ease-out, background-color 150ms ease-out;
+        }
+
+        .scravipo-footer__email:hover { border-color: rgba(243, 241, 236, 0.55); background: rgba(243, 241, 236, 0.06); color: #fff; }
+
+        .scravipo-footer__socials { justify-self: start; }
+
+        .scravipo-footer__social-list {
+          display: flex;
+          flex-direction: column;
+          align-items: start;
+          gap: 0.38rem;
+        }
+
+        .scravipo-footer__social-list a {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: clamp(9.5rem, 14vw, 13rem);
+          min-height: 2rem;
+          padding: 0.4rem 0.56rem 0.4rem 0.68rem;
+          border: 1px solid rgba(243, 241, 236, 0.18);
+          background: #020202;
+          color: rgba(243, 241, 236, 0.72);
+          font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+          font-size: 0.57rem;
+          letter-spacing: 0.08em;
+          text-decoration: none;
+          text-transform: uppercase;
+          transition: color 150ms ease-out, border-color 150ms ease-out, transform 150ms ease-out;
+        }
+
+        .scravipo-footer__social-list a:hover { border-color: rgba(243, 241, 236, 0.58); color: #fff; transform: translateX(3px); }
+        .scravipo-footer__social-list a span:last-child { color: rgba(243, 241, 236, 0.42); font-size: 0.78rem; }
+
+        .scravipo-footer__mark {
+          position: absolute;
+          width: clamp(11rem, 19vw, 20rem);
+          height: clamp(14rem, 25vw, 25rem);
+          right: clamp(-4rem, -1vw, -0.5rem);
+          bottom: clamp(-7rem, -8vw, -2.8rem);
+          z-index: 1;
+          pointer-events: none;
+          user-select: none;
+        }
+
+        .scravipo-footer__mark svg {
+          display: block;
+          width: 100%;
+          height: 100%;
+          overflow: visible;
+        }
+
+        .scravipo-footer__mark span {
+          display: block;
+          color: transparent;
+          font-family: Georgia, "Times New Roman", serif;
+          font-size: clamp(18rem, 38vw, 36rem);
+          font-style: italic;
+          font-weight: 700;
+          letter-spacing: -0.18em;
+          line-height: 0.72;
+          background: linear-gradient(116deg, #35383a 6%, #d9d9d3 18%, #6b6e70 31%, #f1f0e9 43%, #414548 58%, #b8bbb8 74%, #26292b 91%);
+          -webkit-background-clip: text;
+          background-clip: text;
+          filter: drop-shadow(-0.32rem 0.38rem 0.35rem rgba(0, 0, 0, 0.7)) drop-shadow(0 0 1.2rem rgba(167, 181, 188, 0.08));
+          opacity: 0.73;
+          transform: scaleX(0.78);
+          transform-origin: bottom right;
+        }
+
+        .scravipo-footer__top {
+          padding: 0.45rem 0.62rem;
+          border: 1px solid rgba(243, 241, 236, 0.13);
+          background: transparent;
+          color: rgba(243, 241, 236, 0.48);
+          font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+          font-size: 0.53rem;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          transition: border-color 150ms ease-out, color 150ms ease-out, transform 150ms ease-out;
+        }
+
+        .scravipo-footer__top:hover { border-color: rgba(243, 241, 236, 0.48); color: #fff; transform: translateY(-1px); }
+
+        .scravipo-footer__bottom {
+          position: absolute;
+          right: clamp(1.5rem, 5vw, 5.5rem);
+          bottom: clamp(1.25rem, 2.6vw, 2.5rem);
+          left: clamp(1.5rem, 5vw, 5.5rem);
+          z-index: 3;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding-top: 0.9rem;
+          border-top: 1px solid rgba(243, 241, 236, 0.12);
+          color: rgba(243, 241, 236, 0.38);
+          font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+          font-size: 0.56rem;
+          letter-spacing: 0.04em;
+        }
+
+        @media (max-width: 620px) {
+          .scravipo-footer {
+            width: calc(100% - 2rem);
+            min-height: 47rem;
+          }
+
+          .scravipo-footer__content {
+            right: 1.2rem;
+            bottom: 6rem;
+            left: 1.2rem;
+            grid-template-columns: 1fr;
+            gap: 2.4rem;
+          }
+
+          .scravipo-footer__copy { font-size: clamp(1.65rem, 8vw, 2.5rem); }
+          .scravipo-footer__socials { justify-self: start; }
+          .scravipo-footer__mark { right: 0.1rem; bottom: 5rem; width: 8.4rem; height: 10.6rem; }
+          .scravipo-footer__mark span { font-size: 19rem; }
+          .scravipo-footer__bottom { right: 1.2rem; bottom: 1.2rem; left: 1.2rem; align-items: start; flex-direction: column; gap: 0.55rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .scravipo-footer__email,
+          .scravipo-footer__social-list a { transition-duration: 0.01ms; }
+        }
+      `}
+      </style>
+      </section>
+
+      <section className="scravipo-dashboard" id="dashboard" aria-labelledby="dashboard-title">
+        <div className="scravipo-dashboard__intro">
+          <div>
+            <p className="scravipo-dashboard__kicker">Opportunity index <span>·</span> Live workspace</p>
+            <h2 id="dashboard-title">Find the signal.</h2>
+            <p className="scravipo-dashboard__subtitle">One intelligence workspace for the people, companies, and firms worth knowing.</p>
+          </div>
+          <div className="scravipo-dashboard__pulse" aria-label="Workspace status">
+            <span className="scravipo-dashboard__pulse-dot" />
+            <span>Scanning live signals</span>
+          </div>
+        </div>
+
+        <div className="scravipo-category-nav" role="tablist" aria-label="Lead categories">
+          {(Object.keys(dashboardConfigs) as DashboardCategory[]).map((category) => (
+            <button
+              key={category}
+              className={activeCategory === category ? "is-active" : ""}
+              type="button"
+              role="tab"
+              aria-selected={activeCategory === category}
+              onClick={() => {
+                setActiveCategory(category);
+                setSelectedRows([]);
+                setQuery("");
+              }}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+
+        <div className="scravipo-lead-panel">
+          <div className="scravipo-lead-panel__header">
+            <div>
+              <h3>{activeConfig.title}</h3>
+              <p>{activeConfig.subtitle}</p>
+            </div>
+            <div className="scravipo-lead-panel__actions">
+              <label className="scravipo-search">
+                <span className="scravipo-search__icon" aria-hidden="true">⌕</span>
+                <span className="sr-only">Search leads</span>
+                <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search leads" />
+                <kbd>⌘ K</kbd>
+              </label>
+              <button className="scravipo-tool-button" type="button"><span aria-hidden="true">≡</span> Filter</button>
+              <button className="scravipo-tool-button" type="button"><span aria-hidden="true">↕</span> Sort</button>
+            </div>
+          </div>
+
+          <div className="scravipo-table-scroll">
+            <table className="scravipo-lead-table">
+              <thead>
+                <tr>
+                  <th className="scravipo-table-check"><input type="checkbox" aria-label="Select all visible leads" checked={allVisibleSelected} onChange={toggleAllVisible} /></th>
+                  {activeConfig.columns.map((column) => <th key={column.key}>{column.label}</th>)}
+                  <th className="scravipo-table-more"><span className="sr-only">Actions</span>···</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visibleRows.map((row) => {
+                  const isSelected = selectedRows.includes(row.id);
+                  return (
+                    <tr key={row.id} className={isSelected ? "is-selected" : ""}>
+                      <td className="scravipo-table-check"><input type="checkbox" aria-label={`Select ${row.name}`} checked={isSelected} onChange={() => toggleRow(row.id)} /></td>
+                      {activeConfig.columns.map((column) => (
+                        <td key={column.key}>
+                          {column.key === "name" ? (
+                            <div className="scravipo-identity">
+                              <span className={`scravipo-avatar${row.image ? " has-image" : ""}`}>
+                                {row.image ? <img src={row.image} alt={row.imageAlt ?? `${row.name} mark`} /> : row.initials}
+                              </span>
+                              <span><strong>{row.name}</strong><small>{row.secondary}</small></span>
+                            </div>
+                          ) : column.key === "sectors" ? (
+                            <span className="scravipo-tags">{(row.tags ?? []).map((tag) => <em key={tag}>{tag}</em>)}</span>
+                          ) : (
+                            <span className={column.key === "website" ? "scravipo-mono scravipo-linkish" : column.key === "email" ? "scravipo-mono" : ""}>{row.fields[column.key] ?? "—"}</span>
+                          )}
+                        </td>
+                      ))}
+                      <td className="scravipo-table-more"><button type="button" aria-label={`More actions for ${row.name}`}>···</button></td>
+                    </tr>
+                  );
+                })}
+                {visibleRows.length === 0 && <tr><td className="scravipo-empty" colSpan={activeConfig.columns.length + 2}>No signals match “{query}”.</td></tr>}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="scravipo-lead-panel__footer">
+            <span>Showing {visibleRows.length} of {activeConfig.rows.length} signals</span>
+            <button type="button" className="scravipo-load-more">Load more <span aria-hidden="true">↗</span></button>
+          </div>
+        </div>
+      </section>
+
+      <section className="scravipo-bento" id="how-it-works" aria-labelledby="bento-title">
+        <div className="scravipo-bento__heading">
+          <p className="scravipo-bento__kicker">How it works <span>Signal over noise</span></p>
+          <h2 id="bento-title">Search for what matters.</h2>
+          <p>Scravipo does the work between a query and a conversation worth having.</p>
+        </div>
+
+        <div className="scravipo-bento__grid">
+          <article className="scravipo-bento-card scravipo-bento-card--tall">
+            <div className="scravipo-bento-card__copy">
+              <p className="scravipo-bento-card__label">01 <span>Live discovery</span></p>
+              <h3>Real-time search across everything.</h3>
+              <p>There is no static database to search through. The moment a query arrives, Scravipo searches live across multiple sources and turns the freshest signals into a usable result.</p>
+            </div>
+            <div className="scravipo-flow" aria-label="Query to delivery process">
+              {[
+                ["01", "Query", "What are you looking for?"],
+                ["02", "Multi-source scrape", "Signals from the open web"],
+                ["03", "Enrich & qualify", "Intent made legible"],
+                ["04", "Deliver", "Ready for the next move"],
+              ].map(([number, title, detail], index) => (
+                <div className="scravipo-flow__step" key={number}>
+                  <span className="scravipo-flow__number">{number}</span>
+                  <span><strong>{title}</strong><small>{detail}</small></span>
+                  {index < 3 && <i aria-hidden="true">↓</i>}
+                </div>
+              ))}
+            </div>
+          </article>
+
+          <article className="scravipo-bento-card scravipo-bento-card--qualify">
+            <div className="scravipo-bento-card__copy">
+              <p className="scravipo-bento-card__label">02 <span>Intent intelligence</span></p>
+              <h3>Enrich & qualify.</h3>
+              <p>A raw result is only the beginning. Each one is enriched and checked against intent signals before it reaches you, with the reason it qualifies made explicit.</p>
+            </div>
+            <div className="scravipo-signal-window">
+              <div className="scravipo-signal-window__line"><span className="scravipo-signal-window__dot is-blue" /><span>Active hiring signal</span><strong>+94</strong></div>
+              <div className="scravipo-signal-window__line"><span className="scravipo-signal-window__dot is-green" /><span>Recent funding signal</span><strong>+81</strong></div>
+              <div className="scravipo-signal-window__line"><span className="scravipo-signal-window__dot is-amber" /><span>Growth signal detected</span><strong>+76</strong></div>
+            </div>
+          </article>
+
+          <article className="scravipo-bento-card scravipo-bento-card--verified">
+            <div className="scravipo-bento-card__copy">
+              <p className="scravipo-bento-card__label">03 <span>Trust layer</span></p>
+              <h3>Verified contacts.</h3>
+              <p>Email, phone, and professional details are checked before delivery. No scraped-and-dumped lists—only contact paths that have earned their place.</p>
+            </div>
+            <div className="scravipo-contact-proof" aria-hidden="true">
+              <span className="scravipo-contact-proof__avatar">AR</span>
+              <span className="scravipo-contact-proof__identity"><strong>Alex Rivera</strong><small>Growth · verified 2m ago</small></span>
+              <span className="scravipo-contact-proof__check">✓</span>
+            </div>
+          </article>
+
+          <article className="scravipo-bento-card scravipo-bento-card--outreach">
+            <div className="scravipo-bento-card__copy">
+              <p className="scravipo-bento-card__label">04 <span>Workflow ready</span></p>
+              <h3>Built for outreach.</h3>
+              <p>Every lead arrives with the role, contact, and relevance context your sales or BD workflow needs, so research becomes a next step—not another spreadsheet.</p>
+            </div>
+            <div className="scravipo-outreach-strip"><span>Role</span><b>VP Growth</b><span>Relevance</span><b className="is-accent">High</b><span>Next</span><b>Reach out</b></div>
+            <div className="scravipo-adapts">
+              <span className="scravipo-adapts__icon">↗</span>
+              <span><strong>Adapts to what you search.</strong><small>Investor, business, person, company, VC, job—the search and schema reshape around the intent.</small></span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <footer className="scravipo-footer" id="footer">
+        <div className="scravipo-footer__atmosphere" aria-hidden="true" />
+        <div className="scravipo-footer__content">
+          <div className="scravipo-footer__contact">
+            <p className="scravipo-footer__label">CONTACT:</p>
+            <p className="scravipo-footer__copy">Reach out for freelance collaborations<br className="scravipo-footer__desktop-break" /> or just to say hi :)</p>
+            <a className="scravipo-footer__email" href="mailto:mirsadatbinrakib01@gmail.com">Email <span aria-hidden="true">↗</span></a>
+          </div>
+
+          <div className="scravipo-footer__socials">
+            <p className="scravipo-footer__label">SOCIALS:</p>
+            <div className="scravipo-footer__social-list">
+              {[
+                ["Instagram", "https://www.instagram.com/scrapivo/"],
+                ["LinkedIn", "https://www.linkedin.com/company/scrapivo/"],
+              ].map(([label, href]) => (
+                <a key={label} href={href} target="_blank" rel="noreferrer">
+                  <span>{label}</span><span aria-hidden="true">↗</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="scravipo-footer__mark" aria-hidden="true">
+          <svg viewBox="0 0 240 300" role="presentation">
+            <defs>
+              <linearGradient id="scravipo-metal-main" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stopColor="#ffffff" />
+                <stop offset="0.18" stopColor="#8d9295" />
+                <stop offset="0.38" stopColor="#f8f8f3" />
+                <stop offset="0.6" stopColor="#63696d" />
+                <stop offset="0.82" stopColor="#ecece6" />
+                <stop offset="1" stopColor="#3b4044" />
+              </linearGradient>
+              <linearGradient id="scravipo-metal-edge" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stopColor="#31363a" />
+                <stop offset="0.28" stopColor="#d8dad6" />
+                <stop offset="0.52" stopColor="#ffffff" />
+                <stop offset="0.8" stopColor="#747a7d" />
+                <stop offset="1" stopColor="#272c2f" />
+              </linearGradient>
+              <filter id="scravipo-metal-shadow" x="-35%" y="-35%" width="170%" height="180%">
+                <feDropShadow dx="-9" dy="16" stdDeviation="9" floodColor="#000000" floodOpacity="0.72" />
+                <feGaussianBlur in="SourceAlpha" stdDeviation="1.3" result="blur" />
+                <feSpecularLighting in="blur" surfaceScale="5" specularConstant="0.55" specularExponent="28" lightingColor="#ffffff" result="light">
+                  <feDistantLight azimuth="228" elevation="54" />
+                </feSpecularLighting>
+                <feComposite in="light" in2="SourceAlpha" operator="in" result="spec" />
+                <feComposite in="SourceGraphic" in2="spec" operator="arithmetic" k1="1" k2="0.5" k3="0.45" k4="0" />
+              </filter>
+            </defs>
+            <path d="M154 15c-22 2-39 17-46 38-7 22 4 39 26 50l24 12c17 8 21 17 16 29-5 13-17 20-35 21-17 0-32-7-44-20l-17 18c14 18 35 29 60 31 30 2 55-12 67-37 12-25 3-46-24-60l-25-13c-13-7-17-14-13-24 4-10 13-15 27-15 13 0 25 5 36 14l15-18c-17-18-39-27-67-26Z" fill="url(#scravipo-metal-main)" filter="url(#scravipo-metal-shadow)" />
+            <path d="M67 227c21 23 46 35 75 35 33 0 58-14 75-41l-22-15c-12 18-30 27-52 27-22 0-41-8-57-25l-19 19Z" fill="url(#scravipo-metal-edge)" opacity="0.9" />
+            <path d="M105 78c-10 12-11 25-4 36 6 10 18 18 34 25l17 8c10 5 15 10 16 16-1-15-9-26-25-34l-25-13c-13-7-17-14-13-24Z" fill="#ffffff" opacity="0.26" />
+            <path d="M168 27c11 4 21 10 29 18l-9 10c-7-5-14-9-22-11-13-3-24 0-32 8 6-16 18-25 34-25Z" fill="#ffffff" opacity="0.3" />
+          </svg>
+        </div>
+
+        <div className="scravipo-footer__bottom">
+          <span>All rights reserved.</span>
+          <button className="scravipo-footer__top" type="button" onClick={handleBackToTop}>Back to top <span aria-hidden="true">↑</span></button>
+          <span>Design &amp; dev by Scravipo <b aria-hidden="true">▪▪</b></span>
+        </div>
+      </footer>
+    </>
+  );
+}
+

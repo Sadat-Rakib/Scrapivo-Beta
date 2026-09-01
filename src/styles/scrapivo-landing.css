@@ -1286,3 +1286,112 @@
 .scrapivo-landing .scrapivo-cta-footer .cta-bottom-made:hover span:last-child {
   color: #d1d5db;
 }
+/* ============================================================
+   APPEND THESE RULES to the end of src/styles/scrapivo-landing.css
+   All scoped under .scrapivo-landing as usual.
+   ============================================================ */
+
+/* ── Hero statue layer (isolated from hero-base/hero-reveal-layer
+   so it can be repositioned independently) ── */
+   .scrapivo-landing .hero-statue-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 15;
+    pointer-events: none;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+  }
+  .scrapivo-landing .hero-statue-layer img {
+    height: 92%;
+    width: auto;
+    object-fit: contain;
+    /* Adjust this single value to move the statue left/right */
+    transform: translateX(var(--statue-shift, -6%));
+    filter: drop-shadow(0 40px 80px rgba(0, 0, 0, 0.55));
+  }
+  @media (max-width: 768px) {
+    .scrapivo-landing .hero-statue-layer img {
+      height: 60%;
+      transform: translateX(var(--statue-shift, -4%));
+    }
+  }
+  
+  /* ── Crossfade word (Opportunities <-> Leads, matter <-> convert) ──
+     Grid-stack technique: both words occupy the same grid cell so the
+     layout never shifts width when one fades in and the other fades out. */
+  .scrapivo-landing .crossfade-word {
+    display: inline-grid;
+    vertical-align: baseline;
+  }
+  .scrapivo-landing .crossfade-word span {
+    grid-area: 1 / 1;
+    white-space: nowrap;
+    transition: opacity 900ms ease-in-out;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scrapivo-landing .crossfade-word span {
+      transition: none;
+    }
+  }
+  
+  /* ── Cat mascot tail wag (LeadsDashboard.tsx) ── */
+  @keyframes scrapivo-catTailWag {
+    0%,
+    100% {
+      transform: rotate(-8deg);
+    }
+    50% {
+      transform: rotate(10deg);
+    }
+  }
+  .scrapivo-landing .cat-tail {
+    transform-origin: 46% 78%;
+    animation: scrapivo-catTailWag 1.8s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scrapivo-landing .cat-tail {
+      animation: none;
+    }
+  }
+  
+  /* ── Cloud transition band (CloudTransition.tsx) ──
+     Pure CSS dotted "cloud" texture — same radial-gradient-dot technique
+     already used for .cta-beam-dots / .cta-face-dots below. */
+  .scrapivo-landing .cloud-transition {
+    position: relative;
+    height: 18vh;
+    min-height: 140px;
+    overflow: hidden;
+    background: var(--bg-base, #050505);
+  }
+  .scrapivo-landing .cloud-transition .cloud-blob {
+    position: absolute;
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.55) 1.1px, transparent 1.1px);
+    background-size: 7px 7px;
+  }
+  .scrapivo-landing .cloud-transition .cloud-blob.left {
+    top: -30%;
+    left: -8%;
+    width: 46%;
+    height: 160%;
+    -webkit-mask-image: radial-gradient(ellipse 60% 55% at 40% 45%, black 55%, transparent 78%);
+    mask-image: radial-gradient(ellipse 60% 55% at 40% 45%, black 55%, transparent 78%);
+    opacity: 0.6;
+  }
+  .scrapivo-landing .cloud-transition .cloud-blob.right {
+    top: -40%;
+    right: -10%;
+    width: 50%;
+    height: 170%;
+    -webkit-mask-image: radial-gradient(ellipse 55% 50% at 60% 40%, black 55%, transparent 78%);
+    mask-image: radial-gradient(ellipse 55% 50% at 60% 40%, black 55%, transparent 78%);
+    opacity: 0.5;
+  }
+  .scrapivo-landing .cloud-transition::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 0%, var(--bg-base, #050505) 100%);
+    pointer-events: none;
+  }

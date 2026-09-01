@@ -75,10 +75,6 @@ function JobsPage() {
     questions: FlowQuestion[];
   } | null>(null);
   const [broadened, setBroadened] = useState<string[]>([]);
-  const [sourceHealth, setSourceHealth] = useState<
-    Array<{ id: string; label: string; status: string; count: number }>
-  >([]);
-  const [quotaLeft, setQuotaLeft] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const [selectedEntity, setSelectedEntity] = useState<Company360Data | null>(null);
@@ -98,9 +94,10 @@ function JobsPage() {
       location: wantsRemote || rawLocation === "" ? "" : rawLocation,
       remoteOnly: wantsRemote,
       seniority,
-      // An intern-level ask is an internship ask unless the user picked a
-      // different engagement explicitly.
-      employmentType: answers?.employmentType ?? (seniority === "intern" ? "internship" : "any"),
+      employmentType:
+        answers?.employmentType ??
+        parsed.employmentType ??
+        (seniority === "intern" ? "internship" : "any"),
       region: wantsRemote ? "remote" : (parsed.region ?? "any"),
     };
     setFlow(null);
@@ -141,8 +138,6 @@ function JobsPage() {
       setRows(fetchedJobs);
       setSearched(true);
       setBroadened(res.relaxed ?? []);
-      setSourceHealth(res.sourceStatuses ?? []);
-      setQuotaLeft(typeof res.quota?.remaining === "number" ? res.quota.remaining : null);
       saveRouteSearchState("jobs", {
         query: vars.query,
         filters: vars,
@@ -349,31 +344,6 @@ function JobsPage() {
                     composerRef.current?.focus();
                   }}
                 />
-                {sourceHealth.length > 0 && (
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
-                    <span className="font-medium text-white/70">
-                      Sources
-                      {quotaLeft != null && (
-                        <span className="ml-2 text-white/40">· {quotaLeft} searches left today</span>
-                      )}
-                    </span>
-                    {sourceHealth.map((s) => (
-                      <span key={s.id} className="inline-flex items-center gap-1">
-                        <span
-                          className={
-                            s.status === "ok"
-                              ? s.count > 0
-                                ? "size-1.5 rounded-full bg-emerald-400"
-                                : "size-1.5 rounded-full bg-white/30"
-                              : "size-1.5 rounded-full bg-red-400"
-                          }
-                        />
-                        {s.label}
-                        <span className="text-white/40">{s.status === "ok" ? s.count : "err"}</span>
-                      </span>
-                    ))}
-                  </div>
-                )}
                 {broadened.length > 0 && (
                   <div className="flex items-center gap-2 rounded-lg border border-amber-400/20 bg-amber-400/[0.06] px-3 py-2 text-[11px] text-amber-200/90">
                     <SearchCheck className="size-3.5 shrink-0" />
@@ -464,33 +434,36 @@ function JobsPage() {
               />
             )}
 
-            {/* Paste-a-URL intelligence — under the cards: extract a profile,
-                confirm the details, then run a real search with them. */}
-            {!mut.isPending && (
-              <UrlIntelBox
-                variant="jobs"
-                onConfirm={(intel) => {
-                  const query =
-                    intel.skills.slice(0, 3).join(" ") || intel.industry || intel.name || "";
-                  if (!query.trim()) {
-                    toast.message("Nothing usable in that URL — type a role instead.");
-                    return;
-                  }
-                  const remote =
-                    /remote|global/i.test(intel.location || "") && intel.skills.length > 0;
-                  mut.mutate({
-                    query,
-                    location: remote ? "" : (intel.location || "").trim(),
-                    remoteOnly: remote,
-                    seniority: "any",
-                    employmentType: "any",
-                    region: remote ? "remote" : "any",
-                  });
-                }}
-              />
-            )}
+            {/* Paste-a-URL intelligence — docked above composer. */}
           </div>
         </div>
+
+        {!mut.isPending && (
+          <div className="shrink-0 border-t border-white/5 px-4 md:px-6 pt-2">
+            <UrlIntelBox
+              variant="jobs"
+              collapsed={searched && rows.length > 0}
+              onConfirm={(intel) => {
+                const query =
+                  intel.skills.slice(0, 3).join(" ") || intel.industry || intel.name || "";
+                if (!query.trim()) {
+                  toast.message("Nothing usable in that URL — type a role instead.");
+                  return;
+                }
+                const remote =
+                  /remote|global/i.test(intel.location || "") && intel.skills.length > 0;
+                mut.mutate({
+                  query,
+                  location: remote ? "" : (intel.location || "").trim(),
+                  remoteOnly: remote,
+                  seniority: "any",
+                  employmentType: "any",
+                  region: remote ? "remote" : "any",
+                });
+              }}
+            />
+          </div>
+        )}
 
         {/* Bottom-docked composer */}
         <PageComposer

@@ -5,13 +5,24 @@ const QUERY_SYNONYMS: Record<string, string[]> = {
   developer: [
     "developer",
     "engineer",
+    "engineering",
     "software engineer",
+    "software engineering",
     "programmer",
     "swe",
     "software developer",
   ],
-  engineer: ["engineer", "developer"],
-  designer: ["designer", "product designer", "ux designer", "ui designer", "ux/ui designer"],
+  engineer: ["engineer", "engineering", "developer"],
+  frontend: [
+    "frontend",
+    "front-end",
+    "front end",
+    "software engineer",
+    "software engineering",
+    "engineer",
+    "engineering",
+    "swe",
+  ],
   design: ["designer", "product designer", "ux designer", "ui designer"],
   marketing: ["marketing", "marketer", "growth"],
   sales: ["sales", "account executive", "business development"],
@@ -135,17 +146,23 @@ export function guessSeniority(title: string): string | null {
   return "mid";
 }
 
-function queryNeedles(q: string): string[] {
-  // Word-level expansion only: a token must EQUAL a synonym key to expand.
-  // The old substring trigger turned "designer" into the bare needle "design",
-  // which substring-matched "Design Systems Intern" style titles.
+function queryNeedles(q: string, filters?: JobSearchFilters): string[] {
   const pq = parseQuery(q);
   const out = new Set<string>();
   for (const t of pq.tokens) {
     out.add(t);
     for (const s of QUERY_SYNONYMS[t] ?? []) {
-      // Multi-word synonyms are matched via their own word-boundary regexes.
       out.add(s);
+    }
+  }
+  const sen = filters?.seniority?.trim().toLowerCase();
+  if (sen === "intern") {
+    out.add("intern");
+    out.add("internship");
+    if ([...out].some((n) => /front|develop|engineer|software|swe|design/.test(n))) {
+      out.add("software engineer");
+      out.add("software engineering");
+      out.add("engineering");
     }
   }
   if (out.size === 0 && q.trim()) out.add(q.trim().toLowerCase());
@@ -202,7 +219,7 @@ export function matchesJobFilters(
   // own (it contributes to the relevance score instead) — unless relaxed.
   const q = filters.query?.trim().toLowerCase();
   if (q) {
-    const needles = queryNeedles(q);
+    const needles = queryNeedles(q, filters);
     const titleBlob = `${job.title} ${job.department || ""}`;
     const titleMatch = needles.some((n) => needleHit(titleBlob, n));
     if (!titleMatch) {
@@ -280,13 +297,13 @@ export function matchesJobFilters(
   // ── Seniority filter ──
   const sen = filters.seniority?.trim().toLowerCase();
   if (sen && sen !== "any") {
-    const jobSen = (job.seniority || guessSeniority(job.title) || "mid").toLowerCase();
+    const titleLower = job.title.toLowerCase();
+    const titleIntern = /\bintern(?:ship)?s?\b/.test(titleLower);
+    let jobSen = (job.seniority || guessSeniority(job.title) || "mid").toLowerCase();
+    if (sen === "intern" && titleIntern) jobSen = "intern";
     if (sen === "intern" && !relax.includes("seniority")) {
-      // Intern is its own level: intern-titled roles, or roles the board
-      // itself labeled as an internship.
       const typedInternship =
-        normalizeEmploymentType(job.employment_type) === "internship" ||
-        /\bintern(?:ship)?s?\b/.test(job.title.toLowerCase());
+        normalizeEmploymentType(job.employment_type) === "internship" || titleIntern;
       if (jobSen !== "intern" && !typedInternship) return false;
     } else if (relax.includes("seniority")) {
       if (!(SENIORITY_NEIGHBORS[sen] ?? [sen]).includes(jobSen)) return false;
@@ -318,8 +335,13 @@ export function matchesJobFilters(
     // Only enforce when the job states a type somewhere; silent jobs stay in
     // (ATS boards rarely label commitment consistently).
     if (jobType && jobType !== wantType) {
-      // "internship" also accepts jobs the seniority guess calls intern.
-      if (!(wantType === "internship" && guessedSeniority === "intern" && !job.employment_type)) {
+      const titleIntern = /\bintern(?:ship)?s?\b/.test(titleLower);
+      if (
+        wantType === "internship" &&
+        (guessedSeniority === "intern" || titleIntern || !job.employment_type)
+      ) {
+        // Intern-titled roles often carry full-time labels on ATS boards.
+      } else if (!(wantType === "internship" && guessedSeniority === "intern" && !job.employment_type)) {
         return false;
       }
     }

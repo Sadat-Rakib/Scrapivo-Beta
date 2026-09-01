@@ -6,6 +6,7 @@ import type { Lead } from "../scoring";
 import type { ExpandedQueries } from "./query-expander";
 import { disambiguatePlaceQuery, isRealBusinessWebsite } from "./place-disambiguate.server";
 import {
+  fanOutCitiesForAdmin,
   fanOutCitiesForCountry,
   isGazetteerCountry,
   normalizeLocalLocation,
@@ -378,9 +379,9 @@ export async function searchOsmLocalBusinesses(
   const hit = await geocodeNominatimPoint(loc);
   if (!hit) return [];
   if (isBroadAdmin(hit)) {
-    const cities = fanOutCitiesForCountry(loc, 4);
+    const cities = fanOutCitiesForAdmin(loc, 6);
     if (!cities.length) {
-      // Typed place resolved to a country/state with no gazetteer — do not Overpass a bbox.
+      // Unknown admin — do not Overpass a province/country bbox (times out).
       return [];
     }
     const batches = await Promise.all(

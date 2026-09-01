@@ -4,9 +4,9 @@
  * Directory pages (Businesses / Investors / Jobs) no longer expose a filter
  * panel. Instead the user types a free-form ask ("10 dentist shops in Austin,
  * Texas"), we extract every dimension we can CONFIRM from the text, and the
- * questionnaire asks only for what is genuinely missing — plus a few
- * fixed ICP questions (service, contact requirement, list size, engagement
- * type) that describe the searcher and can never be read from the text.
+ * questionnaire asks only for what is genuinely missing. When category,
+ * location, role, seniority, count, or engagement are already stated in
+ * the text, those questions are skipped.
  * No model is in the loop: the same input always yields the same structured
  * intent, so the flow cannot hallucinate a category or a city the user never
  * wrote.
@@ -27,9 +27,13 @@ export interface ParsedIntent {
   entityType?: "individual" | "firm";
   /** Jobs dimensions. */
   seniority?: "intern" | "junior" | "mid" | "senior" | "lead";
+  /** Jobs: full-time | contract | part-time | internship | any */
+  employmentType?: string;
   remoteOnly?: boolean;
   /** Jobs: coarse region derived from explicit region words (not cities). */
   region?: "remote" | "north_america" | "europe" | "asia" | "middle_east";
+  /** Businesses: how many listings the user wants (numeric or null = any). */
+  count?: number | null;
 }
 
 // ── gazetteer ───────────────────────────────────────────────────────────────
@@ -185,6 +189,29 @@ const PLACES = [
   "asia",
   "africa",
   "australia",
+  // Canadian provinces / territories
+  "british columbia",
+  "new brunswick",
+  "newfoundland",
+  "nova scotia",
+  "northwest territories",
+  "prince edward island",
+  "alberta",
+  "ontario",
+  "quebec",
+  "manitoba",
+  "saskatchewan",
+  "yukon",
+  "nunavut",
+  // Australian states
+  "new south wales",
+  "western australia",
+  "south australia",
+  // UK nations
+  "scotland",
+  "wales",
+  "northern ireland",
+  "england",
 ].sort((a, b) => b.length - a.length);
 
 const REGION_MAP: Record<string, ParsedIntent["region"]> = {
@@ -282,6 +309,7 @@ const FILLER = [
   "of",
   "for",
   "to",
+  "and",
 ].sort((a, b) => b.length - a.length);
 
 const INVESTOR_NOISE = [
@@ -376,6 +404,56 @@ function titleCasePlace(place: string): string {
     .replace(/\bUsa\b/, "USA");
 }
 
+const NUMBER_WORD_MAP: Record<string, number> = {
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+  five: 5,
+  six: 6,
+  seven: 7,
+  eight: 8,
+  nine: 9,
+  ten: 10,
+  eleven: 11,
+  twelve: 12,
+  fifteen: 15,
+  twenty: 20,
+  thirty: 30,
+  forty: 40,
+  fifty: 50,
+  sixty: 60,
+  seventy: 70,
+  eighty: 80,
+  ninety: 90,
+  hundred: 100,
+  dozen: 12,
+  dozens: 12,
+};
+
+function parseCountFromText(text: string): { count?: number; rest: string } {
+  const measureRe = new RegExp(
+    `\\b(\\d+|${NUMBER_WORDS})\\s+(?:more\\s+)?(?:other\\s+)?(?:${MEASURE_NOUNS})\\b`,
+    "i",
+  );
+  const m = measureRe.exec(text);
+  if (m) {
+    const raw = m[1].toLowerCase();
+    const n = /^\d+$/.test(raw) ? Number(raw) : (NUMBER_WORD_MAP[raw] ?? undefined);
+    if (n != null && n > 0) {
+      return { count: n, rest: cut(text, m.index, m.index + m[0].length) };
+    }
+  }
+  const bare = /\b(\d+)\b/.exec(text);
+  if (bare) {
+    const n = Number(bare[1]);
+    if (n > 0 && n <= 500) {
+      return { count: n, rest: cut(text, bare.index, bare.index + bare[0].length) };
+    }
+  }
+  return { rest: text };
+}
+
 function tidyCore(core: string): string | undefined {
   const cleaned = core
     .replace(/[\u2018\u2019'"]/g, "")
@@ -402,6 +480,13 @@ export function parseSearchIntent(domain: GuidedDomain, raw: string): ParsedInte
   if (!text) return intent;
 
   let working = text;
+
+  // 0) Businesses count — before location/category stripping.
+  if (domain === "businesses") {
+    const { count, rest } = parseCountFromText(working);
+    if (count != null) intent.count = count;
+    working = rest;
+  }
 
   // 1) Remote (jobs only) — before location so "remote" never becomes a place.
   if (domain === "jobs" && /\bremote\b/i.test(working)) {
@@ -472,23 +557,40 @@ export function parseSearchIntent(domain: GuidedDomain, raw: string): ParsedInte
     }
   }
 
-  // 5) Jobs seniority (jobs only — "senior care homes" must stay a category).
+  // 5) Jobs seniority + employment type (jobs only).
   if (domain === "jobs") {
+    const employmentPatterns: [RegExp, string][] = [
+      [/\b(?:intern|interns|internship|internships|trainee)\b/i, "internship"],
+      [/\b(?:full[ -]?time|permanent)\b/i, "full-time"],
+      [/\b(?:part[ -]?time)\b/i, "part-time"],
+      [/\b(?:contract|freelance|freelancer|c2c|1099)\b/i, "contract"],
+    ];
+    for (const [re, etype] of employmentPatterns) {
+      const m = re.exec(working);
+      if (m) {
+        intent.employmentType = etype;
+        if (etype === "internship") intent.seniority = "intern";
+        working = cut(working, m.index, m.index + m[0].length);
+        break;
+      }
+    }
+
     const seniorityPatterns: [RegExp, ParsedIntent["seniority"]][] = [
-      // "internship(s)" must win before junior — it is its own level, not a
-      // junior alias, and leaving it in the query breaks title matching.
       [/\b(?:intern|interns|internship|internships|trainee)\b/i, "intern"],
       [/\b(?:junior|entry[ -]?level|entry level|graduate)\b/i, "junior"],
       [/\b(?:mid[ -]?level|mid level|intermediate)\b/i, "mid"],
       [/\b(?:senior|sr\.?)\b/i, "senior"],
       [/\b(?:lead|principal|staff|head of|manager|director)\b/i, "lead"],
     ];
-    for (const [re, level] of seniorityPatterns) {
-      const m = re.exec(working);
-      if (m) {
-        intent.seniority = level;
-        working = cut(working, m.index, m.index + m[0].length);
-        break;
+    if (!intent.seniority) {
+      for (const [re, level] of seniorityPatterns) {
+        const m = re.exec(working);
+        if (m) {
+          intent.seniority = level;
+          if (level === "intern" && !intent.employmentType) intent.employmentType = "internship";
+          working = cut(working, m.index, m.index + m[0].length);
+          break;
+        }
       }
     }
   }
@@ -506,16 +608,22 @@ export function parseSearchIntent(domain: GuidedDomain, raw: string): ParsedInte
     }
   }
 
-  // 7) Location — "in/near <Capitalized Place>" first (captures multi-word
-  //    places like "Austin, Texas"), then known place names for bare mentions.
+  // 7) Location — last "in/near <Place>" wins; peel nested "in X in Y" down to Y.
   let location: string | undefined;
-  const prep =
-    /\b(?:in|near|around|at|across|based\s+in|located\s+in)\s+([A-Z][A-Za-z.'-]*(?:\s*,?\s+[A-Z][A-Za-z.'-]+){0,3})/.exec(
-      working,
-    );
-  if (prep) {
-    location = prep[1].trim();
-    working = cut(working, prep.index, prep.index + prep[0].length);
+  const prepRe =
+    /\b(?:in|near|around|at|across|based\s+in|located\s+in)\s+([a-z][a-z.'-]*(?:\s*,?\s+[a-z][a-z.'-]+){0,4})/gi;
+  const prepMatches: RegExpExecArray[] = [];
+  for (let m = prepRe.exec(working); m; m = prepRe.exec(working)) prepMatches.push(m);
+  const prepMatch = prepMatches.at(-1) ?? null;
+  if (prepMatch) {
+    const afterPrep = prepMatch[0]
+      .replace(/^\s*\b(?:in|near|around|at|across|based\s+in|located\s+in)\s+/i, "")
+      .trim();
+    const nested = afterPrep.split(/\s+\bin\b\s+/i);
+    let captured = nested[nested.length - 1].trim();
+    captured = captured.replace(/\s+\b(?:for|at|near)\b\s+.*$/i, "").trim();
+    location = titleCasePlace(captured);
+    working = cut(working, prepMatch.index, prepMatch.index + prepMatch[0].length);
   } else {
     // Bare mentions: collect every known place ("austin texas" →
     // "Austin, Texas"), longest names first.
@@ -602,15 +710,15 @@ export const REMOTE_OPTION = "__remote__";
 
 /**
  * Questions for whatever the parser could NOT confirm. Fully-specified inputs
- * (e.g. "dentists in Austin, Texas") skip the target questions, but the
- * businesses flow always appends its ICP questions — what the user sells,
- * their contact requirement, and list size describe the person searching, so
- * they cannot be read from the ask itself.
+ * (e.g. "10 cafes in Dubai", "hvac in Alberta") skip every dimension already
+ * extracted from the text.
  */
 export function buildGuidedQuestions(domain: GuidedDomain, parsed: ParsedIntent): FlowQuestion[] {
   const qs: FlowQuestion[] = [];
 
   if (domain === "businesses") {
+    const fullySpecified = Boolean(parsed.category && parsed.location);
+
     if (!parsed.category) {
       qs.push({
         id: "category",
@@ -647,65 +755,39 @@ export function buildGuidedQuestions(domain: GuidedDomain, parsed: ParsedIntent)
         required: true,
       });
     }
-    // ICP questions — what the user sells shapes which businesses are worth
-    // contacting, and the requirement answer becomes an automatic filter.
-    qs.push({
-      id: "service",
-      question: "What do you sell / what's your service?",
-      options: [
-        { value: "web design", label: "Web design / development" },
-        { value: "marketing", label: "Marketing / ads" },
-        { value: "seo", label: "SEO" },
-        { value: "software", label: "Software / apps" },
-        { value: "photography", label: "Photography / video" },
-        { value: "accounting", label: "Accounting / bookkeeping" },
-      ],
-      allowOther: true,
-      otherPlaceholder: "e.g. coffee equipment supply, HR consulting…",
-      skipValue: "",
-    });
-    qs.push({
-      id: "requirement",
-      question: "What should every business on this list have?",
-      options: [
-        { value: "contact", label: "Email or phone", hint: "Ready to contact", recommended: true },
-        { value: "email", label: "Email address" },
-        { value: "phone", label: "Phone number" },
-        { value: "website", label: "A website I can review" },
-        { value: "any", label: "No requirement" },
-      ],
-      skipValue: "contact",
-    });
-    // Pain-signal question — the answer becomes the ICP opportunity filter
-    // (same tags as the post-search chips, applied up front).
-    qs.push({
-      id: "opportunity",
-      question: "What kind of businesses do you want on this list?",
-      options: [
-        { value: "any", label: "Any business", hint: "No signal filter", recommended: true },
-        { value: "no_website", label: "Businesses with no website", hint: "Need one built" },
-        { value: "poor_design", label: "Outdated / poor design", hint: "Redesign prospects" },
-        {
-          value: "not_mobile_friendly",
-          label: "Not mobile-friendly",
-          hint: "Losing mobile visitors",
-        },
-        { value: "seo_poor", label: "Weak SEO", hint: "Ranking poorly on Google" },
-        { value: "sales_ready", label: "Sales-ready", hint: "Reachable with a live site" },
-      ],
-      skipValue: "any",
-    });
-    qs.push({
-      id: "count",
-      question: "How many businesses do you need?",
-      options: [
-        { value: "10", label: "10" },
-        { value: "25", label: "25" },
-        { value: "50", label: "50" },
-        { value: "any", label: "As many as possible", recommended: true },
-      ],
-      skipValue: "any",
-    });
+
+    // When category + location are known, skip ICP wizard — search immediately.
+    if (fullySpecified) {
+      if (parsed.count == null) {
+        qs.push({
+          id: "count",
+          question: "How many businesses do you need?",
+          options: [
+            { value: "10", label: "10" },
+            { value: "25", label: "25" },
+            { value: "50", label: "50" },
+            { value: "any", label: "As many as possible", recommended: true },
+          ],
+          skipValue: "any",
+        });
+      }
+      return qs;
+    }
+
+    // Partial ask — optional ICP refinements only when target fields were missing.
+    if (parsed.count == null) {
+      qs.push({
+        id: "count",
+        question: "How many businesses do you need?",
+        options: [
+          { value: "10", label: "10" },
+          { value: "25", label: "25" },
+          { value: "50", label: "50" },
+          { value: "any", label: "As many as possible", recommended: true },
+        ],
+        skipValue: "any",
+      });
+    }
     return qs;
   }
 
@@ -834,17 +916,19 @@ export function buildGuidedQuestions(domain: GuidedDomain, parsed: ParsedIntent)
       skipValue: "any",
     });
   }
-  qs.push({
-    id: "employmentType",
-    question: "What kind of engagement?",
-    options: [
-      { value: "any", label: "Any", recommended: true },
-      { value: "full-time", label: "Full-time" },
-      { value: "contract", label: "Contract / freelance" },
-      { value: "part-time", label: "Part-time" },
-      { value: "internship", label: "Internship" },
-    ],
-    skipValue: "any",
-  });
+  if (!parsed.employmentType) {
+    qs.push({
+      id: "employmentType",
+      question: "What kind of engagement?",
+      options: [
+        { value: "any", label: "Any", recommended: true },
+        { value: "full-time", label: "Full-time" },
+        { value: "contract", label: "Contract / freelance" },
+        { value: "part-time", label: "Part-time" },
+        { value: "internship", label: "Internship" },
+      ],
+      skipValue: "any",
+    });
+  }
   return qs;
 }

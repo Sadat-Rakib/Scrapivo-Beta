@@ -131,8 +131,8 @@ export function matchesLocalCraft(name: string, categoryAsk: string): boolean {
 
   if (/\b(hvac|heating|air conditioning|cooling|furnace|ac repair)\b/.test(ask)) {
     if (
-      /\b(plumb|electric|solar|painter|lawyer|attorney|salon|barber|dental|vet)\b/.test(n) &&
-      !/\b(hvac|heat|air cond|cooling|furnace|vent)\b/.test(n)
+      /\b(lawyer|attorney|salon|barber|dental|vet|restaurant|cafe|gym|spa)\b/.test(n) &&
+      !/\b(hvac|heat|air cond|cooling|furnace|vent|plumb|electric|climate|mechanical)\b/.test(n)
     ) {
       return false;
     }

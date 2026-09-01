@@ -21,6 +21,12 @@ export const LOCATION_ALIASES: Record<string, string> = {
   uae: "United Arab Emirates",
   dubai: "Dubai",
   canada: "Canada",
+  alberta: "Alberta",
+  ontario: "Ontario",
+  quebec: "Quebec",
+  "british columbia": "British Columbia",
+  manitoba: "Manitoba",
+  saskatchewan: "Saskatchewan",
   australia: "Australia",
   germany: "Germany",
   france: "France",
@@ -424,6 +430,68 @@ export const COUNTRY_CITIES: Record<string, string[]> = {
   colombia: ["Bogota", "Medellin", "Cali", "Barranquilla", "Cartagena"],
 };
 
+/** Provinces, states, and other admin regions — fan-out when Nominatim returns broad admin. */
+export const REGION_CITIES: Record<string, string[]> = {
+  alberta: [
+    "Calgary",
+    "Edmonton",
+    "Red Deer",
+    "Lethbridge",
+    "Medicine Hat",
+    "Fort McMurray",
+    "Grande Prairie",
+    "Airdrie",
+  ],
+  "british columbia": ["Vancouver", "Victoria", "Surrey", "Burnaby", "Kelowna", "Kamloops", "Abbotsford"],
+  ontario: [
+    "Toronto",
+    "Ottawa",
+    "Mississauga",
+    "Hamilton",
+    "London",
+    "Kitchener",
+    "Windsor",
+    "Brampton",
+    "Markham",
+  ],
+  quebec: ["Montreal", "Quebec City", "Laval", "Gatineau", "Sherbrooke", "Longueuil"],
+  manitoba: ["Winnipeg", "Brandon", "Steinbach"],
+  saskatchewan: ["Saskatoon", "Regina", "Prince Albert"],
+  "nova scotia": ["Halifax", "Dartmouth", "Sydney"],
+  "new brunswick": ["Moncton", "Saint John", "Fredericton"],
+  texas: ["Houston", "Dallas", "Austin", "San Antonio", "Fort Worth", "El Paso", "Arlington"],
+  california: [
+    "Los Angeles",
+    "San Francisco",
+    "San Diego",
+    "San Jose",
+    "Sacramento",
+    "Fresno",
+    "Oakland",
+  ],
+  florida: ["Miami", "Orlando", "Tampa", "Jacksonville", "Fort Lauderdale", "St. Petersburg"],
+  "new york": ["New York", "Buffalo", "Rochester", "Albany", "Syracuse"],
+  illinois: ["Chicago", "Aurora", "Naperville", "Springfield"],
+  pennsylvania: ["Philadelphia", "Pittsburgh", "Allentown", "Harrisburg"],
+  ohio: ["Columbus", "Cleveland", "Cincinnati", "Toledo"],
+  georgia: ["Atlanta", "Savannah", "Augusta", "Columbus"],
+  "north carolina": ["Charlotte", "Raleigh", "Durham", "Greensboro"],
+  michigan: ["Detroit", "Grand Rapids", "Ann Arbor", "Lansing"],
+  washington: ["Seattle", "Spokane", "Tacoma", "Bellevue"],
+  arizona: ["Phoenix", "Tucson", "Mesa", "Scottsdale"],
+  colorado: ["Denver", "Colorado Springs", "Aurora", "Boulder"],
+  massachusetts: ["Boston", "Worcester", "Springfield", "Cambridge"],
+  "new south wales": ["Sydney", "Newcastle", "Wollongong", "Central Coast"],
+  victoria: ["Melbourne", "Geelong", "Ballarat", "Bendigo"],
+  queensland: ["Brisbane", "Gold Coast", "Sunshine Coast", "Cairns"],
+  scotland: ["Edinburgh", "Glasgow", "Aberdeen", "Dundee"],
+  england: ["London", "Manchester", "Birmingham", "Leeds", "Liverpool", "Bristol"],
+  wales: ["Cardiff", "Swansea", "Newport", "Wrexham"],
+  dubai: ["Dubai"],
+  uae: ["Dubai", "Abu Dhabi", "Sharjah", "Ajman"],
+  "united arab emirates": ["Dubai", "Abu Dhabi", "Sharjah", "Ajman"],
+};
+
 /** Bare city → preferred country for Nominatim (avoids Toronto IA, etc.). */
 export const CITY_COUNTRY_HINTS: Record<string, string> = {
   dhaka: "Bangladesh",
@@ -526,11 +594,30 @@ export function isGazetteerCountry(location: string | null | undefined): boolean
   return key in COUNTRY_CITIES;
 }
 
+export function isGazetteerRegion(location: string | null | undefined): boolean {
+  if (!location) return false;
+  const key = countryKey(location);
+  return key in REGION_CITIES;
+}
+
+export function isGazetteerAdmin(location: string | null | undefined): boolean {
+  return isGazetteerCountry(location) || isGazetteerRegion(location);
+}
+
+export function majorCitiesForAdmin(location: string): string[] {
+  const key = countryKey(location);
+  return REGION_CITIES[key] ?? COUNTRY_CITIES[key] ?? [];
+}
+
 export function majorCitiesForCountry(location: string): string[] {
   return COUNTRY_CITIES[countryKey(location)] ?? [];
 }
 
-/** Cap fan-out so we do not hammer Nominatim/Places on huge countries. */
+/** Cap fan-out so we do not hammer Nominatim/Places on huge countries/regions. */
 export function fanOutCitiesForCountry(location: string, limit = 8): string[] {
   return majorCitiesForCountry(location).slice(0, limit);
+}
+
+export function fanOutCitiesForAdmin(location: string, limit = 8): string[] {
+  return majorCitiesForAdmin(location).slice(0, limit);
 }
