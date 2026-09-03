@@ -208,16 +208,16 @@ function AuthPage() {
       <div className="w-full h-full flex flex-col md:flex-row bg-[#080808] relative z-10">
         
         {/* LEFT HALF (Form) */}
-        <div className="w-full md:w-[45%] lg:w-1/2 p-8 md:p-14 lg:p-20 flex flex-col h-full overflow-y-auto relative z-10 custom-scrollbar">
+        <div className="w-full md:w-[45%] lg:w-[45%] p-8 md:p-12 lg:p-16 flex flex-col h-full overflow-y-auto relative z-10 custom-scrollbar">
           <Link
             to="/"
-            className="inline-flex items-center gap-1.5 text-sm text-white/50 hover:text-white/80 transition-colors mb-12"
+            className="inline-flex items-center gap-1.5 text-sm text-white/50 hover:text-white/80 transition-colors mb-12 shrink-0"
           >
             <ArrowLeft className="size-4" /> Back to home
           </Link>
 
           <div className="flex items-center gap-2.5 mb-10 shrink-0">
-            <img src={heroLogoAsset} alt="" className="h-8 w-auto filter invert brightness-0 saturate-100 contrast-100 opacity-90 mix-blend-screen" />
+            <img src={heroLogoAsset} alt="" className="h-7 w-auto object-contain rounded-full" />
             <span className="font-['Instrument_Serif','Times_New_Roman',serif] italic text-[1.75rem] tracking-[-0.04em]">Scrapivo</span>
           </div>
 
@@ -349,11 +349,11 @@ function AuthPage() {
         </div>
 
         {/* RIGHT HALF (Columns Image) */}
-        <div className="hidden md:block md:w-[55%] lg:w-1/2 relative h-full bg-[#050505]">
+        <div className="hidden md:block md:w-[55%] lg:w-[55%] relative h-full bg-[#050505] overflow-hidden flex items-center justify-center">
           <img 
             src={authColumnsAsset} 
             alt="" 
-            className="w-full h-full object-cover mix-blend-screen opacity-90" 
+            className="w-full h-full object-cover scale-150 origin-right mix-blend-screen opacity-90" 
           />
           <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#080808] to-transparent pointer-events-none" />
         </div>

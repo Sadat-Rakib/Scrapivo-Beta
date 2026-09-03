@@ -4,6 +4,232 @@ import heroLogoAsset from "@/assets/hero-logo.jpg";
 import heroCloudAsset from "@/assets/hero-cloud.png";
 import { Link } from "@tanstack/react-router";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { motion, AnimatePresence } from "framer-motion";
+
+// --- BENTO ANIMATION COMPONENTS ---
+
+function Card1Flow() {
+  const [phase, setPhase] = useState<"typing" | "searching" | "revealing" | "holding">("typing");
+  const [query, setQuery] = useState("");
+  const targetQuery = "find me SaaS founders in NY";
+  const statuses = [
+    "Searching social media...",
+    "Searching public websites...",
+    "Searching directories...",
+    "Searching government sites...",
+  ];
+  const [statusIdx, setStatusIdx] = useState(0);
+
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout>;
+    if (phase === "typing") {
+      if (query.length < targetQuery.length) {
+        t = setTimeout(() => setQuery(targetQuery.slice(0, query.length + 1)), 50 + Math.random() * 40);
+      } else {
+        t = setTimeout(() => setPhase("searching"), 300);
+      }
+    } else if (phase === "searching") {
+      if (statusIdx < statuses.length - 1) {
+        t = setTimeout(() => setStatusIdx(i => i + 1), 600);
+      } else {
+        t = setTimeout(() => setPhase("revealing"), 600);
+      }
+    } else if (phase === "revealing") {
+      t = setTimeout(() => setPhase("holding"), 2000);
+    } else if (phase === "holding") {
+      t = setTimeout(() => {
+        setQuery("");
+        setStatusIdx(0);
+        setPhase("typing");
+      }, 500);
+    }
+    return () => clearTimeout(t);
+  }, [phase, query, statusIdx]);
+
+  return (
+    <div className="scravipo-flow" aria-label="Query to delivery process">
+      <div style={{ position: "relative", marginBottom: "0.5rem", padding: "0.5rem 0.75rem", background: "rgba(0,0,0,0.3)", borderRadius: "0.5rem", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <span style={{ fontSize: "0.65rem", color: "rgba(255,255,255,0.8)", fontFamily: "monospace" }}>
+          {query}<span style={{ opacity: phase === "typing" ? 1 : 0 }}>|</span>
+        </span>
+        <div style={{ 
+          width: "1.2rem", height: "1.2rem", borderRadius: "50%", background: phase !== "typing" ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.05)", 
+          display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.2s",
+          boxShadow: phase !== "typing" ? "0 0 8px rgba(255,255,255,0.2)" : "none"
+        }}>
+          <span style={{ fontSize: "0.6rem", color: "#fff" }}>↗</span>
+        </div>
+      </div>
+      
+      <div style={{ minHeight: "3rem", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+        <AnimatePresence mode="wait">
+          {phase === "searching" && (
+            <motion.div key="searching" initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.5)" }}>
+              <span style={{ display: "inline-block", width: "10px", height: "10px", border: "2px solid rgba(255,255,255,0.2)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 1s linear infinite", verticalAlign: "middle", marginRight: "6px" }} />
+              {statuses[statusIdx]}
+            </motion.div>
+          )}
+          {phase === "revealing" || phase === "holding" ? (
+            <motion.div key="revealing" initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ padding: "0.5rem", background: "rgba(134,197,160,0.1)", border: "1px solid rgba(134,197,160,0.2)", borderRadius: "0.4rem" }}>
+              <div style={{ fontSize: "0.6rem", color: "#86c5a0", fontWeight: "bold", marginBottom: "0.2rem" }}>✓ Found 142 leads</div>
+              <div style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.6)" }}>Top match: Sarah Jenkins, Founder @ DataSync NY</div>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </div>
+      <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+}
+
+function Card2Enrich() {
+  const entities = [
+    { name: "Acme AI", type: "Company", loading: "examining public signals...", result: "Actively hiring engineers", dot: "is-blue" },
+    { name: "Northstar Labs", type: "Startup", loading: "examining recent activity...", result: "Raised Series A ($12M)", dot: "is-green" },
+    { name: "Atlas Ventures", type: "Investor", loading: "checking recent activity...", result: "Invested in AI last 30 days", dot: "is-amber" },
+    { name: "Alex Morgan", type: "Person", loading: "verifying role/company context...", result: "Founder at Northstar Labs", dot: "is-blue" },
+  ];
+  
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [status, setStatus] = useState<"pending" | "checking" | "enriched">("pending");
+
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout>;
+    if (status === "pending") {
+      t = setTimeout(() => setStatus("checking"), 600);
+    } else if (status === "checking") {
+      t = setTimeout(() => setStatus("enriched"), 1500);
+    } else if (status === "enriched") {
+      t = setTimeout(() => {
+        setStatus("pending");
+        setActiveIdx((i) => (i + 1) % entities.length);
+      }, 2500);
+    }
+    return () => clearTimeout(t);
+  }, [status, activeIdx]);
+
+  return (
+    <div className="scravipo-signal-window" style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+      {entities.map((ent, idx) => {
+        const isActive = idx === activeIdx;
+        const isPast = idx < activeIdx || (activeIdx === 0 && idx === entities.length - 1 && status === "pending");
+        const state = isActive ? status : isPast ? "pending" : "pending";
+        
+        return (
+          <div key={ent.name} style={{ opacity: isActive ? 1 : 0.3, transition: "opacity 0.3s" }}>
+            <div style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.9)", fontWeight: "bold" }}>{ent.name} <span style={{ fontWeight: "normal", color: "rgba(255,255,255,0.4)" }}>({ent.type})</span></div>
+            <div style={{ minHeight: "1.2rem", marginTop: "0.2rem" }}>
+              {state === "pending" && <div style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.3)" }}>Waiting...</div>}
+              {state === "checking" && <div style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.6)" }}>{ent.loading}</div>}
+              {state === "enriched" && (
+                <motion.div initial={{ opacity: 0, x: -5 }} animate={{ opacity: 1, x: 0 }} style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                  <span className={`scravipo-signal-window__dot ${ent.dot}`} />
+                  <span style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.8)" }}>{ent.result}</span>
+                </motion.div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function Card3Verified() {
+  const contacts = [
+    { name: "Alex Morgan", detail: "alex@acme.ai", check: "verified email" },
+    { name: "Sarah Jenkins", detail: "+1 (415) 555-0198", check: "verified phone" },
+    { name: "David Chen", detail: "david@northstar.co", check: "verified email" }
+  ];
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [status, setStatus] = useState<"pending" | "verifying" | "verified">("pending");
+
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout>;
+    if (status === "pending") {
+      t = setTimeout(() => setStatus("verifying"), 400);
+    } else if (status === "verifying") {
+      t = setTimeout(() => setStatus("verified"), 1200);
+    } else if (status === "verified") {
+      t = setTimeout(() => {
+        setStatus("pending");
+        setActiveIdx((i) => (i + 1) % contacts.length);
+      }, 2000);
+    }
+    return () => clearTimeout(t);
+  }, [status, activeIdx]);
+
+  const contact = contacts[activeIdx];
+
+  return (
+    <div className="scravipo-contact-proof" aria-hidden="true" style={{ height: "4rem" }}>
+      <AnimatePresence mode="wait">
+        <motion.div key={activeIdx} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }} style={{ display: "flex", alignItems: "center", gap: "0.58rem", width: "100%" }}>
+          <span className="scravipo-contact-proof__avatar">{contact.name.split(" ").map(n=>n[0]).join("")}</span>
+          <span className="scravipo-contact-proof__identity">
+            <strong>{contact.name}</strong>
+            <small style={{ fontFamily: "monospace" }}>{contact.detail}</small>
+          </span>
+          {status === "verifying" && <span style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.5)", marginLeft: "auto" }}>verifying...</span>}
+          {status === "verified" && (
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "0.3rem" }}>
+              <span style={{ fontSize: "0.5rem", color: "#9fd1ac" }}>{contact.check}</span>
+              <span className="scravipo-contact-proof__check">✓</span>
+            </motion.div>
+          )}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function Card4Outreach() {
+  const drafts = [
+    { lead: "Alex Morgan", text: "Hi Alex,\n\nSaw you're leading growth at Acme AI. I noticed your recent Series A and wanted to reach out. We help AI startups scale their outbound efforts securely.\n\nWould you be open to a quick chat next week to see if there's a fit?\n\nBest,\nScrapivo Team" },
+    { lead: "Sarah Jenkins", text: "Hey Sarah; I loved your recent post about data sync challenges. Our new API solves exactly this. Let me know if you want to test it out!" },
+  ];
+  
+  const [draftIdx, setDraftIdx] = useState(0);
+  const [typed, setTyped] = useState("");
+  const [phase, setPhase] = useState<"typing" | "holding" | "clearing">("typing");
+
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout>;
+    const targetText = drafts[draftIdx].text;
+    
+    if (phase === "typing") {
+      if (typed.length < targetText.length) {
+        t = setTimeout(() => setTyped(targetText.slice(0, typed.length + 1)), 15 + Math.random() * 15);
+      } else {
+        t = setTimeout(() => setPhase("holding"), 3000);
+      }
+    } else if (phase === "holding") {
+      t = setTimeout(() => setPhase("clearing"), 50);
+    } else if (phase === "clearing") {
+      t = setTimeout(() => {
+        setTyped("");
+        setDraftIdx((i) => (i + 1) % drafts.length);
+        setPhase("typing");
+      }, 500); 
+    }
+    return () => clearTimeout(t);
+  }, [phase, typed, draftIdx]);
+
+  return (
+    <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column" }}>
+      <div style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.4)", marginBottom: "0.5rem" }}>Drafting for: <span style={{ color: "rgba(255,255,255,0.9)" }}>{drafts[draftIdx].lead}</span></div>
+      <div style={{ 
+        height: "10.5rem", background: "rgba(0,0,0,0.3)", borderRadius: "0.5rem", border: "1px solid rgba(255,255,255,0.1)", 
+        padding: "0.75rem", fontSize: "0.75rem", color: "rgba(255,255,255,0.8)", lineHeight: 1.5,
+        opacity: phase === "clearing" ? 0 : 1, transition: "opacity 0.3s",
+        whiteSpace: "pre-wrap", overflow: "hidden"
+      }}>
+        {typed}<span style={{ opacity: phase === "typing" ? 1 : 0 }}>|</span>
+      </div>
+    </div>
+  );
+}
+
 
 
 /**
@@ -23,7 +249,7 @@ const navItems = [
   { label: "FAQ", href: "#faq" },
 ];
 
-type DashboardCategory = "Investor" | "Local Business" | "Company" | "Person" | "Venture Capital";
+type DashboardCategory = "Mixed" | "Investor" | "Local Business" | "Executive" | "Person" | "Venture Capital";
 
 type LeadRecord = {
   id: string;
@@ -44,6 +270,23 @@ type CategoryConfig = {
 };
 
 const dashboardConfigs: Record<DashboardCategory, CategoryConfig> = {
+  Mixed: {
+    title: "Everything",
+    subtitle: "A cross-section of global leads",
+    columns: [
+      { key: "name", label: "Name / Entity" },
+      { key: "category", label: "Category" },
+      { key: "location", label: "Location" },
+      { key: "contact", label: "Detail / Contact" },
+    ],
+    rows: [
+      { id: "mixed-1", name: "Alfred Lin", secondary: "Sequoia Capital", initials: "AL", image: "https://framerusercontent.com/images/qN8j54q8Vi2GA6Fqt0OG8fQSJw.webp?width=880&height=880", imageAlt: "Alfred Lin", fields: { category: "Investor", location: "San Francisco, CA", contact: "Early-AL@sequoiacap.com" }, tags: ["SaaS"] },
+      { id: "mixed-2", name: "Accel", secondary: "Global venture firm", initials: "AC", image: favicon("accel.com"), imageAlt: "Accel", fields: { category: "Venture Capital", location: "Palo Alto, US", contact: "partners@accel.com" }, tags: ["AI"] },
+      { id: "mixed-3", name: "Dario Amodei", secondary: "Anthropic", initials: "DA", fields: { category: "Person", location: "San Francisco, US", contact: "press@anthropic.com" }, tags: ["Verified"] },
+      { id: "mixed-4", name: "Apex Roofers", secondary: "Roofing & repair", initials: "AR", fields: { category: "Local Business", location: "Denver, US", contact: "No web presence" }, tags: ["Verified"] },
+      { id: "mixed-5", name: "OpenAI", secondary: "Artificial intelligence", initials: "OA", image: favicon("openai.com"), imageAlt: "OpenAI", fields: { category: "Company", location: "San Francisco, US", contact: "legal@openai.com" }, tags: ["Enterprise"] },
+    ],
+  },
   Investor: {
     title: "Investors",
     subtitle: "High-intent investor leads",
@@ -74,33 +317,32 @@ const dashboardConfigs: Record<DashboardCategory, CategoryConfig> = {
       { key: "website", label: "Website" },
     ],
     rows: [
-      { id: "business-1", name: "Blue Bottle Coffee", secondary: "Specialty coffee", initials: "BB", image: favicon("bluebottlecoffee.com"), imageAlt: "Blue Bottle Coffee official mark", fields: { location: "San Francisco, US", category: "Cafe", phone: "+1 (510) 661-3510", email: "support@bluebottlecoffee.com", website: "bluebottlecoffee.com" }, tags: ["Verified"] },
-      { id: "business-2", name: "Monocle Café", secondary: "Independent hospitality", initials: "MC", image: favicon("monocle.com"), imageAlt: "Monocle official mark", fields: { location: "London, UK", category: "Cafe", phone: "+44 20 7135 2040", email: "ma@monocle.com", website: "monocle.com" }, tags: ["Verified"] },
-      { id: "business-3", name: "Borough Market", secondary: "Food market & traders", initials: "BM", image: favicon("boroughmarket.org.uk"), imageAlt: "Borough Market official mark", fields: { location: "London, UK", category: "Market", phone: "020 7407 1002", email: "info@boroughmarket.org.uk", website: "boroughmarket.org.uk" }, tags: ["Verified"] },
-      { id: "business-4", name: "The Hoxton Paris", secondary: "Design-led hospitality", initials: "HP", image: favicon("thehoxton.com"), imageAlt: "The Hoxton official mark", fields: { location: "Paris, France", category: "Hotel", phone: "+33 1 85 65 75 00", email: "hello.paris@thehox.com", website: "thehoxton.com" }, tags: ["Verified"] },
+      { id: "business-1", name: "Joe's Plumbing", secondary: "Independent contractor", initials: "JP", fields: { location: "Austin, US", category: "Plumbing", phone: "+1 (512) 555-0199", email: "joesplumbingatx@gmail.com", website: "None found" }, tags: ["No website"] },
+      { id: "business-2", name: "Maria's Flower Shop", secondary: "Local florist", initials: "MF", fields: { location: "Chicago, US", category: "Retail", phone: "+1 (312) 555-0145", email: "mariaflowers@yahoo.com", website: "None found" }, tags: ["No website"] },
+      { id: "business-3", name: "Apex Roofers", secondary: "Roofing & repair", initials: "AR", fields: { location: "Denver, US", category: "Construction", phone: "+1 (720) 555-0182", email: "apexroofingdenver@gmail.com", website: "None found" }, tags: ["No website"] },
+      { id: "business-4", name: "Golden Wok", secondary: "Family restaurant", initials: "GW", fields: { location: "Seattle, US", category: "Restaurant", phone: "+1 (206) 555-0123", email: "goldenwokseattle@gmail.com", website: "None found" }, tags: ["No website"] },
     ],
   },
-  Company: {
-    title: "Companies",
-    subtitle: "Company intelligence & prospecting",
+  Executive: {
+    title: "Executives",
+    subtitle: "Global company executives & leadership",
     columns: [
-      { key: "name", label: "Company" },
-      { key: "hq", label: "HQ" },
-      { key: "industry", label: "Industry" },
-      { key: "size", label: "Size" },
-      { key: "email", label: "Public email / route" },
-      { key: "website", label: "Website" },
+      { key: "name", label: "Person" },
+      { key: "title", label: "Title" },
+      { key: "company", label: "Company" },
+      { key: "location", label: "Location" },
+      { key: "email", label: "Email" },
     ],
     rows: [
-      { id: "company-1", name: "OpenAI", secondary: "Artificial intelligence", initials: "OA", image: favicon("openai.com"), imageAlt: "OpenAI official mark", fields: { hq: "San Francisco, US", industry: "AI", size: "Enterprise", email: "legal@openai.com", website: "openai.com" }, tags: ["High"] },
-      { id: "company-2", name: "Stripe", secondary: "Financial infrastructure", initials: "ST", image: favicon("stripe.com"), imageAlt: "Stripe official mark", fields: { hq: "San Francisco, US", industry: "Fintech", size: "Enterprise", email: "Stripe newsroom", website: "stripe.com" }, tags: ["Verified"] },
-      { id: "company-3", name: "Linear", secondary: "Product development software", initials: "LI", image: favicon("linear.app"), imageAlt: "Linear official mark", fields: { hq: "San Francisco, US", industry: "SaaS", size: "Growth", email: "hello@linear.app", website: "linear.app" }, tags: ["Product"] },
-      { id: "company-4", name: "Vanta", secondary: "Trust management platform", initials: "VA", image: favicon("vanta.com"), imageAlt: "Vanta official mark", fields: { hq: "San Francisco, US", industry: "Security", size: "Growth", email: "support@vanta.com", website: "vanta.com" }, tags: ["Security"] },
+      { id: "exec-1", name: "Satya Nadella", secondary: "Microsoft", initials: "SN", fields: { title: "CEO", company: "Microsoft", location: "Redmond, US", email: "satyan@microsoft.com" }, tags: ["Enterprise"] },
+      { id: "exec-2", name: "Tim Cook", secondary: "Apple", initials: "TC", fields: { title: "CEO", company: "Apple", location: "Cupertino, US", email: "tcook@apple.com" }, tags: ["Verified"] },
+      { id: "exec-3", name: "Ruth Porat", secondary: "Alphabet", initials: "RP", fields: { title: "President & CIO", company: "Alphabet", location: "Mountain View, US", email: "ruth@abc.xyz" }, tags: ["Finance"] },
+      { id: "exec-4", name: "Marc Benioff", secondary: "Salesforce", initials: "MB", fields: { title: "Chair & CEO", company: "Salesforce", location: "San Francisco, US", email: "ceo@salesforce.com" }, tags: ["Cloud"] },
     ],
   },
   Person: {
-    title: "People",
-    subtitle: "Decision makers & professional contacts",
+    title: "Startup Founders",
+    subtitle: "Founders & early-stage leaders",
     columns: [
       { key: "name", label: "Person" },
       { key: "title", label: "Title" },
@@ -110,10 +352,10 @@ const dashboardConfigs: Record<DashboardCategory, CategoryConfig> = {
       { key: "email", label: "Email" },
     ],
     rows: [
-      { id: "person-1", name: "Dario Amodei", secondary: "Chief executive officer", initials: "DA", image: favicon("anthropic.com"), imageAlt: "Anthropic official mark", fields: { title: "CEO", company: "Anthropic", location: "San Francisco, US", phone: "Anthropic newsroom", email: "press@anthropic.com" }, tags: ["Verified"] },
-      { id: "person-2", name: "Brian Chesky", secondary: "Co-founder & CEO", initials: "BC", image: "https://news.airbnb.com/wp-content/uploads/sites/4/2016/10/Brian-Chesky-Headshot-IR-Crop-Airbnb-2.jpg?w=624", imageAlt: "Brian Chesky", fields: { title: "CEO", company: "Airbnb", location: "San Francisco, US", phone: "Airbnb newsroom", email: "contact.press@airbnb.com" }, tags: ["Leadership"] },
-      { id: "person-3", name: "Jensen Huang", secondary: "Founder & CEO", initials: "JH", image: "https://iprsoftwaremedia.com/219/files/202604/f0e9efa72f909f3f08cdd0a48ff92880/69e6b9293d633260eec67804_jensen-1920x1920/jensen-1920x1920_6a7e6ad5-c215-4503-b70d-fe6e5e9de205-prv.jpg?v=6a7e6ad5-c215-4503-b70d-fe6e5e9de205", imageAlt: "Jensen Huang", fields: { title: "CEO", company: "NVIDIA", location: "Santa Clara, US", phone: "+1 (408) 486-2000", email: "info@nvidia.com" }, tags: ["Leadership"] },
-      { id: "person-4", name: "Melanie Perkins", secondary: "Co-founder & CEO", initials: "MP", image: favicon("canva.com"), imageAlt: "Canva official mark", fields: { title: "CEO", company: "Canva", location: "Sydney, AU", phone: "Canva newsroom", email: "comms@canva.com" }, tags: ["Design"] },
+      { id: "person-1", name: "Dario Amodei", secondary: "Anthropic", initials: "DA", fields: { title: "Founder & CEO", company: "Anthropic", location: "San Francisco, US", phone: "Anthropic newsroom", email: "press@anthropic.com" }, tags: ["Verified"] },
+      { id: "person-2", name: "Brian Chesky", secondary: "Airbnb", initials: "BC", image: "https://news.airbnb.com/wp-content/uploads/sites/4/2016/10/Brian-Chesky-Headshot-IR-Crop-Airbnb-2.jpg?w=624", imageAlt: "Brian Chesky", fields: { title: "Co-founder & CEO", company: "Airbnb", location: "San Francisco, US", phone: "Airbnb newsroom", email: "contact.press@airbnb.com" }, tags: ["Leadership"] },
+      { id: "person-3", name: "Jensen Huang", secondary: "NVIDIA", initials: "JH", image: "https://iprsoftwaremedia.com/219/files/202604/f0e9efa72f909f3f08cdd0a48ff92880/69e6b9293d633260eec67804_jensen-1920x1920/jensen-1920x1920_6a7e6ad5-c215-4503-b70d-fe6e5e9de205-prv.jpg?v=6a7e6ad5-c215-4503-b70d-fe6e5e9de205", imageAlt: "Jensen Huang", fields: { title: "Founder & CEO", company: "NVIDIA", location: "Santa Clara, US", phone: "+1 (408) 486-2000", email: "info@nvidia.com" }, tags: ["Leadership"] },
+      { id: "person-4", name: "Melanie Perkins", secondary: "Canva", initials: "MP", fields: { title: "Co-founder & CEO", company: "Canva", location: "Sydney, AU", phone: "Canva newsroom", email: "comms@canva.com" }, tags: ["Design"] },
     ],
   },
   "Venture Capital": {
@@ -128,10 +370,10 @@ const dashboardConfigs: Record<DashboardCategory, CategoryConfig> = {
       { key: "email", label: "Email / route" },
     ],
     rows: [
-      { id: "vc-1", name: "Accel", secondary: "Global venture firm", initials: "AC", image: favicon("accel.com"), imageAlt: "Accel official mark", fields: { location: "Palo Alto, US", stage: "Seed–Growth", website: "accel.com", email: "Accel contact form", phone: "+1 650 614 4800" }, tags: ["Enterprise", "AI"] },
+      { id: "vc-1", name: "Accel", secondary: "Global venture firm", initials: "AC", image: favicon("accel.com"), imageAlt: "Accel official mark", fields: { location: "Palo Alto, US", stage: "Seed–Growth", website: "accel.com", email: "partners@accel.com", phone: "+1 650 614 4800" }, tags: ["Enterprise", "AI"] },
       { id: "vc-2", name: "Index Ventures", secondary: "Technology investor", initials: "IV", image: favicon("indexventures.com"), imageAlt: "Index Ventures official mark", fields: { location: "London, UK", stage: "Seed–Growth", website: "indexventures.com", email: "press@indexventures.com", phone: "+44 20 7154 2020" }, tags: ["Fintech", "SaaS"] },
-      { id: "vc-3", name: "General Catalyst", secondary: "Transformation investor", initials: "GC", image: favicon("generalcatalyst.com"), imageAlt: "General Catalyst official mark", fields: { location: "Cambridge, US", stage: "Early–Growth", website: "generalcatalyst.com", email: "General Catalyst contact form", phone: "+1 415 659 5000" }, tags: ["Healthcare", "AI"] },
-      { id: "vc-4", name: "Bessemer Venture Partners", secondary: "Cloud & technology investor", initials: "BV", image: favicon("bvp.com"), imageAlt: "Bessemer Venture Partners official mark", fields: { location: "Menlo Park, US", stage: "Seed–Growth", website: "bvp.com", email: "Bessemer contact form", phone: "Firm directory" }, tags: ["Cloud", "Security"] },
+      { id: "vc-3", name: "General Catalyst", secondary: "Transformation investor", initials: "GC", image: favicon("generalcatalyst.com"), imageAlt: "General Catalyst official mark", fields: { location: "Cambridge, US", stage: "Early–Growth", website: "generalcatalyst.com", email: "info@generalcatalyst.com", phone: "+1 415 659 5000" }, tags: ["Healthcare", "AI"] },
+      { id: "vc-4", name: "Bessemer Venture Partners", secondary: "Cloud & technology investor", initials: "BV", image: favicon("bvp.com"), imageAlt: "Bessemer Venture Partners official mark", fields: { location: "Menlo Park, US", stage: "Seed–Growth", website: "bvp.com", email: "contact@bvp.com", phone: "Firm directory" }, tags: ["Cloud", "Security"] },
     ],
   },
 };
@@ -139,107 +381,99 @@ const dashboardConfigs: Record<DashboardCategory, CategoryConfig> = {
 export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string }) {
   const signupSearch = cta === "/auth" ? { mode: "signup" as const } : undefined;
   const [menuOpen, setMenuOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<DashboardCategory>("Investor");
-  const [query, setQuery] = useState("");
-  const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
   // Word cycling for hero headline
   const topWords = ["Opportunities", "Leads"];
   const bottomWords = ["matter", "convert"];
-  const [topIdx, setTopIdx] = useState(0);
-  const [bottomIdx, setBottomIdx] = useState(0);
-  const [topFade, setTopFade] = useState(true);
-  const [bottomFade, setBottomFade] = useState(true);
+  const [wordIdx, setWordIdx] = useState(0);
+  const [fade, setFade] = useState(true);
 
   useEffect(() => {
     const t = setInterval(() => {
-      setTopFade(false);
+      setFade(false);
       setTimeout(() => {
-        setTopIdx(i => (i + 1) % topWords.length);
-        setTopFade(true);
+        setWordIdx(i => (i + 1) % 2);
+        setFade(true);
       }, 600);
     }, 2800);
     return () => clearInterval(t);
   }, []);
 
-  useEffect(() => {
-    const t = setInterval(() => {
-      setBottomFade(false);
-      setTimeout(() => {
-        setBottomIdx(i => (i + 1) % bottomWords.length);
-        setBottomFade(true);
-      }, 600);
-    }, 3200);
-    return () => clearInterval(t);
-  }, []);
-
-  // Dashboard Auto-Type Effect
-  const autoQueries = [
-    { text: "fast growing ai startups in sf", cat: "Company" as DashboardCategory },
-    { text: "seed stage deep tech investors", cat: "Investor" as DashboardCategory },
-    { text: "recently funded b2b saas founders", cat: "Person" as DashboardCategory },
-    { text: "head of growth at series b", cat: "Job" as DashboardCategory },
+  // Dashboard Auto-Type Effect — deterministic scripted state machine
+  // Each scripted query maps directly to one predefined result dataset.
+  // No real search/filter logic. No empty states. This is a marketing demo.
+  const autoQueries: { text: string; configKey: DashboardCategory }[] = [
+    { text: "100+ investors and VCs; Early-Stage AI", configKey: "Venture Capital" },
+    { text: "Want to sell my website service; find me 200+ global local businesses rn", configKey: "Local Business" },
+    { text: "Yo actively looking for jobs; asap find me 100+ startup founders", configKey: "Person" },
+    { text: "find me 50+ global company executives rn", configKey: "Executive" },
   ];
-  const [queryIdx, setQueryIdx] = useState(0);
-  const [typewriterText, setTypewriterText] = useState("");
-  const [isTyping, setIsTyping] = useState(true);
-  const [isAutoTypingActive, setIsAutoTypingActive] = useState(true);
+
+  // scriptPhase: "initial" = showing Mixed, awaiting first type | "typing" = character-by-character | "holding" = showing result, waiting before delete | "deleting" = erasing query
+  const [scriptIdx, setScriptIdx] = useState(0);
+  const [scriptPhase, setScriptPhase] = useState<"initial" | "typing" | "holding" | "deleting">("initial");
+  const [displayedQuery, setDisplayedQuery] = useState("");
+  // Which result set is currently shown in the dashboard table
+  const [activeResultKey, setActiveResultKey] = useState<DashboardCategory>("Mixed");
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
   useEffect(() => {
-    if (!isAutoTypingActive) return;
     let timeout: ReturnType<typeof setTimeout>;
-    
-    if (isTyping) {
-      const targetText = autoQueries[queryIdx].text;
-      if (typewriterText.length < targetText.length) {
+
+    if (scriptPhase === "initial") {
+      // Show Mixed state for 3 seconds, then start typing the first query
+      timeout = setTimeout(() => {
+        setScriptPhase("typing");
+      }, 3000);
+    } else if (scriptPhase === "typing") {
+      const targetText = autoQueries[scriptIdx].text;
+      if (displayedQuery.length < targetText.length) {
         timeout = setTimeout(() => {
-          setTypewriterText(targetText.slice(0, typewriterText.length + 1));
-          setQuery(targetText.slice(0, typewriterText.length + 1));
+          setDisplayedQuery(targetText.slice(0, displayedQuery.length + 1));
         }, 60 + Math.random() * 40);
       } else {
-        timeout = setTimeout(() => setIsTyping(false), 2800);
+        // Typing complete → swap dashboard to the scripted result set
+        timeout = setTimeout(() => {
+          setActiveResultKey(autoQueries[scriptIdx].configKey);
+          setSelectedRows([]);
+          setScriptPhase("holding");
+        }, 100);
       }
-    } else {
-      if (typewriterText.length > 0) {
+    } else if (scriptPhase === "holding") {
+      // Hold the result for 2.8 seconds
+      timeout = setTimeout(() => {
+        setScriptPhase("deleting");
+      }, 2800);
+    } else if (scriptPhase === "deleting") {
+      if (displayedQuery.length > 0) {
         timeout = setTimeout(() => {
-          setTypewriterText(typewriterText.slice(0, -1));
-          setQuery(typewriterText.slice(0, -1));
-        }, 30);
+          setDisplayedQuery(displayedQuery.slice(0, -1));
+        }, 25);
       } else {
+        // Move to next query — all state updates batched inside setTimeout
         timeout = setTimeout(() => {
-          setQueryIdx((i) => {
-            const next = (i + 1) % autoQueries.length;
-            setActiveCategory(autoQueries[next].cat);
-            return next;
-          });
-          setIsTyping(true);
-        }, 500);
+          const nextIdx = (scriptIdx + 1) % autoQueries.length;
+          setScriptIdx(nextIdx);
+          setActiveResultKey("Mixed");
+          setScriptPhase("typing");
+        }, 600);
       }
     }
-    
+
     return () => clearTimeout(timeout);
-  }, [typewriterText, isTyping, queryIdx, isAutoTypingActive]);
+  }, [scriptPhase, displayedQuery, scriptIdx]);
 
-  const handleManualSearch = (val: string) => {
-    setIsAutoTypingActive(false);
-    setQuery(val);
-  };
-
-  const activeConfig = dashboardConfigs[activeCategory];
-  const visibleRows = activeConfig.rows.filter((row) => {
-    const searchable = [row.name, row.secondary, ...Object.values(row.fields), ...(row.tags ?? [])].join(" ").toLowerCase();
-    return searchable.includes(query.trim().toLowerCase());
-  });
-  const allVisibleSelected = visibleRows.length > 0 && visibleRows.every((row) => selectedRows.includes(row.id));
+  const activeConfig = dashboardConfigs[activeResultKey];
 
   const toggleRow = (id: string) => {
     setSelectedRows((current) => current.includes(id) ? current.filter((rowId) => rowId !== id) : [...current, id]);
   };
+  const allVisibleSelected = activeConfig.rows.length > 0 && activeConfig.rows.every((row) => selectedRows.includes(row.id));
 
   const toggleAllVisible = () => {
     setSelectedRows((current) => {
-      if (allVisibleSelected) return current.filter((id) => !visibleRows.some((row) => row.id === id));
-      return Array.from(new Set([...current, ...visibleRows.map((row) => row.id)]));
+      if (allVisibleSelected) return current.filter((id) => !activeConfig.rows.some((row) => row.id === id));
+      return Array.from(new Set([...current, ...activeConfig.rows.map((row) => row.id)]));
     });
   };
 
@@ -297,15 +531,13 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
         </div>
       </header>
 
-      <img className="scravipo-cloud scravipo-cloud--left" src={heroCloudAsset} alt="" aria-hidden="true" />
-      <img className="scravipo-cloud scravipo-cloud--right" src={heroCloudAsset} alt="" aria-hidden="true" />
       <img className="scravipo-statue" src={statueAsset} alt="" aria-hidden="true" />
 
       <main className="scravipo-hero__content">
         <p className="scravipo-eyebrow">Scravipo</p>
         <h1>
-          <span className="scravipo-hero__line-top">Get <span className="scravipo-cycle-word" style={{ opacity: topFade ? 1 : 0 }}>{topWords[topIdx]}</span></span>
-          <span className="scravipo-hero__line-bottom">that <span className="scravipo-cycle-word" style={{ opacity: bottomFade ? 1 : 0 }}>{bottomWords[bottomIdx]}</span></span>
+          <span className="scravipo-hero__line-top">Get <span className="scravipo-cycle-word" style={{ opacity: fade ? 1 : 0 }}>{topWords[wordIdx]}</span></span>
+          <span className="scravipo-hero__line-bottom">that <span className="scravipo-cycle-word" style={{ opacity: fade ? 1 : 0 }}>{bottomWords[wordIdx]}</span></span>
         </h1>
         <p className="scravipo-description">
           Scravipo turns live web signals into verified business
@@ -427,7 +659,7 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
         .scravipo-nav__links a,
         .scravipo-mobile-menu a {
           color: rgba(243, 241, 236, 0.86);
-          font-size: 0.72rem;
+          font-size: 0.95rem;
           font-weight: 500;
           letter-spacing: -0.01em;
           text-decoration: none;
@@ -449,9 +681,9 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
           background: var(--chalk);
           color: #111113;
           font-family: Arial, Helvetica, sans-serif;
-          font-size: 0.85rem;
+          font-size: 0.95rem;
           font-weight: 600;
-          padding: 0.75rem 1.8rem;
+          padding: 0.85rem 1.95rem;
           line-height: 1;
           text-decoration: none;
           transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), background-color 160ms ease-out, box-shadow 160ms ease-out;
@@ -591,7 +823,7 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
 
         .scravipo-statue {
           position: absolute;
-          z-index: 1;
+          z-index: 2;
           right: clamp(-4.8rem, -3.4vw, -1.35rem);
           bottom: clamp(-4.8rem, -3.9vw, -1.1rem);
           width: min(39rem, 42vw);
@@ -620,23 +852,23 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
 
         .scravipo-cloud {
           position: absolute;
-          z-index: 0;
-          width: clamp(14rem, 22vw, 22rem);
+          z-index: 1;
+          width: clamp(16rem, 24vw, 28rem);
           height: auto;
           pointer-events: none;
           user-select: none;
-          opacity: 0.7;
-          filter: brightness(0.85) contrast(1.1);
+          opacity: 0.65;
+          filter: brightness(0.9) contrast(1.05);
         }
 
         .scravipo-cloud--left {
-          left: clamp(-6rem, -4vw, -2rem);
-          bottom: clamp(-2rem, 2vw, 4rem);
+          left: clamp(-8rem, -6vw, -4rem);
+          top: clamp(-8rem, -7vw, -6rem);
         }
 
         .scravipo-cloud--right {
-          right: clamp(2rem, 8vw, 12rem);
-          bottom: clamp(-1rem, 3vw, 5rem);
+          right: clamp(-8rem, -6vw, -4rem);
+          top: clamp(-8rem, -7vw, -6rem);
           transform: scaleX(-1);
         }
 
@@ -699,15 +931,19 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
           }
 
           .scravipo-cloud--left {
-            left: -8rem;
-            bottom: -6rem;
-            opacity: 0.4;
+            left: -4rem;
+            top: -5rem;
+            bottom: auto;
+            width: clamp(12rem, 32vw, 16rem);
+            opacity: 0.45;
           }
 
           .scravipo-cloud--right {
-            right: -6rem;
-            bottom: -5rem;
-            opacity: 0.4;
+            right: -4rem;
+            top: -5rem;
+            bottom: auto;
+            width: clamp(12rem, 32vw, 16rem);
+            opacity: 0.45;
           }
 
           .scravipo-hero__content {
@@ -779,6 +1015,7 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
             linear-gradient(180deg, #0b0d0f 0%, #090a0b 42%, #0a0a0a 100%);
           color: #f3f1ec;
           font-family: Arial, Helvetica, sans-serif;
+          overflow: hidden;
         }
 
         .scravipo-dashboard,
@@ -803,6 +1040,8 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
           gap: 2rem;
           max-width: 79rem;
           margin: 0 auto 2.4rem;
+          position: relative;
+          z-index: 2;
         }
 
         .scravipo-dashboard__kicker {
@@ -908,15 +1147,7 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
         .scravipo-lead-panel {
           max-width: 79rem;
           margin: 0 auto;
-          overflow: hidden;
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          border-radius: 1.15rem;
-          background:
-            linear-gradient(145deg, rgba(48, 57, 64, 0.52), rgba(18, 21, 24, 0.68) 48%, rgba(9, 10, 11, 0.82)),
-            rgba(20, 22, 24, 0.54);
-          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 0 0 1px rgba(137, 174, 194, 0.06), 0 2rem 5rem rgba(0, 0, 0, 0.24);
-          backdrop-filter: blur(28px) saturate(1.22);
-          -webkit-backdrop-filter: blur(28px) saturate(1.22);
+          /* Visuals handled by .liquid-glass */
         }
 
         .scravipo-lead-panel__header,
@@ -1076,6 +1307,12 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
         }
 
         .scravipo-table-more button:hover { color: #f3f1ec; }
+
+        @keyframes scravipo-blink {
+          0%, 100% { border-right-color: transparent; }
+          50% { border-right-color: rgba(255,255,255,0.7); }
+        }
+
 
         .scravipo-lead-table input[type="checkbox"] {
           width: 0.85rem;
@@ -1308,7 +1545,7 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
         .scravipo-bento__heading > p:last-child {
           margin: 1rem auto 0;
           color: rgba(243, 241, 236, 0.45);
-          font-size: 0.76rem;
+          font-size: 1.05rem;
           letter-spacing: -0.02em;
         }
 
@@ -1353,6 +1590,12 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
             radial-gradient(circle at 16% 0%, rgba(255, 255, 255, 0.11), transparent 36%);
           content: "";
           pointer-events: none;
+          animation: scravipo-breathe 4s ease-in-out infinite;
+        }
+
+        @keyframes scravipo-breathe {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 1; }
         }
 
         .scravipo-bento-card:hover {
@@ -1364,7 +1607,7 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
         .scravipo-bento-card--tall { grid-column: 1; grid-row: 1; }
         .scravipo-bento-card--qualify { grid-column: 2; grid-row: 1; }
         .scravipo-bento-card--verified { grid-column: 1; grid-row: 2; }
-        .scravipo-bento-card--outreach { grid-column: 2; grid-row: 2; min-height: 0; }
+        .scravipo-bento-card--outreach { grid-column: 2; grid-row: 2; }
 
         .scravipo-bento-card__copy { position: relative; z-index: 2; max-width: 28rem; }
 
@@ -1375,7 +1618,7 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
           margin: 0 0 1.2rem;
           color: rgba(190, 219, 228, 0.68);
           font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-          font-size: 0.55rem;
+          font-size: 0.85rem;
           letter-spacing: 0.11em;
           text-transform: uppercase;
         }
@@ -1397,7 +1640,7 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
           max-width: 25rem;
           margin: 1rem 0 0;
           color: rgba(243, 241, 236, 0.58);
-          font-size: 0.7rem;
+          font-size: 1rem;
           letter-spacing: -0.018em;
           line-height: 1.5;
         }
@@ -1479,7 +1722,7 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
           .scravipo-bento-card--tall { grid-column: auto; grid-row: auto; }
           .scravipo-bento-card--qualify,
           .scravipo-bento-card--verified { grid-column: auto; }
-          .scravipo-bento-card--outreach { grid-column: 1 / span 2; grid-row: auto; min-height: 19rem; }
+          .scravipo-bento-card--outreach { grid-column: 1 / span 2; grid-row: auto; min-height: 34rem; }
         }
 
         @media (max-width: 580px) {
@@ -1491,7 +1734,7 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
           .scravipo-bento__grid { display: flex; flex-direction: column; gap: 0.8rem; }
           .scravipo-bento-card { min-height: 26rem; padding: 1.15rem; }
           .scravipo-bento-card--tall { min-height: 34rem; }
-          .scravipo-bento-card--outreach { min-height: 29rem; }
+          .scravipo-bento-card--outreach { }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -1501,13 +1744,14 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
         .scravipo-footer {
           position: relative;
           width: calc(100% - clamp(2rem, 8vw, 7rem));
-          min-height: clamp(44rem, 72vw, 64rem);
           margin: 0 auto clamp(1.25rem, 3vw, 3rem);
           overflow: hidden;
           border: 1px solid rgba(255, 255, 255, 0.045);
           background: #020202;
           color: #f3f1ec;
           font-family: Arial, Helvetica, sans-serif;
+          border-radius: 1.5rem;
+          padding: 4rem clamp(1.5rem, 5vw, 5.5rem) 1.5rem;
         }
 
         .scravipo-footer::before {
@@ -1532,14 +1776,12 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
         }
 
         .scravipo-footer__content {
-          position: absolute;
-          right: clamp(1.5rem, 5vw, 5.5rem);
-          bottom: clamp(6rem, 9vw, 8rem);
-          left: clamp(1.5rem, 5vw, 5.5rem);
+          position: relative;
           z-index: 2;
           display: grid;
-          grid-template-columns: 40% 1fr;
+          grid-template-columns: 1fr 1fr 1fr;
           gap: 2rem;
+          align-items: center;
         }
 
         .scravipo-footer__label {
@@ -1611,39 +1853,17 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
         .scravipo-footer__social-list a span:last-child { color: rgba(243, 241, 236, 0.42); font-size: 0.78rem; }
 
         .scravipo-footer__mark {
-          position: absolute;
-          width: clamp(11rem, 19vw, 20rem);
-          height: clamp(14rem, 25vw, 25rem);
-          right: clamp(-4rem, -1vw, -0.5rem);
-          bottom: clamp(-7rem, -8vw, -2.8rem);
-          z-index: 1;
-          pointer-events: none;
-          user-select: none;
+          justify-self: center;
+          width: 9rem;
+          height: 9rem;
+          border-radius: 50%;
+          overflow: hidden;
         }
 
-        .scravipo-footer__mark svg {
-          display: block;
+        .scravipo-footer__mark img {
           width: 100%;
           height: 100%;
-          overflow: visible;
-        }
-
-        .scravipo-footer__mark span {
-          display: block;
-          color: transparent;
-          font-family: Georgia, "Times New Roman", serif;
-          font-size: clamp(18rem, 38vw, 36rem);
-          font-style: italic;
-          font-weight: 700;
-          letter-spacing: -0.18em;
-          line-height: 0.72;
-          background: linear-gradient(116deg, #35383a 6%, #d9d9d3 18%, #6b6e70 31%, #f1f0e9 43%, #414548 58%, #b8bbb8 74%, #26292b 91%);
-          -webkit-background-clip: text;
-          background-clip: text;
-          filter: drop-shadow(-0.32rem 0.38rem 0.35rem rgba(0, 0, 0, 0.7)) drop-shadow(0 0 1.2rem rgba(167, 181, 188, 0.08));
-          opacity: 0.73;
-          transform: scaleX(0.78);
-          transform-origin: bottom right;
+          object-fit: cover;
         }
 
         .scravipo-footer__top {
@@ -1661,19 +1881,17 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
         .scravipo-footer__top:hover { border-color: rgba(243, 241, 236, 0.48); color: #fff; transform: translateY(-1px); }
 
         .scravipo-footer__bottom {
-          position: absolute;
-          right: clamp(1.5rem, 5vw, 5.5rem);
-          bottom: clamp(1.25rem, 2.6vw, 2.5rem);
-          left: clamp(1.5rem, 5vw, 5.5rem);
+          position: relative;
           z-index: 3;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding-top: 0.9rem;
+          padding-top: 1.5rem;
+          margin-top: 4rem;
           border-top: 1px solid rgba(243, 241, 236, 0.12);
           color: rgba(243, 241, 236, 0.38);
           font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-          font-size: 0.56rem;
+          font-size: 0.8rem;
           letter-spacing: 0.04em;
         }
 
@@ -1719,58 +1937,261 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
           background: rgba(255, 255, 255, 0.045);
           border-color: rgba(255, 255, 255, 0.15);
         }
+
+        @keyframes blink-opacity {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+
+        /* --- Apple Liquid Glass Design System --- */
+        .liquid-glass {
+          position: relative;
+          border-radius: 24px;
+          background: rgba(255, 255, 255, 0.06);
+          backdrop-filter: blur(24px) saturate(140%);
+          -webkit-backdrop-filter: blur(24px) saturate(140%);
+          box-shadow:
+            0 8px 32px rgba(0, 0, 0, 0.35),
+            inset 0 1px 0 rgba(255, 255, 255, 0.25),
+            inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+          overflow: hidden;
+        }
+
+        .liquid-glass::before {
+          content: "";
+          position: absolute;
+          top: -20%;
+          left: -10%;
+          width: 60%;
+          height: 60%;
+          background: radial-gradient(
+            circle,
+            rgba(255, 255, 255, 0.18) 0%,
+            rgba(255, 255, 255, 0) 70%
+          );
+          pointer-events: none;
+        }
+
+        .liquid-glass:focus-within,
+        .liquid-glass:hover {
+          background: rgba(255, 255, 255, 0.08);
+          box-shadow:
+            0 8px 36px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.32),
+            inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+          transition: background 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .liquid-glass:focus-within,
+          .liquid-glass:hover {
+            transition: none;
+          }
+        }
+        /* ---------------------------------------- */
+
+        .scravipo-liquid-search-container {
+          width: min(42rem, 100%);
+          padding: 1.25rem 1.5rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1.25rem;
+          cursor: text;
+        }
+
+        .scravipo-liquid-search__input-row {
+          display: flex;
+          align-items: center;
+          font-size: 1.15rem;
+          color: #fff;
+          z-index: 1;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+          letter-spacing: -0.01em;
+        }
+
+        .scravipo-search__placeholder {
+          color: rgba(255, 255, 255, 0.4);
+        }
+
+        .scravipo-liquid-btn {
+          position: relative;
+          display: flex;
+          align-items: center;
+          gap: 0.45rem;
+          padding: 0.5rem 1rem;
+          border-radius: 9999px;
+          background: rgba(255, 255, 255, 0.06);
+          backdrop-filter: blur(24px) saturate(140%);
+          -webkit-backdrop-filter: blur(24px) saturate(140%);
+          color: rgba(255, 255, 255, 0.75);
+          font-size: 0.85rem;
+          font-weight: 500;
+          border: none;
+          outline: none;
+          cursor: pointer;
+          
+          box-shadow: 
+            0 4px 16px rgba(0, 0, 0, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.25),
+            inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+            
+          transition: background 0.4s ease, box-shadow 0.4s ease, color 0.4s ease;
+          z-index: 1;
+          overflow: hidden;
+        }
+
+        .scravipo-liquid-btn::before {
+          content: "";
+          position: absolute;
+          top: -20%;
+          left: -10%;
+          width: 40%;
+          height: 80%;
+          background: radial-gradient(
+            circle,
+            rgba(255, 255, 255, 0.18) 0%,
+            rgba(255, 255, 255, 0) 70%
+          );
+          pointer-events: none;
+        }
+
+        .scravipo-liquid-btn:hover {
+          background: rgba(255, 255, 255, 0.08);
+          color: #fff;
+          box-shadow: 
+            0 4px 20px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.32),
+            inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+        }
+
+        .scravipo-liquid-btn--active {
+          background: rgba(255, 255, 255, 0.15);
+          color: #fff;
+          box-shadow: 
+            inset 0 1px 0 rgba(255, 255, 255, 0.4),
+            inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .scravipo-liquid-btn--active::before {
+          background: radial-gradient(
+            circle,
+            rgba(255, 255, 255, 0.25) 0%,
+            rgba(255, 255, 255, 0) 70%
+          );
+        }
+
+        .scravipo-liquid-btn--icon {
+          padding: 0;
+          width: 2.2rem;
+          height: 2.2rem;
+          justify-content: center;
+        }
+
+        .scravipo-liquid-btn--submit {
+          background: #fff;
+          color: #000;
+          padding: 0;
+          width: 2.2rem;
+          height: 2.2rem;
+          justify-content: center;
+          box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+        }
+
+        .scravipo-liquid-btn--submit::before {
+          display: none;
+        }
+
+        .scravipo-liquid-btn--submit:hover {
+          background: #f0f0f0;
+          box-shadow: 0 6px 16px rgba(255, 255, 255, 0.4);
+        }
+
+        .scravipo-liquid-search__controls {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          z-index: 1;
+        }
+
+        .scravipo-liquid-search__chips,
+        .scravipo-liquid-search__actions {
+          display: flex;
+          gap: 0.5rem;
+          align-items: center;
+        }
       `}
       </style>
       </section>
 
       <section className="scravipo-dashboard" id="dashboard" aria-labelledby="dashboard-title">
-        <div className="scravipo-dashboard__intro">
+        <img className="scravipo-cloud scravipo-cloud--left" src={heroCloudAsset} alt="" aria-hidden="true" />
+        <img className="scravipo-cloud scravipo-cloud--right" src={heroCloudAsset} alt="" aria-hidden="true" />
+        <div className="scravipo-dashboard__intro" style={{ flexDirection: "column", alignItems: "center", textAlign: "center", marginBottom: "3.5rem" }}>
           <div>
-            <p className="scravipo-dashboard__kicker">Opportunity index <span>·</span> Live workspace</p>
             <h2 id="dashboard-title">Leads for <em style={{ fontStyle: "italic", fontFamily: "Georgia, 'Times New Roman', serif" }}>everything.</em></h2>
-            <p className="scravipo-dashboard__subtitle">One intelligence workspace for the people, companies, and firms worth knowing.</p>
           </div>
-          <div className="scravipo-dashboard__pulse" aria-label="Workspace status">
-            <span className="scravipo-dashboard__pulse-dot" />
-            <span>Scanning live signals</span>
+          
+          {/* Standalone Input/Search Bar (Liquid Glass Redesign) */}
+          <div style={{ marginTop: "2rem", width: "100%", display: "flex", justifyContent: "center", position: "relative", zIndex: 10 }}>
+            <div className="scravipo-liquid-search-container liquid-glass">
+              
+              <div className="scravipo-liquid-search__input-row">
+                <span className="scravipo-search__text" style={{ display: "flex", alignItems: "center" }}>
+                  {!displayedQuery && (
+                    <span className="scravipo-search__cursor" style={{ 
+                      display: "inline-block",
+                      marginRight: "0.3rem",
+                      color: "rgba(255,255,255,0.7)",
+                      animation: "blink-opacity 1s step-end infinite"
+                    }}>|</span>
+                  )}
+                  {displayedQuery || <span className="scravipo-search__placeholder">Ask anything...</span>}
+                  {displayedQuery && (
+                    <span className="scravipo-search__cursor" style={{ 
+                      display: "inline-block",
+                      marginLeft: "0.1rem",
+                      color: "rgba(255,255,255,0.7)",
+                      opacity: scriptPhase === "typing" || scriptPhase === "deleting" ? 1 : 1,
+                      animation: scriptPhase === "holding" || scriptPhase === "initial" ? "blink-opacity 1s step-end infinite" : "none"
+                    }}>|</span>
+                  )}
+                </span>
+              </div>
+              
+              <div className="scravipo-liquid-search__controls">
+                <div className="scravipo-liquid-search__chips">
+                  <button className="scravipo-liquid-btn scravipo-liquid-btn--icon" aria-label="Add attachment">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                  </button>
+                  <button className="scravipo-liquid-btn scravipo-liquid-btn--active">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 2v7.31L2.83 12 10 14.69V22l7.17-7.31L24.34 12l-7.17-2.69z"/></svg>
+                    Normal
+                  </button>
+                  <button className="scravipo-liquid-btn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+                    DeepThink
+                  </button>
+                </div>
+                
+                <div className="scravipo-liquid-search__actions">
+                  <button className="scravipo-liquid-btn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                    Voice
+                  </button>
+                  <button className="scravipo-liquid-btn scravipo-liquid-btn--submit" aria-label="Submit search">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="scravipo-category-nav" role="tablist" aria-label="Lead categories">
-          {(Object.keys(dashboardConfigs) as DashboardCategory[]).map((category) => (
-            <button
-              key={category}
-              className={activeCategory === category ? "is-active" : ""}
-              type="button"
-              role="tab"
-              aria-selected={activeCategory === category}
-              onClick={() => {
-                setIsAutoTypingActive(false);
-                setActiveCategory(category);
-                setSelectedRows([]);
-                setQuery("");
-              }}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-
-        <div className="scravipo-lead-panel">
+        <div className="scravipo-lead-panel liquid-glass">
           <div className="scravipo-lead-panel__header">
             <div>
               <h3>{activeConfig.title}</h3>
               <p>{activeConfig.subtitle}</p>
-            </div>
-            <div className="scravipo-lead-panel__actions">
-              <label className="scravipo-search">
-                <span className="scravipo-search__icon" aria-hidden="true">⌕</span>
-                <span className="sr-only">Search leads</span>
-                <input value={query} onChange={(event) => handleManualSearch(event.target.value)} placeholder="Try 'AI startups in SF'" />
-                <kbd>⌘ K</kbd>
-              </label>
-              <button className="scravipo-tool-button" type="button"><span aria-hidden="true">≡</span> Filter</button>
-              <button className="scravipo-tool-button" type="button"><span aria-hidden="true">↕</span> Sort</button>
             </div>
           </div>
 
@@ -1784,7 +2205,7 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
                 </tr>
               </thead>
               <tbody>
-                {visibleRows.map((row) => {
+                {activeConfig.rows.map((row) => {
                   const isSelected = selectedRows.includes(row.id);
                   return (
                     <tr key={row.id} className={isSelected ? "is-selected" : ""}>
@@ -1809,13 +2230,12 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
                     </tr>
                   );
                 })}
-                {visibleRows.length === 0 && <tr><td className="scravipo-empty" colSpan={activeConfig.columns.length + 2}>No signals match “{query}”.</td></tr>}
               </tbody>
             </table>
           </div>
 
           <div className="scravipo-lead-panel__footer">
-            <span>Showing {visibleRows.length} of {activeConfig.rows.length} signals</span>
+            <span>Showing {activeConfig.rows.length} of {activeConfig.rows.length} signals</span>
             <button type="button" className="scravipo-load-more">Load more <span aria-hidden="true">↗</span></button>
           </div>
         </div>
@@ -1823,8 +2243,7 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
 
       <section className="scravipo-bento" id="how-it-works" aria-labelledby="bento-title">
         <div className="scravipo-bento__heading">
-          <p className="scravipo-bento__kicker">How it works <span>Signal over noise</span></p>
-          <h2 id="bento-title">Search for what matters.</h2>
+          <h2 id="bento-title">Find the right one.</h2>
           <p>Scravipo does the work between a query and a conversation worth having.</p>
         </div>
 
@@ -1835,20 +2254,7 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
               <h3>Real-time search across everything.</h3>
               <p>There is no static database to search through. The moment a query arrives, Scravipo searches live across multiple sources and turns the freshest signals into a usable result.</p>
             </div>
-            <div className="scravipo-flow" aria-label="Query to delivery process">
-              {[
-                ["01", "Query", "What are you looking for?"],
-                ["02", "Multi-source scrape", "Signals from the open web"],
-                ["03", "Enrich & qualify", "Intent made legible"],
-                ["04", "Deliver", "Ready for the next move"],
-              ].map(([number, title, detail], index) => (
-                <div className="scravipo-flow__step" key={number}>
-                  <span className="scravipo-flow__number">{number}</span>
-                  <span><strong>{title}</strong><small>{detail}</small></span>
-                  {index < 3 && <i aria-hidden="true">↓</i>}
-                </div>
-              ))}
-            </div>
+            <Card1Flow />
           </article>
 
           <article className="scravipo-bento-card scravipo-bento-card--qualify">
@@ -1857,36 +2263,28 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
               <h3>Enrich & qualify.</h3>
               <p>A raw result is only the beginning. Each one is enriched and checked against intent signals before it reaches you, with the reason it qualifies made explicit.</p>
             </div>
-            <div className="scravipo-signal-window">
-              <div className="scravipo-signal-window__line"><span className="scravipo-signal-window__dot is-blue" /><span>Active hiring signal</span><strong>+94</strong></div>
-              <div className="scravipo-signal-window__line"><span className="scravipo-signal-window__dot is-green" /><span>Recent funding signal</span><strong>+81</strong></div>
-              <div className="scravipo-signal-window__line"><span className="scravipo-signal-window__dot is-amber" /><span>Growth signal detected</span><strong>+76</strong></div>
-            </div>
+            <Card2Enrich />
           </article>
 
           <article className="scravipo-bento-card scravipo-bento-card--verified">
             <div className="scravipo-bento-card__copy">
               <p className="scravipo-bento-card__label">03 <span>Trust layer</span></p>
               <h3>Verified contacts.</h3>
-              <p>Email, phone, and professional details are checked before delivery. No scraped-and-dumped lists—only contact paths that have earned their place.</p>
+              <p>Email, phone, and professional details are checked before delivery. No scraped-and-dumped lists; only contact paths that have earned their place.</p>
             </div>
-            <div className="scravipo-contact-proof" aria-hidden="true">
-              <span className="scravipo-contact-proof__avatar">AR</span>
-              <span className="scravipo-contact-proof__identity"><strong>Alex Rivera</strong><small>Growth · verified 2m ago</small></span>
-              <span className="scravipo-contact-proof__check">✓</span>
-            </div>
+            <Card3Verified />
           </article>
 
           <article className="scravipo-bento-card scravipo-bento-card--outreach">
             <div className="scravipo-bento-card__copy">
               <p className="scravipo-bento-card__label">04 <span>Workflow ready</span></p>
               <h3>Built for outreach.</h3>
-              <p>Every lead arrives with the role, contact, and relevance context your sales or BD workflow needs, so research becomes a next step—not another spreadsheet.</p>
+              <p>Every lead arrives with the role, contact, and relevance context your sales or BD workflow needs, so research becomes a next step; not another spreadsheet.</p>
             </div>
-            <div className="scravipo-outreach-strip"><span>Role</span><b>VP Growth</b><span>Relevance</span><b className="is-accent">High</b><span>Next</span><b>Reach out</b></div>
+            <Card4Outreach />
             <div className="scravipo-adapts">
               <span className="scravipo-adapts__icon">↗</span>
-              <span><strong>Adapts to what you search.</strong><small>Investor, business, person, company, VC, job—the search and schema reshape around the intent.</small></span>
+              <span><strong>Adapts to what you search.</strong><small>Investor, business, person, company, VC, job; the search and schema reshape around the intent.</small></span>
             </div>
           </article>
         </div>
@@ -1930,6 +2328,7 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
 
       <footer className="scravipo-footer" id="footer">
         <div className="scravipo-footer__atmosphere" aria-hidden="true" />
+        
         <div className="scravipo-footer__content">
           <div className="scravipo-footer__contact">
             <p className="scravipo-footer__label">CONTACT:</p>
@@ -1950,15 +2349,10 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
               ))}
             </div>
           </div>
-        </div>
 
-        <div className="scravipo-footer__mark" aria-hidden="true">
-          <img 
-            src={heroLogoAsset} 
-            alt="Scrapivo Logo Mark" 
-            className="w-full h-full object-contain filter invert brightness-0 saturate-100 contrast-100 opacity-[0.03] mix-blend-screen pointer-events-none" 
-            style={{ transform: "scale(1.4) translate(-10%, 15%)", transformOrigin: "bottom right" }}
-          />
+          <div className="scravipo-footer__mark" aria-hidden="true">
+            <img src={brandMarkAsset} alt="Scrapivo Logo Mark" />
+          </div>
         </div>
 
         <div className="scravipo-footer__bottom">
