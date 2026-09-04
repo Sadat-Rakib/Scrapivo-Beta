@@ -6,6 +6,7 @@ import { buildProjectQuery } from "@/lib/project-query";
 import { displaySearchLabel, scrapyAckReply, toPlainSearchQuery } from "@/lib/display-query";
 import { runSearch, getRemainingSearches } from "@/lib/search.functions";
 import { aiChat } from "@/lib/ai-chat.functions";
+import { prepareDynamicQuestions } from "@/lib/search/clarify-ai.functions";
 import { saveLead, listSavedLeads } from "@/lib/leads.functions";
 import { createSignalWatch } from "@/lib/campaigns.functions";
 import { resolveLeadContact, verificationLabel } from "@/lib/contact.functions";
@@ -81,6 +82,7 @@ function DiscoverPage() {
   const getProfile = useServerFn(getMyProfile);
   const patchProfile = useServerFn(updateMyProfile);
   const getUsage = useServerFn(getRemainingSearches);
+  const askDynamicQuestions = useServerFn(prepareDynamicQuestions);
 
   const savedQuery = useQuery({ queryKey: ["saved-leads"], queryFn: () => getSaved() });
   const savedLeads = savedQuery.data ?? [];
@@ -667,26 +669,25 @@ function DiscoverPage() {
       const classified = classifyQuery(plain);
       if (clarifier.shouldClarify(classified)) {
         // Dynamic AI questions first (per-input, memory-aware), hardcoded as fallback.
+        // Server-fn call — never import `.server` modules from this client
+        // component (their node builtins break the browser bundle / Vercel build).
         let questions: ClarifyQuestion[] = [];
         try {
-          const [{ extractSlots }, { generateQuestions }] = await Promise.all([
-            import("@/lib/search/slot-extractor.server"),
-            import("@/lib/search/question-generator.server"),
-          ]);
-          const slots = await extractSlots(plain);
-          if (!slots.missing_slots.length) {
-            // Complete input — skip questions entirely.
-          } else {
-            questions = await generateQuestions(slots, {
-              service: searchContext?.service ?? null,
-              niche: searchContext?.niche ?? null,
-              location: searchContext?.location ?? null,
-              audience: searchContext?.audience ?? null,
-              goal: searchContext?.goal ?? null,
-              experience_level: searchContext?.experience_level ?? null,
-              work_style: searchContext?.work_style ?? null,
-            });
-          }
+          const res = await askDynamicQuestions({
+            data: {
+              query: plain,
+              memory: {
+                service: searchContext?.service ?? null,
+                niche: searchContext?.niche ?? null,
+                location: searchContext?.location ?? null,
+                audience: searchContext?.audience ?? null,
+                goal: searchContext?.goal ?? null,
+                experience_level: searchContext?.experience_level ?? null,
+                work_style: searchContext?.work_style ?? null,
+              },
+            },
+          });
+          questions = (res.questions ?? []) as ClarifyQuestion[];
         } catch (e) {
           console.warn("[discover] dynamic questions failed, using fallback", e);
         }
@@ -809,31 +810,6 @@ function DiscoverPage() {
             <div className="min-h-full flex flex-col items-center justify-center py-6 md:py-10">
               <DiscoverWelcomeHero
                 greetingName={greetingName || undefined}
-                onFocusComposer={() => {
-                  setMode("search");
-                  composerRef.current?.focus();
-                }}
-                onChooseChat={() => {
-                  setChatOpen(true);
-                  setMode("chat");
-                }}
-                projectQuery={
-                  activeProject ? buildProjectQuery(activeProject) || undefined : undefined
-                }
-                onOpenWizard={() => setWizardOpen(true)}
-                onFindLeads={
-                  activeProject
-                    ? () => {
-                        const q = buildProjectQuery(activeProject);
-                        if (!q) return;
-                        setInput(q);
-                        // "Find my leads" is a user-initiated search and must
-                        // clarify like any other; it was going straight to the
-                        // mutation and skipping the questions entirely.
-                        void beginSearch(q);
-                      }
-                    : undefined
-                }
                 onAddInfo={(p) => {
                   // Persist to active project memory (website/about_doc) so
                   // future dynamic questions skip answered dims. Best-effort.

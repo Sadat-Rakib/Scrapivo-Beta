@@ -1,10 +1,19 @@
-// Postgres-backed 24h cache for AI responses. Content-keyed by sha256.
-import { createHash } from "node:crypto";
-
+// Postgres-backed 24h cache for AI responses. Content-keyed by hash.
+//
+// NOTE: pure-TS FNV-1a on purpose — no `node:crypto` import. This module sits
+// in the AI router's import graph, so a node builtin here breaks the browser
+// bundle if the graph is ever pulled client-side. Cache keys just cold-miss
+// once after this change; no migration needed.
 export function cacheKey(task: string, system: string, user: string, model?: string): string {
-  return createHash("sha256")
-    .update(`${task}\u0000${model ?? ""}\u0000${system}\u0000${user}`)
-    .digest("hex");
+  const s = `${task}\u0000${model ?? ""}\u0000${system}\u0000${user}`;
+  let h1 = 0x811c9dc5;
+  let h2 = 0x01000193;
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charCodeAt(i);
+    h1 = Math.imul(h1 ^ c, 0x01000193) >>> 0;
+    h2 = Math.imul(h2 ^ (c + (i & 0xff)), 0x01000193) >>> 0;
+  }
+  return `${h1.toString(16).padStart(8, "0")}${h2.toString(16).padStart(8, "0")}`;
 }
 
 export async function getCached(key: string): Promise<string | null> {
