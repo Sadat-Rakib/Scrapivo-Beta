@@ -264,19 +264,78 @@ export const runSearch = createServerFn({ method: "POST" })
       location: classified.location ?? null,
     };
 
-    // Investor outreach matches — separate from Dealroom "startups raising".
+    // Investor outreach matches — file-first (complete JSONL), live merged as fallback/blend.
     if (planUsesInvestorSeed(searchPlan) || refinement.findInvestors) {
       const { searchInvestors } = await import("./investors/search");
-      const { isIndividual, isFirm } = await import("./investors/types");
+      const { searchCompleteInvestors } = await import("./investors/local-file-source");
+      const { decideSource, insufficientMessage } = await import("./search/source-router");
       type Lead = import("./scoring").Lead;
-      const investors = await searchInvestors({
-        query: data.query,
-        stage: refinement.investorStage,
-        location: refinement.location || undefined,
-        checkBand: refinement.investorCheck,
-        sector: refinement.investorSector || undefined,
-        limit: 40,
+      // Requested scale: parse "20+"/"100+" from query, default 12.
+      const requestedCount = (() => {
+        const m = data.query.match(/(\d+)\s*\+/);
+        return m ? Number(m[1]) : 12;
+      })();
+      const localMatches = (() => {
+        try {
+          return searchCompleteInvestors({
+            query: data.query,
+            stage: refinement.investorStage,
+            location: refinement.location || undefined,
+            checkBand: refinement.investorCheck,
+            sector: refinement.investorSector || undefined,
+            limit: 100,
+          });
+        } catch {
+          return [];
+        }
+      })();
+      const decision = decideSource(classified, localMatches.length, requestedCount);
+      const liveInvestors =
+        decision === "local"
+          ? []
+          : await searchInvestors({
+              query: data.query,
+              stage: refinement.investorStage,
+              location: refinement.location || undefined,
+              checkBand: refinement.investorCheck,
+              sector: refinement.investorSector || undefined,
+              limit: 40,
+            });
+      // Map complete-file rows to investor shape (every row traces to JSONL provenance).
+      const localAsInvestors = localMatches.map((r) => ({
+        id: r.id,
+        type: "individual" as const,
+        name: r.name,
+        firm: r.firm,
+        role: r.role,
+        entity_type: "vc" as const,
+        email: r.email,
+        location: r.location,
+        investment_locations: [r.location],
+        investment_categories: r.stages.flatMap((st) => r.sectors.map((s) => `${st} (${s})`)),
+        links: { linkedin: r.linkedin, website: r.website },
+        website: r.website ?? undefined,
+        image_url: r.image_url,
+        information_completeness_score: r.completeness,
+        _provenance: r.provenance,
+      }));
+      // Blend + dedupe by email/id; local wins on conflict.
+      const seenKeys = new Set(localAsInvestors.map((r) => `${r.email}|${r.id}`.toLowerCase()));
+      const blendedLive = liveInvestors.filter((inv: { id: string; email?: string | null }) => {
+        const email = String(inv.email ?? "").toLowerCase();
+        const key = `${email}|${inv.id}`.toLowerCase();
+        if (seenKeys.has(key)) return false;
+        if (email && [...seenKeys].some((k) => k.startsWith(email))) return false;
+        return true;
       });
+      const investors = [...localAsInvestors, ...blendedLive].slice(
+        0,
+        Math.max(40, requestedCount),
+      );
+      const insufficient =
+        decision === "blend" || investors.length < requestedCount
+          ? insufficientMessage(investors.length, requestedCount)
+          : null;
 
       const people = investors
         .filter((inv) => !("type" in inv) || inv.type === "individual")
@@ -346,17 +405,20 @@ export const runSearch = createServerFn({ method: "POST" })
         .eq("id", userId);
       return {
         error: null,
-        message: null,
+        message: insufficient,
         leads: people.map((p) => p.lead),
         posts: people.map((p) => p.lead),
         companies,
         people,
         local: [],
         investors,
-        sources: ["investors"],
+        sources:
+          decision === "local"
+            ? ["investors-complete-file"]
+            : ["investors-complete-file", "investors"],
         suggestions: ["Try FinTech Seed", "Climate investors in Europe", "Angel check under $50K"],
         queryType: classified.type,
-        refinement: refinement.summary,
+        refinement: insufficient ? `${refinement.summary} · ${insufficient}` : refinement.summary,
         clarifyQuestions: [],
         plan: searchPlan,
       };

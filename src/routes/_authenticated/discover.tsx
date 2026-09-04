@@ -13,6 +13,7 @@ import {
   listProjects,
   createProject,
   setActiveProject,
+  updateProject,
   type Project,
 } from "@/lib/projects.functions";
 import { getMyProfile, updateMyProfile } from "@/lib/profile.functions";
@@ -76,6 +77,7 @@ function DiscoverPage() {
   const getProjects = useServerFn(listProjects);
   const createProj = useServerFn(createProject);
   const setActiveProj = useServerFn(setActiveProject);
+  const patchProj = useServerFn(updateProject);
   const getProfile = useServerFn(getMyProfile);
   const patchProfile = useServerFn(updateMyProfile);
   const getUsage = useServerFn(getRemainingSearches);
@@ -658,21 +660,46 @@ function DiscoverPage() {
     setActiveVertical(detectSearchVertical(trimmed));
     try {
       const plain = toPlainSearchQuery(trimmed) || trimmed;
-      const [{ classifyQuery }, { shouldClarify, buildClarifyingQuestions, applyClarifyAnswers }] =
-        await Promise.all([
-          import("@/lib/search/query-classifier"),
-          import("@/lib/search/clarifier"),
-        ]);
+      const [{ classifyQuery }, clarifier] = await Promise.all([
+        import("@/lib/search/query-classifier"),
+        import("@/lib/search/clarifier"),
+      ]);
       const classified = classifyQuery(plain);
-      if (shouldClarify(classified)) {
-        const questions = buildClarifyingQuestions(classified, {
-          hasLocation: !!classified.location,
-        });
+      if (clarifier.shouldClarify(classified)) {
+        // Dynamic AI questions first (per-input, memory-aware), hardcoded as fallback.
+        let questions: ClarifyQuestion[] = [];
+        try {
+          const [{ extractSlots }, { generateQuestions }] = await Promise.all([
+            import("@/lib/search/slot-extractor.server"),
+            import("@/lib/search/question-generator.server"),
+          ]);
+          const slots = await extractSlots(plain);
+          if (!slots.missing_slots.length) {
+            // Complete input — skip questions entirely.
+          } else {
+            questions = await generateQuestions(slots, {
+              service: searchContext?.service ?? null,
+              niche: searchContext?.niche ?? null,
+              location: searchContext?.location ?? null,
+              audience: searchContext?.audience ?? null,
+              goal: searchContext?.goal ?? null,
+              experience_level: searchContext?.experience_level ?? null,
+              work_style: searchContext?.work_style ?? null,
+            });
+          }
+        } catch (e) {
+          console.warn("[discover] dynamic questions failed, using fallback", e);
+        }
+        if (!questions.length) {
+          questions = clarifier.buildClarifyingQuestions(classified, {
+            hasLocation: !!classified.location,
+          }) as ClarifyQuestion[];
+        }
         // Empty question list = nothing left to ask (all dims inferred).
         if (questions.length) {
           setPendingQuery(trimmed);
           setClarifyQs(questions as ClarifyQuestion[]);
-          setDefaultSummary(applyClarifyAnswers(classified, {}).summary ?? "");
+          setDefaultSummary(clarifier.applyClarifyAnswers(classified, {}).summary ?? "");
           setActiveQuery(trimmed);
           return;
         }
@@ -807,6 +834,31 @@ function DiscoverPage() {
                       }
                     : undefined
                 }
+                onAddInfo={(p) => {
+                  // Persist to active project memory (website/about_doc) so
+                  // future dynamic questions skip answered dims. Best-effort.
+                  const isUrl = /^https?:\/\//i.test(p.urlOrText.trim());
+                  const about = [
+                    p.fileName ? `[File: ${p.fileName}]` : "",
+                    p.fileExcerpt,
+                    !isUrl ? p.urlOrText : "",
+                  ]
+                    .filter(Boolean)
+                    .join("\n\n")
+                    .slice(0, 8000);
+                  if (activeProject && activeProject.id !== "local") {
+                    void patchProj({
+                      data: {
+                        id: activeProject.id,
+                        ...(isUrl ? { website: p.urlOrText.slice(0, 200) } : {}),
+                        ...(about ? { about_doc: about } : {}),
+                      },
+                    })
+                      .then(() => qc.invalidateQueries({ queryKey: ["projects"] }))
+                      .catch(() => {});
+                  }
+                  toast.success("Saved — Scrapy will use this for future chats where applicable.");
+                }}
               />
             </div>
           ) : (

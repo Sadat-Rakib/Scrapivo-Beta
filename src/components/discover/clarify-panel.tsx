@@ -65,7 +65,7 @@ export function ClarifyPanel({ questions, refinement, onApply, onDismiss, disabl
           <Sparkles className="size-3.5" />
           Narrow this down
           <span className="ml-1 text-muted-foreground">
-            {step + 1} of {questions.length}
+            Question {step + 1} of {questions.length}
           </span>
         </div>
         <button
@@ -75,6 +75,19 @@ export function ClarifyPanel({ questions, refinement, onApply, onDismiss, disabl
         >
           <X className="size-3.5" />
         </button>
+      </div>
+
+      <div
+        role="progressbar"
+        aria-valuenow={step + 1}
+        aria-valuemin={1}
+        aria-valuemax={questions.length}
+        className="h-1 w-full overflow-hidden rounded-full bg-primary/10"
+      >
+        <div
+          className="h-full rounded-full bg-primary transition-all"
+          style={{ width: `${((step + 1) / questions.length) * 100}%` }}
+        />
       </div>
 
       {refinement && step === 0 ? (
@@ -135,15 +148,16 @@ export function ClarifyPanel({ questions, refinement, onApply, onDismiss, disabl
 
       <div className="flex items-center justify-between gap-2 pt-1">
         <button
-          onClick={() => setStep((s) => Math.max(0, s - 1))}
+          onClick={() => {
+            setOtherText("");
+            setStep((s) => Math.max(0, s - 1));
+          }}
           disabled={step === 0}
           className="text-xs text-muted-foreground transition-colors hover:text-foreground disabled:invisible"
         >
           Back
         </button>
         <div className="flex gap-1.5">
-          {/* Skipping a question keeps its recommended default — see
-              applyClarifyAnswers, which fills every unanswered field. */}
           <Button
             size="sm"
             variant="ghost"
@@ -153,6 +167,26 @@ export function ClarifyPanel({ questions, refinement, onApply, onDismiss, disabl
           >
             {isLast ? "Search with defaults" : "Skip"}
           </Button>
+          {!isLast ? (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 text-xs"
+              disabled={disabled}
+              onClick={() => setStep((s) => s + 1)}
+            >
+              Next
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              className="h-7 text-xs"
+              disabled={disabled}
+              onClick={() => onApply(answers)}
+            >
+              Search
+            </Button>
+          )}
         </div>
       </div>
     </div>

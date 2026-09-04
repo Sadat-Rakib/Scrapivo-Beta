@@ -3,8 +3,14 @@ import heroStatueAsset from "@/assets/hero-statue.png";
 import heroLogoAsset from "@/assets/hero-logo.jpg";
 import heroCloudAsset from "@/assets/hero-cloud.png";
 import { Link } from "@tanstack/react-router";
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
 import { motion, AnimatePresence } from "framer-motion";
+import { LandingSearchBox } from "./LandingSearchBox";
 
 // --- BENTO ANIMATION COMPONENTS ---
 
@@ -24,13 +30,16 @@ function Card1Flow() {
     let t: ReturnType<typeof setTimeout>;
     if (phase === "typing") {
       if (query.length < targetQuery.length) {
-        t = setTimeout(() => setQuery(targetQuery.slice(0, query.length + 1)), 50 + Math.random() * 40);
+        t = setTimeout(
+          () => setQuery(targetQuery.slice(0, query.length + 1)),
+          50 + Math.random() * 40,
+        );
       } else {
         t = setTimeout(() => setPhase("searching"), 300);
       }
     } else if (phase === "searching") {
       if (statusIdx < statuses.length - 1) {
-        t = setTimeout(() => setStatusIdx(i => i + 1), 600);
+        t = setTimeout(() => setStatusIdx((i) => i + 1), 600);
       } else {
         t = setTimeout(() => setPhase("revealing"), 600);
       }
@@ -48,31 +57,101 @@ function Card1Flow() {
 
   return (
     <div className="scravipo-flow" aria-label="Query to delivery process">
-      <div style={{ position: "relative", marginBottom: "0.5rem", padding: "0.5rem 0.75rem", background: "rgba(0,0,0,0.3)", borderRadius: "0.5rem", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <span style={{ fontSize: "0.65rem", color: "rgba(255,255,255,0.8)", fontFamily: "monospace" }}>
-          {query}<span style={{ opacity: phase === "typing" ? 1 : 0 }}>|</span>
+      <div
+        style={{
+          position: "relative",
+          marginBottom: "0.5rem",
+          padding: "0.5rem 0.75rem",
+          background: "rgba(0,0,0,0.3)",
+          borderRadius: "0.5rem",
+          border: "1px solid rgba(255,255,255,0.1)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <span
+          style={{ fontSize: "0.65rem", color: "rgba(255,255,255,0.8)", fontFamily: "monospace" }}
+        >
+          {query}
+          <span style={{ opacity: phase === "typing" ? 1 : 0 }}>|</span>
         </span>
-        <div style={{ 
-          width: "1.2rem", height: "1.2rem", borderRadius: "50%", background: phase !== "typing" ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.05)", 
-          display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.2s",
-          boxShadow: phase !== "typing" ? "0 0 8px rgba(255,255,255,0.2)" : "none"
-        }}>
+        <div
+          style={{
+            width: "1.2rem",
+            height: "1.2rem",
+            borderRadius: "50%",
+            background: phase !== "typing" ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.05)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            transition: "background 0.2s",
+            boxShadow: phase !== "typing" ? "0 0 8px rgba(255,255,255,0.2)" : "none",
+          }}
+        >
           <span style={{ fontSize: "0.6rem", color: "#fff" }}>↗</span>
         </div>
       </div>
-      
-      <div style={{ minHeight: "3rem", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+
+      <div
+        style={{
+          minHeight: "3rem",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
+      >
         <AnimatePresence mode="wait">
           {phase === "searching" && (
-            <motion.div key="searching" initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.5)" }}>
-              <span style={{ display: "inline-block", width: "10px", height: "10px", border: "2px solid rgba(255,255,255,0.2)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 1s linear infinite", verticalAlign: "middle", marginRight: "6px" }} />
+            <motion.div
+              key="searching"
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.5)" }}
+            >
+              <span
+                style={{
+                  display: "inline-block",
+                  width: "10px",
+                  height: "10px",
+                  border: "2px solid rgba(255,255,255,0.2)",
+                  borderTopColor: "#fff",
+                  borderRadius: "50%",
+                  animation: "spin 1s linear infinite",
+                  verticalAlign: "middle",
+                  marginRight: "6px",
+                }}
+              />
               {statuses[statusIdx]}
             </motion.div>
           )}
           {phase === "revealing" || phase === "holding" ? (
-            <motion.div key="revealing" initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ padding: "0.5rem", background: "rgba(134,197,160,0.1)", border: "1px solid rgba(134,197,160,0.2)", borderRadius: "0.4rem" }}>
-              <div style={{ fontSize: "0.6rem", color: "#86c5a0", fontWeight: "bold", marginBottom: "0.2rem" }}>✓ Found 142 leads</div>
-              <div style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.6)" }}>Top match: Sarah Jenkins, Founder @ DataSync NY</div>
+            <motion.div
+              key="revealing"
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              style={{
+                padding: "0.5rem",
+                background: "rgba(134,197,160,0.1)",
+                border: "1px solid rgba(134,197,160,0.2)",
+                borderRadius: "0.4rem",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "0.6rem",
+                  color: "#86c5a0",
+                  fontWeight: "bold",
+                  marginBottom: "0.2rem",
+                }}
+              >
+                ✓ Found 142 leads
+              </div>
+              <div style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.6)" }}>
+                Top match: Sarah Jenkins, Founder @ DataSync NY
+              </div>
             </motion.div>
           ) : null}
         </AnimatePresence>
@@ -84,12 +163,36 @@ function Card1Flow() {
 
 function Card2Enrich() {
   const entities = [
-    { name: "Acme AI", type: "Company", loading: "examining public signals...", result: "Actively hiring engineers", dot: "is-blue" },
-    { name: "Northstar Labs", type: "Startup", loading: "examining recent activity...", result: "Raised Series A ($12M)", dot: "is-green" },
-    { name: "Atlas Ventures", type: "Investor", loading: "checking recent activity...", result: "Invested in AI last 30 days", dot: "is-amber" },
-    { name: "Alex Morgan", type: "Person", loading: "verifying role/company context...", result: "Founder at Northstar Labs", dot: "is-blue" },
+    {
+      name: "Acme AI",
+      type: "Company",
+      loading: "examining public signals...",
+      result: "Actively hiring engineers",
+      dot: "is-blue",
+    },
+    {
+      name: "Northstar Labs",
+      type: "Startup",
+      loading: "examining recent activity...",
+      result: "Raised Series A ($12M)",
+      dot: "is-green",
+    },
+    {
+      name: "Atlas Ventures",
+      type: "Investor",
+      loading: "checking recent activity...",
+      result: "Invested in AI last 30 days",
+      dot: "is-amber",
+    },
+    {
+      name: "Alex Morgan",
+      type: "Person",
+      loading: "verifying role/company context...",
+      result: "Founder at Northstar Labs",
+      dot: "is-blue",
+    },
   ];
-  
+
   const [activeIdx, setActiveIdx] = useState(0);
   const [status, setStatus] = useState<"pending" | "checking" | "enriched">("pending");
 
@@ -109,22 +212,46 @@ function Card2Enrich() {
   }, [status, activeIdx]);
 
   return (
-    <div className="scravipo-signal-window" style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+    <div
+      className="scravipo-signal-window"
+      style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}
+    >
       {entities.map((ent, idx) => {
         const isActive = idx === activeIdx;
-        const isPast = idx < activeIdx || (activeIdx === 0 && idx === entities.length - 1 && status === "pending");
+        const isPast =
+          idx < activeIdx ||
+          (activeIdx === 0 && idx === entities.length - 1 && status === "pending");
         const state = isActive ? status : isPast ? "pending" : "pending";
-        
+
         return (
           <div key={ent.name} style={{ opacity: isActive ? 1 : 0.3, transition: "opacity 0.3s" }}>
-            <div style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.9)", fontWeight: "bold" }}>{ent.name} <span style={{ fontWeight: "normal", color: "rgba(255,255,255,0.4)" }}>({ent.type})</span></div>
+            <div style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.9)", fontWeight: "bold" }}>
+              {ent.name}{" "}
+              <span style={{ fontWeight: "normal", color: "rgba(255,255,255,0.4)" }}>
+                ({ent.type})
+              </span>
+            </div>
             <div style={{ minHeight: "1.2rem", marginTop: "0.2rem" }}>
-              {state === "pending" && <div style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.3)" }}>Waiting...</div>}
-              {state === "checking" && <div style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.6)" }}>{ent.loading}</div>}
+              {state === "pending" && (
+                <div style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.3)" }}>
+                  Waiting...
+                </div>
+              )}
+              {state === "checking" && (
+                <div style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.6)" }}>
+                  {ent.loading}
+                </div>
+              )}
               {state === "enriched" && (
-                <motion.div initial={{ opacity: 0, x: -5 }} animate={{ opacity: 1, x: 0 }} style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                <motion.div
+                  initial={{ opacity: 0, x: -5 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}
+                >
                   <span className={`scravipo-signal-window__dot ${ent.dot}`} />
-                  <span style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.8)" }}>{ent.result}</span>
+                  <span style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.8)" }}>
+                    {ent.result}
+                  </span>
                 </motion.div>
               )}
             </div>
@@ -139,7 +266,7 @@ function Card3Verified() {
   const contacts = [
     { name: "Alex Morgan", detail: "alex@acme.ai", check: "verified email" },
     { name: "Sarah Jenkins", detail: "+1 (415) 555-0198", check: "verified phone" },
-    { name: "David Chen", detail: "david@northstar.co", check: "verified email" }
+    { name: "David Chen", detail: "david@northstar.co", check: "verified email" },
   ];
   const [activeIdx, setActiveIdx] = useState(0);
   const [status, setStatus] = useState<"pending" | "verifying" | "verified">("pending");
@@ -164,15 +291,37 @@ function Card3Verified() {
   return (
     <div className="scravipo-contact-proof" aria-hidden="true" style={{ height: "4rem" }}>
       <AnimatePresence mode="wait">
-        <motion.div key={activeIdx} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }} style={{ display: "flex", alignItems: "center", gap: "0.58rem", width: "100%" }}>
-          <span className="scravipo-contact-proof__avatar">{contact.name.split(" ").map(n=>n[0]).join("")}</span>
+        <motion.div
+          key={activeIdx}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.3 }}
+          style={{ display: "flex", alignItems: "center", gap: "0.58rem", width: "100%" }}
+        >
+          <span className="scravipo-contact-proof__avatar">
+            {contact.name
+              .split(" ")
+              .map((n) => n[0])
+              .join("")}
+          </span>
           <span className="scravipo-contact-proof__identity">
             <strong>{contact.name}</strong>
             <small style={{ fontFamily: "monospace" }}>{contact.detail}</small>
           </span>
-          {status === "verifying" && <span style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.5)", marginLeft: "auto" }}>verifying...</span>}
+          {status === "verifying" && (
+            <span
+              style={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.5)", marginLeft: "auto" }}
+            >
+              verifying...
+            </span>
+          )}
           {status === "verified" && (
-            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "0.3rem" }}>
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "0.3rem" }}
+            >
               <span style={{ fontSize: "0.5rem", color: "#9fd1ac" }}>{contact.check}</span>
               <span className="scravipo-contact-proof__check">✓</span>
             </motion.div>
@@ -185,10 +334,16 @@ function Card3Verified() {
 
 function Card4Outreach() {
   const drafts = [
-    { lead: "Alex Morgan", text: "Hi Alex,\n\nSaw you're leading growth at Acme AI. I noticed your recent Series A and wanted to reach out. We help AI startups scale their outbound efforts securely.\n\nWould you be open to a quick chat next week to see if there's a fit?\n\nBest,\nScrapivo Team" },
-    { lead: "Sarah Jenkins", text: "Hey Sarah; I loved your recent post about data sync challenges. Our new API solves exactly this. Let me know if you want to test it out!" },
+    {
+      lead: "Alex Morgan",
+      text: "Hi Alex,\n\nSaw you're leading growth at Acme AI. I noticed your recent Series A and wanted to reach out. We help AI startups scale their outbound efforts securely.\n\nWould you be open to a quick chat next week to see if there's a fit?\n\nBest,\nScrapivo Team",
+    },
+    {
+      lead: "Sarah Jenkins",
+      text: "Hey Sarah; I loved your recent post about data sync challenges. Our new API solves exactly this. Let me know if you want to test it out!",
+    },
   ];
-  
+
   const [draftIdx, setDraftIdx] = useState(0);
   const [typed, setTyped] = useState("");
   const [phase, setPhase] = useState<"typing" | "holding" | "clearing">("typing");
@@ -196,10 +351,13 @@ function Card4Outreach() {
   useEffect(() => {
     let t: ReturnType<typeof setTimeout>;
     const targetText = drafts[draftIdx].text;
-    
+
     if (phase === "typing") {
       if (typed.length < targetText.length) {
-        t = setTimeout(() => setTyped(targetText.slice(0, typed.length + 1)), 15 + Math.random() * 15);
+        t = setTimeout(
+          () => setTyped(targetText.slice(0, typed.length + 1)),
+          15 + Math.random() * 15,
+        );
       } else {
         t = setTimeout(() => setPhase("holding"), 3000);
       }
@@ -210,27 +368,39 @@ function Card4Outreach() {
         setTyped("");
         setDraftIdx((i) => (i + 1) % drafts.length);
         setPhase("typing");
-      }, 500); 
+      }, 500);
     }
     return () => clearTimeout(t);
   }, [phase, typed, draftIdx]);
 
   return (
     <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column" }}>
-      <div style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.4)", marginBottom: "0.5rem" }}>Drafting for: <span style={{ color: "rgba(255,255,255,0.9)" }}>{drafts[draftIdx].lead}</span></div>
-      <div style={{ 
-        height: "10.5rem", background: "rgba(0,0,0,0.3)", borderRadius: "0.5rem", border: "1px solid rgba(255,255,255,0.1)", 
-        padding: "0.75rem", fontSize: "0.75rem", color: "rgba(255,255,255,0.8)", lineHeight: 1.5,
-        opacity: phase === "clearing" ? 0 : 1, transition: "opacity 0.3s",
-        whiteSpace: "pre-wrap", overflow: "hidden"
-      }}>
-        {typed}<span style={{ opacity: phase === "typing" ? 1 : 0 }}>|</span>
+      <div style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.4)", marginBottom: "0.5rem" }}>
+        Drafting for:{" "}
+        <span style={{ color: "rgba(255,255,255,0.9)" }}>{drafts[draftIdx].lead}</span>
+      </div>
+      <div
+        style={{
+          height: "10.5rem",
+          background: "rgba(0,0,0,0.3)",
+          borderRadius: "0.5rem",
+          border: "1px solid rgba(255,255,255,0.1)",
+          padding: "0.75rem",
+          fontSize: "0.75rem",
+          color: "rgba(255,255,255,0.8)",
+          lineHeight: 1.5,
+          opacity: phase === "clearing" ? 0 : 1,
+          transition: "opacity 0.3s",
+          whiteSpace: "pre-wrap",
+          overflow: "hidden",
+        }}
+      >
+        {typed}
+        <span style={{ opacity: phase === "typing" ? 1 : 0 }}>|</span>
       </div>
     </div>
   );
 }
-
-
 
 /**
  * Scravipo visual direction: dark editorial monument.
@@ -249,7 +419,13 @@ const navItems = [
   { label: "FAQ", href: "#faq" },
 ];
 
-type DashboardCategory = "Mixed" | "Investor" | "Local Business" | "Executive" | "Person" | "Venture Capital";
+type DashboardCategory =
+  | "Mixed"
+  | "Investor"
+  | "Local Business"
+  | "Executive"
+  | "Person"
+  | "Venture Capital";
 
 type LeadRecord = {
   id: string;
@@ -281,11 +457,71 @@ const dashboardConfigs: Record<DashboardCategory, CategoryConfig> = {
       { key: "relevance", label: "Relevance" },
     ],
     rows: [
-      { id: "mixed-1", name: "Aziza Satybaldyeva", secondary: "Investment Associate · DOMiNO Ventures", initials: "AS", fields: { category: "Investor", location: "Tashkent, UZ", contact: "aziza@dominovc.com", relevance: "Invested in AI pre-seed rounds recently" }, tags: ["Pre-seed"] },
-      { id: "mixed-2", name: "Ferncroft Capital", secondary: "Emerging early-stage fund", initials: "FC", fields: { category: "Venture Capital", location: "Austin, US", contact: "team@ferncroftcap.com", relevance: "Actively deploying in early-stage AI" }, tags: ["AI"] },
-      { id: "mixed-3", name: "Priya Natarajan", secondary: "Co-founder · Loopwire", initials: "PN", fields: { category: "Person", location: "Toronto, CA", contact: "priya@loopwire.io", relevance: "Raised seed funding this quarter" }, tags: ["Verified"] },
-      { id: "mixed-4", name: "Cedar & Pine Bakery", secondary: "Neighborhood bakery", initials: "CP", fields: { category: "Local Business", location: "Portland, US", contact: "hello@cedarpinebakery.com", relevance: "No website — high-intent opportunity" }, tags: ["No website"] },
-      { id: "mixed-5", name: "Northbeam Analytics", secondary: "Data tooling startup", initials: "NA", fields: { category: "Company", location: "Denver, US", contact: "contact@northbeamhq.com", relevance: "Actively hiring across engineering" }, tags: ["Hiring"] },
+      {
+        id: "mixed-1",
+        name: "Aziza Satybaldyeva",
+        secondary: "Investment Associate · DOMiNO Ventures",
+        initials: "AS",
+        fields: {
+          category: "Investor",
+          location: "Tashkent, UZ",
+          contact: "aziza@dominovc.com",
+          relevance: "Invested in AI pre-seed rounds recently",
+        },
+        tags: ["Pre-seed"],
+      },
+      {
+        id: "mixed-2",
+        name: "Ferncroft Capital",
+        secondary: "Emerging early-stage fund",
+        initials: "FC",
+        fields: {
+          category: "Venture Capital",
+          location: "Austin, US",
+          contact: "team@ferncroftcap.com",
+          relevance: "Actively deploying in early-stage AI",
+        },
+        tags: ["AI"],
+      },
+      {
+        id: "mixed-3",
+        name: "Priya Natarajan",
+        secondary: "Co-founder · Loopwire",
+        initials: "PN",
+        fields: {
+          category: "Person",
+          location: "Toronto, CA",
+          contact: "priya@loopwire.io",
+          relevance: "Raised seed funding this quarter",
+        },
+        tags: ["Verified"],
+      },
+      {
+        id: "mixed-4",
+        name: "Cedar & Pine Bakery",
+        secondary: "Neighborhood bakery",
+        initials: "CP",
+        fields: {
+          category: "Local Business",
+          location: "Portland, US",
+          contact: "hello@cedarpinebakery.com",
+          relevance: "No website — high-intent opportunity",
+        },
+        tags: ["No website"],
+      },
+      {
+        id: "mixed-5",
+        name: "Northbeam Analytics",
+        secondary: "Data tooling startup",
+        initials: "NA",
+        fields: {
+          category: "Company",
+          location: "Denver, US",
+          contact: "contact@northbeamhq.com",
+          relevance: "Actively hiring across engineering",
+        },
+        tags: ["Hiring"],
+      },
     ],
   },
   Investor: {
@@ -301,10 +537,73 @@ const dashboardConfigs: Record<DashboardCategory, CategoryConfig> = {
       { key: "relevance", label: "Relevance" },
     ],
     rows: [
-      { id: "investor-1", name: "Alfred Lin", secondary: "Partner · Sequoia Capital", initials: "AL", image: "https://framerusercontent.com/images/qN8j54q8Vi2GA6Fqt0OG8fQSJw.webp?width=880&height=880", imageAlt: "Alfred Lin", fields: { location: "San Francisco, CA", phone: "Firm directory", email: "Early-AL@sequoiacap.com", checkSize: "$1M–$25M", relevance: "Backed breakout SaaS at seed stage" }, tags: ["Consumer", "SaaS"] },
-      { id: "investor-2", name: "Aileen Lee", secondary: "Founder · Cowboy Ventures", initials: "AL", image: "https://cdn.prod.website-files.com/637b82f903cd694c0b0f7546/63ce452d8de9f286395dac25_Aileen_profile_pic.webp", imageAlt: "Aileen Lee", fields: { location: "Palo Alto, CA", phone: "Firm directory", email: "hello@cowboy.vc", checkSize: "$250K–$5M", relevance: "Leading seed rounds in enterprise AI" }, tags: ["Enterprise", "Seed"] },
-      { id: "investor-3", name: "Josh Kopelman", secondary: "Partner · First Round", initials: "JK", image: "https://cdn.sanity.io/images/m6i10uln/production/eb12eb2d830fd3e3b118a6c326d0d1692003c4d4-1024x1256.png?fm=webp&w=3840&q=80", imageAlt: "Josh Kopelman", fields: { location: "Philadelphia, PA", phone: "Firm directory", email: "team@firstround.com", checkSize: "$100K–$20M", relevance: "Invested in AI pre-seed rounds recently" }, tags: ["AI", "B2B"] },
-      { id: "investor-4", name: "Sarah Tavel", secondary: "General Partner · Benchmark", initials: "ST", image: favicon("benchmark.com"), imageAlt: "Benchmark official mark", fields: { location: "San Francisco, CA", phone: "Firm directory", email: "contact@benchmark.com", checkSize: "$1M–$25M", relevance: "Active in fintech marketplace deals" }, tags: ["Marketplaces", "Fintech"] },
+      {
+        id: "investor-1",
+        name: "Alfred Lin",
+        secondary: "Partner · Sequoia Capital",
+        initials: "AL",
+        image:
+          "https://framerusercontent.com/images/qN8j54q8Vi2GA6Fqt0OG8fQSJw.webp?width=880&height=880",
+        imageAlt: "Alfred Lin",
+        fields: {
+          location: "San Francisco, CA",
+          phone: "Firm directory",
+          email: "Early-AL@sequoiacap.com",
+          checkSize: "$1M–$25M",
+          relevance: "Backed breakout SaaS at seed stage",
+        },
+        tags: ["Consumer", "SaaS"],
+      },
+      {
+        id: "investor-2",
+        name: "Aileen Lee",
+        secondary: "Founder · Cowboy Ventures",
+        initials: "AL",
+        image:
+          "https://cdn.prod.website-files.com/637b82f903cd694c0b0f7546/63ce452d8de9f286395dac25_Aileen_profile_pic.webp",
+        imageAlt: "Aileen Lee",
+        fields: {
+          location: "Palo Alto, CA",
+          phone: "Firm directory",
+          email: "hello@cowboy.vc",
+          checkSize: "$250K–$5M",
+          relevance: "Leading seed rounds in enterprise AI",
+        },
+        tags: ["Enterprise", "Seed"],
+      },
+      {
+        id: "investor-3",
+        name: "Josh Kopelman",
+        secondary: "Partner · First Round",
+        initials: "JK",
+        image:
+          "https://cdn.sanity.io/images/m6i10uln/production/eb12eb2d830fd3e3b118a6c326d0d1692003c4d4-1024x1256.png?fm=webp&w=3840&q=80",
+        imageAlt: "Josh Kopelman",
+        fields: {
+          location: "Philadelphia, PA",
+          phone: "Firm directory",
+          email: "team@firstround.com",
+          checkSize: "$100K–$20M",
+          relevance: "Invested in AI pre-seed rounds recently",
+        },
+        tags: ["AI", "B2B"],
+      },
+      {
+        id: "investor-4",
+        name: "Sarah Tavel",
+        secondary: "General Partner · Benchmark",
+        initials: "ST",
+        image: favicon("benchmark.com"),
+        imageAlt: "Benchmark official mark",
+        fields: {
+          location: "San Francisco, CA",
+          phone: "Firm directory",
+          email: "contact@benchmark.com",
+          checkSize: "$1M–$25M",
+          relevance: "Active in fintech marketplace deals",
+        },
+        tags: ["Marketplaces", "Fintech"],
+      },
     ],
   },
   "Local Business": {
@@ -320,10 +619,66 @@ const dashboardConfigs: Record<DashboardCategory, CategoryConfig> = {
       { key: "relevance", label: "Relevance" },
     ],
     rows: [
-      { id: "business-1", name: "Joe's Plumbing", secondary: "Independent contractor", initials: "JP", fields: { location: "Austin, US", category: "Plumbing", phone: "+1 (512) 555-0199", email: "joesplumbingatx@gmail.com", website: "None found", relevance: "No website — high-intent opportunity" }, tags: ["No website"] },
-      { id: "business-2", name: "Maria's Flower Shop", secondary: "Local florist", initials: "MF", fields: { location: "Chicago, US", category: "Retail", phone: "+1 (312) 555-0145", email: "mariaflowers@yahoo.com", website: "None found", relevance: "No website — high-intent opportunity" }, tags: ["No website"] },
-      { id: "business-3", name: "Apex Roofers", secondary: "Roofing & repair", initials: "AR", fields: { location: "Denver, US", category: "Construction", phone: "+1 (720) 555-0182", email: "apexroofingdenver@gmail.com", website: "None found", relevance: "Recently expanded service area" }, tags: ["No website"] },
-      { id: "business-4", name: "Golden Wok", secondary: "Family restaurant", initials: "GW", fields: { location: "Seattle, US", category: "Restaurant", phone: "+1 (206) 555-0123", email: "goldenwokseattle@gmail.com", website: "None found", relevance: "No online ordering — outreach window" }, tags: ["No website"] },
+      {
+        id: "business-1",
+        name: "Joe's Plumbing",
+        secondary: "Independent contractor",
+        initials: "JP",
+        fields: {
+          location: "Austin, US",
+          category: "Plumbing",
+          phone: "+1 (512) 555-0199",
+          email: "joesplumbingatx@gmail.com",
+          website: "None found",
+          relevance: "No website — high-intent opportunity",
+        },
+        tags: ["No website"],
+      },
+      {
+        id: "business-2",
+        name: "Maria's Flower Shop",
+        secondary: "Local florist",
+        initials: "MF",
+        fields: {
+          location: "Chicago, US",
+          category: "Retail",
+          phone: "+1 (312) 555-0145",
+          email: "mariaflowers@yahoo.com",
+          website: "None found",
+          relevance: "No website — high-intent opportunity",
+        },
+        tags: ["No website"],
+      },
+      {
+        id: "business-3",
+        name: "Apex Roofers",
+        secondary: "Roofing & repair",
+        initials: "AR",
+        fields: {
+          location: "Denver, US",
+          category: "Construction",
+          phone: "+1 (720) 555-0182",
+          email: "apexroofingdenver@gmail.com",
+          website: "None found",
+          relevance: "Recently expanded service area",
+        },
+        tags: ["No website"],
+      },
+      {
+        id: "business-4",
+        name: "Golden Wok",
+        secondary: "Family restaurant",
+        initials: "GW",
+        fields: {
+          location: "Seattle, US",
+          category: "Restaurant",
+          phone: "+1 (206) 555-0123",
+          email: "goldenwokseattle@gmail.com",
+          website: "None found",
+          relevance: "No online ordering — outreach window",
+        },
+        tags: ["No website"],
+      },
     ],
   },
   Executive: {
@@ -338,10 +693,62 @@ const dashboardConfigs: Record<DashboardCategory, CategoryConfig> = {
       { key: "relevance", label: "Relevance" },
     ],
     rows: [
-      { id: "exec-1", name: "Satya Nadella", secondary: "Microsoft", initials: "SN", fields: { title: "CEO", company: "Microsoft", location: "Redmond, US", email: "satyan@microsoft.com", relevance: "Overseeing major AI platform bets" }, tags: ["Enterprise"] },
-      { id: "exec-2", name: "Tim Cook", secondary: "Apple", initials: "TC", fields: { title: "CEO", company: "Apple", location: "Cupertino, US", email: "tcook@apple.com", relevance: "Directing services-led growth push" }, tags: ["Verified"] },
-      { id: "exec-3", name: "Ruth Porat", secondary: "Alphabet", initials: "RP", fields: { title: "President & CIO", company: "Alphabet", location: "Mountain View, US", email: "ruth@abc.xyz", relevance: "Steering cloud investment priorities" }, tags: ["Finance"] },
-      { id: "exec-4", name: "Marc Benioff", secondary: "Salesforce", initials: "MB", fields: { title: "Chair & CEO", company: "Salesforce", location: "San Francisco, US", email: "ceo@salesforce.com", relevance: "Acquiring AI startups this year" }, tags: ["Cloud"] },
+      {
+        id: "exec-1",
+        name: "Satya Nadella",
+        secondary: "Microsoft",
+        initials: "SN",
+        fields: {
+          title: "CEO",
+          company: "Microsoft",
+          location: "Redmond, US",
+          email: "satyan@microsoft.com",
+          relevance: "Overseeing major AI platform bets",
+        },
+        tags: ["Enterprise"],
+      },
+      {
+        id: "exec-2",
+        name: "Tim Cook",
+        secondary: "Apple",
+        initials: "TC",
+        fields: {
+          title: "CEO",
+          company: "Apple",
+          location: "Cupertino, US",
+          email: "tcook@apple.com",
+          relevance: "Directing services-led growth push",
+        },
+        tags: ["Verified"],
+      },
+      {
+        id: "exec-3",
+        name: "Ruth Porat",
+        secondary: "Alphabet",
+        initials: "RP",
+        fields: {
+          title: "President & CIO",
+          company: "Alphabet",
+          location: "Mountain View, US",
+          email: "ruth@abc.xyz",
+          relevance: "Steering cloud investment priorities",
+        },
+        tags: ["Finance"],
+      },
+      {
+        id: "exec-4",
+        name: "Marc Benioff",
+        secondary: "Salesforce",
+        initials: "MB",
+        fields: {
+          title: "Chair & CEO",
+          company: "Salesforce",
+          location: "San Francisco, US",
+          email: "ceo@salesforce.com",
+          relevance: "Acquiring AI startups this year",
+        },
+        tags: ["Cloud"],
+      },
     ],
   },
   Person: {
@@ -357,10 +764,72 @@ const dashboardConfigs: Record<DashboardCategory, CategoryConfig> = {
       { key: "relevance", label: "Relevance" },
     ],
     rows: [
-      { id: "person-1", name: "Dario Amodei", secondary: "Anthropic", initials: "DA", fields: { title: "Founder & CEO", company: "Anthropic", location: "San Francisco, US", phone: "Anthropic newsroom", email: "press@anthropic.com", relevance: "Raised funding at record valuation" }, tags: ["Verified"] },
-      { id: "person-2", name: "Brian Chesky", secondary: "Airbnb", initials: "BC", image: "https://news.airbnb.com/wp-content/uploads/sites/4/2016/10/Brian-Chesky-Headshot-IR-Crop-Airbnb-2.jpg?w=624", imageAlt: "Brian Chesky", fields: { title: "Co-founder & CEO", company: "Airbnb", location: "San Francisco, US", phone: "Airbnb newsroom", email: "contact.press@airbnb.com", relevance: "Expanding into new travel verticals" }, tags: ["Leadership"] },
-      { id: "person-3", name: "Jensen Huang", secondary: "NVIDIA", initials: "JH", image: "https://iprsoftwaremedia.com/219/files/202604/f0e9efa72f909f3f08cdd0a48ff92880/69e6b9293d633260eec67804_jensen-1920x1920/jensen-1920x1920_6a7e6ad5-c215-4503-b70d-fe6e5e9de205-prv.jpg?v=6a7e6ad5-c215-4503-b70d-fe6e5e9de205", imageAlt: "Jensen Huang", fields: { title: "Founder & CEO", company: "NVIDIA", location: "Santa Clara, US", phone: "+1 (408) 486-2000", email: "info@nvidia.com", relevance: "Keynote speaker on AI infrastructure" }, tags: ["Leadership"] },
-      { id: "person-4", name: "Melanie Perkins", secondary: "Canva", initials: "MP", fields: { title: "Co-founder & CEO", company: "Canva", location: "Sydney, AU", phone: "Canva newsroom", email: "comms@canva.com", relevance: "Raised seed funding this quarter" }, tags: ["Design"] },
+      {
+        id: "person-1",
+        name: "Dario Amodei",
+        secondary: "Anthropic",
+        initials: "DA",
+        fields: {
+          title: "Founder & CEO",
+          company: "Anthropic",
+          location: "San Francisco, US",
+          phone: "Anthropic newsroom",
+          email: "press@anthropic.com",
+          relevance: "Raised funding at record valuation",
+        },
+        tags: ["Verified"],
+      },
+      {
+        id: "person-2",
+        name: "Brian Chesky",
+        secondary: "Airbnb",
+        initials: "BC",
+        image:
+          "https://news.airbnb.com/wp-content/uploads/sites/4/2016/10/Brian-Chesky-Headshot-IR-Crop-Airbnb-2.jpg?w=624",
+        imageAlt: "Brian Chesky",
+        fields: {
+          title: "Co-founder & CEO",
+          company: "Airbnb",
+          location: "San Francisco, US",
+          phone: "Airbnb newsroom",
+          email: "contact.press@airbnb.com",
+          relevance: "Expanding into new travel verticals",
+        },
+        tags: ["Leadership"],
+      },
+      {
+        id: "person-3",
+        name: "Jensen Huang",
+        secondary: "NVIDIA",
+        initials: "JH",
+        image:
+          "https://iprsoftwaremedia.com/219/files/202604/f0e9efa72f909f3f08cdd0a48ff92880/69e6b9293d633260eec67804_jensen-1920x1920/jensen-1920x1920_6a7e6ad5-c215-4503-b70d-fe6e5e9de205-prv.jpg?v=6a7e6ad5-c215-4503-b70d-fe6e5e9de205",
+        imageAlt: "Jensen Huang",
+        fields: {
+          title: "Founder & CEO",
+          company: "NVIDIA",
+          location: "Santa Clara, US",
+          phone: "+1 (408) 486-2000",
+          email: "info@nvidia.com",
+          relevance: "Keynote speaker on AI infrastructure",
+        },
+        tags: ["Leadership"],
+      },
+      {
+        id: "person-4",
+        name: "Melanie Perkins",
+        secondary: "Canva",
+        initials: "MP",
+        fields: {
+          title: "Co-founder & CEO",
+          company: "Canva",
+          location: "Sydney, AU",
+          phone: "Canva newsroom",
+          email: "comms@canva.com",
+          relevance: "Raised seed funding this quarter",
+        },
+        tags: ["Design"],
+      },
     ],
   },
   "Venture Capital": {
@@ -376,15 +845,79 @@ const dashboardConfigs: Record<DashboardCategory, CategoryConfig> = {
       { key: "relevance", label: "Relevance" },
     ],
     rows: [
-      { id: "vc-1", name: "Accel", secondary: "Global venture firm", initials: "AC", image: favicon("accel.com"), imageAlt: "Accel official mark", fields: { location: "Palo Alto, US", stage: "Seed–Growth", website: "accel.com", email: "partners@accel.com", phone: "+1 650 614 4800", relevance: "Actively deploying in early-stage AI" }, tags: ["Enterprise", "AI"] },
-      { id: "vc-2", name: "Index Ventures", secondary: "Technology investor", initials: "IV", image: favicon("indexventures.com"), imageAlt: "Index Ventures official mark", fields: { location: "London, UK", stage: "Seed–Growth", website: "indexventures.com", email: "press@indexventures.com", phone: "+44 20 7154 2020", relevance: "New fintech fund announced" }, tags: ["Fintech", "SaaS"] },
-      { id: "vc-3", name: "General Catalyst", secondary: "Transformation investor", initials: "GC", image: favicon("generalcatalyst.com"), imageAlt: "General Catalyst official mark", fields: { location: "Cambridge, US", stage: "Early–Growth", website: "generalcatalyst.com", email: "info@generalcatalyst.com", phone: "+1 415 659 5000", relevance: "Hiring AI partners for new fund" }, tags: ["Healthcare", "AI"] },
-      { id: "vc-4", name: "Bessemer Venture Partners", secondary: "Cloud & technology investor", initials: "BV", image: favicon("bvp.com"), imageAlt: "Bessemer Venture Partners official mark", fields: { location: "Menlo Park, US", stage: "Seed–Growth", website: "bvp.com", email: "contact@bvp.com", phone: "Firm directory", relevance: "Backing cloud security seed rounds" }, tags: ["Cloud", "Security"] },
+      {
+        id: "vc-1",
+        name: "Accel",
+        secondary: "Global venture firm",
+        initials: "AC",
+        image: favicon("accel.com"),
+        imageAlt: "Accel official mark",
+        fields: {
+          location: "Palo Alto, US",
+          stage: "Seed–Growth",
+          website: "accel.com",
+          email: "partners@accel.com",
+          phone: "+1 650 614 4800",
+          relevance: "Actively deploying in early-stage AI",
+        },
+        tags: ["Enterprise", "AI"],
+      },
+      {
+        id: "vc-2",
+        name: "Index Ventures",
+        secondary: "Technology investor",
+        initials: "IV",
+        image: favicon("indexventures.com"),
+        imageAlt: "Index Ventures official mark",
+        fields: {
+          location: "London, UK",
+          stage: "Seed–Growth",
+          website: "indexventures.com",
+          email: "press@indexventures.com",
+          phone: "+44 20 7154 2020",
+          relevance: "New fintech fund announced",
+        },
+        tags: ["Fintech", "SaaS"],
+      },
+      {
+        id: "vc-3",
+        name: "General Catalyst",
+        secondary: "Transformation investor",
+        initials: "GC",
+        image: favicon("generalcatalyst.com"),
+        imageAlt: "General Catalyst official mark",
+        fields: {
+          location: "Cambridge, US",
+          stage: "Early–Growth",
+          website: "generalcatalyst.com",
+          email: "info@generalcatalyst.com",
+          phone: "+1 415 659 5000",
+          relevance: "Hiring AI partners for new fund",
+        },
+        tags: ["Healthcare", "AI"],
+      },
+      {
+        id: "vc-4",
+        name: "Bessemer Venture Partners",
+        secondary: "Cloud & technology investor",
+        initials: "BV",
+        image: favicon("bvp.com"),
+        imageAlt: "Bessemer Venture Partners official mark",
+        fields: {
+          location: "Menlo Park, US",
+          stage: "Seed–Growth",
+          website: "bvp.com",
+          email: "contact@bvp.com",
+          phone: "Firm directory",
+          relevance: "Backing cloud security seed rounds",
+        },
+        tags: ["Cloud", "Security"],
+      },
     ],
   },
 };
 
-export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string }) {
+export function HeroSection({ cta, ctaLabel }: { cta: string; ctaLabel?: string }) {
   const signupSearch = cta === "/auth" ? { mode: "signup" as const } : undefined;
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -407,7 +940,7 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
     const t = setInterval(() => {
       setFade(false);
       setTimeout(() => {
-        setWordIdx(i => (i + 1) % 2);
+        setWordIdx((i) => (i + 1) % 2);
         setFade(true);
       }, 600);
     }, 2800);
@@ -419,14 +952,22 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
   // No real search/filter logic. No empty states. This is a marketing demo.
   const autoQueries: { text: string; configKey: DashboardCategory }[] = [
     { text: "100+ investors and VCs; Early-Stage AI", configKey: "Venture Capital" },
-    { text: "Want to sell my website service; find me 200+ global local businesses rn", configKey: "Local Business" },
-    { text: "Yo actively looking for jobs; asap find me 100+ startup founders", configKey: "Person" },
+    {
+      text: "Want to sell my website service; find me 200+ global local businesses rn",
+      configKey: "Local Business",
+    },
+    {
+      text: "Yo actively looking for jobs; asap find me 100+ startup founders",
+      configKey: "Person",
+    },
     { text: "find me 50+ global company executives rn", configKey: "Executive" },
   ];
 
   // scriptPhase: "initial" = showing Mixed, awaiting first type | "typing" = character-by-character | "holding" = showing result, waiting before delete | "deleting" = erasing query
   const [scriptIdx, setScriptIdx] = useState(0);
-  const [scriptPhase, setScriptPhase] = useState<"initial" | "typing" | "holding" | "deleting">("initial");
+  const [scriptPhase, setScriptPhase] = useState<"initial" | "typing" | "holding" | "deleting">(
+    "initial",
+  );
   const [displayedQuery, setDisplayedQuery] = useState("");
   // Which result set is currently shown in the dashboard table
   const [activeResultKey, setActiveResultKey] = useState<DashboardCategory>("Mixed");
@@ -443,9 +984,12 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
     } else if (scriptPhase === "typing") {
       const targetText = autoQueries[scriptIdx].text;
       if (displayedQuery.length < targetText.length) {
-        timeout = setTimeout(() => {
-          setDisplayedQuery(targetText.slice(0, displayedQuery.length + 1));
-        }, 60 + Math.random() * 40);
+        timeout = setTimeout(
+          () => {
+            setDisplayedQuery(targetText.slice(0, displayedQuery.length + 1));
+          },
+          60 + Math.random() * 40,
+        );
       } else {
         // Typing complete → swap dashboard to the scripted result set
         timeout = setTimeout(() => {
@@ -481,13 +1025,17 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
   const activeConfig = dashboardConfigs[activeResultKey];
 
   const toggleRow = (id: string) => {
-    setSelectedRows((current) => current.includes(id) ? current.filter((rowId) => rowId !== id) : [...current, id]);
+    setSelectedRows((current) =>
+      current.includes(id) ? current.filter((rowId) => rowId !== id) : [...current, id],
+    );
   };
-  const allVisibleSelected = activeConfig.rows.length > 0 && activeConfig.rows.every((row) => selectedRows.includes(row.id));
+  const allVisibleSelected =
+    activeConfig.rows.length > 0 && activeConfig.rows.every((row) => selectedRows.includes(row.id));
 
   const toggleAllVisible = () => {
     setSelectedRows((current) => {
-      if (allVisibleSelected) return current.filter((id) => !activeConfig.rows.some((row) => row.id === id));
+      if (allVisibleSelected)
+        return current.filter((id) => !activeConfig.rows.some((row) => row.id === id));
       return Array.from(new Set([...current, ...activeConfig.rows.map((row) => row.id)]));
     });
   };
@@ -499,85 +1047,108 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
   return (
     <>
       <section className="scravipo-hero" id="home" aria-label="Scravipo hero section">
-      <div className="scravipo-hero__texture" aria-hidden="true" />
-      <div className="scravipo-hero__vignette" aria-hidden="true" />
-      <div className="scravipo-hero__grain" aria-hidden="true" />
+        <div className="scravipo-hero__texture" aria-hidden="true" />
+        <div className="scravipo-hero__vignette" aria-hidden="true" />
+        <div className="scravipo-hero__grain" aria-hidden="true" />
 
-      <header className="scravipo-nav-wrap">
-        <nav className="scravipo-nav" aria-label="Primary navigation">
-          <a className="scravipo-brand" href="#home" aria-label="Scravipo home">
-            <img className="scravipo-brand__mark" src={brandMarkAsset} alt="" aria-hidden="true" />
-            <span>Scravipo</span>
-          </a>
+        <header className="scravipo-nav-wrap">
+          <nav className="scravipo-nav" aria-label="Primary navigation">
+            <a className="scravipo-brand" href="#home" aria-label="Scravipo home">
+              <img
+                className="scravipo-brand__mark"
+                src={brandMarkAsset}
+                alt=""
+                aria-hidden="true"
+              />
+              <span>Scravipo</span>
+            </a>
 
-          <div className="scravipo-nav__links" aria-label="Desktop links">
+            <div className="scravipo-nav__links" aria-label="Desktop links">
+              {navItems.map((item) => (
+                <a key={item.href} href={item.href}>
+                  {item.label}
+                </a>
+              ))}
+            </div>
+
+            <Link className="scravipo-join scravipo-join--nav" to={cta} search={signupSearch}>
+              {ctaLabel || "Join"}
+            </Link>
+
+            <button
+              className="scravipo-menu-toggle"
+              type="button"
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((open) => !open)}
+            >
+              <span />
+              <span />
+            </button>
+          </nav>
+
+          <div
+            className={`scravipo-mobile-backdrop${menuOpen ? " is-open" : ""}`}
+            aria-hidden={!menuOpen}
+            onClick={() => setMenuOpen(false)}
+          />
+          <div
+            className={`scravipo-mobile-menu${menuOpen ? " is-open" : ""}`}
+            aria-hidden={!menuOpen}
+          >
             {navItems.map((item) => (
-              <a key={item.href} href={item.href}>
+              <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)}>
                 {item.label}
               </a>
             ))}
+            <Link to={cta} search={signupSearch} onClick={() => setMenuOpen(false)}>
+              {ctaLabel || "Join"}
+            </Link>
           </div>
+        </header>
 
-          <Link className="scravipo-join scravipo-join--nav" to={cta} search={signupSearch}>
-            {ctaLabel || "Join"}
-          </Link>
+        <img className="scravipo-statue" src={statueAsset} alt="" aria-hidden="true" />
 
-          <button
-            className="scravipo-menu-toggle"
-            type="button"
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen((open) => !open)}
+        <main className="scravipo-hero__content">
+          <p className="scravipo-eyebrow">Scravipo</p>
+          <h1>
+            <span className="scravipo-hero__line-top">
+              Get{" "}
+              <span className="scravipo-cycle-word" style={{ opacity: fade ? 1 : 0 }}>
+                {topWords[wordIdx]}
+              </span>
+            </span>
+            <span className="scravipo-hero__line-bottom">
+              that{" "}
+              <span className="scravipo-cycle-word" style={{ opacity: fade ? 1 : 0 }}>
+                {bottomWords[wordIdx]}
+              </span>
+            </span>
+          </h1>
+          <p className="scravipo-description">
+            Scravipo turns live web signals into verified business
+            <br className="scravipo-description__desktop-break" /> opportunities; clients, talent,
+            and deals worth pursuing.
+          </p>
+          <p
+            className="scravipo-signals"
+            aria-label="Real-time signals, verified contacts, no random leads"
           >
-            <span />
-            <span />
-          </button>
-        </nav>
-
-        <div
-          className={`scravipo-mobile-backdrop${menuOpen ? " is-open" : ""}`}
-          aria-hidden={!menuOpen}
-          onClick={() => setMenuOpen(false)}
-        />
-        <div className={`scravipo-mobile-menu${menuOpen ? " is-open" : ""}`} aria-hidden={!menuOpen}>
-          {navItems.map((item) => (
-            <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)}>
-              {item.label}
-            </a>
-          ))}
-          <Link to={cta} search={signupSearch} onClick={() => setMenuOpen(false)}>
-            {ctaLabel || "Join"}
+            <span>Real-time signals</span>
+            <i aria-hidden="true">·</i>
+            <span>Verified contacts</span>
+            <i aria-hidden="true">·</i>
+            <span>No random leads</span>
+          </p>
+          <Link className="scravipo-join scravipo-join--hero" to={cta} search={signupSearch}>
+            {ctaLabel || "Start free"}
           </Link>
-        </div>
-      </header>
+        </main>
 
-      <img className="scravipo-statue" src={statueAsset} alt="" aria-hidden="true" />
+        <span className="scravipo-scratch" aria-hidden="true" />
 
-      <main className="scravipo-hero__content">
-        <p className="scravipo-eyebrow">Scravipo</p>
-        <h1>
-          <span className="scravipo-hero__line-top">Get <span className="scravipo-cycle-word" style={{ opacity: fade ? 1 : 0 }}>{topWords[wordIdx]}</span></span>
-          <span className="scravipo-hero__line-bottom">that <span className="scravipo-cycle-word" style={{ opacity: fade ? 1 : 0 }}>{bottomWords[wordIdx]}</span></span>
-        </h1>
-        <p className="scravipo-description">
-          Scravipo turns live web signals into verified business
-          <br className="scravipo-description__desktop-break" /> opportunities; clients, talent, and deals worth pursuing.
-        </p>
-        <p className="scravipo-signals" aria-label="Real-time signals, verified contacts, no random leads">
-          <span>Real-time signals</span>
-          <i aria-hidden="true">·</i>
-          <span>Verified contacts</span>
-          <i aria-hidden="true">·</i>
-          <span>No random leads</span>
-        </p>
-        <Link className="scravipo-join scravipo-join--hero" to={cta} search={signupSearch}>
-          {ctaLabel || "Start free"}
-        </Link>
-      </main>
-
-      <span className="scravipo-scratch" aria-hidden="true" />
-
-      <style>{`
+        <style>
+          {`
         .scravipo-hero {
           --chalk: #f3f1ec;
           --muted-chalk: rgba(243, 241, 236, 0.74);
@@ -2188,68 +2759,58 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
           align-items: center;
         }
       `}
-      </style>
+        </style>
       </section>
 
       <section className="scravipo-dashboard" id="dashboard" aria-labelledby="dashboard-title">
-        <img className="scravipo-cloud scravipo-cloud--left" src={heroCloudAsset} alt="" aria-hidden="true" />
-        <img className="scravipo-cloud scravipo-cloud--right" src={heroCloudAsset} alt="" aria-hidden="true" />
-        <div className="scravipo-dashboard__intro" style={{ flexDirection: "column", alignItems: "center", textAlign: "center", marginBottom: "3.5rem" }}>
+        <img
+          className="scravipo-cloud scravipo-cloud--left"
+          src={heroCloudAsset}
+          alt=""
+          aria-hidden="true"
+        />
+        <img
+          className="scravipo-cloud scravipo-cloud--right"
+          src={heroCloudAsset}
+          alt=""
+          aria-hidden="true"
+        />
+        <div
+          className="scravipo-dashboard__intro"
+          style={{
+            flexDirection: "column",
+            alignItems: "center",
+            textAlign: "center",
+            marginBottom: "3.5rem",
+          }}
+        >
           <div>
-            <h2 id="dashboard-title">Leads for <em style={{ fontStyle: "italic", fontFamily: "Georgia, 'Times New Roman', serif" }}>everything.</em></h2>
+            <h2 id="dashboard-title">
+              Leads for{" "}
+              <em style={{ fontStyle: "italic", fontFamily: "Georgia, 'Times New Roman', serif" }}>
+                everything.
+              </em>
+            </h2>
           </div>
-          
-          {/* Standalone Input/Search Bar (Liquid Glass Redesign) */}
-          <div style={{ marginTop: "2rem", width: "100%", display: "flex", justifyContent: "center", position: "relative", zIndex: 10 }}>
-            <div className="scravipo-liquid-search-container liquid-glass">
-              
-              <div className="scravipo-liquid-search__input-row">
-                <span className="scravipo-search__text" style={{ display: "flex", alignItems: "center" }}>
-                  {!displayedQuery && (
-                    <span className="scravipo-search__cursor" style={{ 
-                      display: "inline-block",
-                      marginRight: "0.3rem",
-                      color: "rgba(255,255,255,0.7)",
-                      animation: "blink-opacity 1s step-end infinite"
-                    }}>|</span>
-                  )}
-                  {displayedQuery || <span className="scravipo-search__placeholder">Ask anything...</span>}
-                  {displayedQuery && (
-                    <span className="scravipo-search__cursor" style={{ 
-                      display: "inline-block",
-                      marginLeft: "0.1rem",
-                      color: "rgba(255,255,255,0.7)",
-                      opacity: scriptPhase === "typing" || scriptPhase === "deleting" ? 1 : 1,
-                      animation: scriptPhase === "holding" || scriptPhase === "initial" ? "blink-opacity 1s step-end infinite" : "none"
-                    }}>|</span>
-                  )}
-                </span>
-              </div>
-              
-              <div className="scravipo-liquid-search__controls">
-                <div className="scravipo-liquid-search__chips">
-                  <button className="scravipo-liquid-btn scravipo-liquid-btn--icon" aria-label="Add attachment">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-                  </button>
-                  <button className="scravipo-liquid-btn scravipo-liquid-btn--active">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 2v7.31L2.83 12 10 14.69V22l7.17-7.31L24.34 12l-7.17-2.69z"/></svg>
-                    Mode
-                  </button>
-                  <button className="scravipo-liquid-btn">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
-                    Thinker
-                  </button>
-                </div>
-                
-                <div className="scravipo-liquid-search__actions">
-                  <button className="scravipo-liquid-btn scravipo-liquid-btn--icon" aria-label="Voice input" title="Voice input">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-                  </button>
-                  <button className="scravipo-liquid-btn scravipo-liquid-btn--submit" aria-label="Submit search">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
-                  </button>
-                </div>
-              </div>
+
+          {/* Home-parity composer: same visuals as Discover UnifiedComposer, click routes to signup/discover */}
+          <div
+            style={{
+              marginTop: "2rem",
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              position: "relative",
+              zIndex: 10,
+            }}
+          >
+            <div style={{ width: "min(42rem, 100%)" }}>
+              <LandingSearchBox
+                cta={cta}
+                signupSearch={signupSearch}
+                displayedQuery={displayedQuery}
+                typing={scriptPhase === "typing" || scriptPhase === "deleting"}
+              />
             </div>
           </div>
         </div>
@@ -2266,8 +2827,17 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
             <table className="scravipo-lead-table">
               <thead>
                 <tr>
-                  <th className="scravipo-table-check"><input type="checkbox" aria-label="Select all visible leads" checked={allVisibleSelected} onChange={toggleAllVisible} /></th>
-                  {activeConfig.columns.map((column) => <th key={column.key}>{column.label}</th>)}
+                  <th className="scravipo-table-check">
+                    <input
+                      type="checkbox"
+                      aria-label="Select all visible leads"
+                      checked={allVisibleSelected}
+                      onChange={toggleAllVisible}
+                    />
+                  </th>
+                  {activeConfig.columns.map((column) => (
+                    <th key={column.key}>{column.label}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
@@ -2275,20 +2845,48 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
                   const isSelected = selectedRows.includes(row.id);
                   return (
                     <tr key={row.id} className={isSelected ? "is-selected" : ""}>
-                      <td className="scravipo-table-check"><input type="checkbox" aria-label={`Select ${row.name}`} checked={isSelected} onChange={() => toggleRow(row.id)} /></td>
+                      <td className="scravipo-table-check">
+                        <input
+                          type="checkbox"
+                          aria-label={`Select ${row.name}`}
+                          checked={isSelected}
+                          onChange={() => toggleRow(row.id)}
+                        />
+                      </td>
                       {activeConfig.columns.map((column) => (
                         <td key={column.key}>
                           {column.key === "name" ? (
                             <div className="scravipo-identity">
                               <span className={`scravipo-avatar${row.image ? " has-image" : ""}`}>
-                                {row.image ? <img src={row.image} alt={row.imageAlt ?? `${row.name} mark`} /> : row.initials}
+                                {row.image ? (
+                                  <img src={row.image} alt={row.imageAlt ?? `${row.name} mark`} />
+                                ) : (
+                                  row.initials
+                                )}
                               </span>
-                              <span><strong>{row.name}</strong><small>{row.secondary}</small></span>
+                              <span>
+                                <strong>{row.name}</strong>
+                                <small>{row.secondary}</small>
+                              </span>
                             </div>
                           ) : column.key === "sectors" ? (
-                            <span className="scravipo-tags">{(row.tags ?? []).map((tag) => <em key={tag}>{tag}</em>)}</span>
+                            <span className="scravipo-tags">
+                              {(row.tags ?? []).map((tag) => (
+                                <em key={tag}>{tag}</em>
+                              ))}
+                            </span>
                           ) : (
-                            <span className={column.key === "website" ? "scravipo-mono scravipo-linkish" : column.key === "email" ? "scravipo-mono" : ""}>{row.fields[column.key] ?? "—"}</span>
+                            <span
+                              className={
+                                column.key === "website"
+                                  ? "scravipo-mono scravipo-linkish"
+                                  : column.key === "email"
+                                    ? "scravipo-mono"
+                                    : ""
+                              }
+                            >
+                              {row.fields[column.key] ?? "—"}
+                            </span>
                           )}
                         </td>
                       ))}
@@ -2300,8 +2898,12 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
           </div>
 
           <div className="scravipo-lead-panel__footer">
-            <span>Showing {activeConfig.rows.length} of {activeConfig.rows.length} signals</span>
-            <Link to={cta} search={signupSearch} className="scravipo-load-more">Load more <span aria-hidden="true">↗</span></Link>
+            <span>
+              Showing {activeConfig.rows.length} of {activeConfig.rows.length} signals
+            </span>
+            <Link to={cta} search={signupSearch} className="scravipo-load-more">
+              Load more <span aria-hidden="true">↗</span>
+            </Link>
           </div>
         </div>
       </section>
@@ -2315,76 +2917,120 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
         <div className="scravipo-bento__grid">
           <article className="scravipo-bento-card scravipo-bento-card--tall">
             <div className="scravipo-bento-card__copy">
-              <p className="scravipo-bento-card__label">01 <span>Live discovery</span></p>
+              <p className="scravipo-bento-card__label">
+                01 <span>Live discovery</span>
+              </p>
               <h3>Real-time search across everything.</h3>
-              <p>There is no static database to search through. The moment a query arrives, Scravipo searches live across multiple sources and turns the freshest signals into a usable result.</p>
+              <p>
+                There is no static database to search through. The moment a query arrives, Scravipo
+                searches live across multiple sources and turns the freshest signals into a usable
+                result.
+              </p>
             </div>
             <Card1Flow />
           </article>
 
           <article className="scravipo-bento-card scravipo-bento-card--qualify">
             <div className="scravipo-bento-card__copy">
-              <p className="scravipo-bento-card__label">02 <span>Intent intelligence</span></p>
+              <p className="scravipo-bento-card__label">
+                02 <span>Intent intelligence</span>
+              </p>
               <h3>Enrich & qualify.</h3>
-              <p>A raw result is only the beginning. Each one is enriched and checked against intent signals before it reaches you, with the reason it qualifies made explicit.</p>
+              <p>
+                A raw result is only the beginning. Each one is enriched and checked against intent
+                signals before it reaches you, with the reason it qualifies made explicit.
+              </p>
             </div>
             <Card2Enrich />
           </article>
 
           <article className="scravipo-bento-card scravipo-bento-card--verified">
             <div className="scravipo-bento-card__copy">
-              <p className="scravipo-bento-card__label">03 <span>Trust layer</span></p>
+              <p className="scravipo-bento-card__label">
+                03 <span>Trust layer</span>
+              </p>
               <h3>Verified contacts.</h3>
-              <p>Email, phone, and professional details are checked before delivery. No scraped-and-dumped lists; only contact paths that have earned their place.</p>
+              <p>
+                Email, phone, and professional details are checked before delivery. No
+                scraped-and-dumped lists; only contact paths that have earned their place.
+              </p>
             </div>
             <Card3Verified />
           </article>
 
           <article className="scravipo-bento-card scravipo-bento-card--outreach">
             <div className="scravipo-bento-card__copy">
-              <p className="scravipo-bento-card__label">04 <span>Workflow ready</span></p>
+              <p className="scravipo-bento-card__label">
+                04 <span>Workflow ready</span>
+              </p>
               <h3>Built for outreach.</h3>
-              <p>Every lead arrives with the role, contact, and relevance context your sales or BD workflow needs, so research becomes a next step; not another spreadsheet.</p>
+              <p>
+                Every lead arrives with the role, contact, and relevance context your sales or BD
+                workflow needs, so research becomes a next step; not another spreadsheet.
+              </p>
             </div>
             <Card4Outreach />
             <div className="scravipo-adapts">
               <span className="scravipo-adapts__icon">↗</span>
-              <span><strong>Adapts to what you search.</strong><small>Investor, business, person, company, VC, job; the search and schema reshape around the intent.</small></span>
+              <span>
+                <strong>Adapts to what you search.</strong>
+                <small>
+                  Investor, business, person, company, VC, job; the search and schema reshape around
+                  the intent.
+                </small>
+              </span>
             </div>
           </article>
         </div>
       </section>
 
-      
-      <section className="w-full bg-[#0a0a0a] text-[#f3f1ec] py-24 px-4 sm:px-6 lg:px-8 border-t border-white/5" id="faq">
+      <section
+        className="w-full bg-[#0a0a0a] text-[#f3f1ec] py-24 px-4 sm:px-6 lg:px-8 border-t border-white/5"
+        id="faq"
+      >
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-[0.61rem] font-semibold tracking-[0.15em] uppercase text-[#f3f1ec]/40 mb-3">Answers</p>
-            <h2 className="text-4xl md:text-5xl font-normal tracking-[-0.08em] font-['Times_New_Roman_MT_Condensed','Times_New_Roman',Times,serif] leading-[0.92]">Frequently Asked Questions.</h2>
+            <p className="text-[0.61rem] font-semibold tracking-[0.15em] uppercase text-[#f3f1ec]/40 mb-3">
+              Answers
+            </p>
+            <h2 className="text-4xl md:text-5xl font-normal tracking-[-0.08em] font-['Times_New_Roman_MT_Condensed','Times_New_Roman',Times,serif] leading-[0.92]">
+              Frequently Asked Questions.
+            </h2>
           </div>
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="item-1" className="scravipo-faq-item">
-              <AccordionTrigger className="text-sm hover:no-underline hover:text-white text-[#f3f1ec]/90 py-4 font-semibold tracking-[-0.02em]">What is Scrapivo?</AccordionTrigger>
+              <AccordionTrigger className="text-sm hover:no-underline hover:text-white text-[#f3f1ec]/90 py-4 font-semibold tracking-[-0.02em]">
+                What is Scrapivo?
+              </AccordionTrigger>
               <AccordionContent className="text-[#f3f1ec]/60 text-xs leading-relaxed pb-5">
-                Scrapivo is an AI-powered B2B lead generation platform that discovers and qualifies buyer intent in real-time.
+                Scrapivo is an AI-powered B2B lead generation platform that discovers and qualifies
+                buyer intent in real-time.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-2" className="scravipo-faq-item">
-              <AccordionTrigger className="text-sm hover:no-underline hover:text-white text-[#f3f1ec]/90 py-4 font-semibold tracking-[-0.02em]">How does it source leads?</AccordionTrigger>
+              <AccordionTrigger className="text-sm hover:no-underline hover:text-white text-[#f3f1ec]/90 py-4 font-semibold tracking-[-0.02em]">
+                How does it source leads?
+              </AccordionTrigger>
               <AccordionContent className="text-[#f3f1ec]/60 text-xs leading-relaxed pb-5">
-                We scan the open web, including news, job boards, and company updates, to find high-intent signals.
+                We scan the open web, including news, job boards, and company updates, to find
+                high-intent signals.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-3" className="scravipo-faq-item">
-              <AccordionTrigger className="text-sm hover:no-underline hover:text-white text-[#f3f1ec]/90 py-4 font-semibold tracking-[-0.02em]">Is there a free tier?</AccordionTrigger>
+              <AccordionTrigger className="text-sm hover:no-underline hover:text-white text-[#f3f1ec]/90 py-4 font-semibold tracking-[-0.02em]">
+                Is there a free tier?
+              </AccordionTrigger>
               <AccordionContent className="text-[#f3f1ec]/60 text-xs leading-relaxed pb-5">
                 Yes, you can join the Inner Circle and start exploring basic signals for free.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-4" className="scravipo-faq-item">
-              <AccordionTrigger className="text-sm hover:no-underline hover:text-white text-[#f3f1ec]/90 py-4 font-semibold tracking-[-0.02em]">How is this different from other lead-gen tools?</AccordionTrigger>
+              <AccordionTrigger className="text-sm hover:no-underline hover:text-white text-[#f3f1ec]/90 py-4 font-semibold tracking-[-0.02em]">
+                How is this different from other lead-gen tools?
+              </AccordionTrigger>
               <AccordionContent className="text-[#f3f1ec]/60 text-xs leading-relaxed pb-5">
-                Instead of stale databases, we provide verified, real-time signals with explicit context on why you should reach out.
+                Instead of stale databases, we provide verified, real-time signals with explicit
+                context on why you should reach out.
               </AccordionContent>
             </AccordionItem>
           </Accordion>
@@ -2393,12 +3039,17 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
 
       <footer className="scravipo-footer" id="footer">
         <div className="scravipo-footer__atmosphere" aria-hidden="true" />
-        
+
         <div className="scravipo-footer__content">
           <div className="scravipo-footer__contact">
             <p className="scravipo-footer__label">CONTACT:</p>
-            <p className="scravipo-footer__copy">Reach out for freelance collaborations<br className="scravipo-footer__desktop-break" /> or just to say hi :)</p>
-            <a className="scravipo-footer__email" href="mailto:mirsadat@scrapivo.com">Email <span aria-hidden="true">↗</span></a>
+            <p className="scravipo-footer__copy">
+              Reach out for freelance collaborations
+              <br className="scravipo-footer__desktop-break" /> or just to say hi :)
+            </p>
+            <a className="scravipo-footer__email" href="mailto:mirsadat@scrapivo.com">
+              Email <span aria-hidden="true">↗</span>
+            </a>
           </div>
 
           <div className="scravipo-footer__socials">
@@ -2409,7 +3060,8 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
                 ["LinkedIn", "https://www.linkedin.com/company/scrapivo/"],
               ].map(([label, href]) => (
                 <a key={label} href={href} target="_blank" rel="noreferrer">
-                  <span>{label}</span><span aria-hidden="true">↗</span>
+                  <span>{label}</span>
+                  <span aria-hidden="true">↗</span>
                 </a>
               ))}
             </div>
@@ -2422,11 +3074,14 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
 
         <div className="scravipo-footer__bottom">
           <span>All rights reserved.</span>
-          <button className="scravipo-footer__top" type="button" onClick={handleBackToTop}>Back to top <span aria-hidden="true">↑</span></button>
-          <span>Design &amp; dev by Scravipo <b aria-hidden="true">▪▪</b></span>
+          <button className="scravipo-footer__top" type="button" onClick={handleBackToTop}>
+            Back to top <span aria-hidden="true">↑</span>
+          </button>
+          <span>
+            Design &amp; dev by Scravipo <b aria-hidden="true">▪▪</b>
+          </span>
         </div>
       </footer>
     </>
   );
 }
-

@@ -1,22 +1,21 @@
 import { Users, Building2, Store } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
+import { AddYourInformation } from "./add-your-information";
 
 const LOGO_SRC =
   "https://ytjbrwnwdlsituevqkys.supabase.co/storage/v1/object/public/Scrapivo%20Assets/unnamed__1_-removebg-preview.png";
 
 export function DiscoverWelcomeHero({
-  onFocusComposer,
   greetingName,
+  onAddInfo,
 }: {
-  onFocusComposer: () => void;
+  onFocusComposer?: () => void;
   onChooseChat?: () => void;
   projectQuery?: string;
   onFindLeads?: () => void;
   onOpenWizard?: () => void;
   greetingName?: string;
+  onAddInfo?: (payload: { fileExcerpt: string; fileName: string; urlOrText: string }) => void;
 }) {
-  const navigate = useNavigate();
-
   const firstName = greetingName?.trim() ? greetingName.trim().split(" ")[0] : "there";
   const title = `Welcome, ${firstName}!`;
 
@@ -39,11 +38,10 @@ export function DiscoverWelcomeHero({
         data-tour="cards"
         className="mt-6 sm:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4"
       >
-        {/* Find People */}
-        <button
-          type="button"
-          onClick={onFocusComposer}
-          className="liquid-glass rounded-2xl p-4 sm:p-8 flex flex-row items-center gap-3 text-left sm:flex-col sm:items-center sm:gap-4 sm:text-center hover:bg-white/[0.04] transition-all duration-200 hover:-translate-y-0.5 group"
+        {/* Find People — display-only, not clickable */}
+        <div
+          role="presentation"
+          className="liquid-glass rounded-2xl p-4 sm:p-8 flex flex-row items-center gap-3 text-left sm:flex-col sm:items-center sm:gap-4 sm:text-center hover:bg-white/[0.04] transition-all duration-200 hover:-translate-y-0.5 group cursor-default select-none"
         >
           <div className="size-10 sm:size-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform">
             <Users className="size-5 sm:size-6" />
@@ -56,13 +54,12 @@ export function DiscoverWelcomeHero({
               Match with executives, investors, and founders for your niche, stage, and location.
             </p>
           </div>
-        </button>
+        </div>
 
-        {/* Find Companies */}
-        <button
-          type="button"
-          onClick={onFocusComposer}
-          className="liquid-glass rounded-2xl p-4 sm:p-8 flex flex-row items-center gap-3 text-left sm:flex-col sm:items-center sm:gap-4 sm:text-center hover:bg-white/[0.04] transition-all duration-200 hover:-translate-y-0.5 group"
+        {/* Find Companies — display-only, not clickable */}
+        <div
+          role="presentation"
+          className="liquid-glass rounded-2xl p-4 sm:p-8 flex flex-row items-center gap-3 text-left sm:flex-col sm:items-center sm:gap-4 sm:text-center hover:bg-white/[0.04] transition-all duration-200 hover:-translate-y-0.5 group cursor-default select-none"
         >
           <div className="size-10 sm:size-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform">
             <Building2 className="size-5 sm:size-6" />
@@ -75,13 +72,12 @@ export function DiscoverWelcomeHero({
               Surface company intel, firmographics, and buyer signals in real time.
             </p>
           </div>
-        </button>
+        </div>
 
-        {/* Find Businesses */}
-        <button
-          type="button"
-          onClick={() => navigate({ to: "/local-businesses" })}
-          className="liquid-glass rounded-2xl p-4 sm:p-8 flex flex-row items-center gap-3 text-left sm:flex-col sm:items-center sm:gap-4 sm:text-center hover:bg-white/[0.04] transition-all duration-200 hover:-translate-y-0.5 group"
+        {/* Find Businesses — display-only, not clickable */}
+        <div
+          role="presentation"
+          className="liquid-glass rounded-2xl p-4 sm:p-8 flex flex-row items-center gap-3 text-left sm:flex-col sm:items-center sm:gap-4 sm:text-center hover:bg-white/[0.04] transition-all duration-200 hover:-translate-y-0.5 group cursor-default select-none"
         >
           <div className="size-10 sm:size-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform">
             <Store className="size-5 sm:size-6" />
@@ -94,8 +90,23 @@ export function DiscoverWelcomeHero({
               Discover local business opportunities ready for your pitch.
             </p>
           </div>
-        </button>
+        </div>
       </div>
+
+      {/* Add Your Information — idle hero only, below cards, above composer */}
+      <AddYourInformation
+        onGenerate={(p) => {
+          try {
+            localStorage.setItem(
+              "scrapivo:user-info",
+              JSON.stringify({ ...p, at: new Date().toISOString() }),
+            );
+          } catch {
+            // Private-mode storage may throw — server save still runs via onAddInfo.
+          }
+          onAddInfo?.(p);
+        }}
+      />
     </div>
   );
 }
