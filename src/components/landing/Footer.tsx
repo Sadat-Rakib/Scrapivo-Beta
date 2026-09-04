@@ -130,7 +130,7 @@ export function Footer({ cta }: { cta: string }) {
                   boxShadow: "0 0 50px var(--accent-glow)",
                 }}
               >
-                Get Started <ArrowRight className="size-4" />
+                Join <ArrowRight className="size-4" />
               </button>
             </Link>
 

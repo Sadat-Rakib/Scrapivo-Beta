@@ -271,20 +271,21 @@ type CategoryConfig = {
 
 const dashboardConfigs: Record<DashboardCategory, CategoryConfig> = {
   Mixed: {
-    title: "Everything",
-    subtitle: "A cross-section of global leads",
+    title: "All",
+    subtitle: "Your full sales pipeline, ready to close",
     columns: [
       { key: "name", label: "Name / Entity" },
       { key: "category", label: "Category" },
       { key: "location", label: "Location" },
-      { key: "contact", label: "Detail / Contact" },
+      { key: "contact", label: "Contact" },
+      { key: "relevance", label: "Relevance" },
     ],
     rows: [
-      { id: "mixed-1", name: "Alfred Lin", secondary: "Sequoia Capital", initials: "AL", image: "https://framerusercontent.com/images/qN8j54q8Vi2GA6Fqt0OG8fQSJw.webp?width=880&height=880", imageAlt: "Alfred Lin", fields: { category: "Investor", location: "San Francisco, CA", contact: "Early-AL@sequoiacap.com" }, tags: ["SaaS"] },
-      { id: "mixed-2", name: "Accel", secondary: "Global venture firm", initials: "AC", image: favicon("accel.com"), imageAlt: "Accel", fields: { category: "Venture Capital", location: "Palo Alto, US", contact: "partners@accel.com" }, tags: ["AI"] },
-      { id: "mixed-3", name: "Dario Amodei", secondary: "Anthropic", initials: "DA", fields: { category: "Person", location: "San Francisco, US", contact: "press@anthropic.com" }, tags: ["Verified"] },
-      { id: "mixed-4", name: "Apex Roofers", secondary: "Roofing & repair", initials: "AR", fields: { category: "Local Business", location: "Denver, US", contact: "No web presence" }, tags: ["Verified"] },
-      { id: "mixed-5", name: "OpenAI", secondary: "Artificial intelligence", initials: "OA", image: favicon("openai.com"), imageAlt: "OpenAI", fields: { category: "Company", location: "San Francisco, US", contact: "legal@openai.com" }, tags: ["Enterprise"] },
+      { id: "mixed-1", name: "Aziza Satybaldyeva", secondary: "Investment Associate · DOMiNO Ventures", initials: "AS", fields: { category: "Investor", location: "Tashkent, UZ", contact: "aziza@dominovc.com", relevance: "Invested in AI pre-seed rounds recently" }, tags: ["Pre-seed"] },
+      { id: "mixed-2", name: "Ferncroft Capital", secondary: "Emerging early-stage fund", initials: "FC", fields: { category: "Venture Capital", location: "Austin, US", contact: "team@ferncroftcap.com", relevance: "Actively deploying in early-stage AI" }, tags: ["AI"] },
+      { id: "mixed-3", name: "Priya Natarajan", secondary: "Co-founder · Loopwire", initials: "PN", fields: { category: "Person", location: "Toronto, CA", contact: "priya@loopwire.io", relevance: "Raised seed funding this quarter" }, tags: ["Verified"] },
+      { id: "mixed-4", name: "Cedar & Pine Bakery", secondary: "Neighborhood bakery", initials: "CP", fields: { category: "Local Business", location: "Portland, US", contact: "hello@cedarpinebakery.com", relevance: "No website — high-intent opportunity" }, tags: ["No website"] },
+      { id: "mixed-5", name: "Northbeam Analytics", secondary: "Data tooling startup", initials: "NA", fields: { category: "Company", location: "Denver, US", contact: "contact@northbeamhq.com", relevance: "Actively hiring across engineering" }, tags: ["Hiring"] },
     ],
   },
   Investor: {
@@ -297,12 +298,13 @@ const dashboardConfigs: Record<DashboardCategory, CategoryConfig> = {
       { key: "email", label: "Public email / route" },
       { key: "checkSize", label: "Check size" },
       { key: "sectors", label: "Sectors" },
+      { key: "relevance", label: "Relevance" },
     ],
     rows: [
-      { id: "investor-1", name: "Alfred Lin", secondary: "Partner · Sequoia Capital", initials: "AL", image: "https://framerusercontent.com/images/qN8j54q8Vi2GA6Fqt0OG8fQSJw.webp?width=880&height=880", imageAlt: "Alfred Lin", fields: { location: "San Francisco, CA", phone: "Firm directory", email: "Early-AL@sequoiacap.com", checkSize: "$1M–$25M" }, tags: ["Consumer", "SaaS"] },
-      { id: "investor-2", name: "Aileen Lee", secondary: "Founder · Cowboy Ventures", initials: "AL", image: "https://cdn.prod.website-files.com/637b82f903cd694c0b0f7546/63ce452d8de9f286395dac25_Aileen_profile_pic.webp", imageAlt: "Aileen Lee", fields: { location: "Palo Alto, CA", phone: "Firm directory", email: "hello@cowboy.vc", checkSize: "$250K–$5M" }, tags: ["Enterprise", "Seed"] },
-      { id: "investor-3", name: "Josh Kopelman", secondary: "Partner · First Round", initials: "JK", image: "https://cdn.sanity.io/images/m6i10uln/production/eb12eb2d830fd3e3b118a6c326d0d1692003c4d4-1024x1256.png?fm=webp&w=3840&q=80", imageAlt: "Josh Kopelman", fields: { location: "Philadelphia, PA", phone: "Firm directory", email: "First Round contact", checkSize: "$100K–$20M" }, tags: ["AI", "B2B"] },
-      { id: "investor-4", name: "Sarah Tavel", secondary: "General Partner · Benchmark", initials: "ST", image: favicon("benchmark.com"), imageAlt: "Benchmark official mark", fields: { location: "San Francisco, CA", phone: "Firm directory", email: "Benchmark contact", checkSize: "$1M–$25M" }, tags: ["Marketplaces", "Fintech"] },
+      { id: "investor-1", name: "Alfred Lin", secondary: "Partner · Sequoia Capital", initials: "AL", image: "https://framerusercontent.com/images/qN8j54q8Vi2GA6Fqt0OG8fQSJw.webp?width=880&height=880", imageAlt: "Alfred Lin", fields: { location: "San Francisco, CA", phone: "Firm directory", email: "Early-AL@sequoiacap.com", checkSize: "$1M–$25M", relevance: "Backed breakout SaaS at seed stage" }, tags: ["Consumer", "SaaS"] },
+      { id: "investor-2", name: "Aileen Lee", secondary: "Founder · Cowboy Ventures", initials: "AL", image: "https://cdn.prod.website-files.com/637b82f903cd694c0b0f7546/63ce452d8de9f286395dac25_Aileen_profile_pic.webp", imageAlt: "Aileen Lee", fields: { location: "Palo Alto, CA", phone: "Firm directory", email: "hello@cowboy.vc", checkSize: "$250K–$5M", relevance: "Leading seed rounds in enterprise AI" }, tags: ["Enterprise", "Seed"] },
+      { id: "investor-3", name: "Josh Kopelman", secondary: "Partner · First Round", initials: "JK", image: "https://cdn.sanity.io/images/m6i10uln/production/eb12eb2d830fd3e3b118a6c326d0d1692003c4d4-1024x1256.png?fm=webp&w=3840&q=80", imageAlt: "Josh Kopelman", fields: { location: "Philadelphia, PA", phone: "Firm directory", email: "team@firstround.com", checkSize: "$100K–$20M", relevance: "Invested in AI pre-seed rounds recently" }, tags: ["AI", "B2B"] },
+      { id: "investor-4", name: "Sarah Tavel", secondary: "General Partner · Benchmark", initials: "ST", image: favicon("benchmark.com"), imageAlt: "Benchmark official mark", fields: { location: "San Francisco, CA", phone: "Firm directory", email: "contact@benchmark.com", checkSize: "$1M–$25M", relevance: "Active in fintech marketplace deals" }, tags: ["Marketplaces", "Fintech"] },
     ],
   },
   "Local Business": {
@@ -315,12 +317,13 @@ const dashboardConfigs: Record<DashboardCategory, CategoryConfig> = {
       { key: "phone", label: "Phone" },
       { key: "email", label: "Email" },
       { key: "website", label: "Website" },
+      { key: "relevance", label: "Relevance" },
     ],
     rows: [
-      { id: "business-1", name: "Joe's Plumbing", secondary: "Independent contractor", initials: "JP", fields: { location: "Austin, US", category: "Plumbing", phone: "+1 (512) 555-0199", email: "joesplumbingatx@gmail.com", website: "None found" }, tags: ["No website"] },
-      { id: "business-2", name: "Maria's Flower Shop", secondary: "Local florist", initials: "MF", fields: { location: "Chicago, US", category: "Retail", phone: "+1 (312) 555-0145", email: "mariaflowers@yahoo.com", website: "None found" }, tags: ["No website"] },
-      { id: "business-3", name: "Apex Roofers", secondary: "Roofing & repair", initials: "AR", fields: { location: "Denver, US", category: "Construction", phone: "+1 (720) 555-0182", email: "apexroofingdenver@gmail.com", website: "None found" }, tags: ["No website"] },
-      { id: "business-4", name: "Golden Wok", secondary: "Family restaurant", initials: "GW", fields: { location: "Seattle, US", category: "Restaurant", phone: "+1 (206) 555-0123", email: "goldenwokseattle@gmail.com", website: "None found" }, tags: ["No website"] },
+      { id: "business-1", name: "Joe's Plumbing", secondary: "Independent contractor", initials: "JP", fields: { location: "Austin, US", category: "Plumbing", phone: "+1 (512) 555-0199", email: "joesplumbingatx@gmail.com", website: "None found", relevance: "No website — high-intent opportunity" }, tags: ["No website"] },
+      { id: "business-2", name: "Maria's Flower Shop", secondary: "Local florist", initials: "MF", fields: { location: "Chicago, US", category: "Retail", phone: "+1 (312) 555-0145", email: "mariaflowers@yahoo.com", website: "None found", relevance: "No website — high-intent opportunity" }, tags: ["No website"] },
+      { id: "business-3", name: "Apex Roofers", secondary: "Roofing & repair", initials: "AR", fields: { location: "Denver, US", category: "Construction", phone: "+1 (720) 555-0182", email: "apexroofingdenver@gmail.com", website: "None found", relevance: "Recently expanded service area" }, tags: ["No website"] },
+      { id: "business-4", name: "Golden Wok", secondary: "Family restaurant", initials: "GW", fields: { location: "Seattle, US", category: "Restaurant", phone: "+1 (206) 555-0123", email: "goldenwokseattle@gmail.com", website: "None found", relevance: "No online ordering — outreach window" }, tags: ["No website"] },
     ],
   },
   Executive: {
@@ -332,12 +335,13 @@ const dashboardConfigs: Record<DashboardCategory, CategoryConfig> = {
       { key: "company", label: "Company" },
       { key: "location", label: "Location" },
       { key: "email", label: "Email" },
+      { key: "relevance", label: "Relevance" },
     ],
     rows: [
-      { id: "exec-1", name: "Satya Nadella", secondary: "Microsoft", initials: "SN", fields: { title: "CEO", company: "Microsoft", location: "Redmond, US", email: "satyan@microsoft.com" }, tags: ["Enterprise"] },
-      { id: "exec-2", name: "Tim Cook", secondary: "Apple", initials: "TC", fields: { title: "CEO", company: "Apple", location: "Cupertino, US", email: "tcook@apple.com" }, tags: ["Verified"] },
-      { id: "exec-3", name: "Ruth Porat", secondary: "Alphabet", initials: "RP", fields: { title: "President & CIO", company: "Alphabet", location: "Mountain View, US", email: "ruth@abc.xyz" }, tags: ["Finance"] },
-      { id: "exec-4", name: "Marc Benioff", secondary: "Salesforce", initials: "MB", fields: { title: "Chair & CEO", company: "Salesforce", location: "San Francisco, US", email: "ceo@salesforce.com" }, tags: ["Cloud"] },
+      { id: "exec-1", name: "Satya Nadella", secondary: "Microsoft", initials: "SN", fields: { title: "CEO", company: "Microsoft", location: "Redmond, US", email: "satyan@microsoft.com", relevance: "Overseeing major AI platform bets" }, tags: ["Enterprise"] },
+      { id: "exec-2", name: "Tim Cook", secondary: "Apple", initials: "TC", fields: { title: "CEO", company: "Apple", location: "Cupertino, US", email: "tcook@apple.com", relevance: "Directing services-led growth push" }, tags: ["Verified"] },
+      { id: "exec-3", name: "Ruth Porat", secondary: "Alphabet", initials: "RP", fields: { title: "President & CIO", company: "Alphabet", location: "Mountain View, US", email: "ruth@abc.xyz", relevance: "Steering cloud investment priorities" }, tags: ["Finance"] },
+      { id: "exec-4", name: "Marc Benioff", secondary: "Salesforce", initials: "MB", fields: { title: "Chair & CEO", company: "Salesforce", location: "San Francisco, US", email: "ceo@salesforce.com", relevance: "Acquiring AI startups this year" }, tags: ["Cloud"] },
     ],
   },
   Person: {
@@ -350,12 +354,13 @@ const dashboardConfigs: Record<DashboardCategory, CategoryConfig> = {
       { key: "location", label: "Location" },
       { key: "phone", label: "Phone" },
       { key: "email", label: "Email" },
+      { key: "relevance", label: "Relevance" },
     ],
     rows: [
-      { id: "person-1", name: "Dario Amodei", secondary: "Anthropic", initials: "DA", fields: { title: "Founder & CEO", company: "Anthropic", location: "San Francisco, US", phone: "Anthropic newsroom", email: "press@anthropic.com" }, tags: ["Verified"] },
-      { id: "person-2", name: "Brian Chesky", secondary: "Airbnb", initials: "BC", image: "https://news.airbnb.com/wp-content/uploads/sites/4/2016/10/Brian-Chesky-Headshot-IR-Crop-Airbnb-2.jpg?w=624", imageAlt: "Brian Chesky", fields: { title: "Co-founder & CEO", company: "Airbnb", location: "San Francisco, US", phone: "Airbnb newsroom", email: "contact.press@airbnb.com" }, tags: ["Leadership"] },
-      { id: "person-3", name: "Jensen Huang", secondary: "NVIDIA", initials: "JH", image: "https://iprsoftwaremedia.com/219/files/202604/f0e9efa72f909f3f08cdd0a48ff92880/69e6b9293d633260eec67804_jensen-1920x1920/jensen-1920x1920_6a7e6ad5-c215-4503-b70d-fe6e5e9de205-prv.jpg?v=6a7e6ad5-c215-4503-b70d-fe6e5e9de205", imageAlt: "Jensen Huang", fields: { title: "Founder & CEO", company: "NVIDIA", location: "Santa Clara, US", phone: "+1 (408) 486-2000", email: "info@nvidia.com" }, tags: ["Leadership"] },
-      { id: "person-4", name: "Melanie Perkins", secondary: "Canva", initials: "MP", fields: { title: "Co-founder & CEO", company: "Canva", location: "Sydney, AU", phone: "Canva newsroom", email: "comms@canva.com" }, tags: ["Design"] },
+      { id: "person-1", name: "Dario Amodei", secondary: "Anthropic", initials: "DA", fields: { title: "Founder & CEO", company: "Anthropic", location: "San Francisco, US", phone: "Anthropic newsroom", email: "press@anthropic.com", relevance: "Raised funding at record valuation" }, tags: ["Verified"] },
+      { id: "person-2", name: "Brian Chesky", secondary: "Airbnb", initials: "BC", image: "https://news.airbnb.com/wp-content/uploads/sites/4/2016/10/Brian-Chesky-Headshot-IR-Crop-Airbnb-2.jpg?w=624", imageAlt: "Brian Chesky", fields: { title: "Co-founder & CEO", company: "Airbnb", location: "San Francisco, US", phone: "Airbnb newsroom", email: "contact.press@airbnb.com", relevance: "Expanding into new travel verticals" }, tags: ["Leadership"] },
+      { id: "person-3", name: "Jensen Huang", secondary: "NVIDIA", initials: "JH", image: "https://iprsoftwaremedia.com/219/files/202604/f0e9efa72f909f3f08cdd0a48ff92880/69e6b9293d633260eec67804_jensen-1920x1920/jensen-1920x1920_6a7e6ad5-c215-4503-b70d-fe6e5e9de205-prv.jpg?v=6a7e6ad5-c215-4503-b70d-fe6e5e9de205", imageAlt: "Jensen Huang", fields: { title: "Founder & CEO", company: "NVIDIA", location: "Santa Clara, US", phone: "+1 (408) 486-2000", email: "info@nvidia.com", relevance: "Keynote speaker on AI infrastructure" }, tags: ["Leadership"] },
+      { id: "person-4", name: "Melanie Perkins", secondary: "Canva", initials: "MP", fields: { title: "Co-founder & CEO", company: "Canva", location: "Sydney, AU", phone: "Canva newsroom", email: "comms@canva.com", relevance: "Raised seed funding this quarter" }, tags: ["Design"] },
     ],
   },
   "Venture Capital": {
@@ -368,12 +373,13 @@ const dashboardConfigs: Record<DashboardCategory, CategoryConfig> = {
       { key: "sectors", label: "Sectors" },
       { key: "website", label: "Website" },
       { key: "email", label: "Email / route" },
+      { key: "relevance", label: "Relevance" },
     ],
     rows: [
-      { id: "vc-1", name: "Accel", secondary: "Global venture firm", initials: "AC", image: favicon("accel.com"), imageAlt: "Accel official mark", fields: { location: "Palo Alto, US", stage: "Seed–Growth", website: "accel.com", email: "partners@accel.com", phone: "+1 650 614 4800" }, tags: ["Enterprise", "AI"] },
-      { id: "vc-2", name: "Index Ventures", secondary: "Technology investor", initials: "IV", image: favicon("indexventures.com"), imageAlt: "Index Ventures official mark", fields: { location: "London, UK", stage: "Seed–Growth", website: "indexventures.com", email: "press@indexventures.com", phone: "+44 20 7154 2020" }, tags: ["Fintech", "SaaS"] },
-      { id: "vc-3", name: "General Catalyst", secondary: "Transformation investor", initials: "GC", image: favicon("generalcatalyst.com"), imageAlt: "General Catalyst official mark", fields: { location: "Cambridge, US", stage: "Early–Growth", website: "generalcatalyst.com", email: "info@generalcatalyst.com", phone: "+1 415 659 5000" }, tags: ["Healthcare", "AI"] },
-      { id: "vc-4", name: "Bessemer Venture Partners", secondary: "Cloud & technology investor", initials: "BV", image: favicon("bvp.com"), imageAlt: "Bessemer Venture Partners official mark", fields: { location: "Menlo Park, US", stage: "Seed–Growth", website: "bvp.com", email: "contact@bvp.com", phone: "Firm directory" }, tags: ["Cloud", "Security"] },
+      { id: "vc-1", name: "Accel", secondary: "Global venture firm", initials: "AC", image: favicon("accel.com"), imageAlt: "Accel official mark", fields: { location: "Palo Alto, US", stage: "Seed–Growth", website: "accel.com", email: "partners@accel.com", phone: "+1 650 614 4800", relevance: "Actively deploying in early-stage AI" }, tags: ["Enterprise", "AI"] },
+      { id: "vc-2", name: "Index Ventures", secondary: "Technology investor", initials: "IV", image: favicon("indexventures.com"), imageAlt: "Index Ventures official mark", fields: { location: "London, UK", stage: "Seed–Growth", website: "indexventures.com", email: "press@indexventures.com", phone: "+44 20 7154 2020", relevance: "New fintech fund announced" }, tags: ["Fintech", "SaaS"] },
+      { id: "vc-3", name: "General Catalyst", secondary: "Transformation investor", initials: "GC", image: favicon("generalcatalyst.com"), imageAlt: "General Catalyst official mark", fields: { location: "Cambridge, US", stage: "Early–Growth", website: "generalcatalyst.com", email: "info@generalcatalyst.com", phone: "+1 415 659 5000", relevance: "Hiring AI partners for new fund" }, tags: ["Healthcare", "AI"] },
+      { id: "vc-4", name: "Bessemer Venture Partners", secondary: "Cloud & technology investor", initials: "BV", image: favicon("bvp.com"), imageAlt: "Bessemer Venture Partners official mark", fields: { location: "Menlo Park, US", stage: "Seed–Growth", website: "bvp.com", email: "contact@bvp.com", phone: "Firm directory", relevance: "Backing cloud security seed rounds" }, tags: ["Cloud", "Security"] },
     ],
   },
 };
@@ -381,6 +387,15 @@ const dashboardConfigs: Record<DashboardCategory, CategoryConfig> = {
 export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string }) {
   const signupSearch = cta === "/auth" ? { mode: "signup" as const } : undefined;
   const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
 
   // Word cycling for hero headline
   const topWords = ["Opportunities", "Leads"];
@@ -504,7 +519,7 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
           </div>
 
           <Link className="scravipo-join scravipo-join--nav" to={cta} search={signupSearch}>
-            {ctaLabel || "Get Started"}
+            {ctaLabel || "Join"}
           </Link>
 
           <button
@@ -519,7 +534,12 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
           </button>
         </nav>
 
-        <div className={`scravipo-mobile-menu${menuOpen ? " is-open" : ""}`}>
+        <div
+          className={`scravipo-mobile-backdrop${menuOpen ? " is-open" : ""}`}
+          aria-hidden={!menuOpen}
+          onClick={() => setMenuOpen(false)}
+        />
+        <div className={`scravipo-mobile-menu${menuOpen ? " is-open" : ""}`} aria-hidden={!menuOpen}>
           {navItems.map((item) => (
             <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)}>
               {item.label}
@@ -904,26 +924,50 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
             justify-self: end;
           }
 
+          .scravipo-mobile-backdrop {
+            display: none;
+          }
+
+          .scravipo-mobile-backdrop.is-open {
+            display: block;
+            position: fixed;
+            inset: 0;
+            z-index: 4;
+            background: rgba(0, 0, 0, 0.55);
+          }
+
           .scravipo-mobile-menu {
             display: flex;
+            position: absolute;
+            top: calc(100% + 0.45rem);
+            right: 0;
+            left: 0;
+            z-index: 50;
             align-items: stretch;
             flex-direction: column;
             gap: 1.1rem;
             max-height: 0;
             overflow: hidden;
-            margin-top: 0.45rem;
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(-0.4rem);
             padding: 0 1.1rem;
             border: 1px solid transparent;
             border-radius: 0.75rem;
-            background: rgba(24, 24, 27, 0.82);
+            background: rgba(24, 24, 27, 0.92);
             backdrop-filter: blur(18px);
-            transition: max-height 220ms ease-out, padding 220ms ease-out, border-color 220ms ease-out;
+            pointer-events: none;
+            transition: max-height 220ms ease-out, padding 220ms ease-out, border-color 220ms ease-out, opacity 220ms ease-out, transform 220ms ease-out, visibility 220ms;
           }
 
           .scravipo-mobile-menu.is-open {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
             max-height: 18rem;
             padding: 1.1rem;
             border-color: rgba(255, 255, 255, 0.07);
+            pointer-events: auto;
           }
 
           .scravipo-mobile-menu a:last-child {
@@ -952,8 +996,15 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
           }
 
           .scravipo-hero h1 {
-            font-size: clamp(3.5rem, 15vw, 6.1rem);
+            max-width: 100%;
+            font-size: clamp(2.25rem, 11.5vw, 3.5rem);
             letter-spacing: -0.085em;
+          }
+
+          .scravipo-hero h1 > span,
+          .scravipo-hero__line-top,
+          .scravipo-hero__line-bottom {
+            max-width: 100%;
           }
 
           .scravipo-description {
@@ -1429,6 +1480,7 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
           border-radius: 0.38rem;
           color: rgba(243, 241, 236, 0.55);
           font-size: 0.61rem;
+          text-decoration: none;
         }
 
         .scravipo-load-more span { margin-left: 0.25rem; color: rgba(243, 241, 236, 0.75); }
@@ -1465,6 +1517,22 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
           .scravipo-lead-panel__footer { padding: 1rem; }
           .scravipo-table-check { padding-left: 1rem !important; }
           .scravipo-table-more { padding-right: 1rem !important; }
+          .scravipo-liquid-search-container { padding: 1rem; gap: 0.85rem; }
+          .scravipo-liquid-search__input-row { font-size: 1rem; }
+          .scravipo-liquid-search__controls { flex-wrap: wrap; gap: 0.5rem; }
+          .scravipo-liquid-search__chips {
+            flex: 1 1 100%;
+            max-width: 100%;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 0.15rem;
+          }
+          .scravipo-liquid-search__chips::-webkit-scrollbar { display: none; }
+          .scravipo-liquid-search__chips .scravipo-liquid-btn { flex: 0 0 auto; }
+          .scravipo-liquid-btn { padding: 0.42rem 0.75rem; font-size: 0.78rem; }
+          .scravipo-liquid-btn--icon,
+          .scravipo-liquid-btn--submit { flex: 0 0 auto; }
+          .scravipo-liquid-search__actions { flex: 1 1 100%; justify-content: flex-end; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -2201,7 +2269,6 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
                 <tr>
                   <th className="scravipo-table-check"><input type="checkbox" aria-label="Select all visible leads" checked={allVisibleSelected} onChange={toggleAllVisible} /></th>
                   {activeConfig.columns.map((column) => <th key={column.key}>{column.label}</th>)}
-                  <th className="scravipo-table-more"><span className="sr-only">Actions</span>···</th>
                 </tr>
               </thead>
               <tbody>
@@ -2226,7 +2293,6 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
                           )}
                         </td>
                       ))}
-                      <td className="scravipo-table-more"><button type="button" aria-label={`More actions for ${row.name}`}>···</button></td>
                     </tr>
                   );
                 })}
@@ -2236,7 +2302,7 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
 
           <div className="scravipo-lead-panel__footer">
             <span>Showing {activeConfig.rows.length} of {activeConfig.rows.length} signals</span>
-            <button type="button" className="scravipo-load-more">Load more <span aria-hidden="true">↗</span></button>
+            <Link to={cta} search={signupSearch} className="scravipo-load-more">Load more <span aria-hidden="true">↗</span></Link>
           </div>
         </div>
       </section>
