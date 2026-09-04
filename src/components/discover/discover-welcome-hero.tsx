@@ -1,4 +1,4 @@
-import { Landmark, Users, Briefcase } from "lucide-react";
+import { Users, Building2, Store } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 
 const LOGO_SRC =
@@ -35,27 +35,11 @@ export function DiscoverWelcomeHero({
 
       {/* 3 Main Action Cards: compact horizontal rows on phones so the hero
           fits the viewport; vertical centered cards from sm: and up. */}
-      <div className="mt-6 sm:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-        {/* Find Investors */}
-        <button
-          type="button"
-          onClick={() => navigate({ to: "/investors" })}
-          className="liquid-glass rounded-2xl p-4 sm:p-8 flex flex-row items-center gap-3 text-left sm:flex-col sm:items-center sm:gap-4 sm:text-center hover:bg-white/[0.04] transition-all duration-200 hover:-translate-y-0.5 group"
-        >
-          <div className="size-10 sm:size-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform">
-            <Landmark className="size-5 sm:size-6" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-base text-white group-hover:text-white/90">
-              Find Investors
-            </h3>
-            <p className="text-xs text-white/50 mt-1 leading-relaxed">
-              Match with active VCs & angels for your stage, sector, and location.
-            </p>
-          </div>
-        </button>
-
-        {/* Find Customers & Buyers */}
+      <div
+        data-tour="cards"
+        className="mt-6 sm:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4"
+      >
+        {/* Find People */}
         <button
           type="button"
           onClick={onFocusComposer}
@@ -66,29 +50,48 @@ export function DiscoverWelcomeHero({
           </div>
           <div>
             <h3 className="font-semibold text-base text-white group-hover:text-white/90">
-              Find Customers & Buyers
+              Find People
             </h3>
             <p className="text-xs text-white/50 mt-1 leading-relaxed">
-              Surface buyer-intent signals from real-time posts and hiring data.
+              Match with executives, investors, and founders for your niche, stage, and location.
             </p>
           </div>
         </button>
 
-        {/* Find Jobs & Businesses */}
+        {/* Find Companies */}
         <button
           type="button"
-          onClick={() => navigate({ to: "/jobs" })}
+          onClick={onFocusComposer}
           className="liquid-glass rounded-2xl p-4 sm:p-8 flex flex-row items-center gap-3 text-left sm:flex-col sm:items-center sm:gap-4 sm:text-center hover:bg-white/[0.04] transition-all duration-200 hover:-translate-y-0.5 group"
         >
           <div className="size-10 sm:size-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform">
-            <Briefcase className="size-5 sm:size-6" />
+            <Building2 className="size-5 sm:size-6" />
           </div>
           <div>
             <h3 className="font-semibold text-base text-white group-hover:text-white/90">
-              Find Jobs & Businesses
+              Find Companies
             </h3>
             <p className="text-xs text-white/50 mt-1 leading-relaxed">
-              Discover active job postings and local business opportunities.
+              Surface company intel, firmographics, and buyer signals in real time.
+            </p>
+          </div>
+        </button>
+
+        {/* Find Businesses */}
+        <button
+          type="button"
+          onClick={() => navigate({ to: "/local-businesses" })}
+          className="liquid-glass rounded-2xl p-4 sm:p-8 flex flex-row items-center gap-3 text-left sm:flex-col sm:items-center sm:gap-4 sm:text-center hover:bg-white/[0.04] transition-all duration-200 hover:-translate-y-0.5 group"
+        >
+          <div className="size-10 sm:size-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform">
+            <Store className="size-5 sm:size-6" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-base text-white group-hover:text-white/90">
+              Find Businesses
+            </h3>
+            <p className="text-xs text-white/50 mt-1 leading-relaxed">
+              Discover local business opportunities ready for your pitch.
             </p>
           </div>
         </button>

@@ -17,6 +17,7 @@ import {
 } from "@/lib/projects.functions";
 import { getMyProfile, updateMyProfile } from "@/lib/profile.functions";
 import { OnboardingWizard, type OnboardingAnswers } from "@/components/discover/onboarding-wizard";
+import { GuidedTour } from "@/components/discover/guided-tour";
 import type { Lead } from "@/lib/scoring";
 import type { CompanyRow, PersonRow, LocalBusinessRow } from "@/lib/search/lead-segments";
 import { LeadDetailPanel } from "@/components/lead-detail-panel";
@@ -26,6 +27,7 @@ import {
   UnifiedComposer,
   type ComposerHandle,
   type ComposerMode,
+  type SearchTier,
 } from "@/components/discover/unified-composer";
 import { Route as AuthRoute } from "@/routes/_authenticated/route";
 import {
@@ -92,6 +94,7 @@ function DiscoverPage() {
   const projectsQuery = useQuery({ queryKey: ["projects"], queryFn: () => getProjects() });
   const skipKey = `scrapivo:onboarding-skipped:${userId}`;
   const returnChatKey = `scrapivo:return-chat-asked:${userId}`;
+  const tourKey = `scrapivo:guided-tour-seen:${userId}`;
   const [localProject, setLocalProject] = useState<Project | null>(() => {
     if (typeof window === "undefined") return null;
     try {
@@ -109,6 +112,14 @@ function DiscoverPage() {
     );
   });
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [tourSeen, setTourSeen] = useState(() => {
+    if (typeof window === "undefined") return true;
+    try {
+      return localStorage.getItem(tourKey) === "1";
+    } catch {
+      return true;
+    }
+  });
   const serverProjects = projectsQuery.data?.projects ?? [];
   const projects: Project[] = serverProjects.length
     ? serverProjects
@@ -253,6 +264,8 @@ function DiscoverPage() {
 
   const [input, setInput] = useState("");
   const [mode, setMode] = useState<ComposerMode>("search");
+  const [tier, setTier] = useState<SearchTier>("scrapy");
+  const [thinker, setThinker] = useState(false);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [companies, setCompanies] = useState<CompanyRow[]>([]);
   const [people, setPeople] = useState<PersonRow[]>([]);
@@ -698,6 +711,10 @@ function DiscoverPage() {
   const hasResults = leads.length > 0 || activeQuery !== null;
   const idle = !hasResults && !runSearchMut.isPending;
   const showHero = idle;
+  // First-visit guided tour: plays once, only on the home view, and never
+  // on top of the onboarding wizard.
+  const showTour =
+    !tourSeen && !showOnboarding && !wizardOpen && showHero && projectsQuery.isSuccess;
 
   // Every browser session: open Scrapy and ask what they want to find now.
   useEffect(() => {
@@ -1062,7 +1079,7 @@ function DiscoverPage() {
         </div>
 
         <div className="px-4 md:px-6 pb-4 md:pb-6 pt-2">
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-3xl mx-auto" data-tour="composer">
             <UnifiedComposer
               ref={composerRef}
               value={input}
@@ -1074,6 +1091,10 @@ function DiscoverPage() {
               }}
               onSubmit={onSubmit}
               pending={pending}
+              tier={tier}
+              onTierChange={setTier}
+              thinker={thinker}
+              onThinkerChange={setThinker}
             />
           </div>
         </div>
@@ -1128,6 +1149,7 @@ function DiscoverPage() {
           ) : null}
         </SheetContent>
       </Sheet>
+      {showTour && <GuidedTour userId={userId} onDone={() => setTourSeen(true)} />}
     </div>
   );
 }

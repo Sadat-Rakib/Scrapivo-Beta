@@ -14,9 +14,7 @@ import {
   PanelRightClose,
   PanelRightOpen,
   Bell,
-  Store,
-  Landmark,
-  Briefcase,
+  BookOpen,
   Plus,
   ChevronLeft,
   ChevronRight,
@@ -36,11 +34,9 @@ const LOGO_SRC =
 // §4.1: Removed "History" and "Pipeline" from the left sidebar nav
 const navItems = [
   { to: "/discover", label: "Home", icon: Search },
-  { to: "/local-businesses", label: "Businesses", icon: Store },
-  { to: "/investors", label: "Investors", icon: Landmark },
-  { to: "/jobs", label: "Jobs", icon: Briefcase },
   { to: "/watches", label: "Watches", icon: Bell },
   { to: "/saved", label: "Saved", icon: Bookmark },
+  { to: "/guides", label: "Guides", icon: BookOpen },
 ] as const;
 
 const secondaryItems = [
@@ -118,6 +114,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     if (location.pathname === "/discover") return "Home";
     if (location.pathname === "/local-businesses") return "Businesses";
     if (location.pathname === "/jobs") return "Jobs";
+    if (location.pathname === "/guides") return "Guides";
     return location.pathname.slice(1).replace(/-/g, " ");
   };
 
@@ -216,6 +213,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* Nav Links — §1.1: overflow-hidden on container for glass overlay containment */}
       <nav
+        data-tour="sidebar"
         className={`flex-1 overflow-y-auto overflow-x-hidden ${isCollapsed ? "px-2" : "px-3"} py-4 space-y-1 no-scrollbar`}
       >
         {renderNavGroup(navItems, isCollapsed)}
@@ -232,12 +230,12 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className={`p-3 border-t border-white/10 space-y-3 shrink-0`}>
         {!isCollapsed && usage.data && (
           <div className="px-1 space-y-1.5">
-            <div className="flex items-center justify-between text-[11px] text-white/50">
-              <span>Searches today</span>
-              <span className="font-mono text-white/80">
-                {usage.data.used}
-                {usage.data.cap ? `/${usage.data.cap}` : ""}
-              </span>
+            <div className="text-sm font-semibold font-mono text-white/90">
+              {usage.data.used}
+              {usage.data.cap ? `/${usage.data.cap}` : ""}
+            </div>
+            <div className="text-[11px] text-white/40 font-mono">
+              {new Date().toLocaleDateString("en-GB")}
             </div>
             {usage.data.cap && (
               <Progress

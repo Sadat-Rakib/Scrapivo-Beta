@@ -22,6 +22,7 @@ import { Route as AuthenticatedJobsRouteImport } from './routes/_authenticated/j
 import { Route as AuthenticatedInvestorsRouteImport } from './routes/_authenticated/investors'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
 import { Route as AuthenticatedHelpRouteImport } from './routes/_authenticated/help'
+import { Route as AuthenticatedGuidesRouteImport } from './routes/_authenticated/guides'
 import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticated/discover'
 import { Route as ApiWebhooksResendRouteImport } from './routes/api/webhooks/resend'
 import { Route as ApiCronEmailSequencesRouteImport } from './routes/api/cron/email-sequences'
@@ -91,6 +92,11 @@ const AuthenticatedHelpRoute = AuthenticatedHelpRouteImport.update({
   path: '/help',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedGuidesRoute = AuthenticatedGuidesRouteImport.update({
+  id: '/guides',
+  path: '/guides',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDiscoverRoute = AuthenticatedDiscoverRouteImport.update({
   id: '/discover',
   path: '/discover',
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/discover': typeof AuthenticatedDiscoverRoute
+  '/guides': typeof AuthenticatedGuidesRoute
   '/help': typeof AuthenticatedHelpRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/investors': typeof AuthenticatedInvestorsRoute
@@ -129,6 +136,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/discover': typeof AuthenticatedDiscoverRoute
+  '/guides': typeof AuthenticatedGuidesRoute
   '/help': typeof AuthenticatedHelpRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/investors': typeof AuthenticatedInvestorsRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/discover': typeof AuthenticatedDiscoverRoute
+  '/_authenticated/guides': typeof AuthenticatedGuidesRoute
   '/_authenticated/help': typeof AuthenticatedHelpRoute
   '/_authenticated/history': typeof AuthenticatedHistoryRoute
   '/_authenticated/investors': typeof AuthenticatedInvestorsRoute
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/unsubscribe'
     | '/discover'
+    | '/guides'
     | '/help'
     | '/history'
     | '/investors'
@@ -184,6 +194,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/unsubscribe'
     | '/discover'
+    | '/guides'
     | '/help'
     | '/history'
     | '/investors'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/unsubscribe'
     | '/_authenticated/discover'
+    | '/_authenticated/guides'
     | '/_authenticated/help'
     | '/_authenticated/history'
     | '/_authenticated/investors'
@@ -317,6 +329,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHelpRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/guides': {
+      id: '/_authenticated/guides'
+      path: '/guides'
+      fullPath: '/guides'
+      preLoaderRoute: typeof AuthenticatedGuidesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/discover': {
       id: '/_authenticated/discover'
       path: '/discover'
@@ -343,6 +362,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDiscoverRoute: typeof AuthenticatedDiscoverRoute
+  AuthenticatedGuidesRoute: typeof AuthenticatedGuidesRoute
   AuthenticatedHelpRoute: typeof AuthenticatedHelpRoute
   AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
   AuthenticatedInvestorsRoute: typeof AuthenticatedInvestorsRoute
@@ -356,6 +376,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDiscoverRoute: AuthenticatedDiscoverRoute,
+  AuthenticatedGuidesRoute: AuthenticatedGuidesRoute,
   AuthenticatedHelpRoute: AuthenticatedHelpRoute,
   AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
   AuthenticatedInvestorsRoute: AuthenticatedInvestorsRoute,
