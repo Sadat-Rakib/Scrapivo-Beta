@@ -1,4 +1,5 @@
 import { useRef, useImperativeHandle, forwardRef, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   ArrowUp,
   Loader2,
@@ -9,9 +10,13 @@ import {
   Zap,
   Flame,
   Sparkles,
+  X,
+  ImagePlus,
+  FileUp,
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { VoiceInputButton } from "@/components/voice-input-button";
+import { mySupabase } from "@/integrations/my-supabase/client";
 import { toast } from "sonner";
 
 export type ComposerMode = "search" | "chat";
@@ -52,10 +57,93 @@ const DEFAULT_EXAMPLES = [
 ];
 
 const TIERS: Array<{ value: SearchTier; label: string; hint: string; icon: typeof Zap }> = [
-  { value: "scrapy", label: "Scrapy", hint: "Fast everyday search", icon: Sparkles },
+  { value: "scrapy", label: "Scrapy Okay", hint: "Fast everyday search", icon: Sparkles },
   { value: "insane", label: "Scrapy Insane", hint: "Deeper sources, more leads", icon: Zap },
   { value: "crazy", label: "Scrapy Crazy", hint: "Maximum-depth hunt", icon: Flame },
 ];
+
+type ComposerAttachment = { id: string; name: string; block: string };
+
+const MAX_FILE_BYTES = 5 * 1024 * 1024;
+const TEXT_EXTENSIONS = ["txt", "md", "csv", "json", "log"];
+
+const isTextFile = (file: File) =>
+  file.type.startsWith("text/") ||
+  file.type === "application/json" ||
+  TEXT_EXTENSIONS.includes(file.name.split(".").pop()?.toLowerCase() ?? "");
+
+const sanitizeFileName = (name: string) => name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 80);
+
+const IMAGE_ACCEPT = ".png,.jpg,.jpeg,.webp";
+const FILE_ACCEPT = ".txt,.md,.csv,.json,.log,.pdf";
+
+/**
+ * Popup menu rendered in a portal, anchored above (or below when there is no
+ * headroom) the trigger button. Portal rendering is required: the composer
+ * controls row is `overflow-x-auto`, which clips any absolutely-positioned
+ * popup built inline inside it.
+ */
+function AnchoredMenu({
+  triggerRef,
+  onClose,
+  children,
+}: {
+  triggerRef: React.RefObject<HTMLElement | null>;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [style, setStyle] = useState<React.CSSProperties | null>(null);
+
+  useEffect(() => {
+    const measure = () => {
+      const el = triggerRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const width = Math.min(240, window.innerWidth - 16);
+      const left = Math.min(Math.max(8, r.left), Math.max(8, window.innerWidth - width - 8));
+      if (r.top > 300) {
+        setStyle({ position: "fixed", left, bottom: window.innerHeight - r.top + 8, width });
+      } else {
+        setStyle({ position: "fixed", left, top: r.bottom + 8, width });
+      }
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as Node;
+      if (menuRef.current?.contains(t)) return;
+      if (triggerRef.current?.contains(t)) return;
+      onClose();
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    const onScroll = () => onClose();
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    window.addEventListener("scroll", onScroll, true);
+    return () => {
+      window.removeEventListener("resize", measure);
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+      window.removeEventListener("scroll", onScroll, true);
+    };
+  }, [triggerRef, onClose]);
+
+  if (typeof document === "undefined" || !style) return null;
+  return createPortal(
+    <div
+      ref={menuRef}
+      role="menu"
+      className="rounded-2xl border border-white/15 bg-[#141418]/95 backdrop-blur-xl shadow-2xl p-1.5"
+      style={{ ...style, zIndex: 120 }}
+    >
+      {children}
+    </div>,
+    document.body,
+  );
+}
 
 function useAutotypePlaceholder(paused: boolean, examples: string[]) {
   const [text, setText] = useState("");
@@ -116,8 +204,11 @@ function useAutotypePlaceholder(paused: boolean, examples: string[]) {
 
 const pillBase =
   "inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] backdrop-blur-xl px-3 py-1.5 text-xs font-medium text-white/75 hover:bg-white/[0.12] hover:text-white transition-all shrink-0";
+// Prominent active state: bright fill + glow ring so selection reads instantly.
 const pillActive =
-  "border-white/40 bg-white/[0.16] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]";
+  "border-white/60 bg-white/[0.22] text-white shadow-[0_0_18px_rgba(255,255,255,0.28),inset_0_1px_0_rgba(255,255,255,0.4)]";
+const tierRowActive =
+  "bg-white/[0.14] border border-white/30 shadow-[0_0_14px_rgba(255,255,255,0.18)]";
 
 export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function UnifiedComposer(
   {
@@ -138,33 +229,100 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
 ) {
   void onModeChange;
   const textRef = useRef<HTMLTextAreaElement>(null);
-  const tierMenuRef = useRef<HTMLDivElement>(null);
+  const tierTriggerRef = useRef<HTMLButtonElement>(null);
+  const addTriggerRef = useRef<HTMLButtonElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [focused, setFocused] = useState(false);
   const [tierOpen, setTierOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+  const [attachments, setAttachments] = useState<ComposerAttachment[]>([]);
+  const [uploading, setUploading] = useState(false);
   useImperativeHandle(ref, () => ({ focus: () => textRef.current?.focus() }));
 
-  // Close the Mode menu on outside click / Escape.
-  useEffect(() => {
-    if (!tierOpen) return;
-    const onDown = (e: MouseEvent) => {
-      if (tierMenuRef.current && !tierMenuRef.current.contains(e.target as Node)) {
-        setTierOpen(false);
-      }
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setTierOpen(false);
-    };
-    document.addEventListener("mousedown", onDown);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onDown);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [tierOpen]);
+  const openPicker = (accept: string) => {
+    setAddOpen(false);
+    const input = fileInputRef.current;
+    if (!input) return;
+    input.accept = accept;
+    input.click();
+  };
 
   const submit = () => {
     if (pending || !value.trim()) return;
     onSubmit();
+    // Attachment context already lives inside the submitted text; reset chips.
+    setAttachments([]);
+  };
+
+  const removeAttachment = (id: string) => {
+    const target = attachments.find((a) => a.id === id);
+    setAttachments((prev) => prev.filter((a) => a.id !== id));
+    if (target) {
+      onChange(
+        value
+          .split(target.block)
+          .join("")
+          .replace(/\n{3,}/g, "\n\n"),
+      );
+    }
+  };
+
+  const handleFiles = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      const { data } = await mySupabase.auth.getUser();
+      const userId = data.user?.id ?? "anon";
+      let nextValue = value;
+      const nextAttachments: ComposerAttachment[] = [];
+      for (const file of Array.from(files)) {
+        if (file.size > MAX_FILE_BYTES) {
+          toast.error(`"${file.name}" is over 5MB — pick a smaller file.`);
+          continue;
+        }
+        const id =
+          typeof crypto !== "undefined" && "randomUUID" in crypto
+            ? crypto.randomUUID()
+            : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        const safeName = sanitizeFileName(file.name);
+        // Durable store: per-user private bucket (RLS owner-only). If the
+        // bucket/migration isn't deployed yet, keep the local attach working.
+        try {
+          const { error } = await mySupabase.storage
+            .from("attachments")
+            .upload(`${userId}/${id}-${safeName}`, file, { upsert: true });
+          if (error) throw error;
+        } catch {
+          toast.message("Cloud upload unavailable — attached locally for this query.");
+        }
+        let block: string;
+        if (isTextFile(file)) {
+          try {
+            const raw = await file.text();
+            const excerpt = raw.slice(0, 1500).trim() || "(empty file)";
+            block = `\n\n[Attached ${safeName}]\n${excerpt}`;
+          } catch {
+            block = `\n\n[Attached file: ${safeName}]`;
+          }
+        } else {
+          block = `\n\n[Attached file: ${safeName}]`;
+        }
+        nextAttachments.push({ id, name: safeName, block });
+        nextValue = nextValue ? nextValue + block : block.trimStart();
+      }
+      if (nextAttachments.length > 0) {
+        setAttachments((prev) => [...prev, ...nextAttachments]);
+        onChange(nextValue.slice(0, maxChars));
+        toast.message(
+          nextAttachments.length === 1
+            ? `Attached ${nextAttachments[0].name} — its context rides with your query.`
+            : `Attached ${nextAttachments.length} files — their context rides with your query.`,
+        );
+      }
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   };
 
   const isPaused = focused || value.trim().length > 0;
@@ -195,53 +353,119 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
         />
       </div>
 
+      {/* Attachment chips */}
+      {attachments.length > 0 && (
+        <div className="mt-1 flex flex-wrap gap-1.5">
+          {attachments.map((a) => (
+            <span
+              key={a.id}
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/[0.1] pl-3 pr-1.5 py-1 text-[11px] text-white/85"
+            >
+              <span className="max-w-40 truncate">{a.name}</span>
+              <button
+                type="button"
+                aria-label={`Remove ${a.name}`}
+                onClick={() => removeAttachment(a.id)}
+                className="size-4 rounded-full hover:bg-white/20 flex items-center justify-center transition-colors"
+              >
+                <X className="size-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+
       <div
         data-tour="composer-controls"
         className="mt-1 flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-1"
       >
         {/* Attach */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept={`${IMAGE_ACCEPT},${FILE_ACCEPT}`}
+          className="hidden"
+          aria-hidden="true"
+          tabIndex={-1}
+          onChange={(e) => void handleFiles(e.target.files)}
+        />
         <button
+          ref={addTriggerRef}
           type="button"
-          aria-label="Attach context"
-          title="Attach context"
-          onClick={() =>
-            toast.message("Attachments are coming soon — describe context in words for now.")
-          }
-          className="size-8 rounded-full border border-white/15 bg-white/[0.06] backdrop-blur-xl flex items-center justify-center text-white/75 hover:bg-white/[0.12] hover:text-white transition-all shrink-0"
+          aria-label="Add attachment"
+          aria-expanded={addOpen}
+          title="Add images or files as search context"
+          disabled={uploading}
+          onClick={() => setAddOpen((o) => !o)}
+          className="size-8 rounded-full border border-white/15 bg-white/[0.06] backdrop-blur-xl flex items-center justify-center text-white/75 hover:bg-white/[0.12] hover:text-white transition-all shrink-0 disabled:opacity-50"
         >
-          <Plus className="size-4" />
+          {uploading ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
         </button>
+        {addOpen && (
+          <AnchoredMenu triggerRef={addTriggerRef} onClose={() => setAddOpen(false)}>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => openPicker(IMAGE_ACCEPT)}
+              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-left transition-colors hover:bg-white/[0.08]"
+            >
+              <ImagePlus className="size-4 text-white/70 shrink-0" />
+              <span className="flex-1 min-w-0">
+                <span className="block text-xs font-semibold text-white">Add images</span>
+                <span className="block text-[11px] text-white/50">Photos and screenshots</span>
+              </span>
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => openPicker(FILE_ACCEPT)}
+              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-left transition-colors hover:bg-white/[0.08]"
+            >
+              <FileUp className="size-4 text-white/70 shrink-0" />
+              <span className="flex-1 min-w-0">
+                <span className="block text-xs font-semibold text-white">Add files</span>
+                <span className="block text-[11px] text-white/50">Docs, text, and data</span>
+              </span>
+            </button>
+          </AnchoredMenu>
+        )}
 
         {/* Mode selector */}
-        <div ref={tierMenuRef} className="relative shrink-0">
+        <div className="shrink-0">
           <button
+            ref={tierTriggerRef}
             type="button"
             aria-label="Search mode"
             aria-expanded={tierOpen}
             onClick={() => setTierOpen((o) => !o)}
-            className={`${pillBase} ${tierOpen ? pillActive : ""}`}
+            className={`${pillBase} ${tierOpen || tier !== "scrapy" ? pillActive : ""}`}
           >
             <ActiveTierIcon className="size-3.5" />
-            <span>Mode: {activeTier.label}</span>
+            <span>{tier === "scrapy" ? "Mode" : `Mode · ${activeTier.label}`}</span>
             <ChevronDown
               className={`size-3.5 transition-transform ${tierOpen ? "rotate-180" : ""}`}
             />
           </button>
           {tierOpen && (
-            <div className="absolute bottom-full left-0 mb-2 w-60 rounded-2xl border border-white/15 bg-[#141418]/95 backdrop-blur-xl shadow-2xl p-1.5 z-50">
+            <AnchoredMenu triggerRef={tierTriggerRef} onClose={() => setTierOpen(false)}>
               {TIERS.map(({ value: v, label, hint, icon: Icon }) => (
                 <button
                   key={v}
                   type="button"
+                  role="menuitemradio"
+                  aria-checked={v === tier}
                   onClick={() => {
                     onTierChange?.(v);
                     setTierOpen(false);
                   }}
-                  className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-left transition-colors ${
-                    v === tier ? "bg-white/10" : "hover:bg-white/[0.06]"
+                  className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-left transition-all ${
+                    v === tier ? tierRowActive : "border border-transparent hover:bg-white/[0.06]"
                   }`}
                 >
-                  <Icon className="size-4 text-white/70 shrink-0" />
+                  <Icon
+                    className={`size-4 shrink-0 ${v === tier ? "text-white" : "text-white/70"}`}
+                  />
                   <span className="flex-1 min-w-0">
                     <span className="block text-xs font-semibold text-white">{label}</span>
                     <span className="block text-[11px] text-white/50">{hint}</span>
@@ -249,7 +473,7 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
                   {v === tier && <Check className="size-4 text-white shrink-0" />}
                 </button>
               ))}
-            </div>
+            </AnchoredMenu>
           )}
         </div>
 
@@ -265,8 +489,10 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
           <span>Thinker</span>
         </button>
 
-        {/* Voice */}
-        <span className="shrink-0 inline-flex items-center rounded-full border border-white/15 bg-white/[0.06] backdrop-blur-xl text-white/75 hover:bg-white/[0.12] hover:text-white transition-all [&_button]:size-8 [&_button]:text-white/75 [&_button:hover]:!bg-transparent [&_button:hover]:!text-white">
+        <div className="flex-1" />
+
+        {/* Voice — beside submit */}
+        <span className="shrink-0 inline-flex items-center rounded-full border border-white/15 bg-white/[0.06] backdrop-blur-xl text-white/75 hover:bg-white/[0.12] hover:text-white transition-all [&_button]:size-9 [&_button]:rounded-full [&_button]:text-white/75 [&_button:hover]:!bg-transparent [&_button:hover]:!text-white">
           <VoiceInputButton
             onResult={(t) => {
               const next = value.trim() ? `${value.trim()} ${t}` : t;
@@ -274,8 +500,6 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
             }}
           />
         </span>
-
-        <div className="flex-1" />
 
         {/* Submit */}
         <button

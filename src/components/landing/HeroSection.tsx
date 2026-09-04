@@ -2233,18 +2233,17 @@ export function HeroSection({ cta, ctaLabel }: { cta: string, ctaLabel?: string 
                   </button>
                   <button className="scravipo-liquid-btn scravipo-liquid-btn--active">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 2v7.31L2.83 12 10 14.69V22l7.17-7.31L24.34 12l-7.17-2.69z"/></svg>
-                    Normal
+                    Mode
                   </button>
                   <button className="scravipo-liquid-btn">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
-                    DeepThink
+                    Thinker
                   </button>
                 </div>
                 
                 <div className="scravipo-liquid-search__actions">
-                  <button className="scravipo-liquid-btn">
+                  <button className="scravipo-liquid-btn scravipo-liquid-btn--icon" aria-label="Voice input" title="Voice input">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-                    Voice
                   </button>
                   <button className="scravipo-liquid-btn scravipo-liquid-btn--submit" aria-label="Submit search">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>

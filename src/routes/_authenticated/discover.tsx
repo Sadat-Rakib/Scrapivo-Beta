@@ -711,10 +711,21 @@ function DiscoverPage() {
   const hasResults = leads.length > 0 || activeQuery !== null;
   const idle = !hasResults && !runSearchMut.isPending;
   const showHero = idle;
-  // First-visit guided tour: plays once, only on the home view, and never
-  // on top of the onboarding wizard.
+  // First-visit guided tour: plays once, only on the home view, never on top
+  // of the onboarding wizard, and only for genuinely new accounts (signed up
+  // within NEW_USER_WINDOW_MS). Existing users never see it.
+  const NEW_USER_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
+  const profileCreatedAt = (profileQuery.data as { created_at?: string } | undefined)?.created_at;
+  const profileAgeMs = profileCreatedAt ? Date.now() - new Date(profileCreatedAt).getTime() : NaN;
+  const isNewUser = Number.isFinite(profileAgeMs) && profileAgeMs <= NEW_USER_WINDOW_MS;
   const showTour =
-    !tourSeen && !showOnboarding && !wizardOpen && showHero && projectsQuery.isSuccess;
+    !tourSeen &&
+    isNewUser &&
+    !showOnboarding &&
+    !wizardOpen &&
+    showHero &&
+    profileQuery.isSuccess &&
+    projectsQuery.isSuccess;
 
   // Every browser session: open Scrapy and ask what they want to find now.
   useEffect(() => {

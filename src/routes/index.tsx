@@ -46,7 +46,7 @@ function Landing() {
     return () => sub.subscription.unsubscribe();
   }, []);
   const cta = authed ? "/discover" : "/auth";
-  const ctaLabel = authed ? "Open app" : "Join";
+  const ctaLabel = "Join";
 
   return <HeroSection cta={cta} ctaLabel={ctaLabel} />;
 }

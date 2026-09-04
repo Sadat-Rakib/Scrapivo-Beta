@@ -10,7 +10,7 @@ import {
   type CampaignIcp,
 } from "@/lib/campaigns.functions";
 import { Bell, Play, Trash2, RefreshCw } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/watches")({
@@ -19,6 +19,14 @@ export const Route = createFileRoute("/_authenticated/watches")({
   }),
   component: WatchesPage,
 });
+
+const WATCH_EXAMPLES = [
+  "e.g. Watch for SaaS founders hiring engineers rn",
+  "e.g. Alert me when Austin HVAC companies post jobs asap",
+  "e.g. Track pre-seed AI startups raising this quarter",
+  "e.g. Ping me when local dentists expand to a second office",
+  "e.g. Watch for marketing agencies hiring 3+ engineers",
+];
 
 function WatchesPage() {
   const navigate = useNavigate();
@@ -31,6 +39,17 @@ function WatchesPage() {
 
   const [newQuery, setNewQuery] = useState("");
   const [schedule, setSchedule] = useState<"daily" | "weekly">("daily");
+
+  // Rotating placeholder examples: watches are recurring auto-runs, so each
+  // example frames a hunt Scrapivo repeats on schedule and delivers to Discover.
+  const [placeholderIdx, setPlaceholderIdx] = useState(0);
+  useEffect(() => {
+    if (newQuery.trim()) return;
+    const id = window.setInterval(() => {
+      setPlaceholderIdx((i) => (i + 1) % WATCH_EXAMPLES.length);
+    }, 3500);
+    return () => window.clearInterval(id);
+  }, [newQuery]);
 
   const q = useQuery({ queryKey: ["signal-watches"], queryFn: () => list() });
 
@@ -122,7 +141,7 @@ function WatchesPage() {
         <input
           value={newQuery}
           onChange={(e) => setNewQuery(e.target.value)}
-          placeholder="e.g. Currently hiring 3+ engineers with experience in Next.js"
+          placeholder={WATCH_EXAMPLES[placeholderIdx]}
           className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-xs text-white placeholder:text-white/30 outline-none focus:border-white/30"
         />
         <div className="flex items-center justify-between gap-3 pt-1">

@@ -30,6 +30,11 @@ const GUIDES = [
     title: "How to Find Warm Local Leads",
     description: "Spotting high-intent local businesses worth pitching today.",
   },
+  {
+    title: "Signal Watches That Run Themselves",
+    description:
+      "Save a hunt once and Scrapivo re-runs it on schedule, fresh matches land in Discover.",
+  },
 ];
 
 function GuidesPage() {

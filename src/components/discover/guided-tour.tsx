@@ -30,7 +30,12 @@ const STEPS: Step[] = [
   {
     target: "composer-controls",
     title: "Dial up the AI",
-    body: "Mode sets how hard Scrapy searches, and Thinker switches on extended reasoning for tricky hunts. Hit the arrow to run it.",
+    body: "Mode opens Scrapy Okay, Scrapy Insane, and Scrapy Crazy tiers, and Thinker switches on extended reasoning for tricky hunts. The mic sits beside the arrow: hit the arrow to run it.",
+  },
+  {
+    target: "composer",
+    title: "Scrapy welcomes you to Scrapivo",
+    body: "We will help you not only find opportunities and leads, but close them. Describe your first hunt above and let's go.",
   },
 ];
 
