@@ -1,4 +1,1 @@
 project_id = "mpobgdzdpzzzmvufnbqi"
-
-[functions.search]
-verify_jwt = true
