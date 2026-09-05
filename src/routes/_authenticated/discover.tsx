@@ -14,7 +14,6 @@ import {
   listProjects,
   createProject,
   setActiveProject,
-  updateProject,
   type Project,
 } from "@/lib/projects.functions";
 import { getMyProfile, updateMyProfile } from "@/lib/profile.functions";
@@ -78,7 +77,6 @@ function DiscoverPage() {
   const getProjects = useServerFn(listProjects);
   const createProj = useServerFn(createProject);
   const setActiveProj = useServerFn(setActiveProject);
-  const patchProj = useServerFn(updateProject);
   const getProfile = useServerFn(getMyProfile);
   const patchProfile = useServerFn(updateMyProfile);
   const getUsage = useServerFn(getRemainingSearches);
@@ -156,6 +154,8 @@ function DiscoverPage() {
         business: activeProject.business_name ?? undefined,
         experience_level: activeProject.experience_level ?? undefined,
         work_style: activeProject.work_style ?? undefined,
+        website: activeProject.website ?? undefined,
+        about_doc: activeProject.about_doc ?? undefined,
       }
     : undefined;
 
@@ -684,6 +684,8 @@ function DiscoverPage() {
                 goal: searchContext?.goal ?? null,
                 experience_level: searchContext?.experience_level ?? null,
                 work_style: searchContext?.work_style ?? null,
+                website: searchContext?.website ?? null,
+                about_doc: searchContext?.about_doc?.slice(0, 1200) ?? null,
               },
             },
           });
@@ -808,34 +810,7 @@ function DiscoverPage() {
             </div>
           ) : showHero ? (
             <div className="min-h-full flex flex-col items-center justify-center py-6 md:py-10">
-              <DiscoverWelcomeHero
-                greetingName={greetingName || undefined}
-                onAddInfo={(p) => {
-                  // Persist to active project memory (website/about_doc) so
-                  // future dynamic questions skip answered dims. Best-effort.
-                  const isUrl = /^https?:\/\//i.test(p.urlOrText.trim());
-                  const about = [
-                    p.fileName ? `[File: ${p.fileName}]` : "",
-                    p.fileExcerpt,
-                    !isUrl ? p.urlOrText : "",
-                  ]
-                    .filter(Boolean)
-                    .join("\n\n")
-                    .slice(0, 8000);
-                  if (activeProject && activeProject.id !== "local") {
-                    void patchProj({
-                      data: {
-                        id: activeProject.id,
-                        ...(isUrl ? { website: p.urlOrText.slice(0, 200) } : {}),
-                        ...(about ? { about_doc: about } : {}),
-                      },
-                    })
-                      .then(() => qc.invalidateQueries({ queryKey: ["projects"] }))
-                      .catch(() => {});
-                  }
-                  toast.success("Saved — Scrapy will use this for future chats where applicable.");
-                }}
-              />
+              <DiscoverWelcomeHero greetingName={greetingName || undefined} />
             </div>
           ) : (
             <div className="max-w-4xl mx-auto py-4 md:py-6 space-y-5 md:space-y-6">

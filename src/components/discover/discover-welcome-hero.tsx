@@ -1,16 +1,9 @@
 import { FindCard } from "./find-card";
-import type { AddInfoPayload } from "./add-your-information";
 
 const LOGO_SRC =
   "https://ytjbrwnwdlsituevqkys.supabase.co/storage/v1/object/public/Scrapivo%20Assets/unnamed__1_-removebg-preview.png";
 
-export function DiscoverWelcomeHero({
-  greetingName,
-  onAddInfo,
-}: {
-  greetingName?: string;
-  onAddInfo?: (payload: AddInfoPayload) => void;
-}) {
+export function DiscoverWelcomeHero({ greetingName }: { greetingName?: string }) {
   const firstName = greetingName?.trim() ? greetingName.trim().split(" ")[0] : "there";
   const title = `Welcome, ${firstName}!`;
 
@@ -27,20 +20,8 @@ export function DiscoverWelcomeHero({
         What are you looking for now, a buying signal, niche, or role?
       </p>
 
-      {/* Single Find card: rotating categories + nested Add Info pill */}
-      <FindCard
-        onGenerate={(p) => {
-          try {
-            localStorage.setItem(
-              "scrapivo:user-info",
-              JSON.stringify({ ...p, at: new Date().toISOString() }),
-            );
-          } catch {
-            // Private-mode storage may throw — server save still runs via onAddInfo.
-          }
-          onAddInfo?.(p);
-        }}
-      />
+      {/* Single Find card — Add Info lives on the Memory page */}
+      <FindCard />
     </div>
   );
 }

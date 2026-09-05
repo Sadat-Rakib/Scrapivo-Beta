@@ -17,6 +17,7 @@ import { Route as AuthenticatedWatchesRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPipelineRouteImport } from './routes/_authenticated/pipeline'
+import { Route as AuthenticatedMemoryRouteImport } from './routes/_authenticated/memory'
 import { Route as AuthenticatedLocalBusinessesRouteImport } from './routes/_authenticated/local-businesses'
 import { Route as AuthenticatedJobsRouteImport } from './routes/_authenticated/jobs'
 import { Route as AuthenticatedInvestorsRouteImport } from './routes/_authenticated/investors'
@@ -64,6 +65,11 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
 const AuthenticatedPipelineRoute = AuthenticatedPipelineRouteImport.update({
   id: '/pipeline',
   path: '/pipeline',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMemoryRoute = AuthenticatedMemoryRouteImport.update({
+  id: '/memory',
+  path: '/memory',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedLocalBusinessesRoute =
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/investors': typeof AuthenticatedInvestorsRoute
   '/jobs': typeof AuthenticatedJobsRoute
   '/local-businesses': typeof AuthenticatedLocalBusinessesRoute
+  '/memory': typeof AuthenticatedMemoryRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/saved': typeof AuthenticatedSavedRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/investors': typeof AuthenticatedInvestorsRoute
   '/jobs': typeof AuthenticatedJobsRoute
   '/local-businesses': typeof AuthenticatedLocalBusinessesRoute
+  '/memory': typeof AuthenticatedMemoryRoute
   '/pipeline': typeof AuthenticatedPipelineRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/saved': typeof AuthenticatedSavedRoute
@@ -162,6 +170,7 @@ export interface FileRoutesById {
   '/_authenticated/investors': typeof AuthenticatedInvestorsRoute
   '/_authenticated/jobs': typeof AuthenticatedJobsRoute
   '/_authenticated/local-businesses': typeof AuthenticatedLocalBusinessesRoute
+  '/_authenticated/memory': typeof AuthenticatedMemoryRoute
   '/_authenticated/pipeline': typeof AuthenticatedPipelineRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
@@ -182,6 +191,7 @@ export interface FileRouteTypes {
     | '/investors'
     | '/jobs'
     | '/local-businesses'
+    | '/memory'
     | '/pipeline'
     | '/profile'
     | '/saved'
@@ -200,6 +210,7 @@ export interface FileRouteTypes {
     | '/investors'
     | '/jobs'
     | '/local-businesses'
+    | '/memory'
     | '/pipeline'
     | '/profile'
     | '/saved'
@@ -219,6 +230,7 @@ export interface FileRouteTypes {
     | '/_authenticated/investors'
     | '/_authenticated/jobs'
     | '/_authenticated/local-businesses'
+    | '/_authenticated/memory'
     | '/_authenticated/pipeline'
     | '/_authenticated/profile'
     | '/_authenticated/saved'
@@ -292,6 +304,13 @@ declare module '@tanstack/react-router' {
       path: '/pipeline'
       fullPath: '/pipeline'
       preLoaderRoute: typeof AuthenticatedPipelineRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/memory': {
+      id: '/_authenticated/memory'
+      path: '/memory'
+      fullPath: '/memory'
+      preLoaderRoute: typeof AuthenticatedMemoryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/local-businesses': {
@@ -368,6 +387,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedInvestorsRoute: typeof AuthenticatedInvestorsRoute
   AuthenticatedJobsRoute: typeof AuthenticatedJobsRoute
   AuthenticatedLocalBusinessesRoute: typeof AuthenticatedLocalBusinessesRoute
+  AuthenticatedMemoryRoute: typeof AuthenticatedMemoryRoute
   AuthenticatedPipelineRoute: typeof AuthenticatedPipelineRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
@@ -382,6 +402,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedInvestorsRoute: AuthenticatedInvestorsRoute,
   AuthenticatedJobsRoute: AuthenticatedJobsRoute,
   AuthenticatedLocalBusinessesRoute: AuthenticatedLocalBusinessesRoute,
+  AuthenticatedMemoryRoute: AuthenticatedMemoryRoute,
   AuthenticatedPipelineRoute: AuthenticatedPipelineRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSavedRoute: AuthenticatedSavedRoute,

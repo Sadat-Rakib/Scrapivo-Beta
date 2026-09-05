@@ -42,4 +42,6 @@ export type UserMemory = {
   experience_level?: string | null;
   work_style?: string | null;
   website?: string | null;
+  /** Freeform user context (resume/portfolio excerpt, business description). */
+  about_doc?: string | null;
 };

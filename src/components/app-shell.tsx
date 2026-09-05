@@ -15,6 +15,7 @@ import {
   PanelRightOpen,
   Bell,
   BookOpen,
+  Brain,
   Plus,
   ChevronLeft,
   ChevronRight,
@@ -34,6 +35,7 @@ const LOGO_SRC =
 // §4.1: Removed "History" and "Pipeline" from the left sidebar nav
 const navItems = [
   { to: "/discover", label: "Home", icon: Search },
+  { to: "/memory", label: "Memory", icon: Brain },
   { to: "/watches", label: "Watches", icon: Bell },
   { to: "/saved", label: "Saved", icon: Bookmark },
   { to: "/guides", label: "Guides", icon: BookOpen },
@@ -115,6 +117,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     if (location.pathname === "/local-businesses") return "Businesses";
     if (location.pathname === "/jobs") return "Jobs";
     if (location.pathname === "/guides") return "Guides";
+    if (location.pathname === "/memory") return "Memory";
     return location.pathname.slice(1).replace(/-/g, " ");
   };
 

@@ -12,6 +12,7 @@ const MemorySchema = z.object({
   experience_level: z.string().max(10).nullable().optional(),
   work_style: z.string().max(40).nullable().optional(),
   website: z.string().max(200).nullable().optional(),
+  about_doc: z.string().max(1500).nullable().optional(),
 });
 
 const Input = z.object({
@@ -44,6 +45,7 @@ export const prepareDynamicQuestions = createServerFn({ method: "POST" })
       experience_level: data.memory?.experience_level ?? null,
       work_style: data.memory?.work_style ?? null,
       website: data.memory?.website ?? null,
+      about_doc: data.memory?.about_doc ?? null,
     });
     return { questions };
   });
