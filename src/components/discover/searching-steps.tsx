@@ -3,7 +3,8 @@ import { Loader2, Check } from "lucide-react";
 
 type Goal = "jobs" | "clients" | "both";
 type Audience = "companies" | "agencies" | "people" | "all";
-export type SearchVertical = "leads" | "investors" | "local";
+/** Matches resolveSearchVertical — the caller passes the canonical verdict. */
+export type SearchVertical = "leads" | "investors" | "local" | "jobs" | "general";
 
 // =====================================================================
 // Search progress — steps APPEAR one at a time, then keep talking while
@@ -69,6 +70,8 @@ function stepsFor(goal?: Goal, audience?: Audience, vertical?: SearchVertical): 
 
   if (vertical === "investors") return [...base, ...investorsAll];
   if (vertical === "local") return [...base, ...localAll];
+  if (vertical === "jobs") return [...base, ...jobsAll];
+  // "leads"/"general"/undefined keep the audience → goal → jobs fallback ladder.
   if (audience === "people") return [...base, ...peopleSteps];
   if (audience === "companies" || audience === "agencies") return [...base, ...companySteps];
   if (goal === "clients") return [...base, ...clientsAll];
@@ -95,8 +98,10 @@ const HOLDING_LINES = [
 
 function delayForStep(index: number, total: number): number {
   const progress = index / Math.max(1, total - 1);
-  // Stretch so the main list lasts longer (~45–70s for full clients list).
-  return 900 + Math.round(progress * 2800);
+  // 350–500ms per line: the whole list reads in ~5s. The OLD 900–3700ms ramp
+  // made users watch ~31s of narration before results — the search usually
+  // finishes faster than the storytelling.
+  return 350 + Math.round(progress * 150);
 }
 
 export function SearchingSteps({
@@ -132,9 +137,9 @@ export function SearchingSteps({
       const tick = () => {
         i = (i + 1) % HOLDING_LINES.length;
         setHoldingIdx(i);
-        holdTimer.current = setTimeout(tick, 2200);
+        holdTimer.current = setTimeout(tick, 1200);
       };
-      holdTimer.current = setTimeout(tick, 2200);
+      holdTimer.current = setTimeout(tick, 1200);
     };
 
     const advance = () => {

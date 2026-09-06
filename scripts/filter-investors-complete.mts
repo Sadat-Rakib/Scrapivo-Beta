@@ -147,6 +147,11 @@ function main() {
       stages = [...new Set(r.investment_stages.map((s: string) => String(s).trim()).filter(Boolean))];
     }
 
+    // Bio: merged text when present (cap 600), else null — a harvest job
+    // fills gaps from public profiles; display falls back to composed summary.
+    const rawBio = String(r.bio ?? "").trim();
+    const bio = rawBio ? rawBio.slice(0, 600) : null;
+
     seen.add(id);
     const locParts = location.split(",").map((s: string) => s.trim()).filter(Boolean);
     out.push(
@@ -166,6 +171,8 @@ function main() {
         linkedin: linkedin || null,
         website: website || null,
         image_url: r.image_url ?? r.profile_photo?.local_path ?? null,
+        bio,
+        bio_source: bio ? "merged" : null,
         completeness,
         provenance: [`data/investors_merged.json#${id}`],
       }),

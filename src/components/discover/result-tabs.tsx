@@ -12,6 +12,7 @@ import {
   FileText,
   Users,
   Mail,
+  MessageSquare,
   Phone,
   ExternalLink,
   Linkedin,
@@ -178,15 +179,13 @@ function IconLink({
 export function CompanyCard({
   row,
   onOpen,
-  onResolveContact,
-  contactBusy,
   contact,
+  onGenerate,
 }: {
   row: CompanyRow;
   onOpen: (row: CompanyRow) => void;
-  onResolveContact?: (row: CompanyRow) => void;
-  contactBusy?: boolean;
   contact?: ResolvedContactInfo;
+  onGenerate?: (row: CompanyRow, kind: "email" | "message") => void;
 }) {
   return (
     <div className="w-full p-4 rounded-xl border border-border bg-card hover:border-primary/30 transition-all space-y-2">
@@ -224,7 +223,39 @@ export function CompanyCard({
           ))}
         </div>
       </button>
-      <InPostContacts ic={row.inline_contacts} />
+      {(row.linkedin_url || row.twitter_url || row.facebook_url || row.website) && (
+        <div className="flex flex-wrap items-center gap-2.5">
+          {row.linkedin_url && (
+            <IconLink href={row.linkedin_url} label="LinkedIn" icon={Linkedin} />
+          )}
+          {row.twitter_url && <IconLink href={row.twitter_url} label="X" icon={Twitter} />}
+          {row.facebook_url && (
+            <IconLink href={row.facebook_url} label="Facebook" icon={Facebook} />
+          )}
+          {!row.linkedin_url && !row.twitter_url && !row.facebook_url && row.website && (
+            <IconLink href={row.website} label="Site" icon={Globe} />
+          )}
+        </div>
+      )}
+      {onGenerate && (
+        <div className="flex flex-wrap gap-1.5">
+          <button
+            type="button"
+            onClick={() => onGenerate(row, "email")}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-border text-[11px] text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+          >
+            <Mail className="size-3" /> Email
+          </button>
+          <button
+            type="button"
+            onClick={() => onGenerate(row, "message")}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-border text-[11px] text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+          >
+            <MessageSquare className="size-3" /> Message
+          </button>
+        </div>
+      )}
+      {contact?.status !== "ok" && <InPostContacts ic={row.inline_contacts} />}
       {contact?.status === "ok" && (
         <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-2.5 py-2 space-y-1">
           {contact.email && (
@@ -269,30 +300,6 @@ export function CompanyCard({
             Profile available — email/phone not verified yet.
           </div>
         )}
-
-      <div className="flex flex-wrap items-center gap-2.5 pt-1 border-t border-border/60">
-        {row.website && <IconLink href={row.website} label="Website" icon={Globe} />}
-        {row.linkedin_url && <IconLink href={row.linkedin_url} label="LinkedIn" icon={Linkedin} />}
-        {row.twitter_url && <IconLink href={row.twitter_url} label="X" icon={Twitter} />}
-        {row.facebook_url && <IconLink href={row.facebook_url} label="Facebook" icon={Facebook} />}
-        <IconLink href={row.sample_url} label="Signal" icon={ExternalLink} />
-        {onResolveContact && (!contact || contact.status === "none") && (
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-7 text-[10px] ml-auto"
-            disabled={contactBusy}
-            onClick={() => onResolveContact(row)}
-          >
-            <Mail className="size-3 mr-1" />
-            {contactBusy
-              ? "Resolving…"
-              : contact?.status === "none"
-                ? "Deep resolve"
-                : "Resolve contact"}
-          </Button>
-        )}
-      </div>
     </div>
   );
 }
@@ -300,14 +307,10 @@ export function CompanyCard({
 export function PersonCard({
   row,
   onOpen,
-  onAccessContact,
-  contactBusy,
   contact,
 }: {
   row: PersonRow;
   onOpen: (row: PersonRow) => void;
-  onAccessContact: (row: PersonRow) => void;
-  contactBusy?: boolean;
   contact?: ResolvedContactInfo;
 }) {
   return (
@@ -328,11 +331,7 @@ export function PersonCard({
               <span className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground">
                 <Clock className="size-3" /> {row.posted_at_relative}
               </span>
-            ) : (
-              <span className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground">
-                <Clock className="size-3" /> Recently (undated)
-              </span>
-            )}
+            ) : null}
           </div>
         </div>
         {(row.company_hint || row.company_domain) && (
@@ -356,7 +355,18 @@ export function PersonCard({
         )}
       </button>
 
-      <InPostContacts ic={row.inline_contacts} />
+      {(row.linkedin_url || row.github_url || row.author_url) && (
+        <div className="flex flex-wrap items-center gap-2.5">
+          {row.linkedin_url && (
+            <IconLink href={row.linkedin_url} label="LinkedIn" icon={Linkedin} />
+          )}
+          {row.github_url && <IconLink href={row.github_url} label="GitHub" icon={Github} />}
+          {!row.linkedin_url && !row.github_url && row.author_url && (
+            <IconLink href={row.author_url} label="Profile" icon={ExternalLink} />
+          )}
+        </div>
+      )}
+      {contact?.status !== "ok" && <InPostContacts ic={row.inline_contacts} />}
       {contact?.status === "ok" && (
         <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-2.5 py-2 space-y-1">
           {contact.email && (
@@ -408,30 +418,6 @@ export function PersonCard({
             Profile available
           </div>
         )}
-
-      <div className="flex flex-wrap items-center gap-2.5">
-        {row.author_url && <IconLink href={row.author_url} label="Profile" icon={ExternalLink} />}
-        {row.linkedin_url && <IconLink href={row.linkedin_url} label="LinkedIn" icon={Linkedin} />}
-        {row.github_url && <IconLink href={row.github_url} label="GitHub" icon={Github} />}
-        <IconLink href={row.sample_url} label="Post" icon={FileText} />
-        {(!contact || contact.status === "none") && (
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-7 text-[10px] ml-auto"
-            disabled={contactBusy}
-            onClick={() => onAccessContact(row)}
-          >
-            <Mail className="size-3 mr-1" />
-            <Phone className="size-3 mr-1" />
-            {contactBusy
-              ? "Resolving…"
-              : contact?.status === "none"
-                ? "Deep resolve"
-                : "Access contact"}
-          </Button>
-        )}
-      </div>
     </div>
   );
 }
@@ -444,6 +430,7 @@ export function ViewToggle({
   view: "cards" | "table";
   onChange: (v: "cards" | "table") => void;
 }) {
+  const labels = { cards: "Cards", table: "Lists" } as const;
   return (
     <div className="inline-flex rounded-full border border-border p-0.5 bg-muted/40">
       {(["cards", "table"] as const).map((v) => (
@@ -451,13 +438,13 @@ export function ViewToggle({
           key={v}
           type="button"
           onClick={() => onChange(v)}
-          className={`px-2.5 py-1 rounded-full text-[11px] capitalize transition-colors ${
+          className={`px-2.5 py-1 rounded-full text-[11px] transition-colors ${
             view === v
               ? "bg-background text-foreground shadow-sm"
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
-          {v}
+          {labels[v]}
         </button>
       ))}
     </div>
@@ -470,13 +457,15 @@ const td = "px-3 py-2 text-xs align-middle";
 export function CompanyTable({
   rows,
   onOpen,
+  onGenerate,
 }: {
   rows: CompanyRow[];
   onOpen: (row: CompanyRow) => void;
+  onGenerate?: (row: CompanyRow, kind: "email" | "message") => void;
 }) {
   return (
     <div className="rounded-xl border border-border overflow-x-auto pb-1">
-      <table className="w-full min-w-[640px] border-collapse">
+      <table className="w-full min-w-[780px] border-collapse">
         <thead className="bg-muted/40">
           <tr>
             <th className={th}>Company</th>
@@ -484,6 +473,8 @@ export function CompanyTable({
             <th className={th}>Signals</th>
             <th className={th}>Latest</th>
             <th className={th}>Links</th>
+            <th className={th}>Generate Email</th>
+            <th className={th}>Generate Message</th>
           </tr>
         </thead>
         <tbody>
@@ -505,6 +496,24 @@ export function CompanyTable({
                   <IconLink href={r.sample_url} label="Signal" icon={ExternalLink} />
                 </span>
               </td>
+              <td className={td} onClick={(e) => e.stopPropagation()}>
+                <button
+                  type="button"
+                  onClick={() => onGenerate?.(r, "email")}
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-border text-[11px] text-muted-foreground hover:text-foreground hover:bg-accent transition-colors whitespace-nowrap"
+                >
+                  <Mail className="size-3" /> Email
+                </button>
+              </td>
+              <td className={td} onClick={(e) => e.stopPropagation()}>
+                <button
+                  type="button"
+                  onClick={() => onGenerate?.(r, "message")}
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-border text-[11px] text-muted-foreground hover:text-foreground hover:bg-accent transition-colors whitespace-nowrap"
+                >
+                  <MessageSquare className="size-3" /> Message
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -516,21 +525,26 @@ export function CompanyTable({
 export function PersonTable({
   rows,
   onOpen,
+  onGenerate,
 }: {
   rows: PersonRow[];
   onOpen: (row: PersonRow) => void;
+  onGenerate?: (row: PersonRow, kind: "email" | "message") => void;
 }) {
   return (
     <div className="rounded-xl border border-border overflow-x-auto pb-1">
-      <table className="w-full min-w-[720px] border-collapse">
+      <table className="w-full min-w-[1020px] border-collapse">
         <thead className="bg-muted/40">
           <tr>
             <th className={th}>Name</th>
             <th className={th}>Role</th>
             <th className={th}>Company</th>
-            <th className={th}>Platform</th>
-            <th className={th}>Posted</th>
-            <th className={th}>Links</th>
+            <th className={th}>Location</th>
+            <th className={th}>Email</th>
+            <th className={th}>Social</th>
+            <th className={th}>Why match</th>
+            <th className={th}>Generate Email</th>
+            <th className={th}>Generate Message</th>
           </tr>
         </thead>
         <tbody>
@@ -540,24 +554,61 @@ export function PersonTable({
               onClick={() => onOpen(r)}
               className="border-t border-border hover:bg-accent/40 cursor-pointer"
             >
-              <td className={`${td} font-medium`}>{r.name}</td>
+              <td className={`${td} font-medium whitespace-nowrap`}>{r.name}</td>
               <td className={`${td} text-muted-foreground`}>{r.role_hint ?? "—"}</td>
               <td className={`${td} text-muted-foreground`}>
                 {r.company_hint ?? r.company_domain ?? "—"}
               </td>
-              <td className={`${td} text-muted-foreground max-w-[160px] truncate`}>
-                {r.platform ?? "—"}
+              <td className={`${td} text-muted-foreground max-w-[180px] truncate`}>
+                {r.location_hint ?? "—"}
               </td>
-              <td className={`${td} text-muted-foreground`}>{r.posted_at_relative ?? "—"}</td>
+              <td className={`${td} max-w-[220px] truncate`}>
+                {r.inline_contacts?.emails?.[0] ? (
+                  <a
+                    href={`mailto:${r.inline_contacts.emails[0]}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-emerald-400 hover:underline"
+                  >
+                    {r.inline_contacts.emails[0]}
+                  </a>
+                ) : (
+                  <span className="text-muted-foreground">—</span>
+                )}
+              </td>
               <td className={td} onClick={(e) => e.stopPropagation()}>
                 <span className="inline-flex items-center gap-2.5">
-                  {r.author_url && (
+                  {r.linkedin_url && (
+                    <IconLink href={r.linkedin_url} label="LinkedIn" icon={Linkedin} />
+                  )}
+                  {r.github_url && <IconLink href={r.github_url} label="GitHub" icon={Github} />}
+                  {!r.linkedin_url && !r.github_url && r.author_url && (
                     <IconLink href={r.author_url} label="Profile" icon={ExternalLink} />
                   )}
-                  {r.linkedin_url && <IconLink href={r.linkedin_url} label="LI" icon={Linkedin} />}
-                  {r.github_url && <IconLink href={r.github_url} label="GH" icon={Github} />}
-                  <IconLink href={r.sample_url} label="Post" icon={FileText} />
                 </span>
+              </td>
+              <td
+                className={`${td} text-muted-foreground max-w-[240px] truncate`}
+                title={r.why_match ?? undefined}
+              >
+                {r.why_match ?? "—"}
+              </td>
+              <td className={td} onClick={(e) => e.stopPropagation()}>
+                <button
+                  type="button"
+                  onClick={() => onGenerate?.(r, "email")}
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-border text-[11px] text-muted-foreground hover:text-foreground hover:bg-accent transition-colors whitespace-nowrap"
+                >
+                  <Mail className="size-3" /> Email
+                </button>
+              </td>
+              <td className={td} onClick={(e) => e.stopPropagation()}>
+                <button
+                  type="button"
+                  onClick={() => onGenerate?.(r, "message")}
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-border text-[11px] text-muted-foreground hover:text-foreground hover:bg-accent transition-colors whitespace-nowrap"
+                >
+                  <MessageSquare className="size-3" /> Message
+                </button>
               </td>
             </tr>
           ))}
@@ -593,9 +644,22 @@ export function PostsGrid({
   );
 }
 
-export function LocalBusinessCard({ row }: { row: LocalBusinessRow }) {
+export function LocalBusinessCard({
+  row,
+  onOpen,
+  onGenerate,
+}: {
+  row: LocalBusinessRow;
+  onOpen?: (row: LocalBusinessRow) => void;
+  onGenerate?: (row: LocalBusinessRow, kind: "email" | "message") => void;
+}) {
   return (
     <div className="w-full p-4 rounded-xl border border-border bg-card hover:border-primary/30 transition-all space-y-2">
+      <button
+        type="button"
+        onClick={() => onOpen?.(row)}
+        className="text-left w-full"
+      >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="font-medium text-sm truncate">{row.name}</div>
@@ -621,6 +685,25 @@ export function LocalBusinessCard({ row }: { row: LocalBusinessRow }) {
               {t.replace(/_/g, " ")}
             </span>
           ))}
+        </div>
+      )}
+      </button>
+      {onGenerate && (
+        <div className="flex flex-wrap gap-1.5">
+          <button
+            type="button"
+            onClick={() => onGenerate(row, "email")}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-border text-[11px] text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+          >
+            <Mail className="size-3" /> Email
+          </button>
+          <button
+            type="button"
+            onClick={() => onGenerate(row, "message")}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-border text-[11px] text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+          >
+            <MessageSquare className="size-3" /> Message
+          </button>
         </div>
       )}
       <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs">
@@ -653,11 +736,113 @@ export function LocalBusinessCard({ row }: { row: LocalBusinessRow }) {
   );
 }
 
-export function LocalBusinessesGrid({ rows }: { rows: LocalBusinessRow[] }) {
+export function LocalBusinessesGrid({
+  rows,
+  onOpen,
+  onGenerate,
+}: {
+  rows: LocalBusinessRow[];
+  onOpen?: (row: LocalBusinessRow) => void;
+  onGenerate?: (row: LocalBusinessRow, kind: "email" | "message") => void;
+}) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 pb-4">
       {rows.map((r) => (
-        <LocalBusinessCard key={r.key} row={r} />
+        <LocalBusinessCard key={r.key} row={r} onOpen={onOpen} onGenerate={onGenerate} />
+      ))}
+    </div>
+  );
+}
+
+/** Compact list variant: one row per post, no cards. */
+export function PostsList({ leads, onOpen }: { leads: Lead[]; onOpen: (l: Lead) => void }) {
+  return (
+    <div className="rounded-xl border border-border overflow-hidden">
+      {leads.map((l) => (
+        <button
+          key={l.full_post_url}
+          type="button"
+          onClick={() => onOpen(l)}
+          className="w-full flex items-center gap-3 px-3 py-2.5 border-b border-border last:border-b-0 hover:bg-accent/40 transition-colors text-left"
+        >
+          <span className="min-w-0 flex-1">
+            <span className="block text-sm font-medium truncate">{l.title}</span>
+            <span className="block text-[11px] text-muted-foreground truncate">
+              {l.platform ?? l.source ?? "Post"}
+            </span>
+          </span>
+          <ExternalLink className="size-3.5 text-muted-foreground shrink-0" />
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** Compact list variant for local businesses: one row each, no cards. */
+export function LocalListRows({
+  rows,
+  onOpen,
+  onGenerate,
+}: {
+  rows: LocalBusinessRow[];
+  onOpen?: (row: LocalBusinessRow) => void;
+  onGenerate?: (row: LocalBusinessRow, kind: "email" | "message") => void;
+}) {
+  return (
+    <div className="rounded-xl border border-border overflow-hidden">
+      {rows.map((r) => (
+        <div
+          key={r.key}
+          onClick={() => onOpen?.(r)}
+          className="flex items-center gap-3 px-3 py-2.5 border-b border-border last:border-b-0 hover:bg-accent/40 cursor-pointer"
+        >
+          <span className="min-w-0 flex-1">
+            <span className="block text-sm font-medium truncate">{r.name}</span>
+            <span className="block text-[11px] text-muted-foreground truncate">
+              {[r.category, r.address].filter(Boolean).join(" · ")}
+            </span>
+          </span>
+          {r.website && (
+            <a
+              href={r.website}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-xs text-primary hover:underline shrink-0"
+            >
+              <Globe className="size-3" /> Website
+            </a>
+          )}
+          {r.email && (
+            <a
+              href={`mailto:${r.email}`}
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-1 text-xs text-emerald-500 hover:underline shrink-0"
+            >
+              <Mail className="size-3" /> Email
+            </a>
+          )}
+          {onGenerate && (
+            <span
+              className="inline-flex items-center gap-1 shrink-0"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                onClick={() => onGenerate(r, "email")}
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-border text-[11px] text-muted-foreground hover:text-foreground hover:bg-accent"
+              >
+                <Mail className="size-3" /> Email
+              </button>
+              <button
+                type="button"
+                onClick={() => onGenerate(r, "message")}
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-border text-[11px] text-muted-foreground hover:text-foreground hover:bg-accent"
+              >
+                <MessageSquare className="size-3" /> Msg
+              </button>
+            </span>
+          )}
+        </div>
       ))}
     </div>
   );

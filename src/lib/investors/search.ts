@@ -195,12 +195,12 @@ function looksLikeFirmLogoForPerson(
 ): boolean {
   const r = asLoose(rec);
   const file = url.split("/").pop()?.toLowerCase() ?? "";
-  const person = (r.name || "").toLowerCase();
-  const firm = String(r.firm_name || r.firm || "")
+  const person = String(r.name ?? "").toLowerCase();
+  const firm = String(r.firm_name ?? r.firm ?? "")
     .toLowerCase()
     .trim();
-  const personTokens = person.split(/\s+/).filter((t) => t.length > 2);
-  if (personTokens.some((t) => file.includes(t.replace(/[^a-z0-9]/g, "")))) return false;
+  const personTokens = person.split(/\s+/).filter((t: string) => t.length > 2);
+  if (personTokens.some((t: string) => file.includes(t.replace(/[^a-z0-9]/g, "")))) return false;
   if (firm) {
     const firmSlug = firm.replace(/[^a-z0-9]+/g, "");
     if (firmSlug.length >= 4 && file.replace(/[^a-z0-9]+/g, "").includes(firmSlug.slice(0, 10))) {

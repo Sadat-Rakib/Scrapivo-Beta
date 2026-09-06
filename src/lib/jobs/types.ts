@@ -20,7 +20,8 @@ export type JobSourceKind =
   | "source-workatastartup"
   | "source-himalayas"
   | "source-4dayweek"
-  | "source-nodesk";
+  | "source-nodesk"
+  | "source-freehire";
 
 export type JobRegion = "any" | "remote" | "north_america" | "europe" | "asia" | "middle_east";
 

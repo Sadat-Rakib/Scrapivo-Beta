@@ -5,7 +5,7 @@
  * People/Companies general: live unless local dataset attached later.
  */
 import type { ClassifiedQuery } from "./query-classifier";
-import { detectSearchVertical } from "./clarifier";
+import { resolveSearchVertical } from "./vertical";
 
 export type SourceDecision = "local" | "live" | "blend" | "insufficient";
 const MIN_LOCAL = 5;
@@ -16,7 +16,7 @@ export function decideSource(
   requestedCount = MIN_LOCAL,
 ): SourceDecision {
   const raw = classified.raw || "";
-  const vertical = detectSearchVertical(raw);
+  const vertical = resolveSearchVertical(raw);
   const goal = classified.goal;
 
   // Jobs always live

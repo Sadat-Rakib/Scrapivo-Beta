@@ -5,6 +5,8 @@ export type Lead = {
   platform: string;
   platform_label?: string; // friendly badge label, e.g. "Reddit r/forhire [Hiring]"
   title: string;
+  /** Role · location line for directory-sourced rows (rendered under the title). */
+  subtitle?: string;
   snippet: string;
   ai_summary?: string; // 1-sentence summary of what the buyer needs
   full_post_url: string;

@@ -72,6 +72,7 @@ function GuidesPage() {
         Ready to search? Jump to{" "}
         <Link
           to="/discover"
+          search={{}}
           className="underline underline-offset-2 text-white/70 hover:text-white"
         >
           Discover

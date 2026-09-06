@@ -133,7 +133,11 @@ function HelpPage() {
 
       <p className="text-xs text-white/40">
         Ready to search? Jump to{" "}
-        <Link to="/discover" className="underline underline-offset-2 text-white/70 hover:text-white">
+        <Link
+          to="/discover"
+          search={{}}
+          className="underline underline-offset-2 text-white/70 hover:text-white"
+        >
           Discover
         </Link>{" "}
         or{" "}

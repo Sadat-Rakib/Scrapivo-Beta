@@ -32,23 +32,25 @@ import {
 } from "@/components/discover/unified-composer";
 import { Route as AuthRoute } from "@/routes/_authenticated/route";
 import {
-  ResultTabPills,
   PostsGrid,
+  PostsList,
   CompanyCard,
   PersonCard,
   CompanyTable,
   PersonTable,
   ViewToggle,
   LocalBusinessesGrid,
-  type ResultTab,
+  LocalListRows,
   type ResolvedContactInfo,
 } from "@/components/discover/result-tabs";
 import { EntityDetailPanel, type SelectedEntity } from "@/components/discover/entity-detail-panel";
+import { GenerateModal } from "@/components/discover/generate-modal";
 import { Bell, Plus, X } from "lucide-react";
 import { SearchingSteps } from "@/components/discover/searching-steps";
+import { SearchingPlan } from "@/components/discover/searching-plan";
 import { ClarifyPanel } from "@/components/discover/clarify-panel";
 import type { ClarifyQuestion, ClarifyAnswers } from "@/lib/search/clarifier";
-import { detectSearchVertical } from "@/lib/search/clarifier";
+import { resolveSearchVertical } from "@/lib/search/vertical";
 import { friendlyErrorText } from "@/lib/friendly-error";
 import { type ChatTurn } from "@/components/discover/scrapy-chat-panel";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -58,6 +60,10 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { mySupabase } from "@/integrations/my-supabase/client";
 
 export const Route = createFileRoute("/_authenticated/discover")({
+  validateSearch: (search: Record<string, unknown>): { q?: string; fresh?: number } => ({
+    q: typeof search.q === "string" ? search.q : undefined,
+    fresh: typeof search.fresh === "number" ? search.fresh : undefined,
+  }),
   head: () => ({
     meta: [{ title: "Scrapivo — Discover" }],
   }),
@@ -66,6 +72,7 @@ export const Route = createFileRoute("/_authenticated/discover")({
 
 function DiscoverPage() {
   const { userId } = AuthRoute.useRouteContext();
+  const routeSearch = Route.useSearch();
   const qc = useQueryClient();
   const search = useServerFn(runSearch);
   const chat = useServerFn(aiChat);
@@ -247,25 +254,6 @@ function DiscoverPage() {
     }
   };
 
-  // 24h = real posted_at within 24 hours only.
-  // All = no UI age cut.
-  const [freshness, setFreshness] = useState<"all" | "24h">("all");
-  const inWindow = (l: {
-    posted_at?: string;
-    freshness_window?: string;
-    full_post_url?: string;
-    source?: string;
-  }) => {
-    if (freshness === "all") return true;
-    const maxMs = 86_400_000;
-    if (l.posted_at) {
-      const t = new Date(l.posted_at).getTime();
-      return Number.isFinite(t) && Date.now() - t <= maxMs;
-    }
-    // 24h never trusts undated posts.
-    return false;
-  };
-
   const [input, setInput] = useState("");
   const [mode, setMode] = useState<ComposerMode>("search");
   const [tier, setTier] = useState<SearchTier>("scrapy");
@@ -274,11 +262,10 @@ function DiscoverPage() {
   const [companies, setCompanies] = useState<CompanyRow[]>([]);
   const [people, setPeople] = useState<PersonRow[]>([]);
   const [localRows, setLocalRows] = useState<LocalBusinessRow[]>([]);
-  const [resultTab, setResultTab] = useState<ResultTab>("posts");
   const [activeQuery, setActiveQuery] = useState<string | null>(null);
-  const [activeVertical, setActiveVertical] = useState<"investors" | "local" | undefined>(
-    undefined,
-  );
+  const [activeVertical, setActiveVertical] = useState<
+    "investors" | "local" | "jobs" | "general" | undefined
+  >(undefined);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [queryType, setQueryType] = useState<string | null>(null);
   // Clarifying-question flow. Questions are computed BEFORE the search runs and
@@ -297,10 +284,154 @@ function DiscoverPage() {
   const [chatLog, setChatLog] = useState<ChatTurn[]>([]);
   const [chatOpen, setChatOpen] = useState(false);
   const returnChatOpenedRef = useRef(false);
+  // Conversation scroll container — new turns (echoed input, plan, questions)
+  // scroll into view the frame they mount.
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [contactBusyKey, setContactBusyKey] = useState<string | null>(null);
   const [contactByKey, setContactByKey] = useState<Record<string, ResolvedContactInfo>>({});
   const [selectedEntity, setSelectedEntity] = useState<SelectedEntity | null>(null);
+  type GenTarget = {
+    kind: "email" | "message";
+    vertical: "investor" | "company" | "local" | "job";
+    name: string;
+    firm?: string;
+    role?: string;
+    location?: string;
+    email?: string;
+    /** Matched-slot sentence — the personalization hook for the draft. */
+    whyMatch?: string;
+    /** Company/hiring: why-now signal + platform. */
+    whyNow?: string;
+    platform?: string;
+    /** Local: category/address/opportunity for the pitch draft. */
+    category?: string;
+    address?: string;
+    noWebsite?: boolean;
+    seoPoor?: boolean;
+    /** The raise facts the user stated — tailor investor drafts to them. */
+    investorStage?: string;
+    investorSector?: string;
+  };
+  const [genTarget, setGenTarget] = useState<GenTarget | null>(null);
+  const openGenerateForEntity = (kind: "email" | "message") => {
+    if (!selectedEntity) return;
+    if (selectedEntity.type === "person") {
+      const p = selectedEntity.person;
+      setGenTarget({
+        kind,
+        vertical: "investor",
+        name: p.name,
+        firm: p.company_hint,
+        role: p.title_hint ?? p.role_hint ?? undefined,
+        location: p.location_hint ?? undefined,
+        email: p.inline_contacts?.emails?.[0],
+        whyMatch: p.why_match ?? undefined,
+        investorStage: raiseStage,
+        investorSector: raiseSector,
+      });
+    } else if (selectedEntity.type === "local") {
+      const b = selectedEntity.local;
+      setGenTarget({
+        kind,
+        vertical: "local",
+        name: b.name,
+        category: b.category,
+        address: b.address,
+        location: b.address?.split(",").slice(-2, -1)[0]?.trim(),
+        email: b.email,
+        noWebsite: !!b.opportunity_tags?.some(
+          (t) => t === "no_website" || t === "verified_no_website",
+        ),
+        seoPoor: !!b.opportunity_tags?.includes("seo_poor"),
+      });
+    } else {
+      const c = selectedEntity.company;
+      setGenTarget({
+        kind,
+        vertical: "company",
+        name: c.name,
+        firm: c.name,
+        whyNow: c.why_now,
+        platform: c.platforms?.[0],
+        email: contactByKey[`co:${c.key}`]?.email,
+      });
+    }
+  };
+  const openGenerateForLocal = (row: LocalBusinessRow, kind: "email" | "message") => {
+    setGenTarget({
+      kind,
+      vertical: "local",
+      name: row.name,
+      category: row.category,
+      address: row.address,
+      location: row.address?.split(",").slice(-2, -1)[0]?.trim(),
+      email: row.email,
+      noWebsite: !!row.opportunity_tags?.some(
+        (t) => t === "no_website" || t === "verified_no_website",
+      ),
+      seoPoor: !!row.opportunity_tags?.includes("seo_poor"),
+    });
+  };
+  const openGenerateForCompany = (row: CompanyRow, kind: "email" | "message") => {
+    setGenTarget({
+      kind,
+      vertical: "company",
+      name: row.name,
+      firm: row.name,
+      whyNow: row.why_now,
+      platform: row.platforms?.[0],
+      email: contactByKey[`co:${row.key}`]?.email,
+    });
+  };
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
+  // ChatGPT-style conversation: every submitted query persists as a user
+  // bubble WITH its results frozen into the turn, so previous inputs keep
+  // their outputs while new searches append below.
+  type TurnResults = {
+    leads: Lead[];
+    companies: CompanyRow[];
+    people: PersonRow[];
+    local: LocalBusinessRow[];
+  };
+  type ConversationTurn = {
+    id: string;
+    text: string;
+    results?: TurnResults;
+    counts?: { posts: number; companies: number; people: number; local: number };
+  };
+  /** Turns older than this collapse to bubble + counts (memory/DOM cost). */
+  const KEEP_FULL_TURNS = 4;
+  const [turns, setTurns] = useState<ConversationTurn[]>([]);
+  const [planTokens, setPlanTokens] = useState<
+    import("@/lib/search/tokenize-input").InputTokens | null
+  >(null);
+  // Questions mount only after the plan has revealed (min 2 lines) — never beside it.
+  const [planDone, setPlanDone] = useState(false);
+  // Raise facts: clarifier answers win, tokenizer slots from the query fill gaps.
+  const raiseStage =
+    (clarifyAnswers?.investor_stage && clarifyAnswers.investor_stage !== "any"
+      ? clarifyAnswers.investor_stage
+      : undefined) ??
+    planTokens?.stage ??
+    undefined;
+  const raiseSector =
+    (clarifyAnswers?.investor_sector && clarifyAnswers.investor_sector !== "any"
+      ? clarifyAnswers.investor_sector
+      : undefined) ??
+    planTokens?.sector ??
+    undefined;
+  const turnId = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const resetConversation = () => {
+    clearWorkspace();
+    setTurns([]);
+    setPlanTokens(null);
+    setActiveQuery(null);
+    setClarifyAnswers(null);
+    setClarifyQs([]);
+    setPendingQuery(null);
+    setDefaultSummary("");
+    composerRef.current?.focus();
+  };
 
   // Shared contact resolution (cards, tables, and the detail drawer all use it).
   const resolveContactFor = async (
@@ -412,23 +543,16 @@ function DiscoverPage() {
       deepEnrich,
     );
 
-  const entityContactKey = selectedEntity
-    ? selectedEntity.type === "company"
-      ? `co:${selectedEntity.company.key}`
-      : selectedEntity.person.key
-    : null;
+  const entityContactKey =
+    selectedEntity && selectedEntity.type !== "local"
+      ? selectedEntity.type === "company"
+        ? `co:${selectedEntity.company.key}`
+        : selectedEntity.person.key
+      : null;
   const resolveSelectedEntityContact = () => {
     if (!selectedEntity) return;
     if (selectedEntity.type === "company") void resolveCompanyContact(selectedEntity.company);
-    else void resolvePersonContact(selectedEntity.person);
-  };
-  const deepEnrichSelectedEntity = () => {
-    if (!selectedEntity) return;
-    if (selectedEntity.type === "company") {
-      void resolveCompanyContact(selectedEntity.company, false, true);
-    } else {
-      void resolvePersonContact(selectedEntity.person, false, true);
-    }
+    else if (selectedEntity.type === "person") void resolvePersonContact(selectedEntity.person);
   };
 
   // Auto free-only enrich when opening a company with a domain and no contacts yet.
@@ -444,13 +568,8 @@ function DiscoverPage() {
   const composerRef = useRef<ComposerHandle>(null);
   const isMobile = useIsMobile();
 
-  const shownLeads = freshness === "all" ? leads : leads.filter((l) => inWindow(l));
-
-  // The chip scopes the POSTS feed, not the entity tabs.
-  //
-  // Companies and People answer "who is worth contacting", and that does not
-  // expire on the same clock as a forum thread: a role opened four days ago is
-  // still open. Applying the freshness chip here emptied both tabs (ATS caps at 7d).
+  // No freshness gating: every result shows, newest or not.
+  const shownLeads = leads;
   const shownCompanies = companies;
   const shownPeople = people;
 
@@ -464,6 +583,8 @@ function DiscoverPage() {
           query: plain,
           context: searchContext,
           ...(clarify ? { clarify } : {}),
+          tier,
+          thinker,
         },
       });
     },
@@ -485,17 +606,19 @@ function DiscoverPage() {
       setCompanies(cos);
       setPeople(ppl);
       setLocalRows(locs);
-      // Seed published in-post contacts so Resolve isn't required to see them.
+      // Seed known contacts so Show contact isn't needed to see them. Honest
+      // provenance only — no "in database" framing, just the state of the
+      // email/phone we already hold.
       const seeded: Record<string, ResolvedContactInfo> = {};
       for (const c of cos) {
         const email = c.inline_contacts?.emails?.[0];
         const phone = c.inline_contacts?.phones?.[0];
         if (email || phone) {
+          const fromDb = (c.platforms ?? []).includes("Investors");
           seeded[`co:${c.key}`] = {
             email,
             phone,
-            note: "Published in post",
-            verifyNote: "In-post (highest trust)",
+            note: fromDb ? "Verified contact" : "Published in post",
             status: "ok",
           };
         }
@@ -504,32 +627,30 @@ function DiscoverPage() {
         const email = p.inline_contacts?.emails?.[0];
         const phone = p.inline_contacts?.phones?.[0];
         if (email || phone) {
+          const fromDb = p.lead.source === "investors";
           seeded[p.key] = {
             email,
             phone,
-            note: "Published in post",
-            verifyNote: "In-post (highest trust)",
+            note: fromDb ? "Verified contact" : "Published in post",
             status: "ok",
           };
         }
       }
-      setContactByKey(seeded);
+      // MERGE (not replace): frozen turns keep rendering their seeded
+      // contacts; the map is global and keyed by row key.
+      setContactByKey((m) => ({ ...m, ...seeded }));
       setSelected(null);
       setSelectedEntity(null);
-      const aud = searchContext?.audience;
-      setResultTab(
-        aud === "people"
-          ? "people"
-          : aud === "companies" || aud === "agencies"
-            ? "companies"
-            : "posts",
-      );
       setActiveQuery(q);
       setSuggestions(res.suggestions ?? []);
       setQueryType(res.queryType ?? null);
       setRefinement((res as { refinement?: string }).refinement ?? "");
       qc.invalidateQueries({ queryKey: ["usage"] });
-      if (!posts.length && !cos.length && !ppl.length) {
+      qc.invalidateQueries({ queryKey: ["history"] });
+      const serverMessage = (res as { message?: string | null }).message;
+      if (serverMessage) {
+        toast.info(serverMessage);
+      } else if (!posts.length && !cos.length && !ppl.length) {
         toast.info("No buyer-signal posts found. Try a different angle.");
       }
     },
@@ -630,7 +751,8 @@ function DiscoverPage() {
     setCompanies([]);
     setPeople([]);
     setLocalRows([]);
-    setContactByKey({});
+    // contactByKey is GLOBAL: frozen turns still render their seeded
+    // contacts, so it's only wiped on a full conversation reset.
     setSelected(null);
     setSelectedEntity(null);
     setSuggestions([]);
@@ -646,9 +768,67 @@ function DiscoverPage() {
    * Asking after results was the wrong order: the first search is then the
    * wrong one and the user watches it run before being asked to fix it.
    */
+  // Deep-link + new-chat params: ?q= re-runs a history search, ?fresh=
+  // resets to a clean conversation (fixes same-route navigate no-ops).
+  const seenParamsRef = useRef("");
+  useEffect(() => {
+    const key = `${routeSearch.q ?? ""}|${routeSearch.fresh ?? ""}`;
+    if (!key || seenParamsRef.current === key) return;
+    seenParamsRef.current = key;
+    if (routeSearch.fresh) {
+      resetConversation();
+    } else if (routeSearch.q && routeSearch.q.trim() && routeSearch.q.trim() !== activeQuery) {
+      void beginSearch(routeSearch.q);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- param-driven entry only
+  }, [routeSearch.q, routeSearch.fresh]);
+
+  // Auto-scroll: the echoed user bubble and new panels come into view the
+  // frame they appear, matching ChatGPT-style conversation behavior.
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) el.scrollTo({ top: el.scrollHeight });
+  }, [turns.length, clarifyQs.length, runSearchMut.isPending]);
+
   const beginSearch = async (q: string) => {
     const trimmed = q.trim();
     if (!trimmed) return;
+    // User bubble first: the submitted text lives in the conversation from
+    // this instant, independent of whatever happens downstream. The PREVIOUS
+    // turn's workspace is frozen into its own record first — that's what
+    // keeps earlier inputs showing their outputs (ChatGPT-style transcript).
+    setTurns((prev) => {
+      const withSnapshot = prev.map((t, i) => {
+        if (i !== prev.length - 1 || t.results) return t;
+        const hasRows = leads.length > 0 || companies.length > 0 || people.length > 0 || localRows.length > 0;
+        if (!hasRows) return t;
+        return {
+          ...t,
+          results: {
+            leads: [...leads],
+            companies: [...companies],
+            people: [...people],
+            local: [...localRows],
+          },
+        };
+      });
+      // Collapse: keep the last KEEP_FULL_TURNS turns' results in memory.
+      const appended = [...withSnapshot, { id: turnId(), text: trimmed }];
+      const keepFrom = appended.length - KEEP_FULL_TURNS;
+      return appended.map((t, i) => {
+        if (i >= keepFrom || !t.results) return t;
+        return {
+          ...t,
+          results: undefined,
+          counts: {
+            posts: t.results.leads.length,
+            companies: t.results.companies.length,
+            people: t.results.people.length,
+            local: t.results.local.length,
+          },
+        };
+      });
+    });
     // New research starts with a clean screen — never leave the previous
     // answer underneath the clarifier or the hunting steps.
     clearWorkspace();
@@ -659,23 +839,34 @@ function DiscoverPage() {
     // hunting while the old sales cards were still on screen.
     setClarifyAnswers(null);
     setDefaultSummary("");
-    setActiveVertical(detectSearchVertical(trimmed));
     try {
       const plain = toPlainSearchQuery(trimmed) || trimmed;
-      const [{ classifyQuery }, clarifier] = await Promise.all([
-        import("@/lib/search/query-classifier"),
-        import("@/lib/search/clarifier"),
-      ]);
+      const [{ classifyQuery }, clarifier, { tokenizeInput }, { resolveSearchVertical }] =
+        await Promise.all([
+          import("@/lib/search/query-classifier"),
+          import("@/lib/search/clarifier"),
+          import("@/lib/search/tokenize-input"),
+          import("@/lib/search/vertical"),
+        ]);
+      // Canonical vertical from the SAME resolver the server routes with —
+      // narration and pipeline can never disagree ("investor" category must
+      // win even when the hunt regex misses filler like "find ME investors").
+      setActiveVertical(resolveSearchVertical(trimmed));
+      const tokens = tokenizeInput(plain);
+      setPlanTokens(tokens);
       const classified = classifyQuery(plain);
       if (clarifier.shouldClarify(classified)) {
         // Dynamic AI questions first (per-input, memory-aware), hardcoded as fallback.
         // Server-fn call — never import `.server` modules from this client
         // component (their node builtins break the browser bundle / Vercel build).
+        // Deterministic tokens travel along as un-overridable facts.
         let questions: ClarifyQuestion[] = [];
         try {
           const res = await askDynamicQuestions({
             data: {
               query: plain,
+              tokens,
+              thinker,
               memory: {
                 service: searchContext?.service ?? null,
                 niche: searchContext?.niche ?? null,
@@ -695,12 +886,19 @@ function DiscoverPage() {
         }
         if (!questions.length) {
           questions = clarifier.buildClarifyingQuestions(classified, {
-            hasLocation: !!classified.location,
+            hasLocation: !!classified.location || !!searchContext?.location,
+            known: {
+              stage: tokens.stage,
+              sector: tokens.sector,
+              geo: tokens.geo ?? searchContext?.location ?? null,
+            },
+            niche: searchContext?.niche ?? null,
           }) as ClarifyQuestion[];
         }
         // Empty question list = nothing left to ask (all dims inferred).
         if (questions.length) {
           setPendingQuery(trimmed);
+          setPlanDone(false);
           setClarifyQs(questions as ClarifyQuestion[]);
           setDefaultSummary(clarifier.applyClarifyAnswers(classified, {}).summary ?? "");
           setActiveQuery(trimmed);
@@ -719,8 +917,13 @@ function DiscoverPage() {
     const text = input.trim();
     if (!text) return;
     if (mode === "search") {
-      void beginSearch(text);
       setInput("");
+      // Hardened: a freak throw must toast, never swallow the query silently.
+      void beginSearch(text).catch((e: unknown) => {
+        console.error("[discover] beginSearch failed", e);
+        toast.error(friendlyErrorText(e, "Search failed to start"));
+        setInput(text);
+      });
     } else {
       setChatOpen(true);
       const next: ChatTurn[] = [...chatLog, { role: "user", content: text }];
@@ -739,8 +942,130 @@ function DiscoverPage() {
 
   const pending = runSearchMut.isPending || chatMut.isPending;
   const hasResults = leads.length > 0 || activeQuery !== null;
-  const idle = !hasResults && !runSearchMut.isPending;
+  // A submitted turn starts the conversation instantly: the echoed user
+  // bubble renders on the next frame, never held until the clarifier
+  // round-trip finishes (ChatGPT-style echo).
+  const idle = !hasResults && !runSearchMut.isPending && turns.length === 0;
   const showHero = idle;
+
+  /** One full result feed (People → Companies → Posts → Local) — rendered for
+   *  the active workspace AND for frozen transcript turns. */
+  const renderResultSections = (rows: {
+    leads: Lead[];
+    companies: CompanyRow[];
+    people: PersonRow[];
+    local: LocalBusinessRow[];
+  }) => (
+    <>
+      {rows.people.length > 0 && (
+        <div className="space-y-3 pb-4">
+          {viewMode === "table" ? (
+            <PersonTable
+              rows={rows.people}
+              onOpen={(row) => {
+                setSelected(null);
+                setSelectedEntity({ type: "person", person: row });
+              }}
+              onGenerate={(row, kind) =>
+                setGenTarget({
+                  kind,
+                  vertical: "investor",
+                  name: row.name,
+                  firm: row.company_hint,
+                  role: row.title_hint ?? row.role_hint ?? undefined,
+                  location: row.location_hint ?? undefined,
+                  email: row.inline_contacts?.emails?.[0],
+                  whyMatch: row.why_match ?? undefined,
+                  investorStage: raiseStage,
+                  investorSector: raiseSector,
+                })
+              }
+            />
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              {rows.people.map((p) => (
+                <PersonCard
+                  key={p.key}
+                  row={p}
+                  onOpen={(row) => {
+                    setSelected(null);
+                    setSelectedEntity({ type: "person", person: row });
+                  }}
+                  contact={contactByKey[p.key]}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+      {rows.companies.length > 0 && (
+        <div className="space-y-3 pb-4">
+          {viewMode === "table" ? (
+            <CompanyTable
+              rows={rows.companies}
+              onOpen={(row) => {
+                setSelected(null);
+                setSelectedEntity({ type: "company", company: row });
+              }}
+              onGenerate={openGenerateForCompany}
+            />
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              {rows.companies.map((c) => (
+                <CompanyCard
+                  key={c.key}
+                  row={c}
+                  onOpen={(row) => {
+                    setSelected(null);
+                    setSelectedEntity({ type: "company", company: row });
+                  }}
+                  contact={contactByKey[`co:${c.key}`]}
+                  onGenerate={openGenerateForCompany}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+      {rows.leads.length > 0 && (
+        <div className="space-y-3 pb-4">
+          {viewMode === "table" ? (
+            <PostsList leads={rows.leads} onOpen={setSelected} />
+          ) : (
+            <PostsGrid
+              leads={rows.leads}
+              savedByUrl={savedByUrl}
+              onOpen={setSelected}
+              onSave={(l) => saveMut.mutate(l)}
+            />
+          )}
+        </div>
+      )}
+      {rows.local.length > 0 && (
+        <div className="space-y-3 pb-4">
+          {viewMode === "table" ? (
+            <LocalListRows
+              rows={rows.local}
+              onOpen={(row) => {
+                setSelected(null);
+                setSelectedEntity({ type: "local", local: row });
+              }}
+              onGenerate={openGenerateForLocal}
+            />
+          ) : (
+            <LocalBusinessesGrid
+              rows={rows.local}
+              onOpen={(row) => {
+                setSelected(null);
+                setSelectedEntity({ type: "local", local: row });
+              }}
+              onGenerate={openGenerateForLocal}
+            />
+          )}
+        </div>
+      )}
+    </>
+  );
   // First-visit guided tour: plays once, only on the home view, never on top
   // of the onboarding wizard, and only for genuinely new accounts (signed up
   // within NEW_USER_WINDOW_MS). Existing users never see it.
@@ -791,7 +1116,7 @@ function DiscoverPage() {
   return (
     <div className="h-full flex min-h-0 bg-[#0a0a0b] text-white">
       <div className="flex-1 min-w-0 flex flex-col min-h-0">
-        <div className="flex-1 min-h-0 overflow-y-auto px-4 md:px-6">
+        <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto px-4 md:px-6">
           {showOnboarding ? (
             // min-h-full (not h-full) + flex-col: when the content is taller
             // than the scroll container it grows and scrolls from the top
@@ -814,6 +1139,84 @@ function DiscoverPage() {
             </div>
           ) : (
             <div className="max-w-4xl mx-auto py-4 md:py-6 space-y-5 md:space-y-6">
+              {/* Conversation transcript: each turn = user bubble + its own
+                  frozen results (or a collapsed count line for old turns).
+                  The ACTIVE turn's live workspace renders below the map. */}
+              {turns.map((t, i) => {
+                const isLast = i === turns.length - 1;
+                return (
+                  <div key={t.id} className="space-y-4">
+                    <div className="flex justify-end">
+                      <div className="max-w-[85%] rounded-2xl rounded-br-md bg-primary/15 border border-primary/25 px-3.5 py-2 text-sm text-foreground">
+                        {t.text}
+                      </div>
+                    </div>
+                    {t.results && renderResultSections(t.results)}
+                    {t.counts && !t.results && (
+                      <div className="text-xs text-muted-foreground">
+                        {[
+                          t.counts.people ? `${t.counts.people} people` : "",
+                          t.counts.companies ? `${t.counts.companies} companies` : "",
+                          t.counts.posts ? `${t.counts.posts} posts` : "",
+                          t.counts.local ? `${t.counts.local} local` : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" · ") || "No results"}{" "}
+                        — run the search again to reload.
+                      </div>
+                    )}
+                    {isLast && clarifyQs.length > 0 && !runSearchMut.isPending && (
+                      <SearchingPlan
+                        key={`plan-${pendingQuery ?? activeQuery ?? "idle"}`}
+                        tokens={planTokens}
+                        vertical={activeVertical ?? "general"}
+                        onDone={() => setPlanDone(true)}
+                      />
+                    )}
+                    {isLast &&
+                      clarifyQs.length > 0 &&
+                      planDone &&
+                      !runSearchMut.isPending && (
+                        <ClarifyPanel
+                          questions={clarifyQs}
+                          refinement={defaultSummary || refinement}
+                          disabled={runSearchMut.isPending}
+                          onDismiss={() => {
+                            setClarifyQs([]);
+                            const q = pendingQuery;
+                            setPendingQuery(null);
+                            if (q) runSearchMut.mutate({ query: q, clarify: null });
+                          }}
+                          onApply={(answers) => {
+                            setClarifyAnswers(answers);
+                            setClarifyQs([]);
+                            const q = pendingQuery ?? activeQuery;
+                            setPendingQuery(null);
+                            // Pass clarify into mutate vars — do not rely on setState timing.
+                            if (q) runSearchMut.mutate({ query: q, clarify: answers });
+                          }}
+                        />
+                      )}
+                    {isLast && runSearchMut.isPending && (
+                      <SearchingSteps
+                        query={displaySearchLabel(
+                          (typeof runSearchMut.variables === "string"
+                            ? runSearchMut.variables
+                            : runSearchMut.variables?.query) ??
+                            activeQuery ??
+                            "",
+                        )}
+                        goal={searchContext?.goal}
+                        audience={searchContext?.audience}
+                        vertical={activeVertical}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+
+              {/* Active-turn header: watch/clear + Cards|Lists for the live
+                  workspace (frozen turns render read-only above). */}
               {activeQuery &&
                 clarifyQs.length === 0 &&
                 !runSearchMut.isPending &&
@@ -836,6 +1239,8 @@ function DiscoverPage() {
                       <button
                         onClick={() => {
                           clearWorkspace();
+                          setTurns([]);
+                          setPlanTokens(null);
                           setActiveQuery(null);
                           setClarifyAnswers(null);
                           setClarifyQs([]);
@@ -858,180 +1263,24 @@ function DiscoverPage() {
                   people.length > 0 ||
                   localRows.length > 0) && (
                   <div className="flex flex-wrap items-center gap-2">
-                    <ResultTabPills
-                      tab={resultTab}
-                      onChange={setResultTab}
-                      counts={{
-                        posts: shownLeads.length,
-                        companies: shownCompanies.length,
-                        people: shownPeople.length,
-                        local: localRows.length,
-                      }}
-                      visible={
-                        searchContext?.audience === "people"
-                          ? ["people"]
-                          : searchContext?.audience === "companies" ||
-                              searchContext?.audience === "agencies"
-                            ? ["companies", "local"]
-                            : undefined
-                      }
-                    />
-                    {(resultTab === "companies" || resultTab === "people") && (
+                    <div className="ml-auto">
                       <ViewToggle view={viewMode} onChange={setViewMode} />
-                    )}
-                    <div className="inline-flex rounded-full border border-border p-0.5 bg-muted/40 ml-auto">
-                      {(
-                        [
-                          ["24h", "24h"],
-                          ["all", "All"],
-                        ] as const
-                      ).map(([id, label]) => (
-                        <button
-                          key={id}
-                          type="button"
-                          onClick={() => setFreshness(id)}
-                          className={`px-2.5 py-1 rounded-full text-[11px] transition-colors ${
-                            freshness === id
-                              ? "bg-background text-foreground shadow-sm"
-                              : "text-muted-foreground hover:text-foreground"
-                          }`}
-                        >
-                          {label}
-                        </button>
-                      ))}
                     </div>
                   </div>
                 )}
 
-              {clarifyQs.length > 0 && !runSearchMut.isPending && (
-                <ClarifyPanel
-                  questions={clarifyQs}
-                  refinement={defaultSummary || refinement}
-                  disabled={runSearchMut.isPending}
-                  onDismiss={() => {
-                    setClarifyQs([]);
-                    const q = pendingQuery;
-                    setPendingQuery(null);
-                    if (q) runSearchMut.mutate({ query: q, clarify: null });
-                  }}
-                  onApply={(answers) => {
-                    setClarifyAnswers(answers);
-                    setClarifyQs([]);
-                    const q = pendingQuery ?? activeQuery;
-                    setPendingQuery(null);
-                    // Pass clarify into mutate vars — do not rely on setState timing.
-                    if (q) runSearchMut.mutate({ query: q, clarify: answers });
-                  }}
-                />
-              )}
-
-              {runSearchMut.isPending && (
-                <SearchingSteps
-                  query={displaySearchLabel(
-                    (typeof runSearchMut.variables === "string"
-                      ? runSearchMut.variables
-                      : runSearchMut.variables?.query) ??
-                      activeQuery ??
-                      "",
-                  )}
-                  goal={searchContext?.goal}
-                  audience={searchContext?.audience}
-                  vertical={activeVertical}
-                />
-              )}
-
               {/* Previous results must not sit under the clarifier or the
                   hunting steps — that was the reported bug. */}
-              {clarifyQs.length === 0 && !runSearchMut.isPending && (
-                <>
-                  {resultTab === "posts" && (
-                    <PostsGrid
-                      leads={shownLeads}
-                      savedByUrl={savedByUrl}
-                      onOpen={setSelected}
-                      onSave={(l) => saveMut.mutate(l)}
-                    />
-                  )}
-                  {resultTab === "companies" &&
-                    (viewMode === "table" && shownCompanies.length ? (
-                      <div className="pb-4">
-                        <CompanyTable
-                          rows={shownCompanies}
-                          onOpen={(row) => {
-                            setSelected(null);
-                            setSelectedEntity({ type: "company", company: row });
-                          }}
-                        />
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 pb-4">
-                        {shownCompanies.map((c) => (
-                          <CompanyCard
-                            key={c.key}
-                            row={c}
-                            onOpen={(row) => {
-                              setSelected(null);
-                              setSelectedEntity({ type: "company", company: row });
-                            }}
-                            contactBusy={contactBusyKey === `co:${c.key}`}
-                            contact={contactByKey[`co:${c.key}`]}
-                            onResolveContact={resolveCompanyContact}
-                          />
-                        ))}
-                        {!companies.length && (
-                          <p className="text-sm text-muted-foreground col-span-full">
-                            No companies could be confidently identified from these signals yet.
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  {resultTab === "people" &&
-                    (viewMode === "table" && shownPeople.length ? (
-                      <div className="pb-4">
-                        <PersonTable
-                          rows={shownPeople}
-                          onOpen={(row) => {
-                            setSelected(null);
-                            setSelectedEntity({ type: "person", person: row });
-                          }}
-                        />
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 pb-4">
-                        {shownPeople.map((p) => (
-                          <PersonCard
-                            key={p.key}
-                            row={p}
-                            onOpen={(row) => {
-                              setSelected(null);
-                              setSelectedEntity({ type: "person", person: row });
-                            }}
-                            contactBusy={contactBusyKey === p.key}
-                            contact={contactByKey[p.key]}
-                            onAccessContact={resolvePersonContact}
-                          />
-                        ))}
-                        {!people.length && (
-                          <p className="text-sm text-muted-foreground col-span-full">
-                            No people identified yet — job-board listings are company-authored, so
-                            people show up when signals come from posts by real authors.
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  {resultTab === "local" &&
-                    (localRows.length ? (
-                      <LocalBusinessesGrid rows={localRows} />
-                    ) : (
-                      <p className="text-sm text-muted-foreground pb-4">
-                        No local businesses in this search. Try a place + category (e.g. plumbers in
-                        Texas), or use the Local businesses page for a dedicated hunt.
-                      </p>
-                    ))}
-                </>
-              )}
+              {/* Single unified feed: every non-empty section stacks, no tabs. */}
+              {clarifyQs.length === 0 && !runSearchMut.isPending &&
+                renderResultSections({
+                  people: shownPeople,
+                  companies: shownCompanies,
+                  leads: shownLeads,
+                  local: localRows,
+                })}
 
-              {/* `activeQuery` is set the moment the clarifier opens (so the
+                          {/* `activeQuery` is set the moment the clarifier opens (so the
                   header reads correctly), which made this empty-state render
                   UNDER the questions — telling the user nothing was found before
                   the search had even run. No results box while clarifying. */}
@@ -1040,19 +1289,30 @@ function DiscoverPage() {
                 activeQuery &&
                 leads.length === 0 &&
                 companies.length === 0 &&
-                people.length === 0 && (
+                people.length === 0 &&
+                localRows.length === 0 && (
                   <div className="rounded-xl border border-border bg-card p-6 text-sm text-muted-foreground space-y-3">
                     <div className="text-foreground font-medium">
-                      {queryType === "product"
-                        ? `No fresh public asks for a tool like "${displaySearchLabel(activeQuery)}" in the last day or two.`
-                        : `No fresh buyer-intent posts for "${displaySearchLabel(activeQuery)}" in the last day or two.`}
+                      {activeVertical === "local"
+                        ? `No local businesses found for "${displaySearchLabel(activeQuery)}".`
+                        : queryType === "product"
+                          ? `No fresh public asks for a tool like "${displaySearchLabel(activeQuery)}" in the last day or two.`
+                          : `No fresh buyer-intent posts for "${displaySearchLabel(activeQuery)}" in the last day or two.`}
                     </div>
-                    <div>
-                      {queryType === "product"
-                        ? "We look for posts where people recommend, compare, or ask for tools like yours."
-                        : "This means:"}
-                    </div>
-                    {queryType !== "product" && (
+                    {activeVertical === "local" && (
+                      <div>
+                        We scanned the local business database and live directories for that
+                        place. Try a nearby larger city, or check the spelling of the town.
+                      </div>
+                    )}
+                    {activeVertical !== "local" && (
+                      <div>
+                        {queryType === "product"
+                          ? "We look for posts where people recommend, compare, or ask for tools like yours."
+                          : "This means:"}
+                      </div>
+                    )}
+                    {activeVertical !== "local" && queryType !== "product" && (
                       <ul className="list-disc pl-5 space-y-1">
                         <li>
                           No one posted publicly asking for this in the last few hours to two days.
@@ -1131,7 +1391,7 @@ function DiscoverPage() {
             contact={entityContactKey ? contactByKey[entityContactKey] : undefined}
             contactBusy={!!entityContactKey && contactBusyKey === entityContactKey}
             onResolveContact={resolveSelectedEntityContact}
-            onDeepEnrich={deepEnrichSelectedEntity}
+            onGenerate={(kind) => openGenerateForEntity(kind)}
           />
         </div>
       )}
@@ -1158,12 +1418,39 @@ function DiscoverPage() {
               contact={entityContactKey ? contactByKey[entityContactKey] : undefined}
               contactBusy={!!entityContactKey && contactBusyKey === entityContactKey}
               onResolveContact={resolveSelectedEntityContact}
-              onDeepEnrich={deepEnrichSelectedEntity}
+              onGenerate={(kind) => openGenerateForEntity(kind)}
             />
           ) : null}
         </SheetContent>
       </Sheet>
       {showTour && <GuidedTour userId={userId} onDone={() => setTourSeen(true)} />}
+      {genTarget && (
+        <GenerateModal
+          lead={{
+            vertical: genTarget.vertical,
+            name: genTarget.name,
+            firm: genTarget.firm,
+            role: genTarget.role,
+            location: genTarget.location,
+            whyMatch: genTarget.whyMatch,
+            whyNow: genTarget.whyNow,
+            platform: genTarget.platform,
+            category: genTarget.category,
+            address: genTarget.address,
+            noWebsite: genTarget.noWebsite,
+            seoPoor: genTarget.seoPoor,
+          }}
+          kind={genTarget.kind}
+          sender={{
+            name: greetingName || undefined,
+            service: activeProject?.service ?? undefined,
+            stage: genTarget.investorStage,
+            sector: genTarget.investorSector,
+          }}
+          toEmail={genTarget.email}
+          onClose={() => setGenTarget(null)}
+        />
+      )}
     </div>
   );
 }

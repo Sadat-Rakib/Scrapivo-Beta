@@ -21,6 +21,7 @@ const FALLBACK: GenResponse = {
 export async function generateQuestions(
   slots: Slots,
   memory: UserMemory = {},
+  opts?: { maxTokens?: number },
 ): Promise<ClarifyQuestion[]> {
   // Suppress slots already answered by memory (structured fields or freeform context)
   const context =
@@ -43,7 +44,7 @@ export async function generateQuestions(
       ),
       json: true,
       temperature: 0.6,
-      maxTokens: 800,
+      maxTokens: opts?.maxTokens ?? 800,
     });
     const parsed = GenResponseSchema.safeParse(safeJsonParse(out));
     const data = parsed.success ? parsed.data : FALLBACK;

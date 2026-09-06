@@ -3003,34 +3003,74 @@ export function HeroSection({ cta, ctaLabel }: { cta: string; ctaLabel?: string 
                 What is Scrapivo?
               </AccordionTrigger>
               <AccordionContent className="text-[#f3f1ec]/60 text-xs leading-relaxed pb-5">
-                Scrapivo is an AI-powered B2B lead generation platform that discovers and qualifies
-                buyer intent in real-time.
+                Scrapivo is the world&rsquo;s first AI powered lead generation and sales system that
+                finds relevant leads in real time, tells you why they matter, and can reach out to
+                them for you. It helps turn lead generation from a manual, time consuming process
+                into an automated system for finding and engaging your next customers.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-2" className="scravipo-faq-item">
               <AccordionTrigger className="text-sm hover:no-underline hover:text-white text-[#f3f1ec]/90 py-4 font-semibold tracking-[-0.02em]">
-                How does it source leads?
+                Why does Scrapivo exist?
               </AccordionTrigger>
               <AccordionContent className="text-[#f3f1ec]/60 text-xs leading-relaxed pb-5">
-                We scan the open web, including news, job boards, and company updates, to find
-                high-intent signals.
+                Find qualified prospects faster, spend less time searching, and start more
+                conversations with people who actually need what you sell. Instead of switching
+                between platforms with missing contacts, incomplete information, and limited
+                coverage, Scrapivo brings it all together, finds relevant leads from across the web,
+                and reaches out to them for you.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-3" className="scravipo-faq-item">
               <AccordionTrigger className="text-sm hover:no-underline hover:text-white text-[#f3f1ec]/90 py-4 font-semibold tracking-[-0.02em]">
-                Is there a free tier?
+                How does it source leads?
               </AccordionTrigger>
               <AccordionContent className="text-[#f3f1ec]/60 text-xs leading-relaxed pb-5">
-                Yes, you can join the Inner Circle and start exploring basic signals for free.
+                Scrapivo continuously monitors publicly available websites, directories,
+                communities, government sources, social platforms, datasets, and more to discover
+                relevant prospects. Our AI looks for the signals and context that indicate who needs
+                what you sell; and why.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-4" className="scravipo-faq-item">
               <AccordionTrigger className="text-sm hover:no-underline hover:text-white text-[#f3f1ec]/90 py-4 font-semibold tracking-[-0.02em]">
+                Is there a free tier?
+              </AccordionTrigger>
+              <AccordionContent className="text-[#f3f1ec]/60 text-xs leading-relaxed pb-5">
+                Yes; and it&rsquo;s actually powerful. Start for free, find real opportunities,
+                generate value, and upgrade when you&rsquo;re ready to scale.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-5" className="scravipo-faq-item">
+              <AccordionTrigger className="text-sm hover:no-underline hover:text-white text-[#f3f1ec]/90 py-4 font-semibold tracking-[-0.02em]">
                 How is this different from other lead-gen tools?
               </AccordionTrigger>
               <AccordionContent className="text-[#f3f1ec]/60 text-xs leading-relaxed pb-5">
-                Instead of stale databases, we provide verified, real-time signals with explicit
-                context on why you should reach out.
+                <p>
+                  Stop wasting money on huge lists of random leads that are incomplete, hard to
+                  qualify, or simply not a fit.
+                </p>
+                <p className="mt-2">
+                  Scrapivo helps you find the right prospects, understand why they need you, see the
+                  signals behind their intent, and reach them from one AI powered sales system, so
+                  you can fill your pipeline with high intent opportunities, close more customers,
+                  and directly grow your revenue.
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-6" className="scravipo-faq-item">
+              <AccordionTrigger className="text-sm hover:no-underline hover:text-white text-[#f3f1ec]/90 py-4 font-semibold tracking-[-0.02em]">
+                How do I contact support?
+              </AccordionTrigger>
+              <AccordionContent className="text-[#f3f1ec]/60 text-xs leading-relaxed pb-5">
+                Need help? Email us at{" "}
+                <a
+                  href="mailto:mirsadat@scrapivo.com"
+                  className="underline underline-offset-2 hover:text-white transition-colors"
+                >
+                  mirsadat@scrapivo.com
+                </a>{" "}
+                and our team will get back to you as soon as possible.
               </AccordionContent>
             </AccordionItem>
           </Accordion>

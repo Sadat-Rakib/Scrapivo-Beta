@@ -183,7 +183,7 @@ export type LeadSegments = {
   local: LocalBusinessRow[];
 };
 
-const LOCAL_SOURCES = new Set(["osm", "geoapify", "foursquare", "coreclaw_maps", "smb"]);
+const LOCAL_SOURCES = new Set(["osm", "geoapify", "foursquare", "coreclaw_maps", "smb", "overture"]);
 
 /** Build Local Businesses tab from Places/OSM leads (not dumped into Posts). */
 export function buildLocalBusinesses(rawLeads: Lead[]): LocalBusinessRow[] {
@@ -949,8 +949,17 @@ function isBuyerPersonLead(lead: Lead): boolean {
   if (isFieldDecisionMaker(lead) && !SEEKER_PHRASE_RE.test(text)) return true;
   if (SEEKER_PHRASE_RE.test(text) && !BUYER_PHRASE_RE.test(text)) return false;
   if (BUYER_PHRASE_RE.test(text)) return true;
-  // Warm tier with a real author still counts — Posts already passed buyer gates.
-  return (lead.score ?? 0) >= 45 || lead.tier === "hot" || lead.tier === "warm";
+  // Warm/hot tier needs at least one REAL identity signal beyond a bare
+  // platform handle (decision-maker role, company, LinkedIn, or published
+  // contact) — otherwise the lead stays a Post instead of becoming a
+  // dash-filled People row you can't actually qualify.
+  const hasIdentity =
+    isFieldDecisionMaker(lead) ||
+    !!roleHint(lead) ||
+    !!extractCompanyFromLead(lead) ||
+    !!linkedInPersonUrl(lead) ||
+    !!(lead.inline_contacts?.emails?.length || lead.inline_contacts?.phones?.length);
+  return hasIdentity && ((lead.score ?? 0) >= 45 || lead.tier === "hot" || lead.tier === "warm");
 }
 
 function isPersonLead(lead: Lead): boolean {
@@ -1219,6 +1228,9 @@ export function segmentLeads(rawLeads: Lead[], opts?: { craft?: string }): LeadS
       };
     })
     .sort((a, b) => b.score - a.score || b.signal_count - a.signal_count)
+    // Social gate — a row with no reachable profile/site is noise, never a
+    // lead. Every displayed company has at least one real link.
+    .filter((c) => !!(c.linkedin_url || c.twitter_url || c.facebook_url || c.website || c.domain))
     .slice(0, 150);
 
   /**
@@ -1297,6 +1309,10 @@ export function segmentLeads(rawLeads: Lead[], opts?: { craft?: string }): LeadS
       const dm = (isFieldDecisionMaker(b.lead) ? 8 : 0) - (isFieldDecisionMaker(a.lead) ? 8 : 0);
       return b.score - a.score || dm;
     })
+    // Social gate — the Social column must never be empty: every displayed
+    // person has at least one real profile link (LinkedIn, GitHub, or the
+    // platform author profile).
+    .filter((p) => !!(p.linkedin_url || p.author_url || p.github_url))
     .slice(0, 150);
 
   return { posts, companies, people, local: buildLocalBusinesses(leads) };

@@ -114,6 +114,7 @@ export type SearchParams = {
     maxAgeHours?: number;
     explicitExperience?: boolean;
     location?: string | null;
+    localOpportunity?: string | null;
   };
 };
 
@@ -3237,6 +3238,46 @@ async function searchAllSourcesInner(
   // the wrong response: fall through to the normal buyer-intent fan-out, which
   // needs no location and is what the user almost certainly meant.
   if (directoryMode && loc) {
+    // DB-first: the Overture local-business extract answers from disk when it
+    // covers the ask (93k+ rows for loaded regions, instant, zero network).
+    // Below the threshold the file rows blend into the live waterfall.
+    let fileLeads: SourceLead[] = [];
+    try {
+      const { searchLocalBusinessFileLeads } = await import("../local/businesses-file-source");
+      // extraCrafts: raw-query words as fallback crafts — the classifier's
+      // coreSkill can latch onto the wrong token ("web" out of "no web
+      // presence") while "plumbers" sits right there in the input.
+      const locWords = new Set(loc.toLowerCase().split(/[^a-z]+/));
+      const extraCrafts = (classified.raw || "")
+        .toLowerCase()
+        .split(/[^a-z]+/)
+        .filter(
+          (w) =>
+            w.length >= 4 &&
+            !locWords.has(w) &&
+            !/^(with|without|near|presence|website|web|that|have|from|this|they|their)$/i.test(w),
+        );
+      fileLeads = (await searchLocalBusinessFileLeads({
+        craft: classified.coreSkill,
+        extraCrafts,
+        opportunity: prefs?.localOpportunity ?? null,
+        location: loc,
+      })) as SourceLead[];
+    } catch (e) {
+      console.warn("[sources] local business file source failed", e);
+    }
+    const DB_FIRST_MIN = 25;
+    if (fileLeads.length >= DB_FIRST_MIN) {
+      return finishSearch(
+        fileLeads,
+        new Set(["localbiz_file"]),
+        { localbiz_file: fileLeads.length },
+        classified,
+        qx,
+        {},
+      );
+    }
+
     const dirTasks: Array<Promise<SourceLead[]>> = [
       withBudget(searchLocalBusinesses(qx, loc, { directoryMode: true, min: 10 }), []),
       withBudget(searchOsmLocalBusinesses(qx, loc), []),
@@ -3248,9 +3289,11 @@ async function searchAllSourcesInner(
       dirNames.push("serpapi", "tavily");
     }
     const settled = await Promise.allSettled(dirTasks);
-    const all: SourceLead[] = [];
-    const sourcesPresent = new Set<string>();
-    const sourceCounts: Record<string, number> = {};
+    const all: SourceLead[] = [...fileLeads];
+    const sourcesPresent = new Set<string>(fileLeads.length ? ["localbiz_file"] : []);
+    const sourceCounts: Record<string, number> = fileLeads.length
+      ? { localbiz_file: fileLeads.length }
+      : {};
     settled.forEach((r, i) => {
       if (r.status === "fulfilled" && r.value.length) {
         all.push(...r.value);
@@ -3886,7 +3929,16 @@ async function finishSearch(
 
   // Skill relevance — for directory mode, Places leads already match ICP/location
   const relevant = deJunked.filter((l) => {
-    if (directoryMode && (l.source === "geoapify" || l.source === "foursquare")) return true;
+    if (
+      directoryMode &&
+      (l.source === "geoapify" ||
+        l.source === "foursquare" ||
+        l.source === "overture" ||
+        l.source === "osm" ||
+        l.source === "localbiz")
+    ) {
+      return true;
+    }
     const text = `${l.title} ${l.snippet}`;
     return isRelevantAtSource(text, classified, qx);
   });
@@ -3931,7 +3983,14 @@ async function finishSearch(
       // Directory SMB boost
       let s = score;
       const reasonsOut = [...reasons];
-      if (directoryMode && (l.source === "geoapify" || l.source === "foursquare")) {
+      if (
+        directoryMode &&
+        (l.source === "geoapify" ||
+          l.source === "foursquare" ||
+          l.source === "overture" ||
+          l.source === "osm" ||
+          l.source === "localbiz")
+      ) {
         s = Math.min(100, Math.max(s, 55) + 10);
       }
       // Title-level skill gating: a dedicated "<skill> role" outranks a post
@@ -4087,6 +4146,7 @@ async function finishSearch(
           src === "workatastartup" ||
           src === "geoapify" ||
           src === "foursquare" ||
+          src === "overture" ||
           src === "news";
         if (companyish) return l;
 

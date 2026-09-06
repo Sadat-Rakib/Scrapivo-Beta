@@ -7,12 +7,9 @@ import type { ClarifyQuestion, ClarifyAnswers } from "@/lib/search/clarifier";
 // =====================================================================
 // Clarifying questions — one at a time, always skippable.
 //
-// Shown BESIDE results, never instead of them. The search has already run by
-// the time this renders; answering re-runs it with real targeting. That
-// ordering matters: a form that blocks results is a worse product than a
-// slightly-wrong result you can refine, and it's the reason Unify's flow works
-// (it's confirming before spending credits) but a blocking form here wouldn't
-// (we have nothing to spend).
+// Shown INSTEAD of results, before the search runs: answering (or skipping)
+// fires the one targeted search. Rendered exclusively — never alongside
+// results or the searching steps.
 //
 // Every question carries a recommended default, so "Skip" is never a dead end —
 // it runs the search a careful operator would have run.

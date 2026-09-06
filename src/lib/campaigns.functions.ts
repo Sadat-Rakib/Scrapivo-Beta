@@ -105,7 +105,12 @@ export const runSignalWatch = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     if (!camp) throw new Error("Watch not found");
 
-    const result = await executeWatchSearch(context.supabase, context.userId, camp.query);
+    const result = await executeWatchSearch(
+      context.supabase,
+      context.userId,
+      camp.query,
+      context.user?.email,
+    );
 
     const icp = { ...((camp.icp as CampaignIcp) || {}) };
     icp.last_results_count = result.leads.length;
@@ -148,7 +153,12 @@ export const runDueSignalWatches = createServerFn({ method: "POST" })
 
     const results: Array<{ id: string; query: string; results_count: number }> = [];
     for (const camp of due) {
-      const result = await executeWatchSearch(context.supabase, context.userId, camp.query);
+      const result = await executeWatchSearch(
+        context.supabase,
+        context.userId,
+        camp.query,
+        context.user?.email,
+      );
       const icp = { ...((camp.icp as CampaignIcp) || {}) };
       icp.last_results_count = result.leads.length;
       icp.last_error = result.error ?? null;
@@ -170,6 +180,7 @@ async function executeWatchSearch(
   supabase: any,
   userId: string,
   query: string,
+  ownerEmail?: string,
 ): Promise<{
   leads: any[];
   error: string | null;
@@ -183,7 +194,7 @@ async function executeWatchSearch(
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("plan, searches_used, searches_reset_at, years_experience")
+    .select("plan, searches_used, searches_reset_at, years_experience, email")
     .eq("id", userId)
     .maybeSingle();
 
@@ -198,7 +209,11 @@ async function executeWatchSearch(
       .eq("id", userId);
   }
   const plan = profile?.plan ?? "free";
-  if (plan === "free" && used >= 5) {
+  const { isOwnerEmail } = await import("./owner");
+  // Owner identity from the auth session first (profiles.email can be null);
+  // fall back to the stored profile email for older callers.
+  const owner = isOwnerEmail(ownerEmail ?? (profile as { email?: string } | null)?.email ?? "");
+  if (!owner && plan === "free" && used >= 5) {
     return {
       leads: [],
       error: "limit",
@@ -230,10 +245,10 @@ async function executeWatchSearch(
     directoryMode: classified.intentMode === "directory_smb",
   });
 
-  await supabase
-    .from("profiles")
-    .update({ searches_used: used + 1 })
-    .eq("id", userId);
+  // Owner runs unlimited watches — never tick the daily counter.
+  if (!owner) {
+    await supabase.from("profiles").update({ searches_used: used + 1 }).eq("id", userId);
+  }
   await supabase.from("search_history").insert({
     user_id: userId,
     query: `[watch] ${query}`,

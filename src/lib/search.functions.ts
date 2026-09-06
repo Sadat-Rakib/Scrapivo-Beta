@@ -37,7 +37,18 @@ const Input = z.object({
   query: z.string().min(2).max(300),
   context: Context.optional(),
   clarify: ClarifyInput.optional(),
+  /** Search intensity: scrapy = normal, insane = deeper, crazy = maximum. */
+  tier: z.enum(["scrapy", "insane", "crazy"]).optional(),
+  /** Extended thinking: slower, more careful extraction + verification. */
+  thinker: z.boolean().optional(),
 });
+
+/** Tier budgets: result caps, score floor adjustment, enrich caps. */
+const TIER_CONFIG = {
+  scrapy: { poolMul: 1, minScoreBonus: 0, enrichCap: 6, investorCap: 40 },
+  insane: { poolMul: 1.5, minScoreBonus: -3, enrichCap: 10, investorCap: 60 },
+  crazy: { poolMul: 2, minScoreBonus: -5, enrichCap: 16, investorCap: 100 },
+} as const;
 
 export const runSearch = createServerFn({ method: "POST" })
   .middleware([requireMyAuth])
@@ -70,7 +81,10 @@ export const runSearch = createServerFn({ method: "POST" })
         .eq("id", userId);
     }
     const plan = profile?.plan ?? "free";
-    if (plan === "free" && used >= 5) {
+    // Owner bypass: unlimited searches, never quota-gated (see lib/owner.ts).
+    const { isOwnerEmail } = await import("./owner");
+    const isOwner = isOwnerEmail(context.user.email);
+    if (!isOwner && plan === "free" && used >= 5) {
       return {
         error: "limit",
         message: "Free plan: 5 searches per day. Try again tomorrow.",
@@ -81,6 +95,11 @@ export const runSearch = createServerFn({ method: "POST" })
       };
     }
 
+    const tierCfg = TIER_CONFIG[data.tier ?? "scrapy"];
+    const thinker = data.thinker ?? false;
+    if (thinker) console.info(`[discover] thinker on (tier=${data.tier ?? "scrapy"})`);
+    // AI relevance can set this later (slots.work_mode === "remote").
+    let remoteSignal = false;
     const classified = classifyQuery(data.query);
     // Structured project context ("the 75% info"): audience/goal steer source
     // routing; location fills in when the query itself didn't specify one.
@@ -134,10 +153,15 @@ export const runSearch = createServerFn({ method: "POST" })
     // ── Clarifying answers BEFORE expand so location/craft reshape queries ──
     const { applyClarifyAnswers, buildClarifyingQuestions, shouldClarify, extractStatedAudience } =
       await import("./search/clarifier");
+    const { tokenizeInput } = await import("./search/tokenize-input");
+    const queryTokens = tokenizeInput(data.query);
     const refinement = applyClarifyAnswers(classified, data.clarify ?? {});
     const clarifyQuestions =
       !data.clarify && shouldClarify(classified)
-        ? buildClarifyingQuestions(classified, { hasLocation: !!classified.location })
+        ? buildClarifyingQuestions(classified, {
+            hasLocation: !!classified.location,
+            known: { stage: queryTokens.stage, sector: queryTokens.sector },
+          })
         : [];
 
     const { buildSearchPlan, planUsesInvestorSeed, planNeedsLocalEnrichment } =
@@ -164,6 +188,25 @@ export const runSearch = createServerFn({ method: "POST" })
     if (classified.location) {
       const { normalizeLocalLocation } = await import("./local/city-gazetteer");
       classified.location = normalizeLocalLocation(classified.location);
+    }
+
+    // AI relevance extraction for job/hiring goals: the LLM pulls the REAL
+    // role/skill + work-mode words out of the input (deterministic tokenizer
+    // facts stay ground truth) so "companies actively hiring remotely" gets
+    // usable ATS/job-board terms instead of boilerplate leftovers. Cached
+    // server-side; regex fallback keeps it functional without an LLM.
+    if (classified.goal === "jobs") {
+      try {
+        const { extractSlots } = await import("./search/slot-extractor.server");
+        const slots = await extractSlots(data.query, queryTokens, { maxTokens: 256 });
+        const junkCore =
+          !classified.coreSkill ||
+          /^(actively|hiring|remotely|remote|now|asap)\b/i.test(classified.coreSkill);
+        if (slots.role && junkCore) classified.coreSkill = slots.role;
+        if (slots.work_mode === "remote") remoteSignal = true;
+      } catch (e) {
+        console.warn("[discover] AI slot extraction failed; regex path only", e);
+      }
     }
 
     const { injectLocationBias } = await import("./search/query-expander");
@@ -231,6 +274,7 @@ export const runSearch = createServerFn({ method: "POST" })
       ? undefined
       : (expFromClarify ??
         (classified.goal === "jobs" ? (ctx?.experience_level ?? "0-1") : undefined));
+    // AI relevance can set this later (slots.work_mode === "remote").
     const style = ctx?.work_style ?? "remote";
     const queryWantsSenior =
       /\b(senior|sr\.?|staff|principal|lead|[5-9]\+?\s*(?:years|yrs|yoe)|1[0-9]\+?\s*(?:years|yrs|yoe))\b/i.test(
@@ -257,16 +301,66 @@ export const runSearch = createServerFn({ method: "POST" })
       // Project buckets use "2-4"; clarifier uses "3-4".
       preferMid: !productClarify && (exp === "2-4" || exp === "3-4") && !queryWantsSenior,
       preferSenior: !productClarify && (exp === "5+" || queryWantsSenior),
-      preferRemote: style === "remote" && !queryWantsOnsite,
+      preferRemote: (style === "remote" && !queryWantsOnsite) || remoteSignal,
       maxAgeHours: refinement.maxAgeHours,
       /** User answered YoE in clarifier — enforce even on clients ATS signals. */
       explicitExperience: explicitYoe && !!exp,
       location: classified.location ?? null,
+      /** Clarifier opportunity filter for the local DB-first branch. */
+      localOpportunity: refinement.localOpportunity ?? null,
     };
 
     // Investor outreach matches — file-first (complete JSONL), live merged as fallback/blend.
     if (planUsesInvestorSeed(searchPlan) || refinement.findInvestors) {
       const { searchInvestors } = await import("./investors/search");
+      const { getInvestorSectors, getInvestorStages } = await import("./investors/types");
+      // Fit score from actual slot overlap — stage/sector/geo/check/image.
+      // Never a constant; every point traces to a matched filter.
+      const investorFit = (inv: Record<string, unknown>): number => {
+        const stages =
+          "stages" in inv && Array.isArray(inv.stages)
+            ? (inv.stages as string[])
+            : getInvestorStages(inv as never);
+        const sectors =
+          "sectors" in inv && Array.isArray(inv.sectors)
+            ? (inv.sectors as string[])
+            : getInvestorSectors(inv as never);
+        const loc = (
+          ("location" in inv && typeof inv.location === "string" ? inv.location : "") +
+          " " +
+          (("investment_locations" in inv && Array.isArray(inv.investment_locations)
+            ? (inv.investment_locations as string[]).join(" ")
+            : "") ||
+            ("locations" in inv && Array.isArray(inv.locations)
+              ? (inv.locations as string[]).join(" ")
+              : ""))
+        ).toLowerCase();
+        const sweet =
+          ("check_max_usd" in inv && typeof inv.check_max_usd === "number"
+            ? inv.check_max_usd
+            : 0) ||
+          ("check_min_usd" in inv && typeof inv.check_min_usd === "number" ? inv.check_min_usd : 0);
+        const wantStage = (refinement.investorStage || "").toLowerCase();
+        const wantSector = (refinement.investorSector || "").toLowerCase();
+        const wantLoc = (refinement.location || "").toLowerCase();
+        const wantCheck = refinement.investorCheck;
+        let s = 60;
+        if (
+          wantStage &&
+          wantStage !== "any" &&
+          stages.some((x) => x.toLowerCase().replace(/-/g, "") === wantStage.replace(/-/g, ""))
+        )
+          s += 10;
+        if (wantSector && sectors.some((x) => x.toLowerCase().includes(wantSector))) s += 10;
+        if (wantLoc && wantLoc !== "global" && loc.includes(wantLoc)) s += 10;
+        if (wantCheck && wantCheck !== "any") {
+          if (wantCheck === "angel" && sweet > 0 && sweet < 100_000) s += 5;
+          if (wantCheck === "seed" && sweet >= 100_000 && sweet <= 5_000_000) s += 5;
+          if (wantCheck === "growth" && sweet > 5_000_000) s += 5;
+        }
+        if ("image_url" in inv && typeof inv.image_url === "string" && inv.image_url) s += 3;
+        return Math.min(s, 98);
+      };
       const { searchCompleteInvestors } = await import("./investors/local-file-source");
       const { decideSource, insufficientMessage } = await import("./search/source-router");
       type Lead = import("./scoring").Lead;
@@ -328,27 +422,76 @@ export const runSearch = createServerFn({ method: "POST" })
         if (email && [...seenKeys].some((k) => k.startsWith(email))) return false;
         return true;
       });
-      const investors = [...localAsInvestors, ...blendedLive].slice(
+      let investors = [...localAsInvestors, ...blendedLive].slice(
         0,
-        Math.max(40, requestedCount),
+        Math.max(tierCfg.investorCap, requestedCount),
       );
-      const insufficient =
+      // Completeness gate: every served row must carry a contact route.
+      // Email-less rows run through free-only enrichment (bounded); rows still
+      // contact-less after it are dropped, never shown. Nothing is fabricated.
+      let gateNote: string | null = null;
+      const hasEmail = (inv: unknown) => {
+        const e = (inv as { email?: unknown }).email;
+        return typeof e === "string" && e.includes("@");
+      };
+      const emailed = investors.filter(hasEmail);
+      const emailLess = investors.filter((inv) => !hasEmail(inv));
+      if (emailLess.length > 0 && emailed.length < requestedCount) {
+        const { discoverContacts } = await import("./contact/discover-contacts.server");
+        let enriched = 0;
+        const withTimeout = <T>(p: Promise<T>): Promise<T | null> =>
+          Promise.race([p, new Promise<null>((r) => setTimeout(() => r(null), 8000))]);
+        for (const inv of emailLess.slice(0, tierCfg.enrichCap)) {
+          try {
+            const rec = inv as {
+              firm?: string;
+              name?: string;
+              website?: string;
+              email?: string;
+            };
+            const company = typeof rec.firm === "string" && rec.firm ? rec.firm : (rec.name ?? "");
+            const found = await withTimeout(
+              discoverContacts({
+                company: String(company).slice(0, 80),
+                personName: typeof rec.name === "string" ? rec.name : undefined,
+                freeOnly: true,
+                maxPages: 3,
+                skipRegistries: true,
+              }),
+            );
+            const email = found?.emails?.[0]?.email;
+            if (email) {
+              rec.email = email;
+              enriched++;
+            }
+          } catch {
+            // Enrichment is best-effort; failures just hide the row below.
+          }
+        }
+        const hidden = investors.length - emailed.length - enriched;
+        investors = investors.filter(hasEmail);
+        const bits: string[] = [];
+        if (enriched > 0)
+          bits.push(`${enriched} contact${enriched === 1 ? "" : "s"} found via lookup`);
+        if (hidden > 0) bits.push(`${hidden} without contact info hidden`);
+        if (bits.length) gateNote = bits.join(" · ");
+      } else if (emailLess.length > 0) {
+        const hidden = emailLess.length;
+        investors = emailed;
+        gateNote = `${hidden} without contact info hidden`;
+      }
+      const insufficientBase =
         decision === "blend" || investors.length < requestedCount
           ? insufficientMessage(investors.length, requestedCount)
           : null;
+      const insufficient = [insufficientBase, gateNote].filter(Boolean).join(" · ") || null;
 
-      const people = investors
+      const mappedPeople = investors
         .filter((inv) => !("type" in inv) || inv.type === "individual")
         .map((inv) => {
           const name = inv.name;
           const firm = "firm" in inv ? inv.firm : "";
           const role = "role" in inv ? inv.role : "title" in inv ? inv.title : "";
-          const categories =
-            "investment_categories" in inv
-              ? inv.investment_categories
-              : "focus_areas" in inv
-                ? inv.focus_areas.map((f: any) => `${f.sector} (${f.stage})`)
-                : [];
           const locs =
             "investment_locations" in inv
               ? inv.investment_locations
@@ -356,66 +499,180 @@ export const runSearch = createServerFn({ method: "POST" })
                 ? inv.locations
                 : [];
 
+          const fit = investorFit(inv as unknown as Record<string, unknown>);
+          // Carry the DB email onto the row: every downstream contact surface
+          // (green box, mailto chips, table column, detail drawer) reads it.
+          const dbEmail =
+            "email" in inv && typeof inv.email === "string" && inv.email.includes("@")
+              ? inv.email
+              : undefined;
+          const inline = dbEmail
+            ? { emails: [dbEmail], phones: [], links: [] as string[] }
+            : undefined;
+          // About: real bio first (160 chars), else an organized summary from
+          // the record's structured fields — "role at firm · invests at
+          // Pre-seed & Series A · invests in cloud, cybersecurity · based in
+          // Boston". Raw "Stage (Sector)" category strings never display.
+          const rawBio = "bio" in inv && typeof inv.bio === "string" ? inv.bio.trim() : "";
+          const invStages = (
+            "stages" in inv && Array.isArray(inv.stages) ? (inv.stages as unknown[]) : []
+          )
+            .filter((s): s is string => typeof s === "string" && !!s.trim())
+            .slice(0, 3)
+            .map((s) => s.replace(/_/g, "-"));
+          // Long sector entries are concatenated category blobs — keep only
+          // clean labels so the summary reads like a sentence, not a dump.
+          const cleanSectors = (
+            "sectors" in inv && Array.isArray(inv.sectors) ? (inv.sectors as unknown[]) : []
+          )
+            .filter(
+              (s): s is string =>
+                typeof s === "string" && s.trim().length > 0 && s.trim().length <= 40,
+            )
+            .slice(0, 3);
+          const aboutLocation =
+            locs[0] || ("location" in inv && typeof inv.location === "string" ? inv.location : "");
+          const description = rawBio
+            ? rawBio.slice(0, 160)
+            : [
+                [role, firm].filter(Boolean).join(" at "),
+                invStages.length ? `invests at ${invStages.join(" & ")}` : "",
+                cleanSectors.length
+                  ? `invests in ${cleanSectors.map((s) => s.toLowerCase()).join(", ")}`
+                  : "",
+                aboutLocation ? `based in ${aboutLocation}` : "",
+              ]
+                .filter(Boolean)
+                .join(" · ");
+          // Why-match sentence from actually-matched slots.
+          const whyBits: string[] = [];
+          const wantStage = (refinement.investorStage || "").toLowerCase();
+          const wantSector = (refinement.investorSector || "").toLowerCase();
+          if (wantStage && wantStage !== "any")
+            whyBits.push(`backs ${refinement.investorStage} rounds`);
+          if (wantSector) whyBits.push(`invests in ${refinement.investorSector}`);
+          if (refinement.location) whyBits.push(`active in ${refinement.location}`);
+          const whyMatch = `Investor at ${firm}${whyBits.length ? ` — ${whyBits.join(", ")}` : ""}.`;
           const lead: Lead = {
             source: "investors",
             platform: "Investors",
             title: `${name} — ${firm}`,
-            snippet: categories.slice(0, 5).join("; "),
+            subtitle: [role, locs.join(", ")].filter(Boolean).join(" · ") || undefined,
+            snippet: description,
             full_post_url: `https://www.google.com/search?q=${encodeURIComponent(name + " " + firm + " investor")}`,
             author: name,
             posted_at: undefined,
-            score: 70,
+            score: fit,
             match_reasons: ["Investor match"],
+            ...(inline ? { inline_contacts: inline } : {}),
           };
 
+          const invLinks =
+            "links" in inv ? (inv.links as { linkedin?: string } | undefined) : undefined;
+          const invProfiles =
+            "profiles" in inv ? (inv.profiles as { linkedin?: string } | undefined) : undefined;
+          const liUrl =
+            ("linkedin" in inv && typeof inv.linkedin === "string" ? inv.linkedin : undefined) ||
+            ("linkedin_url" in inv && typeof inv.linkedin_url === "string"
+              ? inv.linkedin_url
+              : undefined) ||
+            invLinks?.linkedin ||
+            invProfiles?.linkedin ||
+            undefined;
           return {
             key: `inv:${inv.id}`,
             name,
             title_hint: role,
+            role_hint: role || undefined,
             company_hint: firm,
             location_hint: locs.join(", ") || undefined,
-            description: categories.slice(0, 5).join(", "),
-            why_match: `Investor · ${firm}`,
+            linkedin_url: liUrl,
+            description,
+            why_match: whyMatch,
             sample_url: lead.full_post_url,
             signal_count: 1,
+            ...(inline ? { inline_contacts: inline } : {}),
             lead,
-            score: 70,
+            score: fit,
           };
         });
+      // Social gate — every displayed investor must carry a real profile link
+      // (the DB is 1,252/1,252 LinkedIn). Rows without one are dropped and
+      // logged, never shown as dash-filled rows, never fabricated.
+      const people = mappedPeople.filter((p) => !!p.linkedin_url);
+      if (mappedPeople.length !== people.length) {
+        console.info(
+          `[investors] dropped ${mappedPeople.length - people.length} individual(s) without a LinkedIn profile`,
+        );
+      }
 
-      const companies = investors
+      const mappedCompanies = investors
         .filter((inv) => "type" in inv && inv.type === "firm")
         .map((inv) => {
           const categories = "investment_categories" in inv ? inv.investment_categories : [];
+          const website = "website" in inv && typeof inv.website === "string" ? inv.website : "";
+          const links =
+            "links" in inv ? (inv.links as { linkedin?: string } | undefined) : undefined;
+          const domain = website
+            ? website.replace(/^https?:\/\//, "").split("/")[0] || undefined
+            : undefined;
           return {
             key: inv.id,
             name: inv.name,
+            domain,
             description: `VC Firm · ${categories.slice(0, 3).join(", ")}`,
             why_now: categories.slice(0, 3).join(", "),
             signal_count: 1,
             platforms: ["Investors"],
-            sample_url: "website" in inv && inv.website ? inv.website : "",
+            website: website || undefined,
+            linkedin_url: links?.linkedin || undefined,
+            inline_contacts:
+              website || links?.linkedin
+                ? {
+                    emails: [],
+                    phones: [],
+                    links: [website, links?.linkedin].filter(Boolean) as string[],
+                  }
+                : undefined,
+            sample_url: website,
             leads: [],
-            score: 70,
+            score: investorFit(inv as unknown as Record<string, unknown>),
           };
         });
-      await supabase
-        .from("profiles")
-        .update({ searches_used: used + 1, searches_reset_at: now.toISOString() })
-        .eq("id", userId);
+      // Social gate for firms — LinkedIn or a real website, never a bare name.
+      const companies = mappedCompanies.filter((c) => !!(c.linkedin_url || c.website));
+      // Owner runs unlimited searches — never tick the daily counter.
+      if (!isOwner) {
+        await supabase
+          .from("profiles")
+          .update({ searches_used: used + 1, searches_reset_at: now.toISOString() })
+          .eq("id", userId);
+      }
+      // Investor hunts are completed searches too — log them like the main
+      // path does, otherwise they never appear in chat history.
+      const investorSources =
+        decision === "local"
+          ? ["investors-complete-file"]
+          : ["investors-complete-file", "investors"];
+      await supabase.from("search_history").insert({
+        user_id: userId,
+        query: data.query,
+        results_count: investors.length,
+        sources_searched: investorSources,
+      });
       return {
         error: null,
         message: insufficient,
-        leads: people.map((p) => p.lead),
-        posts: people.map((p) => p.lead),
+        // Investors live ONLY in people/companies shapes — dumping them into
+        // posts/leads made the unified feed render every investor twice
+        // (People section + Posts cards).
+        leads: [],
+        posts: [],
         companies,
         people,
         local: [],
         investors,
-        sources:
-          decision === "local"
-            ? ["investors-complete-file"]
-            : ["investors-complete-file", "investors"],
+        sources: investorSources,
         suggestions: ["Try FinTech Seed", "Climate investors in Europe", "Angel check under $50K"],
         queryType: classified.type,
         refinement: insufficient ? `${refinement.summary} · ${insufficient}` : refinement.summary,
@@ -423,6 +680,10 @@ export const runSearch = createServerFn({ method: "POST" })
         plan: searchPlan,
       };
     }
+
+    // Companies-DB seed rows (hiring companies) — collected in the jobs
+    // branch below, merged into the companies segment after segmentation.
+    const companySeedRows: import("./search/lead-segments").CompanyRow[] = [];
 
     let {
       leads: raw,
@@ -438,8 +699,10 @@ export const runSearch = createServerFn({ method: "POST" })
     if (searchPlan.playbook === "JOB_DISCOVERY") {
       try {
         const { ensureJobCatalogRegistered } = await import("./jobs/source-catalog");
+        const { ensureFreehireSourceRegistered } = await import("./jobs/freehire-source");
         const { fetchAllJobSources } = await import("./jobs/registry");
         ensureJobCatalogRegistered();
+        ensureFreehireSourceRegistered();
         const extraJobs = await fetchAllJobSources({
           query: classified.roleTitle || classified.coreSkill || data.query,
           location: classified.location || "",
@@ -468,6 +731,26 @@ export const runSearch = createServerFn({ method: "POST" })
         if (extraJobs.length) sources = [...new Set([...sources, "jobcatalog"])];
       } catch (e) {
         console.warn("[discover] job catalog merge failed", e);
+      }
+
+      // Companies DB blend: actively-hiring companies from the companies DB
+      // (YC directory hiring flags today; registry-derived hiring signals as
+      // the datasets grow) — the user asked for companies, not only postings.
+      // Merged into the companies segment AFTER segmentation (declared here,
+      // that scope has no companies array yet).
+      try {
+        const { searchCompleteCompanies } = await import("./companies/local-file-source");
+        companySeedRows.push(
+          ...(await searchCompleteCompanies({
+            query: classified.coreSkill || data.query,
+            hiringOnly: true,
+            location: classified.location,
+            limit: 24,
+          })),
+        );
+        if (companySeedRows.length) sources = [...new Set([...sources, "companies_db"])];
+      } catch (e) {
+        console.warn("[discover] companies DB blend failed", e);
       }
     }
 
@@ -1027,7 +1310,9 @@ export const runSearch = createServerFn({ method: "POST" })
       goal === "clients" || classified.signalMode === "buying_signal" || volumePersona;
     // Large pool for three-figure Posts / Companies / People — segment BEFORE
     // diversify so tab volume is not capped by a thin ranked cut.
-    const poolCap = clientsVolume || (goal === "both" && qualityPool >= 80) ? 500 : 320;
+    const poolCap = Math.round(
+      (clientsVolume || (goal === "both" && qualityPool >= 80) ? 500 : 320) * tierCfg.poolMul,
+    );
     const qualitySorted = [...quality].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
     const pool = qualitySorted.slice(0, poolCap);
 
@@ -1043,7 +1328,8 @@ export const runSearch = createServerFn({ method: "POST" })
       maxReddit: clientsVolume ? 18 : Math.min(8, maxTotal),
       maxTotal,
       // Warm floor (35) — enough to cut junk without starving sparse crafts.
-      minScore: clientsVolume ? 35 : 0,
+      // Higher tiers lower the floor to surface more leads.
+      minScore: clientsVolume ? Math.max(0, 35 + tierCfg.minScoreBonus) : 0,
       maxPerPlatform: maxTotal,
       maxFreelancer: clientsVolume ? 18 : Math.min(12, maxTotal),
     });
@@ -1072,7 +1358,12 @@ export const runSearch = createServerFn({ method: "POST" })
     segments = {
       ...segments,
       posts: rankedForFeed,
-      companies: segments.companies.slice(0, 150),
+      companies: [
+        // Companies-DB hiring rows lead the segment — real verified companies,
+        // not name-extracted posts.
+        ...companySeedRows.filter((s) => !segments.companies.some((c) => c.key === s.key)),
+        ...segments.companies,
+      ].slice(0, 150),
       people: segments.people.slice(0, 150),
       local: (segments.local || []).slice(0, 150),
     };
@@ -1254,10 +1545,10 @@ export const runSearch = createServerFn({ method: "POST" })
       });
     }
 
-    await supabase
-      .from("profiles")
-      .update({ searches_used: used + 1 })
-      .eq("id", userId);
+    // Owner runs unlimited searches — never tick the daily counter.
+    if (!isOwner) {
+      await supabase.from("profiles").update({ searches_used: used + 1 }).eq("id", userId);
+    }
     await supabase.from("search_history").insert({
       user_id: userId,
       query: data.query,
@@ -1312,8 +1603,11 @@ export const getRemainingSearches = createServerFn({ method: "GET" })
     let used = profile?.searches_used ?? 0;
     const resetAt = profile?.searches_reset_at ? new Date(profile.searches_reset_at) : new Date(0);
     if (resetAt < new Date(Date.now() - 86400_000)) used = 0;
-    const cap = plan === "free" ? 5 : Infinity;
-    return { plan, used, cap: cap === Infinity ? null : cap };
+    const { isOwnerEmail } = await import("./owner");
+    const owner = isOwnerEmail(context.user.email);
+    const cap = owner || plan !== "free" ? Infinity : 5;
+    // Owner is unlimited — never present an accruing counter as a budget.
+    return { plan, used: owner ? 0 : used, cap: cap === Infinity ? null : cap };
   });
 
 /**
@@ -1336,10 +1630,15 @@ export const prepareSearch = createServerFn({ method: "POST" })
       await import("./search/clarifier");
     const classified = classifyQuery(data.query);
     const needed = shouldClarify(classified);
+    const { tokenizeInput } = await import("./search/tokenize-input");
+    const prepTokens = tokenizeInput(data.query);
     return {
       needsClarify: needed,
       questions: needed
-        ? buildClarifyingQuestions(classified, { hasLocation: !!classified.location })
+        ? buildClarifyingQuestions(classified, {
+            hasLocation: !!classified.location,
+            known: { stage: prepTokens.stage, sector: prepTokens.sector },
+          })
         : [],
       // What we'd assume if they skip — shown so the flow never feels like a
       // black box they're forced through.

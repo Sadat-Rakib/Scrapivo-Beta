@@ -20,6 +20,11 @@ type WdPosting = {
 };
 
 const CAP = Number(process.env.WORKDAY_CAP ?? 80);
+/** Endpoints hit per query. The tenant file now holds 1,000+ verified pairs —
+ *  sampling a rotating window keeps per-query fan-out bounded while every
+ *  endpoint still gets covered across runs (same guarantee as the ATS
+ *  boards' last_checked_at rotation). */
+const ENDPOINTS_PER_RUN = Number(process.env.WORKDAY_ENDPOINTS_PER_RUN ?? 24);
 let endpoints: WorkdayEndpoint[] | null = null;
 
 function loadEndpoints(): WorkdayEndpoint[] {
@@ -33,6 +38,18 @@ function loadEndpoints(): WorkdayEndpoint[] {
     endpoints = [];
   }
   return endpoints;
+}
+
+/** Deterministic rotation over the tenant list — a 5-minute window, like the
+ *  ATS boards' seed rotation, so repeat searches stay consistent within a
+ *  session while the full catalog cycles over time. */
+function sampleEndpoints(all: WorkdayEndpoint[]): WorkdayEndpoint[] {
+  if (all.length <= ENDPOINTS_PER_RUN) return all;
+  const window = Math.floor(Date.now() / (5 * 60_000));
+  const start = (window * ENDPOINTS_PER_RUN) % all.length;
+  const out: WorkdayEndpoint[] = [];
+  for (let i = 0; i < ENDPOINTS_PER_RUN; i++) out.push(all[(start + i) % all.length]);
+  return out;
 }
 
 /** "Posted 3 Days Ago" | "Posted Today" | "Posted 30+ Days Ago" → age days. */
@@ -112,8 +129,9 @@ export function ensureWorkdayAdapterRegistered(): void {
     id: "source-ats-workday",
     label: "Workday",
     fetch: async (filters) => {
-      const eps = loadEndpoints();
-      if (!eps.length) return [];
+      const all = loadEndpoints();
+      if (!all.length) return [];
+      const eps = sampleEndpoints(all);
       const batches = await Promise.all(eps.map((ep) => fetchEndpoint(ep, filters.query ?? "")));
       return batches.flat().slice(0, CAP);
     },

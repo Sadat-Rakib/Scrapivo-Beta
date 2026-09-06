@@ -1,0 +1,146 @@
+import { useState } from "react";
+import { X, Copy, Check, Send, Mail, MessageSquare } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  buildEmailDraft,
+  buildMessageDraft,
+  type DraftLead,
+  type DraftSender,
+} from "@/lib/outreach-draft";
+import { toast } from "sonner";
+
+export type GenerateKind = "email" | "message";
+
+/**
+ * Personalized outreach draft modal. Deterministic template filled from the
+ * row's real data + the sender profile (prefilled from Memory, editable
+ * inline — edits re-draft instantly). Copy + mailto send.
+ */
+export function GenerateModal({
+  lead,
+  kind,
+  sender: senderProp,
+  toEmail,
+  onClose,
+}: {
+  lead: DraftLead;
+  kind: GenerateKind;
+  sender: DraftSender;
+  toEmail?: string;
+  onClose: () => void;
+}) {
+  const [copied, setCopied] = useState(false);
+  // Sender quick-fields: prefilled from Memory, editable here — per-vertical
+  // personalization questions (role/service, proof/metrics) answered inline.
+  const [name, setName] = useState(senderProp.name ?? "");
+  const [service, setService] = useState(senderProp.service ?? "");
+  const [senderRole, setSenderRole] = useState(senderProp.senderRole ?? "");
+  const [proof, setProof] = useState(senderProp.proof ?? "");
+  const [editing, setEditing] = useState(false);
+  const sender: DraftSender = { ...senderProp, name, service, senderRole, proof };
+
+  const email = kind === "email" ? buildEmailDraft(lead, sender) : null;
+  const text = email
+    ? `Subject: ${email.subject}\n\n${email.body}`
+    : buildMessageDraft(lead, sender);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      toast.success("Copied to clipboard.");
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Copy failed — select the text manually.");
+    }
+  };
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={kind === "email" ? "Generate email" : "Generate message"}
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-lg rounded-2xl border border-border bg-card p-5 space-y-4"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 text-sm font-semibold text-white">
+            {kind === "email" ? <Mail className="size-4" /> : <MessageSquare className="size-4" />}
+            {kind === "email" ? "Generate email" : "Generate message"}
+            <span className="text-xs font-normal text-muted-foreground">to {lead.name}</span>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+        <textarea
+          readOnly
+          value={text}
+          rows={10}
+          className="w-full resize-none rounded-xl border border-border bg-muted/30 p-3 text-xs leading-relaxed text-foreground"
+        />
+        {/* Personalization quick-fields — prefilled from Memory, editable per
+            send. These are the per-vertical personalization questions. */}
+        <button
+          type="button"
+          onClick={() => setEditing((e) => !e)}
+          className="text-[11px] text-muted-foreground hover:text-foreground"
+        >
+          {editing ? "Hide your details" : "Edit your details (name · service · proof)"}
+        </button>
+        {editing && (
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Your name"
+              className="rounded-lg border border-border bg-muted/30 px-2 py-1.5 text-xs text-foreground"
+            />
+            <input
+              value={service}
+              onChange={(e) => setService(e.target.value)}
+              placeholder="Your service / what you do"
+              className="rounded-lg border border-border bg-muted/30 px-2 py-1.5 text-xs text-foreground"
+            />
+            <input
+              value={senderRole}
+              onChange={(e) => setSenderRole(e.target.value)}
+              placeholder="Your role (e.g. web designer)"
+              className="rounded-lg border border-border bg-muted/30 px-2 py-1.5 text-xs text-foreground col-span-2"
+            />
+            <input
+              value={proof}
+              onChange={(e) => setProof(e.target.value)}
+              placeholder="Proof / metrics (e.g. Built X · grew Y to Z)"
+              className="rounded-lg border border-border bg-muted/30 px-2 py-1.5 text-xs text-foreground col-span-2"
+            />
+          </div>
+        )}
+        <div className="flex items-center justify-end gap-2">
+          <Button size="sm" variant="outline" onClick={copy} className="h-8 text-xs">
+            {copied ? <Check className="size-3.5 mr-1" /> : <Copy className="size-3.5 mr-1" />}
+            {copied ? "Copied" : "Copy"}
+          </Button>
+          {kind === "email" && toEmail && (
+            <a
+              href={`mailto:${toEmail}?subject=${encodeURIComponent(email?.subject ?? "")}&body=${encodeURIComponent(email?.body ?? "")}`}
+            >
+              <Button size="sm" className="h-8 text-xs">
+                <Send className="size-3.5 mr-1" /> Send
+              </Button>
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

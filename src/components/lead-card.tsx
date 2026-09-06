@@ -114,8 +114,8 @@ export function LeadCard({
 }) {
   const rawTier = lead.intent_tier ?? lead.tier;
   const tier: "hot" | "warm" | undefined = rawTier === "hot" ? "hot" : rawTier ? "warm" : undefined;
-  const score = lead.intent_score ?? lead.score;
   const sourceLabel = displaySource(lead);
+  const isDirectory = lead.source === "investors";
   return (
     <button
       onClick={onOpen}
@@ -160,9 +160,6 @@ export function LeadCard({
           )}
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          {typeof score === "number" && (
-            <span className="font-mono text-xs text-muted-foreground">{score}</span>
-          )}
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -176,6 +173,9 @@ export function LeadCard({
         </div>
       </div>
       <div className="font-medium text-sm leading-snug line-clamp-2">{lead.title}</div>
+      {isDirectory && lead.subtitle && (
+        <div className="mt-0.5 text-xs text-muted-foreground truncate">{lead.subtitle}</div>
+      )}
       {lead.ai_summary && (
         <div className="mt-1.5 text-xs text-foreground/80 line-clamp-2">{lead.ai_summary}</div>
       )}
@@ -201,11 +201,12 @@ export function LeadCard({
         )}
       <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
         <span className="truncate">
-          {lead.author ?? "anon"} · {lead.engagement ?? 0} eng.
+          {!isDirectory ? (lead.author ?? "anon") : ""}
+          {!isDirectory && lead.engagement != null ? ` · ${lead.engagement} eng.` : ""}
         </span>
         <span className="flex items-center gap-1 shrink-0">
           {lead.posted_at_relative ??
-            (lead.posted_at ? new Date(lead.posted_at).toLocaleDateString() : "Recently (undated)")}
+            (lead.posted_at ? new Date(lead.posted_at).toLocaleDateString() : "")}
           <ExternalLink className="size-3" />
         </span>
       </div>

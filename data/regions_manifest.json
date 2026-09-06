@@ -1,0 +1,1172 @@
+[
+ {
+  "file_stem": "gb",
+  "iso2": "GB",
+  "name": "United Kingdom",
+  "region": "europe",
+  "aliases": [
+   "united kingdom",
+   "uk",
+   "britain",
+   "england",
+   "scotland",
+   "wales",
+   "london",
+   "manchester",
+   "birmingham",
+   "edinburgh",
+   "glasgow",
+   "leeds",
+   "bristol"
+  ]
+ },
+ {
+  "file_stem": "de",
+  "iso2": "DE",
+  "name": "Germany",
+  "region": "europe",
+  "aliases": [
+   "germany",
+   "germany",
+   "deutschland",
+   "berlin",
+   "munich",
+   "hamburg",
+   "frankfurt",
+   "cologne",
+   "stuttgart",
+   "düsseldorf"
+  ]
+ },
+ {
+  "file_stem": "fr",
+  "iso2": "FR",
+  "name": "France",
+  "region": "europe",
+  "aliases": [
+   "france",
+   "france",
+   "paris",
+   "lyon",
+   "marseille",
+   "toulouse",
+   "nice",
+   "bordeaux"
+  ]
+ },
+ {
+  "file_stem": "it",
+  "iso2": "IT",
+  "name": "Italy",
+  "region": "europe",
+  "aliases": [
+   "italy",
+   "italy",
+   "italia",
+   "rome",
+   "milan",
+   "naples",
+   "turin",
+   "florence"
+  ]
+ },
+ {
+  "file_stem": "es",
+  "iso2": "ES",
+  "name": "Spain",
+  "region": "europe",
+  "aliases": [
+   "spain",
+   "spain",
+   "españa",
+   "madrid",
+   "barcelona",
+   "valencia",
+   "seville"
+  ]
+ },
+ {
+  "file_stem": "nl",
+  "iso2": "NL",
+  "name": "Netherlands",
+  "region": "europe",
+  "aliases": [
+   "netherlands",
+   "netherlands",
+   "holland",
+   "amsterdam",
+   "rotterdam",
+   "utrecht",
+   "eindhoven"
+  ]
+ },
+ {
+  "file_stem": "be",
+  "iso2": "BE",
+  "name": "Belgium",
+  "region": "europe",
+  "aliases": [
+   "belgium",
+   "belgium",
+   "brussels",
+   "antwerp",
+   "bruges"
+  ]
+ },
+ {
+  "file_stem": "pt",
+  "iso2": "PT",
+  "name": "Portugal",
+  "region": "europe",
+  "aliases": [
+   "portugal",
+   "portugal",
+   "lisbon",
+   "lisboa",
+   "porto"
+  ]
+ },
+ {
+  "file_stem": "pl",
+  "iso2": "PL",
+  "name": "Poland",
+  "region": "europe",
+  "aliases": [
+   "poland",
+   "poland",
+   "polska",
+   "warsaw",
+   "krakow",
+   "wroclaw"
+  ]
+ },
+ {
+  "file_stem": "se",
+  "iso2": "SE",
+  "name": "Sweden",
+  "region": "europe",
+  "aliases": [
+   "sweden",
+   "sweden",
+   "sverige",
+   "stockholm",
+   "gothenburg",
+   "malmo"
+  ]
+ },
+ {
+  "file_stem": "no",
+  "iso2": "NO",
+  "name": "Norway",
+  "region": "europe",
+  "aliases": [
+   "norway",
+   "norway",
+   "oslo",
+   "bergen"
+  ]
+ },
+ {
+  "file_stem": "dk",
+  "iso2": "DK",
+  "name": "Denmark",
+  "region": "europe",
+  "aliases": [
+   "denmark",
+   "denmark",
+   "danmark",
+   "copenhagen",
+   "aarhus"
+  ]
+ },
+ {
+  "file_stem": "fi",
+  "iso2": "FI",
+  "name": "Finland",
+  "region": "europe",
+  "aliases": [
+   "finland",
+   "finland",
+   "suomi",
+   "helsinki",
+   "espoo"
+  ]
+ },
+ {
+  "file_stem": "ie",
+  "iso2": "IE",
+  "name": "Ireland",
+  "region": "europe",
+  "aliases": [
+   "ireland",
+   "ireland",
+   "dublin",
+   "cork",
+   "eire"
+  ]
+ },
+ {
+  "file_stem": "at",
+  "iso2": "AT",
+  "name": "Austria",
+  "region": "europe",
+  "aliases": [
+   "austria",
+   "austria",
+   "vienna",
+   "wien",
+   "salzburg"
+  ]
+ },
+ {
+  "file_stem": "ch",
+  "iso2": "CH",
+  "name": "Switzerland",
+  "region": "europe",
+  "aliases": [
+   "switzerland",
+   "switzerland",
+   "zurich",
+   "geneva",
+   "basel",
+   "bern"
+  ]
+ },
+ {
+  "file_stem": "cz",
+  "iso2": "CZ",
+  "name": "Czechia",
+  "region": "europe",
+  "aliases": [
+   "czechia",
+   "czech republic",
+   "czechia",
+   "prague",
+   "brno"
+  ]
+ },
+ {
+  "file_stem": "gr",
+  "iso2": "GR",
+  "name": "Greece",
+  "region": "europe",
+  "aliases": [
+   "greece",
+   "greece",
+   "athens",
+   "thessaloniki"
+  ]
+ },
+ {
+  "file_stem": "ro",
+  "iso2": "RO",
+  "name": "Romania",
+  "region": "europe",
+  "aliases": [
+   "romania",
+   "romania",
+   "bucharest",
+   "cluj"
+  ]
+ },
+ {
+  "file_stem": "hu",
+  "iso2": "HU",
+  "name": "Hungary",
+  "region": "europe",
+  "aliases": [
+   "hungary",
+   "hungary",
+   "budapest"
+  ]
+ },
+ {
+  "file_stem": "ua",
+  "iso2": "UA",
+  "name": "Ukraine",
+  "region": "europe",
+  "aliases": [
+   "ukraine",
+   "ukraine",
+   "kyiv",
+   "kiev"
+  ]
+ },
+ {
+  "file_stem": "sk",
+  "iso2": "SK",
+  "name": "Slovakia",
+  "region": "europe",
+  "aliases": [
+   "slovakia",
+   "slovakia",
+   "bratislava"
+  ]
+ },
+ {
+  "file_stem": "si",
+  "iso2": "SI",
+  "name": "Slovenia",
+  "region": "europe",
+  "aliases": [
+   "slovenia",
+   "slovenia",
+   "ljubljana"
+  ]
+ },
+ {
+  "file_stem": "hr",
+  "iso2": "HR",
+  "name": "Croatia",
+  "region": "europe",
+  "aliases": [
+   "croatia",
+   "croatia",
+   "zagreb",
+   "split"
+  ]
+ },
+ {
+  "file_stem": "bg",
+  "iso2": "BG",
+  "name": "Bulgaria",
+  "region": "europe",
+  "aliases": [
+   "bulgaria",
+   "bulgaria",
+   "sofia"
+  ]
+ },
+ {
+  "file_stem": "rs",
+  "iso2": "RS",
+  "name": "Serbia",
+  "region": "europe",
+  "aliases": [
+   "serbia",
+   "serbia",
+   "belgrade"
+  ]
+ },
+ {
+  "file_stem": "lt",
+  "iso2": "LT",
+  "name": "Lithuania",
+  "region": "europe",
+  "aliases": [
+   "lithuania",
+   "lithuania",
+   "vilnius"
+  ]
+ },
+ {
+  "file_stem": "lv",
+  "iso2": "LV",
+  "name": "Latvia",
+  "region": "europe",
+  "aliases": [
+   "latvia",
+   "latvia",
+   "riga"
+  ]
+ },
+ {
+  "file_stem": "ee",
+  "iso2": "EE",
+  "name": "Estonia",
+  "region": "europe",
+  "aliases": [
+   "estonia",
+   "estonia",
+   "tallinn"
+  ]
+ },
+ {
+  "file_stem": "is",
+  "iso2": "IS",
+  "name": "Iceland",
+  "region": "europe",
+  "aliases": [
+   "iceland",
+   "iceland",
+   "reykjavik"
+  ]
+ },
+ {
+  "file_stem": "lu",
+  "iso2": "LU",
+  "name": "Luxembourg",
+  "region": "europe",
+  "aliases": [
+   "luxembourg",
+   "l",
+   "u",
+   "x",
+   "e",
+   "m",
+   "b",
+   "o",
+   "u",
+   "r",
+   "g"
+  ]
+ },
+ {
+  "file_stem": "mt",
+  "iso2": "MT",
+  "name": "Malta",
+  "region": "europe",
+  "aliases": [
+   "malta",
+   "malta",
+   "valletta"
+  ]
+ },
+ {
+  "file_stem": "cy",
+  "iso2": "CY",
+  "name": "Cyprus",
+  "region": "europe",
+  "aliases": [
+   "cyprus",
+   "cyprus",
+   "nicosia",
+   "limassol"
+  ]
+ },
+ {
+  "file_stem": "ae",
+  "iso2": "AE",
+  "name": "United Arab Emirates",
+  "region": "middle_east",
+  "aliases": [
+   "united arab emirates",
+   "uae",
+   "dubai",
+   "abu dhabi",
+   "sharjah",
+   "emirates"
+  ]
+ },
+ {
+  "file_stem": "sa",
+  "iso2": "SA",
+  "name": "Saudi Arabia",
+  "region": "middle_east",
+  "aliases": [
+   "saudi arabia",
+   "saudi arabia",
+   "ksa",
+   "riyadh",
+   "jeddah",
+   "dammam"
+  ]
+ },
+ {
+  "file_stem": "il",
+  "iso2": "IL",
+  "name": "Israel",
+  "region": "middle_east",
+  "aliases": [
+   "israel",
+   "israel",
+   "tel aviv",
+   "jerusalem",
+   "haifa"
+  ]
+ },
+ {
+  "file_stem": "qa",
+  "iso2": "QA",
+  "name": "Qatar",
+  "region": "middle_east",
+  "aliases": [
+   "qatar",
+   "qatar",
+   "doha"
+  ]
+ },
+ {
+  "file_stem": "kw",
+  "iso2": "KW",
+  "name": "Kuwait",
+  "region": "middle_east",
+  "aliases": [
+   "kuwait",
+   "k",
+   "u",
+   "w",
+   "a",
+   "i",
+   "t"
+  ]
+ },
+ {
+  "file_stem": "bh",
+  "iso2": "BH",
+  "name": "Bahrain",
+  "region": "middle_east",
+  "aliases": [
+   "bahrain",
+   "bahrain",
+   "manama"
+  ]
+ },
+ {
+  "file_stem": "om",
+  "iso2": "OM",
+  "name": "Oman",
+  "region": "middle_east",
+  "aliases": [
+   "oman",
+   "oman",
+   "muscat"
+  ]
+ },
+ {
+  "file_stem": "jo",
+  "iso2": "JO",
+  "name": "Jordan",
+  "region": "middle_east",
+  "aliases": [
+   "jordan",
+   "jordan",
+   "amman"
+  ]
+ },
+ {
+  "file_stem": "lb",
+  "iso2": "LB",
+  "name": "Lebanon",
+  "region": "middle_east",
+  "aliases": [
+   "lebanon",
+   "lebanon",
+   "beirut"
+  ]
+ },
+ {
+  "file_stem": "tr",
+  "iso2": "TR",
+  "name": "Türkiye",
+  "region": "middle_east",
+  "aliases": [
+   "türkiye",
+   "turkey",
+   "turkiye",
+   "istanbul",
+   "ankara",
+   "izmir",
+   "antalya"
+  ]
+ },
+ {
+  "file_stem": "in",
+  "iso2": "IN",
+  "name": "India",
+  "region": "asia",
+  "aliases": [
+   "india",
+   "india",
+   "bharat",
+   "mumbai",
+   "delhi",
+   "bangalore",
+   "bengaluru",
+   "hyderabad",
+   "chennai",
+   "pune",
+   "kolkata"
+  ]
+ },
+ {
+  "file_stem": "jp",
+  "iso2": "JP",
+  "name": "Japan",
+  "region": "asia",
+  "aliases": [
+   "japan",
+   "japan",
+   "tokyo",
+   "osaka",
+   "kyoto",
+   "yokohama",
+   "nagoya"
+  ]
+ },
+ {
+  "file_stem": "sg",
+  "iso2": "SG",
+  "name": "Singapore",
+  "region": "asia",
+  "aliases": [
+   "singapore",
+   "s",
+   "i",
+   "n",
+   "g",
+   "a",
+   "p",
+   "o",
+   "r",
+   "e"
+  ]
+ },
+ {
+  "file_stem": "id",
+  "iso2": "ID",
+  "name": "Indonesia",
+  "region": "asia",
+  "aliases": [
+   "indonesia",
+   "indonesia",
+   "jakarta",
+   "surabaya",
+   "bali"
+  ]
+ },
+ {
+  "file_stem": "th",
+  "iso2": "TH",
+  "name": "Thailand",
+  "region": "asia",
+  "aliases": [
+   "thailand",
+   "thailand",
+   "bangkok",
+   "phuket",
+   "chiang mai"
+  ]
+ },
+ {
+  "file_stem": "my",
+  "iso2": "MY",
+  "name": "Malaysia",
+  "region": "asia",
+  "aliases": [
+   "malaysia",
+   "malaysia",
+   "kuala lumpur",
+   "penang",
+   "johor"
+  ]
+ },
+ {
+  "file_stem": "ph",
+  "iso2": "PH",
+  "name": "Philippines",
+  "region": "asia",
+  "aliases": [
+   "philippines",
+   "philippines",
+   "manila",
+   "cebu"
+  ]
+ },
+ {
+  "file_stem": "vn",
+  "iso2": "VN",
+  "name": "Vietnam",
+  "region": "asia",
+  "aliases": [
+   "vietnam",
+   "vietnam",
+   "ho chi minh",
+   "hanoi",
+   "saigon"
+  ]
+ },
+ {
+  "file_stem": "pk",
+  "iso2": "PK",
+  "name": "Pakistan",
+  "region": "asia",
+  "aliases": [
+   "pakistan",
+   "pakistan",
+   "karachi",
+   "lahore",
+   "islamabad"
+  ]
+ },
+ {
+  "file_stem": "bd",
+  "iso2": "BD",
+  "name": "Bangladesh",
+  "region": "asia",
+  "aliases": [
+   "bangladesh",
+   "bangladesh",
+   "dhaka",
+   "chittagong"
+  ]
+ },
+ {
+  "file_stem": "kr",
+  "iso2": "KR",
+  "name": "South Korea",
+  "region": "asia",
+  "aliases": [
+   "south korea",
+   "south korea",
+   "korea",
+   "seoul",
+   "busan"
+  ]
+ },
+ {
+  "file_stem": "hk",
+  "iso2": "HK",
+  "name": "Hong Kong",
+  "region": "asia",
+  "aliases": [
+   "hong kong",
+   "h",
+   "o",
+   "n",
+   "g",
+   " ",
+   "k",
+   "o",
+   "n",
+   "g"
+  ]
+ },
+ {
+  "file_stem": "tw",
+  "iso2": "TW",
+  "name": "Taiwan",
+  "region": "asia",
+  "aliases": [
+   "taiwan",
+   "taiwan",
+   "taipei"
+  ]
+ },
+ {
+  "file_stem": "lk",
+  "iso2": "LK",
+  "name": "Sri Lanka",
+  "region": "asia",
+  "aliases": [
+   "sri lanka",
+   "sri lanka",
+   "colombo"
+  ]
+ },
+ {
+  "file_stem": "np",
+  "iso2": "NP",
+  "name": "Nepal",
+  "region": "asia",
+  "aliases": [
+   "nepal",
+   "nepal",
+   "kathmandu"
+  ]
+ },
+ {
+  "file_stem": "kz",
+  "iso2": "KZ",
+  "name": "Kazakhstan",
+  "region": "asia",
+  "aliases": [
+   "kazakhstan",
+   "kazakhstan",
+   "almaty",
+   "astana"
+  ]
+ },
+ {
+  "file_stem": "uz",
+  "iso2": "UZ",
+  "name": "Uzbekistan",
+  "region": "asia",
+  "aliases": [
+   "uzbekistan",
+   "uzbekistan",
+   "tashkent"
+  ]
+ },
+ {
+  "file_stem": "ge",
+  "iso2": "GE",
+  "name": "Georgia",
+  "region": "asia",
+  "aliases": [
+   "georgia",
+   "georgia",
+   "tbilisi"
+  ]
+ },
+ {
+  "file_stem": "az",
+  "iso2": "AZ",
+  "name": "Azerbaijan",
+  "region": "asia",
+  "aliases": [
+   "azerbaijan",
+   "azerbaijan",
+   "baku"
+  ]
+ },
+ {
+  "file_stem": "am",
+  "iso2": "AM",
+  "name": "Armenia",
+  "region": "asia",
+  "aliases": [
+   "armenia",
+   "armenia",
+   "yerevan"
+  ]
+ },
+ {
+  "file_stem": "us",
+  "iso2": "US",
+  "name": "United States",
+  "region": "americas_n",
+  "aliases": [
+   "united states",
+   "usa",
+   "united states",
+   "america",
+   "new york",
+   "los angeles",
+   "chicago",
+   "houston",
+   "austin",
+   "miami",
+   "san francisco",
+   "seattle",
+   "boston",
+   "dallas",
+   "denver",
+   "atlanta"
+  ]
+ },
+ {
+  "file_stem": "ca",
+  "iso2": "CA",
+  "name": "Canada",
+  "region": "americas_n",
+  "aliases": [
+   "canada",
+   "canada",
+   "toronto",
+   "vancouver",
+   "montreal",
+   "calgary",
+   "ottawa"
+  ]
+ },
+ {
+  "file_stem": "mx",
+  "iso2": "MX",
+  "name": "Mexico",
+  "region": "americas_n",
+  "aliases": [
+   "mexico",
+   "mexico",
+   "mexico city",
+   "guadalajara",
+   "monterrey",
+   "cancun"
+  ]
+ },
+ {
+  "file_stem": "cr",
+  "iso2": "CR",
+  "name": "Costa Rica",
+  "region": "americas_n",
+  "aliases": [
+   "costa rica",
+   "costa rica",
+   "san jose"
+  ]
+ },
+ {
+  "file_stem": "pa",
+  "iso2": "PA",
+  "name": "Panama",
+  "region": "americas_n",
+  "aliases": [
+   "panama",
+   "p",
+   "a",
+   "n",
+   "a",
+   "m",
+   "a"
+  ]
+ },
+ {
+  "file_stem": "gt",
+  "iso2": "GT",
+  "name": "Guatemala",
+  "region": "americas_n",
+  "aliases": [
+   "guatemala",
+   "g",
+   "u",
+   "a",
+   "t",
+   "e",
+   "m",
+   "a",
+   "l",
+   "a"
+  ]
+ },
+ {
+  "file_stem": "do",
+  "iso2": "DO",
+  "name": "Dominican Republic",
+  "region": "americas_n",
+  "aliases": [
+   "dominican republic",
+   "dominican republic",
+   "santo domingo"
+  ]
+ },
+ {
+  "file_stem": "pr",
+  "iso2": "PR",
+  "name": "Puerto Rico",
+  "region": "americas_n",
+  "aliases": [
+   "puerto rico",
+   "puerto rico",
+   "san juan"
+  ]
+ },
+ {
+  "file_stem": "br",
+  "iso2": "BR",
+  "name": "Brazil",
+  "region": "americas_s",
+  "aliases": [
+   "brazil",
+   "brazil",
+   "brasil",
+   "sao paulo",
+   "rio de janeiro",
+   "belo horizonte",
+   "brasilia"
+  ]
+ },
+ {
+  "file_stem": "ar",
+  "iso2": "AR",
+  "name": "Argentina",
+  "region": "americas_s",
+  "aliases": [
+   "argentina",
+   "argentina",
+   "buenos aires",
+   "cordoba"
+  ]
+ },
+ {
+  "file_stem": "cl",
+  "iso2": "CL",
+  "name": "Chile",
+  "region": "americas_s",
+  "aliases": [
+   "chile",
+   "chile",
+   "santiago"
+  ]
+ },
+ {
+  "file_stem": "co",
+  "iso2": "CO",
+  "name": "Colombia",
+  "region": "americas_s",
+  "aliases": [
+   "colombia",
+   "colombia",
+   "bogota",
+   "medellin"
+  ]
+ },
+ {
+  "file_stem": "pe",
+  "iso2": "PE",
+  "name": "Peru",
+  "region": "americas_s",
+  "aliases": [
+   "peru",
+   "peru",
+   "lima"
+  ]
+ },
+ {
+  "file_stem": "uy",
+  "iso2": "UY",
+  "name": "Uruguay",
+  "region": "americas_s",
+  "aliases": [
+   "uruguay",
+   "uruguay",
+   "montevideo"
+  ]
+ },
+ {
+  "file_stem": "ec",
+  "iso2": "EC",
+  "name": "Ecuador",
+  "region": "americas_s",
+  "aliases": [
+   "ecuador",
+   "ecuador",
+   "quito",
+   "guayaquil"
+  ]
+ },
+ {
+  "file_stem": "bo",
+  "iso2": "BO",
+  "name": "Bolivia",
+  "region": "americas_s",
+  "aliases": [
+   "bolivia",
+   "bolivia",
+   "la paz"
+  ]
+ },
+ {
+  "file_stem": "py",
+  "iso2": "PY",
+  "name": "Paraguay",
+  "region": "americas_s",
+  "aliases": [
+   "paraguay",
+   "paraguay",
+   "asuncion"
+  ]
+ },
+ {
+  "file_stem": "za",
+  "iso2": "ZA",
+  "name": "South Africa",
+  "region": "africa",
+  "aliases": [
+   "south africa",
+   "south africa",
+   "cape town",
+   "johannesburg",
+   "durban",
+   "pretoria"
+  ]
+ },
+ {
+  "file_stem": "eg",
+  "iso2": "EG",
+  "name": "Egypt",
+  "region": "africa",
+  "aliases": [
+   "egypt",
+   "egypt",
+   "cairo",
+   "alexandria"
+  ]
+ },
+ {
+  "file_stem": "ng",
+  "iso2": "NG",
+  "name": "Nigeria",
+  "region": "africa",
+  "aliases": [
+   "nigeria",
+   "nigeria",
+   "lagos",
+   "abuja"
+  ]
+ },
+ {
+  "file_stem": "ke",
+  "iso2": "KE",
+  "name": "Kenya",
+  "region": "africa",
+  "aliases": [
+   "kenya",
+   "kenya",
+   "nairobi"
+  ]
+ },
+ {
+  "file_stem": "ma",
+  "iso2": "MA",
+  "name": "Morocco",
+  "region": "africa",
+  "aliases": [
+   "morocco",
+   "morocco",
+   "casablanca",
+   "marrakech"
+  ]
+ },
+ {
+  "file_stem": "gh",
+  "iso2": "GH",
+  "name": "Ghana",
+  "region": "africa",
+  "aliases": [
+   "ghana",
+   "ghana",
+   "accra"
+  ]
+ },
+ {
+  "file_stem": "tz",
+  "iso2": "TZ",
+  "name": "Tanzania",
+  "region": "africa",
+  "aliases": [
+   "tanzania",
+   "tanzania",
+   "dar es salaam"
+  ]
+ },
+ {
+  "file_stem": "tn",
+  "iso2": "TN",
+  "name": "Tunisia",
+  "region": "africa",
+  "aliases": [
+   "tunisia",
+   "tunisia",
+   "tunis"
+  ]
+ },
+ {
+  "file_stem": "au",
+  "iso2": "AU",
+  "name": "Australia",
+  "region": "oceania",
+  "aliases": [
+   "australia",
+   "australia",
+   "sydney",
+   "melbourne",
+   "brisbane",
+   "perth",
+   "adelaide"
+  ]
+ },
+ {
+  "file_stem": "nz",
+  "iso2": "NZ",
+  "name": "New Zealand",
+  "region": "oceania",
+  "aliases": [
+   "new zealand",
+   "new zealand",
+   "nz",
+   "auckland",
+   "wellington",
+   "christchurch"
+  ]
+ }
+]

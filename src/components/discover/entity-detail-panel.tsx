@@ -1,6 +1,6 @@
 // Detail drawer for a Company or Person row — the "tap the card, see
-// everything" view: identity, socials, signals timeline, contact resolution.
-import type { CompanyRow, PersonRow } from "@/lib/search/lead-segments";
+// everything" view: identity, socials, contact resolution, generate pills.
+import type { CompanyRow, LocalBusinessRow, PersonRow } from "@/lib/search/lead-segments";
 import type { ResolvedContactInfo } from "@/components/discover/result-tabs";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,18 +13,20 @@ import {
   Globe,
   Linkedin,
   Mail,
+  MessageSquare,
   MapPin,
   Phone,
-  Radar,
   Twitter,
   User,
   X,
   BadgeCheck,
+  Store,
 } from "lucide-react";
 
 export type SelectedEntity =
   | { type: "company"; company: CompanyRow }
-  | { type: "person"; person: PersonRow };
+  | { type: "person"; person: PersonRow }
+  | { type: "local"; local: LocalBusinessRow };
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -48,162 +50,99 @@ function LinkOut({ href, label, icon: Icon }: { href: string; label: string; ico
   );
 }
 
-function ContactBlock({
-  contact,
-  onResolve,
-  onDeepEnrich,
-  busy,
-  hasProfile,
-}: {
-  contact?: ResolvedContactInfo;
-  onResolve: () => void;
-  onDeepEnrich?: () => void;
-  busy?: boolean;
-  hasProfile?: boolean;
-}) {
-  const actions = (
-    <div className="flex flex-wrap gap-1.5">
-      <Button
-        size="sm"
-        variant="outline"
-        className="h-8 text-xs"
-        disabled={busy}
-        onClick={onResolve}
-      >
-        <Mail className="size-3 mr-1" />
-        <Phone className="size-3 mr-1" />
-        {busy ? "Resolving…" : "Resolve contact"}
-      </Button>
-      {onDeepEnrich && (
-        <Button
-          size="sm"
-          variant="outline"
-          className="h-8 text-xs"
-          disabled={busy}
-          onClick={onDeepEnrich}
-          title="Browser + paid enrich (CoreClaw LinkedIn/domain email, Hunter/PDL if keyed). Needs STEALTH_WORKER_URL or SCRAPE_WORKER_URL for browser fetch."
-        >
-          <Radar className="size-3 mr-1" />
-          {busy ? "Enriching…" : "Deep enrich"}
-        </Button>
-      )}
-    </div>
-  );
-
-  if (!contact) {
-    return (
-      <div className="space-y-1.5">
-        {hasProfile && <div className="text-xs text-muted-foreground">Profile available</div>}
-        {actions}
-      </div>
-    );
-  }
-  if (contact.status === "none") {
-    return (
-      <div className="space-y-1.5">
-        <div className="text-xs text-muted-foreground">
-          {hasProfile
-            ? "Profile available — email/phone not verified yet. Try Deep enrich for a browser fetch."
-            : "No verified email/phone found yet — try Deep enrich or Research on the lead."}
-        </div>
-        {actions}
-      </div>
-    );
-  }
-  return (
-    <div className="space-y-1.5">
-      <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 space-y-1.5">
-        {contact.email && (
-          <div className="flex items-center gap-1.5 text-sm">
-            <Mail className="size-3.5 text-emerald-400 shrink-0" />
-            <a href={`mailto:${contact.email}`} className="hover:underline truncate">
-              {contact.email}
-            </a>
-          </div>
-        )}
-        {contact.phone && (
-          <div className="flex items-center gap-1.5 text-sm">
-            <Phone className="size-3.5 text-emerald-400 shrink-0" />
-            <span className="truncate">{contact.phone}</span>
-          </div>
-        )}
-        {contact.domain && (
-          <div className="flex items-center gap-1.5 text-sm">
-            <Globe className="size-3.5 text-emerald-400 shrink-0" />
-            <span className="truncate">{contact.domain}</span>
-          </div>
-        )}
-        {(contact.verifyNote || contact.note) && (
-          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-            <BadgeCheck className="size-3 shrink-0" />
-            {[contact.verifyNote, contact.note].filter(Boolean).join(" · ")}
-          </div>
-        )}
-        {contact.socials && (
-          <div className="flex flex-wrap gap-x-3 gap-y-1 pt-1">
-            {contact.socials.linkedin && (
-              <LinkOut href={contact.socials.linkedin} label="LinkedIn" icon={Linkedin} />
-            )}
-            {contact.socials.twitter && (
-              <LinkOut href={contact.socials.twitter} label="X" icon={Twitter} />
-            )}
-            {contact.socials.facebook && (
-              <LinkOut href={contact.socials.facebook} label="Facebook" icon={Facebook} />
-            )}
-            {contact.socials.instagram && (
-              <LinkOut href={contact.socials.instagram} label="Instagram" icon={Globe} />
-            )}
-            {contact.socials.youtube && (
-              <LinkOut href={contact.socials.youtube} label="YouTube" icon={Globe} />
-            )}
-            {contact.socials.tiktok && (
-              <LinkOut href={contact.socials.tiktok} label="TikTok" icon={Globe} />
-            )}
-            {contact.socials.github && (
-              <LinkOut href={contact.socials.github} label="GitHub" icon={Github} />
-            )}
-          </div>
-        )}
-      </div>
-      {onDeepEnrich && actions}
-    </div>
-  );
-}
-
 export function EntityDetailPanel({
   entity,
   onClose,
   contact,
   onResolveContact,
-  onDeepEnrich,
   contactBusy,
+  onGenerate,
 }: {
   entity: SelectedEntity;
   onClose: () => void;
   contact?: ResolvedContactInfo;
   onResolveContact: () => void;
-  onDeepEnrich?: () => void;
   contactBusy?: boolean;
+  onGenerate?: (kind: "email" | "message") => void;
 }) {
   const isCompany = entity.type === "company";
+  const isLocal = entity.type === "local";
   const c = isCompany ? entity.company : null;
-  const p = !isCompany ? entity.person : null;
+  const b = isLocal ? entity.local : null;
+  const p = !isCompany && !isLocal ? entity.person : null;
+  // Investor rows come from the verified directory, not posts: no post links,
+  // LinkedIn-only socials, and no fake "signals" section.
+  const isInvestorRow = !isCompany && !isLocal && p?.lead.source === "investors";
+  const hasProfile = isCompany
+    ? !!(c?.website || c?.linkedin_url || c?.twitter_url)
+    : isLocal
+      ? !!b?.website
+      : !!(p?.author_url || p?.linkedin_url || p?.github_url);
+
+  // Social row: every real profile/site link on the row, then anything the
+  // contact resolution surfaced — deduped by URL.
+  const socialLinks = (() => {
+    const seen = new Set<string>();
+    const out: Array<{ href: string; label: string; icon: typeof Globe }> = [];
+    const add = (href?: string, label?: string, icon?: typeof Globe) => {
+      if (!href) return;
+      const key = href.replace(/\/+$/, "").toLowerCase();
+      if (seen.has(key)) return;
+      seen.add(key);
+      out.push({ href, label: label ?? "Profile", icon: icon ?? Globe });
+    };
+    if (isCompany && c) {
+      add(c.website, "Website", Globe);
+      add(c.linkedin_url, "LinkedIn", Linkedin);
+      add(c.twitter_url, "X", Twitter);
+      add(c.facebook_url, "Facebook", Facebook);
+    } else if (isLocal && b) {
+      add(b.website, "Website", Globe);
+    } else if (p) {
+      add(p.linkedin_url, "LinkedIn", Linkedin);
+      if (!isInvestorRow) {
+        add(p.author_url, "Profile", ExternalLink);
+        add(p.github_url, "GitHub", Github);
+      }
+    }
+    if (contact?.status === "ok") {
+      if (contact.domain) add(`https://${contact.domain}`, "Website", Globe);
+      add(contact.socials?.linkedin, "LinkedIn", Linkedin);
+      add(contact.socials?.twitter, "X", Twitter);
+      add(contact.socials?.facebook, "Facebook", Facebook);
+      add(contact.socials?.instagram, "Instagram", Globe);
+      add(contact.socials?.youtube, "YouTube", Globe);
+      add(contact.socials?.tiktok, "TikTok", Globe);
+      add(contact.socials?.github, "GitHub", Github);
+    }
+    return out;
+  })();
+
+  const posts = isCompany
+    ? (c?.leads ?? [])
+    : isInvestorRow || isLocal
+      ? []
+      : p
+        ? [p.lead]
+        : [];
 
   return (
     <div className="p-4 md:p-5 space-y-4">
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           <div className="size-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
-            {isCompany ? <Building2 className="size-4.5" /> : <User className="size-4.5" />}
+            {isCompany ? <Building2 className="size-4.5" /> : isLocal ? <Store className="size-4.5" /> : <User className="size-4.5" />}
           </div>
           <div className="min-w-0">
-            <div className="font-semibold text-base truncate">{c?.name ?? p?.name}</div>
+            <div className="font-semibold text-base truncate">{c?.name ?? b?.name ?? p?.name}</div>
             <div className="text-xs text-muted-foreground truncate">
               {isCompany
                 ? [c?.domain, `${c?.signal_count} signal${c?.signal_count === 1 ? "" : "s"}`]
                     .filter(Boolean)
                     .join(" · ")
-                : [p?.role_hint, p?.platform].filter(Boolean).join(" · ")}
+                : isLocal
+                  ? [b?.category, b?.address?.split(",").slice(-2, -1)[0]?.trim()].filter(Boolean).join(" · ")
+                  : [p?.role_hint, p?.company_hint].filter(Boolean).join(" · ")}
             </div>
           </div>
         </div>
@@ -213,6 +152,41 @@ export function EntityDetailPanel({
       </div>
 
       <div className="space-y-2.5">
+        {isLocal && b && (
+          <>
+            {b.category && (
+              <Row label="Category">
+                <span className="text-sm">{b.category.replace(/_/g, " ")}</span>
+              </Row>
+            )}
+            {b.address && (
+              <Row label="Location">
+                <span className="inline-flex items-center gap-1 text-sm">
+                  <MapPin className="size-3.5 text-muted-foreground" /> {b.address}
+                </span>
+              </Row>
+            )}
+            {b.description && (
+              <Row label="About">
+                <p className="text-sm text-foreground/85">{b.description}</p>
+              </Row>
+            )}
+            {!!b.opportunity_tags?.length && (
+              <Row label="Signals">
+                <div className="flex flex-wrap gap-1">
+                  {b.opportunity_tags.slice(0, 6).map((t) => (
+                    <span
+                      key={t}
+                      className="text-[10px] px-1.5 py-0.5 rounded-full border border-border text-muted-foreground"
+                    >
+                      {t.replace(/_/g, " ")}
+                    </span>
+                  ))}
+                </div>
+              </Row>
+            )}
+          </>
+        )}
         {isCompany && c && (
           <>
             {c.latest_signal && (
@@ -230,18 +204,6 @@ export function EntityDetailPanel({
                 <p className="text-sm text-foreground/85">{c.description}</p>
               </Row>
             )}
-            <Row label="Links">
-              <div className="flex flex-wrap gap-y-1">
-                {c.website && <LinkOut href={c.website} label="Website" icon={Globe} />}
-                {c.linkedin_url && (
-                  <LinkOut href={c.linkedin_url} label="LinkedIn" icon={Linkedin} />
-                )}
-                {c.twitter_url && <LinkOut href={c.twitter_url} label="X" icon={Twitter} />}
-                {c.facebook_url && (
-                  <LinkOut href={c.facebook_url} label="Facebook" icon={Facebook} />
-                )}
-              </div>
-            </Row>
           </>
         )}
 
@@ -271,58 +233,133 @@ export function EntityDetailPanel({
                 <p className="text-sm text-foreground/85">{p.description}</p>
               </Row>
             )}
-            <Row label="Links">
-              <div className="flex flex-wrap gap-y-1">
-                {p.author_url && (
-                  <LinkOut href={p.author_url} label="Profile" icon={ExternalLink} />
-                )}
-                {p.linkedin_url && (
-                  <LinkOut href={p.linkedin_url} label="LinkedIn" icon={Linkedin} />
-                )}
-                {p.github_url && <LinkOut href={p.github_url} label="GitHub" icon={Github} />}
-              </div>
-            </Row>
           </>
         )}
 
-        <Row label="Contact">
-          <ContactBlock
-            contact={contact}
-            onResolve={onResolveContact}
-            onDeepEnrich={onDeepEnrich}
-            busy={contactBusy}
-            hasProfile={
-              isCompany
-                ? !!(c?.website || c?.linkedin_url || c?.twitter_url)
-                : !!(p?.author_url || p?.linkedin_url || p?.github_url)
-            }
-          />
-        </Row>
+        {socialLinks.length > 0 && (
+          <Row label="Social">
+            <div className="flex flex-wrap gap-y-1">
+              {socialLinks.map((l) => (
+                <LinkOut key={l.href} href={l.href} label={l.label} icon={l.icon} />
+              ))}
+            </div>
+          </Row>
+        )}
+
+        {isLocal && b?.email && (
+          <Row label="Email">
+            <a
+              href={`mailto:${b.email}`}
+              className="text-sm text-emerald-400 hover:underline break-all"
+            >
+              {b.email}
+            </a>
+          </Row>
+        )}
+        {isLocal && b?.phone && (
+          <Row label="Number">
+            <span className="inline-flex items-center gap-1.5 text-sm">
+              <Phone className="size-3.5 text-emerald-400 shrink-0" /> {b.phone}
+            </span>
+          </Row>
+        )}
+        {contact?.status === "ok" && contact.email && (
+          <Row label="Email">
+            <a
+              href={`mailto:${contact.email}`}
+              className="text-sm text-emerald-400 hover:underline break-all"
+            >
+              {contact.email}
+            </a>
+          </Row>
+        )}
+        {contact?.status === "ok" && contact.phone && (
+          <Row label="Number">
+            <span className="inline-flex items-center gap-1.5 text-sm">
+              <Phone className="size-3.5 text-emerald-400 shrink-0" /> {contact.phone}
+            </span>
+          </Row>
+        )}
+        {contact?.status === "ok" && (contact.verifyNote || contact.note) && (
+          <Row label="Verified">
+            <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
+              <BadgeCheck className="size-3.5 text-emerald-400 shrink-0" />
+              {[contact.verifyNote, contact.note].filter(Boolean).join(" · ")}
+            </span>
+          </Row>
+        )}
+        {!isLocal && (
+          <Row label="Contact">
+            <div className="space-y-1.5">
+              {contact?.status === "none" && (
+                <div className="text-xs text-muted-foreground">
+                  {hasProfile
+                    ? "Profile available — email/phone not verified yet."
+                    : "No verified email/phone found yet."}
+                </div>
+              )}
+              {!contact && hasProfile && (
+                <div className="text-xs text-muted-foreground">Profile available</div>
+              )}
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8 text-xs"
+                disabled={contactBusy}
+                onClick={onResolveContact}
+              >
+                <Mail className="size-3 mr-1" />
+                <Phone className="size-3 mr-1" />
+                {contactBusy ? "Checking…" : "Show contact"}
+              </Button>
+            </div>
+          </Row>
+        )}
+        {onGenerate && (
+          <div className="flex flex-wrap gap-2 pt-1">
+            <button
+              type="button"
+              onClick={() => onGenerate("email")}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            >
+              <Mail className="size-3.5" /> Generate email
+            </button>
+            <button
+              type="button"
+              onClick={() => onGenerate("message")}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            >
+              <MessageSquare className="size-3.5" /> Generate message
+            </button>
+          </div>
+        )}
       </div>
 
-      <div className="space-y-2">
-        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-          {isCompany ? "Signals" : "Post"}
+      {posts.length > 0 && (
+        <div className="space-y-2">
+          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            {isCompany ? "Signals" : "Post"}
+          </div>
+          {posts.map((l) => (
+            <a
+              key={l.full_post_url}
+              href={l.full_post_url}
+              target="_blank"
+              rel="noreferrer"
+              className="block rounded-lg border border-border bg-card hover:border-primary/30 px-3 py-2 transition-colors"
+            >
+              <div className="flex items-center gap-2 text-[10px] text-muted-foreground mb-1">
+                <FileText className="size-3" />
+                <span className="truncate">{l.platform_label ?? l.platform ?? "Signal"}</span>
+                {l.posted_at_relative ? (
+                  <span className="ml-auto shrink-0">{l.posted_at_relative}</span>
+                ) : null}
+              </div>
+              <div className="text-sm line-clamp-2">{l.title}</div>
+            </a>
+          ))}
         </div>
-        {(isCompany ? c!.leads : [p!.lead]).map((l) => (
-          <a
-            key={l.full_post_url}
-            href={l.full_post_url}
-            target="_blank"
-            rel="noreferrer"
-            className="block rounded-lg border border-border bg-card hover:border-primary/30 px-3 py-2 transition-colors"
-          >
-            <div className="flex items-center gap-2 text-[10px] text-muted-foreground mb-1">
-              <FileText className="size-3" />
-              <span className="truncate">{l.platform_label ?? l.platform ?? "Signal"}</span>
-              <span className="ml-auto shrink-0">
-                {l.posted_at_relative || "Recently (undated)"}
-              </span>
-            </div>
-            <div className="text-sm line-clamp-2">{l.title}</div>
-          </a>
-        ))}
-      </div>
+      )}
     </div>
   );
 }

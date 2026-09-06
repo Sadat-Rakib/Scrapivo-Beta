@@ -10,6 +10,7 @@
 // =====================================================================
 import type { ClassifiedQuery } from "./query-classifier";
 import { isProductPitchQuery } from "./query-classifier";
+import { tokenizeInput } from "./tokenize-input";
 
 export type ClarifyOptionId = string;
 
@@ -441,8 +442,11 @@ function isFindInvestorHunt(classified: ClassifiedQuery): boolean {
   // Founder-voice raises ("I am trying to raise for pre-seed round",
   // "raising our seed") are investor hunts too; bare "raise" needs funding
   // context nearby so "companies raising prices" never misroutes here.
-  return (
-    /\b(find (an? )?investors?|need (an? )?investors?|looking for (an? )?(vc|angel|venture|investors?)|raise from|pitch (to )?(vcs?|investors?))\b/i.test(
+  // Filler between verb and noun ("find me investors", "need some investors")
+  // is allowed — the old regex required strict adjacency and silently
+  // rerouted the most common phrasing to the generic live path.
+  if (
+    /\b(?:(?:find(?:ing)?|need(?:ing)?|get(?:ting)?)\s+(?:me\s+)?(?:some\s+)?(?:an?\s+)?investors?|looking\s+for\s+(?:some\s+)?(?:an?\s+)?(?:vcs?|angels?|venture|investors?)|raise\s+from|pitch\s+(?:to\s+)?(?:vcs?|investors?))\b/i.test(
       raw,
     ) ||
     /\brais(?:e|ing|ed)\b[^.?!]{0,40}\b(round|capital|fund(?:s|ing)?|money|pre-?seed|seed|series)\b/i.test(
@@ -451,6 +455,18 @@ function isFindInvestorHunt(classified: ClassifiedQuery): boolean {
     /\b(pre-?seed|seed round|series [abc] round|funding round|venture capital|angel investors?)\b/i.test(
       raw,
     )
+  ) {
+    return true;
+  }
+  // The deterministic tokenizer's investor NOUNS are the final word: an ask
+  // that names investors/VCs/angels routes to the investor DB branch even
+  // when no hunt verb pattern matched ("investors for my ai startup").
+  // Ambiguous finance verbs (fund/funding/raise) are deliberately NOT
+  // considered here — "companies raising prices" must stay buyer-intent.
+  const tokens = tokenizeInput(raw);
+  if (tokens.category !== "investor") return false;
+  return /\b(investors?|vcs?|angels?|venture capital|pre-?seed|seed round)\b/i.test(
+    tokens.expanded,
   );
 }
 
@@ -503,41 +519,72 @@ function investorCheckQuestion(): ClarifyQuestion {
   };
 }
 
-function investorSectorQuestion(): ClarifyQuestion {
+function investorSectorQuestion(preferred?: string | null): ClarifyQuestion {
+  const base: ClarifyOption[] = [
+    { id: "AI", label: "AI / ML", hint: "Model, applied AI, infra", recommended: true },
+    { id: "Fintech", label: "Fintech", hint: "Payments, lending, infra" },
+    { id: "Healthcare", label: "Healthcare", hint: "Biohealth, digital health" },
+    { id: "Climate", label: "Climate", hint: "Energy, sustainability" },
+    { id: "SaaS", label: "SaaS", hint: "B2B software" },
+    { id: "DevTools", label: "DevTools", hint: "Developer platforms" },
+    { id: "any", label: "No sector filter", hint: "Match any thesis" },
+  ];
+  // Input-tailored: the user's own niche (from their query/profile) leads the
+  // options with the recommended badge, replacing the hardcoded default.
+  const p = (preferred || "").trim();
+  if (p && !base.some((o) => o.label.toLowerCase() === p.toLowerCase())) {
+    for (const o of base) o.recommended = false;
+    base.unshift({
+      id: p,
+      label: p.charAt(0).toUpperCase() + p.slice(1),
+      hint: "From your profile",
+      recommended: true,
+    });
+  }
   return {
     id: "investor_sector",
     question: "What sector is your startup in?",
     allowOther: true,
-    options: [
-      { id: "AI", label: "AI / ML", hint: "Model, applied AI, infra", recommended: true },
-      { id: "Fintech", label: "Fintech", hint: "Payments, lending, infra" },
-      { id: "Healthcare", label: "Healthcare", hint: "Biohealth, digital health" },
-      { id: "Climate", label: "Climate", hint: "Energy, sustainability" },
-      { id: "SaaS", label: "SaaS", hint: "B2B software" },
-      { id: "DevTools", label: "DevTools", hint: "Developer platforms" },
-      { id: "any", label: "No sector filter", hint: "Match any thesis" },
-    ],
+    options: base,
   };
 }
 
+export type KnownSlots = {
+  stage?: string | null;
+  sector?: string | null;
+  check?: string | null;
+  /** Place already known from the tokenizer or user memory — skips geography. */
+  geo?: string | null;
+};
+
 export function buildClarifyingQuestions(
   classified: ClassifiedQuery,
-  opts: { hasLocation?: boolean } = {},
+  opts: {
+    hasLocation?: boolean;
+    known?: KnownSlots;
+    /** User memory niche — seeds the sector question with their own words. */
+    niche?: string | null;
+  } = {},
 ): ClarifyQuestion[] {
   const product = isProductClarifyPath(classified);
   const raw = classified.raw || "";
   const statedAudience = extractStatedAudience(raw);
   const statedExp = extractStatedExperience(raw);
   const statedBuyer = hasStatedBuyerType(raw);
-  const hasLocation = !!opts.hasLocation || !!classified.location || mentionsPlace(raw);
+  const hasLocation =
+    !!opts.hasLocation || !!classified.location || mentionsPlace(raw) || !!opts.known?.geo;
   const clientsHunt = isClientsBuyerHunt(classified);
   const out: ClarifyQuestion[] = [];
 
   // Investor directory hunt — dedicated clarifiers (seeded DB path).
+  // Never re-ask slots the user already typed (tokens passed via opts.known).
   if (isFindInvestorHunt(classified)) {
-    out.push(investorStageQuestion());
-    out.push(investorCheckQuestion());
-    out.push(investorSectorQuestion());
+    const knownStage = (opts.known?.stage || "").trim();
+    const knownSector = (opts.known?.sector || "").trim();
+    const knownCheck = (opts.known?.check || "").trim();
+    if (!knownStage) out.push(investorStageQuestion());
+    if (!knownCheck) out.push(investorCheckQuestion());
+    if (!knownSector) out.push(investorSectorQuestion(opts.niche));
     if (!hasLocation) out.push(geographyQuestion());
     return out.slice(0, 4);
   }
@@ -742,16 +789,17 @@ export function applyClarifyAnswers(
   const signalFocus = product ? (answers.signal_focus ?? "all") : undefined;
   const inferredExp = extractStatedExperience(classified.raw || "");
   const clientsHunt = isClientsBuyerHunt(classified);
-  // Clients / buying-signal hunts: never invent a YoE bucket — it biases ATS
-  // filters toward junior roles the user never asked for.
+  const findInvestors = isFindInvestorHunt(classified);
+  const localHunt = isLocalBusinessHunt(classified);
+  // Clients / buying-signal / investor / local hunts: never invent a YoE bucket
+  // — it biases ATS filters toward junior roles the user never asked for, and
+  // leaks "0-1 years experience" into investor/local summaries.
   const experience =
-    product || clientsHunt
+    product || clientsHunt || findInvestors || localHunt
       ? (answers.experience ?? inferredExp ?? undefined)
       : (answers.experience ?? inferredExp ?? "0-1");
 
   const location = answers.other?.geography?.trim() || classified.location || GEO_LOCATIONS[geo];
-
-  const findInvestors = isFindInvestorHunt(classified);
   const localOpportunity =
     answers.local_opportunity ||
     (answers.other?.local_opportunity as ClarifyAnswers["local_opportunity"]) ||
@@ -815,8 +863,16 @@ export { isFindInvestorHunt, isLocalBusinessHunt };
 
 export function mentionsPlace(raw: string): boolean {
   const t = (raw || "").trim();
-  return /\b(?:in|near|around|across|based\s+in|located\s+in)\s+(?:the\s+)?[A-Z][A-Za-z.'-]+(?:\s+[A-Z][A-Za-z.'-]+)?/.test(
-    t,
+  const m =
+    /\b(?:in|near|around|across|based\s+in|located\s+in)\s+(?:the\s+)?([A-Za-z][A-Za-z.'-]+(?:\s+[A-Za-z][A-Za-z.'-]+)?)/.exec(
+      t,
+    );
+  if (!m) return false;
+  // Accept lowercase places ("in camrose") — real users type lowercase. Reject
+  // prepositional/idiomatic phrases ("in the morning", "in particular", …).
+  const candidate = m[1].toLowerCase();
+  return !/^(the|a|an|my|our|their|his|her|its|this|that|these|those|order|advance|general|particular|detail|depth|terms|case|addition|short|total|between|contrast|front|middle|place|return|response|regard|relation|spite|time|view|fact|other|words|summary|conclusion|process|way|hands|doubt|light|event|face|future|past|present|end|start|beginning|progress|demand|market|industry|niche|field|business|businesses|companies|company|firms?|agenc\w*|location|locations|advance)$/.test(
+    candidate,
   );
 }
 

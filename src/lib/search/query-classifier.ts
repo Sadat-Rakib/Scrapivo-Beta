@@ -1181,6 +1181,15 @@ export function extractLocationFromQuery(text: string): string | null {
     )
     .replace(/\s+/g, " ")
     .trim();
+  // Clause boundary: the lazy capture runs to the next punctuation, so
+  // subordinate clauses leak in ("camrose that dont have website" →
+  // "Camrose That Dont Have Website"). Truncate at the first clause marker.
+  loc = loc
+    .split(
+      /\b(?:that|which|who|whose|with|without|dont|don't|not|no|have|has|had|want|looking|need|nearby|and|but)\b/i,
+    )[0]
+    .replace(/\s+/g, " ")
+    .trim();
   // Drop trailing skill leftovers that got captured (e.g. "India marketing")
   loc = loc
     .replace(/\b(marketing|seo|design|software|tech|digital|agency|agencies)\b/gi, " ")
@@ -1402,6 +1411,9 @@ export function detectSkillMentions(text: string): string[] {
 // keyword skill because no concrete technology was detected.
 const SIGNAL_BOILERPLATE = new Set([
   "currently",
+  "actively",
+  "remotely",
+  "remote",
   "hiring",
   "hire",
   "hired",
@@ -1608,17 +1620,29 @@ export function inferGoalFromQuery(text: string): Goal | null {
 
   if (isProductPitchQuery(t)) return "clients";
 
+  // "companies actively hiring remotely" with NO craft named anywhere means
+  // "show me open roles" (jobs), not "companies that need my (missing) craft".
+  // The clients regex below only means a demand hunt when a skill/craft is
+  // actually in play (e.g. "companies looking for writers").
+  const craftMentioned = detectSkillMentions(t).length > 0 || !!findRoleMatch(t);
+
   // Demand hunt for buyers of a craft — always clients.
   if (
-    /\b(companies|people|businesses|firms?)\b.{0,40}\b(looking for|need|want|hiring|seeking)\b/.test(
-      t,
-    ) ||
+    (craftMentioned &&
+      /\b(companies|people|businesses|firms?)\b.{0,40}\b(looking for|need|want|hiring|seeking)\b/.test(
+        t,
+      )) ||
     /\b(looking for|find)\s+(people|companies|businesses|clients|customers)\b.{0,40}\b(who|that)\b/.test(
       t,
     ) ||
     /\b(who|that)\s+(need|want|are looking for|buy)\b/.test(t)
   ) {
     return "clients";
+  }
+
+  // Craft-less hiring ask → jobs (the ATS/job-board fan-out).
+  if (!craftMentioned && /\b(companies|businesses|firms?|startups?)\b.{0,40}\b(hiring|recruiting|onboarding)\b/.test(t)) {
+    return "jobs";
   }
 
   // Explicit job/role seeker — not "looking for people who need…".
@@ -1930,6 +1954,9 @@ export function classifyQuery(raw: string): ClassifiedQuery {
       roleFromRaw?.key ||
       detected[0] ||
       fallbackSignalSkill(skillSeed) ||
+      // Craft-less hiring asks ("companies actively hiring remotely"): every
+      // word is boilerplate, so name the intent instead of leaking junk.
+      (/\bhiring|recruit(?:ing|ment)?\b/i.test(skillSeed) ? "hiring" : "") ||
       extractCoreSkill(skillSeed) ||
       trimmed.split(/\s+/).slice(0, 4).join(" ");
     // Always expand bare skills ("design") via ROLE_CATALOG — detected-only

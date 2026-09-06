@@ -47,3 +47,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Giant local datasets — exceed GitHub 100MB file limit; keep out of git
+data/BasicCompanyDataAsOneFile.zip
+data/pipeline.duckdb
+data/local_businesses_*.jsonl
+data/companies_complete.jsonl
+*.bak
+*.prev
+*.tmp

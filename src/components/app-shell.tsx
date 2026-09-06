@@ -41,10 +41,7 @@ const navItems = [
   { to: "/guides", label: "Guides", icon: BookOpen },
 ] as const;
 
-const secondaryItems = [
-  { to: "/profile", label: "Settings", icon: Settings },
-  { to: "/help", label: "Help", icon: HelpCircle },
-] as const;
+const secondaryItems = [{ to: "/help", label: "Help", icon: HelpCircle }] as const;
 
 const LEFT_STORAGE_KEY = "scrapivo:left-sidebar-collapsed";
 const RIGHT_STORAGE_KEY = "scrapivo:right-sidebar-collapsed";
@@ -190,14 +187,32 @@ export function AppShell({ children }: { children: ReactNode }) {
     </div>
   );
 
-  const renderLeftSidebarContent = (isCollapsed: boolean, showToggle: boolean) => (
+  const renderLeftSidebarContent = (isCollapsed: boolean) => (
     <div className="flex flex-col h-full w-full min-w-0 text-white">
-      {/* Brand Header — §1.2: Toggle now positioned via dedicated straddling button */}
-      <div
-        className={`h-16 flex items-center justify-between px-3 border-b border-white/10 shrink-0`}
-      >
-        <div className="flex items-center gap-2.5 min-w-0 overflow-hidden">
-          <img src={LOGO_SRC} alt="Scrapivo" className="h-7 w-auto shrink-0" />
+      {/* Brand Header IS the sidebar toggle: logo normally, toggle icon on
+          hover (Z-code style), tooltip labels the action. */}
+      <div className="h-16 flex items-center px-3 border-b border-white/10 shrink-0">
+        <button
+          type="button"
+          onClick={() => setLeftCollapsed((c) => !c)}
+          title={isCollapsed ? "Open sidebar" : "Close sidebar"}
+          aria-label={isCollapsed ? "Open sidebar" : "Close sidebar"}
+          className="group flex items-center gap-2.5 min-w-0 overflow-hidden rounded-lg p-1 -ml-1 hover:bg-white/[0.06] transition-colors"
+        >
+          <span className="relative block h-7 w-7 shrink-0">
+            <img
+              src={LOGO_SRC}
+              alt="Scrapivo"
+              className="absolute inset-0 h-7 w-7 object-contain transition-opacity group-hover:opacity-0"
+            />
+            <span className="absolute inset-0 items-center justify-center text-white/80 opacity-0 transition-opacity group-hover:opacity-100 hidden group-hover:flex">
+              {isCollapsed ? (
+                <PanelLeftOpen className="size-5" />
+              ) : (
+                <PanelLeftClose className="size-5" />
+              )}
+            </span>
+          </span>
           {!isCollapsed && (
             <span
               style={{
@@ -211,7 +226,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               Scrapivo
             </span>
           )}
-        </div>
+        </button>
       </div>
 
       {/* Nav Links — §1.1: overflow-hidden on container for glass overlay containment */}
@@ -266,19 +281,32 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         ) : (
           <div className="relative" ref={accountPopoverRef}>
-            <button
-              type="button"
-              onClick={() => setAccountPopoverOpen((v) => !v)}
-              className="w-full flex items-center gap-2.5 p-2 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] transition-colors text-left"
-            >
-              <div className="size-8 rounded-full bg-white/15 border border-white/20 flex items-center justify-center text-white text-xs font-semibold shrink-0">
-                {email ? email[0]?.toUpperCase() : "S"}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-xs font-medium text-white truncate">{email || "Account"}</div>
-                <div className="text-[11px] text-white/40 mt-0.5">Manage account</div>
-              </div>
-            </button>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setAccountPopoverOpen((v) => !v)}
+                className="flex-1 min-w-0 flex items-center gap-2.5 p-2 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] transition-colors text-left"
+              >
+                <div className="size-8 rounded-full bg-white/15 border border-white/20 flex items-center justify-center text-white text-xs font-semibold shrink-0">
+                  {email ? email[0]?.toUpperCase() : "S"}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-medium text-white truncate">
+                    {email || "Account"}
+                  </div>
+                  <div className="text-[11px] text-white/40 mt-0.5">Manage account</div>
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate({ to: "/profile" })}
+                title="Settings"
+                aria-label="Settings"
+                className="size-9 shrink-0 rounded-xl border border-white/10 bg-white/[0.03] text-white/60 hover:text-white hover:bg-white/[0.08] flex items-center justify-center transition-colors"
+              >
+                <Settings className="size-4" />
+              </button>
+            </div>
 
             {/* Account Popover — contained within the sidebar's own width */}
             {accountPopoverOpen &&
@@ -297,22 +325,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           leftCollapsed ? "w-16" : "w-60 max-w-[25vw]"
         }`}
       >
-        {renderLeftSidebarContent(leftCollapsed, true)}
-
-        {/* Left sidebar collapse toggle — 28px glass circle straddling sidebar right border */}
-        <button
-          type="button"
-          onClick={() => setLeftCollapsed((c) => !c)}
-          aria-label={leftCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          title={leftCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className="absolute top-1/2 -translate-y-1/2 -right-3.5 z-30 size-7 rounded-full bg-[#141418] border border-white/20 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition-all shadow-lg hover:scale-105"
-        >
-          {leftCollapsed ? (
-            <ChevronRight className="size-3.5" />
-          ) : (
-            <ChevronLeft className="size-3.5" />
-          )}
-        </button>
+        {renderLeftSidebarContent(leftCollapsed)}
       </aside>
 
       {/* Main Column */}
@@ -332,7 +345,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </button>
               </SheetTrigger>
               <SheetContent side="left" className="p-0 w-64 bg-[#0a0a0b] border-r border-white/10">
-                {renderLeftSidebarContent(false, false)}
+                {renderLeftSidebarContent(false)}
               </SheetContent>
             </Sheet>
 
@@ -362,7 +375,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-2 ml-auto">
             <button
               type="button"
-              onClick={() => navigate({ to: "/discover" })}
+              onClick={() => navigate({ to: "/discover", search: { fresh: Date.now() } })}
               aria-label="New chat"
               className="glass-pill px-3 sm:px-3.5 py-1.5 text-xs font-medium text-white flex items-center gap-1.5 hover:bg-white/15"
             >

@@ -142,7 +142,8 @@ export const runLocalBusinessSearch = createServerFn({ method: "POST" })
     let used = profile?.searches_used ?? 0;
     const resetAt = profile?.searches_reset_at ? new Date(profile.searches_reset_at) : new Date(0);
     if (resetAt < new Date(Date.now() - 86400_000)) used = 0;
-    if (plan === "free" && used >= 5) {
+    const { isOwnerEmail } = await import("./owner");
+    if (!isOwnerEmail(context.user.email) && plan === "free" && used >= 5) {
       return {
         error: "limit" as const,
         message: "Free plan: 5 searches per day. Try again tomorrow.",
@@ -155,18 +156,39 @@ export const runLocalBusinessSearch = createServerFn({ method: "POST" })
     const location = normalizeLocalLocation(data.location.trim());
     const qx = toQx(category, location);
 
+    // DB-first: the Overture extract (data/local_businesses_*.jsonl) answers
+    // from disk when it covers this category+location — instant, free, and
+    // independent of Overpass uptime. Live OSM stays as fallback/top-up.
+    let fileLeads: Parameters<typeof leadToRow>[0][] = [];
+    try {
+      const { searchLocalBusinessFileLeads } = await import("./local/businesses-file-source");
+      fileLeads = (await searchLocalBusinessFileLeads({
+        craft: category,
+        location,
+        limit: 60,
+      })) as Parameters<typeof leadToRow>[0][];
+    } catch (e) {
+      console.warn(`[local-businesses] file source failed for ${category} in ${location}:`, e);
+    }
+    const DB_FIRST_MIN = 12;
+
     const { searchOsmLocalBusinesses } = await import("./search/osm-local-businesses.server");
 
-    // OSM (Nominatim + Overpass) is PRIMARY and fully free. The paid-optional
-    // Places chain only fires when OSM comes back thin AND a key exists.
-    const osm = await searchOsmLocalBusinesses(qx, location).catch((err) => {
-      console.warn(`[local-businesses] OSM search failed for ${category} in ${location}:`, err);
-      return [];
-    });
+    // OSM (Nominatim + Overpass) is the live fallback and thin-coverage top-up.
+    const osm =
+      fileLeads.length >= DB_FIRST_MIN
+        ? []
+        : await searchOsmLocalBusinesses(qx, location).catch((err) => {
+            console.warn(`[local-businesses] OSM search failed for ${category} in ${location}:`, err);
+            return [];
+          });
 
-    let places: Awaited<ReturnType<typeof import("./search/foursquare-places.server")["searchLocalBusinesses"]>> = [];
+    let places: Awaited<
+      ReturnType<(typeof import("./search/foursquare-places.server"))["searchLocalBusinesses"]>
+    > = [];
     const anyPlacesKey = !!(process.env.GEOAPIFY_API_KEY || process.env.FOURSQUARE_API_KEY);
-    if (osm.length < 12 && anyPlacesKey) {
+    const fileFirst = fileLeads.length >= DB_FIRST_MIN;
+    if (!fileFirst && osm.length < 12 && anyPlacesKey) {
       const { searchLocalBusinesses } = await import("./search/foursquare-places.server");
       places = await searchLocalBusinesses(qx, location, { directoryMode: true, min: 10 }).catch(
         (err) => {
@@ -180,12 +202,12 @@ export const runLocalBusinessSearch = createServerFn({ method: "POST" })
     }
 
     console.info(
-      `[local-businesses] ${category} in ${location}: OSM=${osm.length}, PlacesTopUp=${places.length}`,
+      `[local-businesses] ${category} in ${location}: File=${fileLeads.length}, OSM=${osm.length}, PlacesTopUp=${places.length}`,
     );
 
     const byKey = new Map<string, LocalBusinessRow>();
-    for (const l of [...osm, ...places]) {
-      const row = leadToRow(l as Parameters<typeof leadToRow>[0], category, location);
+    for (const l of [...fileLeads, ...osm, ...places]) {
+      const row = leadToRow(l, category, location);
       if (!row) continue;
       const prev = byKey.get(row.key);
       if (!prev || row.score > prev.score) byKey.set(row.key, row);
@@ -391,10 +413,10 @@ export const runLocalBusinessSearch = createServerFn({ method: "POST" })
       ...new Set([...osm, ...places].map((l) => (l as { source?: string }).source || "osm")),
     ];
 
-    await supabase
-      .from("profiles")
-      .update({ searches_used: used + 1 })
-      .eq("id", userId);
+    // Owner runs unlimited searches — never tick the daily counter.
+    if (!isOwnerEmail(context.user.email)) {
+      await supabase.from("profiles").update({ searches_used: used + 1 }).eq("id", userId);
+    }
     await supabase.from("search_history").insert({
       user_id: userId,
       query: `local: ${category} in ${location}`,

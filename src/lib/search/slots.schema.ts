@@ -8,6 +8,8 @@ export const SlotSchema = z.object({
   stage: z.string().max(40).nullable(),
   role: z.string().max(120).nullable(),
   budget_or_check: z.string().max(40).nullable(),
+  /** Work-mode signals for job/hiring queries ("remote", "hybrid", "onsite"). */
+  work_mode: z.enum(["remote", "hybrid", "onsite"]).nullable(),
   intent_verb: z.enum(["hire", "pitch", "fundraise", "jobhunt", "buy", "unknown"]),
   missing_slots: z
     .array(z.enum(["geo", "sector", "stage", "scale", "role", "budget_or_check", "intent_verb"]))

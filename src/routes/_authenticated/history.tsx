@@ -48,7 +48,7 @@ function HistoryPage() {
             </div>
             <button
               type="button"
-              onClick={() => navigate({ to: "/discover" })}
+              onClick={() => navigate({ to: "/discover", search: { q: h.query } })}
               className="glass-pill px-3.5 py-1.5 text-xs font-medium text-white/80 hover:text-white flex items-center gap-1.5 shrink-0"
             >
               <RotateCw className="size-3.5" />

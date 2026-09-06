@@ -48,10 +48,9 @@ export function ChatHistoryPanel() {
             <button
               key={h.id}
               onClick={() => {
-                const targetPath = "/discover";
                 navigate({
-                  to: targetPath,
-                  search: { q: h.query } as any,
+                  to: "/discover",
+                  search: { q: h.query },
                 });
               }}
               className="w-full flex gap-3 text-left p-3 rounded-xl hover:bg-sidebar-accent/40 transition-colors group cursor-pointer"
@@ -78,7 +77,7 @@ export function ChatHistoryPanel() {
 
       <div className="p-4 shrink-0 border-t border-border/40">
         <Button
-          onClick={() => navigate({ to: "/discover" })}
+          onClick={() => navigate({ to: "/discover", search: { fresh: Date.now() } })}
           className="w-full rounded-full text-xs font-semibold"
         >
           <Plus className="size-3.5 mr-1.5" /> Create new chat
