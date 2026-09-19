@@ -1,0 +1,69 @@
+{
+  "gate": "2B",
+  "status": "complete",
+  "date": "2026-09-19",
+  "production_mutations": false,
+  "root_causes": {
+    "people": [
+      "city/country partition routing conflation",
+      "common person roles omitted from SearchSpec role extraction",
+      "final role validation did not reuse token-aware matcher",
+      "country-wide founder wildcard query could hit statement timeout"
+    ],
+    "companies": [
+      "local JSONL index mapper hard-coded physical contact fields to null",
+      "query category vocabulary differed from physical category labels",
+      "coarse physical geography cannot support arbitrary city claims"
+    ],
+    "businesses": [
+      "gazetteer fallback admitted noisy country stems",
+      "diacritics and exact locality comparison were inconsistent",
+      "category variants were not shared across all retrieval stages"
+    ],
+    "investors": [
+      "missing explicit investor type could silently remove merged rows in legacy path"
+    ]
+  },
+  "before": {
+    "people_s3_probes": { "queries": 6, "candidates": 0 },
+    "companies_s3_probes": { "queries": 6, "candidates": 12, "usable": 0 },
+    "businesses_s3_probes": { "queries": 6, "queries_with_candidates": 3, "candidates": 12, "usable": 10 }
+  },
+  "after": {
+    "certification": { "pass": 19, "valid_empty": 9, "bug": 0, "wrong_result": 0, "timeout": 0 },
+    "special_pass": 3,
+    "golden": { "person": "PASS", "company": "PASS", "business": "PASS", "investor": "PASS" },
+    "quantity_50": { "returned": 50, "has_more": true, "total_available": null },
+    "no_website": { "returned": 10, "pending_enrichment": 0 },
+    "email_phone_required": { "returned": 7, "qualification_rejected": 4 },
+    "diacritic_location": { "query": "restaurants in São Paulo", "returned": 4, "pending_enrichment": 2 },
+    "locationless_person": { "query": "copywriters", "returned": 5 }
+  },
+  "performance_ms": {
+    "golden_person": 5512,
+    "golden_company": 9305,
+    "golden_business": 7759,
+    "golden_investor": 1048,
+    "empty_hvac_toronto": 16427,
+    "diacritic_sao_paulo": 49130,
+    "locationless_copywriter": 15089
+  },
+  "index_decision": "Postgres candidate index first, canonical S3 fallback second; keep investors on S3",
+  "index_counts": {
+    "businesses": { "indexed": 609387, "physical": 16338186 },
+    "companies": { "indexed": 79014, "physical": 1602141, "safely_us_routable": 682555, "unmapped_geo": 919586 },
+    "people": { "indexed": 399397, "physical": 484325 },
+    "investors": { "indexed": 0, "physical": 8076 }
+  },
+  "artifacts": [
+    "reports/gate2/02-retrieval-certification.json",
+    "reports/gate2/02-index-backfill-plan.md",
+    "reports/gate2/02-retrieval-repair.md"
+  ],
+  "remaining": [
+    "company corpus coarse geography",
+    "16-49 second large-country S3 fallback",
+    "radius and negative-location SearchSpec support",
+    "jobs have no stored corpus"
+  ]
+}

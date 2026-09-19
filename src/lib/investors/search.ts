@@ -15,6 +15,7 @@ import type {
   isNewFormat,
 } from "./types";
 import { matchLocation, type LocationMatchResult } from "./location-hierarchy";
+import { inferType } from "./types";
 import { getSemanticMatcher } from "./semantic-matcher";
 import { isFirmRecord } from "./card-adapters";
 
@@ -32,7 +33,16 @@ const data = investorsFile as InvestorsFile;
 export function getAllInvestors(): InvestorWithMetadata[] {
   // `entities` is the fallback alias some dataset builds use for the same
   // array — read it when `investors` is missing so renames never blank search.
-  return data.investors ?? data.entities ?? [];
+  const rows = data.investors ?? data.entities ?? [];
+  if (rows.length === 0 && typeof console !== "undefined") {
+    // Loud (not silent) — an empty investor dataset used to surface as
+    // "no results" with no diagnostic trail (see INVESTOR_SEARCH_ROOT_CAUSE).
+    console.error(
+      "[investors] dataset empty: investors_merged.json provided no rows " +
+        "(keys: " + Object.keys(data ?? {}).join(",") + ")",
+    );
+  }
+  return rows;
 }
 
 export type InvestorSearchFilters = {
@@ -441,16 +451,40 @@ async function runInvestorPipeline(
     rows = rows.filter((r) => isFirmRecord(r) === wantFirm);
   }
 
-  // Filter by investor type (vc, angel, scout)
+  // Filter by investor type (vc, angel, scout). Records without an explicit
+  // entity_type/investor_type (e.g. merged rows with free-string `type` like
+  // "venture_capital_investor") are inferred from title/firm/type instead of
+  // being silently dropped — the old `return false` wiped entire results.
   if (type !== "any") {
     rows = rows.filter((r) => {
-      if ("entity_type" in r) {
+      if ("entity_type" in r && typeof r.entity_type === "string" && r.entity_type) {
         return r.entity_type === type;
       }
-      if ("investor_type" in r) {
+      if ("investor_type" in r && typeof r.investor_type === "string" && r.investor_type) {
         return r.investor_type === type;
       }
-      return false;
+      const loose = r as {
+        type?: unknown;
+        title?: unknown;
+        role?: unknown;
+        firm?: unknown;
+        firm_name?: unknown;
+      };
+      const title = [loose.title, loose.role].filter(Boolean).join(" ");
+      const firm = [loose.firm, loose.firm_name].filter(Boolean).join(" ");
+      let inferred = inferType(String(title ?? ""), String(firm ?? ""));
+      if (inferred === "unknown" && typeof loose.type === "string") {
+        const t = loose.type.toLowerCase();
+        // Free-string merged types: "*investor*" (incl. venture_capital_investor)
+        // are people; firm-ish tokens stay unknown unless explicit.
+        if (t.includes("angel") && !t.includes("network")) inferred = "angel";
+        else if (t.includes("scout")) inferred = "scout";
+        else if (t.includes("investor") || t.includes("partner") || t.includes("vc")) {
+          inferred = "vc";
+        }
+      }
+      if (type === "unknown") return true;
+      return inferred === type;
     });
   }
 

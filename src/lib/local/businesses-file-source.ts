@@ -475,6 +475,132 @@ async function streamFilterFile(
   stream.close();
 }
 
+/** Common phone country prefixes (E.164) — enough to sanity-check that a
+ *  row's phone plausibly belongs to the country the user asked about. */
+const PHONE_PREFIXES: Record<string, string> = {
+  US: "1", CA: "1", GB: "44", IE: "353", FR: "33", DE: "49", ES: "34", IT: "39",
+  NL: "31", BE: "32", CH: "41", AT: "43", PT: "351", PL: "48", SE: "46", NO: "47",
+  DK: "45", FI: "358", GR: "30", TR: "90", RU: "7", UA: "380", RO: "40", HU: "36",
+  CZ: "420", SK: "421", HR: "385", RS: "381", BG: "359", IS: "354", LU: "352",
+  MT: "356", CY: "357", AE: "971", SA: "966", IL: "972", QA: "974", KW: "965",
+  BH: "973", OM: "968", JO: "962", LB: "961", IN: "91", PK: "92", BD: "880",
+  LK: "94", NP: "977", CN: "86", JP: "81", KR: "82", TW: "886", HK: "852",
+  SG: "65", MY: "60", ID: "62", TH: "66", VN: "84", PH: "63", KZ: "7",
+  UZ: "998", GE: "995", AZ: "994", AM: "374", MX: "52", BR: "55", AR: "54",
+  CL: "56", CO: "57", PE: "51", UY: "598", EC: "593", BO: "591", PY: "595",
+  CR: "506", PA: "507", GT: "502", DO: "1", PR: "1", ZA: "27", EG: "20",
+  NG: "234", KE: "254", MA: "212", GH: "233", TZ: "255", TN: "216",
+  AU: "61", NZ: "64",
+};
+
+/** True when a phone number plausibly belongs to the given country. Numbers
+ *  without a "+" prefix can't be judged and pass (never drop honest unknowns). */
+export function phoneMatchesCountry(phone: string | null | undefined, iso2: string): boolean {
+  if (!phone) return true;
+  const p = phone.replace(/[^\d+]/g, "");
+  if (!p.startsWith("+")) return true;
+  const prefix = PHONE_PREFIXES[iso2.toUpperCase()];
+  if (!prefix) return true;
+  return p.startsWith(`+${prefix}`);
+}
+
+/** Resolve a free-text location to its country ISO2 via the city map +
+ *  regions manifest. Used for phone sanity and routing context. */
+export function countryForLocation(location: string): string | null {
+  const manifest = loadRegionsManifest();
+  const { stems } = resolveRegionFiles(location, manifest);
+  for (const stem of stems) {
+    const entry = manifest.find((m) => m.file_stem === stem);
+    if (entry) return entry.iso2;
+  }
+  return null;
+}
+
+async function collectStem(
+  stem: string,
+  qWithCity: LocalFileQuery,
+  seen: Set<string>,
+  scored: ScoredBusinessFileRecord[],
+  stopAt: number,
+): Promise<void> {
+  if (isBigFile(stem)) {
+    // Mega-country files (IN/BR/US ≈ 0.8 GB): stream line by line —
+    // readFileSync exceeds the V8 string cap and the parsed form would
+    // blow the heap.
+    const path = findFile(stem);
+    if (path) await streamFilterFile(path, qWithCity, seen, scored, stopAt);
+  } else {
+    const records = loadRegionRecords(stem);
+    for (const { rec, score } of filterBusinessFileRecords(records, qWithCity)) {
+      const key = `${rec.source}:${rec.registry_id}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      scored.push({ rec, score });
+    }
+  }
+}
+
+/** A lead "has a website" when it carries a company domain or an http post URL. */
+export function leadHasWebsite(l: Lead): boolean {
+  const ext = l as Lead & { company_domain?: string };
+  if (ext.company_domain) return true;
+  const url = l.full_post_url ?? "";
+  return /^https?:\/\//i.test(url) && !/openstreetmap\.org|google\.com\/maps/i.test(url);
+}
+
+function leadHasPhone(l: Lead): boolean {
+  const ext = l as Lead & { phones?: string[] };
+  return !!ext.phones?.length;
+}
+
+function leadHasEmail(l: Lead): boolean {
+  const ext = l as Lead & { emails?: string[] };
+  return !!ext.emails?.length;
+}
+
+/** Opportunity filter for MERGED live rows (the file path filters in scoreRecord).
+ *  Rows that fail are wrong for the ask — dropped, never shown. */
+export function applyDirectoryOpportunityFilter(
+  leads: Lead[],
+  opportunity: string | null | undefined,
+): Lead[] {
+  if (!opportunity || opportunity === "any") return leads;
+  return leads.filter((l) => {
+    if (opportunity === "no_website") return !leadHasWebsite(l);
+    if (opportunity === "has_phone") return leadHasPhone(l);
+    if (opportunity === "sales_ready") return leadHasPhone(l) || leadHasEmail(l);
+    return true;
+  });
+}
+
+/** Strip country-contradicting phones (e.g. +1 on an Indian business).
+ *  The ROW stays — only the wrong number goes. Numbers without a "+" prefix
+ *  can't be judged and are kept. Returns how many numbers were stripped. */
+export function sanitizeDirectoryLeadPhones(leads: Lead[], iso2: string | null): number {
+  if (!iso2) return 0;
+  let stripped = 0;
+  for (const l of leads) {
+    const ext = l as Lead & { phones?: string[] };
+    const phones = ext.phones;
+    if (!phones?.length) continue;
+    const kept = phones.filter((p) => phoneMatchesCountry(p, iso2));
+    if (kept.length === phones.length) continue;
+    stripped += phones.length - kept.length;
+    const dropped = phones.filter((p) => !phoneMatchesCountry(p, iso2));
+    ext.phones = kept.length ? kept : undefined;
+    for (const d of dropped) {
+      const frag = `Phone: ${d}`;
+      if (typeof l.snippet === "string" && l.snippet.includes(frag)) {
+        l.snippet = l.snippet
+          .split(" · ")
+          .filter((part) => part.trim() !== frag)
+          .join(" · ");
+      }
+    }
+  }
+  return stripped;
+}
+
 /** Lead-shaped rows for the Discover directory branch (OSM-source shape). */
 export async function searchLocalBusinessFileLeads(q: LocalFileQuery): Promise<Lead[]> {
   const manifest = loadRegionsManifest();
@@ -486,23 +612,28 @@ export async function searchLocalBusinessFileLeads(q: LocalFileQuery): Promise<L
   const seen = new Set<string>();
   const qWithCity: LocalFileQuery = { ...q, cityTokens };
   for (const stem of stems) {
-    if (isBigFile(stem)) {
-      // Mega-country files (IN/BR/US ≈ 0.8 GB): stream line by line —
-      // readFileSync exceeds the V8 string cap and the parsed form would
-      // blow the heap.
-      const path = findFile(stem);
-      if (path) await streamFilterFile(path, qWithCity, seen, scored, limit * 3);
-    } else {
-      const records = loadRegionRecords(stem);
-      for (const { rec, score } of filterBusinessFileRecords(records, qWithCity)) {
-        const key = `${rec.source}:${rec.registry_id}`;
-        if (seen.has(key)) continue;
-        seen.add(key);
-        scored.push({ rec, score });
-      }
-    }
+    await collectStem(stem, qWithCity, seen, scored, limit * 3);
     if (scored.length >= limit * 3) break; // plenty to rank and slice
   }
+
+  // Two-pass fallback: a craft word that maps to no Overture category
+  // ("website" out of "without websites") zeroed pass 1 — re-scan location-only
+  // so ANY city/country still returns its businesses (generalOnly path).
+  if (scored.length < Math.min(15, limit)) {
+    const qLocationOnly: LocalFileQuery = {
+      ...qWithCity,
+      craft: undefined,
+      extraCrafts: [],
+      keywords: [],
+    };
+    for (const stem of stems) {
+      await collectStem(stem, qLocationOnly, seen, scored, limit * 3);
+      if (scored.length >= limit * 3) break;
+    }
+  }
   scored.sort((a, b) => b.score - a.score || a.rec.name.localeCompare(b.rec.name));
-  return recordsToLeads(scored.slice(0, limit));
+  const leads = recordsToLeads(scored.slice(0, limit));
+  // Strip country-contradicting phones from our own rows too (rows stay).
+  sanitizeDirectoryLeadPhones(leads, countryForLocation(q.location));
+  return leads;
 }

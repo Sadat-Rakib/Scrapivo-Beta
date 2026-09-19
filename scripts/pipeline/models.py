@@ -160,6 +160,7 @@ class PersonRecord(BaseModel):
     twitter: Optional[str] = None
     website: Optional[str] = None
     email: Optional[str] = None  # only when PUBLICLY published
+    phone: Optional[str] = None  # only when PUBLICLY published (e.g. user CSVs)
     bio: Optional[str] = None
     confidence: int = 50
     source_tier: str = "directory"

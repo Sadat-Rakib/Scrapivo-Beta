@@ -1,0 +1,1190 @@
+{
+  "generatedAt": "2026-09-19T18:24:52.806Z",
+  "summary": {
+    "pass": 19,
+    "valid-empty": 9
+  },
+  "probes": [
+    {
+      "label": "people/founders-canada",
+      "source": "pg-index",
+      "latencyMs": 1614,
+      "query": "founders in Canada",
+      "entity": "person",
+      "classification": "PASS",
+      "rows": 50,
+      "samples": [
+        {
+          "key": "s3people:dafa4528624d1ecb4b3709702a4cc090",
+          "name": "Mike Borg — Founder and CEO @ Index Biosystems",
+          "role": "Mike Borg — Founder and CEO @ Index Biosystems",
+          "category": null,
+          "location": "Saint Catharines",
+          "country": "CA",
+          "website": "http://www.linkedin.com/in/mike-borg-09736723",
+          "email": "mborg@indexbiosystems.com",
+          "phone": "+1 905-348-3335"
+        },
+        {
+          "key": "s3people:3ccb3f6753ea6b602d09b67f0cd573cd",
+          "name": "Joshua Pollack — Co-Founder @ CELL AG TECH",
+          "role": "Joshua Pollack — Co-Founder @ CELL AG TECH",
+          "category": null,
+          "location": "Toronto",
+          "country": "CA",
+          "website": "http://www.linkedin.com/in/joshuahartpollack",
+          "email": "josh@cellagtech.com",
+          "phone": "+1 416-834-5755"
+        },
+        {
+          "key": "s3people:cc29db6646b45a3f9ea4c70de8c6dd3d",
+          "name": "Trevor Golding — CEO + Founder @ Gold Leaf Technologies Inc.",
+          "role": "Trevor Golding — CEO + Founder @ Gold Leaf Technologies Inc.",
+          "category": null,
+          "location": "Ottawa",
+          "country": "CA",
+          "website": "http://www.linkedin.com/in/t-golding",
+          "email": "trevor@goldleaftech.com",
+          "phone": "+1 833-453-5323"
+        }
+      ],
+      "meta": {
+        "dbHit": true,
+        "engine": "pg-index",
+        "partitionsRead": [
+          "idx_people(country,city_norm,role_norm)"
+        ],
+        "rowsScanned": 50,
+        "rowsReturned": 50,
+        "elapsedMs": 1604,
+        "indexUsed": "idx_ppl_country_citynorm_rolenorm"
+      }
+    },
+    {
+      "label": "people/copywriters-canada",
+      "source": "pg-index",
+      "latencyMs": 3677,
+      "query": "copywriters in Canada",
+      "entity": "person",
+      "classification": "PASS",
+      "rows": 1,
+      "samples": [
+        {
+          "key": "s3people:0442226fb81c1fd14b4f281e4c87376d",
+          "name": "Trelawney Erwin — Copywriter & Owner @ Passion Works Digital",
+          "role": "Trelawney Erwin — Copywriter & Owner @ Passion Works Digital",
+          "category": null,
+          "location": "CA",
+          "country": "CA",
+          "website": "http://www.linkedin.com/in/trelawney-erwin-445421212",
+          "email": "trelawney@passionworksdigital.com",
+          "phone": "+1 902-401-1986"
+        }
+      ],
+      "meta": {
+        "dbHit": true,
+        "engine": "pg-index",
+        "partitionsRead": [
+          "idx_people(country,city_norm,role_norm)"
+        ],
+        "rowsScanned": 1,
+        "rowsReturned": 1,
+        "elapsedMs": 3670,
+        "indexUsed": "idx_ppl_country_citynorm_rolenorm"
+      }
+    },
+    {
+      "label": "people/software-engineers-toronto",
+      "source": "pg-index",
+      "latencyMs": 134,
+      "query": "software engineers in Toronto",
+      "entity": "person",
+      "classification": "VALID_EMPTY",
+      "rows": 0,
+      "samples": [],
+      "meta": {
+        "dbHit": false,
+        "engine": "pg-index",
+        "partitionsRead": [
+          "idx_people(country,city_norm,role_norm)"
+        ],
+        "rowsScanned": 0,
+        "rowsReturned": 0,
+        "elapsedMs": 129,
+        "indexUsed": "idx_ppl_country_citynorm_rolenorm"
+      }
+    },
+    {
+      "label": "people/designers-london",
+      "source": "pg-index",
+      "latencyMs": 331,
+      "query": "designers in London",
+      "entity": "person",
+      "classification": "PASS",
+      "rows": 3,
+      "samples": [
+        {
+          "key": "s3people:1e6ef68d306577a3fdb16ae6d29def20",
+          "name": "Adrian Myburgh — Lead Product Designer @ Agreena",
+          "role": "Adrian Myburgh — Lead Product Designer @ Agreena",
+          "category": null,
+          "location": "London",
+          "country": "GB",
+          "website": "http://www.linkedin.com/company/agreena",
+          "email": "adrian.myburgh@agreena.com",
+          "phone": "+44 20 3696 9700"
+        },
+        {
+          "key": "s3people:672cc890e92c0f84a2078fbe4ccaef65",
+          "name": "Adrian Myburgh — Lead Product Designer @ Agreena",
+          "role": "Adrian Myburgh — Lead Product Designer @ Agreena",
+          "category": null,
+          "location": "London",
+          "country": "GB",
+          "website": "http://www.linkedin.com/company/agreena",
+          "email": "adrian.myburgh@agreena.com",
+          "phone": "+44 20 3696 9700"
+        },
+        {
+          "key": "s3people:b76d7deb3db76b51c878097be9ba4286",
+          "name": "Adrian Myburgh — Lead Product Designer @ Agreena",
+          "role": "Adrian Myburgh — Lead Product Designer @ Agreena",
+          "category": null,
+          "location": "London",
+          "country": "GB",
+          "website": "http://www.linkedin.com/company/agreena",
+          "email": "adrian.myburgh@agreena.com",
+          "phone": "+44 20 3696 9700"
+        }
+      ],
+      "meta": {
+        "dbHit": true,
+        "engine": "pg-index",
+        "partitionsRead": [
+          "idx_people(country,city_norm,role_norm)"
+        ],
+        "rowsScanned": 3,
+        "rowsReturned": 3,
+        "elapsedMs": 330,
+        "indexUsed": "idx_ppl_country_citynorm_rolenorm"
+      }
+    },
+    {
+      "label": "people/sales-managers-new-york",
+      "source": "pg-index",
+      "latencyMs": 407,
+      "query": "sales managers in New York",
+      "entity": "person",
+      "classification": "PASS",
+      "rows": 37,
+      "samples": [
+        {
+          "key": "s3people:3398b3d58bae9930e416d2e9a946d56f",
+          "name": "Jedidiah Omorebokhae — Area Sales Manager @ Bosch",
+          "role": "Jedidiah Omorebokhae — Area Sales Manager @ Bosch",
+          "category": null,
+          "location": "New York",
+          "country": "US",
+          "website": "http://www.linkedin.com/in/jedidiahobrandmkt",
+          "email": "jedidiaho@hotmail.com",
+          "phone": "+1 877-267-2499"
+        },
+        {
+          "key": "s3people:37b641c123dc4f20dfa5ebdf0232480a",
+          "name": "Jedidiah Omorebokhae — Area Sales Manager @ Bosch",
+          "role": "Jedidiah Omorebokhae — Area Sales Manager @ Bosch",
+          "category": null,
+          "location": "New York",
+          "country": "US",
+          "website": "http://www.linkedin.com/in/jedidiahobrandmkt",
+          "email": "jedidiaho@hotmail.com",
+          "phone": "+1 877-267-2499"
+        },
+        {
+          "key": "s3people:95c0023850092e72603ddfef345da6dd",
+          "name": "Jedidiah Omorebokhae — Area Sales Manager @ Bosch",
+          "role": "Jedidiah Omorebokhae — Area Sales Manager @ Bosch",
+          "category": null,
+          "location": "New York",
+          "country": "US",
+          "website": "http://www.linkedin.com/in/jedidiahobrandmkt",
+          "email": "jedidiaho@hotmail.com",
+          "phone": "+1 877-267-2499"
+        }
+      ],
+      "meta": {
+        "dbHit": true,
+        "engine": "pg-index",
+        "partitionsRead": [
+          "idx_people(country,city_norm,role_norm)"
+        ],
+        "rowsScanned": 37,
+        "rowsReturned": 37,
+        "elapsedMs": 406,
+        "indexUsed": "idx_ppl_country_citynorm_rolenorm"
+      }
+    },
+    {
+      "label": "companies/ai-toronto",
+      "source": "pg-index",
+      "latencyMs": 146,
+      "query": "AI companies in Toronto",
+      "entity": "company",
+      "classification": "VALID_EMPTY",
+      "rows": 0,
+      "samples": [],
+      "meta": {
+        "dbHit": false,
+        "engine": "pg-index",
+        "partitionsRead": [
+          "idx_companies(country,city_norm)"
+        ],
+        "rowsScanned": 0,
+        "rowsReturned": 0,
+        "elapsedMs": 144,
+        "indexUsed": "idx_co_country_city_quality_cover"
+      }
+    },
+    {
+      "label": "companies/saas-london",
+      "source": "pg-index",
+      "latencyMs": 795,
+      "query": "SaaS companies in London",
+      "entity": "company",
+      "classification": "VALID_EMPTY",
+      "rows": 0,
+      "samples": [],
+      "meta": {
+        "dbHit": false,
+        "engine": "pg-index",
+        "partitionsRead": [
+          "idx_companies(country,city_norm)"
+        ],
+        "rowsScanned": 0,
+        "rowsReturned": 0,
+        "elapsedMs": 795,
+        "indexUsed": "idx_co_country_city_quality_cover"
+      }
+    },
+    {
+      "label": "companies/construction-calgary",
+      "source": "pg-index",
+      "latencyMs": 116,
+      "query": "construction companies in Calgary",
+      "entity": "company",
+      "classification": "VALID_EMPTY",
+      "rows": 0,
+      "samples": [],
+      "meta": {
+        "dbHit": false,
+        "engine": "pg-index",
+        "partitionsRead": [
+          "idx_companies(country,city_norm)"
+        ],
+        "rowsScanned": 0,
+        "rowsReturned": 0,
+        "elapsedMs": 115,
+        "indexUsed": "idx_co_country_city_quality_cover"
+      }
+    },
+    {
+      "label": "companies/healthcare-chicago",
+      "source": "pg-index",
+      "latencyMs": 138,
+      "query": "healthcare companies in Chicago",
+      "entity": "company",
+      "classification": "PASS",
+      "rows": 4,
+      "samples": [
+        {
+          "key": "yc:liv-labs-inc",
+          "name": "Liv Labs — Healthcare",
+          "role": "Liv Labs — Healthcare",
+          "category": "Healthcare",
+          "location": "Chicago",
+          "country": "US",
+          "website": "http://www.livlabsfitness.com",
+          "email": null,
+          "phone": null
+        },
+        {
+          "key": "yc:perspectives-health",
+          "name": "Perspectives Health — Healthcare",
+          "role": "Perspectives Health — Healthcare",
+          "category": "Healthcare",
+          "location": "Chicago",
+          "country": "US",
+          "website": "https://perspectiveshealth.ai/",
+          "email": null,
+          "phone": null
+        },
+        {
+          "key": "yc:synapticure",
+          "name": "Synapticure — Healthcare",
+          "role": "Synapticure — Healthcare",
+          "category": "Healthcare",
+          "location": "Chicago",
+          "country": "US",
+          "website": "http://www.synapticure.com",
+          "email": null,
+          "phone": null
+        }
+      ],
+      "meta": {
+        "dbHit": true,
+        "engine": "pg-index",
+        "partitionsRead": [
+          "idx_companies(country,city_norm)"
+        ],
+        "rowsScanned": 4,
+        "rowsReturned": 4,
+        "elapsedMs": 138,
+        "indexUsed": "idx_co_country_city_quality_cover"
+      }
+    },
+    {
+      "label": "companies/manufacturing-pune",
+      "source": "pg-index",
+      "latencyMs": 123,
+      "query": "manufacturing companies in Pune",
+      "entity": "company",
+      "classification": "VALID_EMPTY",
+      "rows": 0,
+      "samples": [],
+      "meta": {
+        "dbHit": false,
+        "engine": "pg-index",
+        "partitionsRead": [
+          "idx_companies(country,city_norm)"
+        ],
+        "rowsScanned": 0,
+        "rowsReturned": 0,
+        "elapsedMs": 123,
+        "indexUsed": "idx_co_country_city_quality_cover"
+      }
+    },
+    {
+      "label": "businesses/hvac-toronto",
+      "source": "pg-index",
+      "latencyMs": 171,
+      "query": "HVAC businesses in Toronto",
+      "entity": "business",
+      "classification": "VALID_EMPTY",
+      "rows": 0,
+      "samples": [],
+      "meta": {
+        "dbHit": false,
+        "engine": "pg-index",
+        "partitionsRead": [
+          "idx_businesses(country,city_norm,category)"
+        ],
+        "rowsScanned": 0,
+        "rowsReturned": 0,
+        "elapsedMs": 170,
+        "indexUsed": "idx_biz_country_citynorm_cat"
+      }
+    },
+    {
+      "label": "businesses/dentists-edmonton",
+      "source": "pg-index",
+      "latencyMs": 442,
+      "query": "dentists in Edmonton",
+      "entity": "business",
+      "classification": "VALID_EMPTY",
+      "rows": 0,
+      "samples": [],
+      "meta": {
+        "dbHit": false,
+        "engine": "pg-index",
+        "partitionsRead": [
+          "idx_businesses(country,city_norm,category)"
+        ],
+        "rowsScanned": 0,
+        "rowsReturned": 0,
+        "elapsedMs": 438,
+        "indexUsed": "idx_biz_country_citynorm_cat"
+      }
+    },
+    {
+      "label": "businesses/restaurants-austin",
+      "source": "pg-index",
+      "latencyMs": 946,
+      "query": "restaurants in Austin",
+      "entity": "business",
+      "classification": "PASS",
+      "rows": 50,
+      "samples": [
+        {
+          "key": "overture:59408c22-1fa8-48c2-9a70-fd3dd7df4acd",
+          "name": "Two Goose",
+          "role": "Two Goose",
+          "category": "barbecue_restaurant",
+          "location": "Austin, TX",
+          "country": "US",
+          "website": "http://twogoosemarket.com/",
+          "email": null,
+          "phone": "+15126314665"
+        },
+        {
+          "key": "overture:5c82126c-7f17-4a27-a103-169cfe3d0042",
+          "name": "Best Dam BBQ Joint",
+          "role": "Best Dam BBQ Joint",
+          "category": "barbecue_restaurant",
+          "location": "Austin, TX",
+          "country": "US",
+          "website": "https://www.bestdambbqjoint.com/",
+          "email": null,
+          "phone": "+15125650567"
+        },
+        {
+          "key": "overture:03f90e0e-c18e-45a2-9b4f-dba894ee63c2",
+          "name": "Blue Ribbon Barbecue",
+          "role": "Blue Ribbon Barbecue",
+          "category": "barbecue_restaurant",
+          "location": "Austin, TX",
+          "country": "US",
+          "website": "http://www.brbbq.net",
+          "email": null,
+          "phone": "+15123741178"
+        }
+      ],
+      "meta": {
+        "dbHit": true,
+        "engine": "pg-index",
+        "partitionsRead": [
+          "idx_businesses(country,city_norm,category)"
+        ],
+        "rowsScanned": 50,
+        "rowsReturned": 50,
+        "elapsedMs": 945,
+        "indexUsed": "idx_biz_country_citynorm_cat"
+      }
+    },
+    {
+      "label": "businesses/plumbers-pune",
+      "source": "pg-index",
+      "latencyMs": 242,
+      "query": "plumbers in Pune",
+      "entity": "business",
+      "classification": "PASS",
+      "rows": 13,
+      "samples": [
+        {
+          "key": "overture:f57ebaca-3b14-42c7-8626-74456abd4185",
+          "name": "Schneider Electric - Mauli Hardware And Electrical",
+          "role": "Schneider Electric - Mauli Hardware And Electrical",
+          "category": "plumber",
+          "location": "Pune, Maharashtra",
+          "country": "IN",
+          "website": "https://retailpavilion-in.se.com/schneider-electric-mauli-hardware-and-electrical-pimple-saudagar-pune-6554/overview",
+          "email": null,
+          "phone": null
+        },
+        {
+          "key": "overture:1d046eea-8501-4522-8eb4-5f034693ebe0",
+          "name": "QPoint Engineering Solutions",
+          "role": "QPoint Engineering Solutions",
+          "category": "plumber",
+          "location": "Pune, MH",
+          "country": "IN",
+          "website": "https://qpointsolutions.com/",
+          "email": null,
+          "phone": "+918605010543"
+        },
+        {
+          "key": "overture:4280bc35-2284-495b-baf2-9d9128481191",
+          "name": "Aquapulse Plumbing And services",
+          "role": "Aquapulse Plumbing And services",
+          "category": "plumber",
+          "location": "Pune, Maharashtra",
+          "country": "IN",
+          "website": "http://aquapulse7.in.com/",
+          "email": null,
+          "phone": null
+        }
+      ],
+      "meta": {
+        "dbHit": true,
+        "engine": "pg-index",
+        "partitionsRead": [
+          "idx_businesses(country,city_norm,category)"
+        ],
+        "rowsScanned": 13,
+        "rowsReturned": 13,
+        "elapsedMs": 242,
+        "indexUsed": "idx_biz_country_citynorm_cat"
+      }
+    },
+    {
+      "label": "businesses/marketing-agencies-london",
+      "source": "pg-index",
+      "latencyMs": 205,
+      "query": "marketing agencies in London",
+      "entity": "company",
+      "classification": "VALID_EMPTY",
+      "rows": 0,
+      "samples": [],
+      "meta": {
+        "dbHit": false,
+        "engine": "pg-index",
+        "partitionsRead": [
+          "idx_companies(country,city_norm)"
+        ],
+        "rowsScanned": 0,
+        "rowsReturned": 0,
+        "elapsedMs": 205,
+        "indexUsed": "idx_co_country_city_quality_cover"
+      }
+    },
+    {
+      "label": "investors/saas",
+      "source": "s3-parquet",
+      "latencyMs": 1320,
+      "classification": "PASS",
+      "rows": 50,
+      "samples": [
+        {
+          "key": "ent-5fc096e79efd",
+          "name": "Aaref Hilaly",
+          "role": "Partner",
+          "category": null,
+          "location": "San Francisco, California",
+          "country": "California",
+          "website": "https://baincapitalventures.com",
+          "email": "ahilaly@baincapital.com",
+          "phone": null
+        },
+        {
+          "key": "individual-65b1f58a9cd7452b",
+          "name": "Özge Sevim",
+          "role": "Principal",
+          "category": null,
+          "location": "Istanbul, Türkiye",
+          "country": "Türkiye",
+          "website": "https://212.vc",
+          "email": "ozge@212.vc",
+          "phone": null
+        },
+        {
+          "key": "individual-392a674b4c823c4f",
+          "name": "Kıvanç Aydın",
+          "role": "Partner",
+          "category": null,
+          "location": "Princeton, New Jersey, United States",
+          "country": "United States",
+          "website": "https://212.vc",
+          "email": "kivanc@212.vc",
+          "phone": null
+        }
+      ],
+      "meta": {
+        "dbHit": true,
+        "engine": "s3-parquet",
+        "partitionsRead": [
+          "processed/investors/investor.parquet"
+        ],
+        "rowsScanned": 191,
+        "rowsReturned": 50
+      }
+    },
+    {
+      "label": "investors/ai",
+      "source": "s3-parquet",
+      "latencyMs": 1026,
+      "classification": "PASS",
+      "rows": 50,
+      "samples": [
+        {
+          "key": "ent-5fc096e79efd",
+          "name": "Aaref Hilaly",
+          "role": "Partner",
+          "category": null,
+          "location": "San Francisco, California",
+          "country": "California",
+          "website": "https://baincapitalventures.com",
+          "email": "ahilaly@baincapital.com",
+          "phone": null
+        },
+        {
+          "key": "ent-af006de58eff",
+          "name": "Aaron Samuels",
+          "role": "Founder and Managing Partner",
+          "category": null,
+          "location": "New York, New York",
+          "country": "New York",
+          "website": "https://collidecap.com",
+          "email": "aaron.samuels@collidecap.com",
+          "phone": null
+        },
+        {
+          "key": "individual-68a06c02304e489b",
+          "name": "Rebecca Redfield",
+          "role": "Senior Associate",
+          "category": null,
+          "location": "United States",
+          "country": "United States",
+          "website": "https://406ventures.com",
+          "email": "rredfield@406ventures.com",
+          "phone": null
+        }
+      ],
+      "meta": {
+        "dbHit": true,
+        "engine": "s3-parquet",
+        "partitionsRead": [
+          "processed/investors/investor.parquet"
+        ],
+        "rowsScanned": 50,
+        "rowsReturned": 50
+      }
+    },
+    {
+      "label": "investors/seed",
+      "source": "s3-parquet",
+      "latencyMs": 1558,
+      "classification": "PASS",
+      "rows": 50,
+      "samples": [
+        {
+          "key": "ent-5fc096e79efd",
+          "name": "Aaref Hilaly",
+          "role": "Partner",
+          "category": null,
+          "location": "San Francisco, California",
+          "country": "California",
+          "website": "https://baincapitalventures.com",
+          "email": "ahilaly@baincapital.com",
+          "phone": null
+        },
+        {
+          "key": "ent-af006de58eff",
+          "name": "Aaron Samuels",
+          "role": "Founder and Managing Partner",
+          "category": null,
+          "location": "New York, New York",
+          "country": "New York",
+          "website": "https://collidecap.com",
+          "email": "aaron.samuels@collidecap.com",
+          "phone": null
+        },
+        {
+          "key": "individual-68a06c02304e489b",
+          "name": "Rebecca Redfield",
+          "role": "Senior Associate",
+          "category": null,
+          "location": "United States",
+          "country": "United States",
+          "website": "https://406ventures.com",
+          "email": "rredfield@406ventures.com",
+          "phone": null
+        }
+      ],
+      "meta": {
+        "dbHit": true,
+        "engine": "s3-parquet",
+        "partitionsRead": [
+          "processed/investors/investor.parquet"
+        ],
+        "rowsScanned": 50,
+        "rowsReturned": 50
+      }
+    },
+    {
+      "label": "investors/fintech",
+      "source": "s3-parquet",
+      "latencyMs": 1680,
+      "classification": "PASS",
+      "rows": 50,
+      "samples": [
+        {
+          "key": "ent-5fc096e79efd",
+          "name": "Aaref Hilaly",
+          "role": "Partner",
+          "category": null,
+          "location": "San Francisco, California",
+          "country": "California",
+          "website": "https://baincapitalventures.com",
+          "email": "ahilaly@baincapital.com",
+          "phone": null
+        },
+        {
+          "key": "individual-51e8f007603fbce3",
+          "name": "John Locke",
+          "role": "Partner",
+          "category": null,
+          "location": "San Francisco Bay Area",
+          "country": "San Francisco Bay Area",
+          "website": "https://accel.com",
+          "email": "jlocke@accel.com",
+          "phone": null
+        },
+        {
+          "key": "individual-fb819142fbd3d668",
+          "name": "Christine Esserman",
+          "role": "Partner",
+          "category": null,
+          "location": "San Francisco, California, United States",
+          "country": "United States",
+          "website": "https://accel.com",
+          "email": "cesserman@accel.com",
+          "phone": null
+        }
+      ],
+      "meta": {
+        "dbHit": true,
+        "engine": "s3-parquet",
+        "partitionsRead": [
+          "processed/investors/investor.parquet"
+        ],
+        "rowsScanned": 70,
+        "rowsReturned": 50
+      }
+    },
+    {
+      "label": "golden/person",
+      "source": "s3-parquet",
+      "latencyMs": 5512,
+      "classification": "PASS",
+      "rows": 3,
+      "known": [
+        {
+          "key": null,
+          "name": "Katlin Lang",
+          "role": "Co-Founder",
+          "category": null,
+          "location": null,
+          "country": "Canada",
+          "website": "http://www.farmsimple.ca",
+          "email": "katlin@farmsimple.ca",
+          "phone": "+1 306-424-7741"
+        }
+      ],
+      "meta": {
+        "dbHit": true,
+        "engine": "s3-parquet",
+        "partitionsRead": [
+          "processed/people_by_country/ (resolved shards for \"Canada\": 2 file(s))"
+        ],
+        "rowsScanned": 16904,
+        "rowsReturned": 3
+      }
+    },
+    {
+      "label": "golden/company",
+      "source": "s3-parquet",
+      "latencyMs": 9305,
+      "classification": "PASS",
+      "rows": 5,
+      "fieldsPreserved": true,
+      "known": [
+        {
+          "key": null,
+          "name": "S & A",
+          "role": null,
+          "category": "Hardware, Industrial Manufacturing, Software",
+          "location": "European Union (EU), Europe, Middle East, and Africa (EMEA)",
+          "country": null,
+          "website": "http://www.sea-software.it",
+          "email": "commerciale@sea-software.it",
+          "phone": "39-0835259541"
+        },
+        {
+          "key": null,
+          "name": "S & A Digital Technology",
+          "role": null,
+          "category": "Animation, Architecture, Video Editing",
+          "location": "Asia-Pacific (APAC)",
+          "country": null,
+          "website": "https://www.sapluscg.com",
+          "email": "info@sapluscg.com",
+          "phone": "86.21.63513008"
+        },
+        {
+          "key": null,
+          "name": "S & A Group",
+          "role": null,
+          "category": "Financial Services, Funerals, Insurance, Life Insurance",
+          "location": "Southern US",
+          "country": null,
+          "website": "https://www.sagrouponline.com",
+          "email": "hireme@sagrouponline.com",
+          "phone": "1 (205) 419-3606"
+        }
+      ],
+      "meta": {
+        "dbHit": true,
+        "engine": "s3-parquet",
+        "partitionsRead": [
+          "processed/companies_by_initial/_part=s/"
+        ],
+        "rowsScanned": 5,
+        "rowsReturned": 5
+      }
+    },
+    {
+      "label": "golden/business",
+      "source": "s3-parquet",
+      "latencyMs": 7759,
+      "classification": "PASS",
+      "rows": 5,
+      "known": [
+        {
+          "key": "2e0eb11c-643a-4125-b0be-2f50a8f4c4eb",
+          "name": "1000 Degrees Neapolitan Pizza - Austin",
+          "role": null,
+          "category": "pizza_restaurant",
+          "location": "Austin",
+          "country": "US",
+          "website": "http://www.1000degreespizza.com",
+          "email": null,
+          "phone": "+15125790056"
+        },
+        {
+          "key": "f2bf43be-a3fb-4b82-96c4-032429475d1a",
+          "name": "101 by TeaHaus",
+          "role": null,
+          "category": "restaurant",
+          "location": "Austin",
+          "country": "US",
+          "website": "https://airportblvd.101byteahaus.com/?utm_source=bing&utm_medium=websiteurl&utm_campaign=search",
+          "email": null,
+          "phone": "+15123717751"
+        },
+        {
+          "key": "3151e030-8ce6-4120-b52d-85921ce8cd5b",
+          "name": "123 Noodles - Austin",
+          "role": null,
+          "category": "noodles_restaurant",
+          "location": "Austin",
+          "country": "US",
+          "website": "http://123noodles.com",
+          "email": null,
+          "phone": "+15126663577"
+        }
+      ],
+      "meta": {
+        "dbHit": true,
+        "engine": "s3-parquet",
+        "partitionsRead": [
+          "processed/local-businesses/by_country/(gazetteer: 2 file(s) for \"Austin\": us,austin)",
+          "(exact=5 nearby=0 for \"Austin\")"
+        ],
+        "rowsScanned": 93,
+        "rowsReturned": 5
+      }
+    },
+    {
+      "label": "golden/investor",
+      "source": "s3-parquet",
+      "latencyMs": 1048,
+      "classification": "PASS",
+      "rows": 1,
+      "known": [
+        {
+          "key": "ent-5fc096e79efd",
+          "name": "Aaref Hilaly",
+          "role": "Partner",
+          "category": null,
+          "location": "San Francisco, California",
+          "country": "California",
+          "website": "https://baincapitalventures.com",
+          "email": "ahilaly@baincapital.com",
+          "phone": null
+        }
+      ],
+      "meta": {
+        "dbHit": true,
+        "engine": "s3-parquet",
+        "partitionsRead": [
+          "processed/investors/investor.parquet"
+        ],
+        "rowsScanned": 8076,
+        "rowsReturned": 1
+      }
+    },
+    {
+      "label": "e2e/person",
+      "source": "stored-pipeline",
+      "latencyMs": 331,
+      "query": "founders in Canada",
+      "classification": "PASS",
+      "rows": 5,
+      "pendingEnrichment": 0,
+      "rejected": 0,
+      "hasMore": true,
+      "reason": "RESULTS",
+      "samples": [
+        {
+          "key": "s3people:10e62b9c929d3627b1fabd59a7ce7838",
+          "name": "Patrick Walther — Chief Operating Officer | co-Founder @ AGvisorPRO",
+          "role": "Patrick Walther — Chief Operating Officer | co-Founder @ AGvisorPRO",
+          "category": null,
+          "location": "Calgary",
+          "country": "CA",
+          "website": "http://www.linkedin.com/in/patrick-a-walther",
+          "email": "patrick.walther@agvisorpro.com",
+          "phone": "204-891-1649"
+        },
+        {
+          "key": "s3people:92ce4a7afa10db2ffc578dfa4b6e4ff4",
+          "name": "Karen Schuett — Co Founder | CEO @ Livestock Water Recycling",
+          "role": "Karen Schuett — Co Founder | CEO @ Livestock Water Recycling",
+          "category": null,
+          "location": "Calgary",
+          "country": "CA",
+          "website": "http://www.linkedin.com/in/karen-schuett",
+          "email": "karen.schuett@livestockwaterrecycling.com",
+          "phone": "+1 403-203-4972"
+        },
+        {
+          "key": "s3people:16973b6477805ea5a8f02e45808e9c47",
+          "name": "Karen Schuett — Co Founder | CEO @ Livestock Water Recycling",
+          "role": "Karen Schuett — Co Founder | CEO @ Livestock Water Recycling",
+          "category": null,
+          "location": "Calgary",
+          "country": "CA",
+          "website": "http://www.linkedin.com/in/karen-schuett",
+          "email": "karen.schuett@livestockwaterrecycling.com",
+          "phone": "+1 403-203-4972"
+        }
+      ],
+      "meta": [
+        {
+          "dbHit": true,
+          "engine": "pg-index",
+          "partitionsRead": [
+            "idx_people(country,city_norm,role_norm)"
+          ],
+          "rowsScanned": 6,
+          "rowsReturned": 6,
+          "elapsedMs": 171,
+          "indexUsed": "idx_ppl_country_citynorm_rolenorm"
+        }
+      ]
+    },
+    {
+      "label": "e2e/business",
+      "source": "stored-pipeline",
+      "latencyMs": 16427,
+      "query": "HVAC businesses in Toronto",
+      "classification": "VALID_EMPTY",
+      "rows": 0,
+      "pendingEnrichment": 0,
+      "rejected": 0,
+      "hasMore": false,
+      "reason": "NO_CATEGORY_MATCH",
+      "samples": [],
+      "meta": [
+        {
+          "dbHit": false,
+          "engine": "pg-index",
+          "partitionsRead": [
+            "idx_businesses(country,city_norm,category)"
+          ],
+          "rowsScanned": 0,
+          "rowsReturned": 0,
+          "elapsedMs": 113,
+          "indexUsed": "idx_biz_country_citynorm_cat"
+        },
+        {
+          "dbHit": false,
+          "engine": "s3-parquet",
+          "partitionsRead": [
+            "processed/local-businesses/by_country/(gazetteer: 1 file(s) for \"Toronto\": ca)",
+            "(exact=0 nearby=0 for \"Toronto\")"
+          ],
+          "rowsScanned": 400000,
+          "rowsReturned": 0
+        }
+      ]
+    },
+    {
+      "label": "e2e/investor",
+      "source": "stored-pipeline",
+      "latencyMs": 889,
+      "query": "SaaS investors",
+      "classification": "PASS",
+      "rows": 5,
+      "pendingEnrichment": 0,
+      "rejected": 0,
+      "hasMore": true,
+      "reason": "RESULTS",
+      "samples": [
+        {
+          "key": "db:investor:aaref-hilaly:0",
+          "name": "Aaref Hilaly — Partner @ Bain Capital Ventures",
+          "role": "Aaref Hilaly — Partner @ Bain Capital Ventures",
+          "category": null,
+          "location": "San Francisco",
+          "country": "California",
+          "website": "https://baincapitalventures.com",
+          "email": "ahilaly@baincapital.com",
+          "phone": null
+        },
+        {
+          "key": "db:investor:özge-sevim:1",
+          "name": "Özge Sevim — Principal @ 212",
+          "role": "Özge Sevim — Principal @ 212",
+          "category": null,
+          "location": "Istanbul",
+          "country": "Türkiye",
+          "website": "https://212.vc",
+          "email": "ozge@212.vc",
+          "phone": null
+        },
+        {
+          "key": "db:investor:kıvanç-aydın:2",
+          "name": "Kıvanç Aydın — Partner @ 212",
+          "role": "Kıvanç Aydın — Partner @ 212",
+          "category": null,
+          "location": "Princeton",
+          "country": "United States",
+          "website": "https://212.vc",
+          "email": "kivanc@212.vc",
+          "phone": null
+        }
+      ],
+      "meta": [
+        {
+          "dbHit": true,
+          "engine": "s3-parquet",
+          "partitionsRead": [
+            "processed/investors/investor.parquet"
+          ],
+          "rowsScanned": 113,
+          "rowsReturned": 6
+        }
+      ]
+    },
+    {
+      "label": "special/quantity-50",
+      "source": "stored-pipeline",
+      "latencyMs": 201,
+      "query": "restaurants in Austin",
+      "classification": "PASS",
+      "rows": 50,
+      "pendingEnrichment": 0,
+      "rejected": 0,
+      "hasMore": true,
+      "reason": "RESULTS",
+      "samples": [
+        {
+          "key": "overture:5c82126c-7f17-4a27-a103-169cfe3d0042",
+          "name": "Best Dam BBQ Joint",
+          "role": "Best Dam BBQ Joint",
+          "category": "barbecue_restaurant",
+          "location": "Austin, TX",
+          "country": "US",
+          "website": "https://www.bestdambbqjoint.com/",
+          "email": null,
+          "phone": "+15125650567"
+        },
+        {
+          "key": "overture:5d6106d3-2acb-4afa-9342-d9bd0961ba10",
+          "name": "LeRoy & Lewis",
+          "role": "LeRoy & Lewis",
+          "category": "barbecue_restaurant",
+          "location": "Austin, TX",
+          "country": "US",
+          "website": "http://leroyandlewis.com",
+          "email": null,
+          "phone": "+15129459882"
+        },
+        {
+          "key": "overture:03f90e0e-c18e-45a2-9b4f-dba894ee63c2",
+          "name": "Blue Ribbon Barbecue",
+          "role": "Blue Ribbon Barbecue",
+          "category": "barbecue_restaurant",
+          "location": "Austin, TX",
+          "country": "US",
+          "website": "http://www.brbbq.net",
+          "email": null,
+          "phone": "+15123741178"
+        }
+      ],
+      "meta": [
+        {
+          "dbHit": true,
+          "engine": "pg-index",
+          "partitionsRead": [
+            "idx_businesses(country,city_norm,category)"
+          ],
+          "rowsScanned": 51,
+          "rowsReturned": 51,
+          "elapsedMs": 179,
+          "indexUsed": "idx_biz_country_citynorm_cat"
+        }
+      ]
+    },
+    {
+      "label": "special/diacritic-location",
+      "source": "stored-pipeline",
+      "latencyMs": 49130,
+      "query": "restaurants in São Paulo",
+      "classification": "PASS",
+      "rows": 4,
+      "pendingEnrichment": 2,
+      "rejected": 0,
+      "hasMore": true,
+      "reason": "RESULTS",
+      "samples": [
+        {
+          "key": "09d85028-0cc2-4485-accd-6e4baf3177ec",
+          "name": "Padariacapãoredondooficial",
+          "role": "Padariacapãoredondooficial",
+          "category": "restaurant",
+          "location": "São Paulo, SP",
+          "country": "BR",
+          "website": "https://linktr.ee/padariacapaoredondooficial",
+          "email": null,
+          "phone": "+5511976147362"
+        },
+        {
+          "key": "619eb02a-5d02-4eea-bbe0-43ef3b39afed",
+          "name": "Amore Milho Santos",
+          "role": "Amore Milho Santos",
+          "category": "restaurant",
+          "location": "São Paulo, SP",
+          "country": "BR",
+          "website": "https://amoremilhofranquia.com.br/",
+          "email": null,
+          "phone": null
+        },
+        {
+          "key": "bf84984b-3e3c-40e7-b840-3758b02c5a85",
+          "name": "Restaurante Sabor do Chefe",
+          "role": "Restaurante Sabor do Chefe",
+          "category": "restaurant",
+          "location": "São Paulo, SP",
+          "country": "BR",
+          "website": null,
+          "email": null,
+          "phone": "+554930262527"
+        }
+      ],
+      "meta": [
+        {
+          "dbHit": false,
+          "engine": "pg-index",
+          "partitionsRead": [
+            "idx_businesses(country,city_norm,category)"
+          ],
+          "rowsScanned": 0,
+          "rowsReturned": 0,
+          "elapsedMs": 128,
+          "indexUsed": "idx_biz_country_citynorm_cat"
+        },
+        {
+          "dbHit": true,
+          "engine": "s3-parquet",
+          "partitionsRead": [
+            "processed/local-businesses/by_country/(gazetteer: 1 file(s) for \"São Paulo\": br)",
+            "(exact=6 nearby=0 for \"São Paulo\")"
+          ],
+          "rowsScanned": 1039334,
+          "rowsReturned": 6
+        }
+      ]
+    }
+  ]
+}
