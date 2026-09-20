@@ -27,6 +27,7 @@ import { Route as AuthenticatedGuidesRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticated/discover'
 import { Route as ApiWebhooksResendRouteImport } from './routes/api/webhooks/resend'
 import { Route as ApiCronEmailSequencesRouteImport } from './routes/api/cron/email-sequences'
+import { Route as ApiResearchSessionIdEventsRouteImport } from './routes/api/research/$sessionId/events'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -118,6 +119,12 @@ const ApiCronEmailSequencesRoute = ApiCronEmailSequencesRouteImport.update({
   path: '/api/cron/email-sequences',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiResearchSessionIdEventsRoute =
+  ApiResearchSessionIdEventsRouteImport.update({
+    id: '/api/research/$sessionId/events',
+    path: '/api/research/$sessionId/events',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -137,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/watches': typeof AuthenticatedWatchesRoute
   '/api/cron/email-sequences': typeof ApiCronEmailSequencesRoute
   '/api/webhooks/resend': typeof ApiWebhooksResendRoute
+  '/api/research/$sessionId/events': typeof ApiResearchSessionIdEventsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -156,6 +164,7 @@ export interface FileRoutesByTo {
   '/watches': typeof AuthenticatedWatchesRoute
   '/api/cron/email-sequences': typeof ApiCronEmailSequencesRoute
   '/api/webhooks/resend': typeof ApiWebhooksResendRoute
+  '/api/research/$sessionId/events': typeof ApiResearchSessionIdEventsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -177,6 +186,7 @@ export interface FileRoutesById {
   '/_authenticated/watches': typeof AuthenticatedWatchesRoute
   '/api/cron/email-sequences': typeof ApiCronEmailSequencesRoute
   '/api/webhooks/resend': typeof ApiWebhooksResendRoute
+  '/api/research/$sessionId/events': typeof ApiResearchSessionIdEventsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -198,6 +208,7 @@ export interface FileRouteTypes {
     | '/watches'
     | '/api/cron/email-sequences'
     | '/api/webhooks/resend'
+    | '/api/research/$sessionId/events'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -217,6 +228,7 @@ export interface FileRouteTypes {
     | '/watches'
     | '/api/cron/email-sequences'
     | '/api/webhooks/resend'
+    | '/api/research/$sessionId/events'
   id:
     | '__root__'
     | '/'
@@ -237,6 +249,7 @@ export interface FileRouteTypes {
     | '/_authenticated/watches'
     | '/api/cron/email-sequences'
     | '/api/webhooks/resend'
+    | '/api/research/$sessionId/events'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -246,6 +259,7 @@ export interface RootRouteChildren {
   UnsubscribeRoute: typeof UnsubscribeRoute
   ApiCronEmailSequencesRoute: typeof ApiCronEmailSequencesRoute
   ApiWebhooksResendRoute: typeof ApiWebhooksResendRoute
+  ApiResearchSessionIdEventsRoute: typeof ApiResearchSessionIdEventsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -376,6 +390,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCronEmailSequencesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/research/$sessionId/events': {
+      id: '/api/research/$sessionId/events'
+      path: '/api/research/$sessionId/events'
+      fullPath: '/api/research/$sessionId/events'
+      preLoaderRoute: typeof ApiResearchSessionIdEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -419,6 +440,7 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeRoute: UnsubscribeRoute,
   ApiCronEmailSequencesRoute: ApiCronEmailSequencesRoute,
   ApiWebhooksResendRoute: ApiWebhooksResendRoute,
+  ApiResearchSessionIdEventsRoute: ApiResearchSessionIdEventsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

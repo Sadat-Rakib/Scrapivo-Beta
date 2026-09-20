@@ -365,8 +365,9 @@ export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
         if (hint) {
           const isoOk = !!rowIso && rowIso === hint.toLowerCase();
           const nameOk = like(row.location ?? "", location) || like(row.detail, location);
-          // Country is a disambiguation guard, not proof of city membership.
-          if (!isoOk || !nameOk) return false;
+          // The city is proof; a populated country is only a disambiguation
+          // guard. Providers such as OSM often omit country on exact-city rows.
+          if (!nameOk || (rowIso.length > 0 && !isoOk)) return false;
         } else if (
           !like(row.country ?? "", location) &&
           !like(row.location ?? "", location) &&
@@ -1109,7 +1110,9 @@ export async function runSpecSearchCore(
   if (spec.entity === "job" && useCoverageSelector()) {
     // (Dynamic import: this module is client-reachable; the jobs chain
     // reaches node builtins which must not join the static browser graph.)
-    const { fetchSpecJobs: fetchJobs } = await import("@/lib/search/jobs-provider");
+    const { fetchSpecJobs: fetchJobs, jobPostingToSpecRow } = await import(
+      "@/lib/search/jobs-provider"
+    );
     const runJobs = deps.providerJobs === null ? null : (deps.providerJobs ?? fetchJobs);
     if (runJobs) {
       try {
@@ -1137,19 +1140,7 @@ export async function runSpecSearchCore(
           rowsScanned: j.fetched,
           rowsReturned: j.jobs.length,
         });
-        rows = j.jobs.map((p) => ({
-          kind: "job" as const,
-          key: `job:${p.board_id}:${p.id}`,
-          title: `${p.title} @ ${p.company}`,
-          detail: [p.location, p.employment_type, p.remote ? "Remote" : null, p.salary]
-            .filter(has)
-            .join(" · "),
-          email: p.contacts?.[0]?.email ?? null,
-          phone: null,
-          url: p.url,
-          location: p.location,
-          country: null,
-        }));
+        rows = j.jobs.map((p) => jobPostingToSpecRow(p, "job"));
         if (j.jobs.length >= fetchWindow) fetchedHitCap = true;
         pageBaseOffset = effOffset;
         console.info(

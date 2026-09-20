@@ -1,0 +1,75 @@
+{
+  "date": "2026-09-20",
+  "status": "mvp_vertical_slice_complete",
+  "default_initial_target": 10,
+  "quantity": {
+    "explicit_respected": true,
+    "static_15_returns": 10,
+    "stored_6_triggers_live": true,
+    "quantity_50_pass": true,
+    "continuation_without_duplicates": true
+  },
+  "enrichment": {
+    "strategy": "missing_fields_only",
+    "paid_calls_default": 0,
+    "supported": ["email", "phone", "url", "domain", "location", "employer", "salary", "claim_evidence"]
+  },
+  "signals": {
+    "live_when_required": true,
+    "types": ["HIRING", "SEEKING_JOB", "SEEKING_SERVICE", "FUNDRAISING", "RECENTLY_FUNDED", "EXPANDING", "PRODUCT_LAUNCH", "RECENT_ACTIVITY", "NO_WEBSITE", "WEAK_WEBSITE", "TECHNOLOGY_USAGE", "ROLE_CHANGE", "USER_DEFINED"],
+    "event_time_distinct_from_observation_time": true
+  },
+  "live_providers": {
+    "real_smoke": {
+      "provider": "osm-overpass",
+      "query": "active HVAC contractors in Toronto with phone",
+      "candidates": 142,
+      "elapsed_ms": 5178,
+      "paid_calls": 0
+    },
+    "reused": ["searxng", "osm-overpass", "reddit-social", "jobs-fleet", "direct-http"]
+  },
+  "events": {
+    "transport": "authenticated_sse",
+    "cancellation": true,
+    "continuation": true,
+    "screenshot_refs": true
+  },
+  "certification": {
+    "test_files": 2,
+    "tests": 38,
+    "passed": 38,
+    "failed": 0,
+    "adjacent_retrieval_tests": 42,
+    "adjacent_retrieval_passed": 42,
+    "wrong_result_fixtures": 0,
+    "ai_calls": {
+      "stored": 0,
+      "providers": 0,
+      "enrichment": 0,
+      "browser_reasoning": 0
+    }
+  },
+  "e2e": {
+    "people": "PASS",
+    "intent_people": "PASS",
+    "companies": "PASS",
+    "businesses": "PASS",
+    "no_website": "PASS",
+    "jobs": "PASS",
+    "investors": "PASS"
+  },
+  "build": {
+    "route_generation": "PASS",
+    "production_bundle": "BLOCKED_PREEXISTING_MISSING_PG_DEPENDENCY",
+    "typecheck": "BLOCKED_PREEXISTING_REPOSITORY_DEBT"
+  },
+  "terra_remaining": [
+    "durable multi-instance session storage",
+    "qualified live persistence hook",
+    "additional providers and fixtures",
+    "second browser adapter",
+    "load testing",
+    "minimal internal viewer"
+  ]
+}

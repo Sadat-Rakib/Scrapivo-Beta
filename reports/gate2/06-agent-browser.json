@@ -1,0 +1,55 @@
+{
+  "date": "2026-09-20",
+  "backend": "agent-browser-cli",
+  "version": "0.38.1",
+  "platform": "windows-x86_64",
+  "doctor": { "pass": 9, "warn": 0, "fail": 0 },
+  "operations": {
+    "navigate": true,
+    "observe": true,
+    "click": true,
+    "type": true,
+    "select": true,
+    "scroll": true,
+    "wait": true,
+    "extract": true,
+    "screenshot": true,
+    "close": true
+  },
+  "spike": {
+    "page": "https://www.selenium.dev/selenium/web/web-form.html",
+    "passed": true,
+    "screenshot": "reports/gate2/agent-browser-spike.png",
+    "screenshot_bytes": 31520,
+    "warm_command_ms_range": [1200, 1700],
+    "successful_visible_open_ms": 5500,
+    "known_issue": "intermittent fresh headed CLI response delay near 30 seconds",
+    "command_timeout_ms": 30000
+  },
+  "safety": {
+    "captcha_bypass": false,
+    "private_contact_inference": false,
+    "full_html_to_llm": false,
+    "browser_reasoning_calls": 0,
+    "action_reobserve": true,
+    "budgets": true
+  },
+  "status_policy": {
+    "temporarily_closed": "REJECT",
+    "permanently_closed": "REJECT",
+    "inactive": "REJECT",
+    "unknown": "UNRESOLVED"
+  },
+  "streaming": {
+    "transport": "SSE",
+    "screenshots_at_meaningful_actions": true,
+    "video": false
+  },
+  "terra_remaining": [
+    "expanded local fixture site",
+    "workflow cache persistence",
+    "Camofox adapter",
+    "load testing",
+    "internal viewer"
+  ]
+}
