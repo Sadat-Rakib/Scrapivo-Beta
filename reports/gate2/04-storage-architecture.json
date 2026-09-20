@@ -1,0 +1,117 @@
+{
+  "status": "architecture_and_first_implementation_complete_bulk_build_pending",
+  "date": "2026-09-19",
+  "canonical_store": "AWS S3",
+  "search_index_store": {
+    "default": "AWS S3",
+    "optional": "Cloudflare R2 via S3-compatible endpoint",
+    "r2_configured": false
+  },
+  "format": {
+    "postings": "SPI1 binary delta-varint postings with deterministic JSON range header",
+    "documents": "Zstandard compact Parquet, one object per canonical source object",
+    "bucket_hex_chars": 2,
+    "active_pointer": "derived/search-index/active.json",
+    "immutable_versions": "derived/search-index/versions/<version>/",
+    "normal_query_canonical_reads": 0
+  },
+  "physical": {
+    "business": 16338186,
+    "company": 1602141,
+    "person": 484325,
+    "investor": 8076
+  },
+  "supabase": {
+    "plan": "Free",
+    "quota_bytes": 524288000,
+    "before_bytes": 651930771,
+    "derived_idx_bytes": 634699776,
+    "application_public_bytes": 4595712,
+    "projected_after_safe_cleanup_bytes": 17230995,
+    "cleanup_executed": false,
+    "reason": "cleanup is gated on full build, full reconciliation, remote certification, cutover, and rollback proof"
+  },
+  "shape_benchmark": {
+    "business_subset_rows": 7937,
+    "query": "restaurant in Manama",
+    "compact_row_shards": {
+      "bytes_per_record": 247.236,
+      "objects": 232,
+      "cold_ms": 19.547,
+      "warm_median_ms": 4.297
+    },
+    "binary_postings_plus_documents": {
+      "bytes_per_record": 138.933,
+      "objects": 1092,
+      "posting_bytes_read": 435,
+      "cold_ms": 16.889,
+      "warm_median_ms": 0.192
+    },
+    "decision": "binary_postings_plus_compact_parquet_documents"
+  },
+  "subset_build": {
+    "version": "subset-20260919-v3",
+    "source_objects": 5,
+    "physical": 43765,
+    "searchable": 43331,
+    "duplicate": 0,
+    "quarantined": 434,
+    "unindexable": 0,
+    "failed": 0,
+    "posting_objects": 3860,
+    "posting_bytes": 6407687,
+    "document_objects": 5,
+    "document_bytes": 3272695,
+    "manifest_bytes": 922201,
+    "build_ms": 81678,
+    "resume_ms": 65458,
+    "resume_reprocessed_partitions": 0,
+    "ai_calls": 0
+  },
+  "subset_certification": {
+    "seed": 9172601,
+    "business": 500,
+    "person": 200,
+    "company": 200,
+    "investor": 100,
+    "tested": 1000,
+    "passed": 1000,
+    "unexplained_failures": 0,
+    "wrong_results": 0,
+    "quantity_100_entities_passed": 4,
+    "p50_ms": 1.717,
+    "p95_ms": 24.792,
+    "max_ms": 38.882,
+    "canonical_reads": 0,
+    "ai_calls": 0
+  },
+  "local_build_capacity": {
+    "drive": "C:",
+    "free_bytes_observed": 41877504,
+    "subset_working_bytes_for_43765_rows": 22940038,
+    "estimated_full_working_bytes": 9650000000,
+    "required_free_bytes_before_full_build": 20000000000,
+    "safe_to_start_full_build": false,
+    "action": "free at least 20 GB or point output-dir and checkpoint-dir at a writable volume with at least 20 GB free"
+  },
+  "safety": {
+    "canonical_s3_mutations": 0,
+    "supabase_mutations": 0,
+    "active_pointer_mutations": 0,
+    "immutable_upload_checksum_verification": true,
+    "activation_requires_complete_reconciliation": true,
+    "activation_compare_guard": true,
+    "legacy_fallback_retained": true,
+    "object_index_feature_default": "off"
+  },
+  "remaining_mechanical_work": [
+    "provide at least 20 GB free working space; current C drive has only about 42 MB",
+    "run full resumable build and upload immutable version without activation",
+    "run seeded full-corpus certification and generate 04-index-reconciliation.json",
+    "certify S3 range-read runtime and activate with expected previous-version guard",
+    "enable object-index feature flag",
+    "add and apply the versioned idx_* drop migration only after cutover proof",
+    "measure Supabase and write 04-supabase-after-cleanup.json",
+    "run final Gate-2B regression battery and commit"
+  ]
+}

@@ -31,6 +31,9 @@ export interface DbHitMeta {
   /** Postgres-index hits only: wall time and the index/plan that served. */
   elapsedMs?: number;
   indexUsed?: string;
+  /** Object-index accounting. Absent on legacy readers. */
+  bytesRead?: number;
+  canonicalRowsRead?: number;
 }
 
 /** Fetch byte range of an S3 object. */

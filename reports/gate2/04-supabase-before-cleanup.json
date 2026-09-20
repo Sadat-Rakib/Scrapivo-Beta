@@ -1,0 +1,119 @@
+{
+  "captured_at": "2026-09-19T20:00:00-06:00",
+  "project_ref": "fxcrmybvfokyrvcuhcgh",
+  "plan": "Free",
+  "postgres_version": "17.6.1",
+  "region": "ca-central-1",
+  "quota_bytes": 524288000,
+  "database_bytes": 651930771,
+  "database_megabytes": 621.73,
+  "derived_idx_total_bytes": 634699776,
+  "public_non_idx_total_bytes": 4595712,
+  "classification": {
+    "A_APPLICATION_DATA": [
+      "public.qualified_leads",
+      "public.search_history",
+      "public.ai_cache",
+      "public.source_health"
+    ],
+    "B_DERIVED_SEARCH_INDEX": [
+      "public.idx_businesses",
+      "public.idx_companies",
+      "public.idx_people"
+    ],
+    "C_CACHE_TEMPORARY": [],
+    "D_UNKNOWN": []
+  },
+  "relations": [
+    {
+      "relation": "public.idx_businesses",
+      "rows": 609387,
+      "table_bytes": 257220608,
+      "index_bytes": 129908736,
+      "toast_bytes": 8192,
+      "total_bytes": 387227648,
+      "rebuildable": true,
+      "application_critical": false,
+      "safe_removal_candidate": "only_after_object_index_cutover_certification",
+      "source_corpus": "s3://scrapivo/processed/local-businesses/by_country/",
+      "rebuild_command": "python scripts/pipeline/build_search_index.py --version <version> --entity business --upload"
+    },
+    {
+      "relation": "public.idx_people",
+      "rows": 399397,
+      "table_bytes": 145121280,
+      "index_bytes": 65765376,
+      "toast_bytes": 8192,
+      "total_bytes": 210960384,
+      "rebuildable": true,
+      "application_critical": false,
+      "safe_removal_candidate": "only_after_object_index_cutover_certification",
+      "source_corpus": "s3://scrapivo/processed/people_by_country/",
+      "rebuild_command": "python scripts/pipeline/build_search_index.py --version <version> --entity person --upload"
+    },
+    {
+      "relation": "public.idx_companies",
+      "rows": 79014,
+      "table_bytes": 15949824,
+      "index_bytes": 20520960,
+      "toast_bytes": 8192,
+      "total_bytes": 36511744,
+      "rebuildable": true,
+      "application_critical": false,
+      "safe_removal_candidate": "only_after_object_index_cutover_certification",
+      "source_corpus": "s3://scrapivo/processed/companies_by_initial/",
+      "rebuild_command": "python scripts/pipeline/build_search_index.py --version <version> --entity company --upload"
+    },
+    {
+      "relation": "public.source_health",
+      "total_bytes": 1851392,
+      "rebuildable": false,
+      "application_critical": true,
+      "safe_removal_candidate": false
+    },
+    {
+      "relation": "public.ai_cache",
+      "total_bytes": 909312,
+      "rebuildable": false,
+      "application_critical": true,
+      "safe_removal_candidate": false
+    },
+    {
+      "relation": "public.search_history",
+      "total_bytes": 614400,
+      "rebuildable": false,
+      "application_critical": true,
+      "safe_removal_candidate": false
+    },
+    {
+      "relation": "public.qualified_leads",
+      "total_bytes": 278528,
+      "rebuildable": false,
+      "application_critical": true,
+      "safe_removal_candidate": false
+    }
+  ],
+  "indexes": [
+    {"name": "idx_biz_country_cat_quality", "bytes": 6127616},
+    {"name": "idx_biz_country_citynorm_cat", "bytes": 6594560},
+    {"name": "idx_biz_domain", "bytes": 16646144},
+    {"name": "idx_biz_name_trgm", "bytes": 58793984},
+    {"name": "idx_businesses_pkey", "bytes": 41713664},
+    {"name": "idx_co_country_city_quality_cover", "bytes": 6782976},
+    {"name": "idx_co_country_citynorm", "bytes": 573440},
+    {"name": "idx_co_country_citynorm_cat", "bytes": 589824},
+    {"name": "idx_co_name_trgm", "bytes": 8757248},
+    {"name": "idx_companies_pkey", "bytes": 3792896},
+    {"name": "idx_people_pkey", "bytes": 27344896},
+    {"name": "idx_ppl_country_citynorm_rolenorm", "bytes": 12386304},
+    {"name": "idx_ppl_name_trgm", "bytes": 26009600}
+  ],
+  "ddl_source": "supabase/migrations/20260910000000_search_index.sql",
+  "projected_after_safe_idx_removal_bytes": 17230995,
+  "cleanup_executed": false,
+  "notes": [
+    "No database mutation was performed during this snapshot.",
+    "qualified_leads and its RLS posture are explicitly outside this migration.",
+    "The three idx_* relations remain required until object-index cutover is certified."
+  ]
+}

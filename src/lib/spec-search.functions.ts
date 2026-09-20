@@ -19,8 +19,9 @@ import { searchBusinessesDB, craftMatches } from "@/lib/canonical/businesses.ser
 import { searchInvestorsDB } from "@/lib/canonical/investors.server";
 import { COUNTRY_ISO } from "@/lib/search/search-spec-extract";
 import { countryHintForCity } from "@/lib/search/location-resolver";
-import { useIndexedSearch } from "@/lib/search/flag";
+import { useIndexedSearch, useObjectSearchIndex } from "@/lib/search/flag";
 import { queryIndexForSpec } from "@/lib/indexed/search-index.server";
+import { queryObjectIndexForSpec } from "@/lib/object-index/search.server";
 import { useCoverageSelector } from "@/lib/search/flag";
 import { selectCoverageSources, type CoverageMatrix } from "@/lib/search/coverage-selector";
 import { normCityLookup } from "@/lib/search/search-spec-extract";
@@ -1065,7 +1066,9 @@ export async function runSpecSearchCore(
   const companies = deps.companies ?? searchCompaniesDB;
   const businesses = deps.businesses ?? searchBusinessesDB;
   const investors = deps.investors ?? searchInvestorsDB;
-  const indexer = deps.index === null ? null : (deps.index ?? queryIndexForSpec);
+  const indexer = deps.index === null
+    ? null
+    : (deps.index ?? (useObjectSearchIndex() ? queryObjectIndexForSpec : queryIndexForSpec));
   const dbMeta: DbHitMeta[] = [];
   let rows: SpecRow[] = [];
   // Paging state (Phase 1.8): fetchedHitCap (a source hit its fetch window)
