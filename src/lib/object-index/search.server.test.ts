@@ -44,8 +44,8 @@ describe("stored object-index retrieval", () => {
 
   it("discovers, hydrates, and filters with zero AI calls", async () => {
     const terms = [{ dimension: "city", term: "toronto" }, { dimension: "category", term: "hvac" }];
-    const keys = terms.map(({ dimension, term }) =>
-      `derived/search-index/versions/test-v1/postings/business/${dimension}/${postingBucket(term, 3)}.pidx`);
+    const keys = await Promise.all(terms.map(async ({ dimension, term }) =>
+      `derived/search-index/versions/test-v1/postings/business/${dimension}/${await postingBucket(term, 3)}.pidx`));
     const encoder = new TextEncoder();
     const objects = new Map<string, Uint8Array>([
       ["derived/search-index/active.json", encoder.encode(JSON.stringify({ version: "test-v1", manifestKey: "manifest.json", activatedAt: "now" }))],

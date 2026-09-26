@@ -1,0 +1,86 @@
+{
+  "seed": 4242,
+  "holdout": [
+    {
+      "id": "h000a",
+      "prompt": "recruiters who serve cheesemongers in Barcelona",
+      "set": "holdout",
+      "expect": {
+        "relation": "offers_service",
+        "location": "barcelona"
+      },
+      "pairWith": "h000b"
+    },
+    {
+      "id": "h000b",
+      "prompt": "cheesemongers in Barcelona who need a recruiter",
+      "set": "holdout",
+      "expect": {
+        "relation": "needs_service",
+        "location": "barcelona"
+      },
+      "pairWith": "h000a"
+    },
+    {
+      "id": "h002a",
+      "prompt": "companies in Toronto using Salesforce",
+      "set": "holdout",
+      "expect": {
+        "relation": "uses_technology",
+        "location": "toronto"
+      },
+      "pairWith": "h002b"
+    },
+    {
+      "id": "h002b",
+      "prompt": "companies in Toronto looking to move off Salesforce",
+      "set": "holdout",
+      "expect": {
+        "location": "toronto"
+      },
+      "pairWith": "h002a"
+    }
+  ],
+  "chaos": [
+    {
+      "id": "c000a",
+      "prompt": "podiatrists who serve dentists in trondheim",
+      "set": "chaos",
+      "expect": {
+        "relation": "offers_service",
+        "location": "trondheim"
+      },
+      "pairWith": "c000b"
+    },
+    {
+      "id": "c000b",
+      "prompt": "can u get me dentists in Trndheim who need a podiatrsit when u can",
+      "set": "chaos",
+      "expect": {
+        "relation": "needs_service",
+        "location": "trondheim"
+      },
+      "pairWith": "c000a"
+    },
+    {
+      "id": "c002a",
+      "prompt": "investors funding agritech startups in Copnehagen...",
+      "set": "chaos",
+      "expect": {
+        "entity_type": "investor",
+        "location": "copenhagen"
+      },
+      "pairWith": "c002b"
+    },
+    {
+      "id": "c002b",
+      "prompt": "agritech statups in Copenhgen raising money",
+      "set": "chaos",
+      "expect": {
+        "entity_type": "company",
+        "location": "copenhagen"
+      },
+      "pairWith": "c002a"
+    }
+  ]
+}

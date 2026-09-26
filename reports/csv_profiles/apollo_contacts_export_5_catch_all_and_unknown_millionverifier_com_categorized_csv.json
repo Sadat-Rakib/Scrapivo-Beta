@@ -1,0 +1,176 @@
+{
+  "key": "apollo-contacts-export (5)_CATCH_ALL_AND_UNKNOWN_MILLIONVERIFIER.COM_CATEGORIZED.csv",
+  "size": 11960536,
+  "last_modified": "2026-09-08 00:13:26+00:00",
+  "columns": [
+    "First Name",
+    "Last Name",
+    "Title",
+    "Comp name",
+    "Website",
+    "Email",
+    "Phone",
+    "Comp Phone",
+    "Employees",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter",
+    "Country",
+    "Industry",
+    "Tech Used",
+    "Keywords",
+    "SEO Description"
+  ],
+  "row_count": 7383,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "First Name": "first_name",
+    "Last Name": "last_name",
+    "Title": "title",
+    "Comp name": "other",
+    "Website": "website",
+    "Email": "email",
+    "Phone": "phone",
+    "Comp Phone": "phone",
+    "Employees": "employees",
+    "Pers Linkedin": "linkedin",
+    "Comp Linkedin": "linkedin",
+    "Facebook": "social",
+    "Twitter": "social",
+    "Country": "country",
+    "Industry": "industry",
+    "Tech Used": "tech",
+    "Keywords": "descriptive",
+    "SEO Description": "descriptive"
+  },
+  "missing_pct": {
+    "First Name": 0.0,
+    "Last Name": 0.5,
+    "Title": 0.0,
+    "Comp name": 0.0,
+    "Website": 0.0,
+    "Email": 0.0,
+    "Phone": 100.0,
+    "Comp Phone": 4.4,
+    "Employees": 9.2,
+    "Pers Linkedin": 0.0,
+    "Comp Linkedin": 9.2,
+    "Facebook": 34.0,
+    "Twitter": 42.1,
+    "Country": 0.0,
+    "Industry": 9.2,
+    "Tech Used": 10.9,
+    "Keywords": 18.5,
+    "SEO Description": 100.0
+  },
+  "samples": {
+    "First Name": [
+      "Marissa",
+      "Viegas",
+      "Michael"
+    ],
+    "Last Name": [
+      "Painter",
+      "Tattoli",
+      "Murlowski"
+    ],
+    "Title": [
+      "Agency Owner",
+      "Vice President, Chief Product Owner, Core Infrastructure and Operations Services",
+      "Owner"
+    ],
+    "Comp name": [
+      "Maverick Insurance",
+      "Prudential Equity Group",
+      "D&D Associates"
+    ],
+    "Website": [
+      "https://theinsurancemaverick.com",
+      "https://prudential.com",
+      "https://ddassociates.com"
+    ],
+    "Email": [
+      "marissa@maverickinsagency.com",
+      "jp.viegas@prudential.com",
+      "michael.tattoli@ddassociates.com"
+    ],
+    "Comp Phone": [
+      "'+1 214-838-5500",
+      "'+1 973-802-6000",
+      "'+1 800-554-0347"
+    ],
+    "Employees": [
+      "10",
+      "16000",
+      "8"
+    ],
+    "Pers Linkedin": [
+      "http://www.linkedin.com/in/marissapainter",
+      "http://www.linkedin.com/in/jp-viegas",
+      "http://www.linkedin.com/in/michael-tattoli-b424693a"
+    ],
+    "Comp Linkedin": [
+      "http://www.linkedin.com/company/theinsurancemaverick",
+      "http://www.linkedin.com/company/prudential-financial",
+      "http://www.linkedin.com/company/d&d-associates-garden-city-ny"
+    ],
+    "Facebook": [
+      "https://www.facebook.com/theinsurancemaverick",
+      "https://facebook.com/Prudential/",
+      "https://facebook.com/Prudential/"
+    ],
+    "Country": [
+      "United States",
+      "United States",
+      "United States"
+    ],
+    "Industry": [
+      "insurance",
+      "financial services",
+      "insurance"
+    ],
+    "Tech Used": [
+      "Gmail, Google Apps, Google Cloud Hosting, Mobile Friendly, Varnish, Wix",
+      "Mimecast, Outlook, Microsoft Office 365, Amazon AWS, Hubspot, Mobile Friendly, Google Analytics, Remote, AI",
+      "UltraDns, CloudFlare Hosting"
+    ],
+    "Keywords": [
+      "insurance, finance, services, financial services, auto insurance, home & rental insurance, life insurance",
+      "erie insurance, business insurance, auto insurance, home insurance, b2b",
+      "business amp commercial lines insurance, personal lines insurance, business commercial lines insurance, life insurance"
+    ],
+    "Twitter": [
+      "https://twitter.com/prudential/",
+      "https://twitter.com/prudential/",
+      "https://www.twitter.com/progressive"
+    ]
+  },
+  "validity": {
+    "Email": "3/3 valid-shape",
+    "Comp Phone": "3/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Website",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter"
+  ],
+  "activity_match_keys": [
+    "First Name",
+    "Last Name",
+    "Website",
+    "Email",
+    "Phone",
+    "Comp Phone",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter"
+  ]
+}

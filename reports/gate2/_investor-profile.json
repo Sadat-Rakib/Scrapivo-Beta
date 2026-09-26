@@ -1,0 +1,208 @@
+{
+  "total": 8076,
+  "countries": 240,
+  "cities": 560,
+  "kinds": 2,
+  "website": 7485,
+  "email": 2458,
+  "linkedin": 7438,
+  "bio": 4240,
+  "sectors": 5262,
+  "stages": 5334,
+  "check_size": 4002,
+  "duplicate_ids": 0,
+  "top_countries": [
+    [
+      "United States",
+      1944
+    ],
+    [
+      "California",
+      1133
+    ],
+    [
+      null,
+      1000
+    ],
+    [
+      "Unknown",
+      769
+    ],
+    [
+      "New York",
+      532
+    ],
+    [
+      "United Kingdom",
+      275
+    ],
+    [
+      "San Francisco Bay Area",
+      263
+    ],
+    [
+      "India",
+      147
+    ],
+    [
+      "Massachusetts",
+      127
+    ],
+    [
+      "Germany",
+      115
+    ],
+    [
+      "Colorado",
+      87
+    ],
+    [
+      "Canada",
+      87
+    ],
+    [
+      "USA",
+      86
+    ],
+    [
+      "France",
+      86
+    ],
+    [
+      "Illinois",
+      67
+    ],
+    [
+      "Israel",
+      66
+    ],
+    [
+      "New York City Metropolitan Area",
+      50
+    ],
+    [
+      "Singapore",
+      48
+    ],
+    [
+      "Texas",
+      43
+    ],
+    [
+      "Multiple locations worldwide",
+      37
+    ]
+  ],
+  "top_kinds": [
+    [
+      "individual",
+      7439
+    ],
+    [
+      "firm",
+      637
+    ]
+  ],
+  "top_sectors": [
+    [
+      "Fintech",
+      2206
+    ],
+    [
+      "SaaS",
+      1690
+    ],
+    [
+      "Consumer",
+      1571
+    ],
+    [
+      "AI",
+      1556
+    ],
+    [
+      "Enterprise",
+      1389
+    ],
+    [
+      "Agentic AI AI Infrastructure Artificial Intelligence (AI) Foundational AI Generative AI",
+      1252
+    ],
+    [
+      "Health",
+      1141
+    ],
+    [
+      "Cybersecurity",
+      762
+    ],
+    [
+      "Biotech",
+      678
+    ],
+    [
+      "Deeptech / Hardware",
+      517
+    ],
+    [
+      "Climate",
+      511
+    ],
+    [
+      "Healthcare",
+      508
+    ],
+    [
+      "Media",
+      480
+    ],
+    [
+      "Crypto & Blockchain",
+      432
+    ],
+    [
+      "AI & ML",
+      357
+    ],
+    [
+      "Education",
+      348
+    ],
+    [
+      "Future of Work",
+      336
+    ],
+    [
+      "Web3 / Crypto",
+      336
+    ],
+    [
+      "Logistics",
+      316
+    ],
+    [
+      "Data",
+      313
+    ],
+    [
+      "Energy",
+      301
+    ],
+    [
+      "Robotics",
+      280
+    ],
+    [
+      "Ecommerce",
+      279
+    ],
+    [
+      "Gaming",
+      269
+    ],
+    [
+      "Food & Ag",
+      264
+    ]
+  ]
+}

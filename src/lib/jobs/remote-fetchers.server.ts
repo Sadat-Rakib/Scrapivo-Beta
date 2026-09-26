@@ -8,7 +8,7 @@
  * and the age window is 21 days — wide enough for real volume, narrow enough
  * to stay fresh.
  */
-import { resilientFetch, resilientJson } from "@/lib/search/http-fetch.server";
+import { resilientFetch, resilientJson, resilientText } from "@/lib/search/http-fetch.server";
 import { guessSeniority, looksRemote } from "./filters";
 import { hasWord, parseQuery } from "./relevance";
 import { sanitizeJobText } from "./hygiene";
@@ -491,6 +491,108 @@ export async function fetchTheMuseJobs(query: string | undefined): Promise<RawJo
       employment_type: sanitizeJobText(j.type) || null,
     });
     if (out.length >= CAP) break;
+  }
+  return out;
+}
+
+// ── Internshala (India-first board; server-rendered schema.org ItemList) ──
+// No public API: list pages embed an ItemList whose detail-URL slugs encode
+// location + company ("…-job-in-chennai-at-acme-corp1788416201"), parsed
+// back out deterministically. Undated by design (isActiveJob keeps undated).
+
+function deslug(s: string): string {
+  return s
+    .split("-")
+    .filter(Boolean)
+    .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : w))
+    .join(" ");
+}
+
+function parseInternshalaSlug(url: string): { location: string | null; company: string | null } {
+  const m = /\/job\/detail\/(.+)$/.exec(url);
+  if (!m) return { location: null, company: null };
+  const rest = m[1].replace(/\/$/, "");
+  const ji = rest.lastIndexOf("-job-in-");
+  if (ji < 0) return { location: null, company: null };
+  const after = rest.slice(ji + "-job-in-".length);
+  const ai = after.lastIndexOf("-at-");
+  if (ai < 0) return { location: deslug(after), company: null };
+  const locRaw = after.slice(0, ai).toLowerCase();
+  const coRaw = after.slice(ai + "-at-".length).replace(/\d+$/, "");
+  return {
+    location: locRaw === "multiple-locations" ? null : deslug(locRaw) || null,
+    company: deslug(coRaw) || null,
+  };
+}
+
+export async function fetchInternshalaJobs(
+  query: string | undefined,
+  location?: string,
+): Promise<RawJobPosting[]> {
+  const q = query?.trim();
+  if (!q) return [];
+  const skill = q
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  if (!skill) return [];
+  const urls = [`https://internshala.com/jobs/${skill}-jobs/`];
+  const city = (location ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z]+/g, "-")
+    .replace(/^-|-$/g, "");
+  // City-scoped variant only for plausible single-token cities (never
+  // ISO/country codes — wrong guesses 404 and are skipped).
+  if (
+    city &&
+    city.length >= 3 &&
+    city.length <= 20 &&
+    !city.includes("-") &&
+    !/^(in|us|uk|remote)$/.test(city)
+  ) {
+    urls.push(`https://internshala.com/jobs/${skill}-jobs-in-${city}/`);
+  }
+  const out: RawJobPosting[] = [];
+  const seen = new Set<string>();
+  for (const pageUrl of urls.slice(0, 2)) {
+    const html = await withTimeout(resilientText(pageUrl).catch(() => ""), 12_000, "");
+    if (!html) continue;
+    for (const m of html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)) {
+      let data: unknown;
+      try {
+        data = JSON.parse(m[1]);
+      } catch {
+        continue;
+      }
+      const blocks = Array.isArray(data) ? data : [data];
+      for (const b of blocks) {
+        const rec = b as { "@type"?: string; itemListElement?: unknown };
+        if (!rec || rec["@type"] !== "ItemList" || !Array.isArray(rec.itemListElement)) continue;
+        for (const it of rec.itemListElement as Array<{ name?: string; url?: string }>) {
+          const title = sanitizeJobText(it?.name ?? "");
+          const url2 = String(it?.url ?? "");
+          if (!title || !url2 || seen.has(url2)) continue;
+          seen.add(url2);
+          if (!titleGate(title, q)) continue;
+          const parsed = parseInternshalaSlug(url2);
+          out.push({
+            title,
+            company: parsed.company || "—",
+            location: parsed.location,
+            url: url2,
+            source: "source-internshala",
+            board_id: "internshala",
+            posted_at: null,
+            description: sanitizeJobText(title).slice(0, 200) || null,
+            salary: null,
+            remote: /remote/i.test(parsed.location ?? ""),
+            seniority: guessSeniority(title),
+          });
+          if (out.length >= CAP) return out;
+        }
+      }
+    }
   }
   return out;
 }

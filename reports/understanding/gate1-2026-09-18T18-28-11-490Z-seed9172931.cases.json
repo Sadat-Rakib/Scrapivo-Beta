@@ -1,0 +1,52 @@
+{
+  "seed": 9172931,
+  "holdout": [
+    {
+      "id": "h000a",
+      "prompt": "brand strategists who serve cobblers in Kelowna",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "location": "kelowna"
+      },
+      "pairWith": "h000b"
+    },
+    {
+      "id": "h000b",
+      "prompt": "cobblers in Kelowna who need a brand strategist",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "needs_service",
+        "object": "brand strategist",
+        "location": "kelowna"
+      },
+      "pairWith": "h000a"
+    },
+    {
+      "id": "h002a",
+      "prompt": "agronomists who serve dive schools in Cebu",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "location": "cebu"
+      },
+      "pairWith": "h002b"
+    },
+    {
+      "id": "h002b",
+      "prompt": "dive schools in Cebu who need a agronomist",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "needs_service",
+        "object": "agronomist",
+        "location": "cebu"
+      },
+      "pairWith": "h002a"
+    }
+  ],
+  "chaos": []
+}

@@ -1,0 +1,57 @@
+{
+  "seed": 9172947,
+  "holdout": [
+    {
+      "id": "h000a",
+      "prompt": "wind turbine technicians looking for clients",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_client"
+      },
+      "pairWith": "h000b"
+    },
+    {
+      "id": "h000b",
+      "prompt": "businesses looking for wind turbine technicians",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "business",
+          "company"
+        ],
+        "relation": "needs_service",
+        "object": "wind turbine technician"
+      },
+      "pairWith": "h000a"
+    },
+    {
+      "id": "h002a",
+      "prompt": "trade show fabrication agencies in Hsinchu",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "hsinchu",
+        "clarification": "forbidden"
+      },
+      "pairWith": "h002b"
+    },
+    {
+      "id": "h002b",
+      "prompt": "companies in Hsinchu needing trade show fabrication",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "needs_service",
+        "object": "trade show fabrication",
+        "location": "hsinchu",
+        "intent_signal_required": true
+      },
+      "pairWith": "h002a"
+    }
+  ],
+  "chaos": []
+}

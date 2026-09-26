@@ -1,0 +1,95 @@
+{
+  "key": "4.csv",
+  "entity": "person",
+  "rows": 24999,
+  "required_fields": [
+    "Name",
+    "Company",
+    "Title",
+    "Email",
+    "Phone",
+    "Website",
+    "Social(any)",
+    "Location"
+  ],
+  "absent_columns": [],
+  "complete": 15233,
+  "incomplete": 9766,
+  "complete_pct": 60.9,
+  "missing_counts": {
+    "Email": 9130,
+    "Location": 167,
+    "Phone": 895,
+    "Website": 22
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Email"
+      ],
+      "rows": 8693
+    },
+    {
+      "missing": [
+        "Phone"
+      ],
+      "rows": 504
+    },
+    {
+      "missing": [
+        "Email",
+        "Phone"
+      ],
+      "rows": 380
+    },
+    {
+      "missing": [
+        "Location"
+      ],
+      "rows": 110
+    },
+    {
+      "missing": [
+        "Email",
+        "Location"
+      ],
+      "rows": 50
+    },
+    {
+      "missing": [
+        "Website"
+      ],
+      "rows": 15
+    },
+    {
+      "missing": [
+        "Phone",
+        "Website"
+      ],
+      "rows": 4
+    },
+    {
+      "missing": [
+        "Email",
+        "Location",
+        "Phone"
+      ],
+      "rows": 4
+    },
+    {
+      "missing": [
+        "Location",
+        "Phone"
+      ],
+      "rows": 3
+    },
+    {
+      "missing": [
+        "Email",
+        "Website"
+      ],
+      "rows": 3
+    }
+  ],
+  "people_bonus_rows": 0
+}

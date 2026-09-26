@@ -1,0 +1,31 @@
+{
+  "key": "apollo-contacts-export (5)_CATCH_ALL_AND_UNKNOWN_MILLIONVERIFIER.COM-All deliverable emails-20250728 (1)_CATEGORIZED.csv",
+  "entity": "person",
+  "rows": 4810,
+  "required_fields": [
+    "Name",
+    "Company",
+    "Title",
+    "Email",
+    "Phone",
+    "Website",
+    "Social(any)",
+    "Location"
+  ],
+  "absent_columns": [],
+  "complete": 4569,
+  "incomplete": 241,
+  "complete_pct": 95.0,
+  "missing_counts": {
+    "Phone": 241
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Phone"
+      ],
+      "rows": 241
+    }
+  ],
+  "people_bonus_rows": 0
+}

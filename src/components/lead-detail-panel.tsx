@@ -374,8 +374,22 @@ export function LeadDetailPanel({
         <div>
           <h2 className="text-lg font-semibold leading-snug">{lead.title}</h2>
           <div className="mt-1 text-xs text-muted-foreground">
-            {lead.author ?? "anon"} · {lead.engagement ?? 0} engagement
-            {lead.posted_at && ` · ${new Date(lead.posted_at).toLocaleDateString()}`}
+            {lead.platform === "canonical" ||
+            lead.platform_label === "Directory" ||
+            (!lead.author && (lead.engagement == null || lead.engagement === 0))
+              ? [
+                  lead.author && lead.author !== "anon" ? lead.author : null,
+                  lead.posted_at ? new Date(lead.posted_at).toLocaleDateString() : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · ") || null
+              : [
+                  lead.author ?? "anon",
+                  `${lead.engagement ?? 0} engagement`,
+                  lead.posted_at ? new Date(lead.posted_at).toLocaleDateString() : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
           </div>
           <a
             href={lead.full_post_url}

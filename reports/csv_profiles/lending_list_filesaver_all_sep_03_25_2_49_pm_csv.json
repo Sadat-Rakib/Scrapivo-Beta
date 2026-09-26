@@ -1,0 +1,134 @@
+{
+  "key": "Lending List filesaver-All_Sep 03 25 2_49 pm.csv",
+  "size": 3326233,
+  "last_modified": "2026-09-08 00:12:46+00:00",
+  "columns": [
+    "First Name",
+    "Last Name",
+    "Title",
+    "Comp name",
+    "Website",
+    "Email",
+    "Phone",
+    "Comp Phone",
+    "Employees",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter",
+    "Country",
+    "Industry",
+    "Tech Used",
+    "Keywords",
+    "SEO Description",
+    "Category"
+  ],
+  "row_count": 34564,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "First Name": "first_name",
+    "Last Name": "last_name",
+    "Title": "title",
+    "Comp name": "other",
+    "Website": "website",
+    "Email": "email",
+    "Phone": "phone",
+    "Comp Phone": "phone",
+    "Employees": "employees",
+    "Pers Linkedin": "linkedin",
+    "Comp Linkedin": "linkedin",
+    "Facebook": "social",
+    "Twitter": "social",
+    "Country": "country",
+    "Industry": "industry",
+    "Tech Used": "tech",
+    "Keywords": "descriptive",
+    "SEO Description": "descriptive",
+    "Category": "industry"
+  },
+  "missing_pct": {
+    "First Name": 25.2,
+    "Last Name": 0.3,
+    "Title": 100.0,
+    "Comp name": 0.0,
+    "Website": 100.0,
+    "Email": 0.0,
+    "Phone": 0.0,
+    "Comp Phone": 100.0,
+    "Employees": 100.0,
+    "Pers Linkedin": 100.0,
+    "Comp Linkedin": 100.0,
+    "Facebook": 100.0,
+    "Twitter": 100.0,
+    "Country": 0.0,
+    "Industry": 0.0,
+    "Tech Used": 100.0,
+    "Keywords": 100.0,
+    "SEO Description": 100.0,
+    "Category": 100.0
+  },
+  "samples": {
+    "First Name": [
+      "Tad",
+      "Steve",
+      "Steve"
+    ],
+    "Last Name": [
+      "Janicki",
+      "Gray",
+      "Rose"
+    ],
+    "Email": [
+      "bfsllp@live.com",
+      "fourboystransportation@outlook.com",
+      "electricrosebud@hotmail.com"
+    ],
+    "Phone": [
+      "15205511871",
+      "19282435795",
+      "19286063556"
+    ],
+    "Country": [
+      "US",
+      "US",
+      "US"
+    ],
+    "Industry": [
+      "Lending",
+      "Lending",
+      "Lending"
+    ],
+    "Comp name": [
+      "Four Boys Transportation INC",
+      "Rose Electric",
+      "SteveS Landscaping Service"
+    ]
+  },
+  "validity": {
+    "Email": "3/3 valid-shape",
+    "Phone": "3/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Website",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter"
+  ],
+  "activity_match_keys": [
+    "First Name",
+    "Last Name",
+    "Website",
+    "Email",
+    "Phone",
+    "Comp Phone",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter"
+  ]
+}

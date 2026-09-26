@@ -1,0 +1,365 @@
+{
+  "key": "crunchbase_2.2m-2.3m.csv",
+  "size": 59367475,
+  "last_modified": "2026-09-08 00:12:14+00:00",
+  "columns": [
+    "id",
+    "created_at",
+    "name",
+    "short_description",
+    "semrush_global_rank",
+    "semrush_visits_latest_month",
+    "num_investors",
+    "funding_total",
+    "num_exits",
+    "num_funding_rounds",
+    "last_funding_type",
+    "last_funding_at",
+    "num_acquisitions",
+    "apptopia_total_apps",
+    "apptopia_total_downloads",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "num_investments",
+    "num_lead_investments",
+    "num_lead_investors",
+    "listed_stock_symbol",
+    "company_type",
+    "hub_tags",
+    "operating_status",
+    "founded_on",
+    "categories",
+    "founders",
+    "website",
+    "ipo_status",
+    "num_employees_enum",
+    "locations",
+    "growth_insight_description",
+    "growth_insight_indicator",
+    "growth_insight_direction",
+    "growth_insight_confidence",
+    "investor_insight_description",
+    "permalink",
+    "url"
+  ],
+  "row_count": 100000,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "id": "other",
+    "created_at": "other",
+    "name": "full_name",
+    "short_description": "descriptive",
+    "semrush_global_rank": "other",
+    "semrush_visits_latest_month": "other",
+    "num_investors": "other",
+    "funding_total": "other",
+    "num_exits": "other",
+    "num_funding_rounds": "other",
+    "last_funding_type": "other",
+    "last_funding_at": "other",
+    "num_acquisitions": "other",
+    "apptopia_total_apps": "other",
+    "apptopia_total_downloads": "other",
+    "contact_email": "email",
+    "phone_number": "phone",
+    "facebook": "social",
+    "linkedin": "linkedin",
+    "twitter": "social",
+    "num_investments": "other",
+    "num_lead_investments": "other",
+    "num_lead_investors": "other",
+    "listed_stock_symbol": "other",
+    "company_type": "company",
+    "hub_tags": "other",
+    "operating_status": "other",
+    "founded_on": "other",
+    "categories": "other",
+    "founders": "other",
+    "website": "website",
+    "ipo_status": "other",
+    "num_employees_enum": "employees",
+    "locations": "other",
+    "growth_insight_description": "descriptive",
+    "growth_insight_indicator": "other",
+    "growth_insight_direction": "other",
+    "growth_insight_confidence": "other",
+    "investor_insight_description": "descriptive",
+    "permalink": "other",
+    "url": "website"
+  },
+  "missing_pct": {
+    "id": 0.0,
+    "created_at": 0.0,
+    "name": 0.0,
+    "short_description": 0.0,
+    "semrush_global_rank": 68.8,
+    "semrush_visits_latest_month": 68.8,
+    "num_investors": 90.0,
+    "funding_total": 90.6,
+    "num_exits": 99.8,
+    "num_funding_rounds": 87.7,
+    "last_funding_type": 87.7,
+    "last_funding_at": 87.5,
+    "num_acquisitions": 98.7,
+    "apptopia_total_apps": 93.3,
+    "apptopia_total_downloads": 98.2,
+    "contact_email": 32.9,
+    "phone_number": 28.4,
+    "facebook": 53.9,
+    "linkedin": 29.9,
+    "twitter": 66.1,
+    "num_investments": 99.5,
+    "num_lead_investments": 99.8,
+    "num_lead_investors": 94.2,
+    "listed_stock_symbol": 99.6,
+    "company_type": 3.6,
+    "hub_tags": 99.8,
+    "operating_status": 0.0,
+    "founded_on": 16.9,
+    "categories": 8.9,
+    "founders": 78.1,
+    "website": 14.2,
+    "ipo_status": 11.4,
+    "num_employees_enum": 25.9,
+    "locations": 7.1,
+    "growth_insight_description": 98.1,
+    "growth_insight_indicator": 98.1,
+    "growth_insight_direction": 99.4,
+    "growth_insight_confidence": 99.4,
+    "investor_insight_description": 97.5,
+    "permalink": 0.0,
+    "url": 0.0
+  },
+  "samples": {
+    "id": [
+      "b40a0fb8-92ea-4106-bcfd-3462b27ae732",
+      "08a660d9-96d7-117c-0763-da2435c2ec6b",
+      "6b85d78b-597a-4964-9ef3-e5014144f76e"
+    ],
+    "created_at": [
+      "2024-08-22 13:36:26.217955+00",
+      "2024-08-22 13:36:26.217955+00",
+      "2024-08-22 13:36:26.217955+00"
+    ],
+    "name": [
+      "Shanghai Jduntex Technology Co.",
+      "Shanghai Jeegu Electronic Ltd",
+      "Shanghai Jesoncom Communication Engineering"
+    ],
+    "short_description": [
+      "Shanghai Jduntex Technology Co. is a supplier of FR fabrics, workwear clothing, and visibility garments.",
+      "we focus on develop smartwriter that is improving people's handwriting skill by electronic ink screen",
+      "Shanghai Jessubond International Co. is a traffic safety product manufacturer that produces convex and dome mirrors."
+    ],
+    "contact_email": [
+      "sales@jduntex.com",
+      "piper@126.com",
+      "sales831@jb369.com"
+    ],
+    "phone_number": [
+      "+86 21 5784 9396",
+      "+86(0)21.66276925",
+      "+0086 21 57852819"
+    ],
+    "linkedin": [
+      "https://www.linkedin.com/company/shanghai-jduntex-technology-co-ltd/?trk=pulse-article_main-author-card",
+      "https://www.linkedin.com/company/shanghai-jessubond-international-co-ltd",
+      "https://www.linkedin.com/company/shanghai-joinwit-optoelectronic-tech--co--ltd"
+    ],
+    "company_type": [
+      "for_profit",
+      "for_profit",
+      "for_profit"
+    ],
+    "operating_status": [
+      "active",
+      "active",
+      "active"
+    ],
+    "founded_on": [
+      "2005-01-01",
+      "2004-04-22",
+      "2004-01-01"
+    ],
+    "categories": [
+      "Commercial, Security, Wholesale",
+      "Artificial Intelligence (AI), Consumer Electronics, Electronics, Hardware, Software",
+      "Manufacturing"
+    ],
+    "website": [
+      "https://www.jduntex.com",
+      "http://www.kaixinlianzi.cn",
+      "https://www.shjesoncom.com/"
+    ],
+    "ipo_status": [
+      "private",
+      "private",
+      "private"
+    ],
+    "num_employees_enum": [
+      "c_00011_00050",
+      "c_00001_00010",
+      "c_00101_00250"
+    ],
+    "locations": [
+      "Asia-Pacific (APAC)",
+      "Asia-Pacific (APAC)",
+      "Asia-Pacific (APAC)"
+    ],
+    "permalink": [
+      "shanghai-jduntex-technology-co",
+      "shanghai-jeegu-electronic-ltd",
+      "shanghai-jesoncom-communication-engineering"
+    ],
+    "url": [
+      "https://www.crunchbase.com/organization/shanghai-jduntex-technology-co",
+      "https://www.crunchbase.com/organization/shanghai-jeegu-electronic-ltd",
+      "https://www.crunchbase.com/organization/shanghai-jesoncom-communication-engineering"
+    ],
+    "founders": [
+      "yuelong chen",
+      "Yixin Jiang",
+      "Sheng Xuanhuai"
+    ],
+    "semrush_global_rank": [
+      "8997651",
+      "7867370",
+      "10347760"
+    ],
+    "semrush_visits_latest_month": [
+      "445",
+      "683",
+      "233"
+    ],
+    "facebook": [
+      "https://www.facebook.com/JBTrafficSafety",
+      "https://www.facebook.com/JoinwitTelecom",
+      "https://www.facebook.com/jmindustry"
+    ],
+    "twitter": [
+      "https://twitter.com/ye_bink",
+      "https://twitter.com/shjmindustry",
+      "https://www.twitter.com/jameslinsjtu"
+    ],
+    "num_investors": [
+      "1",
+      "3",
+      "2"
+    ],
+    "num_funding_rounds": [
+      "1",
+      "2",
+      "1"
+    ],
+    "last_funding_type": [
+      "undisclosed",
+      "series_a",
+      "angel"
+    ],
+    "last_funding_at": [
+      "2020-11-01",
+      "2018-04-24",
+      "2022-08-30"
+    ],
+    "funding_total": [
+      "13000000",
+      "20000000",
+      "10620000"
+    ],
+    "apptopia_total_apps": [
+      "1",
+      "4",
+      "1"
+    ],
+    "num_lead_investors": [
+      "1",
+      "1",
+      "2"
+    ],
+    "investor_insight_description": [],
+    "num_investments": [
+      "1",
+      "2",
+      "7"
+    ],
+    "growth_insight_description": [
+      "Shape Corp. opened a $74 million automotive components plant in Limestone, part of Huntsville.",
+      "Shaping Our Appalachian Region received a $500K grant to support skilled remote work in Eastern Kentucky.",
+      "Equativ and Sharethrough merged to form one of the largest global independent ad platforms and marketplaces."
+    ],
+    "growth_insight_indicator": [
+      "growing",
+      "growing",
+      "growing"
+    ],
+    "growth_insight_direction": [
+      "c400_growing",
+      "c400_growing",
+      "c400_growing"
+    ],
+    "growth_insight_confidence": [
+      "c300_medium",
+      "c400_high",
+      "c400_high"
+    ],
+    "hub_tags": [
+      "cbvp",
+      "cbvp",
+      "cbvp"
+    ],
+    "num_exits": [
+      "1",
+      "1",
+      "2"
+    ],
+    "apptopia_total_downloads": [
+      "4",
+      "913795",
+      "22"
+    ],
+    "num_lead_investments": [
+      "2",
+      "1",
+      "3"
+    ],
+    "num_acquisitions": [
+      "3",
+      "1",
+      "1"
+    ],
+    "listed_stock_symbol": [
+      "NSE:SHANKARA",
+      "LSE:SHG",
+      "NSE:SHANTHALA"
+    ]
+  },
+  "validity": {
+    "contact_email": "3/3 valid-shape",
+    "phone_number": "3/3 valid-shape"
+  },
+  "entity": "company",
+  "entity_confidence": 0.85,
+  "entity_why": "value-checked override: name=organization name; founders/company_type/num_employees_enum/funding/ipo_status present; no person first/last-name columns",
+  "social_cols": [
+    "facebook",
+    "linkedin",
+    "twitter",
+    "website",
+    "url"
+  ],
+  "activity_match_keys": [
+    "name",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "company_type",
+    "website",
+    "url"
+  ]
+}

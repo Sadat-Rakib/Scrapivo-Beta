@@ -1,0 +1,365 @@
+{
+  "key": "crunchbase_2.0m-2.1m.csv",
+  "size": 59255244,
+  "last_modified": "2026-09-08 00:12:14+00:00",
+  "columns": [
+    "id",
+    "created_at",
+    "name",
+    "short_description",
+    "semrush_global_rank",
+    "semrush_visits_latest_month",
+    "num_investors",
+    "funding_total",
+    "num_exits",
+    "num_funding_rounds",
+    "last_funding_type",
+    "last_funding_at",
+    "num_acquisitions",
+    "apptopia_total_apps",
+    "apptopia_total_downloads",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "num_investments",
+    "num_lead_investments",
+    "num_lead_investors",
+    "listed_stock_symbol",
+    "company_type",
+    "hub_tags",
+    "operating_status",
+    "founded_on",
+    "categories",
+    "founders",
+    "website",
+    "ipo_status",
+    "num_employees_enum",
+    "locations",
+    "growth_insight_description",
+    "growth_insight_indicator",
+    "growth_insight_direction",
+    "growth_insight_confidence",
+    "investor_insight_description",
+    "permalink",
+    "url"
+  ],
+  "row_count": 100000,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "id": "other",
+    "created_at": "other",
+    "name": "full_name",
+    "short_description": "descriptive",
+    "semrush_global_rank": "other",
+    "semrush_visits_latest_month": "other",
+    "num_investors": "other",
+    "funding_total": "other",
+    "num_exits": "other",
+    "num_funding_rounds": "other",
+    "last_funding_type": "other",
+    "last_funding_at": "other",
+    "num_acquisitions": "other",
+    "apptopia_total_apps": "other",
+    "apptopia_total_downloads": "other",
+    "contact_email": "email",
+    "phone_number": "phone",
+    "facebook": "social",
+    "linkedin": "linkedin",
+    "twitter": "social",
+    "num_investments": "other",
+    "num_lead_investments": "other",
+    "num_lead_investors": "other",
+    "listed_stock_symbol": "other",
+    "company_type": "company",
+    "hub_tags": "other",
+    "operating_status": "other",
+    "founded_on": "other",
+    "categories": "other",
+    "founders": "other",
+    "website": "website",
+    "ipo_status": "other",
+    "num_employees_enum": "employees",
+    "locations": "other",
+    "growth_insight_description": "descriptive",
+    "growth_insight_indicator": "other",
+    "growth_insight_direction": "other",
+    "growth_insight_confidence": "other",
+    "investor_insight_description": "descriptive",
+    "permalink": "other",
+    "url": "website"
+  },
+  "missing_pct": {
+    "id": 0.0,
+    "created_at": 0.0,
+    "name": 0.0,
+    "short_description": 0.0,
+    "semrush_global_rank": 56.5,
+    "semrush_visits_latest_month": 56.5,
+    "num_investors": 92.1,
+    "funding_total": 92.5,
+    "num_exits": 99.9,
+    "num_funding_rounds": 90.3,
+    "last_funding_type": 90.3,
+    "last_funding_at": 90.1,
+    "num_acquisitions": 98.3,
+    "apptopia_total_apps": 92.6,
+    "apptopia_total_downloads": 97.7,
+    "contact_email": 24.9,
+    "phone_number": 19.4,
+    "facebook": 37.0,
+    "linkedin": 20.7,
+    "twitter": 53.3,
+    "num_investments": 99.6,
+    "num_lead_investments": 99.8,
+    "num_lead_investors": 94.6,
+    "listed_stock_symbol": 99.3,
+    "company_type": 2.8,
+    "hub_tags": 99.7,
+    "operating_status": 0.0,
+    "founded_on": 16.8,
+    "categories": 3.3,
+    "founders": 77.3,
+    "website": 4.2,
+    "ipo_status": 2.5,
+    "num_employees_enum": 13.6,
+    "locations": 6.1,
+    "growth_insight_description": 97.5,
+    "growth_insight_indicator": 97.5,
+    "growth_insight_direction": 98.9,
+    "growth_insight_confidence": 98.9,
+    "investor_insight_description": 99.1,
+    "permalink": 0.0,
+    "url": 0.0
+  },
+  "samples": {
+    "id": [
+      "c7d68a63-c1b0-4177-904a-726125e492b3",
+      "d17f965e-7b1a-4845-b4ef-0b1a85d306ea",
+      "2d5e33b1-81c9-43e0-be4a-2fd55e0c4705"
+    ],
+    "created_at": [
+      "2024-08-22 03:17:45.946214+00",
+      "2024-08-22 03:17:45.946214+00",
+      "2024-08-22 03:17:45.946214+00"
+    ],
+    "name": [
+      "Radiant Industrial",
+      "Radiant Industries",
+      "Radiant Info Solutions"
+    ],
+    "short_description": [
+      "Radiant Info Solutions is a leading name for IT Services and Networking Solutions in India.",
+      "Radiant Innovation is a firm that designs and develops infra-red technology products like infrared thermometer, etc.",
+      "Radiant Interactive Group is a web development firm that specializes in the health and wellbeing sectors."
+    ],
+    "contact_email": [
+      "chin@radiant-ind.com",
+      "info@radiantindia.net",
+      "info@radiant.in"
+    ],
+    "phone_number": [
+      "+65 6468 7652",
+      "91-814-635-0500",
+      "+91-11-46515639/40"
+    ],
+    "linkedin": [
+      "https://www.linkedin.com/company/radiant-industrial-pte-ltd",
+      "https://www.linkedin.com/company/radiantindustries",
+      "https://www.linkedin.com/company/radiant-info-solutions-pvt-ltd/"
+    ],
+    "company_type": [
+      "for_profit",
+      "for_profit",
+      "for_profit"
+    ],
+    "operating_status": [
+      "active",
+      "active",
+      "active"
+    ],
+    "founded_on": [
+      "2002-01-01",
+      "2014-01-01",
+      "2007-01-01"
+    ],
+    "categories": [
+      "Energy Management, Financial Services, Lighting, Waste Management",
+      "Building Material, Industrial, Manufacturing",
+      "Information Technology, Network Security"
+    ],
+    "website": [
+      "https://www.radiant-ind.com",
+      "https://www.radiantindia.net",
+      "https://radiant.in"
+    ],
+    "ipo_status": [
+      "private",
+      "private",
+      "private"
+    ],
+    "num_employees_enum": [
+      "c_00001_00010",
+      "c_00011_00050",
+      "c_00011_00050"
+    ],
+    "locations": [
+      "Asia-Pacific (APAC), Association of Southeast Asian Nations (ASEAN), Southeast Asia",
+      "Asia-Pacific (APAC)",
+      "Asia-Pacific (APAC)"
+    ],
+    "permalink": [
+      "radiant-industrial",
+      "radiant-industries",
+      "radiant-info-solutions"
+    ],
+    "url": [
+      "https://www.crunchbase.com/organization/radiant-industrial",
+      "https://www.crunchbase.com/organization/radiant-industries",
+      "https://www.crunchbase.com/organization/radiant-info-solutions"
+    ],
+    "facebook": [
+      "https://www.facebook.com/radiantindialudhiana/",
+      "https://www.facebook.com/radiant.info.solutions/",
+      "https://www.facebook.com/radiantinfo"
+    ],
+    "founders": [
+      "Prabhdeep Singh",
+      "Laura Agyeman",
+      "Jeff Friesen"
+    ],
+    "semrush_global_rank": [
+      "4108596",
+      "8838554",
+      "12504428"
+    ],
+    "semrush_visits_latest_month": [
+      "2530",
+      "455",
+      "101"
+    ],
+    "twitter": [
+      "https://twitter.com/Radiant_in",
+      "https://www.twitter.com/radiantinsights",
+      "https://twitter.com/collegeradiant"
+    ],
+    "apptopia_total_apps": [
+      "1",
+      "3",
+      "6"
+    ],
+    "apptopia_total_downloads": [
+      "86350",
+      "16348",
+      "3948"
+    ],
+    "funding_total": [
+      "75000",
+      "200000000",
+      "200000000"
+    ],
+    "num_funding_rounds": [
+      "1",
+      "1",
+      "1"
+    ],
+    "last_funding_type": [
+      "series_unknown",
+      "private_equity",
+      "private_equity"
+    ],
+    "last_funding_at": [
+      "2024-06-05",
+      "2017-07-18",
+      "2021-05-10"
+    ],
+    "num_investors": [
+      "1",
+      "1",
+      "1"
+    ],
+    "num_investments": [
+      "1",
+      "1",
+      "1"
+    ],
+    "num_lead_investments": [
+      "1",
+      "2",
+      "4"
+    ],
+    "num_lead_investors": [
+      "1",
+      "1",
+      "1"
+    ],
+    "num_acquisitions": [
+      "1",
+      "5",
+      "1"
+    ],
+    "growth_insight_description": [
+      "Radyus Research partnered with Dt&CRO to facilitate the entry of South Korean biotech companies into the U.S. market.",
+      "RailPros completed its second acquisition, expanding its operations to Tennessee.",
+      "Rainforest Automation accelerated its growth by securing $20 million in a Series A funding round."
+    ],
+    "growth_insight_indicator": [
+      "growing",
+      "growing",
+      "growing"
+    ],
+    "listed_stock_symbol": [
+      "AMEX:RLGT",
+      "TSXV:RTI",
+      "NSE:RADIOCITY"
+    ],
+    "growth_insight_direction": [
+      "c400_growing",
+      "c400_growing",
+      "c400_growing"
+    ],
+    "growth_insight_confidence": [
+      "c300_medium",
+      "c400_high",
+      "c400_high"
+    ],
+    "investor_insight_description": [],
+    "hub_tags": [
+      "cbvp",
+      "unicorn",
+      "pledge_one_percent"
+    ],
+    "num_exits": [
+      "1",
+      "1",
+      "3"
+    ]
+  },
+  "validity": {
+    "contact_email": "3/3 valid-shape",
+    "phone_number": "3/3 valid-shape"
+  },
+  "entity": "company",
+  "entity_confidence": 0.85,
+  "entity_why": "value-checked override: name=organization name; founders/company_type/num_employees_enum/funding/ipo_status present; no person first/last-name columns",
+  "social_cols": [
+    "facebook",
+    "linkedin",
+    "twitter",
+    "website",
+    "url"
+  ],
+  "activity_match_keys": [
+    "name",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "company_type",
+    "website",
+    "url"
+  ]
+}

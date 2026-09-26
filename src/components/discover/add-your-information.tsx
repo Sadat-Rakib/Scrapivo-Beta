@@ -17,7 +17,7 @@ type Props = {
 };
 
 /** Shared file-picker state so the card and pill variants stay identical. */
-function useAddInfoFile() {
+export function useAddInfoFile() {
   const [fileName, setFileName] = useState("");
   const [fileExcerpt, setFileExcerpt] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);

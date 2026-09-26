@@ -1,0 +1,56 @@
+{
+  "seed": 9172859,
+  "holdout": [
+    {
+      "id": "h000a",
+      "prompt": "companies in Ann Arbor hiring brand strategists",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "hiring",
+        "location": "ann arbor",
+        "intent_signal_required": true
+      },
+      "pairWith": "h000b"
+    },
+    {
+      "id": "h000b",
+      "prompt": "brand strategists in Ann Arbor looking for work",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_job",
+        "location": "ann arbor"
+      },
+      "pairWith": "h000a"
+    },
+    {
+      "id": "h002a",
+      "prompt": "investors funding forestry startups in Örebro",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "investor",
+        "location": "örebro"
+      },
+      "pairWith": "h002b"
+    },
+    {
+      "id": "h002b",
+      "prompt": "forestry startups in Örebro raising money",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "seeking_funding",
+        "location": "örebro"
+      },
+      "pairWith": "h002a"
+    }
+  ],
+  "chaos": []
+}

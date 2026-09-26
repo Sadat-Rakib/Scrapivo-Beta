@@ -1,0 +1,92 @@
+{
+  "key": "Vanda Closer Data Master List of CXO 112924.csv",
+  "entity": "person",
+  "rows": 275052,
+  "required_fields": [
+    "Name",
+    "Company",
+    "Title",
+    "Email",
+    "Phone",
+    "Website",
+    "Social(any)",
+    "Location"
+  ],
+  "absent_columns": [],
+  "complete": 0,
+  "incomplete": 275052,
+  "complete_pct": 0.0,
+  "missing_counts": {
+    "Company": 275052,
+    "Phone": 275052,
+    "Social(any)": 87491,
+    "Website": 236047,
+    "Title": 102023,
+    "Name": 148
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Company",
+        "Phone",
+        "Website"
+      ],
+      "rows": 130917
+    },
+    {
+      "missing": [
+        "Company",
+        "Phone",
+        "Social(any)",
+        "Title",
+        "Website"
+      ],
+      "rows": 77866
+    },
+    {
+      "missing": [
+        "Company",
+        "Phone"
+      ],
+      "rows": 32635
+    },
+    {
+      "missing": [
+        "Company",
+        "Phone",
+        "Title",
+        "Website"
+      ],
+      "rows": 24009
+    },
+    {
+      "missing": [
+        "Company",
+        "Phone",
+        "Social(any)"
+      ],
+      "rows": 6370
+    },
+    {
+      "missing": [
+        "Company",
+        "Phone",
+        "Social(any)",
+        "Website"
+      ],
+      "rows": 3107
+    },
+    {
+      "missing": [
+        "Company",
+        "Name",
+        "Phone",
+        "Social(any)",
+        "Title",
+        "Website"
+      ],
+      "rows": 148
+    }
+  ],
+  "people_bonus_rows": 0
+}

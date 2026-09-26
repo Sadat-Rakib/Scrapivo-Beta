@@ -54,10 +54,16 @@ export function ensureFreehireSourceRegistered(): void {
           headers: { Accept: "application/json", "User-Agent": "Scrapivo/1.0" },
           signal: AbortSignal.timeout(12_000),
         });
-        if (!res.ok) return [];
+        if (!res.ok) {
+          // Loud server-side (UI shows sourceStatuses from the registry meta
+          // path); silent [] here used to masquerade outages as "no jobs".
+          console.warn(`[jobs] source-freehire HTTP ${res.status}`);
+          return [];
+        }
         const json = (await res.json().catch(() => null)) as { data?: FreehireJob[] } | null;
         data = json?.data ?? [];
-      } catch {
+      } catch (e) {
+        console.warn("[jobs] source-freehire fetch failed", e);
         return [];
       }
       const out: RawJobPosting[] = [];

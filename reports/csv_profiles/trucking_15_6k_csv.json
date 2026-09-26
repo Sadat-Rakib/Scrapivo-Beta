@@ -1,0 +1,181 @@
+{
+  "key": "trucking- 15.6k.csv",
+  "size": 13452176,
+  "last_modified": "2026-09-08 00:12:56+00:00",
+  "columns": [
+    "First Name",
+    "Last Name",
+    "Title",
+    "Comp name",
+    "Website",
+    "Email",
+    "Phone",
+    "Comp Phone",
+    "Employees",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter",
+    "Country",
+    "Industry",
+    "Tech Used",
+    "Keywords",
+    "SEO Description"
+  ],
+  "row_count": 15536,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "First Name": "first_name",
+    "Last Name": "last_name",
+    "Title": "title",
+    "Comp name": "other",
+    "Website": "website",
+    "Email": "email",
+    "Phone": "phone",
+    "Comp Phone": "phone",
+    "Employees": "employees",
+    "Pers Linkedin": "linkedin",
+    "Comp Linkedin": "linkedin",
+    "Facebook": "social",
+    "Twitter": "social",
+    "Country": "country",
+    "Industry": "industry",
+    "Tech Used": "tech",
+    "Keywords": "descriptive",
+    "SEO Description": "descriptive"
+  },
+  "missing_pct": {
+    "First Name": 0.0,
+    "Last Name": 0.6,
+    "Title": 0.0,
+    "Comp name": 0.0,
+    "Website": 0.0,
+    "Email": 0.0,
+    "Phone": 100.0,
+    "Comp Phone": 2.5,
+    "Employees": 0.0,
+    "Pers Linkedin": 3.9,
+    "Comp Linkedin": 0.2,
+    "Facebook": 18.8,
+    "Twitter": 33.5,
+    "Country": 0.0,
+    "Industry": 0.0,
+    "Tech Used": 1.3,
+    "Keywords": 21.9,
+    "SEO Description": 35.1
+  },
+  "samples": {
+    "First Name": [
+      "Aaron",
+      "Aaron",
+      "Aaron"
+    ],
+    "Last Name": [
+      "Dones",
+      "Deward",
+      "Sidman"
+    ],
+    "Title": [
+      "Founder, CEO",
+      "Chief Operating Officer",
+      "chief operations officer"
+    ],
+    "Comp name": [
+      "Advanced Carrier",
+      "Unique Truck Equipment",
+      "seamens moving"
+    ],
+    "Website": [
+      "http://www.go-act.com",
+      "http://www.uniquetruck.com",
+      "http://www.seamensmoving.com"
+    ],
+    "Email": [
+      "adones@go-act.com",
+      "adeward@uniquetruck.com",
+      "aaron@seamensmoving.com"
+    ],
+    "Comp Phone": [
+      "'+1 248-630-1326",
+      "'+1 616-531-8868",
+      "'+1 212-997-1117"
+    ],
+    "Employees": [
+      "7",
+      "11",
+      "14"
+    ],
+    "Pers Linkedin": [
+      "http://www.linkedin.com/in/findhiddenprofitsinlogistics",
+      "http://www.linkedin.com/in/aarondeward",
+      "http://www.linkedin.com/in/aaron-sidman-55952911a"
+    ],
+    "Comp Linkedin": [
+      "http://www.linkedin.com/company/advanced-carrier-technologies-llc",
+      "http://www.linkedin.com/company/unique-truck-equipment",
+      "http://www.linkedin.com/company/seamen's-moving"
+    ],
+    "Facebook": [
+      "https://www.facebook.com/advancedcarriertechnologies",
+      "https://www.facebook.com/uniquetruck",
+      "https://www.facebook.com/seamens.moving"
+    ],
+    "Twitter": [
+      "https://twitter.com/GoACTnow",
+      "https://www.twitter.com/uniquetruck",
+      "https://twitter.com/seamensmoving"
+    ],
+    "Country": [
+      "United States",
+      "United States",
+      "United States"
+    ],
+    "Industry": [
+      "transportation/trucking/railroad",
+      "transportation/trucking/railroad",
+      "transportation/trucking/railroad"
+    ],
+    "Tech Used": [
+      "WordPress.org, Nginx, Google Font API, Mobile Friendly, reCAPTCHA",
+      "Outlook, Sequence Monitor SPF, Microsoft Office 365, Google Cloud Hosting, Remote",
+      "Gmail, Google Apps, Amazon AWS, Nginx, Google Analytics, Remote"
+    ],
+    "Keywords": [
+      "storage, packing & crating, long distance moving, commercial moving, residential moving, home services, movers",
+      "volvo heavy duty trucks, carrier transicold transport refrigeration, hino business class trucks",
+      "public services & government"
+    ],
+    "SEO Description": [
+      "Your California movers offering local moving, long distance moving, and packing with clean cut drug free athlete movers.",
+      "Discover the Difference",
+      "America's Largest Truck Parts Inventory! We Ship Anywhere! Toll Free:1-800-643-2001 Hours: Mo-Fr 8:00-4:30 Sa 8:00-12:00"
+    ]
+  },
+  "validity": {
+    "Email": "3/3 valid-shape",
+    "Comp Phone": "3/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Website",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter"
+  ],
+  "activity_match_keys": [
+    "First Name",
+    "Last Name",
+    "Website",
+    "Email",
+    "Phone",
+    "Comp Phone",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter"
+  ]
+}

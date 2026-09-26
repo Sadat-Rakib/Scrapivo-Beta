@@ -1,0 +1,46 @@
+{
+  "key": "asia_region_v2.csv",
+  "entity": "person",
+  "rows": 2087,
+  "required_fields": [
+    "Name",
+    "Company",
+    "Title",
+    "Email",
+    "Phone",
+    "Website",
+    "Social(any)",
+    "Location"
+  ],
+  "absent_columns": [],
+  "complete": 1999,
+  "incomplete": 88,
+  "complete_pct": 95.8,
+  "missing_counts": {
+    "Phone": 87,
+    "Title": 1,
+    "Company": 1
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Phone"
+      ],
+      "rows": 86
+    },
+    {
+      "missing": [
+        "Title"
+      ],
+      "rows": 1
+    },
+    {
+      "missing": [
+        "Company",
+        "Phone"
+      ],
+      "rows": 1
+    }
+  ],
+  "people_bonus_rows": 0
+}

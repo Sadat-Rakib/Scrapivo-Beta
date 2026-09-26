@@ -19,6 +19,7 @@ export type JobSourceKind =
   | "source-hn"
   | "source-workatastartup"
   | "source-himalayas"
+  | "source-internshala"
   | "source-4dayweek"
   | "source-nodesk"
   | "source-freehire";
@@ -45,8 +46,10 @@ export type JobSourceId =
   | "hn"
   | "workatastartup"
   | "himalayas"
+  | "internshala"
   | "4dayweek"
-  | "nodesk";
+  | "nodesk"
+  | "freehire";
 
 export const ALL_JOB_SOURCE_IDS: JobSourceId[] = [
   "greenhouse",
@@ -68,8 +71,10 @@ export const ALL_JOB_SOURCE_IDS: JobSourceId[] = [
   "hn",
   "workatastartup",
   "himalayas",
+  "internshala",
   "4dayweek",
   "nodesk",
+  "freehire",
 ];
 
 export type JobSearchFilters = {

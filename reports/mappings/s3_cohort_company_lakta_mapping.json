@@ -1,0 +1,43 @@
+{
+  "approved": true,
+  "ambiguities": [
+    "extra (16.4% present): value census at transform, then map or document-drop",
+    "website_url vs website_or_social_url vs latka_url: same-host check; corporate site wins"
+  ],
+  "canonical_entity": "company",
+  "cohort": "s3-new-2026-09",
+  "decisions": [
+    {
+      "canonical": "Company Name/Website/Industry/Location/Revenue/Growth/Funding/Socials",
+      "evidence": "self-describing SaaS-DB columns",
+      "sources": [
+        "company_name",
+        "website_url",
+        "industry",
+        "location",
+        "revenue",
+        "revenue_alt",
+        "growth_percent",
+        "funding",
+        "linkedin_url",
+        "twitter_url",
+        "logo_url"
+      ],
+      "status": "proposed",
+      "transform": "standard normalize"
+    }
+  ],
+  "est_rows": 47496,
+  "family": "F-lakta",
+  "founder_linkage": "founder_name + founder_latka_url -> person-seed CANDIDATE queue, never auto-created",
+  "approver": "user",
+  "date": "2026-09-08",
+  "ambiguity_resolutions": {
+    "A1_website_conflicts": "corporate-site-wins after same-host check; loser to evidence",
+    "A2_mystery_columns": "inspect values at transform; map or document-drop",
+    "A3_backup_emails": "ordered fallback evidence; primary stays canonical Email",
+    "A4_duplicate_pair": "closed: apollo (5)...(1)_CATEGORIZED.csv excluded (SHA-verified), raw preserved",
+    "A5_cross_file_overlap": "dedupe analysis report-only at Stage C; no merges/deletes",
+    "campaign_engagement": "DEFERRED per user 2026-09-08; carried inert, revisit at live-activity stage"
+  }
+}

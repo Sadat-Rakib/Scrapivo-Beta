@@ -1,0 +1,365 @@
+{
+  "key": "crunchbase_1.9m-2.0m.csv",
+  "size": 58753329,
+  "last_modified": "2026-09-08 00:12:14+00:00",
+  "columns": [
+    "id",
+    "created_at",
+    "name",
+    "short_description",
+    "semrush_global_rank",
+    "semrush_visits_latest_month",
+    "num_investors",
+    "funding_total",
+    "num_exits",
+    "num_funding_rounds",
+    "last_funding_type",
+    "last_funding_at",
+    "num_acquisitions",
+    "apptopia_total_apps",
+    "apptopia_total_downloads",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "num_investments",
+    "num_lead_investments",
+    "num_lead_investors",
+    "listed_stock_symbol",
+    "company_type",
+    "hub_tags",
+    "operating_status",
+    "founded_on",
+    "categories",
+    "founders",
+    "website",
+    "ipo_status",
+    "num_employees_enum",
+    "locations",
+    "growth_insight_description",
+    "growth_insight_indicator",
+    "growth_insight_direction",
+    "growth_insight_confidence",
+    "investor_insight_description",
+    "permalink",
+    "url"
+  ],
+  "row_count": 100000,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "id": "other",
+    "created_at": "other",
+    "name": "full_name",
+    "short_description": "descriptive",
+    "semrush_global_rank": "other",
+    "semrush_visits_latest_month": "other",
+    "num_investors": "other",
+    "funding_total": "other",
+    "num_exits": "other",
+    "num_funding_rounds": "other",
+    "last_funding_type": "other",
+    "last_funding_at": "other",
+    "num_acquisitions": "other",
+    "apptopia_total_apps": "other",
+    "apptopia_total_downloads": "other",
+    "contact_email": "email",
+    "phone_number": "phone",
+    "facebook": "social",
+    "linkedin": "linkedin",
+    "twitter": "social",
+    "num_investments": "other",
+    "num_lead_investments": "other",
+    "num_lead_investors": "other",
+    "listed_stock_symbol": "other",
+    "company_type": "company",
+    "hub_tags": "other",
+    "operating_status": "other",
+    "founded_on": "other",
+    "categories": "other",
+    "founders": "other",
+    "website": "website",
+    "ipo_status": "other",
+    "num_employees_enum": "employees",
+    "locations": "other",
+    "growth_insight_description": "descriptive",
+    "growth_insight_indicator": "other",
+    "growth_insight_direction": "other",
+    "growth_insight_confidence": "other",
+    "investor_insight_description": "descriptive",
+    "permalink": "other",
+    "url": "website"
+  },
+  "missing_pct": {
+    "id": 0.0,
+    "created_at": 0.0,
+    "name": 0.0,
+    "short_description": 0.0,
+    "semrush_global_rank": 60.9,
+    "semrush_visits_latest_month": 60.9,
+    "num_investors": 90.3,
+    "funding_total": 90.9,
+    "num_exits": 99.9,
+    "num_funding_rounds": 88.0,
+    "last_funding_type": 88.0,
+    "last_funding_at": 87.8,
+    "num_acquisitions": 98.6,
+    "apptopia_total_apps": 92.0,
+    "apptopia_total_downloads": 97.8,
+    "contact_email": 27.5,
+    "phone_number": 22.8,
+    "facebook": 38.4,
+    "linkedin": 23.3,
+    "twitter": 56.5,
+    "num_investments": 99.6,
+    "num_lead_investments": 99.9,
+    "num_lead_investors": 93.9,
+    "listed_stock_symbol": 99.5,
+    "company_type": 3.4,
+    "hub_tags": 99.8,
+    "operating_status": 0.0,
+    "founded_on": 17.5,
+    "categories": 4.8,
+    "founders": 75.5,
+    "website": 5.0,
+    "ipo_status": 3.6,
+    "num_employees_enum": 15.5,
+    "locations": 6.2,
+    "growth_insight_description": 98.0,
+    "growth_insight_indicator": 98.0,
+    "growth_insight_direction": 99.0,
+    "growth_insight_confidence": 99.0,
+    "investor_insight_description": 98.9,
+    "permalink": 0.0,
+    "url": 0.0
+  },
+  "samples": {
+    "id": [
+      "81f47b73-2e4b-4df8-a2ec-ee61a104c428",
+      "96251a2d-4672-4b35-b059-f356e971ec2c",
+      "a3d2e0fc-3e3e-bf63-d7f9-bb0e618437c5"
+    ],
+    "created_at": [
+      "2024-08-20 17:33:12.503557+00",
+      "2024-08-20 17:33:12.503557+00",
+      "2024-08-20 17:33:12.503557+00"
+    ],
+    "name": [
+      "Pictoria Studios",
+      "Pictorial Meadows",
+      "Pictorial Photography Courses"
+    ],
+    "short_description": [
+      "Pictoria Studios provides web design, animation, marketing, and IT management services.",
+      "Building the Goto Marketplace for Everything Photo",
+      "Pictory is a photo sharing app where user can share and post photos."
+    ],
+    "phone_number": [
+      "+1 407 906 6299",
+      "+44 114 267 7635",
+      "+65 8488 7773"
+    ],
+    "linkedin": [
+      "https://www.linkedin.com/company/pictoria-studios-usa/",
+      "https://www.linkedin.com/company/pictorial-meadows-limited/?originalSubdomain=in",
+      "https://www.linkedin.com/company/pictorious"
+    ],
+    "company_type": [
+      "for_profit",
+      "for_profit",
+      "for_profit"
+    ],
+    "operating_status": [
+      "active",
+      "active",
+      "active"
+    ],
+    "founded_on": [
+      "2006-01-01",
+      "2003-01-01",
+      "1990-01-01"
+    ],
+    "categories": [
+      "Animation, IT Management, Video, Web Design",
+      "Agriculture, Environmental Consulting, Farming",
+      "Photography"
+    ],
+    "website": [
+      "https://pictoriastudios.com",
+      "https://www.pictorialmeadows.co.uk/",
+      "http://www.pictorial.com.sg"
+    ],
+    "ipo_status": [
+      "private",
+      "private",
+      "private"
+    ],
+    "num_employees_enum": [
+      "c_00011_00050",
+      "c_00001_00010",
+      "c_00001_00010"
+    ],
+    "locations": [
+      "East Coast, Southern US",
+      "East Coast, New England, Northeastern US",
+      "Asia-Pacific (APAC), Association of Southeast Asian Nations (ASEAN), Southeast Asia"
+    ],
+    "permalink": [
+      "pictoria-studios",
+      "pictorial-meadows",
+      "pictorial-photography-courses"
+    ],
+    "url": [
+      "https://www.crunchbase.com/organization/pictoria-studios",
+      "https://www.crunchbase.com/organization/pictorial-meadows",
+      "https://www.crunchbase.com/organization/pictorial-photography-courses"
+    ],
+    "semrush_global_rank": [
+      "5774573",
+      "35255",
+      "2661600"
+    ],
+    "semrush_visits_latest_month": [
+      "832",
+      "1838778",
+      "6592"
+    ],
+    "contact_email": [
+      "info@pictorialmeadows.co.uk",
+      "enquiry@pictorial.com.sg",
+      "info@pictorious.com"
+    ],
+    "facebook": [
+      "https://www.facebook.com/pg/pictorialmeadows/",
+      "http://www.facebook.com/PictorialPhotographySingapore",
+      "https://www.facebook.com/pictorious/"
+    ],
+    "twitter": [
+      "https://twitter.com/pictorialmeadow?lang=en",
+      "http://twitter.com/pictorials1",
+      "https://twitter.com/Pictorious"
+    ],
+    "num_investors": [
+      "1",
+      "5",
+      "6"
+    ],
+    "funding_total": [
+      "25000",
+      "4716218",
+      "23047779"
+    ],
+    "num_funding_rounds": [
+      "1",
+      "2",
+      "7"
+    ],
+    "last_funding_type": [
+      "seed",
+      "seed",
+      "angel"
+    ],
+    "last_funding_at": [
+      "2012-01-12",
+      "2023-03-23",
+      "2021-03-31"
+    ],
+    "apptopia_total_apps": [
+      "36",
+      "1",
+      "3"
+    ],
+    "founders": [
+      "Albert Chung, Michael Park",
+      "Adam McPhee, Kevin McPhee",
+      "Abid Ali Mohammed, Vikram Chalana, Vishal Chalana"
+    ],
+    "num_lead_investors": [
+      "1",
+      "1",
+      "1"
+    ],
+    "apptopia_total_downloads": [
+      "12",
+      "833",
+      "60"
+    ],
+    "num_acquisitions": [
+      "1",
+      "2",
+      "1"
+    ],
+    "listed_stock_symbol": [
+      "NSE:PPSL",
+      "NSE:PIDILITIND",
+      "OTC:PDDTF"
+    ],
+    "growth_insight_description": [
+      "Piece of Cake Moving & Storage has been recognized as America’s fastest-growing moving company.",
+      "Pienso raised $10 million in funding to scale its no-code AI model training tools.",
+      "Pierre Fabre signed a lease in Secaucus as part of its efforts to grow in the US market."
+    ],
+    "growth_insight_indicator": [
+      "growing",
+      "growing",
+      "growing"
+    ],
+    "growth_insight_direction": [
+      "c400_growing",
+      "c400_growing",
+      "c400_growing"
+    ],
+    "growth_insight_confidence": [
+      "c300_medium",
+      "c400_high",
+      "c400_high"
+    ],
+    "investor_insight_description": [],
+    "num_investments": [
+      "7",
+      "4",
+      "1"
+    ],
+    "num_lead_investments": [
+      "3",
+      "1",
+      "1"
+    ],
+    "num_exits": [
+      "1",
+      "1",
+      "1"
+    ],
+    "hub_tags": [
+      "unicorn",
+      "unicorn",
+      "cbvp"
+    ]
+  },
+  "validity": {
+    "contact_email": "3/3 valid-shape",
+    "phone_number": "3/3 valid-shape"
+  },
+  "entity": "company",
+  "entity_confidence": 0.85,
+  "entity_why": "value-checked override: name=organization name; founders/company_type/num_employees_enum/funding/ipo_status present; no person first/last-name columns",
+  "social_cols": [
+    "facebook",
+    "linkedin",
+    "twitter",
+    "website",
+    "url"
+  ],
+  "activity_match_keys": [
+    "name",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "company_type",
+    "website",
+    "url"
+  ]
+}

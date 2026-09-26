@@ -1,0 +1,544 @@
+{
+  "questions": [],
+  "clarify": [],
+  "rows": [],
+  "dbMeta": [
+    {
+      "dbHit": false,
+      "engine": "pg-index",
+      "partitionsRead": [
+        "idx_people(country,city_norm,role_norm)"
+      ],
+      "rowsScanned": 0,
+      "rowsReturned": 0,
+      "elapsedMs": 4844,
+      "indexUsed": "idx_ppl_country_citynorm_rolenorm"
+    },
+    {
+      "dbHit": true,
+      "engine": "live-browser",
+      "partitionsRead": [
+        "live-gapfill(11)"
+      ],
+      "rowsScanned": 11,
+      "rowsReturned": 11
+    }
+  ],
+  "rejected": 1,
+  "liveDiscovery": "completed",
+  "pendingEnrichment": 10,
+  "moreAvailableMessage": "There are more verified leads — want to see them?",
+  "offset": 0,
+  "limit": 50,
+  "hasMore": false,
+  "totalAvailable": null,
+  "spec": {
+    "entity": "person",
+    "criteria": [
+      {
+        "field": "geo_scope",
+        "value": "worldwide",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "role",
+        "value": "founder",
+        "stated": true,
+        "confidence": 0.5
+      },
+      {
+        "field": "industry",
+        "value": "SaaS",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "offer",
+        "value": "AI automation",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "mode",
+        "value": "selling",
+        "stated": true,
+        "confidence": 1
+      }
+    ],
+    "missing": [],
+    "signal_required": false,
+    "signal_types": [],
+    "signal_recency": null,
+    "status": "ready_to_search",
+    "raw_query": "Find 10 SaaS founders globally who may need help with AI automation.",
+    "locationSuggestion": null,
+    "understanding": {
+      "version": "u1",
+      "input": {
+        "raw": "Find 10 SaaS founders globally who may need help with AI automation.",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "lead_discovery",
+        "raw": null,
+        "confidence": 0.95
+      },
+      "prospecting_mode": {
+        "value": "fit_based",
+        "raw": "may need",
+        "confidence": 0.95
+      },
+      "target": {
+        "entity_type": {
+          "value": "person",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "entity_ambiguous": false,
+        "entity_subtype": null,
+        "role": {
+          "value": "founder",
+          "raw": "founders",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "job_title": null,
+        "industry": null,
+        "category": null,
+        "business_type": null,
+        "niche": null,
+        "company_stage": null,
+        "technologies": [],
+        "descriptors": []
+      },
+      "relation": {
+        "type": {
+          "value": "none",
+          "raw": "may need",
+          "confidence": 0.95
+        },
+        "direction": {
+          "value": "none",
+          "raw": "may need",
+          "confidence": 0.95
+        },
+        "label": null,
+        "object": null
+      },
+      "organization_context": {
+        "on_behalf_of_company": "unknown",
+        "company": null
+      },
+      "user_context": {
+        "selling": {
+          "service": {
+            "value": "AI automation",
+            "raw": "may need",
+            "normalized": null,
+            "confidence": 0.85
+          },
+          "product": null
+        },
+        "objective": null,
+        "notes": []
+      },
+      "location": {
+        "value": "global",
+        "raw": "globally",
+        "scope": "global",
+        "radius": null,
+        "radius_unit": null,
+        "country_code": null,
+        "canonical": "global",
+        "confidence": 0.5
+      },
+      "temporal": null,
+      "constraints": [],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": false,
+        "reasons": []
+      },
+      "quantity": {
+        "requested": 10,
+        "minimum": null,
+        "maximum": null,
+        "unlimited": false,
+        "approximate": false,
+        "raw": "10"
+      },
+      "required_fields": [],
+      "preferred_fields": [],
+      "contact_requirements": [],
+      "verification": [],
+      "output": [],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": false,
+        "fields": [],
+        "reason": null,
+        "question": null
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": "groq:openai/gpt-oss-20b",
+        "model": "openai/gpt-oss-20b",
+        "prompt_version": "u1-v15",
+        "latency_ms": 956,
+        "fallback_used": false,
+        "cached": false,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": null,
+          "repair_attempted": false,
+          "repair_reason": null,
+          "repair_success": null
+        },
+        "notes": [
+          "Modal need describes potential fit; expressed buying intent is not required."
+        ]
+      }
+    }
+  },
+  "outcome": "NO_QUALIFIED_RESULTS",
+  "diagnostics": [],
+  "retrievalTrace": {
+    "sources": [
+      {
+        "source": "pg-index",
+        "partitions": [
+          "idx_people(country,city_norm,role_norm)"
+        ],
+        "scanned": 0,
+        "matched": 0
+      },
+      {
+        "source": "live-browser",
+        "partitions": [
+          "live-gapfill(11)"
+        ],
+        "scanned": 11,
+        "matched": 11
+      }
+    ],
+    "rawCandidates": 11,
+    "postSpecFilter": 10,
+    "complete": 0,
+    "pendingEnrichment": 10,
+    "qualificationRejected": 0,
+    "returned": 0,
+    "reason": "INCOMPLETE"
+  },
+  "executionPlan": {
+    "requirements": {
+      "entityTypes": [
+        "person"
+      ],
+      "claims": [],
+      "needsDiscovery": true,
+      "needsIdentityResolution": true,
+      "needsLocation": false,
+      "needsTemporal": false,
+      "opportunity": null
+    },
+    "steps": [
+      {
+        "providerId": "indexed-db",
+        "costTier": 0,
+        "role": "primary",
+        "reason": "primary_tier_L0:indexed-db+identity",
+        "capabilities": {
+          "id": "indexed-db",
+          "label": "Indexed / internal DB",
+          "entityTypes": [
+            "person",
+            "company",
+            "business",
+            "investor",
+            "job"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": true,
+          "locationSupport": true,
+          "temporalSupport": false,
+          "costTier": 0,
+          "live": false
+        }
+      },
+      {
+        "providerId": "direct-http",
+        "costTier": 2,
+        "role": "primary",
+        "reason": "primary_tier_L2:direct-http",
+        "capabilities": {
+          "id": "direct-http",
+          "label": "Direct HTTP fetch",
+          "entityTypes": [
+            "company",
+            "business",
+            "person"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": false,
+          "costTier": 2,
+          "live": true
+        }
+      },
+      {
+        "providerId": "searxng",
+        "costTier": 2,
+        "role": "primary",
+        "reason": "primary_tier_L2:searxng",
+        "capabilities": {
+          "id": "searxng",
+          "label": "SearXNG (self-hosted web)",
+          "entityTypes": [
+            "person",
+            "company",
+            "business",
+            "investor",
+            "job"
+          ],
+          "claims": [
+            "hiring",
+            "service_request",
+            "funding",
+            "social_ask"
+          ],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": true,
+          "temporalSupport": true,
+          "costTier": 2,
+          "live": true
+        }
+      },
+      {
+        "providerId": "html-parser",
+        "costTier": 3,
+        "role": "primary",
+        "reason": "primary_tier_L3:html-parser",
+        "capabilities": {
+          "id": "html-parser",
+          "label": "HTML parser",
+          "entityTypes": [
+            "company",
+            "business",
+            "person",
+            "job"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": false,
+          "costTier": 3,
+          "live": true
+        }
+      },
+      {
+        "providerId": "browser-automation",
+        "costTier": 5,
+        "role": "escalation",
+        "reason": "escalate_after_free_ladder:browser-automation",
+        "capabilities": {
+          "id": "browser-automation",
+          "label": "Browser automation",
+          "entityTypes": [
+            "company",
+            "business",
+            "person",
+            "job"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": false,
+          "costTier": 5,
+          "live": true,
+          "escalateOnly": true
+        }
+      },
+      {
+        "providerId": "agentic-browser",
+        "costTier": 6,
+        "role": "escalation",
+        "reason": "escalate_after_free_ladder:agentic-browser",
+        "capabilities": {
+          "id": "agentic-browser",
+          "label": "Agentic browser",
+          "entityTypes": [
+            "company",
+            "business",
+            "person"
+          ],
+          "claims": [
+            "service_request",
+            "hiring",
+            "social_ask"
+          ],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": true,
+          "costTier": 6,
+          "live": true,
+          "escalateOnly": true
+        }
+      },
+      {
+        "providerId": "paid-serp",
+        "costTier": 7,
+        "role": "escalation",
+        "reason": "escalate_after_free_ladder:paid-serp",
+        "capabilities": {
+          "id": "paid-serp",
+          "label": "Paid SERP API",
+          "entityTypes": [
+            "person",
+            "company",
+            "business",
+            "investor",
+            "job"
+          ],
+          "claims": [
+            "hiring",
+            "service_request",
+            "funding",
+            "social_ask"
+          ],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": true,
+          "temporalSupport": true,
+          "costTier": 7,
+          "live": true,
+          "escalateOnly": true
+        }
+      }
+    ],
+    "skipped": [
+      {
+        "providerId": "osm-local",
+        "reason": "entity_type_mismatch"
+      },
+      {
+        "providerId": "company-registry",
+        "reason": "entity_type_mismatch"
+      },
+      {
+        "providerId": "sitemap-jsonld",
+        "reason": "entity_type_mismatch"
+      },
+      {
+        "providerId": "jobs-fleet",
+        "reason": "entity_type_mismatch"
+      }
+    ],
+    "researchPlan": {
+      "discoveryQueries": [
+        "\"founder\" SaaS",
+        "\"co-founder\" SaaS",
+        "\"Founder & CEO\" SaaS",
+        "site:linkedin.com/in \"founder\" SaaS",
+        "site:linkedin.com/in \"co-founder\" SaaS",
+        "site:linkedin.com/in \"Founder & CEO\" SaaS",
+        "founder SaaS startup"
+      ],
+      "requiredFields": [
+        "name",
+        "role",
+        "company",
+        "industry",
+        "website_or_profile",
+        "identity_evidence"
+      ],
+      "desiredCount": 5,
+      "stoppingRules": {
+        "maxQueries": 6,
+        "maxPages": 20,
+        "maxCandidates": 15,
+        "maxNoProgressQueries": 2
+      }
+    }
+  },
+  "providerAttempts": [
+    {
+      "provider": "indexed-db",
+      "entitiesResolved": 0,
+      "qualified": 0,
+      "attempted": false,
+      "succeeded": false,
+      "artifactsFound": 0,
+      "error": "handled_outside_live_gapfill",
+      "role": "primary",
+      "costTier": 0
+    },
+    {
+      "provider": "direct-http",
+      "entitiesResolved": 0,
+      "qualified": 0,
+      "attempted": true,
+      "succeeded": true,
+      "artifactsFound": 0,
+      "role": "primary",
+      "costTier": 2
+    },
+    {
+      "provider": "searxng",
+      "entitiesResolved": 0,
+      "qualified": 0,
+      "attempted": true,
+      "succeeded": true,
+      "artifactsFound": 0,
+      "role": "primary",
+      "costTier": 2
+    },
+    {
+      "provider": "html-parser",
+      "entitiesResolved": 0,
+      "qualified": 0,
+      "attempted": false,
+      "succeeded": false,
+      "artifactsFound": 0,
+      "error": "handled_outside_live_gapfill",
+      "role": "primary",
+      "costTier": 3
+    },
+    {
+      "provider": "paid-serp",
+      "entitiesResolved": 0,
+      "qualified": 0,
+      "attempted": false,
+      "succeeded": false,
+      "artifactsFound": 0,
+      "error": "skipped_free_first",
+      "role": "escalation",
+      "costTier": 7
+    },
+    {
+      "provider": "browser-live",
+      "attempted": true,
+      "succeeded": true,
+      "artifactsFound": 11,
+      "entitiesResolved": 0,
+      "qualified": 0
+    }
+  ],
+  "search_run_id": "run_0474ae90",
+  "conversation_id": "83775911-3efb-42a6-aa40-51453ab9cd2c:5d8da32c-2648-4aed-92f8-9885e2d62a4e",
+  "turn_id": "1790373806255-v018o2j59h",
+  "request_id": "req_3dddcf32",
+  "qualified_count": 0
+}

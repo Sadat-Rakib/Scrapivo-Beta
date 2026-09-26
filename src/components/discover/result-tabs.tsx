@@ -6,7 +6,13 @@ import type {
   LocalBusinessRow,
 } from "@/lib/search/lead-segments";
 import { LeadCard } from "@/components/lead-card";
+import { IntentBadge } from "@/components/discover/intent-badge";
+import type { SignalTier } from "@/lib/intent/strategy";
 import { Button } from "@/components/ui/button";
+import { ensureHttpUrl } from "@/lib/search/site-url";
+
+/** Verified-intent badge input (null/undefined = no badge, never shown). */
+export type IntentBadgeInput = { tier: SignalTier; confidence?: number } | null | undefined;
 import {
   Building2,
   FileText,
@@ -163,9 +169,12 @@ function IconLink({
   label: string;
   icon: typeof Globe;
 }) {
+  // Website href safety: schemeless stored URLs are qualified here so every
+  // icon link opens the site instead of navigating inside the app.
+  const safe = ensureHttpUrl(href) ?? href;
   return (
     <a
-      href={href}
+      href={safe}
       target="_blank"
       rel="noreferrer"
       onClick={(e) => e.stopPropagation()}
@@ -181,11 +190,16 @@ export function CompanyCard({
   onOpen,
   contact,
   onGenerate,
+  intent,
+  relevance,
 }: {
   row: CompanyRow;
   onOpen: (row: CompanyRow) => void;
   contact?: ResolvedContactInfo;
   onGenerate?: (row: CompanyRow, kind: "email" | "message") => void;
+  intent?: IntentBadgeInput;
+  /** Phase A3: stated-criteria relevance chips (derived, never invented). */
+  relevance?: string[];
 }) {
   return (
     <div className="w-full p-4 rounded-xl border border-border bg-card hover:border-primary/30 transition-all space-y-2">
@@ -198,6 +212,7 @@ export function CompanyCard({
             )}
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">
+            {intent ? <IntentBadge tier={intent.tier} confidence={intent.confidence} /> : null}
             <span className="text-[10px] text-muted-foreground">
               {row.signal_count} signal{row.signal_count === 1 ? "" : "s"}
             </span>
@@ -209,6 +224,18 @@ export function CompanyCard({
           </div>
         </div>
         <p className="mt-2 text-xs text-foreground/80 line-clamp-2">{row.why_now}</p>
+        {relevance && relevance.length > 0 && (
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            {relevance.map((chip) => (
+              <span
+                key={chip}
+                className="text-[10px] px-1.5 py-0.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+              >
+                {chip}
+              </span>
+            ))}
+          </div>
+        )}
         {row.description && (
           <p className="mt-1 text-[11px] text-muted-foreground line-clamp-2">{row.description}</p>
         )}
@@ -308,10 +335,14 @@ export function PersonCard({
   row,
   onOpen,
   contact,
+  intent,
+  onGenerate,
 }: {
   row: PersonRow;
   onOpen: (row: PersonRow) => void;
   contact?: ResolvedContactInfo;
+  intent?: IntentBadgeInput;
+  onGenerate?: (row: PersonRow, kind: "email" | "message") => void;
 }) {
   return (
     <div className="w-full p-4 rounded-xl border border-border bg-card space-y-2">
@@ -322,6 +353,7 @@ export function PersonCard({
             {row.role_hint && <div className="text-[11px] text-primary/90">{row.role_hint}</div>}
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">
+            {intent ? <IntentBadge tier={intent.tier} confidence={intent.confidence} /> : null}
             {row.platform && (
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground truncate max-w-[130px]">
                 {row.platform}
@@ -349,9 +381,6 @@ export function PersonCard({
         )}
         {row.why_match && (
           <p className="mt-1.5 text-xs text-foreground/80 line-clamp-2">{row.why_match}</p>
-        )}
-        {row.description && (
-          <p className="mt-1 text-[11px] text-muted-foreground line-clamp-2">{row.description}</p>
         )}
       </button>
 
@@ -418,6 +447,24 @@ export function PersonCard({
             Profile available
           </div>
         )}
+      {onGenerate && (
+        <div className="flex flex-wrap gap-1.5">
+          <button
+            type="button"
+            onClick={() => onGenerate(row, "email")}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-border text-[11px] text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+          >
+            <Mail className="size-3" /> Email
+          </button>
+          <button
+            type="button"
+            onClick={() => onGenerate(row, "message")}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-border text-[11px] text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+          >
+            <MessageSquare className="size-3" /> Message
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -454,24 +501,134 @@ export function ViewToggle({
 const th = "px-3 py-2 text-left text-[11px] font-medium text-muted-foreground whitespace-nowrap";
 const td = "px-3 py-2 text-xs align-middle";
 
+export function BusinessTable({
+  rows,
+  onOpen,
+  onGenerate,
+  relevanceByKey,
+}: {
+  rows: LocalBusinessRow[];
+  onOpen?: (row: LocalBusinessRow) => void;
+  onGenerate?: (row: LocalBusinessRow, kind: "email" | "message") => void;
+  relevanceByKey?: Record<string, string[]>;
+}) {
+  return (
+    <div className="rounded-xl border border-border overflow-x-auto pb-1">
+      <table className="w-full min-w-[1020px] border-collapse">
+        <thead className="bg-muted/40">
+          <tr>
+            <th className={th}>Business</th>
+            <th className={th}>Category</th>
+            <th className={th}>Location</th>
+            <th className={th}>Phone</th>
+            <th className={th}>Site status</th>
+            <th className={th}>Why match</th>
+            <th className={th}>Email</th>
+            <th className={th}>Message</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => {
+            const siteUrl = ensureHttpUrl(r.website);
+            const why =
+              (r.why_match && r.why_match.trim()) ||
+              (relevanceByKey?.[r.key] ?? []).join(" · ") ||
+              "";
+            return (
+              <tr
+                key={r.key}
+                onClick={() => onOpen?.(r)}
+                className="border-t border-border hover:bg-accent/40 cursor-pointer"
+              >
+                <td className={`${td} font-medium whitespace-nowrap`}>
+                  {r.name}
+                  {r.soft_duplicate ? (
+                    <span className="ml-1.5 text-[10px] text-amber-600 dark:text-amber-400">
+                      possible dup
+                    </span>
+                  ) : null}
+                </td>
+                <td className={`${td} text-muted-foreground`}>{r.category ?? "—"}</td>
+                <td className={`${td} text-muted-foreground max-w-[220px] truncate`}>
+                  {r.address ?? "—"}
+                </td>
+                <td className={td}>
+                  {r.phone ? (
+                    <span className="inline-flex items-center gap-1">
+                      <Phone className="size-3" /> {r.phone}
+                    </span>
+                  ) : r.phoneStatus === "mismatch-hidden" || r.phoneStatus === "invalid-hidden" ? (
+                    <span className="text-muted-foreground/70">unverified</span>
+                  ) : (
+                    <span className="text-muted-foreground">—</span>
+                  )}
+                </td>
+                <td className={td}>
+                  {siteUrl ? (
+                    <a
+                      href={siteUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-flex items-center gap-1 text-primary hover:underline"
+                    >
+                      <Globe className="size-3" /> Listed
+                    </a>
+                  ) : (
+                    <span className="text-emerald-400">No site</span>
+                  )}
+                </td>
+                <td className={`${td} text-muted-foreground max-w-[220px] truncate`}>
+                  {why || null}
+                </td>
+                <td className={td} onClick={(e) => e.stopPropagation()}>
+                  <button
+                    type="button"
+                    onClick={() => onGenerate?.(r, "email")}
+                    className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-border text-[11px] text-muted-foreground hover:text-foreground hover:bg-accent transition-colors whitespace-nowrap"
+                  >
+                    <Mail className="size-3" /> Email
+                  </button>
+                </td>
+                <td className={td} onClick={(e) => e.stopPropagation()}>
+                  <button
+                    type="button"
+                    onClick={() => onGenerate?.(r, "message")}
+                    className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-border text-[11px] text-muted-foreground hover:text-foreground hover:bg-accent transition-colors whitespace-nowrap"
+                  >
+                    <MessageSquare className="size-3" /> Msg
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export function CompanyTable({
   rows,
   onOpen,
   onGenerate,
+  relevanceByKey,
 }: {
   rows: CompanyRow[];
   onOpen: (row: CompanyRow) => void;
   onGenerate?: (row: CompanyRow, kind: "email" | "message") => void;
+  relevanceByKey?: Record<string, string[]>;
 }) {
   return (
     <div className="rounded-xl border border-border overflow-x-auto pb-1">
-      <table className="w-full min-w-[780px] border-collapse">
+      <table className="w-full min-w-[860px] border-collapse">
         <thead className="bg-muted/40">
           <tr>
             <th className={th}>Company</th>
             <th className={th}>Domain</th>
             <th className={th}>Signals</th>
             <th className={th}>Latest</th>
+            <th className={th}>Why match</th>
             <th className={th}>Links</th>
             <th className={th}>Generate Email</th>
             <th className={th}>Generate Message</th>
@@ -488,6 +645,9 @@ export function CompanyTable({
               <td className={`${td} text-muted-foreground`}>{r.domain ?? "—"}</td>
               <td className={td}>{r.signal_count}</td>
               <td className={`${td} text-muted-foreground`}>{r.latest_signal ?? "—"}</td>
+              <td className={`${td} text-muted-foreground max-w-[220px] truncate`}>
+                {(relevanceByKey?.[r.key] ?? []).join(" · ") || "—"}
+              </td>
               <td className={td} onClick={(e) => e.stopPropagation()}>
                 <span className="inline-flex items-center gap-2.5">
                   {r.website && <IconLink href={r.website} label="Site" icon={Globe} />}
@@ -590,7 +750,7 @@ export function PersonTable({
                 className={`${td} text-muted-foreground max-w-[240px] truncate`}
                 title={r.why_match ?? undefined}
               >
-                {r.why_match ?? "—"}
+                {r.why_match ?? null}
               </td>
               <td className={td} onClick={(e) => e.stopPropagation()}>
                 <button
@@ -631,9 +791,9 @@ export function PostsGrid({
 }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 pb-4">
-      {leads.map((l) => (
+      {leads.map((l, idx) => (
         <LeadCard
-          key={l.full_post_url}
+          key={l.full_post_url || `${l.title}-${idx}`}
           lead={l}
           saved={savedByUrl.has(l.full_post_url)}
           onOpen={() => onOpen(l)}
@@ -648,45 +808,46 @@ export function LocalBusinessCard({
   row,
   onOpen,
   onGenerate,
+  intent,
+  relevance,
 }: {
   row: LocalBusinessRow;
   onOpen?: (row: LocalBusinessRow) => void;
   onGenerate?: (row: LocalBusinessRow, kind: "email" | "message") => void;
+  intent?: IntentBadgeInput;
+  /** Phase A3: stated-criteria relevance chips (derived, never invented). */
+  relevance?: string[];
 }) {
   return (
     <div className="w-full p-4 rounded-xl border border-border bg-card hover:border-primary/30 transition-all space-y-2">
-      <button
-        type="button"
-        onClick={() => onOpen?.(row)}
-        className="text-left w-full"
-      >
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <div className="font-medium text-sm truncate">{row.name}</div>
-          {row.category && (
-            <div className="text-xs text-muted-foreground truncate">{row.category}</div>
-          )}
-        </div>
-        <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground shrink-0">
-          Local
-        </span>
-      </div>
-      {row.address && <p className="text-xs text-muted-foreground">{row.address}</p>}
-      {row.description && row.description !== row.address && (
-        <p className="text-xs text-foreground/80 line-clamp-3">{row.description}</p>
-      )}
-      {!!row.opportunity_tags?.length && (
-        <div className="flex flex-wrap gap-1">
-          {row.opportunity_tags.map((t) => (
-            <span
-              key={t}
-              className="text-[10px] px-1.5 py-0.5 rounded-full border border-border text-muted-foreground"
-            >
-              {t.replace(/_/g, " ")}
+      <button type="button" onClick={() => onOpen?.(row)} className="text-left w-full">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <div className="font-medium text-sm truncate">{row.name}</div>
+            {row.category && (
+              <div className="text-xs text-muted-foreground truncate">{row.category}</div>
+            )}
+          </div>
+          <span className="flex flex-col items-end gap-1 shrink-0">
+            {intent ? <IntentBadge tier={intent.tier} confidence={intent.confidence} /> : null}
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+              Local
             </span>
-          ))}
+          </span>
         </div>
-      )}
+        {row.address && <p className="text-xs text-muted-foreground truncate">{row.address}</p>}
+        {relevance && relevance.length > 0 && (
+          <div className="flex flex-wrap gap-1 pt-0.5">
+            {relevance.map((chip) => (
+              <span
+                key={chip}
+                className="text-[10px] px-1.5 py-0.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+              >
+                {chip}
+              </span>
+            ))}
+          </div>
+        )}
       </button>
       {onGenerate && (
         <div className="flex flex-wrap gap-1.5">
@@ -707,11 +868,12 @@ export function LocalBusinessCard({
         </div>
       )}
       <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs">
-        {row.website && (
+        {ensureHttpUrl(row.website) && (
           <a
-            href={row.website}
+            href={ensureHttpUrl(row.website)!}
             target="_blank"
             rel="noreferrer"
+            onClick={(e) => e.stopPropagation()}
             className="inline-flex items-center gap-1 text-primary hover:underline"
           >
             <Globe className="size-3" /> Website
@@ -722,6 +884,12 @@ export function LocalBusinessCard({
             <Phone className="size-3" /> {row.phone}
           </span>
         )}
+        {!row.phone &&
+          (row.phoneStatus === "mismatch-hidden" || row.phoneStatus === "invalid-hidden") && (
+            <span className="inline-flex items-center gap-1 text-muted-foreground/70">
+              <Phone className="size-3" /> number unverified
+            </span>
+          )}
         {row.email && (
           <a
             href={`mailto:${row.email}`}
@@ -740,15 +908,26 @@ export function LocalBusinessesGrid({
   rows,
   onOpen,
   onGenerate,
+  intentByKey,
+  relevanceByKey,
 }: {
   rows: LocalBusinessRow[];
   onOpen?: (row: LocalBusinessRow) => void;
   onGenerate?: (row: LocalBusinessRow, kind: "email" | "message") => void;
+  intentByKey?: Record<string, IntentBadgeInput>;
+  relevanceByKey?: Record<string, string[]>;
 }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 pb-4">
       {rows.map((r) => (
-        <LocalBusinessCard key={r.key} row={r} onOpen={onOpen} onGenerate={onGenerate} />
+        <LocalBusinessCard
+          key={r.key}
+          row={r}
+          onOpen={onOpen}
+          onGenerate={onGenerate}
+          intent={intentByKey?.[r.key] ?? null}
+          relevance={relevanceByKey?.[r.key]}
+        />
       ))}
     </div>
   );
@@ -773,76 +952,6 @@ export function PostsList({ leads, onOpen }: { leads: Lead[]; onOpen: (l: Lead) 
           </span>
           <ExternalLink className="size-3.5 text-muted-foreground shrink-0" />
         </button>
-      ))}
-    </div>
-  );
-}
-
-/** Compact list variant for local businesses: one row each, no cards. */
-export function LocalListRows({
-  rows,
-  onOpen,
-  onGenerate,
-}: {
-  rows: LocalBusinessRow[];
-  onOpen?: (row: LocalBusinessRow) => void;
-  onGenerate?: (row: LocalBusinessRow, kind: "email" | "message") => void;
-}) {
-  return (
-    <div className="rounded-xl border border-border overflow-hidden">
-      {rows.map((r) => (
-        <div
-          key={r.key}
-          onClick={() => onOpen?.(r)}
-          className="flex items-center gap-3 px-3 py-2.5 border-b border-border last:border-b-0 hover:bg-accent/40 cursor-pointer"
-        >
-          <span className="min-w-0 flex-1">
-            <span className="block text-sm font-medium truncate">{r.name}</span>
-            <span className="block text-[11px] text-muted-foreground truncate">
-              {[r.category, r.address].filter(Boolean).join(" · ")}
-            </span>
-          </span>
-          {r.website && (
-            <a
-              href={r.website}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 text-xs text-primary hover:underline shrink-0"
-            >
-              <Globe className="size-3" /> Website
-            </a>
-          )}
-          {r.email && (
-            <a
-              href={`mailto:${r.email}`}
-              onClick={(e) => e.stopPropagation()}
-              className="inline-flex items-center gap-1 text-xs text-emerald-500 hover:underline shrink-0"
-            >
-              <Mail className="size-3" /> Email
-            </a>
-          )}
-          {onGenerate && (
-            <span
-              className="inline-flex items-center gap-1 shrink-0"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                type="button"
-                onClick={() => onGenerate(r, "email")}
-                className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-border text-[11px] text-muted-foreground hover:text-foreground hover:bg-accent"
-              >
-                <Mail className="size-3" /> Email
-              </button>
-              <button
-                type="button"
-                onClick={() => onGenerate(r, "message")}
-                className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-border text-[11px] text-muted-foreground hover:text-foreground hover:bg-accent"
-              >
-                <MessageSquare className="size-3" /> Msg
-              </button>
-            </span>
-          )}
-        </div>
       ))}
     </div>
   );

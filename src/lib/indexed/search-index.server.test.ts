@@ -81,6 +81,18 @@ describe("indexed stored retrieval mapping", () => {
     expect(result?.rows[0].evidence).toHaveLength(1);
   });
 
+  it("uses indexed role and industry filters for global founders", async () => {
+    mockState.rows.set("idx_people", [{
+      registry_key: "p:global-founder", name: "Ada", role: "Founder & CEO", company: "Analytical",
+      city: "Toronto", country: "CA", industry: "Software as a Service", linkedin: null, email: null, phone: null,
+    }]);
+    const spec = extractSearchSpec("SaaS founders global");
+    const result = await queryIndexForSpec(spec, 25);
+    expect(result?.rows).toHaveLength(1);
+    expect(mockState.calls.some(([table, method]) => table === "idx_people" && method === "or")).toBe(true);
+    expect(mockState.calls.some(([table, method, args]) => table === "idx_people" && method === "ilike" && (args as unknown[])[0] === "role_norm")).toBe(true);
+  });
+
   it("pushes explicit contact requirements into candidate supply", async () => {
     mockState.rows.set("idx_people", []);
     await queryIndexForSpec(extractSearchSpec("founders in Canada with email and phone"), 50);

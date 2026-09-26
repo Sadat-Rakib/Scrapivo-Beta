@@ -1,0 +1,10 @@
+import './_env.mts';
+process.env.USE_PAID_SOURCES = 'false';
+const { understandSearchSpec } = await import('../src/lib/understanding/to-search-spec');
+const { runLiveGapfill } = await import('../src/lib/search/live-gapfill');
+const { qualifyLead } = await import('../src/lib/search/qualify');
+const query = process.argv.slice(2).join(' ');
+if (!query) throw new Error('Pass the real search query to diagnose.');
+const spec = await understandSearchSpec(query, {});
+const result = await runLiveGapfill(spec, { browser: null });
+console.log(JSON.stringify({ spec: { entity: spec.entity, criteria: spec.criteria }, candidates: result.rows.map(row => ({ name: row.title, kind: row.kind, detail: row.detail, evidence: row.evidence, decision: qualifyLead(row, spec, row.evidence) })) }, null, 2));

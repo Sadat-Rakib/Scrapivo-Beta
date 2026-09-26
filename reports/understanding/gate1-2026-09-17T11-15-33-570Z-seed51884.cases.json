@@ -1,0 +1,306 @@
+{
+  "seed": 51884,
+  "holdout": [
+    {
+      "id": "h000a",
+      "prompt": "quantity surveyors who serve bell foundries in Arequipa",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "location": "arequipa"
+      },
+      "pairWith": "h000b"
+    },
+    {
+      "id": "h000b",
+      "prompt": "bell foundries in Arequipa who need a quantity surveyor",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "needs_service",
+        "object": "quantity surveyor",
+        "location": "arequipa"
+      },
+      "pairWith": "h000a"
+    },
+    {
+      "id": "h002a",
+      "prompt": "technical translation agencies in Nagoya",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "nagoya",
+        "clarification": "forbidden"
+      },
+      "pairWith": "h002b"
+    },
+    {
+      "id": "h002b",
+      "prompt": "companies in Nagoya needing technical translation",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "needs_service",
+        "object": "technical translation",
+        "location": "nagoya",
+        "intent_signal_required": true
+      },
+      "pairWith": "h002a"
+    },
+    {
+      "id": "h004a",
+      "prompt": "investors funding circular economy startups in Wrocław",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "investor",
+        "location": "wrocław"
+      },
+      "pairWith": "h004b"
+    },
+    {
+      "id": "h004b",
+      "prompt": "circular economy startups in Wrocław raising money",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "seeking_funding",
+        "location": "wrocław"
+      },
+      "pairWith": "h004a"
+    },
+    {
+      "id": "h006",
+      "prompt": "brand strategists in Aberystwyth hiring brand strategists",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "hiring_based",
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "aberystwyth",
+        "intent_signal_required": true
+      },
+      "note": "person_hiring"
+    },
+    {
+      "id": "h007",
+      "prompt": "freelance harbour pilots under $150/hour, excluding Busan",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "no_location": true,
+        "negated": [
+          "location"
+        ]
+      },
+      "note": "excluded_location"
+    },
+    {
+      "id": "h008",
+      "prompt": "quantity surveyors in Busan looking for a job",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "job_based",
+        "entity_type": "person",
+        "relation": "seeking_job",
+        "location": "busan"
+      },
+      "note": "person_seeking_job"
+    },
+    {
+      "id": "h009",
+      "prompt": "sailmakers in Arequipa",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "task_type": "lead_discovery",
+        "prospecting_mode": "fit_based",
+        "relation": "none",
+        "location": "arequipa",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity"
+    },
+    {
+      "id": "h010",
+      "prompt": "businesses partnered with ClickHouse",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": [
+          "partnered_with",
+          "custom"
+        ]
+      },
+      "note": "partnered_with"
+    },
+    {
+      "id": "h011",
+      "prompt": "find quilt shops in Gaborone and also find saunas in Fayetteville",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "compound": true,
+        "min_subgoals": 2
+      },
+      "note": "compound"
+    },
+    {
+      "id": "h012",
+      "prompt": "I need at least 100 cider houses in Tulsa",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "quantity_min": 100,
+        "location": "tulsa"
+      },
+      "note": "quantity_minimum"
+    },
+    {
+      "id": "h013",
+      "prompt": "firms in Kelowna that provide technical translation",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "object": "technical translation",
+        "location": "kelowna",
+        "intent_signal_required": false
+      },
+      "note": "offers_service"
+    },
+    {
+      "id": "h014",
+      "prompt": "orthodontists in Kelowna looking for a job",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "job_based",
+        "entity_type": "person",
+        "relation": "seeking_job",
+        "location": "kelowna"
+      },
+      "note": "person_seeking_job"
+    },
+    {
+      "id": "h015",
+      "prompt": "tax barristers in Curitiba looking for clients",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_client",
+        "location": "curitiba"
+      },
+      "note": "seeking_client"
+    },
+    {
+      "id": "h016",
+      "prompt": "I sell grant writing. Find me 50 orthotics clinics in Busan.",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "none",
+        "prospecting_mode": "fit_based",
+        "user_selling": "grant writing",
+        "quantity": 50,
+        "location": "busan"
+      },
+      "note": "user_context"
+    },
+    {
+      "id": "h017",
+      "prompt": "mushroom farms within 15 miles of Leipzig",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "leipzig",
+        "location_scope": "within_radius",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity_radius"
+    },
+    {
+      "id": "h018",
+      "prompt": "find mushroom farms in Timișoara and also find piano tuners in Tromsø",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "compound": true,
+        "min_subgoals": 2
+      },
+      "note": "compound"
+    },
+    {
+      "id": "h019",
+      "prompt": "I need at least 60 taxidermists in Hamilton",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "quantity_min": 60,
+        "location": "hamilton"
+      },
+      "note": "quantity_minimum"
+    },
+    {
+      "id": "h020",
+      "prompt": "I sell food safety auditing. Find me 50 seed libraries in Arequipa.",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "none",
+        "prospecting_mode": "fit_based",
+        "user_selling": "food safety auditing",
+        "quantity": 50,
+        "location": "arequipa"
+      },
+      "note": "user_context"
+    },
+    {
+      "id": "h021",
+      "prompt": "businesses partnered with Twilio",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": [
+          "partnered_with",
+          "custom"
+        ]
+      },
+      "note": "partnered_with"
+    },
+    {
+      "id": "h022",
+      "prompt": "give me 30 orthotics clinics in Salta",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "quantity": 30,
+        "location": "salta",
+        "relation": "none"
+      },
+      "note": "quantity_exact"
+    },
+    {
+      "id": "h023",
+      "prompt": "circular economy",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "clarification": "required"
+      },
+      "note": "underspecified"
+    }
+  ],
+  "chaos": []
+}

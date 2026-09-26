@@ -1,0 +1,39 @@
+{
+  "key": "Healthcare & Wellness 2.1k_CATEGORIZED.csv",
+  "entity": "person",
+  "rows": 2105,
+  "required_fields": [
+    "Name",
+    "Company",
+    "Title",
+    "Email",
+    "Phone",
+    "Website",
+    "Social(any)",
+    "Location"
+  ],
+  "absent_columns": [],
+  "complete": 0,
+  "incomplete": 2105,
+  "complete_pct": 0.0,
+  "missing_counts": {
+    "Phone": 2105,
+    "Website": 40
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Phone"
+      ],
+      "rows": 2065
+    },
+    {
+      "missing": [
+        "Phone",
+        "Website"
+      ],
+      "rows": 40
+    }
+  ],
+  "people_bonus_rows": 0
+}

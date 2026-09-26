@@ -1,0 +1,365 @@
+{
+  "key": "crunchbase_2.7-2.8m.csv",
+  "size": 57030709,
+  "last_modified": "2026-09-08 00:12:14+00:00",
+  "columns": [
+    "id",
+    "created_at",
+    "name",
+    "short_description",
+    "semrush_global_rank",
+    "semrush_visits_latest_month",
+    "num_investors",
+    "funding_total",
+    "num_exits",
+    "num_funding_rounds",
+    "last_funding_type",
+    "last_funding_at",
+    "num_acquisitions",
+    "apptopia_total_apps",
+    "apptopia_total_downloads",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "num_investments",
+    "num_lead_investments",
+    "num_lead_investors",
+    "listed_stock_symbol",
+    "company_type",
+    "hub_tags",
+    "operating_status",
+    "founded_on",
+    "categories",
+    "founders",
+    "website",
+    "ipo_status",
+    "num_employees_enum",
+    "locations",
+    "growth_insight_description",
+    "growth_insight_indicator",
+    "growth_insight_direction",
+    "growth_insight_confidence",
+    "investor_insight_description",
+    "permalink",
+    "url"
+  ],
+  "row_count": 100000,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "id": "other",
+    "created_at": "other",
+    "name": "full_name",
+    "short_description": "descriptive",
+    "semrush_global_rank": "other",
+    "semrush_visits_latest_month": "other",
+    "num_investors": "other",
+    "funding_total": "other",
+    "num_exits": "other",
+    "num_funding_rounds": "other",
+    "last_funding_type": "other",
+    "last_funding_at": "other",
+    "num_acquisitions": "other",
+    "apptopia_total_apps": "other",
+    "apptopia_total_downloads": "other",
+    "contact_email": "email",
+    "phone_number": "phone",
+    "facebook": "social",
+    "linkedin": "linkedin",
+    "twitter": "social",
+    "num_investments": "other",
+    "num_lead_investments": "other",
+    "num_lead_investors": "other",
+    "listed_stock_symbol": "other",
+    "company_type": "company",
+    "hub_tags": "other",
+    "operating_status": "other",
+    "founded_on": "other",
+    "categories": "other",
+    "founders": "other",
+    "website": "website",
+    "ipo_status": "other",
+    "num_employees_enum": "employees",
+    "locations": "other",
+    "growth_insight_description": "descriptive",
+    "growth_insight_indicator": "other",
+    "growth_insight_direction": "other",
+    "growth_insight_confidence": "other",
+    "investor_insight_description": "descriptive",
+    "permalink": "other",
+    "url": "website"
+  },
+  "missing_pct": {
+    "id": 0.0,
+    "created_at": 0.0,
+    "name": 0.0,
+    "short_description": 0.0,
+    "semrush_global_rank": 61.6,
+    "semrush_visits_latest_month": 61.6,
+    "num_investors": 92.9,
+    "funding_total": 92.7,
+    "num_exits": 99.9,
+    "num_funding_rounds": 90.6,
+    "last_funding_type": 90.6,
+    "last_funding_at": 90.4,
+    "num_acquisitions": 98.7,
+    "apptopia_total_apps": 93.0,
+    "apptopia_total_downloads": 98.6,
+    "contact_email": 25.7,
+    "phone_number": 20.1,
+    "facebook": 36.0,
+    "linkedin": 21.5,
+    "twitter": 54.5,
+    "num_investments": 99.8,
+    "num_lead_investments": 99.9,
+    "num_lead_investors": 95.9,
+    "listed_stock_symbol": 99.7,
+    "company_type": 3.4,
+    "hub_tags": 99.9,
+    "operating_status": 0.0,
+    "founded_on": 18.8,
+    "categories": 4.4,
+    "founders": 74.8,
+    "website": 4.7,
+    "ipo_status": 3.2,
+    "num_employees_enum": 14.7,
+    "locations": 6.2,
+    "growth_insight_description": 98.1,
+    "growth_insight_indicator": 98.1,
+    "growth_insight_direction": 98.8,
+    "growth_insight_confidence": 98.8,
+    "investor_insight_description": 98.8,
+    "permalink": 0.0,
+    "url": 0.0
+  },
+  "samples": {
+    "id": [
+      "ae4341fb-1c01-4f0a-a4d2-9ecad434bbe7",
+      "a0540e7d-dd0e-47f9-9002-bb4009b7c56c",
+      "153a16a9-9b83-408e-8f06-5546b22db540"
+    ],
+    "created_at": [
+      "2024-08-24 14:07:26.440742+00",
+      "2024-08-24 14:07:26.440742+00",
+      "2024-08-24 14:07:26.440742+00"
+    ],
+    "name": [
+      "White & Associates",
+      "White & Associates Insurance",
+      "White & Associates, PSC"
+    ],
+    "short_description": [
+      "White & Bain Financial Services is an insurance firm.",
+      "Specialist PE/VC and technology lawyers: Buy-outs, M&A, technology contracts and disputes",
+      "White & Brown Alloy Castings is a manufacturer of non-ferrous castings, forgings, and valves."
+    ],
+    "phone_number": [
+      "+1 801424-5120",
+      "+1 731-285-0565",
+      "+1-859-624-3926"
+    ],
+    "company_type": [
+      "for_profit",
+      "for_profit",
+      "for_profit"
+    ],
+    "operating_status": [
+      "active",
+      "active",
+      "active"
+    ],
+    "categories": [
+      "Accounting, Consulting, Financial Services",
+      "Insurance",
+      "Accounting, Consulting, Financial Services"
+    ],
+    "website": [
+      "http://www.whitecpafirm.com",
+      "https://whiteandassociates.net/",
+      "http://whiteandassociatespsc.com/"
+    ],
+    "ipo_status": [
+      "private",
+      "private",
+      "private"
+    ],
+    "locations": [
+      "Western US",
+      "Midwestern US",
+      "Southern US"
+    ],
+    "permalink": [
+      "white-associates-bbe7",
+      "white-associates-insurance",
+      "white-associates-psc"
+    ],
+    "url": [
+      "https://www.crunchbase.com/organization/white-associates-bbe7",
+      "https://www.crunchbase.com/organization/white-associates-insurance",
+      "https://www.crunchbase.com/organization/white-associates-psc"
+    ],
+    "semrush_global_rank": [
+      "12095922",
+      "14024342",
+      "5581727"
+    ],
+    "semrush_visits_latest_month": [
+      "132",
+      "64",
+      "878"
+    ],
+    "facebook": [
+      "https://www.facebook.com/WhiteandAssociatesInsurance",
+      "https://www.facebook.com/whiteandassocpsc/",
+      "https://www.facebook.com/WhiteandBorgognoniArchitects"
+    ],
+    "linkedin": [
+      "https://www.linkedin.com/company/white-and-associtates/",
+      "https://www.linkedin.com/company/white-&-associates-psc",
+      "https://www.linkedin.com/company/white-&-black-legal-llp"
+    ],
+    "founded_on": [
+      "1976-01-01",
+      "2007-01-01",
+      "1965-01-01"
+    ],
+    "founders": [
+      "Larry White",
+      "John Allen, Phil Riman, Phil Thompson",
+      "George B. Case, Justin DuPratt White"
+    ],
+    "num_employees_enum": [
+      "c_00051_00100",
+      "c_00001_00010",
+      "c_00001_00010"
+    ],
+    "contact_email": [
+      "pam@whiteandassociatespsc.com",
+      "enquiries@wablegal.com",
+      "nickw@wb-architects.com"
+    ],
+    "twitter": [
+      "https://www.twitter.com/wablegal",
+      "https://twitter.com/WBArchitectsPC",
+      "https://twitter.com/WhiteCase"
+    ],
+    "apptopia_total_apps": [
+      "3",
+      "1",
+      "1"
+    ],
+    "growth_insight_description": [
+      "White River Creston acquired Benson Hill Ingredients, a soy processing plant in Iowa, for $72 million.",
+      "White River Soy Processing acquired Benson Hill Ingredients, which included a soy processing plant in Iowa.",
+      "Whiteboard Advisors acquired a popular EdTech newsletter and an investor database."
+    ],
+    "growth_insight_indicator": [
+      "growing",
+      "growing",
+      "growing"
+    ],
+    "growth_insight_direction": [
+      "c400_growing",
+      "c400_growing",
+      "c400_growing"
+    ],
+    "growth_insight_confidence": [
+      "c400_high",
+      "c400_high",
+      "c300_medium"
+    ],
+    "num_investors": [
+      "4",
+      "1",
+      "1"
+    ],
+    "funding_total": [
+      "39350000",
+      "380000",
+      "0"
+    ],
+    "num_funding_rounds": [
+      "4",
+      "2",
+      "1"
+    ],
+    "last_funding_type": [
+      "series_d",
+      "seed",
+      "series_unknown"
+    ],
+    "last_funding_at": [
+      "2003-06-05",
+      "2020-06-05",
+      "2022-01-01"
+    ],
+    "num_lead_investors": [
+      "2",
+      "1",
+      "2"
+    ],
+    "investor_insight_description": [],
+    "num_acquisitions": [
+      "16",
+      "1",
+      "1"
+    ],
+    "apptopia_total_downloads": [
+      "33955",
+      "4586",
+      "301"
+    ],
+    "listed_stock_symbol": [
+      "TSXV:WGO",
+      "TSXV:WHM",
+      "OTC:WMTM"
+    ],
+    "num_exits": [
+      "1",
+      "1",
+      "1"
+    ],
+    "num_investments": [
+      "4",
+      "1",
+      "5"
+    ],
+    "num_lead_investments": [
+      "3",
+      "1",
+      "2"
+    ],
+    "hub_tags": [
+      "cbvp",
+      "cbvp",
+      "cbvp"
+    ]
+  },
+  "validity": {
+    "contact_email": "3/3 valid-shape",
+    "phone_number": "3/3 valid-shape"
+  },
+  "entity": "company",
+  "entity_confidence": 0.85,
+  "entity_why": "value-checked override: name=organization name; founders/company_type/num_employees_enum/funding/ipo_status present; no person first/last-name columns",
+  "social_cols": [
+    "facebook",
+    "linkedin",
+    "twitter",
+    "website",
+    "url"
+  ],
+  "activity_match_keys": [
+    "name",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "company_type",
+    "website",
+    "url"
+  ]
+}

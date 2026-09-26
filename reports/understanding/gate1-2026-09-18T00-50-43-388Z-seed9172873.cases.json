@@ -1,0 +1,333 @@
+{
+  "seed": 9172873,
+  "holdout": [
+    {
+      "id": "h000a",
+      "prompt": "saunas in Braga",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "relation": "none",
+        "location": "braga",
+        "clarification": "forbidden"
+      },
+      "pairWith": "h000b"
+    },
+    {
+      "id": "h000b",
+      "prompt": "saunas in Braga with no website",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "braga"
+      },
+      "pairWith": "h000a"
+    },
+    {
+      "id": "h002a",
+      "prompt": "prosthetists who serve hydroponic farms in Aberystwyth",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "location": "aberystwyth"
+      },
+      "pairWith": "h002b"
+    },
+    {
+      "id": "h002b",
+      "prompt": "hydroponic farms in Aberystwyth who need a prosthetist",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "needs_service",
+        "object": "prosthetist",
+        "location": "aberystwyth"
+      },
+      "pairWith": "h002a"
+    },
+    {
+      "id": "h004a",
+      "prompt": "investors funding haulage startups in Surabaya",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "investor",
+        "location": "surabaya"
+      },
+      "pairWith": "h004b"
+    },
+    {
+      "id": "h004b",
+      "prompt": "haulage startups in Surabaya raising money",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "seeking_funding",
+        "location": "surabaya"
+      },
+      "pairWith": "h004a"
+    },
+    {
+      "id": "h006",
+      "prompt": "companies that posted a prosthetist role in the last 6 months",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "hiring",
+        "temporal": true,
+        "no_location": true
+      },
+      "note": "temporal_hiring"
+    },
+    {
+      "id": "h007",
+      "prompt": "firms in Enschede that provide patent drafting",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "object": "patent drafting",
+        "location": "enschede",
+        "intent_signal_required": false
+      },
+      "note": "offers_service"
+    },
+    {
+      "id": "h008",
+      "prompt": "give me 40 chocolatiers in Aberystwyth",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "quantity": 40,
+        "location": "aberystwyth",
+        "relation": "none"
+      },
+      "note": "quantity_exact"
+    },
+    {
+      "id": "h009",
+      "prompt": "firms in Trois-Rivières that provide technical translation",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "object": "technical translation",
+        "location": "trois-rivières",
+        "intent_signal_required": false
+      },
+      "note": "offers_service"
+    },
+    {
+      "id": "h010",
+      "prompt": "Give me 100 orthotics clinics in Tulsa, phone number required, Instagram if possible, verify they are currently open, and output a table I can paste into Notion",
+      "set": "holdout",
+      "size": "large",
+      "expect": {
+        "location": "tulsa",
+        "quantity": 100,
+        "required_fields": [
+          "phone"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ],
+        "min_verification": 1
+      },
+      "note": "long_form"
+    },
+    {
+      "id": "h011",
+      "prompt": "harbour pilots attending Mobile World Congress",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": [
+          "attending_event",
+          "custom"
+        ]
+      },
+      "note": "attending_event"
+    },
+    {
+      "id": "h012",
+      "prompt": "haulage startups in Hamilton that raised funding recently",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "event_based",
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "received_funding",
+        "location": "hamilton",
+        "temporal": true
+      },
+      "note": "received_funding"
+    },
+    {
+      "id": "h013",
+      "prompt": "optometrists within 15 miles of Ghent",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "ghent",
+        "location_scope": "within_radius",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity_radius"
+    },
+    {
+      "id": "h014",
+      "prompt": "find sailmakers in Aberystwyth and also find farriers in Ann Arbor",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "compound": true,
+        "min_subgoals": 2
+      },
+      "note": "compound"
+    },
+    {
+      "id": "h015",
+      "prompt": "AI safety researchers in Surabaya looking for a job",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "prospecting_mode": "job_based",
+        "entity_type": "person",
+        "relation": "seeking_job",
+        "location": "surabaya"
+      },
+      "note": "person_seeking_job"
+    },
+    {
+      "id": "h016",
+      "prompt": "sound engineers attending Websummit Qatar",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": [
+          "attending_event",
+          "custom"
+        ]
+      },
+      "note": "attending_event"
+    },
+    {
+      "id": "h017",
+      "prompt": "geothermal startups in Inverness that raised funding recently",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "event_based",
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "received_funding",
+        "location": "inverness",
+        "temporal": true
+      },
+      "note": "received_funding"
+    },
+    {
+      "id": "h018",
+      "prompt": "space companies in Cebu with at least 20 employees, not agencies",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "location": "cebu",
+        "min_constraints": 2,
+        "negated": [
+          "category"
+        ]
+      },
+      "note": "constraints"
+    },
+    {
+      "id": "h019",
+      "prompt": "audiologists in Salta hiring localisation managers",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "hiring_based",
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "salta",
+        "intent_signal_required": true
+      },
+      "note": "person_hiring"
+    },
+    {
+      "id": "h020",
+      "prompt": "universities in Arequipa that need trade show fabrication",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "organization",
+          "business",
+          "company",
+          "other"
+        ],
+        "relation": "needs_service",
+        "location": "arequipa"
+      },
+      "note": "organization"
+    },
+    {
+      "id": "h021",
+      "prompt": "optometrists in Košice with no email address",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "opportunity_based",
+        "relation": "lacks_asset",
+        "location": "košice",
+        "min_constraints": 1,
+        "intent_signal_required": false
+      },
+      "note": "lacks_asset"
+    },
+    {
+      "id": "h022",
+      "prompt": "mining companies in Kumasi with at least 250 employees, not agencies",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "location": "kumasi",
+        "min_constraints": 2,
+        "negated": [
+          "category"
+        ]
+      },
+      "note": "constraints"
+    },
+    {
+      "id": "h023",
+      "prompt": "taxidermists in Bergen with no phone number",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "opportunity_based",
+        "relation": "lacks_asset",
+        "location": "bergen",
+        "min_constraints": 1,
+        "intent_signal_required": false
+      },
+      "note": "lacks_asset"
+    }
+  ],
+  "chaos": []
+}

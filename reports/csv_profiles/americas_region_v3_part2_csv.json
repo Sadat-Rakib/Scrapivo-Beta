@@ -1,0 +1,239 @@
+{
+  "key": "americas_region_v3_part2.csv",
+  "size": 971322,
+  "last_modified": "2026-09-08 00:14:52+00:00",
+  "columns": [
+    "fullname",
+    "firstname",
+    "lastname",
+    "Title",
+    "asddas",
+    "company",
+    "email",
+    "Email Status",
+    "Seniority",
+    "Departments",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Stage",
+    "# Employees",
+    "Industry",
+    "Keywords",
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "City"
+  ],
+  "row_count": 1804,
+  "sampled_rows": 1804,
+  "delimiter": ",",
+  "roles": {
+    "fullname": "last_name",
+    "firstname": "first_name",
+    "lastname": "last_name",
+    "Title": "title",
+    "asddas": "other",
+    "company": "company",
+    "email": "email",
+    "Email Status": "email",
+    "Seniority": "other",
+    "Departments": "other",
+    "First Phone": "phone",
+    "Work Direct Phone": "phone",
+    "Home Phone": "phone",
+    "Mobile Phone": "phone",
+    "Corporate Phone": "phone",
+    "Other Phone": "phone",
+    "Stage": "other",
+    "# Employees": "employees",
+    "Industry": "industry",
+    "Keywords": "descriptive",
+    "Person Linkedin Url": "linkedin",
+    "Website": "website",
+    "Company Linkedin Url": "linkedin",
+    "Facebook Url": "social",
+    "Twitter Url": "social",
+    "City": "other"
+  },
+  "missing_pct": {
+    "fullname": 0.0,
+    "firstname": 0.0,
+    "lastname": 0.6,
+    "Title": 0.1,
+    "asddas": 0.1,
+    "company": 0.1,
+    "email": 0.0,
+    "Email Status": 0.0,
+    "Seniority": 0.1,
+    "Departments": 24.9,
+    "First Phone": 5.4,
+    "Work Direct Phone": 100.0,
+    "Home Phone": 100.0,
+    "Mobile Phone": 100.0,
+    "Corporate Phone": 5.4,
+    "Other Phone": 100.0,
+    "Stage": 0.0,
+    "# Employees": 0.2,
+    "Industry": 0.9,
+    "Keywords": 12.1,
+    "Person Linkedin Url": 0.0,
+    "Website": 0.3,
+    "Company Linkedin Url": 0.2,
+    "Facebook Url": 9.0,
+    "Twitter Url": 8.7,
+    "City": 10.1
+  },
+  "samples": {
+    "fullname": [
+      "Jennifer",
+      "Kelly",
+      "Nicolas"
+    ],
+    "firstname": [
+      "Jennifer",
+      "Kelly",
+      "Nicolas"
+    ],
+    "lastname": [
+      "Cook",
+      "Frauenkron",
+      "Undurraga"
+    ],
+    "Title": [
+      "Human Resources Manager",
+      "Market Segment Manager - Spray Foam",
+      "Busines Development Sr. Manager"
+    ],
+    "asddas": [
+      "The Home Depot",
+      "BASF",
+      "NotCo"
+    ],
+    "company": [
+      "The Home Depot",
+      "BASF",
+      "NotCo"
+    ],
+    "email": [
+      "jennifer_cook@homedepot.com",
+      "kelly.frauenkron@basf.com",
+      "nicolas.undurraga@thenotcompany.com"
+    ],
+    "Email Status": [
+      "Verified",
+      "Verified",
+      "Verified"
+    ],
+    "Seniority": [
+      "Manager",
+      "Manager",
+      "Manager"
+    ],
+    "Departments": [
+      "Human Resources",
+      "Sales",
+      "C-Suite, Finance"
+    ],
+    "First Phone": [
+      "'+1 770-433-8211",
+      "'+49 621 600",
+      "'+64 7-838 9800"
+    ],
+    "Corporate Phone": [
+      "'+1 770-433-8211",
+      "'+49 621 600",
+      "'+64 7-838 9800"
+    ],
+    "Stage": [
+      "Cold",
+      "Cold",
+      "Cold"
+    ],
+    "# Employees": [
+      "463000",
+      "112000",
+      "880"
+    ],
+    "Industry": [
+      "retail",
+      "chemicals",
+      "research"
+    ],
+    "Keywords": [
+      "retail, home improvement, customer service, appliances, hardware stores, home & garden, nurseries & gardening, shopping",
+      "chemicals, performance products, functional materials, solutions, agricultural solutions, oil, gas",
+      "chemicals, performance products, functional materials, solutions, agricultural solutions, oil, gas"
+    ],
+    "Person Linkedin Url": [
+      "http://www.linkedin.com/in/jennifer-cook-17775a155",
+      "http://www.linkedin.com/in/kelly-frauenkron-a767358",
+      "http://www.linkedin.com/in/nicolas-undurraga-884a48155"
+    ],
+    "Website": [
+      "http://www.homedepot.com",
+      "http://www.basf.com",
+      "http://www.notco.com"
+    ],
+    "Company Linkedin Url": [
+      "http://www.linkedin.com/company/the-home-depot",
+      "http://www.linkedin.com/company/basf",
+      "http://www.linkedin.com/company/the-not-co-"
+    ],
+    "Facebook Url": [
+      "https://www.facebook.com/homedepot",
+      "https://facebook.com/basf.apac/",
+      "https://www.facebook.com/notcous"
+    ],
+    "Twitter Url": [
+      "https://www.twitter.com/homedepot",
+      "https://twitter.com/BASFCanada",
+      "https://www.twitter.com/notcous"
+    ],
+    "City": [
+      "Smyrna",
+      "Onalaska",
+      "New York"
+    ]
+  },
+  "validity": {
+    "email": "3/3 valid-shape",
+    "Email Status": "0/3 valid-shape",
+    "First Phone": "3/3 valid-shape",
+    "Corporate Phone": "3/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url"
+  ],
+  "activity_match_keys": [
+    "fullname",
+    "firstname",
+    "lastname",
+    "company",
+    "email",
+    "Email Status",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url"
+  ]
+}

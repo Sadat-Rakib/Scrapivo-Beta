@@ -1,0 +1,365 @@
+{
+  "key": "crunchbase_300k-400k.csv",
+  "size": 58942573,
+  "last_modified": "2026-09-08 00:12:14+00:00",
+  "columns": [
+    "id",
+    "created_at",
+    "name",
+    "short_description",
+    "semrush_global_rank",
+    "semrush_visits_latest_month",
+    "num_investors",
+    "funding_total",
+    "num_exits",
+    "num_funding_rounds",
+    "last_funding_type",
+    "last_funding_at",
+    "num_acquisitions",
+    "apptopia_total_apps",
+    "apptopia_total_downloads",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "num_investments",
+    "num_lead_investments",
+    "num_lead_investors",
+    "listed_stock_symbol",
+    "company_type",
+    "hub_tags",
+    "operating_status",
+    "founded_on",
+    "categories",
+    "founders",
+    "website",
+    "ipo_status",
+    "num_employees_enum",
+    "locations",
+    "growth_insight_description",
+    "growth_insight_indicator",
+    "growth_insight_direction",
+    "growth_insight_confidence",
+    "investor_insight_description",
+    "permalink",
+    "url"
+  ],
+  "row_count": 100000,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "id": "other",
+    "created_at": "other",
+    "name": "full_name",
+    "short_description": "descriptive",
+    "semrush_global_rank": "other",
+    "semrush_visits_latest_month": "other",
+    "num_investors": "other",
+    "funding_total": "other",
+    "num_exits": "other",
+    "num_funding_rounds": "other",
+    "last_funding_type": "other",
+    "last_funding_at": "other",
+    "num_acquisitions": "other",
+    "apptopia_total_apps": "other",
+    "apptopia_total_downloads": "other",
+    "contact_email": "email",
+    "phone_number": "phone",
+    "facebook": "social",
+    "linkedin": "linkedin",
+    "twitter": "social",
+    "num_investments": "other",
+    "num_lead_investments": "other",
+    "num_lead_investors": "other",
+    "listed_stock_symbol": "other",
+    "company_type": "company",
+    "hub_tags": "other",
+    "operating_status": "other",
+    "founded_on": "other",
+    "categories": "other",
+    "founders": "other",
+    "website": "website",
+    "ipo_status": "other",
+    "num_employees_enum": "employees",
+    "locations": "other",
+    "growth_insight_description": "descriptive",
+    "growth_insight_indicator": "other",
+    "growth_insight_direction": "other",
+    "growth_insight_confidence": "other",
+    "investor_insight_description": "descriptive",
+    "permalink": "other",
+    "url": "website"
+  },
+  "missing_pct": {
+    "id": 0.0,
+    "created_at": 0.0,
+    "name": 0.0,
+    "short_description": 0.0,
+    "semrush_global_rank": 60.1,
+    "semrush_visits_latest_month": 60.1,
+    "num_investors": 91.8,
+    "funding_total": 91.8,
+    "num_exits": 99.9,
+    "num_funding_rounds": 89.6,
+    "last_funding_type": 89.6,
+    "last_funding_at": 89.3,
+    "num_acquisitions": 98.3,
+    "apptopia_total_apps": 93.6,
+    "apptopia_total_downloads": 98.2,
+    "contact_email": 25.9,
+    "phone_number": 22.9,
+    "facebook": 37.5,
+    "linkedin": 21.6,
+    "twitter": 53.5,
+    "num_investments": 99.7,
+    "num_lead_investments": 99.8,
+    "num_lead_investors": 94.2,
+    "listed_stock_symbol": 99.5,
+    "company_type": 3.4,
+    "hub_tags": 99.7,
+    "operating_status": 0.0,
+    "founded_on": 17.4,
+    "categories": 4.8,
+    "founders": 75.3,
+    "website": 4.5,
+    "ipo_status": 2.6,
+    "num_employees_enum": 16.0,
+    "locations": 7.0,
+    "growth_insight_description": 97.8,
+    "growth_insight_indicator": 97.8,
+    "growth_insight_direction": 98.9,
+    "growth_insight_confidence": 98.9,
+    "investor_insight_description": 98.7,
+    "permalink": 0.0,
+    "url": 0.0
+  },
+  "samples": {
+    "id": [
+      "dff36e62-25ce-412e-a4b8-6b0dfce1288d",
+      "1020a61e-271b-4286-939c-e03274a27179",
+      "4b5b59db-3873-ebaf-be4a-0dcbdd773032"
+    ],
+    "created_at": [
+      "2024-08-15 07:55:07.325505+00",
+      "2024-08-15 07:55:07.325505+00",
+      "2024-08-15 07:55:07.325505+00"
+    ],
+    "name": [
+      "Budgify",
+      "Budguiden",
+      "Budgy App"
+    ],
+    "short_description": [
+      "Budguiden  is a cargo & freight company",
+      "Budgy App is a finance app that allows users to track and split bills with friends while traveling.",
+      "Budgy Smuggler is a retailer of customized lingeries, undergarments, hats, and accessories for men, women, and kids."
+    ],
+    "contact_email": [
+      "budgifyfintech@gmail.com",
+      "info@budguiden.se",
+      "BUDGY@BUDGYSMUGGLER.COM.AU"
+    ],
+    "phone_number": [
+      "0501735823",
+      "+46 10 207 93 00",
+      "+61 404 026 836"
+    ],
+    "linkedin": [
+      "https://www.linkedin.com/company/budgifyatitsbest/",
+      "https://www.linkedin.com/company/budguiden/",
+      "https://www.linkedin.com/company/budgy-smuggler"
+    ],
+    "twitter": [
+      "https://twitter.com/BudgifyF57810",
+      "https://twitter.com/budguiden",
+      "https://twitter.com/budgysmuggler"
+    ],
+    "company_type": [
+      "for_profit",
+      "for_profit",
+      "for_profit"
+    ],
+    "operating_status": [
+      "active",
+      "active",
+      "active"
+    ],
+    "founded_on": [
+      "2022-11-20",
+      "2013-01-01",
+      "2003-01-01"
+    ],
+    "founders": [
+      "Charles Wedzi, Prince Baffoe",
+      "James McCoy",
+      "Joe Johnston, Martin McKeaveney, Michael Shanks"
+    ],
+    "ipo_status": [
+      "private",
+      "private",
+      "private"
+    ],
+    "num_employees_enum": [
+      "c_00001_00010",
+      "c_00011_00050",
+      "c_00001_00010"
+    ],
+    "permalink": [
+      "budgify-288d",
+      "budguiden",
+      "budgy-app"
+    ],
+    "url": [
+      "https://www.crunchbase.com/organization/budgify-288d",
+      "https://www.crunchbase.com/organization/budguiden",
+      "https://www.crunchbase.com/organization/budgy-app"
+    ],
+    "facebook": [
+      "https://www.facebook.com/budguiden",
+      "https://www.facebook.com/Budgyapps",
+      "https://www.facebook.com/BudgySmuggler"
+    ],
+    "categories": [
+      "Freight Service, Information Technology, Transportation",
+      "Apps",
+      "Fashion, Lingerie, Printing, Retail"
+    ],
+    "website": [
+      "https://budguiden.se/",
+      "http://www.budgyapp.com/",
+      "https://budgysmuggler.com.au"
+    ],
+    "locations": [
+      "European Union (EU), Nordic Countries, Scandinavia, Europe, Middle East, and Africa (EMEA)",
+      "Europe, Middle East, and Africa (EMEA)",
+      "Asia-Pacific (APAC), Australasia"
+    ],
+    "semrush_global_rank": [
+      "8925232",
+      "285778",
+      "4928335"
+    ],
+    "semrush_visits_latest_month": [
+      "97",
+      "142817",
+      "1723"
+    ],
+    "growth_insight_description": [
+      "Bueno Finance was brought in by BBVA to drive growth in the US.",
+      "Buffalo Games was recognized as one of the fastest-growing companies in Buffalo.",
+      "BugBiome received funding from angel investors."
+    ],
+    "growth_insight_indicator": [
+      "growing",
+      "growing",
+      "growing"
+    ],
+    "num_acquisitions": [
+      "1",
+      "1",
+      "1"
+    ],
+    "apptopia_total_apps": [
+      "1",
+      "3",
+      "1"
+    ],
+    "num_investors": [
+      "16",
+      "2",
+      "1"
+    ],
+    "funding_total": [
+      "9190660",
+      "0",
+      "1230000"
+    ],
+    "num_funding_rounds": [
+      "3",
+      "1",
+      "2"
+    ],
+    "last_funding_type": [
+      "seed",
+      "seed",
+      "pre_seed"
+    ],
+    "last_funding_at": [
+      "2022-11-04",
+      "2022-01-15",
+      "2018-12-01"
+    ],
+    "num_lead_investors": [
+      "2",
+      "1",
+      "1"
+    ],
+    "apptopia_total_downloads": [
+      "0",
+      "4150",
+      "6906"
+    ],
+    "growth_insight_direction": [
+      "c400_growing",
+      "c400_growing",
+      "c400_growing"
+    ],
+    "growth_insight_confidence": [
+      "c400_high",
+      "c300_medium",
+      "c300_medium"
+    ],
+    "num_investments": [
+      "1",
+      "1",
+      "2"
+    ],
+    "hub_tags": [
+      "cbvp",
+      "pledge_one_percent",
+      "unicorn"
+    ],
+    "investor_insight_description": [],
+    "num_exits": [
+      "1",
+      "1",
+      "9"
+    ],
+    "listed_stock_symbol": [
+      "NYSE:BVN",
+      "TSXV:BUF",
+      "NYSE:BBW"
+    ],
+    "num_lead_investments": [
+      "2",
+      "27",
+      "19"
+    ]
+  },
+  "validity": {
+    "contact_email": "3/3 valid-shape",
+    "phone_number": "3/3 valid-shape"
+  },
+  "entity": "company",
+  "entity_confidence": 0.85,
+  "entity_why": "value-checked override: name=organization name; founders/company_type/num_employees_enum/funding/ipo_status present; no person first/last-name columns",
+  "social_cols": [
+    "facebook",
+    "linkedin",
+    "twitter",
+    "website",
+    "url"
+  ],
+  "activity_match_keys": [
+    "name",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "company_type",
+    "website",
+    "url"
+  ]
+}

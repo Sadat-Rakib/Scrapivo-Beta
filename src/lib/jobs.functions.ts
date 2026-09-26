@@ -5,6 +5,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireMyAuth } from "@/integrations/my-supabase/auth-middleware";
 import { ensureJobCatalogRegistered } from "@/lib/jobs/source-catalog";
+import { ensureFreehireSourceRegistered } from "@/lib/jobs/freehire-source";
 import { fetchAllJobSourcesWithMeta, listJobSources } from "@/lib/jobs/registry";
 import { ALL_JOB_SOURCE_IDS } from "@/lib/jobs/types";
 import { awaitProviderSlot } from "@/lib/intelligence/provider-rate-limit.server";
@@ -33,6 +34,10 @@ export const runJobSearch = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     ensureJobCatalogRegistered();
+    // The 3.3M-posting freehire catalogue must be registered on this path too —
+    // previously only the Discover fan-out registered it, so the Jobs page
+    // searched ATS boards alone and returned thin results.
+    ensureFreehireSourceRegistered();
 
     const { loadCachedJobs, upsertCachedJobs, peekJobSearchQuota } = await import(
       "./jobs/quota-cache.server"

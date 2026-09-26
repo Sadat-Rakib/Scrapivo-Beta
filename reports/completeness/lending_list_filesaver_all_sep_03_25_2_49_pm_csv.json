@@ -1,0 +1,59 @@
+{
+  "key": "Lending List filesaver-All_Sep 03 25 2_49 pm.csv",
+  "entity": "person",
+  "rows": 34564,
+  "required_fields": [
+    "Name",
+    "Company",
+    "Title",
+    "Email",
+    "Phone",
+    "Website",
+    "Social(any)",
+    "Location"
+  ],
+  "absent_columns": [],
+  "complete": 0,
+  "incomplete": 34564,
+  "complete_pct": 0.0,
+  "missing_counts": {
+    "Company": 32,
+    "Title": 34564,
+    "Phone": 34564,
+    "Website": 34564,
+    "Social(any)": 34564,
+    "Name": 71
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Phone",
+        "Social(any)",
+        "Title",
+        "Website"
+      ],
+      "rows": 34461
+    },
+    {
+      "missing": [
+        "Name",
+        "Phone",
+        "Social(any)",
+        "Title",
+        "Website"
+      ],
+      "rows": 71
+    },
+    {
+      "missing": [
+        "Company",
+        "Phone",
+        "Social(any)",
+        "Title",
+        "Website"
+      ],
+      "rows": 32
+    }
+  ],
+  "people_bonus_rows": 0
+}

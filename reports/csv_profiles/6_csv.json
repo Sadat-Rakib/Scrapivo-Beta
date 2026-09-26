@@ -1,0 +1,283 @@
+{
+  "key": "6.csv",
+  "size": 18934248,
+  "last_modified": "2026-09-08 00:12:13+00:00",
+  "columns": [
+    "First Name",
+    "Last Name",
+    "Title",
+    "Company",
+    "Company Name for Emails",
+    "Email",
+    "Email Status",
+    "Seniority",
+    "Departments",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Stage",
+    "# Employees",
+    "Industry",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "City",
+    "State",
+    "Country",
+    "Company City",
+    "Company State",
+    "Company Country",
+    "Company Phone",
+    "SEO Description"
+  ],
+  "row_count": 32096,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "First Name": "first_name",
+    "Last Name": "last_name",
+    "Title": "title",
+    "Company": "company",
+    "Company Name for Emails": "email",
+    "Email": "email",
+    "Email Status": "email",
+    "Seniority": "other",
+    "Departments": "other",
+    "First Phone": "phone",
+    "Work Direct Phone": "phone",
+    "Home Phone": "phone",
+    "Mobile Phone": "phone",
+    "Corporate Phone": "phone",
+    "Other Phone": "phone",
+    "Stage": "other",
+    "# Employees": "employees",
+    "Industry": "industry",
+    "Website": "website",
+    "Company Linkedin Url": "linkedin",
+    "Facebook Url": "social",
+    "Twitter Url": "social",
+    "City": "other",
+    "State": "other",
+    "Country": "country",
+    "Company City": "company",
+    "Company State": "company",
+    "Company Country": "company",
+    "Company Phone": "phone",
+    "SEO Description": "descriptive"
+  },
+  "missing_pct": {
+    "First Name": 0.0,
+    "Last Name": 0.9,
+    "Title": 0.0,
+    "Company": 0.0,
+    "Company Name for Emails": 0.0,
+    "Email": 44.1,
+    "Email Status": 0.0,
+    "Seniority": 0.0,
+    "Departments": 36.1,
+    "First Phone": 4.1,
+    "Work Direct Phone": 100.0,
+    "Home Phone": 100.0,
+    "Mobile Phone": 100.0,
+    "Corporate Phone": 4.1,
+    "Other Phone": 100.0,
+    "Stage": 0.0,
+    "# Employees": 0.0,
+    "Industry": 0.8,
+    "Website": 0.0,
+    "Company Linkedin Url": 0.1,
+    "Facebook Url": 8.2,
+    "Twitter Url": 8.4,
+    "City": 18.8,
+    "State": 14.7,
+    "Country": 0.9,
+    "Company City": 12.8,
+    "Company State": 10.2,
+    "Company Country": 0.1,
+    "Company Phone": 3.7,
+    "SEO Description": 15.1
+  },
+  "samples": {
+    "First Name": [
+      "Harry",
+      "Gordon",
+      "Francisco"
+    ],
+    "Last Name": [
+      "Clore",
+      "Middleton",
+      "Ballesteros"
+    ],
+    "Title": [
+      "Associate Director, Budget and Finance",
+      "Construction Supervisor",
+      "Partner Sales Manager"
+    ],
+    "Company": [
+      "University of Illinois at Urbana-Champaign",
+      "Syngenta ANZ",
+      "FUJITSU"
+    ],
+    "Company Name for Emails": [
+      "University of Illinois at Urbana-Champaign",
+      "Syngenta ANZ",
+      "FUJITSU"
+    ],
+    "Email": [
+      "hclore@illinois.edu",
+      "gordon.middleton@syngenta.com",
+      "francisco@fujitsu.com"
+    ],
+    "Email Status": [
+      "Verified",
+      "Verified",
+      "Verified"
+    ],
+    "Seniority": [
+      "Director",
+      "Manager",
+      "Partner"
+    ],
+    "Departments": [
+      "Finance",
+      "Operations",
+      "Sales"
+    ],
+    "First Phone": [
+      "'+1 217-333-3077",
+      "'+41 61 323 11 11",
+      "'+81 362-52-2220"
+    ],
+    "Corporate Phone": [
+      "'+1 217-333-3077",
+      "'+41 61 323 11 11",
+      "'+81 362-52-2220"
+    ],
+    "Stage": [
+      "Cold",
+      "Cold",
+      "Cold"
+    ],
+    "# Employees": [
+      "22000",
+      "60000",
+      "124000"
+    ],
+    "Industry": [
+      "higher education",
+      "farming",
+      "information technology & services"
+    ],
+    "Website": [
+      "http://www.illinois.edu",
+      "http://www.syngenta.com",
+      "http://www.fujitsu.com"
+    ],
+    "Company Linkedin Url": [
+      "http://www.linkedin.com/school/university-of-illinois-urbana-champaign",
+      "http://www.linkedin.com/company/syngenta",
+      "http://www.linkedin.com/company/fujitsu"
+    ],
+    "Facebook Url": [
+      "https://www.facebook.com/uofigrainger",
+      "https://www.facebook.com/Syngenta",
+      "https://www.facebook.com/FujitsuICT"
+    ],
+    "Twitter Url": [
+      "https://twitter.com/uofigrainger",
+      "https://twitter.com/Syngenta",
+      "https://twitter.com/Fujitsu_Global"
+    ],
+    "City": [
+      "Urbana",
+      "Falkirk",
+      "Madrid"
+    ],
+    "State": [
+      "Illinois",
+      "Scotland",
+      "Community of Madrid"
+    ],
+    "Country": [
+      "United States",
+      "United Kingdom",
+      "Spain"
+    ],
+    "Company City": [
+      "Champaign",
+      "Garden City",
+      "Garden City"
+    ],
+    "Company State": [
+      "Illinois",
+      "Missouri",
+      "Missouri"
+    ],
+    "Company Country": [
+      "United States",
+      "Russia",
+      "United States"
+    ],
+    "Company Phone": [
+      "'+1 217-333-3077",
+      "'+41 61 323 11 11",
+      "'+81 362-52-2220"
+    ],
+    "SEO Description": [
+      "Our Purpose: make the world more sustainable by building trust in society through innovation.",
+      "Our Purpose: make the world more sustainable by building trust in society through innovation.",
+      "Our Purpose: make the world more sustainable by building trust in society through innovation."
+    ],
+    "Work Direct Phone": [
+      "'+1 888-622-8658"
+    ],
+    "Other Phone": [
+      "'+1 888-622-8658"
+    ]
+  },
+  "validity": {
+    "Company Name for Emails": "0/3 valid-shape",
+    "Email": "3/3 valid-shape",
+    "Email Status": "0/3 valid-shape",
+    "First Phone": "3/3 valid-shape",
+    "Work Direct Phone": "1/1 valid-shape",
+    "Corporate Phone": "3/3 valid-shape",
+    "Other Phone": "1/1 valid-shape",
+    "Company Phone": "3/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url"
+  ],
+  "activity_match_keys": [
+    "First Name",
+    "Last Name",
+    "Company",
+    "Company Name for Emails",
+    "Email",
+    "Email Status",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "Company City",
+    "Company State",
+    "Company Country",
+    "Company Phone"
+  ]
+}

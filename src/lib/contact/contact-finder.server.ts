@@ -27,7 +27,7 @@
 // =====================================================================
 import { createHash } from "node:crypto";
 import { promises as dns } from "node:dns";
-import { resilientText } from "../search/http-fetch.server";
+import { resilientJson, resilientText } from "../search/http-fetch.server";
 import { validateFetchedPage, condensePageText } from "../search/fetch-gate.server";
 
 // ── shared types ────────────────────────────────────────────────────────────
@@ -836,6 +836,53 @@ function extractLinkInBioUrls(html: string): string[] {
 }
 
 /**
+ * GitHub public profile via REST API (keyless, 60 req/hr shared quota).
+ * Structured bio/email/company/blog beats HTML scraping the profile page —
+ * and unlike LinkedIn it needs no cookies (ToS-clean). Returns null on any
+ * failure (rate limit, 404, network): the caller falls through to HTML.
+ */
+const GITHUB_PROFILE_RE = /^https?:\/\/(?:www\.)?github\.com\/([A-Za-z0-9-]{2,40})\/?$/i;
+
+export interface GitHubProfile {
+  email?: string;
+  blog?: string;
+  bio?: string;
+  company?: string;
+  location?: string;
+}
+
+export async function fetchGitHubProfile(handle: string): Promise<GitHubProfile | null> {
+  if (!/^[A-Za-z0-9-]{2,40}$/.test(handle)) return null;
+  try {
+    const data = await Promise.race([
+      resilientJson<{
+        email?: string | null;
+        blog?: string | null;
+        bio?: string | null;
+        company?: string | null;
+        location?: string | null;
+      }>(`https://api.github.com/users/${encodeURIComponent(handle)}`).catch(() => null),
+      new Promise<null>((r) => setTimeout(() => r(null), 10_000)),
+    ]);
+    if (!data) return null;
+    const out: GitHubProfile = {};
+    if (typeof data.email === "string" && data.email.includes("@")) {
+      const d = data.email.toLowerCase().split("@")[1];
+      if (d && !PROFILE_EMAIL_NOISE.has(d)) out.email = data.email.toLowerCase();
+    }
+    if (typeof data.blog === "string" && data.blog.trim()) out.blog = data.blog.trim();
+    if (typeof data.bio === "string" && data.bio.trim()) out.bio = data.bio.trim().slice(0, 500);
+    if (typeof data.company === "string" && data.company.trim())
+      out.company = data.company.trim().slice(0, 120);
+    if (typeof data.location === "string" && data.location.trim())
+      out.location = data.location.trim().slice(0, 120);
+    return out.email || out.blog || out.bio ? out : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Scout-style profile / bio harvest: fetch public social + link-in-bio pages
  * and pull emails/phones/links. Best-effort HTTP (no LinkedIn cookies).
  */
@@ -849,6 +896,19 @@ export async function harvestProfileContacts(urls: string[]): Promise<PageContac
 
   for (const url of queue) {
     try {
+      // GitHub profiles: structured REST API first (keyless). On any miss,
+      // fall through to the generic HTML scrape below.
+      const gh = GITHUB_PROFILE_RE.exec(url.trim());
+      if (gh) {
+        const prof = await fetchGitHubProfile(gh[1]);
+        if (prof) {
+          pages.push(url);
+          if (prof.email) emails.add(prof.email);
+          // prof.blog/bio/company inform manual review via discovery notes
+          // upstream; not fetched here (queue stays bounded, no extra calls).
+          continue;
+        }
+      }
       const html = await resilientText(url, { retries: 1 });
       if (!html || html.length < 40) continue;
       pages.push(url);

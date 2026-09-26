@@ -1,0 +1,594 @@
+/**
+ * M9 — Verification / provenance / freshness.
+ *
+ * Answers: does this evidence prove the requested claim about this exact
+ * entity, and was the underlying event valid within the Spec time window?
+ *
+ * Hard law:
+ *   observed_at = when WE saw the evidence
+ *   event_at    = when the claimed event actually occurred
+ * Never substitute one for the other.
+ *
+ * Boolean "verified: true" is a derived view — never a replacement for proof.
+ */
+import type { SearchSpec } from "@/lib/search/search-spec";
+import type { Evidence } from "@/lib/search/evidence";
+import {
+  asClaimEvidence,
+  evidenceClaimType,
+  evidenceSubject,
+  isClaimAligned,
+  isSubjectBound,
+  requestedClaimTypes,
+  type ClaimEvidence,
+  type RoleCurrentness,
+} from "@/lib/search/claim-binding";
+import type { QualificationRejectCode } from "@/lib/search/canonical-contract";
+import { personImpliesCurrentRole } from "@/lib/search/person";
+
+export type Freshness = "fresh" | "stale" | "unknown";
+
+/** Job posting currentness (M13 specializes). */
+export type JobCurrentness = "active" | "expired" | "stale" | "unknown";
+
+/** Social signal currentness (M14 specializes). */
+export type SocialCurrentness = "fresh" | "stale" | "unknown";
+
+export type Currentness =
+  | { kind: "role"; value: RoleCurrentness }
+  | { kind: "job"; value: JobCurrentness }
+  | { kind: "social"; value: SocialCurrentness };
+
+export type ClaimParameters = {
+  role?: string | null;
+  technology?: string | null;
+  seniority?: string | null;
+  location?: string | null;
+  service?: string | null;
+  product?: string | null;
+  funding_stage?: string | null;
+  [key: string]: string | number | boolean | null | undefined;
+};
+
+export type TemporalConstraint = {
+  /** Recency window from Spec (e.g. "90d"). */
+  signal_recency: string | null;
+  /** "recent" | "last_n_days" | "this_quarter" | "in_year" | "current" | … */
+  relation: string | null;
+  /** Calendar year when relation is in_year. */
+  year: string | null;
+  /** True when Spec requires an in-window event_at (unknown must fail). */
+  required: boolean;
+};
+
+export type TemporalValidity = {
+  freshness: Freshness;
+  /** True when Spec requires temporal validity and this evidence passes. */
+  ok: boolean;
+  reason: string;
+  event_at: string | null;
+  observed_at: string | null;
+  window_ms: number | null;
+};
+
+export type ClaimVerificationResult = {
+  ok: boolean;
+  reject_code?: QualificationRejectCode;
+  reason?: string;
+  freshness?: Freshness;
+  claim?: ClaimEvidence | null;
+};
+
+function fieldOf(spec: SearchSpec, f: string): string | null {
+  const c = spec.criteria.find((x) => x.field === f);
+  return c?.value?.trim() ? c.value : null;
+}
+
+/** Parse Nd / Nw / Nm recency windows into milliseconds. */
+export function parseRecencyWindowMs(recency: string | null | undefined): number | null {
+  if (!recency) return null;
+  const m = /^(\d+)(d|w|m)$/i.exec(recency.trim());
+  if (!m) return null;
+  const n = Number(m[1]);
+  const u = m[2].toLowerCase();
+  if (u === "d") return n * 86_400_000;
+  if (u === "w") return n * 7 * 86_400_000;
+  if (u === "m") return n * 30 * 86_400_000;
+  return null;
+}
+
+/**
+ * Derive temporal constraint from SearchSpec.
+ * "recently funded" / signal_recency / temporal_year all require event_at.
+ */
+export function deriveTemporalConstraint(spec: SearchSpec): TemporalConstraint {
+  const relation = fieldOf(spec, "temporal_relation");
+  const year = fieldOf(spec, "temporal_year");
+  const signal_recency = spec.signal_recency;
+  const fundingRecent = fieldOf(spec, "funding_status") === "recent";
+  const required =
+    !!signal_recency ||
+    fundingRecent ||
+    relation === "recent" ||
+    relation === "last_n_days" ||
+    relation === "last_n_weeks" ||
+    relation === "last_n_months" ||
+    relation === "this_quarter" ||
+    relation === "current" ||
+    relation === "in_year" ||
+    !!year;
+
+  return {
+    signal_recency: signal_recency ?? (fundingRecent ? "90d" : null),
+    relation,
+    year,
+    required,
+  };
+}
+
+/**
+ * Evaluate temporal validity from event_at — NEVER from observed_at.
+ *
+ * observed today + event 2023 ≠ "recently funded".
+ * Missing event_at when Spec requires recency → unknown → fail closed.
+ */
+export function evaluateTemporalValidity(
+  evidence: Evidence | ClaimEvidence,
+  spec: SearchSpec,
+  nowMs: number = Date.now(),
+): TemporalValidity {
+  const constraint = deriveTemporalConstraint(spec);
+  const claim = asClaimEvidence(evidence, evidenceSubject(evidence));
+  const observed_at =
+    claim?.observed_at ??
+    ("observed_at" in evidence ? (evidence as Evidence).observed_at : null);
+  const event_at = claim?.event_at ?? null;
+
+  if (!constraint.required) {
+    return {
+      freshness: event_at ? "fresh" : "unknown",
+      ok: true,
+      reason: "no_temporal_constraint",
+      event_at,
+      observed_at,
+      window_ms: null,
+    };
+  }
+
+  // in_year: event must fall in that calendar year (not "observed this year").
+  if (constraint.relation === "in_year" && constraint.year) {
+    if (!event_at) {
+      return {
+        freshness: "unknown",
+        ok: false,
+        reason: "event_at_required_for_in_year",
+        event_at: null,
+        observed_at,
+        window_ms: null,
+      };
+    }
+    const t = Date.parse(event_at);
+    if (Number.isNaN(t)) {
+      return {
+        freshness: "unknown",
+        ok: false,
+        reason: "event_at_unparseable",
+        event_at,
+        observed_at,
+        window_ms: null,
+      };
+    }
+    const y = new Date(t).getUTCFullYear();
+    const want = Number(constraint.year);
+    const ok = y === want;
+    return {
+      freshness: ok ? "fresh" : "stale",
+      ok,
+      reason: ok ? `event_in_year_${want}` : `event_year_${y}_≠_${want}`,
+      event_at,
+      observed_at,
+      window_ms: null,
+    };
+  }
+
+  const windowMs =
+    parseRecencyWindowMs(constraint.signal_recency) ??
+    (constraint.required ? 90 * 86_400_000 : null);
+
+  if (!event_at) {
+    return {
+      freshness: "unknown",
+      ok: false,
+      reason: "event_at_required_observed_at_is_not_a_substitute",
+      event_at: null,
+      observed_at,
+      window_ms: windowMs,
+    };
+  }
+
+  const t = Date.parse(event_at);
+  if (Number.isNaN(t)) {
+    return {
+      freshness: "unknown",
+      ok: false,
+      reason: "event_at_unparseable",
+      event_at,
+      observed_at,
+      window_ms: windowMs,
+    };
+  }
+
+  const age = nowMs - t;
+  if (windowMs != null && age > windowMs) {
+    return {
+      freshness: "stale",
+      ok: false,
+      reason: `event_at_outside_window_${constraint.signal_recency ?? "90d"}`,
+      event_at,
+      observed_at,
+      window_ms: windowMs,
+    };
+  }
+
+  return {
+    freshness: "fresh",
+    ok: true,
+    reason: "event_at_within_window",
+    event_at,
+    observed_at,
+    window_ms: windowMs,
+  };
+}
+
+/**
+ * Claim parameters the Spec requires (not optional metadata).
+ */
+export function deriveRequiredClaimParameters(spec: SearchSpec): ClaimParameters {
+  const params: ClaimParameters = {};
+  const role =
+    fieldOf(spec, "requested_role") ||
+    (spec.entity === "job" ? fieldOf(spec, "role") : null);
+  const tech = fieldOf(spec, "technology") || fieldOf(spec, "skill");
+  const seniority = fieldOf(spec, "seniority");
+  const service = fieldOf(spec, "requested_service");
+  const product = fieldOf(spec, "requested_product");
+  const funding = fieldOf(spec, "funding_status");
+
+  // Hiring / person-need: role (+ tech/seniority when stated) are required params.
+  const claims = requestedClaimTypes(spec);
+  if (claims.includes("hiring") || claims.includes("social_ask")) {
+    if (role) params.role = role;
+    if (tech) params.technology = tech;
+    if (seniority) params.seniority = seniority;
+  }
+  if (claims.includes("service_request")) {
+    if (service) params.service = service;
+    if (product) params.product = product;
+  }
+  // "recent" is temporal (signal_recency), not a funding-stage parameter.
+  if (
+    claims.includes("funding") &&
+    funding &&
+    funding !== "recent" &&
+    funding !== "current"
+  ) {
+    params.funding_stage = funding;
+  }
+  // Location is an M6 candidate-field gate (entity geography), not a claim
+  // parameter — "need marketing" evidence need not restate Austin in the excerpt.
+  return params;
+}
+
+function normParam(v: string | number | boolean | null | undefined): string {
+  if (v == null) return "";
+  return String(v).toLowerCase().trim();
+}
+
+function paramTokens(v: string): string[] {
+  return v
+    .toLowerCase()
+    .split(/[^a-z0-9+#.]+/)
+    .filter((t) => t.length >= 2);
+}
+
+/** Soft token presence: developer ↔ developers. */
+function tokenInHay(hay: string, tok: string): boolean {
+  if (!tok) return true;
+  if (hay.includes(tok)) return true;
+  if (tok.endsWith("s") && tok.length > 3 && hay.includes(tok.slice(0, -1))) {
+    return true;
+  }
+  if (!tok.endsWith("s") && hay.includes(`${tok}s`)) return true;
+  return false;
+}
+
+/**
+ * Does evidence claim_parameters (or excerpt fallback) satisfy Spec-required params?
+ * Broad claim_type alone is not enough: hiring accountant ≠ hiring React developer.
+ */
+export function claimParametersMatch(
+  evidence: Evidence | ClaimEvidence,
+  required: ClaimParameters,
+): { ok: boolean; mismatched: string[] } {
+  const keys = Object.keys(required).filter((k) => {
+    const v = required[k];
+    return v != null && String(v).trim() !== "";
+  });
+  if (!keys.length) return { ok: true, mismatched: [] };
+
+  const claim = asClaimEvidence(evidence, evidenceSubject(evidence));
+  const params = claim?.claim_parameters ?? {};
+  const hay = `${claim?.claim ?? ""} ${claim?.evidence_text ?? ""} ${
+    "excerpt" in evidence ? (evidence as Evidence).excerpt ?? "" : ""
+  }`.toLowerCase();
+
+  const mismatched: string[] = [];
+  for (const key of keys) {
+    const want = normParam(required[key]);
+    if (!want) continue;
+    const haveRaw = params[key];
+    if (haveRaw != null && String(haveRaw).trim() !== "") {
+      const have = normParam(haveRaw);
+      const wantToks = paramTokens(want);
+      const haveToks = paramTokens(have);
+      const overlap =
+        wantToks.every(
+          (t) => tokenInHay(have, t) || haveToks.some((h) => tokenInHay(h, t) || tokenInHay(t, h)),
+        ) ||
+        haveToks.every(
+          (t) => tokenInHay(want, t) || wantToks.some((w) => tokenInHay(w, t) || tokenInHay(t, w)),
+        );
+      if (!overlap && have !== want) {
+        mismatched.push(key);
+      }
+      continue;
+    }
+    const toks = paramTokens(want);
+    if (!toks.every((t) => tokenInHay(hay, t))) {
+      mismatched.push(key);
+    }
+  }
+  return { ok: mismatched.length === 0, mismatched };
+}
+
+/**
+ * Provenance completeness: delivered claims need a traceable evidence_url
+ * (except structural no_website which may use an entity: URI).
+ */
+export function provenanceComplete(evidence: Evidence | ClaimEvidence): boolean {
+  const claim = asClaimEvidence(evidence, evidenceSubject(evidence));
+  if (!claim) return false;
+  const url = (claim.evidence_url ?? "").trim();
+  if (!url) return false;
+  if (!claim.observed_at?.trim()) return false;
+  if (!claim.claim_type) return false;
+  if (!claim.subject?.trim()) return false;
+  return true;
+}
+
+/**
+ * Freeze event_at across re-crawls: a newer observed_at must not rewrite
+ * a historical event_at. Conflicting event dates → keep existing (fail closed
+ * on convenience).
+ */
+export function mergeEvidencePreservingEventAt(
+  existing: Evidence,
+  incoming: Evidence,
+): Evidence {
+  const sameSubject =
+    (existing.subject ?? "") === (incoming.subject ?? "") &&
+    existing.evidence_type === incoming.evidence_type;
+  if (!sameSubject) return incoming;
+
+  const oldEvent = existing.event_at?.trim() || null;
+  const newEvent = incoming.event_at?.trim() || null;
+
+  if (oldEvent && newEvent && oldEvent !== newEvent) {
+    // Conflict: keep historical event_at; refresh observed_at only.
+    return {
+      ...incoming,
+      event_at: oldEvent,
+      observed_at: incoming.observed_at || existing.observed_at,
+    };
+  }
+  if (oldEvent && !newEvent) {
+    return { ...incoming, event_at: oldEvent };
+  }
+  return incoming;
+}
+
+/**
+ * Role currentness gate for person Specs that ask for current founders/roles.
+ * M12: person+role Specs imply current holders unless former/ex/past is stated.
+ */
+export function evaluateRoleCurrentness(
+  evidence: Evidence | ClaimEvidence,
+  spec: SearchSpec,
+): { ok: boolean; value: RoleCurrentness; reason: string } {
+  const wantsCurrent =
+    personImpliesCurrentRole(spec) ||
+    /\b(current|currently)\s+(founder|ceo|cto|role|employee)/i.test(spec.raw_query) ||
+    /\bcurrent\s+founders?\b/i.test(spec.raw_query) ||
+    fieldOf(spec, "role_currentness") === "current_role";
+
+  const params =
+    ("claim_parameters" in evidence && evidence.claim_parameters) ||
+    ({} as Record<string, unknown>);
+  const stamped = (params.role_currentness as string | undefined) ?? null;
+  const value: RoleCurrentness =
+    stamped === "current_role" ||
+    stamped === "former_role" ||
+    stamped === "historical_role" ||
+    stamped === "unknown"
+      ? stamped
+      : "unknown";
+
+  if (!wantsCurrent) {
+    return { ok: true, value, reason: "currentness_not_required" };
+  }
+  if (value === "former_role" || value === "historical_role") {
+    return {
+      ok: false,
+      value,
+      reason: "former_or_historical_role_cannot_satisfy_current_request",
+    };
+  }
+  if (value === "unknown") {
+    // Need/signal claims (social_ask/hiring/…) prove a separate proposition from
+    // the person's professional role. An unstamped need claim must not fail
+    // closed under personImpliesCurrentRole — employment/identity evidence is
+    // where M12 enforces founder/role currentness. A need claim that *stamps*
+    // former/historical still fails above (m9).
+    const claimType = evidenceClaimType(evidence);
+    if (
+      claimType === "social_ask" ||
+      claimType === "hiring" ||
+      claimType === "service_request" ||
+      claimType === "funding" ||
+      claimType === "no_website"
+    ) {
+      return {
+        ok: true,
+        value,
+        reason: "need_claim_role_currentness_deferred_to_employment",
+      };
+    }
+    // Fail closed when Spec asks for current and role/identity evidence does
+    // not stamp currentness.
+    return {
+      ok: false,
+      value,
+      reason: "role_currentness_unknown_fail_closed",
+    };
+  }
+  return { ok: true, value, reason: "current_role" };
+}
+
+/**
+ * Full claim verification for one evidence item against Spec + entity.
+ */
+export function verifyClaimEvidence(args: {
+  evidence: Evidence | ClaimEvidence;
+  entityId: string;
+  spec: SearchSpec;
+  nowMs?: number;
+}): ClaimVerificationResult {
+  const { evidence, entityId, spec } = args;
+  const requested = requestedClaimTypes(spec);
+
+  if (!provenanceComplete(evidence)) {
+    return {
+      ok: false,
+      reject_code: "PROVENANCE_INCOMPLETE",
+      reason: "claim missing evidence_url/subject/observed_at",
+    };
+  }
+
+  if (!isSubjectBound(evidence, entityId)) {
+    return {
+      ok: false,
+      reject_code: "CLAIM_NOT_SUBJECT_BOUND",
+      reason: "evidence.subject !== candidate.entity_id",
+    };
+  }
+
+  if (requested.length && !isClaimAligned(evidence, requested)) {
+    return {
+      ok: false,
+      reject_code: "CLAIM_TYPE_MISMATCH",
+      reason: `claim_type ${evidenceClaimType(evidence)} not in [${requested.join(", ")}]`,
+    };
+  }
+
+  const requiredParams = deriveRequiredClaimParameters(spec);
+  const paramMatch = claimParametersMatch(evidence, requiredParams);
+  if (!paramMatch.ok) {
+    return {
+      ok: false,
+      reject_code: "CLAIM_PARAMETER_MISMATCH",
+      reason: `claim parameters mismatch: ${paramMatch.mismatched.join(", ")}`,
+    };
+  }
+
+  const temporal = evaluateTemporalValidity(evidence, spec, args.nowMs);
+  if (!temporal.ok) {
+    return {
+      ok: false,
+      reject_code:
+        temporal.freshness === "unknown" ? "TEMPORAL_UNKNOWN" : "TEMPORAL_STALE",
+      reason: temporal.reason,
+      freshness: temporal.freshness,
+    };
+  }
+
+  const currentness = evaluateRoleCurrentness(evidence, spec);
+  if (!currentness.ok) {
+    return {
+      ok: false,
+      reject_code: "CURRENTNESS_MISMATCH",
+      reason: currentness.reason,
+    };
+  }
+
+  const claim = asClaimEvidence(evidence, entityId);
+  if (claim) {
+    claim.freshness = temporal.freshness;
+    if (!claim.claim_parameters) {
+      claim.claim_parameters = { ...requiredParams };
+    }
+  }
+
+  return { ok: true, freshness: temporal.freshness, claim };
+}
+
+/**
+ * Pick verifying evidence for a candidate: first subject-bound, claim-aligned,
+ * parameter-matched, temporally valid item — or explain failure.
+ */
+export function verifyCandidateClaims(args: {
+  evidence: Array<Evidence | ClaimEvidence>;
+  entityId: string;
+  spec: SearchSpec;
+  nowMs?: number;
+}): ClaimVerificationResult {
+  const { evidence, entityId, spec } = args;
+  if (!evidence.length) {
+    return {
+      ok: false,
+      reject_code: "NO_CLAIM_EVIDENCE",
+      reason: "no evidence",
+    };
+  }
+
+  let lastFail: ClaimVerificationResult | null = null;
+  for (const e of evidence) {
+    const r = verifyClaimEvidence({
+      evidence: e,
+      entityId,
+      spec,
+      nowMs: args.nowMs,
+    });
+    if (r.ok) return r;
+    lastFail = r;
+  }
+
+  // Prefer the most informative failure among subject/type/param/temporal.
+  const ranked = evidence.map((e) =>
+    verifyClaimEvidence({ evidence: e, entityId, spec, nowMs: args.nowMs }),
+  );
+  const byCode = (code: string) => ranked.find((r) => r.reject_code === code);
+  return (
+    byCode("CLAIM_NOT_SUBJECT_BOUND") ||
+    byCode("CLAIM_TYPE_MISMATCH") ||
+    byCode("CLAIM_PARAMETER_MISMATCH") ||
+    byCode("TEMPORAL_UNKNOWN") ||
+    byCode("TEMPORAL_STALE") ||
+    byCode("CURRENTNESS_MISMATCH") ||
+    byCode("PROVENANCE_INCOMPLETE") ||
+    lastFail || {
+      ok: false,
+      reject_code: "NO_CLAIM_EVIDENCE",
+      reason: "no verifying evidence",
+    }
+  );
+}

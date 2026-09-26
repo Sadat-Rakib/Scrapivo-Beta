@@ -1,7 +1,13 @@
 // Detail drawer for a Company or Person row — the "tap the card, see
 // everything" view: identity, socials, contact resolution, generate pills.
+import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import type { CompanyRow, LocalBusinessRow, PersonRow } from "@/lib/search/lead-segments";
 import type { ResolvedContactInfo } from "@/components/discover/result-tabs";
+import { TIER_LABEL, type EvidenceObject } from "@/lib/intent/evidence";
+import { ensureHttpUrl } from "@/lib/search/site-url";
+import { fixMojibake } from "@/lib/encoding";
+import { getWebsiteBio, type WebsiteBio } from "@/lib/search/website-bio.server";
 import { Button } from "@/components/ui/button";
 import {
   Building2,
@@ -50,6 +56,62 @@ function LinkOut({ href, label, icon: Icon }: { href: string; label: string; ico
   );
 }
 
+/**
+ * Website-derived About (Phase 2c): extractive excerpt from the business's
+ * own public site, loaded asynchronously AFTER the panel renders — retrieval
+ * never waits for it. No site or failed fetch → the row stays hidden (never
+ * filler stitched from name/location fields).
+ */
+function WebsiteBioRow({ website }: { website?: string }) {
+  const getBio = useServerFn(getWebsiteBio);
+  const [state, setState] = useState<
+    | { status: "idle" }
+    | { status: "loading" }
+    | { status: "ready"; bio: WebsiteBio }
+    | { status: "unavailable" }
+  >({ status: "idle" });
+  useEffect(() => {
+    if (!website) {
+      setState({ status: "unavailable" });
+      return;
+    }
+    let cancelled = false;
+    setState({ status: "loading" });
+    getBio({ data: { url: website } })
+      .then((bio) => {
+        if (!cancelled) setState(bio ? { status: "ready", bio } : { status: "unavailable" });
+      })
+      .catch(() => {
+        if (!cancelled) setState({ status: "unavailable" });
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- refetch per website
+  }, [website]);
+  if (state.status === "idle" || state.status === "unavailable") return null;
+  if (state.status === "loading") {
+    return (
+      <Row label="About">
+        <p className="text-sm text-muted-foreground animate-pulse">Reading their website…</p>
+      </Row>
+    );
+  }
+  return (
+    <Row label="About">
+      <p className="text-sm text-foreground/85">{state.bio.blurb}</p>
+      <a
+        href={state.bio.url}
+        target="_blank"
+        rel="noreferrer"
+        className="mt-1 inline-flex items-center gap-0.5 text-[11px] text-muted-foreground hover:text-primary"
+      >
+        From their website <ExternalLink className="size-3" />
+      </a>
+    </Row>
+  );
+}
+
 export function EntityDetailPanel({
   entity,
   onClose,
@@ -57,6 +119,7 @@ export function EntityDetailPanel({
   onResolveContact,
   contactBusy,
   onGenerate,
+  evidence,
 }: {
   entity: SelectedEntity;
   onClose: () => void;
@@ -64,6 +127,8 @@ export function EntityDetailPanel({
   onResolveContact: () => void;
   contactBusy?: boolean;
   onGenerate?: (kind: "email" | "message") => void;
+  /** Verified intent evidence (Step 4). Absent = no verified intent. */
+  evidence?: EvidenceObject[];
 }) {
   const isCompany = entity.type === "company";
   const isLocal = entity.type === "local";
@@ -86,10 +151,14 @@ export function EntityDetailPanel({
     const out: Array<{ href: string; label: string; icon: typeof Globe }> = [];
     const add = (href?: string, label?: string, icon?: typeof Globe) => {
       if (!href) return;
-      const key = href.replace(/\/+$/, "").toLowerCase();
+      // Website href safety: schemeless stored URLs are dropped here so the
+      // panel never renders a link that navigates inside the app.
+      const safe = ensureHttpUrl(href);
+      if (!safe) return;
+      const key = safe.replace(/\/+$/, "").toLowerCase();
       if (seen.has(key)) return;
       seen.add(key);
-      out.push({ href, label: label ?? "Profile", icon: icon ?? Globe });
+      out.push({ href: safe, label: label ?? "Profile", icon: icon ?? Globe });
     };
     if (isCompany && c) {
       add(c.website, "Website", Globe);
@@ -118,30 +187,34 @@ export function EntityDetailPanel({
     return out;
   })();
 
-  const posts = isCompany
-    ? (c?.leads ?? [])
-    : isInvestorRow || isLocal
-      ? []
-      : p
-        ? [p.lead]
-        : [];
+  const posts = isCompany ? (c?.leads ?? []) : isInvestorRow || isLocal ? [] : p ? [p.lead] : [];
 
   return (
     <div className="p-4 md:p-5 space-y-4">
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           <div className="size-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
-            {isCompany ? <Building2 className="size-4.5" /> : isLocal ? <Store className="size-4.5" /> : <User className="size-4.5" />}
+            {isCompany ? (
+              <Building2 className="size-4.5" />
+            ) : isLocal ? (
+              <Store className="size-4.5" />
+            ) : (
+              <User className="size-4.5" />
+            )}
           </div>
           <div className="min-w-0">
-            <div className="font-semibold text-base truncate">{c?.name ?? b?.name ?? p?.name}</div>
+            <div className={`font-semibold truncate ${isLocal ? "text-lg" : "text-base"}`}>
+              {fixMojibake(c?.name ?? b?.name ?? p?.name ?? "")}
+            </div>
             <div className="text-xs text-muted-foreground truncate">
               {isCompany
                 ? [c?.domain, `${c?.signal_count} signal${c?.signal_count === 1 ? "" : "s"}`]
                     .filter(Boolean)
                     .join(" · ")
                 : isLocal
-                  ? [b?.category, b?.address?.split(",").slice(-2, -1)[0]?.trim()].filter(Boolean).join(" · ")
+                  ? [b?.category, b?.address?.split(",").slice(-2, -1)[0]?.trim()]
+                      .filter(Boolean)
+                      .join(" · ")
                   : [p?.role_hint, p?.company_hint].filter(Boolean).join(" · ")}
             </div>
           </div>
@@ -156,7 +229,9 @@ export function EntityDetailPanel({
           <>
             {b.category && (
               <Row label="Category">
-                <span className="text-sm">{b.category.replace(/_/g, " ")}</span>
+                <span className="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300">
+                  {b.category.replace(/_/g, " ")}
+                </span>
               </Row>
             )}
             {b.address && (
@@ -166,18 +241,17 @@ export function EntityDetailPanel({
                 </span>
               </Row>
             )}
-            {b.description && (
-              <Row label="About">
-                <p className="text-sm text-foreground/85">{b.description}</p>
-              </Row>
-            )}
+            {/* About = website bio only (Phase 2c). The old row showed the
+                location string as a fake "bio" — location already has its
+                own row above. No site → no About row, never filler. */}
+            <WebsiteBioRow website={b.website} />
             {!!b.opportunity_tags?.length && (
-              <Row label="Signals">
-                <div className="flex flex-wrap gap-1">
+              <Row label="Opportunity">
+                <div className="flex flex-wrap gap-1.5 pt-0.5">
                   {b.opportunity_tags.slice(0, 6).map((t) => (
                     <span
                       key={t}
-                      className="text-[10px] px-1.5 py-0.5 rounded-full border border-border text-muted-foreground"
+                      className="text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/25 bg-emerald-500/[0.07] text-emerald-200/90"
                     >
                       {t.replace(/_/g, " ")}
                     </span>
@@ -192,16 +266,24 @@ export function EntityDetailPanel({
             {c.latest_signal && (
               <Row label="Latest">
                 <span className="inline-flex items-center gap-1 text-sm">
-                  <Clock className="size-3.5 text-muted-foreground" /> {c.latest_signal}
+                  <Clock className="size-3.5 text-muted-foreground" /> {fixMojibake(c.latest_signal)}
                 </span>
               </Row>
             )}
             <Row label="Why now">
-              <p className="text-sm text-foreground/85">{c.why_now}</p>
+              <p className="text-sm text-foreground/85">{fixMojibake(c.why_now)}</p>
             </Row>
             {c.description && (
               <Row label="About">
-                <p className="text-sm text-foreground/85">{c.description}</p>
+                <p className="text-sm text-foreground/85">{fixMojibake(c.description)}</p>
+              </Row>
+            )}
+            {c.platforms?.length > 0 && (
+              <Row label="Seen on">
+                <span className="text-sm text-muted-foreground">
+                  {c.platforms.slice(0, 6).join(" · ")}
+                  {c.signal_count > 1 ? ` · ${c.signal_count} signals` : ""}
+                </span>
               </Row>
             )}
           </>
@@ -216,21 +298,57 @@ export function EntityDetailPanel({
                 </span>
               </Row>
             )}
+            {p.title_hint && p.title_hint !== p.role_hint && (
+              <Row label="Title">
+                <span className="text-sm text-foreground/85">{fixMojibake(p.title_hint)}</span>
+              </Row>
+            )}
+            {(p.platform || p.posted_at_relative) && (
+              <Row label="Source">
+                <span className="text-sm text-muted-foreground">
+                  {[p.platform, p.posted_at_relative].filter(Boolean).join(" · ")}
+                  {p.signal_count > 1 ? ` · ${p.signal_count} signals` : ""}
+                </span>
+              </Row>
+            )}
             {p.location_hint && (
               <Row label="Location">
                 <span className="inline-flex items-center gap-1 text-sm">
-                  <MapPin className="size-3.5 text-muted-foreground" /> {p.location_hint}
+                  <MapPin className="size-3.5 text-muted-foreground" /> {fixMojibake(p.location_hint)}
                 </span>
               </Row>
             )}
             {p.why_match && (
               <Row label="Why match">
-                <p className="text-sm text-foreground/85">{p.why_match}</p>
+                <p className="text-sm text-foreground/85">{fixMojibake(p.why_match)}</p>
               </Row>
             )}
             {p.description && (
               <Row label="About">
-                <p className="text-sm text-foreground/85">{p.description}</p>
+                <p className="text-sm text-foreground/85">{fixMojibake(p.description)}</p>
+              </Row>
+            )}
+            {(p.inline_contacts?.emails?.length || p.inline_contacts?.phones?.length) && (
+              <Row label="In post">
+                <div className="space-y-0.5">
+                  {p.inline_contacts.emails.slice(0, 3).map((e) => (
+                    <a
+                      key={e}
+                      href={`mailto:${e}`}
+                      className="block text-sm text-emerald-400 hover:underline break-all"
+                    >
+                      {e}
+                    </a>
+                  ))}
+                  {p.inline_contacts.phones.slice(0, 3).map((ph) => (
+                    <span key={ph} className="block text-sm">
+                      {ph}
+                    </span>
+                  ))}
+                  <div className="text-[10px] text-muted-foreground">
+                    Published in the post — highest trust
+                  </div>
+                </div>
               </Row>
             )}
           </>
@@ -263,6 +381,15 @@ export function EntityDetailPanel({
             </span>
           </Row>
         )}
+        {isLocal &&
+          !b?.phone &&
+          (b?.phoneStatus === "mismatch-hidden" || b?.phoneStatus === "invalid-hidden") && (
+            <Row label="Number">
+              <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Phone className="size-3.5 shrink-0" /> number unverified — hidden, not shown
+              </span>
+            </Row>
+          )}
         {contact?.status === "ok" && contact.email && (
           <Row label="Email">
             <a
@@ -312,6 +439,46 @@ export function EntityDetailPanel({
                 <Phone className="size-3 mr-1" />
                 {contactBusy ? "Checking…" : "Show contact"}
               </Button>
+            </div>
+          </Row>
+        )}
+        {!!evidence?.length && (
+          <Row label="Intent evidence">
+            <div className="space-y-2">
+              {evidence.slice(0, 3).map((ev) => (
+                <div
+                  key={ev.url}
+                  className="rounded-lg border border-border bg-card px-2.5 py-2 space-y-1"
+                >
+                  <div className="text-xs font-medium">{TIER_LABEL[ev.tier]}</div>
+                  <p className="text-xs text-foreground/80">{ev.reason}</p>
+                  <p className="text-[11px] text-muted-foreground line-clamp-2">“{ev.excerpt}”</p>
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-muted-foreground">
+                    <span>{ev.source}</span>
+                    {ev.publishedAt ? (
+                      <span>{new Date(ev.publishedAt).toLocaleDateString()}</span>
+                    ) : null}
+                    <span>{Math.round(ev.confidence * 100)}% confidence</span>
+                    <a
+                      href={ev.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-0.5 text-primary hover:underline"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      View evidence <ExternalLink className="size-3" />
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Row>
+        )}
+        {!evidence?.length && (isCompany || (!isLocal && p && !isInvestorRow)) && (
+          <Row label="Intent evidence">
+            <div className="text-xs text-muted-foreground">
+              No verified intent signals yet — signals appear here when this{" "}
+              {isCompany ? "company" : "person"} posts a hiring or buying signal.
             </div>
           </Row>
         )}

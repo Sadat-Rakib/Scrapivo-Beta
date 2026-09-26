@@ -1,0 +1,36 @@
+{
+  "idx_businesses": {
+    "country_non_null": 609387,
+    "city_norm_non_null": 609387,
+    "category_non_null": 586923,
+    "website_non_null": 447978,
+    "email_non_null": 0,
+    "phone_non_null": 503566,
+    "domain_non_null": 447978,
+    "country_aggregate_http": 400,
+    "countries": null
+  },
+  "idx_companies": {
+    "country_non_null": 78994,
+    "city_norm_non_null": 71009,
+    "category_non_null": 4786,
+    "website_non_null": 4781,
+    "email_non_null": 0,
+    "phone_non_null": 0,
+    "domain_non_null": 4781,
+    "country_aggregate_http": 400,
+    "countries": null
+  },
+  "idx_people": {
+    "country_non_null": 399394,
+    "city_norm_non_null": 105875,
+    "role_norm_non_null": 399394,
+    "website_non_null": null,
+    "email_non_null": 399394,
+    "phone_non_null": 399394,
+    "domain_non_null": null,
+    "linkedin_non_null": 399383,
+    "country_aggregate_http": 400,
+    "countries": null
+  }
+}

@@ -11,9 +11,9 @@
  */
 import type { SearchSpec } from "./search-spec";
 import type { SpecRow } from "@/lib/spec-search.functions";
+import { resolveCanonicalLocation } from "./location-resolver";
 import {
   makeEvidence,
-  structuralNoWebsiteEvidence,
   whyMatchFromEvidence,
   type Evidence,
 } from "./evidence";
@@ -21,8 +21,10 @@ import { applyQualificationGate } from "./qualify";
 import { mintProvisionalEntityId } from "./canonical-contract";
 import { applyPageClassificationToLiveRow } from "./page-classify";
 import { applyEntityResolutionToRow } from "./entity-resolve";
+import { mergeDuplicateCandidates } from "./candidate-merge";
 import {
   buildSourcePlan,
+  buildResearchPlan,
   deriveCoverageRequirements,
   type ProviderDiagnostic,
   type SourcePlan,
@@ -40,6 +42,13 @@ export type LiveGapfillResult = {
 };
 
 export type LiveGapfillDeps = {
+  /** Injectable browser discovery; production always uses the browser adapter. */
+  browser?: ((spec: SearchSpec, options: { searchRunId?: string; signal?: AbortSignal | null; onProgress?: (event: { action: string; source?: string; detail?: string }) => void; researchPlan?: ReturnType<typeof buildResearchPlan>; initialCandidates?: SpecRow[]; desiredCount?: number; isVerified?: (row: SpecRow) => boolean; timeoutMs?: number }) => Promise<SpecRow[]>) | null;
+  searchRunId?: string;
+  onBrowserProgress?: (event: { action: string; source?: string; detail?: string }) => void;
+  desiredCount?: number;
+  initialCandidates?: SpecRow[];
+  isVerified?: (row: SpecRow) => boolean;
   /** OSM / local businesses live search. Null skips. */
   osm?: ((query: string, location: string, category: string) => Promise<SpecRow[]>) | null;
   /** Jobs fleet. Null skips. */
@@ -75,7 +84,9 @@ function craftFromTag(tag: string, fallback: string): string {
   if (/caf[eé]|coffee|roaster/.test(t)) return "cafe";
   if (/yoga/.test(t)) return "yoga";
   if (/restaurant|fast_food|bistro/.test(t)) return "restaurant";
-  return fallback;
+  if (/hvac|heating|cooling|air.condition|refrigerat|furnace/.test(t)) return "HVAC";
+  // A broad OSM tag must not be relabelled as the user's requested trade.
+  return tag;
 }
 
 /** Default OSM adapter — wraps searchOsmLocalBusinesses into SpecRows. */
@@ -134,9 +145,28 @@ async function defaultOsm(
       phone: phone.phone,
       phoneStatus: phone.status,
       url: l.full_post_url ?? null,
+      website_url: l.full_post_url ?? null,
+      source_url: (l as typeof l & { source_record_url?: string }).source_record_url ?? null,
+      no_website_verification: {
+        structured_source_url: (l as typeof l & { source_record_url?: string }).source_record_url ?? null,
+        structured_absence: (l as typeof l & { structured_website_absent?: boolean }).structured_website_absent === true,
+        exact_queries: [],
+      },
       category: craftFromTag(tag, category),
       location,
       country: null,
+      // The actual OSM record supports identity/contact facts, never website absence.
+      evidence: [{
+        source_url: (l as typeof l & { source_record_url?: string }).source_record_url ?? `osm:${entity_id}`,
+        source_type: "osm" as const,
+        excerpt: [l.title, tag, location, phone.phone ? `phone ${phone.phone}` : null].filter(Boolean).join(" · "),
+        observed_at: new Date().toISOString(),
+        evidence_type: "identity" as const,
+        supports: "identity" as const,
+        confidence: 0.8,
+        extraction_method: "osm_tags",
+        subject: entity_id,
+      }],
       why_match: why,
     };
   });
@@ -172,33 +202,12 @@ async function defaultWeb(
   spec?: SearchSpec,
 ): Promise<SpecRow[]> {
   const { discoverWebFreeFirst } = await import("./provider-ladder");
-  const roleBits = query.trim();
-  const loc = location && !/^(worldwide|global|anywhere)$/i.test(location) ? location : "";
-  const requested =
-    (spec &&
-      (fieldOf(spec, "requested_role") ||
-        fieldOf(spec, "requested_service") ||
-        fieldOf(spec, "requested_product"))) ||
-    "";
-  const funding = spec ? fieldOf(spec, "funding_status") : null;
-  const q =
-    entity === "person"
-      ? [roleBits, requested, loc, "founder OR CEO OR CTO"].filter(Boolean).join(" ")
-      : entity === "company"
-        ? [
-            roleBits,
-            requested,
-            funding ? "funded OR raised OR series" : null,
-            loc,
-            "company OR startup",
-          ]
-            .filter(Boolean)
-            .join(" ")
-        : [roleBits, loc].filter(Boolean).join(" ");
-  if (!q.trim()) return [];
+  const plan = spec ? buildResearchPlan(spec, { desiredCount: 10 }) : null;
+  const queries = plan?.discoveryQueries.length ? plan.discoveryQueries : [query.trim()].filter(Boolean);
+  if (!queries.length) return [];
   const { results } = await discoverWebFreeFirst({
-    queries: [q],
-    maxQueries: 8,
+    queries,
+    maxQueries: plan?.stoppingRules.maxQueries ?? 8,
     timeRange: "year",
     sourceKey: `live-${entity}`,
     operation: `live-gapfill:${entity}`,
@@ -220,18 +229,22 @@ async function defaultWeb(
       entity_resolved: false as const,
       page_type: "unknown" as const,
       title,
-      detail: [snippet, loc].filter(has).join(" · "),
+      detail: snippet,
       email: null,
       phone: null,
       url,
-      location: loc || null,
+      source_url: url,
+      location: null,
       country: null,
       evidence,
       why_match: why,
       verification_status: "discovered" as const,
     };
     const classified = applyPageClassificationToLiveRow(base);
-    return applyEntityResolutionToRow(classified);
+    const resolved = applyEntityResolutionToRow(classified);
+    // A search hit is provenance, not an independently verified entity destination.
+    // Browser research may later promote an official site or profile URL.
+    return { ...resolved, url: null };
   });
 }
 
@@ -399,33 +412,6 @@ export function applyWhyMatchGate(
   const prepared = rows.map((r) => {
     const withOpp = opp ? { ...r, opportunity: r.opportunity ?? opp } : r;
     if (withOpp.evidence?.length) return withOpp;
-    // Structural no_website only when we observed absence from a real source
-    // (resolved entity with explicit empty site). Never from "SERP found nothing".
-    if (opp === "no_website" && !withOpp.url) {
-      const subject =
-        withOpp.entity_id?.trim() ||
-        withOpp.key?.trim() ||
-        null;
-      const fromOsm = (withOpp.key ?? "").startsWith("live-osm:");
-      const resolved = withOpp.entity_resolved === true || fromOsm;
-      if (subject && resolved) {
-        const ev = [
-          structuralNoWebsiteEvidence({
-            source_url: fromOsm ? `osm:${withOpp.key}` : subject,
-            source_type: fromOsm ? "osm" : "db",
-            extraction_method: fromOsm ? "osm_tags" : "registry_no_website",
-            observation: `No website on file for ${withOpp.title}`,
-          }),
-        ].map((e) => ({ ...e, subject }));
-        return {
-          ...withOpp,
-          entity_id: withOpp.entity_id ?? subject,
-          entity_resolved: true,
-          page_type: withOpp.page_type ?? "entity_page",
-          evidence: ev,
-        };
-      }
-    }
     return withOpp;
   });
 
@@ -444,8 +430,8 @@ export function applyWhyMatchGate(
   return { kept: qualified, dropped };
 }
 
-/** Run live gapfill for thin DB or signal-required specs. */
-export async function runLiveGapfill(
+/** Run the structured source plan. Browser discovery runs independently below. */
+async function runSourceGapfill(
   spec: SearchSpec,
   deps: LiveGapfillDeps = {},
 ): Promise<LiveGapfillResult> {
@@ -458,7 +444,7 @@ export async function runLiveGapfill(
   const web = deps.web === null ? null : (deps.web ?? defaultWeb);
 
   const requirements = deriveCoverageRequirements(spec);
-  const plan = buildSourcePlan(spec, requirements);
+  const plan = buildSourcePlan(spec, requirements, { desiredCount: deps.desiredCount });
   const diagnostics: ProviderDiagnostic[] = [];
 
   const record = (
@@ -506,7 +492,11 @@ export async function runLiveGapfill(
         continue;
       }
       try {
-        const rows = await osm(spec.raw_query, location, category);
+        const geo = resolveCanonicalLocation(location);
+        const osmLocation = geo?.kind === "metro"
+          ? geo.member_ids.find((id) => id.startsWith("geo:city:"))?.slice("geo:city:".length) ?? location
+          : location;
+        const rows = await osm(spec.raw_query, osmLocation, category);
         record("osm-local", {
           attempted: true,
           succeeded: true,
@@ -603,27 +593,14 @@ export async function runLiveGapfill(
         continue;
       }
       try {
-        const reqRole = fieldOf(spec, "requested_role");
-        const reqSvc = fieldOf(spec, "requested_service");
-        const funding = fieldOf(spec, "funding_status");
-        const parts = [
-          role,
-          model,
-          category,
-          location,
-          reqRole,
-          reqSvc,
-          funding ? "funded startup" : null,
-          spec.raw_query,
-        ].filter(has);
-        const q = [...new Set(parts)].join(" ");
+        const q = buildResearchPlan(spec, { desiredCount: deps.desiredCount }).discoveryQueries[0] ?? "";
         const entity =
           spec.entity === "business" ||
           spec.entity === "company" ||
           spec.entity === "person"
             ? spec.entity
             : "company";
-        const rows = await web(q || spec.raw_query, location, entity, spec);
+        const rows = await web(q, location, entity, spec);
         record(step.providerId, {
           attempted: true,
           succeeded: true,
@@ -690,4 +667,109 @@ export async function runLiveGapfill(
   });
 
   return { rows: [], engine: "live-none", scanned: 0, plan, diagnostics };
+}
+
+/** Run both free source discovery and browser discovery for every live request. */
+export async function runLiveGapfill(
+  spec: SearchSpec,
+  deps: LiveGapfillDeps = {},
+): Promise<LiveGapfillResult> {
+  const { throwIfAborted, isDeadlineAbort } = await import("./search-run");
+  throwIfAborted(deps.signal);
+  const browser = deps.browser === null ? null : (deps.browser ?? (process.env.VITEST ? async () => [] as SpecRow[] : async (query: SearchSpec, options: { searchRunId?: string; signal?: AbortSignal | null; onProgress?: (event: { action: string; source?: string; detail?: string }) => void }) => {
+    const { discoverWithBrowser } = await import("./browser-live.server");
+    return discoverWithBrowser(query, options);
+  }));
+  const sourceResult = await Promise.resolve(runSourceGapfill(spec, deps)).then(
+    (value) => ({ status: "fulfilled" as const, value }),
+    (reason) => ({ status: "rejected" as const, reason }),
+  );
+  throwIfAborted(deps.signal);
+  if (sourceResult.status === "rejected" && sourceResult.reason instanceof Error && sourceResult.reason.message === "SEARCH_CANCELLED") {
+    throw sourceResult.reason;
+  }
+
+  const source = sourceResult.status === "fulfilled" ? sourceResult.value : null;
+  const initialCandidates = [...(deps.initialCandidates ?? []), ...(source?.rows ?? [])];
+  const desiredCount = Math.max(1, deps.desiredCount ?? 10);
+  const isVerified = deps.isVerified ?? ((row: SpecRow) => row.disposition === "qualified" || row.verification_status === "verified");
+  const verifiedCount = initialCandidates.filter(isVerified).length;
+  const shouldBrowse = !!browser && verifiedCount < desiredCount;
+  const matchSeed = fieldOf(spec, "opportunity") === "no_website"
+    ? (await import("@/lib/spec-search.functions")).rowSatisfiesSpec
+    : null;
+  const browserSeeds = matchSeed
+    ? initialCandidates
+        .filter((row) => !row.website_url && row.no_website_verification?.structured_absence === true &&
+          !!row.no_website_verification.structured_source_url && matchSeed(spec, row))
+        .sort((a, b) => {
+          const strength = (row: SpecRow) =>
+            Number(!!row.phone) * 4 + Number(!!row.email) * 3 +
+            Number(!!row.detail && row.detail !== row.location) * 2 +
+            Number(!!row.category) + Number(!!row.entity_resolved);
+          return strength(b) - strength(a);
+        })
+        .slice(0, Math.min(20, Math.max(15, desiredCount * 2)))
+    : initialCandidates.slice(0, 6);
+  const researchPlan = buildResearchPlan(spec, { desiredCount });
+  const browserOptions = {
+    ...(deps.searchRunId ? { searchRunId: deps.searchRunId } : {}),
+    ...(deps.signal ? { signal: deps.signal } : {}),
+    ...(deps.onBrowserProgress ? { onProgress: deps.onBrowserProgress } : {}),
+    researchPlan,
+    initialCandidates: browserSeeds,
+    desiredCount,
+    isVerified,
+    // Leave time for final enrichment/qualification before the 120s run abort.
+    timeoutMs: spec.entity === "company" ? 75_000 : 90_000,
+  };
+  const browserResult = shouldBrowse
+    ? await Promise.resolve(browser(spec, browserOptions)).then(
+        (value) => ({ status: "fulfilled" as const, value }),
+        (reason) => ({ status: "rejected" as const, reason }),
+      )
+    : ({ status: "fulfilled" as const, value: [] as SpecRow[] });
+  // Keep browser rows on the hard deadline: the research is already paid
+  // for, and the caller finalizes whatever qualifies. Only a real
+  // cancellation stops delivery here.
+  if (deps.signal?.aborted && !isDeadlineAbort(deps.signal)) throwIfAborted(deps.signal);
+  if (browserResult.status === "rejected" && browserResult.reason instanceof Error && browserResult.reason.message === "SEARCH_CANCELLED") {
+    throw browserResult.reason;
+  }
+
+  const browserRows = browserResult.status === "fulfilled" ? browserResult.value : [];
+  const diagnostics: ProviderDiagnostic[] = [...(source?.diagnostics ?? [])];
+  if (sourceResult.status === "rejected") {
+    diagnostics.push({
+      provider: "structured-live",
+      attempted: true,
+      succeeded: false,
+      artifactsFound: 0,
+      entitiesResolved: 0,
+      qualified: 0,
+      outcome: "SOURCE_ERROR",
+      error: sourceResult.reason instanceof Error ? sourceResult.reason.message : String(sourceResult.reason),
+    });
+  }
+  diagnostics.push({
+    provider: "browser-live",
+    attempted: shouldBrowse,
+    succeeded: browserResult.status === "fulfilled",
+    artifactsFound: browserRows.length,
+    entitiesResolved: 0,
+    qualified: 0,
+    ...(browserResult.status === "rejected" ? {
+      outcome: "SOURCE_ERROR" as const,
+      error: browserResult.reason instanceof Error ? browserResult.reason.message : String(browserResult.reason),
+    } : {}),
+  });
+
+  const rows = mergeDuplicateCandidates([...(source?.rows ?? []), ...browserRows]);
+  return {
+    rows,
+    engine: browserRows.length ? (source?.rows.length ? `${source.engine}+browser` : "live-browser") : (source?.engine ?? "live-none"),
+    scanned: (source?.scanned ?? 0) + browserRows.length,
+    plan: source?.plan,
+    diagnostics,
+  };
 }

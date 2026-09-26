@@ -1,0 +1,45 @@
+{
+  "key": "1-other_region.csv",
+  "entity": "person",
+  "rows": 1205,
+  "required_fields": [
+    "Name",
+    "Company",
+    "Title",
+    "Email",
+    "Phone",
+    "Website",
+    "Social(any)",
+    "Location"
+  ],
+  "absent_columns": [],
+  "complete": 1094,
+  "incomplete": 111,
+  "complete_pct": 90.8,
+  "missing_counts": {
+    "Location": 56,
+    "Phone": 57
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Phone"
+      ],
+      "rows": 55
+    },
+    {
+      "missing": [
+        "Location"
+      ],
+      "rows": 54
+    },
+    {
+      "missing": [
+        "Location",
+        "Phone"
+      ],
+      "rows": 2
+    }
+  ],
+  "people_bonus_rows": 0
+}

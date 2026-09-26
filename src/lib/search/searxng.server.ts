@@ -283,6 +283,10 @@ const SOURCE_QUOTAS: Record<string, number> = {
   decisionmakers: 2,
   fiverr: 1,
   startups: 1,
+  // Intent discovery (Step 4): 3 queries per candidate must all be servable.
+  intent: 6,
+  // Entity research runs after discovery and needs two bounded lookups per lead.
+  "browser-research": 20,
 };
 const DEFAULT_QUOTA = 2;
 
@@ -426,7 +430,7 @@ async function takeBudget(sourceKey = "default"): Promise<boolean> {
   let reserved = false;
 
   if (req) {
-    const cap = REQUEST_CLASS_CAPS[cls];
+    const cap = sourceKey === "browser-research" ? 20 : REQUEST_CLASS_CAPS[cls];
     const quota = SOURCE_QUOTAS[sourceKey] ?? DEFAULT_QUOTA;
     const mine = req.perSource.get(sourceKey) ?? 0;
     if (req.usedByClass[cls] >= cap || req.used >= req.total || mine >= quota) return false;
@@ -543,6 +547,7 @@ async function querySearxngOnce(
   index: number,
   timeRange: string,
   sourceKey: string,
+  outerSignal?: AbortSignal | null,
 ): Promise<{
   results: SearxngRawResult[];
   status: "ok" | "empty" | "error" | "cached" | "budget";
@@ -597,12 +602,22 @@ async function querySearxngOnce(
         // Local SearXNG must not go through Chrome-header resilientFetch —
         // under Discover fan-out that path threw connection errors that looked
         // identical to "container not running" and wiped socialdorks to 0.
+        const timeout = AbortSignal.timeout(12_000);
+        const signal =
+          outerSignal && typeof AbortSignal.any === "function"
+            ? AbortSignal.any([timeout, outerSignal])
+            : outerSignal?.aborted
+              ? outerSignal
+              : timeout;
         res = localSearx
           ? await fetch(url, {
               headers: { Accept: "application/json" },
-              signal: AbortSignal.timeout(12_000),
+              signal,
             })
-          : await resilientFetch(url, { headers: { Accept: "application/json" } });
+          : await resilientFetch(url, {
+              headers: { Accept: "application/json" },
+              signal: outerSignal ?? undefined,
+            });
       } finally {
         releaseInflight();
       }
@@ -675,9 +690,16 @@ export async function searchSearxng(
   timeRange = "day",
   /** Quota bucket — see SOURCE_QUOTAS. Sources that omit it share "default". */
   sourceKey = "default",
+  /** M3: cancel remaining queries when the search run is aborted. */
+  signal?: AbortSignal | null,
 ): Promise<SearxngResult[]> {
   const rawBase = process.env.SEARXNG_URL;
   if (!rawBase) return [];
+  if (signal?.aborted) {
+    const err = new Error("SEARCH_CANCELLED");
+    (err as Error & { code: string }).code = "SEARCH_CANCELLED";
+    throw err;
+  }
   // Windows Docker often binds IPv4 only; Node resolving `localhost` to ::1
   // produced connection errors that looked identical to "container not running"
   // and wiped every social dork mid-search.
@@ -707,8 +729,13 @@ export async function searchSearxng(
   let consecutiveMisses = 0;
   let budgetHit = false;
   for (let i = 0; i < list.length; i++) {
+    if (signal?.aborted) {
+      const err = new Error("SEARCH_CANCELLED");
+      (err as Error & { code: string }).code = "SEARCH_CANCELLED";
+      throw err;
+    }
     const q = list[i];
-    const { results: raw, status } = await querySearxngOnce(baseUrl, q, i, timeRange, sourceKey);
+    const { results: raw, status } = await querySearxngOnce(baseUrl, q, i, timeRange, sourceKey, signal);
     if (status === "ok" || status === "cached") {
       okCount++;
       // A cache hit proves nothing about upstream health, but it also isn't a

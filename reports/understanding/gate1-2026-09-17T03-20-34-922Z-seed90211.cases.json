@@ -1,0 +1,339 @@
+{
+  "seed": 90211,
+  "holdout": [
+    {
+      "id": "h000a",
+      "prompt": "clinical psychologists looking for clients",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_client"
+      },
+      "pairWith": "h000b"
+    },
+    {
+      "id": "h000b",
+      "prompt": "businesses looking for clinical psychologists",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "business",
+          "company"
+        ],
+        "relation": "needs_service",
+        "object": "clinical psychologist"
+      },
+      "pairWith": "h000a"
+    },
+    {
+      "id": "h002a",
+      "prompt": "companies in Pereira hiring audiologists",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "hiring",
+        "location": "pereira",
+        "intent_signal_required": true
+      },
+      "pairWith": "h002b"
+    },
+    {
+      "id": "h002b",
+      "prompt": "audiologists in Pereira looking for work",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_job",
+        "location": "pereira"
+      },
+      "pairWith": "h002a"
+    },
+    {
+      "id": "h004a",
+      "prompt": "investors funding aquaculture startups in Inverness",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "investor",
+        "location": "inverness"
+      },
+      "pairWith": "h004b"
+    },
+    {
+      "id": "h004b",
+      "prompt": "aquaculture startups in Inverness raising money",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "seeking_funding",
+        "location": "inverness"
+      },
+      "pairWith": "h004a"
+    },
+    {
+      "id": "h006",
+      "prompt": "piano tuners in Napier with no website",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "opportunity_based",
+        "relation": "lacks_asset",
+        "location": "napier",
+        "min_constraints": 1,
+        "intent_signal_required": false
+      },
+      "note": "lacks_asset"
+    },
+    {
+      "id": "h007",
+      "prompt": "orthotics clinics within 50 miles of Pécs",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "pécs",
+        "location_scope": "within_radius",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity_radius"
+    },
+    {
+      "id": "h008",
+      "prompt": "clinical psychologists in Leipzig hiring localisation managers",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "hiring_based",
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "leipzig",
+        "intent_signal_required": true
+      },
+      "note": "person_hiring"
+    },
+    {
+      "id": "h009",
+      "prompt": "musictech companies in Windhoek with at least 20 employees, not agencies",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "location": "windhoek",
+        "min_constraints": 2,
+        "negated": [
+          "category"
+        ]
+      },
+      "note": "constraints"
+    },
+    {
+      "id": "h010",
+      "prompt": "wind turbine technician job postings in Ghent from the last month",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "entity_type": [
+          "job",
+          "company"
+        ],
+        "location": "ghent",
+        "temporal": true
+      },
+      "note": "jobs"
+    },
+    {
+      "id": "h011",
+      "prompt": "freelance sound engineers under $90/hour, excluding Leipzig",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "no_location": true,
+        "negated": [
+          "location"
+        ]
+      },
+      "note": "excluded_location"
+    },
+    {
+      "id": "h012",
+      "prompt": "space startups in Aberystwyth that raised funding recently",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "event_based",
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "received_funding",
+        "location": "aberystwyth",
+        "temporal": true
+      },
+      "note": "received_funding"
+    },
+    {
+      "id": "h013",
+      "prompt": "housing associations in Košice that need voiceover",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "organization",
+          "business",
+          "company",
+          "other"
+        ],
+        "relation": "needs_service",
+        "location": "košice"
+      },
+      "note": "organization"
+    },
+    {
+      "id": "h014",
+      "prompt": "give me 40 optometrists in Enschede",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "quantity": 40,
+        "location": "enschede",
+        "relation": "none"
+      },
+      "note": "quantity_exact"
+    },
+    {
+      "id": "h015",
+      "prompt": "give me 40 cider houses in Inverness",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "quantity": 40,
+        "location": "inverness",
+        "relation": "none"
+      },
+      "note": "quantity_exact"
+    },
+    {
+      "id": "h016",
+      "prompt": "firms in Maribor that provide grant writing",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "object": "grant writing",
+        "location": "maribor",
+        "intent_signal_required": false
+      },
+      "note": "offers_service"
+    },
+    {
+      "id": "h017",
+      "prompt": "universities in Braga that need ISO certification",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "organization",
+          "business",
+          "company",
+          "other"
+        ],
+        "relation": "needs_service",
+        "location": "braga"
+      },
+      "note": "organization"
+    },
+    {
+      "id": "h018",
+      "prompt": "forestry companies in Fayetteville with at least 100 employees, not agencies",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "location": "fayetteville",
+        "min_constraints": 2,
+        "negated": [
+          "category"
+        ]
+      },
+      "note": "constraints"
+    },
+    {
+      "id": "h019",
+      "prompt": "find cobblers in Varna and also find seed libraries in Waterford",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "compound": true,
+        "min_subgoals": 2
+      },
+      "note": "compound"
+    },
+    {
+      "id": "h020",
+      "prompt": "companies that posted a luthier role in the last 2 months",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "hiring",
+        "temporal": true,
+        "no_location": true
+      },
+      "note": "temporal_hiring"
+    },
+    {
+      "id": "h021",
+      "prompt": "Give me 25 chocolatiers in Timișoara, phone number required, Instagram if possible, verify they are currently open, and output a spreadsheet",
+      "set": "holdout",
+      "size": "large",
+      "expect": {
+        "location": "timișoara",
+        "quantity": 25,
+        "required_fields": [
+          "phone"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ],
+        "min_verification": 1
+      },
+      "note": "long_form"
+    },
+    {
+      "id": "h022",
+      "prompt": "firms in Busan that provide food safety auditing",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "object": "food safety auditing",
+        "location": "busan",
+        "intent_signal_required": false
+      },
+      "note": "offers_service"
+    },
+    {
+      "id": "h023",
+      "prompt": "hospitals in Kumasi that need trade show fabrication",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "organization",
+          "business",
+          "company",
+          "other"
+        ],
+        "relation": "needs_service",
+        "location": "kumasi"
+      },
+      "note": "organization"
+    }
+  ],
+  "chaos": []
+}

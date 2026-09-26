@@ -1,0 +1,365 @@
+{
+  "key": "crunchbase_1.6m-1.7m.csv",
+  "size": 59150270,
+  "last_modified": "2026-09-08 00:12:14+00:00",
+  "columns": [
+    "id",
+    "created_at",
+    "name",
+    "short_description",
+    "semrush_global_rank",
+    "semrush_visits_latest_month",
+    "num_investors",
+    "funding_total",
+    "num_exits",
+    "num_funding_rounds",
+    "last_funding_type",
+    "last_funding_at",
+    "num_acquisitions",
+    "apptopia_total_apps",
+    "apptopia_total_downloads",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "num_investments",
+    "num_lead_investments",
+    "num_lead_investors",
+    "listed_stock_symbol",
+    "company_type",
+    "hub_tags",
+    "operating_status",
+    "founded_on",
+    "categories",
+    "founders",
+    "website",
+    "ipo_status",
+    "num_employees_enum",
+    "locations",
+    "growth_insight_description",
+    "growth_insight_indicator",
+    "growth_insight_direction",
+    "growth_insight_confidence",
+    "investor_insight_description",
+    "permalink",
+    "url"
+  ],
+  "row_count": 100000,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "id": "other",
+    "created_at": "other",
+    "name": "full_name",
+    "short_description": "descriptive",
+    "semrush_global_rank": "other",
+    "semrush_visits_latest_month": "other",
+    "num_investors": "other",
+    "funding_total": "other",
+    "num_exits": "other",
+    "num_funding_rounds": "other",
+    "last_funding_type": "other",
+    "last_funding_at": "other",
+    "num_acquisitions": "other",
+    "apptopia_total_apps": "other",
+    "apptopia_total_downloads": "other",
+    "contact_email": "email",
+    "phone_number": "phone",
+    "facebook": "social",
+    "linkedin": "linkedin",
+    "twitter": "social",
+    "num_investments": "other",
+    "num_lead_investments": "other",
+    "num_lead_investors": "other",
+    "listed_stock_symbol": "other",
+    "company_type": "company",
+    "hub_tags": "other",
+    "operating_status": "other",
+    "founded_on": "other",
+    "categories": "other",
+    "founders": "other",
+    "website": "website",
+    "ipo_status": "other",
+    "num_employees_enum": "employees",
+    "locations": "other",
+    "growth_insight_description": "descriptive",
+    "growth_insight_indicator": "other",
+    "growth_insight_direction": "other",
+    "growth_insight_confidence": "other",
+    "investor_insight_description": "descriptive",
+    "permalink": "other",
+    "url": "website"
+  },
+  "missing_pct": {
+    "id": 0.0,
+    "created_at": 0.0,
+    "name": 0.0,
+    "short_description": 0.0,
+    "semrush_global_rank": 57.5,
+    "semrush_visits_latest_month": 57.5,
+    "num_investors": 89.7,
+    "funding_total": 90.5,
+    "num_exits": 99.8,
+    "num_funding_rounds": 87.9,
+    "last_funding_type": 87.9,
+    "last_funding_at": 87.5,
+    "num_acquisitions": 98.5,
+    "apptopia_total_apps": 91.8,
+    "apptopia_total_downloads": 97.3,
+    "contact_email": 28.4,
+    "phone_number": 25.8,
+    "facebook": 39.0,
+    "linkedin": 23.9,
+    "twitter": 54.5,
+    "num_investments": 99.3,
+    "num_lead_investments": 99.7,
+    "num_lead_investors": 93.0,
+    "listed_stock_symbol": 99.7,
+    "company_type": 4.6,
+    "hub_tags": 99.8,
+    "operating_status": 0.0,
+    "founded_on": 18.7,
+    "categories": 6.2,
+    "founders": 77.1,
+    "website": 6.5,
+    "ipo_status": 4.8,
+    "num_employees_enum": 18.4,
+    "locations": 7.4,
+    "growth_insight_description": 97.4,
+    "growth_insight_indicator": 97.4,
+    "growth_insight_direction": 98.8,
+    "growth_insight_confidence": 98.8,
+    "investor_insight_description": 98.0,
+    "permalink": 0.0,
+    "url": 0.0
+  },
+  "samples": {
+    "id": [
+      "61b9a530-c386-4b41-927f-9c99913ab99d",
+      "6d59ec59-8e17-f0e5-daed-e2c6a3cb0ff7",
+      "0a3f4909-b654-47e5-8320-530fd6a574ae"
+    ],
+    "created_at": [
+      "2024-08-20 01:24:05.272793+00",
+      "2024-08-20 01:24:05.272793+00",
+      "2024-08-20 01:24:05.272793+00"
+    ],
+    "name": [
+      "Minimally Invasive Vascular Center",
+      "Minimally invasive devices",
+      "Miniman"
+    ],
+    "short_description": [
+      "Minimally Invasive Vascular Center is an intravascular and endovascular surgery hospital.",
+      "Miniman is a Web Design & Development platform.",
+      "Miniman gaming is an online platform for various flash games."
+    ],
+    "semrush_global_rank": [
+      "7010512",
+      "153160",
+      "73717"
+    ],
+    "semrush_visits_latest_month": [
+      "935",
+      "309247",
+      "769205"
+    ],
+    "phone_number": [
+      "1 855-803-6482",
+      "(614)484-5036",
+      "+44 7828 847356"
+    ],
+    "facebook": [
+      "https://www.facebook.com/MinimallyInvasiveVascularCenter/",
+      "https://www.facebook.com/MinimanWebDesign",
+      "https://www.facebook.com/minimani.fi"
+    ],
+    "company_type": [
+      "for_profit",
+      "for_profit",
+      "for_profit"
+    ],
+    "operating_status": [
+      "active",
+      "active",
+      "active"
+    ],
+    "categories": [
+      "Health Care, Hospital, Medical",
+      "Enterprise Software, Medical, Medical Device",
+      "Internet, Marketing"
+    ],
+    "website": [
+      "https://www.minimallyinvasivevascularcenters.com/",
+      "http://www.midsurgical.com",
+      "https://miniman-webdesign.co.uk/"
+    ],
+    "ipo_status": [
+      "private",
+      "private",
+      "private"
+    ],
+    "locations": [
+      "Greater Baltimore-Maryland Area, Washington DC Metro Area, East Coast, Southern US",
+      "Great Lakes, Midwestern US",
+      "Great Lakes, Midwestern US"
+    ],
+    "permalink": [
+      "minimally-invasive-vascular-center",
+      "minimally-invasive-devices",
+      "miniman"
+    ],
+    "url": [
+      "https://www.crunchbase.com/organization/minimally-invasive-vascular-center",
+      "https://www.crunchbase.com/organization/minimally-invasive-devices",
+      "https://www.crunchbase.com/organization/miniman"
+    ],
+    "num_investors": [
+      "5",
+      "1",
+      "1"
+    ],
+    "funding_total": [
+      "47087046",
+      "189715",
+      "1215"
+    ],
+    "num_funding_rounds": [
+      "8",
+      "1",
+      "1"
+    ],
+    "last_funding_type": [
+      "series_c",
+      "seed",
+      "series_unknown"
+    ],
+    "last_funding_at": [
+      "2015-11-19",
+      "2020-11-13",
+      "2020-02-21"
+    ],
+    "contact_email": [
+      "inquiries@floshield.com",
+      "hello@miniman-webdesign.co.uk",
+      "asiakaspalvelu@minimani.fi"
+    ],
+    "linkedin": [
+      "https://www.linkedin.com/company/minimally-invasive-devices",
+      "https://www.linkedin.com/company/miniman-web-design/",
+      "https://www.linkedin.com/company/minimani-yhtiot-oy"
+    ],
+    "num_lead_investors": [
+      "3",
+      "1",
+      "1"
+    ],
+    "founded_on": [
+      "2006-01-01",
+      "2010-01-01",
+      "2005-05-15"
+    ],
+    "founders": [
+      "Wayne Poll",
+      "Antonio Silveira Guanaes Gomes, Ari Posner, Samuel Millner",
+      "Olive O’Connor"
+    ],
+    "num_employees_enum": [
+      "c_00011_00050",
+      "c_00001_00010",
+      "c_00001_00010"
+    ],
+    "growth_insight_description": [
+      "Ministry of programming was included in the FT 1000, the eighth annual ranking of Europe’s fastest-growing companies.",
+      "Minor Figures has made its oat milk products available throughout North America in Whole Foods and Sprouts stores.",
+      "MintOak Innovations appointed new executives to drive growth in the Middle East and Africa."
+    ],
+    "growth_insight_indicator": [
+      "growing",
+      "growing",
+      "growing"
+    ],
+    "twitter": [
+      "https://twitter.com/minimanwd",
+      "https://twitter.com/Minimapnyc",
+      "https://twitter.com/minimap_net"
+    ],
+    "apptopia_total_apps": [
+      "4",
+      "1",
+      "11"
+    ],
+    "num_acquisitions": [
+      "1",
+      "1",
+      "3"
+    ],
+    "investor_insight_description": [],
+    "num_exits": [
+      "1",
+      "2",
+      "1"
+    ],
+    "num_investments": [
+      "3",
+      "6",
+      "3"
+    ],
+    "num_lead_investments": [
+      "3",
+      "4",
+      "1"
+    ],
+    "hub_tags": [
+      "unicorn",
+      "emerging_unicorn",
+      "unicorn"
+    ],
+    "apptopia_total_downloads": [
+      "1917",
+      "4886",
+      "34073"
+    ],
+    "growth_insight_direction": [
+      "c400_growing",
+      "c400_growing",
+      "c400_growing"
+    ],
+    "growth_insight_confidence": [
+      "c400_high",
+      "c300_medium",
+      "c300_medium"
+    ],
+    "listed_stock_symbol": [
+      "LSE:MIN",
+      "TSXV:MSR",
+      "TSX:MI.UN"
+    ]
+  },
+  "validity": {
+    "contact_email": "3/3 valid-shape",
+    "phone_number": "3/3 valid-shape"
+  },
+  "entity": "company",
+  "entity_confidence": 0.85,
+  "entity_why": "value-checked override: name=organization name; founders/company_type/num_employees_enum/funding/ipo_status present; no person first/last-name columns",
+  "social_cols": [
+    "facebook",
+    "linkedin",
+    "twitter",
+    "website",
+    "url"
+  ],
+  "activity_match_keys": [
+    "name",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "company_type",
+    "website",
+    "url"
+  ]
+}

@@ -1,0 +1,363 @@
+{
+  "key": "crunchbase_2.4m-2.5m.csv",
+  "size": 59382918,
+  "last_modified": "2026-09-08 00:12:14+00:00",
+  "columns": [
+    "id",
+    "created_at",
+    "name",
+    "short_description",
+    "semrush_global_rank",
+    "semrush_visits_latest_month",
+    "num_investors",
+    "funding_total",
+    "num_exits",
+    "num_funding_rounds",
+    "last_funding_type",
+    "last_funding_at",
+    "num_acquisitions",
+    "apptopia_total_apps",
+    "apptopia_total_downloads",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "num_investments",
+    "num_lead_investments",
+    "num_lead_investors",
+    "listed_stock_symbol",
+    "company_type",
+    "hub_tags",
+    "operating_status",
+    "founded_on",
+    "categories",
+    "founders",
+    "website",
+    "ipo_status",
+    "num_employees_enum",
+    "locations",
+    "growth_insight_description",
+    "growth_insight_indicator",
+    "growth_insight_direction",
+    "growth_insight_confidence",
+    "investor_insight_description",
+    "permalink",
+    "url"
+  ],
+  "row_count": 100000,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "id": "other",
+    "created_at": "other",
+    "name": "full_name",
+    "short_description": "descriptive",
+    "semrush_global_rank": "other",
+    "semrush_visits_latest_month": "other",
+    "num_investors": "other",
+    "funding_total": "other",
+    "num_exits": "other",
+    "num_funding_rounds": "other",
+    "last_funding_type": "other",
+    "last_funding_at": "other",
+    "num_acquisitions": "other",
+    "apptopia_total_apps": "other",
+    "apptopia_total_downloads": "other",
+    "contact_email": "email",
+    "phone_number": "phone",
+    "facebook": "social",
+    "linkedin": "linkedin",
+    "twitter": "social",
+    "num_investments": "other",
+    "num_lead_investments": "other",
+    "num_lead_investors": "other",
+    "listed_stock_symbol": "other",
+    "company_type": "company",
+    "hub_tags": "other",
+    "operating_status": "other",
+    "founded_on": "other",
+    "categories": "other",
+    "founders": "other",
+    "website": "website",
+    "ipo_status": "other",
+    "num_employees_enum": "employees",
+    "locations": "other",
+    "growth_insight_description": "descriptive",
+    "growth_insight_indicator": "other",
+    "growth_insight_direction": "other",
+    "growth_insight_confidence": "other",
+    "investor_insight_description": "descriptive",
+    "permalink": "other",
+    "url": "website"
+  },
+  "missing_pct": {
+    "id": 0.0,
+    "created_at": 0.0,
+    "name": 0.0,
+    "short_description": 0.0,
+    "semrush_global_rank": 62.7,
+    "semrush_visits_latest_month": 62.7,
+    "num_investors": 95.5,
+    "funding_total": 95.5,
+    "num_exits": 99.9,
+    "num_funding_rounds": 94.0,
+    "last_funding_type": 94.1,
+    "last_funding_at": 93.8,
+    "num_acquisitions": 99.0,
+    "apptopia_total_apps": 92.9,
+    "apptopia_total_downloads": 98.7,
+    "contact_email": 22.6,
+    "phone_number": 26.8,
+    "facebook": 36.5,
+    "linkedin": 21.3,
+    "twitter": 48.1,
+    "num_investments": 99.7,
+    "num_lead_investments": 99.8,
+    "num_lead_investors": 97.2,
+    "listed_stock_symbol": 99.8,
+    "company_type": 3.7,
+    "hub_tags": 99.4,
+    "operating_status": 0.0,
+    "founded_on": 16.0,
+    "categories": 6.1,
+    "founders": 73.4,
+    "website": 4.3,
+    "ipo_status": 3.0,
+    "num_employees_enum": 14.3,
+    "locations": 9.2,
+    "growth_insight_description": 98.8,
+    "growth_insight_indicator": 98.8,
+    "growth_insight_direction": 99.5,
+    "growth_insight_confidence": 99.5,
+    "investor_insight_description": 99.0,
+    "permalink": 0.0,
+    "url": 0.0
+  },
+  "samples": {
+    "id": [
+      "c45c5a6e-1a1f-49fa-9ffd-495c35b29b20",
+      "46b6d04f-3535-45c4-bdc8-fe14bf702e42",
+      "263ba21a-488a-4084-befa-f7508d01eba1"
+    ],
+    "created_at": [
+      "2024-08-23 19:08:29.054811+00",
+      "2024-08-23 19:08:29.054811+00",
+      "2024-08-23 19:08:29.054811+00"
+    ],
+    "name": [
+      "Teanum",
+      "Teao",
+      "Teao Technology Co"
+    ],
+    "short_description": [
+      "Teanum is a manufacturing company that produces and provides a wide range of wines, spirits, and virgin olive oils.",
+      "Teao is a gourmet tea and beverage company.",
+      "Teao Technology Co is an investment company."
+    ],
+    "contact_email": [
+      "info@teanum.com",
+      "info@teao.in",
+      "hello@teaologyskincare.com"
+    ],
+    "phone_number": [
+      "+39 0882 336332",
+      "97417 71199",
+      "1 949-831-8656"
+    ],
+    "facebook": [
+      "https://www.facebook.com/Teanum",
+      "https://www.facebook.com/teao.in/",
+      "https://www.facebook.com/TeaologyTeas"
+    ],
+    "linkedin": [
+      "https://www.linkedin.com/company/cantine-teanum",
+      "https://www.linkedin.com/company/teao",
+      "https://www.linkedin.com/company/teaology-skincare"
+    ],
+    "company_type": [
+      "for_profit",
+      "for_profit",
+      "for_profit"
+    ],
+    "operating_status": [
+      "active",
+      "active",
+      "active"
+    ],
+    "founded_on": [
+      "2000-01-01",
+      "2019-01-01",
+      "2016-01-01"
+    ],
+    "categories": [
+      "E-Commerce, Food and Beverage, Manufacturing, Wine And Spirits",
+      "Consumer, Food and Beverage, Tea",
+      "E-Commerce, Food and Beverage, Tea"
+    ],
+    "website": [
+      "https://teanum.com/",
+      "https://teao.in/",
+      "https://teaology.com"
+    ],
+    "ipo_status": [
+      "private",
+      "private",
+      "private"
+    ],
+    "num_employees_enum": [
+      "c_00001_00010",
+      "c_00001_00010",
+      "c_00001_00010"
+    ],
+    "locations": [
+      "European Union (EU), Europe, Middle East, and Africa (EMEA)",
+      "Asia-Pacific (APAC)",
+      "Greater Los Angeles Area, West Coast, Western US"
+    ],
+    "permalink": [
+      "teanum",
+      "teao",
+      "teao-technology-co"
+    ],
+    "url": [
+      "https://www.crunchbase.com/organization/teanum",
+      "https://www.crunchbase.com/organization/teao",
+      "https://www.crunchbase.com/organization/teao-technology-co"
+    ],
+    "twitter": [
+      "https://twitter.com/teao_in",
+      "https://twitter.com/TeaologyTea",
+      "https://twitter.com/teaonic"
+    ],
+    "founders": [
+      "Adarsh Kashyap",
+      "Bahniman Kakati, Jayanta Kakati",
+      "Pranav Dandekar"
+    ],
+    "investor_insight_description": [],
+    "semrush_global_rank": [
+      "3689740",
+      "7885565",
+      "7313829"
+    ],
+    "semrush_visits_latest_month": [
+      "3338",
+      "677",
+      "819"
+    ],
+    "num_investors": [
+      "1",
+      "1",
+      "6"
+    ],
+    "funding_total": [
+      "20000000",
+      "50000000",
+      "17500000"
+    ],
+    "num_funding_rounds": [
+      "1",
+      "1",
+      "1"
+    ],
+    "last_funding_type": [
+      "series_a",
+      "seed",
+      "seed"
+    ],
+    "last_funding_at": [
+      "2020-03-05",
+      "2016-01-01",
+      "2023-08-03"
+    ],
+    "num_lead_investors": [
+      "1",
+      "2",
+      "3"
+    ],
+    "apptopia_total_apps": [
+      "1",
+      "3",
+      "1"
+    ],
+    "growth_insight_description": [
+      "TechTarget forecasted growth and announced plans for a merger with Informa."
+    ],
+    "growth_insight_indicator": [
+      "growing",
+      "growing",
+      "growing"
+    ],
+    "listed_stock_symbol": [
+      "OTC:TEAR",
+      "BSE:MR3",
+      "NASDAQ:TECD"
+    ],
+    "num_acquisitions": [
+      "1",
+      "1",
+      "1"
+    ],
+    "apptopia_total_downloads": [
+      "0",
+      "721",
+      "106586"
+    ],
+    "hub_tags": [
+      "unicorn",
+      "cbvp",
+      "cbvp"
+    ],
+    "growth_insight_direction": [
+      "c400_growing",
+      "c400_growing",
+      "c400_growing"
+    ],
+    "growth_insight_confidence": [
+      "c300_medium",
+      "c400_high",
+      "c300_medium"
+    ],
+    "num_exits": [
+      "1",
+      "3",
+      "1"
+    ],
+    "num_investments": [
+      "2",
+      "10",
+      "5"
+    ],
+    "num_lead_investments": [
+      "1",
+      "3",
+      "2"
+    ]
+  },
+  "validity": {
+    "contact_email": "3/3 valid-shape",
+    "phone_number": "3/3 valid-shape"
+  },
+  "entity": "company",
+  "entity_confidence": 0.85,
+  "entity_why": "value-checked override: name=organization name; founders/company_type/num_employees_enum/funding/ipo_status present; no person first/last-name columns",
+  "social_cols": [
+    "facebook",
+    "linkedin",
+    "twitter",
+    "website",
+    "url"
+  ],
+  "activity_match_keys": [
+    "name",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "company_type",
+    "website",
+    "url"
+  ]
+}

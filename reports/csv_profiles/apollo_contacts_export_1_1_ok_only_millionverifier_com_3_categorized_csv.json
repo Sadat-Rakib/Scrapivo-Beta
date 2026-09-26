@@ -1,0 +1,176 @@
+{
+  "key": "apollo-contacts-export (1) (1)_OK_ONLY_MILLIONVERIFIER.COM (3)_CATEGORIZED.csv",
+  "size": 61280108,
+  "last_modified": "2026-09-08 00:12:13+00:00",
+  "columns": [
+    "First Name",
+    "Last Name",
+    "Title",
+    "Comp name",
+    "Website",
+    "Email",
+    "Phone",
+    "Comp Phone",
+    "Employees",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter",
+    "Country",
+    "Industry",
+    "Tech Used",
+    "Keywords",
+    "SEO Description"
+  ],
+  "row_count": 40358,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "First Name": "first_name",
+    "Last Name": "last_name",
+    "Title": "title",
+    "Comp name": "other",
+    "Website": "website",
+    "Email": "email",
+    "Phone": "phone",
+    "Comp Phone": "phone",
+    "Employees": "employees",
+    "Pers Linkedin": "linkedin",
+    "Comp Linkedin": "linkedin",
+    "Facebook": "social",
+    "Twitter": "social",
+    "Country": "country",
+    "Industry": "industry",
+    "Tech Used": "tech",
+    "Keywords": "descriptive",
+    "SEO Description": "descriptive"
+  },
+  "missing_pct": {
+    "First Name": 0.0,
+    "Last Name": 0.3,
+    "Title": 0.0,
+    "Comp name": 0.0,
+    "Website": 0.0,
+    "Email": 0.0,
+    "Phone": 100.0,
+    "Comp Phone": 9.2,
+    "Employees": 0.5,
+    "Pers Linkedin": 0.1,
+    "Comp Linkedin": 0.7,
+    "Facebook": 44.9,
+    "Twitter": 63.4,
+    "Country": 0.0,
+    "Industry": 1.2,
+    "Tech Used": 1.7,
+    "Keywords": 8.1,
+    "SEO Description": 100.0
+  },
+  "samples": {
+    "First Name": [
+      "Theresa",
+      "Audrey",
+      "Jay"
+    ],
+    "Last Name": [
+      "Butcher",
+      "Pappas",
+      "Shapiro"
+    ],
+    "Title": [
+      "Owner",
+      "President & CEO",
+      "President and CEO"
+    ],
+    "Comp name": [
+      "Riverside Health Club US",
+      "CAHP CREDIT UNION",
+      "Central Texas Pediatric Orthopaedics"
+    ],
+    "Website": [
+      "https://riversidehealthclub.com",
+      "https://cahpcu.org",
+      "https://ctpomd.com"
+    ],
+    "Email": [
+      "theresa@riversidehealthclub.com",
+      "audrey@cahpcu.org",
+      "jshapiro@ctpomd.com"
+    ],
+    "Comp Phone": [
+      "'+1 360-424-4200",
+      "'+1 800-542-2247",
+      "'+1 512-478-8116"
+    ],
+    "Employees": [
+      "38",
+      "30",
+      "53"
+    ],
+    "Pers Linkedin": [
+      "http://www.linkedin.com/in/theresa-butcher-2b2208b3",
+      "http://www.linkedin.com/in/audrey-pappas-91aa239",
+      "http://www.linkedin.com/in/jay-shapiro-180409ab"
+    ],
+    "Comp Linkedin": [
+      "http://www.linkedin.com/company/riverside-health-club-us",
+      "http://www.linkedin.com/company/cahp-credit-union",
+      "http://www.linkedin.com/company/central-texas-pediatric-orthopedics"
+    ],
+    "Facebook": [
+      "https://www.facebook.com/RiversideHealthClubMountVernon/",
+      "https://www.facebook.com/KidBonesATX",
+      "https://facebook.com/valiantcapitallending"
+    ],
+    "Twitter": [
+      "https://twitter.com/RiversideHClub",
+      "https://twitter.com/KidBonesATX",
+      "https://twitter.com/JoyfulCompanion"
+    ],
+    "Country": [
+      "United States",
+      "United States",
+      "United States"
+    ],
+    "Industry": [
+      "health, wellness & fitness",
+      "financial services",
+      "medical practice"
+    ],
+    "Tech Used": [
+      "Outlook, Microsoft Azure Hosting, Hubspot, Atlassian Cloud, IoT, Android, Node.js, Python, Flutter, SharePoint, AI",
+      "Squarespace ECommerce, Typekit, Google Tag Manager, Mobile Friendly",
+      "Mimecast, Outlook, Microsoft Office 365, Amazon AWS, Mobile Friendly"
+    ],
+    "Keywords": [
+      "employee benefits, wealth management, investments, insurance products, investment management, financial services",
+      "business consulting & services, management consulting",
+      "workers compensation defense"
+    ]
+  },
+  "validity": {
+    "Email": "3/3 valid-shape",
+    "Comp Phone": "3/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Website",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter"
+  ],
+  "activity_match_keys": [
+    "First Name",
+    "Last Name",
+    "Website",
+    "Email",
+    "Phone",
+    "Comp Phone",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter"
+  ]
+}

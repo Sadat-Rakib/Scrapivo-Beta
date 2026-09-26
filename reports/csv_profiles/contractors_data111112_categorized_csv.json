@@ -1,0 +1,130 @@
+{
+  "key": "Contractors - data111112_CATEGORIZED.csv",
+  "size": 16596847,
+  "last_modified": "2026-09-08 00:12:34+00:00",
+  "columns": [
+    "First Name",
+    "Last Name",
+    "Title",
+    "Comp name",
+    "Website",
+    "Email",
+    "Phone",
+    "Comp Phone",
+    "Employees",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter",
+    "Country",
+    "Industry",
+    "Tech Used",
+    "Keywords",
+    "SEO Description"
+  ],
+  "row_count": 111923,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "First Name": "first_name",
+    "Last Name": "last_name",
+    "Title": "title",
+    "Comp name": "other",
+    "Website": "website",
+    "Email": "email",
+    "Phone": "phone",
+    "Comp Phone": "phone",
+    "Employees": "employees",
+    "Pers Linkedin": "linkedin",
+    "Comp Linkedin": "linkedin",
+    "Facebook": "social",
+    "Twitter": "social",
+    "Country": "country",
+    "Industry": "industry",
+    "Tech Used": "tech",
+    "Keywords": "descriptive",
+    "SEO Description": "descriptive"
+  },
+  "missing_pct": {
+    "First Name": 0.0,
+    "Last Name": 0.2,
+    "Title": 0.0,
+    "Comp name": 1.6,
+    "Website": 100.0,
+    "Email": 0.0,
+    "Phone": 100.0,
+    "Comp Phone": 100.0,
+    "Employees": 0.0,
+    "Pers Linkedin": 100.0,
+    "Comp Linkedin": 100.0,
+    "Facebook": 100.0,
+    "Twitter": 100.0,
+    "Country": 100.0,
+    "Industry": 0.0,
+    "Tech Used": 100.0,
+    "Keywords": 100.0,
+    "SEO Description": 100.0
+  },
+  "samples": {
+    "First Name": [
+      "Dave",
+      "Bill",
+      "Darryl"
+    ],
+    "Last Name": [
+      "Jesurun",
+      "Minkoff",
+      "Hunter"
+    ],
+    "Title": [
+      "Founder, CEO, and Chief Pilot",
+      "President",
+      "President"
+    ],
+    "Comp name": [
+      "High Country Air Service",
+      "AltiSky",
+      "Asia Supply Line"
+    ],
+    "Email": [
+      "dave.jesurun@highcountryairservice.com",
+      "bill.minkoff@altisky.com",
+      "darryl@asiasupplyline.com"
+    ],
+    "Employees": [
+      "http://www.linkedin.com/in/davejesurun",
+      "http://www.linkedin.com/in/bill-minkoff",
+      "http://www.linkedin.com/in/darryl-hunter-cssbb-ab28763"
+    ],
+    "Industry": [
+      "contractor",
+      "contractor",
+      "contractor"
+    ]
+  },
+  "validity": {
+    "Email": "3/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Website",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter"
+  ],
+  "activity_match_keys": [
+    "First Name",
+    "Last Name",
+    "Website",
+    "Email",
+    "Phone",
+    "Comp Phone",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter"
+  ]
+}

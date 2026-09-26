@@ -1,0 +1,329 @@
+{
+  "seed": 9172737,
+  "holdout": [
+    {
+      "id": "h000a",
+      "prompt": "companies in Tromsø hiring harbour pilots",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "hiring",
+        "location": "tromsø",
+        "intent_signal_required": true
+      },
+      "pairWith": "h000b"
+    },
+    {
+      "id": "h000b",
+      "prompt": "harbour pilots in Tromsø looking for work",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_job",
+        "location": "tromsø"
+      },
+      "pairWith": "h000a"
+    },
+    {
+      "id": "h002a",
+      "prompt": "investors funding satellite imaging startups in Bergen",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "investor",
+        "location": "bergen"
+      },
+      "pairWith": "h002b"
+    },
+    {
+      "id": "h002b",
+      "prompt": "satellite imaging startups in Bergen raising money",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "seeking_funding",
+        "location": "bergen"
+      },
+      "pairWith": "h002a"
+    },
+    {
+      "id": "h004a",
+      "prompt": "sound engineers who serve seed libraries in Napier",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "location": "napier"
+      },
+      "pairWith": "h004b"
+    },
+    {
+      "id": "h004b",
+      "prompt": "seed libraries in Napier who need a sound engineer",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "needs_service",
+        "object": "sound engineer",
+        "location": "napier"
+      },
+      "pairWith": "h004a"
+    },
+    {
+      "id": "h006",
+      "prompt": "prosthetics labs in Waterford",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "task_type": "lead_discovery",
+        "prospecting_mode": "fit_based",
+        "relation": "none",
+        "location": "waterford",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity"
+    },
+    {
+      "id": "h007",
+      "prompt": "find optometrists in Salta and also find piano tuners in Inverness",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "compound": true,
+        "min_subgoals": 2
+      },
+      "note": "compound"
+    },
+    {
+      "id": "h008",
+      "prompt": "companies that posted a localisation manager role in the last 2 months",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "hiring",
+        "temporal": true,
+        "no_location": true
+      },
+      "note": "temporal_hiring"
+    },
+    {
+      "id": "h009",
+      "prompt": "prosthetist job postings in Geelong from the last month",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "task_type": "job_discovery",
+        "prospecting_mode": "job_based",
+        "entity_type": "job",
+        "relation": "none",
+        "location": "geelong",
+        "temporal": true
+      },
+      "note": "jobs"
+    },
+    {
+      "id": "h010",
+      "prompt": "localisation managers in Curitiba hiring tax barristers",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "hiring_based",
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "curitiba",
+        "intent_signal_required": true
+      },
+      "note": "person_hiring"
+    },
+    {
+      "id": "h011",
+      "prompt": "Give me 25 board game cafés in Hsinchu, phone number required, Instagram if possible, verify they are currently open, and output a spreadsheet",
+      "set": "holdout",
+      "size": "large",
+      "expect": {
+        "location": "hsinchu",
+        "quantity": 25,
+        "required_fields": [
+          "phone"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ],
+        "min_verification": 1
+      },
+      "note": "long_form"
+    },
+    {
+      "id": "h012",
+      "prompt": "I'm selling food safety auditing to small firms. Find me 100+ chocolatiers in Tulsa that don't have a real website, phone required, socials if possible, verify they exist, and give me a table plus outreach drafts.",
+      "set": "holdout",
+      "size": "large",
+      "expect": {
+        "prospecting_mode": "opportunity_based",
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "tulsa",
+        "quantity_min": 100,
+        "user_selling": "food safety auditing",
+        "required_fields": [
+          "phone"
+        ],
+        "min_verification": 1,
+        "output": [
+          "table",
+          "outreach_drafts"
+        ]
+      },
+      "note": "long_form_opportunity"
+    },
+    {
+      "id": "h013",
+      "prompt": "precision fermentation startups in Cebu that raised funding recently",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "prospecting_mode": "event_based",
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "received_funding",
+        "location": "cebu",
+        "temporal": true
+      },
+      "note": "received_funding"
+    },
+    {
+      "id": "h014",
+      "prompt": "sailmakers in Ann Arbor",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "task_type": "lead_discovery",
+        "prospecting_mode": "fit_based",
+        "relation": "none",
+        "location": "ann arbor",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity"
+    },
+    {
+      "id": "h015",
+      "prompt": "cider houses in Hsinchu",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "task_type": "lead_discovery",
+        "prospecting_mode": "fit_based",
+        "relation": "none",
+        "location": "hsinchu",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity"
+    },
+    {
+      "id": "h016",
+      "prompt": "firms in Aberystwyth that provide drone surveying",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "object": "drone surveying",
+        "location": "aberystwyth",
+        "intent_signal_required": false
+      },
+      "note": "offers_service"
+    },
+    {
+      "id": "h017",
+      "prompt": "prosthetists in Brno looking for a job",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "job_based",
+        "entity_type": "person",
+        "relation": "seeking_job",
+        "location": "brno"
+      },
+      "note": "person_seeking_job"
+    },
+    {
+      "id": "h018",
+      "prompt": "businesses partnered with Twilio",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": [
+          "partnered_with",
+          "custom"
+        ]
+      },
+      "note": "partnered_with"
+    },
+    {
+      "id": "h019",
+      "prompt": "technical translation",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "clarification": "required"
+      },
+      "note": "underspecified"
+    },
+    {
+      "id": "h020",
+      "prompt": "prosthetists in Inverness looking for clients",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_client",
+        "location": "inverness"
+      },
+      "note": "seeking_client"
+    },
+    {
+      "id": "h021",
+      "prompt": "companies in Enschede using Twilio",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "uses_technology",
+        "object": "twilio",
+        "location": "enschede"
+      },
+      "note": "uses_technology"
+    },
+    {
+      "id": "h022",
+      "prompt": "businesses partnered with Terraform",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": [
+          "partnered_with",
+          "custom"
+        ]
+      },
+      "note": "partnered_with"
+    },
+    {
+      "id": "h023",
+      "prompt": "quantity surveyors in Kelowna looking for clients",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_client",
+        "location": "kelowna"
+      },
+      "note": "seeking_client"
+    }
+  ],
+  "chaos": []
+}

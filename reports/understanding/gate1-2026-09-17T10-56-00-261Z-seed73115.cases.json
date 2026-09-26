@@ -1,0 +1,322 @@
+{
+  "seed": 73115,
+  "holdout": [
+    {
+      "id": "h000a",
+      "prompt": "penetration testing agencies in Cebu",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "cebu",
+        "clarification": "forbidden"
+      },
+      "pairWith": "h000b"
+    },
+    {
+      "id": "h000b",
+      "prompt": "companies in Cebu needing penetration testing",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "needs_service",
+        "object": "penetration testing",
+        "location": "cebu",
+        "intent_signal_required": true
+      },
+      "pairWith": "h000a"
+    },
+    {
+      "id": "h002a",
+      "prompt": "orthodontists looking for clients",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_client"
+      },
+      "pairWith": "h002b"
+    },
+    {
+      "id": "h002b",
+      "prompt": "businesses looking for orthodontists",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "business",
+          "company"
+        ],
+        "relation": "needs_service",
+        "object": "orthodontist"
+      },
+      "pairWith": "h002a"
+    },
+    {
+      "id": "h004a",
+      "prompt": "trade show fabrication agencies in Aarhus",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "aarhus",
+        "clarification": "forbidden"
+      },
+      "pairWith": "h004b"
+    },
+    {
+      "id": "h004b",
+      "prompt": "companies in Aarhus needing trade show fabrication",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "needs_service",
+        "object": "trade show fabrication",
+        "location": "aarhus",
+        "intent_signal_required": true
+      },
+      "pairWith": "h004a"
+    },
+    {
+      "id": "h006",
+      "prompt": "upholsterers in Enschede",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "task_type": "lead_discovery",
+        "prospecting_mode": "fit_based",
+        "relation": "none",
+        "location": "enschede",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity"
+    },
+    {
+      "id": "h007",
+      "prompt": "sound engineers in Nagoya looking for a job",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "job_based",
+        "entity_type": "person",
+        "relation": "seeking_job",
+        "location": "nagoya"
+      },
+      "note": "person_seeking_job"
+    },
+    {
+      "id": "h008",
+      "prompt": "defence companies in Sfax with at least 20 employees, not agencies",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "location": "sfax",
+        "min_constraints": 2,
+        "negated": [
+          "category"
+        ]
+      },
+      "note": "constraints"
+    },
+    {
+      "id": "h009",
+      "prompt": "optometrists within 10 miles of Waterford",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "waterford",
+        "location_scope": "within_radius",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity_radius"
+    },
+    {
+      "id": "h010",
+      "prompt": "find saunas in Mombasa and also find upholsterers in Enschede",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "compound": true,
+        "min_subgoals": 2
+      },
+      "note": "compound"
+    },
+    {
+      "id": "h011",
+      "prompt": "companies in Örebro that need waste haulage",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "intent_based",
+        "relation": "needs_service",
+        "object": "waste haulage",
+        "location": "örebro",
+        "intent_signal_required": true
+      },
+      "note": "needs_service"
+    },
+    {
+      "id": "h012",
+      "prompt": "circular economy",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "clarification": "required"
+      },
+      "note": "underspecified"
+    },
+    {
+      "id": "h013",
+      "prompt": "quantity surveyors in Bergen looking for clients",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_client",
+        "location": "bergen"
+      },
+      "note": "seeking_client"
+    },
+    {
+      "id": "h014",
+      "prompt": "proptech",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "clarification": "required"
+      },
+      "note": "underspecified"
+    },
+    {
+      "id": "h015",
+      "prompt": "geothermal startups in Trois-Rivières that raised funding recently",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "event_based",
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "received_funding",
+        "location": "trois-rivières",
+        "temporal": true
+      },
+      "note": "received_funding"
+    },
+    {
+      "id": "h016",
+      "prompt": "piano tuners in Maribor with no email address",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "opportunity_based",
+        "relation": "lacks_asset",
+        "location": "maribor",
+        "min_constraints": 1,
+        "intent_signal_required": false
+      },
+      "note": "lacks_asset"
+    },
+    {
+      "id": "h017",
+      "prompt": "haulage startups in Split that raised funding recently",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "event_based",
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "received_funding",
+        "location": "split",
+        "temporal": true
+      },
+      "note": "received_funding"
+    },
+    {
+      "id": "h018",
+      "prompt": "arborists attending Interzoo",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "entity_type": "person",
+        "relation": [
+          "attending_event",
+          "custom"
+        ]
+      },
+      "note": "attending_event"
+    },
+    {
+      "id": "h019",
+      "prompt": "give me 30 orthotics clinics in Hamilton",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "quantity": 30,
+        "location": "hamilton",
+        "relation": "none"
+      },
+      "note": "quantity_exact"
+    },
+    {
+      "id": "h020",
+      "prompt": "firms in Saskatoon that provide packaging design",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "object": "packaging design",
+        "location": "saskatoon",
+        "intent_signal_required": false
+      },
+      "note": "offers_service"
+    },
+    {
+      "id": "h021",
+      "prompt": "conservator job postings in Maribor from the last month",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "entity_type": [
+          "job",
+          "company"
+        ],
+        "location": "maribor",
+        "temporal": true
+      },
+      "note": "jobs"
+    },
+    {
+      "id": "h022",
+      "prompt": "conservators attending Interzoo",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "entity_type": "person",
+        "relation": [
+          "attending_event",
+          "custom"
+        ]
+      },
+      "note": "attending_event"
+    },
+    {
+      "id": "h023",
+      "prompt": "firms in Nagoya that provide packaging design",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "object": "packaging design",
+        "location": "nagoya",
+        "intent_signal_required": false
+      },
+      "note": "offers_service"
+    }
+  ],
+  "chaos": []
+}

@@ -1,0 +1,2078 @@
+{
+  "seed": 55555,
+  "holdout": [
+    {
+      "id": "h000a",
+      "prompt": "optometrists in Leipzig",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "relation": "none",
+        "location": "leipzig",
+        "clarification": "forbidden"
+      },
+      "pairWith": "h000b"
+    },
+    {
+      "id": "h000b",
+      "prompt": "optometrists in Leipzig with no website",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "leipzig"
+      },
+      "pairWith": "h000a"
+    },
+    {
+      "id": "h002a",
+      "prompt": "subtitling agencies in Split",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "split",
+        "clarification": "forbidden"
+      },
+      "pairWith": "h002b"
+    },
+    {
+      "id": "h002b",
+      "prompt": "companies in Split needing subtitling",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "needs_service",
+        "object": "subtitling",
+        "location": "split",
+        "intent_signal_required": true
+      },
+      "pairWith": "h002a"
+    },
+    {
+      "id": "h004a",
+      "prompt": "farriers in Hsinchu",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "relation": "none",
+        "location": "hsinchu",
+        "clarification": "forbidden"
+      },
+      "pairWith": "h004b"
+    },
+    {
+      "id": "h004b",
+      "prompt": "farriers in Hsinchu with no website",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "hsinchu"
+      },
+      "pairWith": "h004a"
+    },
+    {
+      "id": "h006a",
+      "prompt": "orthodontists looking for clients",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_client"
+      },
+      "pairWith": "h006b"
+    },
+    {
+      "id": "h006b",
+      "prompt": "businesses looking for orthodontists",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "business",
+          "company"
+        ],
+        "relation": "needs_service",
+        "object": "orthodontist"
+      },
+      "pairWith": "h006a"
+    },
+    {
+      "id": "h008a",
+      "prompt": "packaging design agencies in Leuven",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "leuven",
+        "clarification": "forbidden"
+      },
+      "pairWith": "h008b"
+    },
+    {
+      "id": "h008b",
+      "prompt": "companies in Leuven needing packaging design",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "needs_service",
+        "object": "packaging design",
+        "location": "leuven",
+        "intent_signal_required": true
+      },
+      "pairWith": "h008a"
+    },
+    {
+      "id": "h010a",
+      "prompt": "patent drafting agencies in Split",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "split",
+        "clarification": "forbidden"
+      },
+      "pairWith": "h010b"
+    },
+    {
+      "id": "h010b",
+      "prompt": "companies in Split needing patent drafting",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "needs_service",
+        "object": "patent drafting",
+        "location": "split",
+        "intent_signal_required": true
+      },
+      "pairWith": "h010a"
+    },
+    {
+      "id": "h012a",
+      "prompt": "investors funding aquaculture startups in Braga",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "investor",
+        "location": "braga"
+      },
+      "pairWith": "h012b"
+    },
+    {
+      "id": "h012b",
+      "prompt": "aquaculture startups in Braga raising money",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "company",
+        "relation": "seeking_funding",
+        "location": "braga"
+      },
+      "pairWith": "h012a"
+    },
+    {
+      "id": "h014a",
+      "prompt": "companies in Busan hiring prosthetists",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "hiring",
+        "location": "busan",
+        "intent_signal_required": true
+      },
+      "pairWith": "h014b"
+    },
+    {
+      "id": "h014b",
+      "prompt": "prosthetists in Busan looking for work",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_job",
+        "location": "busan"
+      },
+      "pairWith": "h014a"
+    },
+    {
+      "id": "h016a",
+      "prompt": "penetration testing agencies in Curitiba",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "curitiba",
+        "clarification": "forbidden"
+      },
+      "pairWith": "h016b"
+    },
+    {
+      "id": "h016b",
+      "prompt": "companies in Curitiba needing penetration testing",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "needs_service",
+        "object": "penetration testing",
+        "location": "curitiba",
+        "intent_signal_required": true
+      },
+      "pairWith": "h016a"
+    },
+    {
+      "id": "h018a",
+      "prompt": "chocolatiers in Surabaya",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "relation": "none",
+        "location": "surabaya",
+        "clarification": "forbidden"
+      },
+      "pairWith": "h018b"
+    },
+    {
+      "id": "h018b",
+      "prompt": "chocolatiers in Surabaya with no website",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "surabaya"
+      },
+      "pairWith": "h018a"
+    },
+    {
+      "id": "h020",
+      "prompt": "sports clubs in Daugavpils that need fleet maintenance",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "organization",
+          "business",
+          "company",
+          "other"
+        ],
+        "relation": "needs_service",
+        "location": "daugavpils"
+      },
+      "note": "organization"
+    },
+    {
+      "id": "h021",
+      "prompt": "upholsterers within 50 miles of Aarhus",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "aarhus",
+        "location_scope": "within_radius",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity_radius"
+    },
+    {
+      "id": "h022",
+      "prompt": "hospitals in Cebu that need waste haulage",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "organization",
+          "business",
+          "company",
+          "other"
+        ],
+        "relation": "needs_service",
+        "location": "cebu"
+      },
+      "note": "organization"
+    },
+    {
+      "id": "h023",
+      "prompt": "companies that posted a wind turbine technician role in the last 6 months",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "hiring",
+        "temporal": true,
+        "no_location": true
+      },
+      "note": "temporal_hiring"
+    },
+    {
+      "id": "h024",
+      "prompt": "freelance conservators under $150/hour, excluding Ghent",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "no_location": true,
+        "negated": [
+          "location"
+        ]
+      },
+      "note": "excluded_location"
+    },
+    {
+      "id": "h025",
+      "prompt": "housing associations in Leuven that need warehouse automation",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "organization",
+          "business",
+          "company",
+          "other"
+        ],
+        "relation": "needs_service",
+        "location": "leuven"
+      },
+      "note": "organization"
+    },
+    {
+      "id": "h026",
+      "prompt": "defence companies in Enschede with at least 20 employees, not agencies",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "location": "enschede",
+        "min_constraints": 2,
+        "negated": [
+          "category"
+        ]
+      },
+      "note": "constraints"
+    },
+    {
+      "id": "h027",
+      "prompt": "companies in Gaborone using Sage",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "uses_technology",
+        "object": "sage",
+        "location": "gaborone"
+      },
+      "note": "uses_technology"
+    },
+    {
+      "id": "h028",
+      "prompt": "piano tuners within 50 miles of Salta",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "salta",
+        "location_scope": "within_radius",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity_radius"
+    },
+    {
+      "id": "h029",
+      "prompt": "I need at least 15 dive schools in Gaborone",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "quantity_min": 15,
+        "location": "gaborone"
+      },
+      "note": "quantity_minimum"
+    },
+    {
+      "id": "h030",
+      "prompt": "I sell warehouse automation. Find me 50 chocolatiers in Leipzig.",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "none",
+        "prospecting_mode": "fit_based",
+        "user_selling": "warehouse automation",
+        "quantity": 50,
+        "location": "leipzig"
+      },
+      "note": "user_context"
+    },
+    {
+      "id": "h031",
+      "prompt": "AI safety researchers attending Vivatech",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": [
+          "attending_event",
+          "custom"
+        ]
+      },
+      "note": "attending_event"
+    },
+    {
+      "id": "h032",
+      "prompt": "companies in Aarhus that need trade show fabrication",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "intent_based",
+        "relation": "needs_service",
+        "object": "trade show fabrication",
+        "location": "aarhus",
+        "intent_signal_required": true
+      },
+      "note": "needs_service"
+    },
+    {
+      "id": "h033",
+      "prompt": "freelance brand strategists under $120/hour, excluding Hamilton",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "no_location": true,
+        "negated": [
+          "location"
+        ]
+      },
+      "note": "excluded_location"
+    },
+    {
+      "id": "h034",
+      "prompt": "actuarys in Leipzig hiring quantity surveyors",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "hiring_based",
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "leipzig",
+        "intent_signal_required": true
+      },
+      "note": "person_hiring"
+    },
+    {
+      "id": "h035",
+      "prompt": "localisation manager job postings in Trois-Rivières from the last month",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "entity_type": [
+          "job",
+          "company"
+        ],
+        "location": "trois-rivières",
+        "temporal": true
+      },
+      "note": "jobs"
+    },
+    {
+      "id": "h036",
+      "prompt": "companies in Swansea using Zoho",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "uses_technology",
+        "object": "zoho",
+        "location": "swansea"
+      },
+      "note": "uses_technology"
+    },
+    {
+      "id": "h037",
+      "prompt": "Give me 20 orthotics clinics in Tromsø, phone number required, Instagram if possible, verify they are currently open, and output a spreadsheet",
+      "set": "holdout",
+      "size": "large",
+      "expect": {
+        "location": "tromsø",
+        "quantity": 20,
+        "required_fields": [
+          "phone"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ],
+        "min_verification": 1
+      },
+      "note": "long_form"
+    },
+    {
+      "id": "h038",
+      "prompt": "I need at least 60 saunas in Geelong",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "quantity_min": 60,
+        "location": "geelong"
+      },
+      "note": "quantity_minimum"
+    },
+    {
+      "id": "h039",
+      "prompt": "find optometrists in Kumasi and also find optometrists in Braga",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "compound": true,
+        "min_subgoals": 2
+      },
+      "note": "compound"
+    },
+    {
+      "id": "h040",
+      "prompt": "I sell subtitling. Find me 50 prosthetics labs in Wrocław.",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "none",
+        "prospecting_mode": "fit_based",
+        "user_selling": "subtitling",
+        "quantity": 50,
+        "location": "wrocław"
+      },
+      "note": "user_context"
+    },
+    {
+      "id": "h041",
+      "prompt": "clinical psychologist job postings in Aarhus from the last month",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "entity_type": [
+          "job",
+          "company"
+        ],
+        "location": "aarhus",
+        "temporal": true
+      },
+      "note": "jobs"
+    },
+    {
+      "id": "h042",
+      "prompt": "pharmacovigilance startups in Leipzig that raised funding recently",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "event_based",
+        "entity_type": "company",
+        "relation": "received_funding",
+        "location": "leipzig",
+        "temporal": true
+      },
+      "note": "received_funding"
+    },
+    {
+      "id": "h043",
+      "prompt": "port logistics companies in Ghent with at least 20 employees, not agencies",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "location": "ghent",
+        "min_constraints": 2,
+        "negated": [
+          "category"
+        ]
+      },
+      "note": "constraints"
+    },
+    {
+      "id": "h044",
+      "prompt": "give me 50 upholsterers in Salta",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "quantity": 50,
+        "location": "salta",
+        "relation": "none"
+      },
+      "note": "quantity_exact"
+    },
+    {
+      "id": "h045",
+      "prompt": "companies in Daugavpils using Contentful",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "uses_technology",
+        "object": "contentful",
+        "location": "daugavpils"
+      },
+      "note": "uses_technology"
+    },
+    {
+      "id": "h046",
+      "prompt": "millwrights in Hsinchu hiring localisation managers",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "hiring_based",
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "hsinchu",
+        "intent_signal_required": true
+      },
+      "note": "person_hiring"
+    },
+    {
+      "id": "h047",
+      "prompt": "cobblers in Leuven",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "task_type": "lead_discovery",
+        "prospecting_mode": "fit_based",
+        "relation": "none",
+        "location": "leuven",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity"
+    },
+    {
+      "id": "h048",
+      "prompt": "I need at least 60 seed libraries in Geelong",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "quantity_min": 60,
+        "location": "geelong"
+      },
+      "note": "quantity_minimum"
+    },
+    {
+      "id": "h049",
+      "prompt": "piano tuners within 10 miles of Waterford",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "waterford",
+        "location_scope": "within_radius",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity_radius"
+    },
+    {
+      "id": "h050",
+      "prompt": "nonprofits in Windhoek that need warehouse automation",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "organization",
+          "business",
+          "company",
+          "other"
+        ],
+        "relation": "needs_service",
+        "location": "windhoek"
+      },
+      "note": "organization"
+    },
+    {
+      "id": "h051",
+      "prompt": "arborists attending Vivatech",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "entity_type": "person",
+        "relation": [
+          "attending_event",
+          "custom"
+        ]
+      },
+      "note": "attending_event"
+    },
+    {
+      "id": "h052",
+      "prompt": "quilt shops in Košice",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "task_type": "lead_discovery",
+        "prospecting_mode": "fit_based",
+        "relation": "none",
+        "location": "košice",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity"
+    },
+    {
+      "id": "h053",
+      "prompt": "find hydroponic farms in Aberystwyth and also find sailmakers in Hamilton",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "compound": true,
+        "min_subgoals": 2
+      },
+      "note": "compound"
+    },
+    {
+      "id": "h054",
+      "prompt": "companies that posted a prosthetist role in the last 3 weeks",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "hiring",
+        "temporal": true,
+        "no_location": true
+      },
+      "note": "temporal_hiring"
+    },
+    {
+      "id": "h055",
+      "prompt": "Give me 25 hydroponic farms in Tromsø, phone number required, Instagram if possible, verify they are currently open, and output a spreadsheet",
+      "set": "holdout",
+      "size": "large",
+      "expect": {
+        "location": "tromsø",
+        "quantity": 25,
+        "required_fields": [
+          "phone"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ],
+        "min_verification": 1
+      },
+      "note": "long_form"
+    },
+    {
+      "id": "h056",
+      "prompt": "cider houses in Arequipa with no online booking",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "opportunity_based",
+        "relation": "lacks_asset",
+        "location": "arequipa",
+        "min_constraints": 1,
+        "intent_signal_required": false
+      },
+      "note": "lacks_asset"
+    },
+    {
+      "id": "h057",
+      "prompt": "fractional CFOs attending Interzoo",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": [
+          "attending_event",
+          "custom"
+        ]
+      },
+      "note": "attending_event"
+    },
+    {
+      "id": "h058",
+      "prompt": "I sell food safety auditing. Find me 50 saunas in Bergen.",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "none",
+        "prospecting_mode": "fit_based",
+        "user_selling": "food safety auditing",
+        "quantity": 50,
+        "location": "bergen"
+      },
+      "note": "user_context"
+    },
+    {
+      "id": "h059",
+      "prompt": "sailmakers within 25 km of Daugavpils",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "daugavpils",
+        "location_scope": "within_radius",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity_radius"
+    },
+    {
+      "id": "h060",
+      "prompt": "I sell drone surveying. Find me 200 cider houses in Geelong.",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "none",
+        "prospecting_mode": "fit_based",
+        "user_selling": "drone surveying",
+        "quantity": 200,
+        "location": "geelong"
+      },
+      "note": "user_context"
+    },
+    {
+      "id": "h061",
+      "prompt": "orthodontists attending Anuga",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "entity_type": "person",
+        "relation": [
+          "attending_event",
+          "custom"
+        ]
+      },
+      "note": "attending_event"
+    },
+    {
+      "id": "h062",
+      "prompt": "I need at least 25 quilt shops in Ghent",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "quantity_min": 25,
+        "location": "ghent"
+      },
+      "note": "quantity_minimum"
+    },
+    {
+      "id": "h063",
+      "prompt": "companies in Mombasa that need waste haulage",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "intent_based",
+        "relation": "needs_service",
+        "object": "waste haulage",
+        "location": "mombasa",
+        "intent_signal_required": true
+      },
+      "note": "needs_service"
+    },
+    {
+      "id": "h064",
+      "prompt": "forestry",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "clarification": "required"
+      },
+      "note": "underspecified"
+    },
+    {
+      "id": "h065",
+      "prompt": "aquaculture companies in Tulsa with at least 50 employees, not agencies",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "location": "tulsa",
+        "min_constraints": 2,
+        "negated": [
+          "category"
+        ]
+      },
+      "note": "constraints"
+    },
+    {
+      "id": "h066",
+      "prompt": "quilt shops in Leuven",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "task_type": "lead_discovery",
+        "prospecting_mode": "fit_based",
+        "relation": "none",
+        "location": "leuven",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity"
+    },
+    {
+      "id": "h067",
+      "prompt": "I need at least 60 orthotics clinics in Braga",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "quantity_min": 60,
+        "location": "braga"
+      },
+      "note": "quantity_minimum"
+    },
+    {
+      "id": "h068",
+      "prompt": "harbour pilots attending Anuga",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": [
+          "attending_event",
+          "custom"
+        ]
+      },
+      "note": "attending_event"
+    },
+    {
+      "id": "h069",
+      "prompt": "prosthetics labs within 30 km of Leuven",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "leuven",
+        "location_scope": "within_radius",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity_radius"
+    },
+    {
+      "id": "h070",
+      "prompt": "tax barristers in Wrocław looking for clients",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_client",
+        "location": "wrocław"
+      },
+      "note": "seeking_client"
+    },
+    {
+      "id": "h071",
+      "prompt": "piano tuners in Enschede with no website",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "opportunity_based",
+        "relation": "lacks_asset",
+        "location": "enschede",
+        "min_constraints": 1,
+        "intent_signal_required": false
+      },
+      "note": "lacks_asset"
+    },
+    {
+      "id": "h072",
+      "prompt": "forestry companies in Geelong with at least 10 employees, not agencies",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "location": "geelong",
+        "min_constraints": 2,
+        "negated": [
+          "category"
+        ]
+      },
+      "note": "constraints"
+    },
+    {
+      "id": "h073",
+      "prompt": "companies in Braga using Zoho",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "uses_technology",
+        "object": "zoho",
+        "location": "braga"
+      },
+      "note": "uses_technology"
+    },
+    {
+      "id": "h074",
+      "prompt": "companies that posted a conservator role in the last 2 weeks",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "hiring",
+        "temporal": true,
+        "no_location": true
+      },
+      "note": "temporal_hiring"
+    },
+    {
+      "id": "h075",
+      "prompt": "companies that posted a harbour pilot role in the last 2 months",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "hiring",
+        "temporal": true,
+        "no_location": true
+      },
+      "note": "temporal_hiring"
+    },
+    {
+      "id": "h076",
+      "prompt": "I need at least 25 farriers in Boise",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "quantity_min": 25,
+        "location": "boise"
+      },
+      "note": "quantity_minimum"
+    },
+    {
+      "id": "h077",
+      "prompt": "pharmacovigilance",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "clarification": "required"
+      },
+      "note": "underspecified"
+    },
+    {
+      "id": "h078",
+      "prompt": "saunas in Mombasa with no website",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "opportunity_based",
+        "relation": "lacks_asset",
+        "location": "mombasa",
+        "min_constraints": 1,
+        "intent_signal_required": false
+      },
+      "note": "lacks_asset"
+    },
+    {
+      "id": "h079",
+      "prompt": "defence startups in Waterford that raised funding recently",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "event_based",
+        "entity_type": "company",
+        "relation": "received_funding",
+        "location": "waterford",
+        "temporal": true
+      },
+      "note": "received_funding"
+    }
+  ],
+  "chaos": [
+    {
+      "id": "c000a",
+      "prompt": "HYDROPPONIC FARMS IN ENSCHEDE pls",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "enschede",
+        "clarification": "forbidden"
+      },
+      "pairWith": "c000b"
+    },
+    {
+      "id": "c000b",
+      "prompt": "hydroponic farms in Enschede with no website",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "enschede"
+      },
+      "pairWith": "c000a"
+    },
+    {
+      "id": "c002a",
+      "prompt": "tax barristrs who serve bell foundriees in cebu",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "location": "cebu"
+      },
+      "pairWith": "c002b"
+    },
+    {
+      "id": "c002b",
+      "prompt": "bell foundries in Cebu who need a tax barrister",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "needs_service",
+        "object": "tax barrister",
+        "location": "cebu"
+      },
+      "pairWith": "c002a"
+    },
+    {
+      "id": "c004a",
+      "prompt": "companies in Košice hiring arborists",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "hiring",
+        "location": "košice",
+        "intent_signal_required": true
+      },
+      "pairWith": "c004b"
+    },
+    {
+      "id": "c004b",
+      "prompt": "arboriists in Košice looking for work",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_job",
+        "location": "košice"
+      },
+      "pairWith": "c004a"
+    },
+    {
+      "id": "c006a",
+      "prompt": "gimme wind turbine technicians loking for clients",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_client"
+      },
+      "pairWith": "c006b"
+    },
+    {
+      "id": "c006b",
+      "prompt": "businnesses looking for wind turbine technicians",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "business",
+          "company"
+        ],
+        "relation": "needs_service",
+        "object": "wind turbine technician"
+      },
+      "pairWith": "c006a"
+    },
+    {
+      "id": "c008a",
+      "prompt": "looking for companies in Örebro hiring luthiers asap",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "hiring",
+        "location": "örebro",
+        "intent_signal_required": true
+      },
+      "pairWith": "c008b"
+    },
+    {
+      "id": "c008b",
+      "prompt": "luthiers in örebro looing for work",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_job",
+        "location": "örebro"
+      },
+      "pairWith": "c008a"
+    },
+    {
+      "id": "c010a",
+      "prompt": "gimme orthodontists who serve chocolaiters in Curitiba",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "location": "curitiba"
+      },
+      "pairWith": "c010b"
+    },
+    {
+      "id": "c010b",
+      "prompt": "chocolatiers in curitiba who need a orthodontist",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "needs_service",
+        "object": "orthodontist",
+        "location": "curitiba"
+      },
+      "pairWith": "c010a"
+    },
+    {
+      "id": "c012a",
+      "prompt": "investors funding proptech startups in Gaborone thx",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "entity_type": "investor",
+        "location": "gaborone"
+      },
+      "pairWith": "c012b"
+    },
+    {
+      "id": "c012b",
+      "prompt": "yo proptech startups  in Gaborone raising money",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "entity_type": "company",
+        "relation": "seeking_funding",
+        "location": "gaborone"
+      },
+      "pairWith": "c012a"
+    },
+    {
+      "id": "c014a",
+      "prompt": "yo actuarys looking for clients?",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_client"
+      },
+      "pairWith": "c014b"
+    },
+    {
+      "id": "c014b",
+      "prompt": "pls  businesses  looikng  for actuarys  if poss",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "business",
+          "company"
+        ],
+        "relation": "needs_service",
+        "object": "actuary"
+      },
+      "pairWith": "c014a"
+    },
+    {
+      "id": "c016a",
+      "prompt": "conservators who serve upholsterers in Pécs",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "location": "pécs"
+      },
+      "pairWith": "c016b"
+    },
+    {
+      "id": "c016b",
+      "prompt": "upholsterers in Pécs who need a conservator today",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "needs_service",
+        "object": "conservator",
+        "location": "pécs"
+      },
+      "pairWith": "c016a"
+    },
+    {
+      "id": "c018a",
+      "prompt": "tax  barritsers  looking for clients pls",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_client"
+      },
+      "pairWith": "c018b"
+    },
+    {
+      "id": "c018b",
+      "prompt": "businesses looking for tax  barristers",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "business",
+          "company"
+        ],
+        "relation": "needs_service",
+        "object": "tax barrister"
+      },
+      "pairWith": "c018a"
+    },
+    {
+      "id": "c020",
+      "prompt": "hi ok so i do technical translation n im tryna find like seed libraries aronud wrocław that dont got a site, phone would b great, thx if poss",
+      "set": "chaos",
+      "size": "large",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "wrocław",
+        "user_selling": "technical translation"
+      },
+      "note": "chaos_rambling"
+    },
+    {
+      "id": "c021",
+      "prompt": "uphoslterers  hsinchu pls",
+      "set": "chaos",
+      "size": "tiny",
+      "expect": {
+        "relation": "none",
+        "location": "hsinchu"
+      },
+      "note": "chaos_plain"
+    },
+    {
+      "id": "c022",
+      "prompt": "who around vlinius needs someone for grant writing asap",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "needs_service",
+        "object": "grant writing",
+        "location": "vilnius"
+      },
+      "note": "chaos_needs_service"
+    },
+    {
+      "id": "c023",
+      "prompt": "who around saskatoon needs someone for subtitling asap",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "needs_service",
+        "object": "subtitling",
+        "location": "saskatoon"
+      },
+      "note": "chaos_needs_service"
+    },
+    {
+      "id": "c024",
+      "prompt": "need some founders round leipzig tryna bring on prostehtist ppl rn when u can",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "leipzig"
+      },
+      "note": "chaos_hiring"
+    },
+    {
+      "id": "c025",
+      "prompt": "find me 40 upholsterers outside pécs, not chains, insta if possible!!",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "quantity": 40,
+        "location": "pécs",
+        "min_constraints": 1,
+        "negated": [
+          "category"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ]
+      },
+      "note": "chaos_quantity_constraints"
+    },
+    {
+      "id": "c026",
+      "prompt": "SEED LIBRARIES SWANSEA PLS",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "swansea"
+      },
+      "note": "chaos_plain"
+    },
+    {
+      "id": "c027",
+      "prompt": "hey  ok so i do  fleet maintenance n  im tryna  find like  chocolatiers around curitiba that dont got a  site, phone would b great,  thx",
+      "set": "chaos",
+      "size": "large",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "curitiba",
+        "user_selling": "fleet maintenance"
+      },
+      "note": "chaos_rambling"
+    },
+    {
+      "id": "c028",
+      "prompt": "mushroom farms daugavpils pls when  u can",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "daugavpils"
+      },
+      "note": "chaos_plain"
+    },
+    {
+      "id": "c029",
+      "prompt": "help me find who around örebro needs someone for waste haulage asap",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "needs_service",
+        "object": "waste haulage",
+        "location": "örebro"
+      },
+      "note": "chaos_needs_service"
+    },
+    {
+      "id": "c030",
+      "prompt": "need some founders round daugavpils tryna bring on sound engineer ppl rn",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "daugavpils"
+      },
+      "note": "chaos_hiring"
+    },
+    {
+      "id": "c031",
+      "prompt": "any sailmakers near wrocław no proper website n got phone?",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "wrocław",
+        "location_scope": "near"
+      },
+      "note": "chaos_lacks_asset"
+    },
+    {
+      "id": "c032",
+      "prompt": "need some fuonders round busan tryna bring on luthier ppl rn",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "busan"
+      },
+      "note": "chaos_hiring"
+    },
+    {
+      "id": "c033",
+      "prompt": "HYDROPONIC FARMS BUSAN PLS",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "busan"
+      },
+      "note": "chaos_plain"
+    },
+    {
+      "id": "c034",
+      "prompt": "ok so find me 30 board game cafés outside sfax, not chains, insta if posssible",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "quantity": 30,
+        "location": "sfax",
+        "min_constraints": 1,
+        "negated": [
+          "category"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ]
+      },
+      "note": "chaos_quantity_constraints"
+    },
+    {
+      "id": "c035",
+      "prompt": "need ok so i do subtitling n im tryna find like cobblers around chattanooga that dont got a site, phone would b great, thx...",
+      "set": "chaos",
+      "size": "large",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "chattanooga",
+        "user_selling": "subtitling"
+      },
+      "note": "chaos_rambling"
+    },
+    {
+      "id": "c036",
+      "prompt": "WHO AROND SALTA NEEDS SOMEONE FOR  FOOD  SAFETY  AUIDTING  ASAP",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "needs_service",
+        "object": "food safety auditing",
+        "location": "salta"
+      },
+      "note": "chaos_needs_service"
+    },
+    {
+      "id": "c037",
+      "prompt": "need foresrty sartups saskatoon funded this yr + founders names if u can today",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": "company",
+        "relation": "received_funding",
+        "location": "saskatoon",
+        "temporal": true
+      },
+      "note": "chaos_funding"
+    },
+    {
+      "id": "c038",
+      "prompt": "need some founders round daugavpils tryna bring on conservator ppl rn",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "daugavpils"
+      },
+      "note": "chaos_hiring"
+    },
+    {
+      "id": "c039",
+      "prompt": "need aquaculture startups tromsø funded this yr + foundes names if u can",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": "company",
+        "relation": "received_funding",
+        "location": "tromsø",
+        "temporal": true
+      },
+      "note": "chaos_funding"
+    },
+    {
+      "id": "c040",
+      "prompt": "need some founders round aarhus tryna bring on orthodontist ppl rn",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "aarhus"
+      },
+      "note": "chaos_hiring"
+    },
+    {
+      "id": "c041",
+      "prompt": "need auqaculture startups kelowna funded this yr + founders names if u can",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": "company",
+        "relation": "received_funding",
+        "location": "kelowna",
+        "temporal": true
+      },
+      "note": "chaos_funding"
+    },
+    {
+      "id": "c042",
+      "prompt": "find me 30 quilt shops outisde braga, not chains, insta if posisble",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "quantity": 30,
+        "location": "braga",
+        "min_constraints": 1,
+        "negated": [
+          "category"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ]
+      },
+      "note": "chaos_quantity_constraints"
+    },
+    {
+      "id": "c043",
+      "prompt": "hey find  me 20  optometists outside turku,  not chains, insta if possible",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "quantity": 20,
+        "location": "turku",
+        "min_constraints": 1,
+        "negated": [
+          "category"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ]
+      },
+      "note": "chaos_quantity_constraints"
+    },
+    {
+      "id": "c044",
+      "prompt": "chocolatiers geelong pls",
+      "set": "chaos",
+      "size": "tiny",
+      "expect": {
+        "relation": "none",
+        "location": "geelong"
+      },
+      "note": "chaos_plain"
+    },
+    {
+      "id": "c045",
+      "prompt": "need forestry startups salta fundde this yr + founders names if u can",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": "company",
+        "relation": "received_funding",
+        "location": "salta",
+        "temporal": true
+      },
+      "note": "chaos_funding"
+    },
+    {
+      "id": "c046",
+      "prompt": "any prosthetics labs near daugavpils no proper website n got phone?",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "daugavpils",
+        "location_scope": "near"
+      },
+      "note": "chaos_lacks_asset"
+    },
+    {
+      "id": "c047",
+      "prompt": "hi bell fuondries in kelowna and also cobblers in brno rn",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "compound": true,
+        "min_subgoals": 2
+      },
+      "note": "chaos_compound"
+    },
+    {
+      "id": "c048",
+      "prompt": "ok so i do ISO certification n im tryna find like saunas around chttanooga that dont got a site, phone would b great, thx",
+      "set": "chaos",
+      "size": "large",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "chattanooga",
+        "user_selling": "iso certification"
+      },
+      "note": "chaos_rambling"
+    },
+    {
+      "id": "c049",
+      "prompt": "ok so i do ISO certification n im tryna find like orthotics clinics around fayetteviille that dont got a site phone would b great thx pls...",
+      "set": "chaos",
+      "size": "large",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "fayetteville",
+        "user_selling": "iso certification"
+      },
+      "note": "chaos_rambling"
+    },
+    {
+      "id": "c050",
+      "prompt": "need need musictech startups fayetteville funded this yr + founders names if u can 🙏",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": "company",
+        "relation": "received_funding",
+        "location": "fayetteville",
+        "temporal": true
+      },
+      "note": "chaos_funding"
+    },
+    {
+      "id": "c051",
+      "prompt": "who aroound busan needs someoen for iso certification asap asap",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "needs_service",
+        "object": "iso certification",
+        "location": "busan"
+      },
+      "note": "chaos_needs_service"
+    },
+    {
+      "id": "c052",
+      "prompt": "quilt shops in leipzig and also farriers in kumasi",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "compound": true,
+        "min_subgoals": 2
+      },
+      "note": "chaos_compound"
+    },
+    {
+      "id": "c053",
+      "prompt": "ok so OK SO I DO TECHNICL TRANLATION N IM TRYNA FIND LIKE TAXIDERMISTS AROUND SFAX THAT DONT GOT A SITE, PHONE WOULD B GREAT, THX today",
+      "set": "chaos",
+      "size": "large",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "sfax",
+        "user_selling": "technical translation"
+      },
+      "note": "chaos_rambling"
+    },
+    {
+      "id": "c054",
+      "prompt": "need pharmacovigilance startups waaterford funedd this yr + founders names if u can",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": "company",
+        "relation": "received_funding",
+        "location": "waterford",
+        "temporal": true
+      },
+      "note": "chaos_funding"
+    },
+    {
+      "id": "c055",
+      "prompt": "board game cafés sfax pls",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "sfax"
+      },
+      "note": "chaos_plain"
+    },
+    {
+      "id": "c056",
+      "prompt": "need some founnders round busan tryna bring on prosthetist ppl rn",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "busan"
+      },
+      "note": "chaos_hiring"
+    },
+    {
+      "id": "c057",
+      "prompt": "any  piano tuners  near ann  arbor no proper website  n got  phone?",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "ann arbor",
+        "location_scope": "near"
+      },
+      "note": "chaos_lacks_asset"
+    },
+    {
+      "id": "c058",
+      "prompt": "hi find me 40  mushroom farms  outside surabaya,  not chains, insta if psosible  asap",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "quantity": 40,
+        "location": "surabaya",
+        "min_constraints": 1,
+        "negated": [
+          "category"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ]
+      },
+      "note": "chaos_quantity_constraints"
+    },
+    {
+      "id": "c059",
+      "prompt": "pls ANY MUSHROOM FARMS NEAR CURITIBA NO PROPER WEBSSITE N GOT PHONE?",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "curitiba",
+        "location_scope": "near"
+      },
+      "note": "chaos_lacks_asset"
+    },
+    {
+      "id": "c060",
+      "prompt": "sailmakers salta pls",
+      "set": "chaos",
+      "size": "tiny",
+      "expect": {
+        "relation": "none",
+        "location": "salta"
+      },
+      "note": "chaos_plain"
+    },
+    {
+      "id": "c061",
+      "prompt": "find me 20 chocolatiers outside kumasi, not chains, insta if possible",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "quantity": 20,
+        "location": "kumasi",
+        "min_constraints": 1,
+        "negated": [
+          "category"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ]
+      },
+      "note": "chaos_quantity_constraints"
+    },
+    {
+      "id": "c062",
+      "prompt": "ok so i do voiceoer n im tryna find like farriers around gaborone that dont got a site, phone would b great, thx",
+      "set": "chaos",
+      "size": "large",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "gaborone",
+        "user_selling": "voiceover"
+      },
+      "note": "chaos_rambling"
+    },
+    {
+      "id": "c063",
+      "prompt": "any optometrists  near turku no  proper website n got phone?",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "turku",
+        "location_scope": "near"
+      },
+      "note": "chaos_lacks_asset"
+    },
+    {
+      "id": "c064",
+      "prompt": "any optometrists near bergen no proper websiite n got phone? pls",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "bergen",
+        "location_scope": "near"
+      },
+      "note": "chaos_lacks_asset"
+    },
+    {
+      "id": "c065",
+      "prompt": "any bell foundries near salta no proper website n got phone?",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "salta",
+        "location_scope": "near"
+      },
+      "note": "chaos_lacks_asset"
+    },
+    {
+      "id": "c066",
+      "prompt": "coblers brno pls rn",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "brno"
+      },
+      "note": "chaos_plain"
+    },
+    {
+      "id": "c067",
+      "prompt": "find me 40 board game cafés outside pécs, not chains, insta if possbile when u can",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "quantity": 40,
+        "location": "pécs",
+        "min_constraints": 1,
+        "negated": [
+          "category"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ]
+      },
+      "note": "chaos_quantity_constraints"
+    },
+    {
+      "id": "c068",
+      "prompt": "any cobblers near geelong no proper website n got phone? pls...",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "geelong",
+        "location_scope": "near"
+      },
+      "note": "chaos_lacks_asset"
+    },
+    {
+      "id": "c069",
+      "prompt": "cobblers in braga and also seed librraries in hamliton as many as u can",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "compound": true,
+        "min_subgoals": 2
+      },
+      "note": "chaos_compound"
+    },
+    {
+      "id": "c070",
+      "prompt": "who around busan needs someonne for waste haualge asap as many as u can",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "needs_service",
+        "object": "waste haulage",
+        "location": "busan"
+      },
+      "note": "chaos_needs_service"
+    },
+    {
+      "id": "c071",
+      "prompt": "can u get me need some founders round mombasa tryna bring on tax barrister ppl rn",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "mombasa"
+      },
+      "note": "chaos_hiring"
+    },
+    {
+      "id": "c072",
+      "prompt": "ok so i do ISO certification n im tryna find like roasteires around boise that dont got a site, phone would b great, thx",
+      "set": "chaos",
+      "size": "large",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "boise",
+        "user_selling": "iso certification"
+      },
+      "note": "chaos_rambling"
+    },
+    {
+      "id": "c073",
+      "prompt": "orthotics clinics in nagoya and also bell foundries in wrocław",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "compound": true,
+        "min_subgoals": 2
+      },
+      "note": "chaos_compound"
+    },
+    {
+      "id": "c074",
+      "prompt": "looking for hydroponic farms in boise and also piano tuners in kelowna rn",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "compound": true,
+        "min_subgoals": 2
+      },
+      "note": "chaos_compound"
+    },
+    {
+      "id": "c075",
+      "prompt": "hi need circular economy startups turku funded this yr + founders names if u can",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": "company",
+        "relation": "received_funding",
+        "location": "turku",
+        "temporal": true
+      },
+      "note": "chaos_funding"
+    },
+    {
+      "id": "c076",
+      "prompt": "hey cider houses chattanooa pls 🚀",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "chattanooga"
+      },
+      "note": "chaos_plain"
+    },
+    {
+      "id": "c077",
+      "prompt": "gimme find me 40 orthotics clinics outside braga, not chains, insta if possible",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "quantity": 40,
+        "location": "braga",
+        "min_constraints": 1,
+        "negated": [
+          "category"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ]
+      },
+      "note": "chaos_quantity_constraints"
+    },
+    {
+      "id": "c078",
+      "prompt": "OK SO I DO TRADE SHOW FABRICATION N IM TRYNA FIND LIKE DIVE SCHOOLS AROUND DUNEDIN THAT DONT GOT A SITE, PHONE WOULD B GREAT, THX",
+      "set": "chaos",
+      "size": "large",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "dunedin",
+        "user_selling": "trade show fabrication"
+      },
+      "note": "chaos_rambling"
+    },
+    {
+      "id": "c079",
+      "prompt": "any roasteries near hinchu no proper webite n got phone?",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "hsinchu",
+        "location_scope": "near"
+      },
+      "note": "chaos_lacks_asset"
+    }
+  ]
+}

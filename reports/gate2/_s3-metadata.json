@@ -1,0 +1,2974 @@
+{
+  "processed/local-businesses/by_country/": {
+    "objects": 91,
+    "bytes": 1793647463,
+    "rows": 16338186,
+    "min_rows": 8773,
+    "max_rows": 2000000,
+    "schema": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11",
+      "12",
+      "13",
+      "14",
+      "15",
+      "16",
+      "17",
+      "18",
+      "19",
+      "20"
+    ],
+    "files": [
+      {
+        "key": "processed/local-businesses/by_country/ae.parquet",
+        "rows": 86070,
+        "size": 9949818
+      },
+      {
+        "key": "processed/local-businesses/by_country/am.parquet",
+        "rows": 13468,
+        "size": 1507335
+      },
+      {
+        "key": "processed/local-businesses/by_country/ar.parquet",
+        "rows": 400000,
+        "size": 40891546
+      },
+      {
+        "key": "processed/local-businesses/by_country/at.parquet",
+        "rows": 130000,
+        "size": 14614506
+      },
+      {
+        "key": "processed/local-businesses/by_country/au.parquet",
+        "rows": 400000,
+        "size": 43002425
+      },
+      {
+        "key": "processed/local-businesses/by_country/austin.parquet",
+        "rows": 93734,
+        "size": 10797915
+      },
+      {
+        "key": "processed/local-businesses/by_country/az.parquet",
+        "rows": 17466,
+        "size": 1868220
+      },
+      {
+        "key": "processed/local-businesses/by_country/bd.parquet",
+        "rows": 124482,
+        "size": 14701701
+      },
+      {
+        "key": "processed/local-businesses/by_country/be.parquet",
+        "rows": 130000,
+        "size": 14028643
+      },
+      {
+        "key": "processed/local-businesses/by_country/bg.parquet",
+        "rows": 45000,
+        "size": 5016377
+      },
+      {
+        "key": "processed/local-businesses/by_country/bh.parquet",
+        "rows": 8773,
+        "size": 985496
+      },
+      {
+        "key": "processed/local-businesses/by_country/bo.parquet",
+        "rows": 45000,
+        "size": 4889262
+      },
+      {
+        "key": "processed/local-businesses/by_country/br.parquet",
+        "rows": 2000000,
+        "size": 208935622
+      },
+      {
+        "key": "processed/local-businesses/by_country/ca.parquet",
+        "rows": 400000,
+        "size": 43742923
+      },
+      {
+        "key": "processed/local-businesses/by_country/ch.parquet",
+        "rows": 130000,
+        "size": 13870021
+      },
+      {
+        "key": "processed/local-businesses/by_country/cl.parquet",
+        "rows": 130000,
+        "size": 13175787
+      },
+      {
+        "key": "processed/local-businesses/by_country/co.parquet",
+        "rows": 130000,
+        "size": 13933507
+      },
+      {
+        "key": "processed/local-businesses/by_country/cr.parquet",
+        "rows": 45000,
+        "size": 4972788
+      },
+      {
+        "key": "processed/local-businesses/by_country/cy.parquet",
+        "rows": 37943,
+        "size": 4255793
+      },
+      {
+        "key": "processed/local-businesses/by_country/cz.parquet",
+        "rows": 130000,
+        "size": 14294939
+      },
+      {
+        "key": "processed/local-businesses/by_country/de.parquet",
+        "rows": 400000,
+        "size": 45792881
+      },
+      {
+        "key": "processed/local-businesses/by_country/dk.parquet",
+        "rows": 130000,
+        "size": 14162032
+      },
+      {
+        "key": "processed/local-businesses/by_country/do.parquet",
+        "rows": 43591,
+        "size": 4854116
+      },
+      {
+        "key": "processed/local-businesses/by_country/ec.parquet",
+        "rows": 45000,
+        "size": 5035008
+      },
+      {
+        "key": "processed/local-businesses/by_country/ee.parquet",
+        "rows": 31621,
+        "size": 3360638
+      },
+      {
+        "key": "processed/local-businesses/by_country/eg.parquet",
+        "rows": 130000,
+        "size": 15916551
+      },
+      {
+        "key": "processed/local-businesses/by_country/es.parquet",
+        "rows": 400000,
+        "size": 43453758
+      },
+      {
+        "key": "processed/local-businesses/by_country/fi.parquet",
+        "rows": 130000,
+        "size": 13848502
+      },
+      {
+        "key": "processed/local-businesses/by_country/fr.parquet",
+        "rows": 400000,
+        "size": 46179132
+      },
+      {
+        "key": "processed/local-businesses/by_country/gb.parquet",
+        "rows": 400000,
+        "size": 45752581
+      },
+      {
+        "key": "processed/local-businesses/by_country/ge.parquet",
+        "rows": 23967,
+        "size": 2772528
+      },
+      {
+        "key": "processed/local-businesses/by_country/gh.parquet",
+        "rows": 17434,
+        "size": 2064272
+      },
+      {
+        "key": "processed/local-businesses/by_country/gr.parquet",
+        "rows": 130000,
+        "size": 14445082
+      },
+      {
+        "key": "processed/local-businesses/by_country/gt.parquet",
+        "rows": 45000,
+        "size": 4964482
+      },
+      {
+        "key": "processed/local-businesses/by_country/hk.parquet",
+        "rows": 45000,
+        "size": 4797581
+      },
+      {
+        "key": "processed/local-businesses/by_country/hr.parquet",
+        "rows": 45000,
+        "size": 4761021
+      },
+      {
+        "key": "processed/local-businesses/by_country/hu.parquet",
+        "rows": 130000,
+        "size": 13952699
+      },
+      {
+        "key": "processed/local-businesses/by_country/id.parquet",
+        "rows": 400000,
+        "size": 40806589
+      },
+      {
+        "key": "processed/local-businesses/by_country/ie.parquet",
+        "rows": 112677,
+        "size": 12783193
+      },
+      {
+        "key": "processed/local-businesses/by_country/il.parquet",
+        "rows": 86459,
+        "size": 9894048
+      },
+      {
+        "key": "processed/local-businesses/by_country/in.parquet",
+        "rows": 2000000,
+        "size": 245745448
+      },
+      {
+        "key": "processed/local-businesses/by_country/is.parquet",
+        "rows": 11395,
+        "size": 1177841
+      },
+      {
+        "key": "processed/local-businesses/by_country/it.parquet",
+        "rows": 400000,
+        "size": 43842234
+      },
+      {
+        "key": "processed/local-businesses/by_country/jo.parquet",
+        "rows": 33862,
+        "size": 4133698
+      },
+      {
+        "key": "processed/local-businesses/by_country/jp.parquet",
+        "rows": 400000,
+        "size": 40444376
+      },
+      {
+        "key": "processed/local-businesses/by_country/ke.parquet",
+        "rows": 45000,
+        "size": 5181848
+      },
+      {
+        "key": "processed/local-businesses/by_country/kr.parquet",
+        "rows": 130000,
+        "size": 14348415
+      },
+      {
+        "key": "processed/local-businesses/by_country/kw.parquet",
+        "rows": 15736,
+        "size": 1610068
+      },
+      {
+        "key": "processed/local-businesses/by_country/kz.parquet",
+        "rows": 22810,
+        "size": 2567652
+      },
+      {
+        "key": "processed/local-businesses/by_country/lb.parquet",
+        "rows": 28686,
+        "size": 3163654
+      },
+      {
+        "key": "processed/local-businesses/by_country/lk.parquet",
+        "rows": 45000,
+        "size": 5151523
+      },
+      {
+        "key": "processed/local-businesses/by_country/lt.parquet",
+        "rows": 43059,
+        "size": 4649541
+      },
+      {
+        "key": "processed/local-businesses/by_country/lu.parquet",
+        "rows": 18678,
+        "size": 2133023
+      },
+      {
+        "key": "processed/local-businesses/by_country/lv.parquet",
+        "rows": 39734,
+        "size": 4065688
+      },
+      {
+        "key": "processed/local-businesses/by_country/ma.parquet",
+        "rows": 45000,
+        "size": 5068388
+      },
+      {
+        "key": "processed/local-businesses/by_country/mt.parquet",
+        "rows": 13162,
+        "size": 1537005
+      },
+      {
+        "key": "processed/local-businesses/by_country/mx.parquet",
+        "rows": 400000,
+        "size": 40163476
+      },
+      {
+        "key": "processed/local-businesses/by_country/my.parquet",
+        "rows": 130000,
+        "size": 13171496
+      },
+      {
+        "key": "processed/local-businesses/by_country/ng.parquet",
+        "rows": 69899,
+        "size": 8569286
+      },
+      {
+        "key": "processed/local-businesses/by_country/nl.parquet",
+        "rows": 130000,
+        "size": 14828981
+      },
+      {
+        "key": "processed/local-businesses/by_country/no.parquet",
+        "rows": 130000,
+        "size": 13530326
+      },
+      {
+        "key": "processed/local-businesses/by_country/np.parquet",
+        "rows": 45000,
+        "size": 4964413
+      },
+      {
+        "key": "processed/local-businesses/by_country/nz.parquet",
+        "rows": 130000,
+        "size": 14320239
+      },
+      {
+        "key": "processed/local-businesses/by_country/om.parquet",
+        "rows": 9491,
+        "size": 1056013
+      },
+      {
+        "key": "processed/local-businesses/by_country/pa.parquet",
+        "rows": 18159,
+        "size": 2035869
+      },
+      {
+        "key": "processed/local-businesses/by_country/pe.parquet",
+        "rows": 130000,
+        "size": 14027278
+      },
+      {
+        "key": "processed/local-businesses/by_country/ph.parquet",
+        "rows": 130000,
+        "size": 12672330
+      },
+      {
+        "key": "processed/local-businesses/by_country/pk.parquet",
+        "rows": 126245,
+        "size": 14618742
+      },
+      {
+        "key": "processed/local-businesses/by_country/pl.parquet",
+        "rows": 130000,
+        "size": 14203344
+      },
+      {
+        "key": "processed/local-businesses/by_country/pr.parquet",
+        "rows": 45000,
+        "size": 4700039
+      },
+      {
+        "key": "processed/local-businesses/by_country/pt.parquet",
+        "rows": 130000,
+        "size": 14738117
+      },
+      {
+        "key": "processed/local-businesses/by_country/py.parquet",
+        "rows": 45000,
+        "size": 4663025
+      },
+      {
+        "key": "processed/local-businesses/by_country/qa.parquet",
+        "rows": 14382,
+        "size": 1617662
+      },
+      {
+        "key": "processed/local-businesses/by_country/ro.parquet",
+        "rows": 130000,
+        "size": 13921215
+      },
+      {
+        "key": "processed/local-businesses/by_country/rs.parquet",
+        "rows": 45000,
+        "size": 4932977
+      },
+      {
+        "key": "processed/local-businesses/by_country/sa.parquet",
+        "rows": 77036,
+        "size": 8048071
+      },
+      {
+        "key": "processed/local-businesses/by_country/se.parquet",
+        "rows": 130000,
+        "size": 13261502
+      },
+      {
+        "key": "processed/local-businesses/by_country/sg.parquet",
+        "rows": 69158,
+        "size": 7581561
+      },
+      {
+        "key": "processed/local-businesses/by_country/si.parquet",
+        "rows": 36453,
+        "size": 3885928
+      },
+      {
+        "key": "processed/local-businesses/by_country/sk.parquet",
+        "rows": 45000,
+        "size": 4987028
+      },
+      {
+        "key": "processed/local-businesses/by_country/th.parquet",
+        "rows": 130000,
+        "size": 14174585
+      },
+      {
+        "key": "processed/local-businesses/by_country/tn.parquet",
+        "rows": 36530,
+        "size": 4172952
+      },
+      {
+        "key": "processed/local-businesses/by_country/tr.parquet",
+        "rows": 400000,
+        "size": 39688915
+      },
+      {
+        "key": "processed/local-businesses/by_country/tw.parquet",
+        "rows": 45000,
+        "size": 4585068
+      },
+      {
+        "key": "processed/local-businesses/by_country/tz.parquet",
+        "rows": 12944,
+        "size": 1497476
+      },
+      {
+        "key": "processed/local-businesses/by_country/ua.parquet",
+        "rows": 130000,
+        "size": 14907682
+      },
+      {
+        "key": "processed/local-businesses/by_country/us.parquet",
+        "rows": 2000000,
+        "size": 217742847
+      },
+      {
+        "key": "processed/local-businesses/by_country/uy.parquet",
+        "rows": 32251,
+        "size": 3464080
+      },
+      {
+        "key": "processed/local-businesses/by_country/uz.parquet",
+        "rows": 10831,
+        "size": 1267206
+      },
+      {
+        "key": "processed/local-businesses/by_country/vn.parquet",
+        "rows": 130000,
+        "size": 13837111
+      },
+      {
+        "key": "processed/local-businesses/by_country/za.parquet",
+        "rows": 130000,
+        "size": 13958903
+      }
+    ]
+  },
+  "processed/companies_by_initial/": {
+    "objects": 110,
+    "bytes": 355129771,
+    "rows": 1602141,
+    "min_rows": 1,
+    "max_rows": 151155,
+    "schema": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11",
+      "12",
+      "13",
+      "14",
+      "15",
+      "16",
+      "17",
+      "18",
+      "19",
+      "20",
+      "21",
+      "22",
+      "23",
+      "24",
+      "25",
+      "26",
+      "27",
+      "28",
+      "29",
+      "30"
+    ],
+    "files": [
+      {
+        "key": "processed/companies_by_initial/_part=%21/data_0.parquet",
+        "rows": 8,
+        "size": 9881
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%22/data_0.parquet",
+        "rows": 8,
+        "size": 10235
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%23/data_0.parquet",
+        "rows": 26,
+        "size": 15885
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%24/data_0.parquet",
+        "rows": 2,
+        "size": 7120
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%26/data_0.parquet",
+        "rows": 40,
+        "size": 19011
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%27/data_0.parquet",
+        "rows": 13,
+        "size": 11244
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%28/data_0.parquet",
+        "rows": 24,
+        "size": 16021
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%2A/data_0.parquet",
+        "rows": 6,
+        "size": 9050
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%2B/data_0.parquet",
+        "rows": 26,
+        "size": 16002
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%2C/data_0.parquet",
+        "rows": 2,
+        "size": 6467
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%2F/data_0.parquet",
+        "rows": 5,
+        "size": 8794
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%3A/data_0.parquet",
+        "rows": 10,
+        "size": 10590
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%3C/data_0.parquet",
+        "rows": 1,
+        "size": 6322
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%3D/data_0.parquet",
+        "rows": 1,
+        "size": 6371
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%3E/data_0.parquet",
+        "rows": 1,
+        "size": 5884
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%3F/data_0.parquet",
+        "rows": 2,
+        "size": 6231
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%40/data_0.parquet",
+        "rows": 29,
+        "size": 16522
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%5B/data_0.parquet",
+        "rows": 28,
+        "size": 16442
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%5C/data_0.parquet",
+        "rows": 1,
+        "size": 6395
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%60/data_0.parquet",
+        "rows": 1,
+        "size": 5873
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%7B/data_0.parquet",
+        "rows": 5,
+        "size": 8952
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%7D/data_0.parquet",
+        "rows": 1,
+        "size": 6594
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C2%B0/data_0.parquet",
+        "rows": 1,
+        "size": 6954
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C2%B4/data_0.parquet",
+        "rows": 1,
+        "size": 5676
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C2%BF/data_0.parquet",
+        "rows": 1,
+        "size": 6483
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C3%A0/data_0.parquet",
+        "rows": 12,
+        "size": 11253
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C3%A1/data_0.parquet",
+        "rows": 118,
+        "size": 39369
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C3%A2/data_0.parquet",
+        "rows": 7,
+        "size": 9652
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C3%A4/data_0.parquet",
+        "rows": 10,
+        "size": 10640
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C3%A5/data_0.parquet",
+        "rows": 42,
+        "size": 19603
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C3%A7/data_0.parquet",
+        "rows": 113,
+        "size": 38271
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C3%A8/data_0.parquet",
+        "rows": 4,
+        "size": 7545
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C3%A9/data_0.parquet",
+        "rows": 88,
+        "size": 33811
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C3%AA/data_0.parquet",
+        "rows": 5,
+        "size": 8566
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C3%AB/data_0.parquet",
+        "rows": 2,
+        "size": 6384
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C3%AD/data_0.parquet",
+        "rows": 5,
+        "size": 9125
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C3%B1/data_0.parquet",
+        "rows": 1,
+        "size": 5616
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C3%B2/data_0.parquet",
+        "rows": 1,
+        "size": 6267
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C3%B3/data_0.parquet",
+        "rows": 45,
+        "size": 20764
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C3%B4/data_0.parquet",
+        "rows": 12,
+        "size": 10565
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C3%B5/data_0.parquet",
+        "rows": 2,
+        "size": 6535
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C3%B6/data_0.parquet",
+        "rows": 216,
+        "size": 62445
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C3%B8/data_0.parquet",
+        "rows": 17,
+        "size": 13095
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C3%BA/data_0.parquet",
+        "rows": 13,
+        "size": 11425
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C3%BC/data_0.parquet",
+        "rows": 80,
+        "size": 29737
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C4%81/data_0.parquet",
+        "rows": 2,
+        "size": 6315
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C4%8D/data_0.parquet",
+        "rows": 24,
+        "size": 14028
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C4%91/data_0.parquet",
+        "rows": 12,
+        "size": 11567
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C4%93/data_0.parquet",
+        "rows": 1,
+        "size": 6467
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C4%B1/data_0.parquet",
+        "rows": 1,
+        "size": 5955
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C5%82/data_0.parquet",
+        "rows": 6,
+        "size": 9371
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C5%91/data_0.parquet",
+        "rows": 1,
+        "size": 6094
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C5%99/data_0.parquet",
+        "rows": 1,
+        "size": 5634
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C5%9B/data_0.parquet",
+        "rows": 2,
+        "size": 6705
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C5%9F/data_0.parquet",
+        "rows": 62,
+        "size": 25087
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C5%A1/data_0.parquet",
+        "rows": 15,
+        "size": 11840
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C5%BC/data_0.parquet",
+        "rows": 1,
+        "size": 5904
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%C8%99/data_0.parquet",
+        "rows": 1,
+        "size": 6261
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%E2%80%8B/data_0.parquet",
+        "rows": 141,
+        "size": 48666
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%E2%80%8D/data_0.parquet",
+        "rows": 7,
+        "size": 9493
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%E2%80%8E/data_0.parquet",
+        "rows": 3,
+        "size": 7406
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%E2%80%98/data_0.parquet",
+        "rows": 2,
+        "size": 7403
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%E2%80%99/data_0.parquet",
+        "rows": 2,
+        "size": 6788
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%E2%80%9A/data_0.parquet",
+        "rows": 1,
+        "size": 5928
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%E2%80%9C/data_0.parquet",
+        "rows": 1,
+        "size": 5568
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%E2%80%A6/data_0.parquet",
+        "rows": 1,
+        "size": 6300
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%ED%94%8C/data_0.parquet",
+        "rows": 1,
+        "size": 5828
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%EF%B8%8F/data_0.parquet",
+        "rows": 1,
+        "size": 6191
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%EF%BC%93/data_0.parquet",
+        "rows": 1,
+        "size": 5418
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%EF%BD%84/data_0.parquet",
+        "rows": 1,
+        "size": 5736
+      },
+      {
+        "key": "processed/companies_by_initial/_part=%F0%9D%97%99/data_0.parquet",
+        "rows": 1,
+        "size": 6119
+      },
+      {
+        "key": "processed/companies_by_initial/_part=-/data_0.parquet",
+        "rows": 6,
+        "size": 8876
+      },
+      {
+        "key": "processed/companies_by_initial/_part=/data_0.parquet",
+        "rows": 38,
+        "size": 18654
+      },
+      {
+        "key": "processed/companies_by_initial/_part=0/data_0.parquet",
+        "rows": 125,
+        "size": 39575
+      },
+      {
+        "key": "processed/companies_by_initial/_part=1/data_0.parquet",
+        "rows": 2694,
+        "size": 616260
+      },
+      {
+        "key": "processed/companies_by_initial/_part=2/data_0.parquet",
+        "rows": 2198,
+        "size": 500680
+      },
+      {
+        "key": "processed/companies_by_initial/_part=3/data_0.parquet",
+        "rows": 3281,
+        "size": 729089
+      },
+      {
+        "key": "processed/companies_by_initial/_part=4/data_0.parquet",
+        "rows": 1720,
+        "size": 387762
+      },
+      {
+        "key": "processed/companies_by_initial/_part=5/data_0.parquet",
+        "rows": 762,
+        "size": 183480
+      },
+      {
+        "key": "processed/companies_by_initial/_part=6/data_0.parquet",
+        "rows": 339,
+        "size": 89458
+      },
+      {
+        "key": "processed/companies_by_initial/_part=7/data_0.parquet",
+        "rows": 619,
+        "size": 150224
+      },
+      {
+        "key": "processed/companies_by_initial/_part=8/data_0.parquet",
+        "rows": 459,
+        "size": 117174
+      },
+      {
+        "key": "processed/companies_by_initial/_part=9/data_0.parquet",
+        "rows": 577,
+        "size": 142285
+      },
+      {
+        "key": "processed/companies_by_initial/_part=_/data_0.parquet",
+        "rows": 4,
+        "size": 7407
+      },
+      {
+        "key": "processed/companies_by_initial/_part=a/data_0.parquet",
+        "rows": 119256,
+        "size": 26274286
+      },
+      {
+        "key": "processed/companies_by_initial/_part=b/data_0.parquet",
+        "rows": 54901,
+        "size": 12259954
+      },
+      {
+        "key": "processed/companies_by_initial/_part=c/data_0.parquet",
+        "rows": 149035,
+        "size": 32802450
+      },
+      {
+        "key": "processed/companies_by_initial/_part=d/data_0.parquet",
+        "rows": 75643,
+        "size": 16731714
+      },
+      {
+        "key": "processed/companies_by_initial/_part=e/data_0.parquet",
+        "rows": 79509,
+        "size": 17378259
+      },
+      {
+        "key": "processed/companies_by_initial/_part=f/data_0.parquet",
+        "rows": 64648,
+        "size": 14343718
+      },
+      {
+        "key": "processed/companies_by_initial/_part=g/data_0.parquet",
+        "rows": 70930,
+        "size": 15694715
+      },
+      {
+        "key": "processed/companies_by_initial/_part=h/data_0.parquet",
+        "rows": 56526,
+        "size": 12618321
+      },
+      {
+        "key": "processed/companies_by_initial/_part=i/data_0.parquet",
+        "rows": 42280,
+        "size": 9268982
+      },
+      {
+        "key": "processed/companies_by_initial/_part=j/data_0.parquet",
+        "rows": 27804,
+        "size": 6252540
+      },
+      {
+        "key": "processed/companies_by_initial/_part=k/data_0.parquet",
+        "rows": 41966,
+        "size": 9394851
+      },
+      {
+        "key": "processed/companies_by_initial/_part=l/data_0.parquet",
+        "rows": 63260,
+        "size": 14077901
+      },
+      {
+        "key": "processed/companies_by_initial/_part=m/data_0.parquet",
+        "rows": 116466,
+        "size": 25742267
+      },
+      {
+        "key": "processed/companies_by_initial/_part=n/data_0.parquet",
+        "rows": 55042,
+        "size": 12213939
+      },
+      {
+        "key": "processed/companies_by_initial/_part=o/data_0.parquet",
+        "rows": 38937,
+        "size": 8626089
+      },
+      {
+        "key": "processed/companies_by_initial/_part=p/data_0.parquet",
+        "rows": 79792,
+        "size": 17576736
+      },
+      {
+        "key": "processed/companies_by_initial/_part=q/data_0.parquet",
+        "rows": 10012,
+        "size": 2206965
+      },
+      {
+        "key": "processed/companies_by_initial/_part=r/data_0.parquet",
+        "rows": 68837,
+        "size": 15233017
+      },
+      {
+        "key": "processed/companies_by_initial/_part=s/data_0.parquet",
+        "rows": 151155,
+        "size": 33381423
+      },
+      {
+        "key": "processed/companies_by_initial/_part=t/data_0.parquet",
+        "rows": 103560,
+        "size": 22921471
+      },
+      {
+        "key": "processed/companies_by_initial/_part=u/data_0.parquet",
+        "rows": 22518,
+        "size": 5029810
+      },
+      {
+        "key": "processed/companies_by_initial/_part=v/data_0.parquet",
+        "rows": 40249,
+        "size": 8873780
+      },
+      {
+        "key": "processed/companies_by_initial/_part=w/data_0.parquet",
+        "rows": 48116,
+        "size": 10648926
+      },
+      {
+        "key": "processed/companies_by_initial/_part=x/data_0.parquet",
+        "rows": 4062,
+        "size": 899869
+      },
+      {
+        "key": "processed/companies_by_initial/_part=y/data_0.parquet",
+        "rows": 2824,
+        "size": 667260
+      },
+      {
+        "key": "processed/companies_by_initial/_part=z/data_0.parquet",
+        "rows": 663,
+        "size": 165865
+      }
+    ]
+  },
+  "processed/people_by_country/": {
+    "objects": 362,
+    "bytes": 62039368,
+    "rows": 484325,
+    "min_rows": 1,
+    "max_rows": 351216,
+    "schema": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11",
+      "12",
+      "13",
+      "14",
+      "15",
+      "16",
+      "17",
+      "18",
+      "19",
+      "20",
+      "21",
+      "22",
+      "23",
+      "24",
+      "25",
+      "26",
+      "27",
+      "28",
+      "29"
+    ],
+    "files": [
+      {
+        "key": "processed/people_by_country/_part=afghanistan/data_0.parquet",
+        "rows": 32,
+        "size": 12124
+      },
+      {
+        "key": "processed/people_by_country/_part=afghanistan/data_1.parquet",
+        "rows": 4,
+        "size": 5613
+      },
+      {
+        "key": "processed/people_by_country/_part=albania/data_0.parquet",
+        "rows": 15,
+        "size": 10933
+      },
+      {
+        "key": "processed/people_by_country/_part=albania/data_1.parquet",
+        "rows": 9,
+        "size": 8948
+      },
+      {
+        "key": "processed/people_by_country/_part=algeria/data_0.parquet",
+        "rows": 26,
+        "size": 13734
+      },
+      {
+        "key": "processed/people_by_country/_part=algeria/data_1.parquet",
+        "rows": 15,
+        "size": 10442
+      },
+      {
+        "key": "processed/people_by_country/_part=american-samoa/data_0.parquet",
+        "rows": 1,
+        "size": 6426
+      },
+      {
+        "key": "processed/people_by_country/_part=andorra/data_0.parquet",
+        "rows": 3,
+        "size": 6939
+      },
+      {
+        "key": "processed/people_by_country/_part=angola/data_0.parquet",
+        "rows": 4,
+        "size": 8083
+      },
+      {
+        "key": "processed/people_by_country/_part=argentina/data_0.parquet",
+        "rows": 805,
+        "size": 73384
+      },
+      {
+        "key": "processed/people_by_country/_part=argentina/data_1.parquet",
+        "rows": 251,
+        "size": 37432
+      },
+      {
+        "key": "processed/people_by_country/_part=arizona/data_0.parquet",
+        "rows": 3,
+        "size": 6085
+      },
+      {
+        "key": "processed/people_by_country/_part=armenia/data_0.parquet",
+        "rows": 16,
+        "size": 11733
+      },
+      {
+        "key": "processed/people_by_country/_part=armenia/data_1.parquet",
+        "rows": 5,
+        "size": 7958
+      },
+      {
+        "key": "processed/people_by_country/_part=australia/data_0.parquet",
+        "rows": 7482,
+        "size": 519973
+      },
+      {
+        "key": "processed/people_by_country/_part=australia/data_1.parquet",
+        "rows": 6252,
+        "size": 399565
+      },
+      {
+        "key": "processed/people_by_country/_part=austria/data_0.parquet",
+        "rows": 190,
+        "size": 31742
+      },
+      {
+        "key": "processed/people_by_country/_part=austria/data_1.parquet",
+        "rows": 159,
+        "size": 22247
+      },
+      {
+        "key": "processed/people_by_country/_part=azerbaijan/data_0.parquet",
+        "rows": 19,
+        "size": 11430
+      },
+      {
+        "key": "processed/people_by_country/_part=azerbaijan/data_1.parquet",
+        "rows": 1,
+        "size": 6877
+      },
+      {
+        "key": "processed/people_by_country/_part=bahrain/data_0.parquet",
+        "rows": 146,
+        "size": 18740
+      },
+      {
+        "key": "processed/people_by_country/_part=bahrain/data_1.parquet",
+        "rows": 61,
+        "size": 12253
+      },
+      {
+        "key": "processed/people_by_country/_part=bangladesh/data_0.parquet",
+        "rows": 218,
+        "size": 32760
+      },
+      {
+        "key": "processed/people_by_country/_part=bangladesh/data_1.parquet",
+        "rows": 141,
+        "size": 21026
+      },
+      {
+        "key": "processed/people_by_country/_part=barbados/data_0.parquet",
+        "rows": 1,
+        "size": 5088
+      },
+      {
+        "key": "processed/people_by_country/_part=barbados/data_1.parquet",
+        "rows": 1,
+        "size": 4838
+      },
+      {
+        "key": "processed/people_by_country/_part=beijing/data_0.parquet",
+        "rows": 1,
+        "size": 6896
+      },
+      {
+        "key": "processed/people_by_country/_part=belarus/data_0.parquet",
+        "rows": 16,
+        "size": 10707
+      },
+      {
+        "key": "processed/people_by_country/_part=belarus/data_1.parquet",
+        "rows": 13,
+        "size": 9350
+      },
+      {
+        "key": "processed/people_by_country/_part=belgium/data_0.parquet",
+        "rows": 2408,
+        "size": 141661
+      },
+      {
+        "key": "processed/people_by_country/_part=belize/data_0.parquet",
+        "rows": 2,
+        "size": 5061
+      },
+      {
+        "key": "processed/people_by_country/_part=benin/data_0.parquet",
+        "rows": 10,
+        "size": 8886
+      },
+      {
+        "key": "processed/people_by_country/_part=benin/data_1.parquet",
+        "rows": 1,
+        "size": 4603
+      },
+      {
+        "key": "processed/people_by_country/_part=berlin/data_0.parquet",
+        "rows": 1,
+        "size": 6961
+      },
+      {
+        "key": "processed/people_by_country/_part=bogota/data_0.parquet",
+        "rows": 1,
+        "size": 6577
+      },
+      {
+        "key": "processed/people_by_country/_part=bolivia/data_0.parquet",
+        "rows": 6,
+        "size": 9882
+      },
+      {
+        "key": "processed/people_by_country/_part=bolivia/data_1.parquet",
+        "rows": 5,
+        "size": 8160
+      },
+      {
+        "key": "processed/people_by_country/_part=bosnia-and-herzegovina/data_0.parquet",
+        "rows": 21,
+        "size": 10911
+      },
+      {
+        "key": "processed/people_by_country/_part=bosnia-and-herzegovina/data_1.parquet",
+        "rows": 8,
+        "size": 8352
+      },
+      {
+        "key": "processed/people_by_country/_part=boston/data_0.parquet",
+        "rows": 1,
+        "size": 5508
+      },
+      {
+        "key": "processed/people_by_country/_part=botswana/data_0.parquet",
+        "rows": 13,
+        "size": 9110
+      },
+      {
+        "key": "processed/people_by_country/_part=botswana/data_1.parquet",
+        "rows": 3,
+        "size": 6763
+      },
+      {
+        "key": "processed/people_by_country/_part=brazil/data_0.parquet",
+        "rows": 3394,
+        "size": 268512
+      },
+      {
+        "key": "processed/people_by_country/_part=brazil/data_1.parquet",
+        "rows": 2766,
+        "size": 193523
+      },
+      {
+        "key": "processed/people_by_country/_part=bulgaria/data_0.parquet",
+        "rows": 79,
+        "size": 18716
+      },
+      {
+        "key": "processed/people_by_country/_part=bulgaria/data_1.parquet",
+        "rows": 35,
+        "size": 12536
+      },
+      {
+        "key": "processed/people_by_country/_part=burkina-faso/data_0.parquet",
+        "rows": 7,
+        "size": 8957
+      },
+      {
+        "key": "processed/people_by_country/_part=burkina-faso/data_1.parquet",
+        "rows": 3,
+        "size": 7235
+      },
+      {
+        "key": "processed/people_by_country/_part=burundi/data_0.parquet",
+        "rows": 4,
+        "size": 7909
+      },
+      {
+        "key": "processed/people_by_country/_part=california/data_0.parquet",
+        "rows": 3,
+        "size": 7202
+      },
+      {
+        "key": "processed/people_by_country/_part=california/data_1.parquet",
+        "rows": 1,
+        "size": 4644
+      },
+      {
+        "key": "processed/people_by_country/_part=cambodia/data_0.parquet",
+        "rows": 27,
+        "size": 14104
+      },
+      {
+        "key": "processed/people_by_country/_part=cambodia/data_1.parquet",
+        "rows": 5,
+        "size": 8899
+      },
+      {
+        "key": "processed/people_by_country/_part=cameroon/data_0.parquet",
+        "rows": 38,
+        "size": 13153
+      },
+      {
+        "key": "processed/people_by_country/_part=cameroon/data_1.parquet",
+        "rows": 11,
+        "size": 9222
+      },
+      {
+        "key": "processed/people_by_country/_part=canada/data_0.parquet",
+        "rows": 13061,
+        "size": 1046123
+      },
+      {
+        "key": "processed/people_by_country/_part=canada/data_1.parquet",
+        "rows": 3843,
+        "size": 589448
+      },
+      {
+        "key": "processed/people_by_country/_part=catalonia/data_0.parquet",
+        "rows": 1,
+        "size": 6700
+      },
+      {
+        "key": "processed/people_by_country/_part=central-african-republic/data_0.parquet",
+        "rows": 1,
+        "size": 7209
+      },
+      {
+        "key": "processed/people_by_country/_part=central-african-republic/data_1.parquet",
+        "rows": 1,
+        "size": 4949
+      },
+      {
+        "key": "processed/people_by_country/_part=chad/data_0.parquet",
+        "rows": 4,
+        "size": 6923
+      },
+      {
+        "key": "processed/people_by_country/_part=chad/data_1.parquet",
+        "rows": 3,
+        "size": 5860
+      },
+      {
+        "key": "processed/people_by_country/_part=chile/data_0.parquet",
+        "rows": 246,
+        "size": 35932
+      },
+      {
+        "key": "processed/people_by_country/_part=chile/data_1.parquet",
+        "rows": 94,
+        "size": 24858
+      },
+      {
+        "key": "processed/people_by_country/_part=china/data_0.parquet",
+        "rows": 1772,
+        "size": 123323
+      },
+      {
+        "key": "processed/people_by_country/_part=china/data_1.parquet",
+        "rows": 1017,
+        "size": 62486
+      },
+      {
+        "key": "processed/people_by_country/_part=colombia/data_0.parquet",
+        "rows": 207,
+        "size": 40419
+      },
+      {
+        "key": "processed/people_by_country/_part=colombia/data_1.parquet",
+        "rows": 92,
+        "size": 24219
+      },
+      {
+        "key": "processed/people_by_country/_part=colorado/data_0.parquet",
+        "rows": 1,
+        "size": 6959
+      },
+      {
+        "key": "processed/people_by_country/_part=costa-rica/data_0.parquet",
+        "rows": 61,
+        "size": 19907
+      },
+      {
+        "key": "processed/people_by_country/_part=costa-rica/data_1.parquet",
+        "rows": 15,
+        "size": 11382
+      },
+      {
+        "key": "processed/people_by_country/_part=cote-d-ivoire/data_0.parquet",
+        "rows": 64,
+        "size": 17952
+      },
+      {
+        "key": "processed/people_by_country/_part=cote-d-ivoire/data_1.parquet",
+        "rows": 46,
+        "size": 12344
+      },
+      {
+        "key": "processed/people_by_country/_part=croatia/data_0.parquet",
+        "rows": 50,
+        "size": 16596
+      },
+      {
+        "key": "processed/people_by_country/_part=croatia/data_1.parquet",
+        "rows": 54,
+        "size": 13113
+      },
+      {
+        "key": "processed/people_by_country/_part=cuba/data_0.parquet",
+        "rows": 1,
+        "size": 4658
+      },
+      {
+        "key": "processed/people_by_country/_part=curacao/data_0.parquet",
+        "rows": 2,
+        "size": 6785
+      },
+      {
+        "key": "processed/people_by_country/_part=cyprus/data_0.parquet",
+        "rows": 4,
+        "size": 7523
+      },
+      {
+        "key": "processed/people_by_country/_part=czech-republic/data_0.parquet",
+        "rows": 53,
+        "size": 18252
+      },
+      {
+        "key": "processed/people_by_country/_part=czech-republic/data_1.parquet",
+        "rows": 24,
+        "size": 12732
+      },
+      {
+        "key": "processed/people_by_country/_part=czechia/data_0.parquet",
+        "rows": 65,
+        "size": 21481
+      },
+      {
+        "key": "processed/people_by_country/_part=czechia/data_1.parquet",
+        "rows": 38,
+        "size": 15346
+      },
+      {
+        "key": "processed/people_by_country/_part=democratic-republic-of-the-congo/data_0.parquet",
+        "rows": 14,
+        "size": 10282
+      },
+      {
+        "key": "processed/people_by_country/_part=denmark/data_0.parquet",
+        "rows": 396,
+        "size": 46891
+      },
+      {
+        "key": "processed/people_by_country/_part=denmark/data_1.parquet",
+        "rows": 332,
+        "size": 31266
+      },
+      {
+        "key": "processed/people_by_country/_part=djibouti/data_0.parquet",
+        "rows": 4,
+        "size": 8628
+      },
+      {
+        "key": "processed/people_by_country/_part=djibouti/data_1.parquet",
+        "rows": 4,
+        "size": 7117
+      },
+      {
+        "key": "processed/people_by_country/_part=dominican-republic/data_0.parquet",
+        "rows": 3,
+        "size": 7663
+      },
+      {
+        "key": "processed/people_by_country/_part=dubois/data_0.parquet",
+        "rows": 1,
+        "size": 5158
+      },
+      {
+        "key": "processed/people_by_country/_part=ecuador/data_0.parquet",
+        "rows": 18,
+        "size": 12840
+      },
+      {
+        "key": "processed/people_by_country/_part=ecuador/data_1.parquet",
+        "rows": 7,
+        "size": 9469
+      },
+      {
+        "key": "processed/people_by_country/_part=egypt/data_0.parquet",
+        "rows": 311,
+        "size": 37040
+      },
+      {
+        "key": "processed/people_by_country/_part=egypt/data_1.parquet",
+        "rows": 194,
+        "size": 21962
+      },
+      {
+        "key": "processed/people_by_country/_part=el-salvador/data_0.parquet",
+        "rows": 12,
+        "size": 10348
+      },
+      {
+        "key": "processed/people_by_country/_part=el-salvador/data_1.parquet",
+        "rows": 1,
+        "size": 5181
+      },
+      {
+        "key": "processed/people_by_country/_part=eritrea/data_0.parquet",
+        "rows": 1,
+        "size": 6921
+      },
+      {
+        "key": "processed/people_by_country/_part=estonia/data_0.parquet",
+        "rows": 53,
+        "size": 17319
+      },
+      {
+        "key": "processed/people_by_country/_part=estonia/data_1.parquet",
+        "rows": 18,
+        "size": 11182
+      },
+      {
+        "key": "processed/people_by_country/_part=ethiopia/data_0.parquet",
+        "rows": 98,
+        "size": 20840
+      },
+      {
+        "key": "processed/people_by_country/_part=ethiopia/data_1.parquet",
+        "rows": 25,
+        "size": 11940
+      },
+      {
+        "key": "processed/people_by_country/_part=federal-territory-of-kuala-lumpur/data_0.parquet",
+        "rows": 1,
+        "size": 6873
+      },
+      {
+        "key": "processed/people_by_country/_part=fiji/data_0.parquet",
+        "rows": 6,
+        "size": 9309
+      },
+      {
+        "key": "processed/people_by_country/_part=finland/data_0.parquet",
+        "rows": 464,
+        "size": 46744
+      },
+      {
+        "key": "processed/people_by_country/_part=finland/data_1.parquet",
+        "rows": 223,
+        "size": 25701
+      },
+      {
+        "key": "processed/people_by_country/_part=flanders/data_0.parquet",
+        "rows": 1,
+        "size": 6752
+      },
+      {
+        "key": "processed/people_by_country/_part=france/data_0.parquet",
+        "rows": 2994,
+        "size": 218983
+      },
+      {
+        "key": "processed/people_by_country/_part=france/data_1.parquet",
+        "rows": 95,
+        "size": 16863
+      },
+      {
+        "key": "processed/people_by_country/_part=gabon/data_0.parquet",
+        "rows": 2,
+        "size": 7854
+      },
+      {
+        "key": "processed/people_by_country/_part=gauteng/data_0.parquet",
+        "rows": 1,
+        "size": 6315
+      },
+      {
+        "key": "processed/people_by_country/_part=georgia/data_0.parquet",
+        "rows": 37,
+        "size": 15688
+      },
+      {
+        "key": "processed/people_by_country/_part=georgia/data_1.parquet",
+        "rows": 16,
+        "size": 10737
+      },
+      {
+        "key": "processed/people_by_country/_part=germany/data_0.parquet",
+        "rows": 6260,
+        "size": 465190
+      },
+      {
+        "key": "processed/people_by_country/_part=germany/data_1.parquet",
+        "rows": 5690,
+        "size": 370927
+      },
+      {
+        "key": "processed/people_by_country/_part=ghana/data_0.parquet",
+        "rows": 127,
+        "size": 23464
+      },
+      {
+        "key": "processed/people_by_country/_part=ghana/data_1.parquet",
+        "rows": 111,
+        "size": 17455
+      },
+      {
+        "key": "processed/people_by_country/_part=greece/data_0.parquet",
+        "rows": 172,
+        "size": 23762
+      },
+      {
+        "key": "processed/people_by_country/_part=greece/data_1.parquet",
+        "rows": 2,
+        "size": 5012
+      },
+      {
+        "key": "processed/people_by_country/_part=guadeloupe/data_0.parquet",
+        "rows": 2,
+        "size": 7377
+      },
+      {
+        "key": "processed/people_by_country/_part=guam/data_0.parquet",
+        "rows": 5,
+        "size": 8565
+      },
+      {
+        "key": "processed/people_by_country/_part=guatemala/data_0.parquet",
+        "rows": 57,
+        "size": 15628
+      },
+      {
+        "key": "processed/people_by_country/_part=guatemala/data_1.parquet",
+        "rows": 7,
+        "size": 7962
+      },
+      {
+        "key": "processed/people_by_country/_part=guinea/data_0.parquet",
+        "rows": 2,
+        "size": 6898
+      },
+      {
+        "key": "processed/people_by_country/_part=haiti/data_0.parquet",
+        "rows": 6,
+        "size": 9205
+      },
+      {
+        "key": "processed/people_by_country/_part=haiti/data_1.parquet",
+        "rows": 2,
+        "size": 6754
+      },
+      {
+        "key": "processed/people_by_country/_part=hamburg/data_0.parquet",
+        "rows": 1,
+        "size": 6139
+      },
+      {
+        "key": "processed/people_by_country/_part=haryana/data_0.parquet",
+        "rows": 1,
+        "size": 6237
+      },
+      {
+        "key": "processed/people_by_country/_part=hawaii/data_0.parquet",
+        "rows": 1,
+        "size": 5090
+      },
+      {
+        "key": "processed/people_by_country/_part=honduras/data_0.parquet",
+        "rows": 5,
+        "size": 9102
+      },
+      {
+        "key": "processed/people_by_country/_part=hong-kong/data_0.parquet",
+        "rows": 384,
+        "size": 35510
+      },
+      {
+        "key": "processed/people_by_country/_part=hong-kong/data_1.parquet",
+        "rows": 339,
+        "size": 27902
+      },
+      {
+        "key": "processed/people_by_country/_part=https-www-facebook-com-cbc-/data_0.parquet",
+        "rows": 1,
+        "size": 5101
+      },
+      {
+        "key": "processed/people_by_country/_part=hungary/data_0.parquet",
+        "rows": 343,
+        "size": 40638
+      },
+      {
+        "key": "processed/people_by_country/_part=hungary/data_1.parquet",
+        "rows": 172,
+        "size": 20538
+      },
+      {
+        "key": "processed/people_by_country/_part=iceland/data_0.parquet",
+        "rows": 9,
+        "size": 7217
+      },
+      {
+        "key": "processed/people_by_country/_part=iceland/data_1.parquet",
+        "rows": 10,
+        "size": 7502
+      },
+      {
+        "key": "processed/people_by_country/_part=illinois/data_0.parquet",
+        "rows": 2,
+        "size": 7181
+      },
+      {
+        "key": "processed/people_by_country/_part=india/data_0.parquet",
+        "rows": 23238,
+        "size": 1502706
+      },
+      {
+        "key": "processed/people_by_country/_part=india/data_1.parquet",
+        "rows": 1810,
+        "size": 96131
+      },
+      {
+        "key": "processed/people_by_country/_part=indonesia/data_0.parquet",
+        "rows": 1001,
+        "size": 85704
+      },
+      {
+        "key": "processed/people_by_country/_part=indonesia/data_1.parquet",
+        "rows": 756,
+        "size": 50760
+      },
+      {
+        "key": "processed/people_by_country/_part=iowa/data_0.parquet",
+        "rows": 1,
+        "size": 5984
+      },
+      {
+        "key": "processed/people_by_country/_part=iran/data_0.parquet",
+        "rows": 42,
+        "size": 16896
+      },
+      {
+        "key": "processed/people_by_country/_part=iran/data_1.parquet",
+        "rows": 12,
+        "size": 9646
+      },
+      {
+        "key": "processed/people_by_country/_part=iraq/data_0.parquet",
+        "rows": 29,
+        "size": 12384
+      },
+      {
+        "key": "processed/people_by_country/_part=iraq/data_1.parquet",
+        "rows": 5,
+        "size": 6981
+      },
+      {
+        "key": "processed/people_by_country/_part=ireland/data_0.parquet",
+        "rows": 439,
+        "size": 40725
+      },
+      {
+        "key": "processed/people_by_country/_part=ireland/data_1.parquet",
+        "rows": 14,
+        "size": 7358
+      },
+      {
+        "key": "processed/people_by_country/_part=isle-of-man/data_0.parquet",
+        "rows": 1,
+        "size": 5976
+      },
+      {
+        "key": "processed/people_by_country/_part=israel/data_0.parquet",
+        "rows": 813,
+        "size": 79337
+      },
+      {
+        "key": "processed/people_by_country/_part=israel/data_1.parquet",
+        "rows": 653,
+        "size": 53506
+      },
+      {
+        "key": "processed/people_by_country/_part=italy/data_0.parquet",
+        "rows": 2943,
+        "size": 191396
+      },
+      {
+        "key": "processed/people_by_country/_part=italy/data_1.parquet",
+        "rows": 161,
+        "size": 18958
+      },
+      {
+        "key": "processed/people_by_country/_part=ithaca/data_0.parquet",
+        "rows": 2,
+        "size": 5265
+      },
+      {
+        "key": "processed/people_by_country/_part=jamaica/data_0.parquet",
+        "rows": 8,
+        "size": 9634
+      },
+      {
+        "key": "processed/people_by_country/_part=japan/data_0.parquet",
+        "rows": 1283,
+        "size": 97744
+      },
+      {
+        "key": "processed/people_by_country/_part=japan/data_1.parquet",
+        "rows": 238,
+        "size": 28177
+      },
+      {
+        "key": "processed/people_by_country/_part=jordan/data_0.parquet",
+        "rows": 55,
+        "size": 16262
+      },
+      {
+        "key": "processed/people_by_country/_part=jordan/data_1.parquet",
+        "rows": 18,
+        "size": 10107
+      },
+      {
+        "key": "processed/people_by_country/_part=kazakhstan/data_0.parquet",
+        "rows": 27,
+        "size": 13357
+      },
+      {
+        "key": "processed/people_by_country/_part=kazakhstan/data_1.parquet",
+        "rows": 47,
+        "size": 13346
+      },
+      {
+        "key": "processed/people_by_country/_part=kenya/data_0.parquet",
+        "rows": 345,
+        "size": 42764
+      },
+      {
+        "key": "processed/people_by_country/_part=kenya/data_1.parquet",
+        "rows": 177,
+        "size": 24181
+      },
+      {
+        "key": "processed/people_by_country/_part=kosovo/data_0.parquet",
+        "rows": 12,
+        "size": 10126
+      },
+      {
+        "key": "processed/people_by_country/_part=kosovo/data_1.parquet",
+        "rows": 3,
+        "size": 5400
+      },
+      {
+        "key": "processed/people_by_country/_part=kuwait/data_0.parquet",
+        "rows": 6,
+        "size": 9778
+      },
+      {
+        "key": "processed/people_by_country/_part=kuwait/data_1.parquet",
+        "rows": 3,
+        "size": 7983
+      },
+      {
+        "key": "processed/people_by_country/_part=kuwait/data_2.parquet",
+        "rows": 1,
+        "size": 4442
+      },
+      {
+        "key": "processed/people_by_country/_part=kyrgyzstan/data_0.parquet",
+        "rows": 16,
+        "size": 9515
+      },
+      {
+        "key": "processed/people_by_country/_part=laos/data_0.parquet",
+        "rows": 10,
+        "size": 9137
+      },
+      {
+        "key": "processed/people_by_country/_part=laos/data_1.parquet",
+        "rows": 1,
+        "size": 5282
+      },
+      {
+        "key": "processed/people_by_country/_part=latvia/data_0.parquet",
+        "rows": 18,
+        "size": 12811
+      },
+      {
+        "key": "processed/people_by_country/_part=latvia/data_1.parquet",
+        "rows": 13,
+        "size": 10248
+      },
+      {
+        "key": "processed/people_by_country/_part=lebanon/data_0.parquet",
+        "rows": 39,
+        "size": 15152
+      },
+      {
+        "key": "processed/people_by_country/_part=lebanon/data_1.parquet",
+        "rows": 19,
+        "size": 10837
+      },
+      {
+        "key": "processed/people_by_country/_part=lesotho/data_0.parquet",
+        "rows": 6,
+        "size": 9322
+      },
+      {
+        "key": "processed/people_by_country/_part=liberia/data_0.parquet",
+        "rows": 8,
+        "size": 8366
+      },
+      {
+        "key": "processed/people_by_country/_part=liberia/data_1.parquet",
+        "rows": 2,
+        "size": 7030
+      },
+      {
+        "key": "processed/people_by_country/_part=libya/data_0.parquet",
+        "rows": 1,
+        "size": 6725
+      },
+      {
+        "key": "processed/people_by_country/_part=lithuania/data_0.parquet",
+        "rows": 126,
+        "size": 22475
+      },
+      {
+        "key": "processed/people_by_country/_part=lithuania/data_1.parquet",
+        "rows": 140,
+        "size": 20519
+      },
+      {
+        "key": "processed/people_by_country/_part=lombardy/data_0.parquet",
+        "rows": 1,
+        "size": 6506
+      },
+      {
+        "key": "processed/people_by_country/_part=luxembourg/data_0.parquet",
+        "rows": 34,
+        "size": 14352
+      },
+      {
+        "key": "processed/people_by_country/_part=luxembourg/data_1.parquet",
+        "rows": 26,
+        "size": 11465
+      },
+      {
+        "key": "processed/people_by_country/_part=madagascar/data_0.parquet",
+        "rows": 5,
+        "size": 8726
+      },
+      {
+        "key": "processed/people_by_country/_part=maharashtra/data_0.parquet",
+        "rows": 1,
+        "size": 6730
+      },
+      {
+        "key": "processed/people_by_country/_part=malawi/data_0.parquet",
+        "rows": 25,
+        "size": 13322
+      },
+      {
+        "key": "processed/people_by_country/_part=malawi/data_1.parquet",
+        "rows": 10,
+        "size": 8543
+      },
+      {
+        "key": "processed/people_by_country/_part=malaysia/data_0.parquet",
+        "rows": 521,
+        "size": 53515
+      },
+      {
+        "key": "processed/people_by_country/_part=malaysia/data_1.parquet",
+        "rows": 376,
+        "size": 33359
+      },
+      {
+        "key": "processed/people_by_country/_part=mali/data_0.parquet",
+        "rows": 10,
+        "size": 9914
+      },
+      {
+        "key": "processed/people_by_country/_part=mali/data_1.parquet",
+        "rows": 2,
+        "size": 6917
+      },
+      {
+        "key": "processed/people_by_country/_part=malta/data_0.parquet",
+        "rows": 1,
+        "size": 6732
+      },
+      {
+        "key": "processed/people_by_country/_part=malta/data_1.parquet",
+        "rows": 2,
+        "size": 7032
+      },
+      {
+        "key": "processed/people_by_country/_part=marshall-islands/data_0.parquet",
+        "rows": 2,
+        "size": 7301
+      },
+      {
+        "key": "processed/people_by_country/_part=marshall-islands/data_1.parquet",
+        "rows": 3,
+        "size": 4807
+      },
+      {
+        "key": "processed/people_by_country/_part=masovian-voivodeship/data_0.parquet",
+        "rows": 1,
+        "size": 6059
+      },
+      {
+        "key": "processed/people_by_country/_part=mauritania/data_0.parquet",
+        "rows": 3,
+        "size": 7907
+      },
+      {
+        "key": "processed/people_by_country/_part=mauritius/data_0.parquet",
+        "rows": 7,
+        "size": 8704
+      },
+      {
+        "key": "processed/people_by_country/_part=melbourne/data_0.parquet",
+        "rows": 1,
+        "size": 6378
+      },
+      {
+        "key": "processed/people_by_country/_part=mexico-city/data_0.parquet",
+        "rows": 1,
+        "size": 5417
+      },
+      {
+        "key": "processed/people_by_country/_part=mexico/data_0.parquet",
+        "rows": 1348,
+        "size": 115777
+      },
+      {
+        "key": "processed/people_by_country/_part=mexico/data_1.parquet",
+        "rows": 405,
+        "size": 49883
+      },
+      {
+        "key": "processed/people_by_country/_part=missouri/data_0.parquet",
+        "rows": 1,
+        "size": 4889
+      },
+      {
+        "key": "processed/people_by_country/_part=moldova/data_0.parquet",
+        "rows": 15,
+        "size": 10921
+      },
+      {
+        "key": "processed/people_by_country/_part=moldova/data_1.parquet",
+        "rows": 2,
+        "size": 5221
+      },
+      {
+        "key": "processed/people_by_country/_part=mongolia/data_0.parquet",
+        "rows": 6,
+        "size": 7939
+      },
+      {
+        "key": "processed/people_by_country/_part=mongolia/data_1.parquet",
+        "rows": 2,
+        "size": 5363
+      },
+      {
+        "key": "processed/people_by_country/_part=montenegro/data_0.parquet",
+        "rows": 8,
+        "size": 9040
+      },
+      {
+        "key": "processed/people_by_country/_part=montenegro/data_1.parquet",
+        "rows": 1,
+        "size": 6032
+      },
+      {
+        "key": "processed/people_by_country/_part=morocco/data_0.parquet",
+        "rows": 94,
+        "size": 20800
+      },
+      {
+        "key": "processed/people_by_country/_part=morocco/data_1.parquet",
+        "rows": 77,
+        "size": 15574
+      },
+      {
+        "key": "processed/people_by_country/_part=mozambique/data_0.parquet",
+        "rows": 20,
+        "size": 10838
+      },
+      {
+        "key": "processed/people_by_country/_part=mozambique/data_1.parquet",
+        "rows": 5,
+        "size": 7876
+      },
+      {
+        "key": "processed/people_by_country/_part=myanmar-burma-/data_0.parquet",
+        "rows": 3,
+        "size": 7802
+      },
+      {
+        "key": "processed/people_by_country/_part=nairobi/data_0.parquet",
+        "rows": 1,
+        "size": 6239
+      },
+      {
+        "key": "processed/people_by_country/_part=namibia/data_0.parquet",
+        "rows": 10,
+        "size": 9211
+      },
+      {
+        "key": "processed/people_by_country/_part=namibia/data_1.parquet",
+        "rows": 1,
+        "size": 4902
+      },
+      {
+        "key": "processed/people_by_country/_part=nepal/data_0.parquet",
+        "rows": 24,
+        "size": 12403
+      },
+      {
+        "key": "processed/people_by_country/_part=nepal/data_1.parquet",
+        "rows": 8,
+        "size": 8426
+      },
+      {
+        "key": "processed/people_by_country/_part=netherlands/data_0.parquet",
+        "rows": 4304,
+        "size": 295098
+      },
+      {
+        "key": "processed/people_by_country/_part=netherlands/data_1.parquet",
+        "rows": 108,
+        "size": 17392
+      },
+      {
+        "key": "processed/people_by_country/_part=new-south-wales/data_0.parquet",
+        "rows": 1,
+        "size": 7196
+      },
+      {
+        "key": "processed/people_by_country/_part=new-york/data_0.parquet",
+        "rows": 2,
+        "size": 6831
+      },
+      {
+        "key": "processed/people_by_country/_part=new-zealand/data_0.parquet",
+        "rows": 286,
+        "size": 37282
+      },
+      {
+        "key": "processed/people_by_country/_part=new-zealand/data_1.parquet",
+        "rows": 315,
+        "size": 30074
+      },
+      {
+        "key": "processed/people_by_country/_part=nicaragua/data_0.parquet",
+        "rows": 3,
+        "size": 7728
+      },
+      {
+        "key": "processed/people_by_country/_part=nicaragua/data_1.parquet",
+        "rows": 2,
+        "size": 5166
+      },
+      {
+        "key": "processed/people_by_country/_part=niger/data_0.parquet",
+        "rows": 5,
+        "size": 8510
+      },
+      {
+        "key": "processed/people_by_country/_part=niger/data_1.parquet",
+        "rows": 2,
+        "size": 6912
+      },
+      {
+        "key": "processed/people_by_country/_part=nigeria/data_0.parquet",
+        "rows": 341,
+        "size": 41046
+      },
+      {
+        "key": "processed/people_by_country/_part=nigeria/data_1.parquet",
+        "rows": 281,
+        "size": 26019
+      },
+      {
+        "key": "processed/people_by_country/_part=north-brabant/data_0.parquet",
+        "rows": 1,
+        "size": 6068
+      },
+      {
+        "key": "processed/people_by_country/_part=north-carolina/data_0.parquet",
+        "rows": 1,
+        "size": 6296
+      },
+      {
+        "key": "processed/people_by_country/_part=north-korea/data_0.parquet",
+        "rows": 3,
+        "size": 5949
+      },
+      {
+        "key": "processed/people_by_country/_part=north-macedonia/data_0.parquet",
+        "rows": 5,
+        "size": 8619
+      },
+      {
+        "key": "processed/people_by_country/_part=north-macedonia/data_1.parquet",
+        "rows": 1,
+        "size": 4958
+      },
+      {
+        "key": "processed/people_by_country/_part=north-rhine-westphalia/data_0.parquet",
+        "rows": 1,
+        "size": 6890
+      },
+      {
+        "key": "processed/people_by_country/_part=norway/data_0.parquet",
+        "rows": 1041,
+        "size": 53090
+      },
+      {
+        "key": "processed/people_by_country/_part=norway/data_1.parquet",
+        "rows": 17,
+        "size": 7684
+      },
+      {
+        "key": "processed/people_by_country/_part=oman/data_0.parquet",
+        "rows": 9,
+        "size": 8861
+      },
+      {
+        "key": "processed/people_by_country/_part=ontario/data_0.parquet",
+        "rows": 1,
+        "size": 6746
+      },
+      {
+        "key": "processed/people_by_country/_part=oregon/data_0.parquet",
+        "rows": 1,
+        "size": 7011
+      },
+      {
+        "key": "processed/people_by_country/_part=pakistan/data_0.parquet",
+        "rows": 493,
+        "size": 49058
+      },
+      {
+        "key": "processed/people_by_country/_part=pakistan/data_1.parquet",
+        "rows": 287,
+        "size": 25635
+      },
+      {
+        "key": "processed/people_by_country/_part=panama/data_0.parquet",
+        "rows": 48,
+        "size": 14784
+      },
+      {
+        "key": "processed/people_by_country/_part=panama/data_1.parquet",
+        "rows": 22,
+        "size": 11666
+      },
+      {
+        "key": "processed/people_by_country/_part=paraguay/data_0.parquet",
+        "rows": 33,
+        "size": 14658
+      },
+      {
+        "key": "processed/people_by_country/_part=paraguay/data_1.parquet",
+        "rows": 13,
+        "size": 11268
+      },
+      {
+        "key": "processed/people_by_country/_part=pennsylvania/data_0.parquet",
+        "rows": 5,
+        "size": 7529
+      },
+      {
+        "key": "processed/people_by_country/_part=peru/data_0.parquet",
+        "rows": 110,
+        "size": 24925
+      },
+      {
+        "key": "processed/people_by_country/_part=peru/data_1.parquet",
+        "rows": 47,
+        "size": 16959
+      },
+      {
+        "key": "processed/people_by_country/_part=philippines/data_0.parquet",
+        "rows": 986,
+        "size": 78943
+      },
+      {
+        "key": "processed/people_by_country/_part=philippines/data_1.parquet",
+        "rows": 48,
+        "size": 10239
+      },
+      {
+        "key": "processed/people_by_country/_part=poland/data_0.parquet",
+        "rows": 992,
+        "size": 88450
+      },
+      {
+        "key": "processed/people_by_country/_part=poland/data_1.parquet",
+        "rows": 735,
+        "size": 52228
+      },
+      {
+        "key": "processed/people_by_country/_part=portugal/data_0.parquet",
+        "rows": 312,
+        "size": 37349
+      },
+      {
+        "key": "processed/people_by_country/_part=portugal/data_1.parquet",
+        "rows": 107,
+        "size": 20223
+      },
+      {
+        "key": "processed/people_by_country/_part=provence-alpes-cote-d-azur/data_0.parquet",
+        "rows": 1,
+        "size": 6274
+      },
+      {
+        "key": "processed/people_by_country/_part=puerto-rico/data_0.parquet",
+        "rows": 82,
+        "size": 18094
+      },
+      {
+        "key": "processed/people_by_country/_part=puerto-rico/data_1.parquet",
+        "rows": 20,
+        "size": 12179
+      },
+      {
+        "key": "processed/people_by_country/_part=qatar/data_0.parquet",
+        "rows": 13,
+        "size": 11928
+      },
+      {
+        "key": "processed/people_by_country/_part=qatar/data_1.parquet",
+        "rows": 16,
+        "size": 11089
+      },
+      {
+        "key": "processed/people_by_country/_part=republic-of-indonesia/data_0.parquet",
+        "rows": 234,
+        "size": 33980
+      },
+      {
+        "key": "processed/people_by_country/_part=republic-of-indonesia/data_1.parquet",
+        "rows": 222,
+        "size": 25320
+      },
+      {
+        "key": "processed/people_by_country/_part=republic-of-the-congo/data_0.parquet",
+        "rows": 4,
+        "size": 6507
+      },
+      {
+        "key": "processed/people_by_country/_part=republic-of-the-union-of-myanmar/data_0.parquet",
+        "rows": 17,
+        "size": 11674
+      },
+      {
+        "key": "processed/people_by_country/_part=republic-of-the-union-of-myanmar/data_1.parquet",
+        "rows": 5,
+        "size": 7347
+      },
+      {
+        "key": "processed/people_by_country/_part=reunion/data_0.parquet",
+        "rows": 2,
+        "size": 6697
+      },
+      {
+        "key": "processed/people_by_country/_part=reunion/data_1.parquet",
+        "rows": 4,
+        "size": 6861
+      },
+      {
+        "key": "processed/people_by_country/_part=romania/data_0.parquet",
+        "rows": 515,
+        "size": 38479
+      },
+      {
+        "key": "processed/people_by_country/_part=romania/data_1.parquet",
+        "rows": 37,
+        "size": 9140
+      },
+      {
+        "key": "processed/people_by_country/_part=russia/data_0.parquet",
+        "rows": 254,
+        "size": 37831
+      },
+      {
+        "key": "processed/people_by_country/_part=russia/data_1.parquet",
+        "rows": 113,
+        "size": 22774
+      },
+      {
+        "key": "processed/people_by_country/_part=rwanda/data_0.parquet",
+        "rows": 44,
+        "size": 15586
+      },
+      {
+        "key": "processed/people_by_country/_part=rwanda/data_1.parquet",
+        "rows": 16,
+        "size": 9879
+      },
+      {
+        "key": "processed/people_by_country/_part=saint-lucia/data_0.parquet",
+        "rows": 1,
+        "size": 5079
+      },
+      {
+        "key": "processed/people_by_country/_part=saudi-arabia/data_0.parquet",
+        "rows": 97,
+        "size": 23939
+      },
+      {
+        "key": "processed/people_by_country/_part=saudi-arabia/data_1.parquet",
+        "rows": 79,
+        "size": 16990
+      },
+      {
+        "key": "processed/people_by_country/_part=senegal/data_0.parquet",
+        "rows": 26,
+        "size": 14214
+      },
+      {
+        "key": "processed/people_by_country/_part=senegal/data_1.parquet",
+        "rows": 15,
+        "size": 12704
+      },
+      {
+        "key": "processed/people_by_country/_part=serbia/data_0.parquet",
+        "rows": 99,
+        "size": 20945
+      },
+      {
+        "key": "processed/people_by_country/_part=serbia/data_1.parquet",
+        "rows": 44,
+        "size": 13450
+      },
+      {
+        "key": "processed/people_by_country/_part=sierra-leone/data_0.parquet",
+        "rows": 5,
+        "size": 9011
+      },
+      {
+        "key": "processed/people_by_country/_part=singapore/data_0.parquet",
+        "rows": 827,
+        "size": 81051
+      },
+      {
+        "key": "processed/people_by_country/_part=singapore/data_1.parquet",
+        "rows": 613,
+        "size": 49546
+      },
+      {
+        "key": "processed/people_by_country/_part=slovakia/data_0.parquet",
+        "rows": 51,
+        "size": 17899
+      },
+      {
+        "key": "processed/people_by_country/_part=slovakia/data_1.parquet",
+        "rows": 50,
+        "size": 13838
+      },
+      {
+        "key": "processed/people_by_country/_part=slovenia/data_0.parquet",
+        "rows": 23,
+        "size": 13736
+      },
+      {
+        "key": "processed/people_by_country/_part=slovenia/data_1.parquet",
+        "rows": 15,
+        "size": 9302
+      },
+      {
+        "key": "processed/people_by_country/_part=somalia/data_0.parquet",
+        "rows": 13,
+        "size": 9959
+      },
+      {
+        "key": "processed/people_by_country/_part=somalia/data_1.parquet",
+        "rows": 6,
+        "size": 6854
+      },
+      {
+        "key": "processed/people_by_country/_part=south-africa/data_0.parquet",
+        "rows": 585,
+        "size": 65522
+      },
+      {
+        "key": "processed/people_by_country/_part=south-africa/data_1.parquet",
+        "rows": 387,
+        "size": 37278
+      },
+      {
+        "key": "processed/people_by_country/_part=south-korea/data_0.parquet",
+        "rows": 246,
+        "size": 33679
+      },
+      {
+        "key": "processed/people_by_country/_part=south-korea/data_1.parquet",
+        "rows": 135,
+        "size": 21036
+      },
+      {
+        "key": "processed/people_by_country/_part=south-sudan/data_0.parquet",
+        "rows": 10,
+        "size": 9659
+      },
+      {
+        "key": "processed/people_by_country/_part=south-sudan/data_1.parquet",
+        "rows": 1,
+        "size": 4942
+      },
+      {
+        "key": "processed/people_by_country/_part=spain/data_0.parquet",
+        "rows": 2061,
+        "size": 149239
+      },
+      {
+        "key": "processed/people_by_country/_part=spain/data_1.parquet",
+        "rows": 75,
+        "size": 12945
+      },
+      {
+        "key": "processed/people_by_country/_part=sri-lanka/data_0.parquet",
+        "rows": 43,
+        "size": 16854
+      },
+      {
+        "key": "processed/people_by_country/_part=sri-lanka/data_1.parquet",
+        "rows": 19,
+        "size": 10897
+      },
+      {
+        "key": "processed/people_by_country/_part=state-of-goias/data_0.parquet",
+        "rows": 1,
+        "size": 5825
+      },
+      {
+        "key": "processed/people_by_country/_part=sudan/data_0.parquet",
+        "rows": 92,
+        "size": 14946
+      },
+      {
+        "key": "processed/people_by_country/_part=sudan/data_1.parquet",
+        "rows": 14,
+        "size": 6832
+      },
+      {
+        "key": "processed/people_by_country/_part=swaziland/data_0.parquet",
+        "rows": 2,
+        "size": 6117
+      },
+      {
+        "key": "processed/people_by_country/_part=swaziland/data_1.parquet",
+        "rows": 2,
+        "size": 5616
+      },
+      {
+        "key": "processed/people_by_country/_part=sweden/data_0.parquet",
+        "rows": 316,
+        "size": 41035
+      },
+      {
+        "key": "processed/people_by_country/_part=sweden/data_1.parquet",
+        "rows": 180,
+        "size": 24875
+      },
+      {
+        "key": "processed/people_by_country/_part=switzerland/data_0.parquet",
+        "rows": 1235,
+        "size": 109592
+      },
+      {
+        "key": "processed/people_by_country/_part=switzerland/data_1.parquet",
+        "rows": 409,
+        "size": 41108
+      },
+      {
+        "key": "processed/people_by_country/_part=syria/data_0.parquet",
+        "rows": 5,
+        "size": 9012
+      },
+      {
+        "key": "processed/people_by_country/_part=taiwan/data_0.parquet",
+        "rows": 214,
+        "size": 26128
+      },
+      {
+        "key": "processed/people_by_country/_part=taiwan/data_1.parquet",
+        "rows": 154,
+        "size": 18042
+      },
+      {
+        "key": "processed/people_by_country/_part=tajikistan/data_0.parquet",
+        "rows": 7,
+        "size": 8825
+      },
+      {
+        "key": "processed/people_by_country/_part=tanzania/data_0.parquet",
+        "rows": 42,
+        "size": 17089
+      },
+      {
+        "key": "processed/people_by_country/_part=tanzania/data_1.parquet",
+        "rows": 20,
+        "size": 11406
+      },
+      {
+        "key": "processed/people_by_country/_part=thailand/data_0.parquet",
+        "rows": 693,
+        "size": 58540
+      },
+      {
+        "key": "processed/people_by_country/_part=thailand/data_1.parquet",
+        "rows": 33,
+        "size": 10046
+      },
+      {
+        "key": "processed/people_by_country/_part=the-bahamas/data_0.parquet",
+        "rows": 3,
+        "size": 8068
+      },
+      {
+        "key": "processed/people_by_country/_part=the-gambia/data_0.parquet",
+        "rows": 2,
+        "size": 6797
+      },
+      {
+        "key": "processed/people_by_country/_part=timor-leste/data_0.parquet",
+        "rows": 1,
+        "size": 7001
+      },
+      {
+        "key": "processed/people_by_country/_part=timor-leste/data_1.parquet",
+        "rows": 1,
+        "size": 4992
+      },
+      {
+        "key": "processed/people_by_country/_part=togo/data_0.parquet",
+        "rows": 9,
+        "size": 8175
+      },
+      {
+        "key": "processed/people_by_country/_part=togo/data_1.parquet",
+        "rows": 5,
+        "size": 6986
+      },
+      {
+        "key": "processed/people_by_country/_part=trinidad-and-tobago/data_0.parquet",
+        "rows": 8,
+        "size": 10341
+      },
+      {
+        "key": "processed/people_by_country/_part=trinidad-and-tobago/data_1.parquet",
+        "rows": 6,
+        "size": 8534
+      },
+      {
+        "key": "processed/people_by_country/_part=tucson/data_0.parquet",
+        "rows": 1,
+        "size": 5217
+      },
+      {
+        "key": "processed/people_by_country/_part=tuerkiye/data_0.parquet",
+        "rows": 2,
+        "size": 7421
+      },
+      {
+        "key": "processed/people_by_country/_part=tuerkiye/data_1.parquet",
+        "rows": 5,
+        "size": 8499
+      },
+      {
+        "key": "processed/people_by_country/_part=tunisia/data_0.parquet",
+        "rows": 39,
+        "size": 15716
+      },
+      {
+        "key": "processed/people_by_country/_part=tunisia/data_1.parquet",
+        "rows": 23,
+        "size": 11674
+      },
+      {
+        "key": "processed/people_by_country/_part=turkey/data_0.parquet",
+        "rows": 490,
+        "size": 53809
+      },
+      {
+        "key": "processed/people_by_country/_part=turkey/data_1.parquet",
+        "rows": 370,
+        "size": 34716
+      },
+      {
+        "key": "processed/people_by_country/_part=turkmenistan/data_0.parquet",
+        "rows": 1,
+        "size": 6467
+      },
+      {
+        "key": "processed/people_by_country/_part=u-s-virgin-islands/data_0.parquet",
+        "rows": 2,
+        "size": 7233
+      },
+      {
+        "key": "processed/people_by_country/_part=u-s-virgin-islands/data_1.parquet",
+        "rows": 1,
+        "size": 4683
+      },
+      {
+        "key": "processed/people_by_country/_part=uganda/data_0.parquet",
+        "rows": 62,
+        "size": 17991
+      },
+      {
+        "key": "processed/people_by_country/_part=uganda/data_1.parquet",
+        "rows": 16,
+        "size": 9770
+      },
+      {
+        "key": "processed/people_by_country/_part=ukraine/data_0.parquet",
+        "rows": 476,
+        "size": 51632
+      },
+      {
+        "key": "processed/people_by_country/_part=ukraine/data_1.parquet",
+        "rows": 170,
+        "size": 24140
+      },
+      {
+        "key": "processed/people_by_country/_part=united-arab-emirates/data_0.parquet",
+        "rows": 353,
+        "size": 49301
+      },
+      {
+        "key": "processed/people_by_country/_part=united-arab-emirates/data_1.parquet",
+        "rows": 245,
+        "size": 33035
+      },
+      {
+        "key": "processed/people_by_country/_part=united-kingdom/data_0.parquet",
+        "rows": 4456,
+        "size": 357876
+      },
+      {
+        "key": "processed/people_by_country/_part=united-kingdom/data_1.parquet",
+        "rows": 1936,
+        "size": 136192
+      },
+      {
+        "key": "processed/people_by_country/_part=united-states/data_0.parquet",
+        "rows": 351216,
+        "size": 49187699
+      },
+      {
+        "key": "processed/people_by_country/_part=uruguay/data_0.parquet",
+        "rows": 169,
+        "size": 21132
+      },
+      {
+        "key": "processed/people_by_country/_part=uruguay/data_1.parquet",
+        "rows": 72,
+        "size": 15440
+      },
+      {
+        "key": "processed/people_by_country/_part=uttar-pradesh/data_0.parquet",
+        "rows": 1,
+        "size": 5839
+      },
+      {
+        "key": "processed/people_by_country/_part=uzbekistan/data_0.parquet",
+        "rows": 28,
+        "size": 14184
+      },
+      {
+        "key": "processed/people_by_country/_part=uzbekistan/data_1.parquet",
+        "rows": 18,
+        "size": 10390
+      },
+      {
+        "key": "processed/people_by_country/_part=vanuatu/data_0.parquet",
+        "rows": 1,
+        "size": 7021
+      },
+      {
+        "key": "processed/people_by_country/_part=venezuela/data_0.parquet",
+        "rows": 8,
+        "size": 9652
+      },
+      {
+        "key": "processed/people_by_country/_part=venezuela/data_1.parquet",
+        "rows": 2,
+        "size": 4872
+      },
+      {
+        "key": "processed/people_by_country/_part=vietnam/data_0.parquet",
+        "rows": 211,
+        "size": 30401
+      },
+      {
+        "key": "processed/people_by_country/_part=vietnam/data_1.parquet",
+        "rows": 63,
+        "size": 17234
+      },
+      {
+        "key": "processed/people_by_country/_part=yemen/data_0.parquet",
+        "rows": 9,
+        "size": 8864
+      },
+      {
+        "key": "processed/people_by_country/_part=yemen/data_1.parquet",
+        "rows": 1,
+        "size": 5115
+      },
+      {
+        "key": "processed/people_by_country/_part=zambia/data_0.parquet",
+        "rows": 72,
+        "size": 17950
+      },
+      {
+        "key": "processed/people_by_country/_part=zambia/data_1.parquet",
+        "rows": 24,
+        "size": 11136
+      },
+      {
+        "key": "processed/people_by_country/_part=zimbabwe/data_0.parquet",
+        "rows": 19,
+        "size": 12218
+      },
+      {
+        "key": "processed/people_by_country/_part=zimbabwe/data_1.parquet",
+        "rows": 3,
+        "size": 6278
+      },
+      {
+        "key": "processed/people_by_country/_part=zurich/data_0.parquet",
+        "rows": 1,
+        "size": 7767
+      }
+    ]
+  },
+  "processed/investors/": {
+    "objects": 1,
+    "bytes": 1844423,
+    "rows": 8076,
+    "min_rows": 8076,
+    "max_rows": 8076,
+    "schema": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11",
+      "12",
+      "13",
+      "14",
+      "15",
+      "16",
+      "17",
+      "18",
+      "19",
+      "20",
+      "21",
+      "22",
+      "23",
+      "24",
+      "25"
+    ],
+    "files": [
+      {
+        "key": "processed/investors/investor.parquet",
+        "rows": 8076,
+        "size": 1844423
+      }
+    ]
+  }
+}

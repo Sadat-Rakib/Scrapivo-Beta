@@ -1,0 +1,327 @@
+{
+  "key": "1- europe_region.csv",
+  "size": 4176304,
+  "last_modified": "2026-09-08 00:13:50+00:00",
+  "columns": [
+    "fullname",
+    "firstname",
+    "lastname",
+    "Title",
+    "Company",
+    "company",
+    "email",
+    "Email Status",
+    "Seniority",
+    "Departments",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Stage",
+    "# Employees",
+    "Industry",
+    "Keywords",
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "City",
+    "State",
+    "Country",
+    "Company Address",
+    "Company City",
+    "Company State",
+    "Company Country",
+    "Company Phone",
+    "SEO Description",
+    "Technologies",
+    "",
+    ""
+  ],
+  "row_count": 2453,
+  "sampled_rows": 2453,
+  "delimiter": ",",
+  "roles": {
+    "fullname": "last_name",
+    "firstname": "first_name",
+    "lastname": "last_name",
+    "Title": "title",
+    "Company": "company",
+    "company": "company",
+    "email": "email",
+    "Email Status": "email",
+    "Seniority": "other",
+    "Departments": "other",
+    "First Phone": "phone",
+    "Work Direct Phone": "phone",
+    "Home Phone": "phone",
+    "Mobile Phone": "phone",
+    "Corporate Phone": "phone",
+    "Other Phone": "phone",
+    "Stage": "other",
+    "# Employees": "employees",
+    "Industry": "industry",
+    "Keywords": "descriptive",
+    "Person Linkedin Url": "linkedin",
+    "Website": "website",
+    "Company Linkedin Url": "linkedin",
+    "Facebook Url": "social",
+    "Twitter Url": "social",
+    "City": "other",
+    "State": "other",
+    "Country": "country",
+    "Company Address": "company",
+    "Company City": "company",
+    "Company State": "company",
+    "Company Country": "company",
+    "Company Phone": "phone",
+    "SEO Description": "descriptive",
+    "Technologies": "tech",
+    "": "other"
+  },
+  "missing_pct": {
+    "fullname": 0.0,
+    "firstname": 0.0,
+    "lastname": 0.1,
+    "Title": 0.0,
+    "Company": 0.0,
+    "company": 0.0,
+    "email": 0.0,
+    "Email Status": 0.0,
+    "Seniority": 0.0,
+    "Departments": 32.5,
+    "First Phone": 4.4,
+    "Work Direct Phone": 100.0,
+    "Home Phone": 100.0,
+    "Mobile Phone": 100.0,
+    "Corporate Phone": 4.4,
+    "Other Phone": 100.0,
+    "Stage": 0.0,
+    "# Employees": 0.0,
+    "Industry": 0.4,
+    "Keywords": 14.5,
+    "Person Linkedin Url": 0.0,
+    "Website": 0.0,
+    "Company Linkedin Url": 0.0,
+    "Facebook Url": 9.8,
+    "Twitter Url": 7.5,
+    "City": 20.5,
+    "State": 18.9,
+    "Country": 0.0,
+    "Company Address": 0.1,
+    "Company City": 5.7,
+    "Company State": 5.3,
+    "Company Country": 0.1,
+    "Company Phone": 4.4,
+    "SEO Description": 14.2,
+    "Technologies": 0.1,
+    "": 99.8
+  },
+  "samples": {
+    "fullname": [
+      "Dries",
+      "Herman",
+      "Els"
+    ],
+    "firstname": [
+      "Dries",
+      "Herman",
+      "Els"
+    ],
+    "lastname": [
+      "Verstraete",
+      "Herrebout",
+      "Veldhuizen"
+    ],
+    "Title": [
+      "Lead Engineer E&I",
+      "Quality Manager",
+      "Sales Manager - Business Unit Intensive Livestock & Crop Storage"
+    ],
+    "Company": [
+      "BASF",
+      "VERVAET",
+      "Ridder"
+    ],
+    "company": [
+      "BASF",
+      "VERVAET",
+      "Ridder"
+    ],
+    "email": [
+      "dries.verstraete@basf.com",
+      "herman.herrebout@vervaet.nl",
+      "els.veldhuizen@ridder.com"
+    ],
+    "Email Status": [
+      "Verified",
+      "Verified",
+      "Verified"
+    ],
+    "Seniority": [
+      "Manager",
+      "Manager",
+      "Manager"
+    ],
+    "Departments": [
+      "Engineering & Technical",
+      "Information Technology",
+      "Information Technology, Sales"
+    ],
+    "First Phone": [
+      "'+49 621 600",
+      "'+31 11 548 1720",
+      "'+31 34 141 6854"
+    ],
+    "Corporate Phone": [
+      "'+49 621 600",
+      "'+31 11 548 1720",
+      "'+31 34 141 6854"
+    ],
+    "Stage": [
+      "Cold",
+      "Cold",
+      "Cold"
+    ],
+    "# Employees": [
+      "112000",
+      "84",
+      "220"
+    ],
+    "Industry": [
+      "chemicals",
+      "farming",
+      "farming"
+    ],
+    "Keywords": [
+      "chemicals, performance products, functional materials, solutions, agricultural solutions, oil, gas",
+      "chemicals, performance products, functional materials, solutions, agricultural solutions, oil, gas",
+      "agriculture, food tech, vertical farming, indoor farming, iot, urban farming"
+    ],
+    "Person Linkedin Url": [
+      "http://www.linkedin.com/in/dries-verstraete-5a1b0a26",
+      "http://www.linkedin.com/in/herman-herrebout-64a5b64b",
+      "http://www.linkedin.com/in/els-veldhuizen-987a2574"
+    ],
+    "Website": [
+      "http://www.basf.com",
+      "http://www.vervaet.nl",
+      "http://www.ridder.com"
+    ],
+    "Company Linkedin Url": [
+      "http://www.linkedin.com/company/basf",
+      "http://www.linkedin.com/company/vervaetmachinery",
+      "http://www.linkedin.com/company/riddergroup"
+    ],
+    "Facebook Url": [
+      "https://facebook.com/basf.apac/",
+      "https://www.facebook.com/vervaetmachinery/",
+      "https://facebook.com/CNHIndustrial"
+    ],
+    "Twitter Url": [
+      "https://twitter.com/BASFCanada",
+      "https://twitter.com/FransVervaetBV",
+      "https://twitter.com/cnhindustrial"
+    ],
+    "City": [
+      "Antwerp",
+      "Terneuzen",
+      "Harderwijk"
+    ],
+    "State": [
+      "Flanders",
+      "Zeeland",
+      "Gelderland"
+    ],
+    "Country": [
+      "Belgium",
+      "Netherlands",
+      "Netherlands"
+    ],
+    "Company Address": [
+      "38 Carl-Bosch-Strasse, Ludwigshafen am Rhein, Rheinland-Pfalz, Germany, 67063",
+      "1 Haringkaker, Biervliet, Zeeland, Netherlands, 4521 GN",
+      "36 Lorentzstraat, Harderwijk, Gelderland, Netherlands, 3846 AX"
+    ],
+    "Company City": [
+      "Ludwigshafen am Rhein",
+      "Biervliet",
+      "Harderwijk"
+    ],
+    "Company State": [
+      "Rheinland-Pfalz",
+      "Zeeland",
+      "Gelderland"
+    ],
+    "Company Country": [
+      "Germany",
+      "Netherlands",
+      "Netherlands"
+    ],
+    "Company Phone": [
+      "'+49 621 600",
+      "'+31 11 548 1720",
+      "'+31 34 141 6854"
+    ],
+    "SEO Description": [
+      "TOMRA's mission is to transform how we all obtain, use and reuse the planet's resources to enable a world without waste.",
+      "BX is an Environmental Farm Management Software enabling farmers to become data-driven climate change enterprises.",
+      "Monil revolusjonerer landbruket ved � lage virtuelle gjerder for storfe."
+    ],
+    "Technologies": [
+      "Google Cloud Hosting",
+      "Outlook, WordPress.org, Mobile Friendly, Google Tag Manager, Apache, reCAPTCHA, AI",
+      "Outlook, Microsoft Office 365, DigitalOcean, Webflow, Vimeo, Nginx, Mobile Friendly"
+    ],
+    "": [
+      "Europe",
+      "Europe",
+      "Europe"
+    ]
+  },
+  "validity": {
+    "email": "3/3 valid-shape",
+    "Email Status": "0/3 valid-shape",
+    "First Phone": "3/3 valid-shape",
+    "Corporate Phone": "3/3 valid-shape",
+    "Company Phone": "3/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url"
+  ],
+  "activity_match_keys": [
+    "fullname",
+    "firstname",
+    "lastname",
+    "Company",
+    "company",
+    "email",
+    "Email Status",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "Company Address",
+    "Company City",
+    "Company State",
+    "Company Country",
+    "Company Phone"
+  ]
+}

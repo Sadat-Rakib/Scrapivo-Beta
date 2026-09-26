@@ -301,6 +301,8 @@ export type Database = {
           results_count: number;
           sources_searched: string[];
           user_id: string;
+          conversation_id?: string | null;
+          transcript?: unknown | null;
         };
         Insert: {
           created_at?: string;
@@ -309,6 +311,8 @@ export type Database = {
           results_count?: number;
           sources_searched?: string[];
           user_id: string;
+          conversation_id?: string | null;
+          transcript?: unknown | null;
         };
         Update: {
           created_at?: string;
@@ -317,6 +321,8 @@ export type Database = {
           results_count?: number;
           sources_searched?: string[];
           user_id?: string;
+          conversation_id?: string | null;
+          transcript?: unknown | null;
         };
         Relationships: [];
       };

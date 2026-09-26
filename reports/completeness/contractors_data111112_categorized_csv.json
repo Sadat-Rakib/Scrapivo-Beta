@@ -1,0 +1,81 @@
+{
+  "key": "Contractors - data111112_CATEGORIZED.csv",
+  "entity": "person",
+  "rows": 111923,
+  "required_fields": [
+    "Name",
+    "Company",
+    "Title",
+    "Email",
+    "Phone",
+    "Website",
+    "Social(any)",
+    "Location"
+  ],
+  "absent_columns": [],
+  "complete": 0,
+  "incomplete": 111923,
+  "complete_pct": 0.0,
+  "missing_counts": {
+    "Phone": 111923,
+    "Website": 111923,
+    "Social(any)": 111923,
+    "Location": 111923,
+    "Company": 1800,
+    "Title": 27,
+    "Name": 2
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Location",
+        "Phone",
+        "Social(any)",
+        "Website"
+      ],
+      "rows": 110099
+    },
+    {
+      "missing": [
+        "Company",
+        "Location",
+        "Phone",
+        "Social(any)",
+        "Website"
+      ],
+      "rows": 1795
+    },
+    {
+      "missing": [
+        "Location",
+        "Phone",
+        "Social(any)",
+        "Title",
+        "Website"
+      ],
+      "rows": 22
+    },
+    {
+      "missing": [
+        "Company",
+        "Location",
+        "Phone",
+        "Social(any)",
+        "Title",
+        "Website"
+      ],
+      "rows": 5
+    },
+    {
+      "missing": [
+        "Location",
+        "Name",
+        "Phone",
+        "Social(any)",
+        "Website"
+      ],
+      "rows": 2
+    }
+  ],
+  "people_bonus_rows": 0
+}

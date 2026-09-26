@@ -1,0 +1,564 @@
+{
+  "questions": [
+    "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?"
+  ],
+  "clarify": [
+    {
+      "id": "entity_industry",
+      "question": "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?",
+      "options": [
+        {
+          "id": "saas",
+          "label": "SaaS",
+          "hint": "Software companies"
+        },
+        {
+          "id": "fintech",
+          "label": "Fintech",
+          "hint": "Financial tech"
+        },
+        {
+          "id": "healthcare",
+          "label": "Healthcare",
+          "hint": "Health companies"
+        }
+      ],
+      "allowOther": true
+    }
+  ],
+  "rows": [],
+  "dbMeta": [
+    {
+      "dbHit": false,
+      "engine": "pg-index",
+      "partitionsRead": [
+        "idx_people(country,city_norm,role_norm)"
+      ],
+      "rowsScanned": 0,
+      "rowsReturned": 0,
+      "elapsedMs": 1927,
+      "indexUsed": "idx_ppl_country_citynorm_rolenorm"
+    },
+    {
+      "dbHit": false,
+      "engine": "s3-parquet",
+      "partitionsRead": [
+        "processed/people_by_country/_part=united-states/data_0.parquet"
+      ],
+      "rowsScanned": 351216,
+      "rowsReturned": 0
+    },
+    {
+      "dbHit": true,
+      "engine": "live-web+browser",
+      "partitionsRead": [
+        "live-gapfill(16)"
+      ],
+      "rowsScanned": 16,
+      "rowsReturned": 15
+    }
+  ],
+  "rejected": 11,
+  "liveDiscovery": "completed",
+  "pendingEnrichment": 0,
+  "moreAvailableMessage": null,
+  "offset": 0,
+  "limit": 50,
+  "hasMore": false,
+  "totalAvailable": null,
+  "spec": {
+    "entity": "person",
+    "criteria": [
+      {
+        "field": "role",
+        "value": "copywriter",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "location",
+        "value": "New York",
+        "stated": true,
+        "confidence": 0.5
+      },
+      {
+        "field": "location_id",
+        "value": "geo:city:new-york",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "location_kind",
+        "value": "city",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "location_country",
+        "value": "US",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "location_parents",
+        "value": "geo:country:us",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "content_topic",
+        "value": "AI content or AI slop",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "needs_live",
+        "value": "true",
+        "stated": true,
+        "confidence": 1
+      }
+    ],
+    "missing": [],
+    "signal_required": false,
+    "signal_types": [],
+    "signal_recency": null,
+    "status": "ready_to_search",
+    "raw_query": "Find copywriters in New York who talk about AI content or AI slop.",
+    "locationSuggestion": null,
+    "understanding": {
+      "version": "u1",
+      "input": {
+        "raw": "Find copywriters in New York who talk about AI content or AI slop.",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "lead_discovery",
+        "raw": "Find copywriters in New York who talk about AI content or AI slop.",
+        "confidence": 0.5
+      },
+      "prospecting_mode": {
+        "value": "social_signal_based",
+        "raw": "talk about AI content or AI slop",
+        "confidence": 1
+      },
+      "target": {
+        "entity_type": {
+          "value": "person",
+          "raw": "copywriters",
+          "confidence": 0.5
+        },
+        "entity_ambiguous": false,
+        "entity_subtype": null,
+        "role": null,
+        "job_title": null,
+        "industry": null,
+        "category": null,
+        "business_type": null,
+        "niche": null,
+        "company_stage": null,
+        "technologies": [],
+        "descriptors": []
+      },
+      "relation": {
+        "type": {
+          "value": "uses_technology",
+          "raw": "talk about AI content or AI slop.",
+          "confidence": 0.5
+        },
+        "label": null,
+        "object": {
+          "value": "AI content or AI slop",
+          "raw": "AI content or AI slop.",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "direction": {
+          "value": "subject_to_object",
+          "raw": "talk about AI content or AI slop.",
+          "confidence": 0.5
+        }
+      },
+      "organization_context": {
+        "on_behalf_of_company": "unknown",
+        "company": null
+      },
+      "user_context": {
+        "selling": null,
+        "objective": null,
+        "notes": []
+      },
+      "location": {
+        "value": "New York",
+        "raw": "in New York",
+        "scope": "in",
+        "radius": null,
+        "radius_unit": null,
+        "country_code": "US",
+        "canonical": "New York",
+        "confidence": 0.5
+      },
+      "temporal": null,
+      "constraints": [
+        {
+          "field": "content_topic",
+          "operator": "eq",
+          "value": "AI content or AI slop",
+          "raw": "talk about AI content or AI slop",
+          "confidence": 1,
+          "negated": false,
+          "unit": null
+        }
+      ],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": false,
+        "reasons": []
+      },
+      "quantity": null,
+      "required_fields": [],
+      "preferred_fields": [],
+      "contact_requirements": [],
+      "verification": [],
+      "output": [],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": false,
+        "fields": [],
+        "reason": null,
+        "question": null
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": null,
+        "model": null,
+        "prompt_version": "u1-v15",
+        "latency_ms": 103,
+        "fallback_used": false,
+        "cached": true,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": null,
+          "repair_attempted": false,
+          "repair_reason": null,
+          "repair_success": null
+        },
+        "notes": []
+      }
+    }
+  },
+  "outcome": "NO_QUALIFIED_RESULTS",
+  "diagnostics": [],
+  "retrievalTrace": {
+    "sources": [
+      {
+        "source": "pg-index",
+        "partitions": [
+          "idx_people(country,city_norm,role_norm)"
+        ],
+        "scanned": 0,
+        "matched": 0
+      },
+      {
+        "source": "s3-parquet",
+        "partitions": [
+          "processed/people_by_country/_part=united-states/data_0.parquet"
+        ],
+        "scanned": 351216,
+        "matched": 0
+      },
+      {
+        "source": "live-web+browser",
+        "partitions": [
+          "live-gapfill(16)"
+        ],
+        "scanned": 16,
+        "matched": 15
+      }
+    ],
+    "rawCandidates": 15,
+    "postSpecFilter": 4,
+    "complete": 4,
+    "pendingEnrichment": 0,
+    "qualificationRejected": 4,
+    "returned": 0,
+    "reason": "FAILED_QUALIFICATION"
+  },
+  "executionPlan": {
+    "requirements": {
+      "entityTypes": [
+        "person"
+      ],
+      "claims": [],
+      "needsDiscovery": true,
+      "needsIdentityResolution": true,
+      "needsLocation": true,
+      "needsTemporal": false,
+      "opportunity": null
+    },
+    "steps": [
+      {
+        "providerId": "indexed-db",
+        "costTier": 0,
+        "role": "primary",
+        "reason": "primary_tier_L0:indexed-db+identity",
+        "capabilities": {
+          "id": "indexed-db",
+          "label": "Indexed / internal DB",
+          "entityTypes": [
+            "person",
+            "company",
+            "business",
+            "investor",
+            "job"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": true,
+          "locationSupport": true,
+          "temporalSupport": false,
+          "costTier": 0,
+          "live": false
+        }
+      },
+      {
+        "providerId": "direct-http",
+        "costTier": 2,
+        "role": "primary",
+        "reason": "primary_tier_L2:direct-http",
+        "capabilities": {
+          "id": "direct-http",
+          "label": "Direct HTTP fetch",
+          "entityTypes": [
+            "company",
+            "business",
+            "person"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": false,
+          "costTier": 2,
+          "live": true
+        }
+      },
+      {
+        "providerId": "searxng",
+        "costTier": 2,
+        "role": "primary",
+        "reason": "primary_tier_L2:searxng",
+        "capabilities": {
+          "id": "searxng",
+          "label": "SearXNG (self-hosted web)",
+          "entityTypes": [
+            "person",
+            "company",
+            "business",
+            "investor",
+            "job"
+          ],
+          "claims": [
+            "hiring",
+            "service_request",
+            "funding",
+            "social_ask"
+          ],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": true,
+          "temporalSupport": true,
+          "costTier": 2,
+          "live": true
+        }
+      },
+      {
+        "providerId": "html-parser",
+        "costTier": 3,
+        "role": "primary",
+        "reason": "primary_tier_L3:html-parser",
+        "capabilities": {
+          "id": "html-parser",
+          "label": "HTML parser",
+          "entityTypes": [
+            "company",
+            "business",
+            "person",
+            "job"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": false,
+          "costTier": 3,
+          "live": true
+        }
+      },
+      {
+        "providerId": "browser-automation",
+        "costTier": 5,
+        "role": "escalation",
+        "reason": "escalate_after_free_ladder:browser-automation",
+        "capabilities": {
+          "id": "browser-automation",
+          "label": "Browser automation",
+          "entityTypes": [
+            "company",
+            "business",
+            "person",
+            "job"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": false,
+          "costTier": 5,
+          "live": true,
+          "escalateOnly": true
+        }
+      },
+      {
+        "providerId": "agentic-browser",
+        "costTier": 6,
+        "role": "escalation",
+        "reason": "escalate_after_free_ladder:agentic-browser",
+        "capabilities": {
+          "id": "agentic-browser",
+          "label": "Agentic browser",
+          "entityTypes": [
+            "company",
+            "business",
+            "person"
+          ],
+          "claims": [
+            "service_request",
+            "hiring",
+            "social_ask"
+          ],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": true,
+          "costTier": 6,
+          "live": true,
+          "escalateOnly": true
+        }
+      },
+      {
+        "providerId": "paid-serp",
+        "costTier": 7,
+        "role": "escalation",
+        "reason": "escalate_after_free_ladder:paid-serp",
+        "capabilities": {
+          "id": "paid-serp",
+          "label": "Paid SERP API",
+          "entityTypes": [
+            "person",
+            "company",
+            "business",
+            "investor",
+            "job"
+          ],
+          "claims": [
+            "hiring",
+            "service_request",
+            "funding",
+            "social_ask"
+          ],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": true,
+          "temporalSupport": true,
+          "costTier": 7,
+          "live": true,
+          "escalateOnly": true
+        }
+      }
+    ],
+    "skipped": [
+      {
+        "providerId": "osm-local",
+        "reason": "entity_type_mismatch"
+      },
+      {
+        "providerId": "company-registry",
+        "reason": "entity_type_mismatch"
+      },
+      {
+        "providerId": "sitemap-jsonld",
+        "reason": "entity_type_mismatch"
+      },
+      {
+        "providerId": "jobs-fleet",
+        "reason": "entity_type_mismatch"
+      }
+    ],
+    "researchPlan": {
+      "discoveryQueries": [
+        "copywriter New York \"AI content\"",
+        "copywriter New York \"AI slop\"",
+        "copywriter New York",
+        "site:linkedin.com/in copywriter New York",
+        "copywriter startup New York"
+      ],
+      "requiredFields": [
+        "name",
+        "role",
+        "company",
+        "website_or_profile",
+        "location",
+        "topic_evidence",
+        "identity_evidence"
+      ],
+      "desiredCount": 5,
+      "stoppingRules": {
+        "maxQueries": 5,
+        "maxPages": 15,
+        "maxCandidates": 15,
+        "maxNoProgressQueries": 2
+      }
+    }
+  },
+  "providerAttempts": [
+    {
+      "provider": "indexed-db",
+      "entitiesResolved": 0,
+      "qualified": 0,
+      "attempted": false,
+      "succeeded": false,
+      "artifactsFound": 0,
+      "error": "handled_outside_live_gapfill",
+      "role": "primary",
+      "costTier": 0
+    },
+    {
+      "provider": "direct-http",
+      "entitiesResolved": 0,
+      "qualified": 0,
+      "attempted": true,
+      "succeeded": true,
+      "artifactsFound": 15,
+      "role": "primary",
+      "costTier": 2
+    },
+    {
+      "provider": "browser-live",
+      "attempted": true,
+      "succeeded": true,
+      "artifactsFound": 1,
+      "entitiesResolved": 0,
+      "qualified": 0
+    }
+  ],
+  "search_run_id": "run_f32a3770",
+  "conversation_id": "83775911-3efb-42a6-aa40-51453ab9cd2c:9bdbf0b3-fa02-40e3-9eb0-07834eb736b3",
+  "turn_id": "1790345956235-8quiiif0s5v",
+  "request_id": "req_5a17377e",
+  "qualified_count": 0
+}

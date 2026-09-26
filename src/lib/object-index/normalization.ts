@@ -1,4 +1,3 @@
-import { createHash } from "node:crypto";
 import { canonCraft } from "@/lib/canonical/businesses.server";
 import { companyCategoryTerms } from "@/lib/canonical/companies.server";
 import { normCityLookup, normalizeRole } from "@/lib/search/search-spec-extract";
@@ -13,8 +12,11 @@ export function normalizeIndexText(value: string): string {
     .replace(/\s+/g, " ");
 }
 
-export function postingBucket(term: string, hexChars: number): string {
-  return createHash("sha256").update(term, "utf8").digest("hex").slice(0, hexChars);
+export async function postingBucket(term: string, hexChars: number): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(term));
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0"))
+    .join("")
+    .slice(0, hexChars);
 }
 
 export function categoryTerms(entity: "business" | "company", value: string): string[] {
@@ -24,4 +26,3 @@ export function categoryTerms(entity: "business" | "company", value: string): st
 
 export const cityTerm = (value: string) => normCityLookup(value);
 export const roleTerm = (value: string) => normalizeRole(value);
-

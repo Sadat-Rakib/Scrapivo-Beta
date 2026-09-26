@@ -1,0 +1,389 @@
+{
+ "people_total_rows": 484325,
+ "people_slugs": 219,
+ "people_top_slugs": [
+  [
+   "united-states",
+   351216
+  ],
+  [
+   "india",
+   25048
+  ],
+  [
+   "canada",
+   16904
+  ],
+  [
+   "australia",
+   13734
+  ],
+  [
+   "germany",
+   11950
+  ],
+  [
+   "united-kingdom",
+   6392
+  ],
+  [
+   "brazil",
+   6160
+  ],
+  [
+   "netherlands",
+   4412
+  ],
+  [
+   "italy",
+   3104
+  ],
+  [
+   "france",
+   3089
+  ],
+  [
+   "china",
+   2789
+  ],
+  [
+   "belgium",
+   2408
+  ],
+  [
+   "spain",
+   2136
+  ],
+  [
+   "indonesia",
+   1757
+  ],
+  [
+   "mexico",
+   1753
+  ],
+  [
+   "poland",
+   1727
+  ],
+  [
+   "switzerland",
+   1644
+  ],
+  [
+   "japan",
+   1521
+  ],
+  [
+   "israel",
+   1466
+  ],
+  [
+   "singapore",
+   1440
+  ]
+ ],
+ "people_top_roles": [
+  [
+   "financial advisor",
+   46706
+  ],
+  [
+   "owner",
+   25384
+  ],
+  [
+   "chief executive officer",
+   15726
+  ],
+  [
+   "ceo",
+   11621
+  ],
+  [
+   "president",
+   9688
+  ],
+  [
+   "vice president",
+   6382
+  ],
+  [
+   "founder",
+   4934
+  ],
+  [
+   "co-founder",
+   4066
+  ],
+  [
+   "assistant manager",
+   3844
+  ],
+  [
+   "financial planner",
+   3159
+  ],
+  [
+   "project manager",
+   2893
+  ],
+  [
+   "product owner",
+   2825
+  ],
+  [
+   "president & ceo",
+   2761
+  ],
+  [
+   "manager",
+   2716
+  ],
+  [
+   "business owner",
+   2549
+  ],
+  [
+   "founder & ceo",
+   2123
+  ],
+  [
+   "agency owner",
+   2052
+  ],
+  [
+   "president and ceo",
+   1930
+  ],
+  [
+   "store manager",
+   1896
+  ],
+  [
+   "senior financial advisor",
+   1756
+  ],
+  [
+   "president/ceo",
+   1711
+  ],
+  [
+   "wealth management advisor",
+   1687
+  ],
+  [
+   "department supervisor",
+   1664
+  ],
+  [
+   "co-owner",
+   1663
+  ],
+  [
+   "product manager",
+   1532
+  ],
+  [
+   "sales manager",
+   1438
+  ],
+  [
+   "supervisor",
+   1420
+  ],
+  [
+   "account manager",
+   1368
+  ],
+  [
+   "operations manager",
+   1337
+  ],
+  [
+   "founder and ceo",
+   1278
+  ],
+  [
+   "managing director",
+   1204
+  ],
+  [
+   "key account manager",
+   1134
+  ],
+  [
+   "certified financial planner",
+   1017
+  ],
+  [
+   "chief financial officer",
+   984
+  ],
+  [
+   "partner",
+   976
+  ],
+  [
+   "associate financial advisor",
+   945
+  ],
+  [
+   "wealth management advisor, senior vice president",
+   923
+  ],
+  [
+   "senior vice president",
+   917
+  ],
+  [
+   "vice president of sales",
+   914
+  ],
+  [
+   "financial solutions advisor",
+   889
+  ]
+ ],
+ "company_rows": 315208,
+ "company_countries": {
+  "GB": 300042,
+  "?": 14208,
+  "IN": 236,
+  "US": 135,
+  "NL": 79,
+  "IT": 67,
+  "FR": 65,
+  "DE": 63,
+  "ES": 38,
+  "DK": 20,
+  "CA": 18,
+  "LU": 17,
+  "EE": 15,
+  "PT": 14,
+  "AT": 14
+ },
+ "company_top_cities": [
+  [
+   "GB/LONDON",
+   66015
+  ],
+  [
+   "GB/MANCHESTER",
+   5937
+  ],
+  [
+   "GB/BIRMINGHAM",
+   5532
+  ],
+  [
+   "GB/BRISTOL",
+   4299
+  ],
+  [
+   "GB/GLASGOW",
+   3540
+  ],
+  [
+   "?/SAN FRANCISCO",
+   3018
+  ],
+  [
+   "GB/EDINBURGH",
+   2898
+  ],
+  [
+   "GB/CARDIFF",
+   2770
+  ],
+  [
+   "GB/LEEDS",
+   2597
+  ],
+  [
+   "GB/LIVERPOOL",
+   2577
+  ],
+  [
+   "GB/LEICESTER",
+   2491
+  ],
+  [
+   "GB/NOTTINGHAM",
+   2324
+  ],
+  [
+   "GB/ILFORD",
+   1884
+  ],
+  [
+   "GB/HARROW",
+   1836
+  ],
+  [
+   "GB/SHEFFIELD",
+   1781
+  ],
+  [
+   "GB/CROYDON",
+   1524
+  ],
+  [
+   "GB/BRADFORD",
+   1522
+  ],
+  [
+   "GB/BRIGHTON",
+   1511
+  ],
+  [
+   "GB/COVENTRY",
+   1460
+  ],
+  [
+   "GB/MILTON KEYNES",
+   1402
+  ],
+  [
+   "GB/BOLTON",
+   1400
+  ],
+  [
+   "GB/NORTHAMPTON",
+   1362
+  ],
+  [
+   "GB/LUTON",
+   1352
+  ],
+  [
+   "GB/READING",
+   1318
+  ],
+  [
+   "GB/SOUTHAMPTON",
+   1287
+  ],
+  [
+   "GB/NORWICH",
+   1272
+  ],
+  [
+   "GB/NEWCASTLE UPON TYNE",
+   1174
+  ],
+  [
+   "GB/SLOUGH",
+   1122
+  ],
+  [
+   "GB/DERBY",
+   1118
+  ],
+  [
+   "GB/WATFORD",
+   1104
+  ]
+ ],
+ "company_cities_ge50": 738
+}

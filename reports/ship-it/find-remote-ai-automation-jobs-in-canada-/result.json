@@ -1,0 +1,590 @@
+{
+  "questions": [],
+  "clarify": [],
+  "rows": [
+    {
+      "kind": "job",
+      "key": "job:superior-plus:057c99969953baf6c558f54f9d70aef2fc4d2e8f",
+      "entity_id": "job:superior-plus:057c99969953baf6c558f54f9d70aef2fc4d2e8f",
+      "entity_resolved": true,
+      "page_type": "job_posting",
+      "identity_confidence": 0.92,
+      "resolution_method": "structured_job_provider",
+      "title": "AI & Automation Manager @ Superior Plus",
+      "detail": "ON, CA; Calgary, AB, CA; Sainte-Catherine, QC, CA · Remote",
+      "employer": "Superior Plus",
+      "salary": null,
+      "email": null,
+      "phone": null,
+      "url": "https://jobs.dayforcehcm.com/en-US/superiorplus/spcareers/jobs/43673?utm_source=freehire.me",
+      "location": "ON, CA; Calgary, AB, CA; Sainte-Catherine, QC, CA",
+      "country": "CA",
+      "why_match": "Hiring signal · “AI & Automation Manager at Superior Plus” · jobs.dayforcehcm.com",
+      "evidence": [
+        {
+          "source_url": "https://jobs.dayforcehcm.com/en-US/superiorplus/spcareers/jobs/43673?utm_source=freehire.me",
+          "source_type": "job",
+          "excerpt": "AI & Automation Manager at Superior Plus",
+          "evidence_type": "hiring",
+          "supports": "intent",
+          "subject": "job:superior-plus:057c99969953baf6c558f54f9d70aef2fc4d2e8f",
+          "event_at": "2026-09-23T06:00:00Z",
+          "observed_at": "2026-09-25T14:30:37.576Z",
+          "extraction_method": "structured_job_provider",
+          "confidence": 0.9
+        }
+      ],
+      "role": null,
+      "company": null,
+      "category": null,
+      "sector": null,
+      "industry": null,
+      "stage": null,
+      "check": null,
+      "missingFields": [],
+      "complete": true,
+      "field_provenance": {},
+      "disposition": "qualified",
+      "relevance_score": 0.7000000000000001,
+      "intent_score": 0.8,
+      "disposition_label": null,
+      "verification_status": "verified"
+    },
+    {
+      "kind": "job",
+      "key": "job:nerdwallet:028a0104bc15cfee8a03042a644ccf3b33514989",
+      "entity_id": "job:nerdwallet:028a0104bc15cfee8a03042a644ccf3b33514989",
+      "entity_resolved": true,
+      "page_type": "job_posting",
+      "identity_confidence": 0.92,
+      "resolution_method": "structured_job_provider",
+      "title": "Software Engineer, AI & Automation - Canada @ nerdwallet",
+      "detail": "NerdWallet Canada · FullTime · Remote",
+      "employer": "nerdwallet",
+      "salary": null,
+      "email": null,
+      "phone": null,
+      "url": "https://jobs.ashbyhq.com/nerdwallet/dd822a9a-2beb-4594-bdac-a0a77b040661",
+      "location": "NerdWallet Canada",
+      "country": "CA",
+      "why_match": "Hiring signal · “Software Engineer, AI & Automation - Canada at nerdwallet” · jobs.ashbyhq.com",
+      "evidence": [
+        {
+          "source_url": "https://jobs.ashbyhq.com/nerdwallet/dd822a9a-2beb-4594-bdac-a0a77b040661",
+          "source_type": "job",
+          "excerpt": "Software Engineer, AI & Automation - Canada at nerdwallet",
+          "evidence_type": "hiring",
+          "supports": "intent",
+          "subject": "job:nerdwallet:028a0104bc15cfee8a03042a644ccf3b33514989",
+          "event_at": "2026-09-11T05:43:17.024+00:00",
+          "observed_at": "2026-09-25T14:31:06.454Z",
+          "extraction_method": "structured_job_provider",
+          "confidence": 0.9
+        }
+      ],
+      "role": null,
+      "company": null,
+      "category": null,
+      "sector": null,
+      "industry": null,
+      "stage": null,
+      "check": null,
+      "missingFields": [],
+      "complete": true,
+      "field_provenance": {},
+      "disposition": "qualified",
+      "relevance_score": 0.7000000000000001,
+      "intent_score": 0.8,
+      "disposition_label": null,
+      "verification_status": "verified"
+    }
+  ],
+  "dbMeta": [
+    {
+      "dbHit": true,
+      "engine": "provider-jobs",
+      "partitionsRead": [
+        "jobs-fleet(23/23 sources ok, 69 seeker-filtered)"
+      ],
+      "rowsScanned": 6265,
+      "rowsReturned": 92
+    },
+    {
+      "dbHit": true,
+      "engine": "live-jobs+browser",
+      "partitionsRead": [
+        "live-gapfill(40)"
+      ],
+      "rowsScanned": 40,
+      "rowsReturned": 27
+    }
+  ],
+  "rejected": 115,
+  "liveDiscovery": "completed",
+  "pendingEnrichment": 0,
+  "moreAvailableMessage": "There are more verified leads — want to see them?",
+  "offset": 0,
+  "limit": 50,
+  "hasMore": true,
+  "totalAvailable": null,
+  "spec": {
+    "entity": "job",
+    "criteria": [
+      {
+        "field": "employment",
+        "value": "remote",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "role",
+        "value": "ai automation",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "industry",
+        "value": "AI",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "location",
+        "value": "Canada",
+        "stated": true,
+        "confidence": 0.5
+      },
+      {
+        "field": "location_id",
+        "value": "geo:country:ca",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "location_kind",
+        "value": "country",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "location_country",
+        "value": "CA",
+        "stated": true,
+        "confidence": 1
+      }
+    ],
+    "missing": [],
+    "signal_required": false,
+    "signal_types": [],
+    "signal_recency": null,
+    "status": "ready_to_search",
+    "raw_query": "Find remote AI automation jobs in Canada.",
+    "locationSuggestion": null,
+    "understanding": {
+      "version": "u1",
+      "input": {
+        "raw": "Find remote AI automation jobs in Canada.",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "job_discovery",
+        "raw": null,
+        "confidence": 0.95
+      },
+      "prospecting_mode": {
+        "value": "job_based",
+        "raw": null,
+        "confidence": 0.9
+      },
+      "target": {
+        "entity_type": {
+          "value": "job",
+          "raw": "jobs",
+          "confidence": 0.95
+        },
+        "entity_ambiguous": false,
+        "entity_subtype": null,
+        "role": null,
+        "job_title": null,
+        "industry": null,
+        "category": null,
+        "business_type": null,
+        "niche": null,
+        "company_stage": null,
+        "technologies": [],
+        "descriptors": []
+      },
+      "relation": {
+        "type": {
+          "value": "none",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "label": null,
+        "object": null,
+        "direction": {
+          "value": "none",
+          "raw": null,
+          "confidence": 0.95
+        }
+      },
+      "organization_context": {
+        "on_behalf_of_company": "unknown",
+        "company": null
+      },
+      "user_context": {
+        "selling": null,
+        "objective": null,
+        "notes": []
+      },
+      "location": {
+        "value": "Canada",
+        "raw": "in Canada",
+        "scope": "remote",
+        "radius": null,
+        "radius_unit": null,
+        "country_code": "CA",
+        "canonical": "Canada",
+        "confidence": 0.5
+      },
+      "temporal": null,
+      "constraints": [],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": false,
+        "reasons": []
+      },
+      "quantity": null,
+      "required_fields": [],
+      "preferred_fields": [],
+      "contact_requirements": [],
+      "verification": [],
+      "output": [],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": false,
+        "fields": [],
+        "reason": null,
+        "question": null
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": null,
+        "model": null,
+        "prompt_version": "u1-v15",
+        "latency_ms": 123,
+        "fallback_used": false,
+        "cached": true,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": null,
+          "repair_attempted": false,
+          "repair_reason": null,
+          "repair_success": null
+        },
+        "notes": []
+      }
+    }
+  },
+  "outcome": "QUALIFIED_RESULTS",
+  "diagnostics": [],
+  "retrievalTrace": {
+    "sources": [
+      {
+        "source": "provider-jobs",
+        "partitions": [
+          "jobs-fleet(23/23 sources ok, 69 seeker-filtered)"
+        ],
+        "scanned": 6265,
+        "matched": 92
+      },
+      {
+        "source": "live-jobs+browser",
+        "partitions": [
+          "live-gapfill(40)"
+        ],
+        "scanned": 40,
+        "matched": 27
+      }
+    ],
+    "rawCandidates": 119,
+    "postSpecFilter": 4,
+    "complete": 2,
+    "pendingEnrichment": 0,
+    "qualificationRejected": 0,
+    "returned": 2,
+    "reason": "RESULTS"
+  },
+  "executionPlan": {
+    "requirements": {
+      "entityTypes": [
+        "job"
+      ],
+      "claims": [],
+      "needsDiscovery": true,
+      "needsIdentityResolution": true,
+      "needsLocation": true,
+      "needsTemporal": false,
+      "opportunity": null
+    },
+    "steps": [
+      {
+        "providerId": "indexed-db",
+        "costTier": 0,
+        "role": "primary",
+        "reason": "primary_tier_L0:indexed-db+identity",
+        "capabilities": {
+          "id": "indexed-db",
+          "label": "Indexed / internal DB",
+          "entityTypes": [
+            "person",
+            "company",
+            "business",
+            "investor",
+            "job"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": true,
+          "locationSupport": true,
+          "temporalSupport": false,
+          "costTier": 0,
+          "live": false
+        }
+      },
+      {
+        "providerId": "jobs-fleet",
+        "costTier": 1,
+        "role": "primary",
+        "reason": "primary_tier_L1:jobs-fleet",
+        "capabilities": {
+          "id": "jobs-fleet",
+          "label": "Jobs fleet (M13 finishes contract)",
+          "entityTypes": [
+            "job"
+          ],
+          "claims": [
+            "hiring"
+          ],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": true,
+          "temporalSupport": true,
+          "costTier": 1,
+          "live": true
+        }
+      },
+      {
+        "providerId": "searxng",
+        "costTier": 2,
+        "role": "primary",
+        "reason": "primary_tier_L2:searxng",
+        "capabilities": {
+          "id": "searxng",
+          "label": "SearXNG (self-hosted web)",
+          "entityTypes": [
+            "person",
+            "company",
+            "business",
+            "investor",
+            "job"
+          ],
+          "claims": [
+            "hiring",
+            "service_request",
+            "funding",
+            "social_ask"
+          ],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": true,
+          "temporalSupport": true,
+          "costTier": 2,
+          "live": true
+        }
+      },
+      {
+        "providerId": "html-parser",
+        "costTier": 3,
+        "role": "primary",
+        "reason": "primary_tier_L3:html-parser",
+        "capabilities": {
+          "id": "html-parser",
+          "label": "HTML parser",
+          "entityTypes": [
+            "company",
+            "business",
+            "person",
+            "job"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": false,
+          "costTier": 3,
+          "live": true
+        }
+      },
+      {
+        "providerId": "sitemap-jsonld",
+        "costTier": 4,
+        "role": "primary",
+        "reason": "primary_tier_L4:sitemap-jsonld",
+        "capabilities": {
+          "id": "sitemap-jsonld",
+          "label": "Sitemap / RSS / JSON-LD / OpenGraph",
+          "entityTypes": [
+            "company",
+            "business",
+            "job"
+          ],
+          "claims": [
+            "hiring",
+            "funding"
+          ],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": true,
+          "costTier": 4,
+          "live": true
+        }
+      },
+      {
+        "providerId": "browser-automation",
+        "costTier": 5,
+        "role": "escalation",
+        "reason": "escalate_after_free_ladder:browser-automation",
+        "capabilities": {
+          "id": "browser-automation",
+          "label": "Browser automation",
+          "entityTypes": [
+            "company",
+            "business",
+            "person",
+            "job"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": false,
+          "costTier": 5,
+          "live": true,
+          "escalateOnly": true
+        }
+      },
+      {
+        "providerId": "paid-serp",
+        "costTier": 7,
+        "role": "escalation",
+        "reason": "escalate_after_free_ladder:paid-serp",
+        "capabilities": {
+          "id": "paid-serp",
+          "label": "Paid SERP API",
+          "entityTypes": [
+            "person",
+            "company",
+            "business",
+            "investor",
+            "job"
+          ],
+          "claims": [
+            "hiring",
+            "service_request",
+            "funding",
+            "social_ask"
+          ],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": true,
+          "temporalSupport": true,
+          "costTier": 7,
+          "live": true,
+          "escalateOnly": true
+        }
+      }
+    ],
+    "skipped": [
+      {
+        "providerId": "osm-local",
+        "reason": "entity_type_mismatch"
+      },
+      {
+        "providerId": "company-registry",
+        "reason": "entity_type_mismatch"
+      },
+      {
+        "providerId": "direct-http",
+        "reason": "entity_type_mismatch"
+      },
+      {
+        "providerId": "agentic-browser",
+        "reason": "entity_type_mismatch"
+      }
+    ],
+    "researchPlan": {
+      "discoveryQueries": [
+        "ai automation Canada job",
+        "ai automation remote job"
+      ],
+      "requiredFields": [
+        "name",
+        "role",
+        "industry",
+        "job_url",
+        "location",
+        "identity_evidence"
+      ],
+      "desiredCount": 5,
+      "stoppingRules": {
+        "maxQueries": 3,
+        "maxPages": 15,
+        "maxCandidates": 15,
+        "maxNoProgressQueries": 2
+      }
+    }
+  },
+  "providerAttempts": [
+    {
+      "provider": "indexed-db",
+      "entitiesResolved": 0,
+      "qualified": 0,
+      "attempted": false,
+      "succeeded": false,
+      "artifactsFound": 0,
+      "error": "handled_outside_live_gapfill",
+      "role": "primary",
+      "costTier": 0
+    },
+    {
+      "provider": "jobs-fleet",
+      "entitiesResolved": 0,
+      "qualified": 0,
+      "attempted": true,
+      "succeeded": true,
+      "artifactsFound": 25,
+      "role": "primary",
+      "costTier": 1
+    },
+    {
+      "provider": "browser-live",
+      "attempted": true,
+      "succeeded": true,
+      "artifactsFound": 15,
+      "entitiesResolved": 0,
+      "qualified": 0
+    }
+  ],
+  "search_run_id": "run_0856e2f1",
+  "conversation_id": "83775911-3efb-42a6-aa40-51453ab9cd2c:da4669b7-7dec-4933-af5f-5f342939a907",
+  "turn_id": "1790346631105-g4zl2im54w",
+  "request_id": "req_9b9a8c0d",
+  "qualified_count": 2
+}

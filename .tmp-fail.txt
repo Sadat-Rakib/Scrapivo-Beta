@@ -1,0 +1,166 @@
+﻿
+[chaos/c002b] LOCALISATION  MANGERS IN VARNA LOOKNG FOR  WORK  if poss
+   ENTITY want person got unknown
+   RELATION want seeking_job got none
+   q=ΓÇö cons=[] clar=ΓÇö sells=ΓÇö viol=ΓÇö
+
+[chaos/c006a] AUDIOLOGISTS LOOKKING FOR CLIENTS rn
+   RELATION want seeking_client got none
+   q=ΓÇö cons=[] clar=ΓÇö sells=ΓÇö viol=ΓÇö
+
+[chaos/c006b] hi businesses lookking for audiologists
+   RELATION want needs_service got none
+   OBJECT want audiologist got null
+   q=ΓÇö cons=[] clar=ΓÇö sells=ΓÇö viol=ΓÇö
+
+[chaos/c014a] luthiers looking for clients thx
+   ENTITY want person got unknown
+   q=ΓÇö cons=[] clar=ΓÇö sells=ΓÇö viol=ΓÇö
+
+[chaos/c014b] busineses looking for luthiers
+   ENTITY want business|company got unknown
+   q=ΓÇö cons=[] clar=ΓÇö sells=ΓÇö viol=ΓÇö
+
+[chaos/c016a] audiologists who serve cider houses in geelong!!
+   RELATION want offers_service got unknown
+   q=ΓÇö cons=[] clar=unreadable_relation sells=ΓÇö viol=ΓÇö
+
+[chaos/c016b] cider houses  in Geelong who need a audioolgist...
+   OBJECT want audiologist got audioolgist...
+   q=ΓÇö cons=[] clar=ΓÇö sells=ΓÇö viol=ΓÇö
+
+[chaos/c018a] ok  so  FRACTIONAL CFOS LOOKING FOR CLIENTS today
+   ENTITY want person got unknown
+   q=ΓÇö cons=[] clar=ΓÇö sells=ΓÇö viol=ΓÇö
+
+[chaos/c021] ok so i do grant writinng n im tryna find like mushroom farms around brno that dont got a site, phone would b great, thx
+   RELATION want lacks_asset got none
+   OBJECT want website got null
+   q=ΓÇö cons=[] clar=ΓÇö sells=grant writinng and im trying viol=ΓÇö
+
+[chaos/c023] looking for need space startups braga funded this yr + foundesr names if u can
+   ENTITY want company got unknown
+   LOCATION want braga got null (raw "null")
+   q=ΓÇö cons=[] clar=missing_target sells=ΓÇö viol=ΓÇö
+
+[chaos/c024] i want who around pereira needs someeone for food safety auditing asap
+   OBJECT want food safety auditing got someeone
+   q=ΓÇö cons=[] clar=missing_target sells=ΓÇö viol=ΓÇö
+
+[chaos/c025] need aquaculture statrups trois-rivi├¿res funded this yr + founders names if u can thx
+   ENTITY want company got unknown
+   LOCATION want trois-rivi├¿res got null (raw "null")
+   q=ΓÇö cons=[] clar=ΓÇö sells=ΓÇö viol=ΓÇö
+
+[chaos/c027] need some foudners round ann  arbor tryna bring  on auudiologist ppl rn
+   ENTITY want person got unknown
+   q=ΓÇö cons=[] clar=ΓÇö sells=ΓÇö viol=ΓÇö
+
+[chaos/c030] i want any cider houses near enschede no poper website n got phone?
+   RELATION want lacks_asset got none
+   OBJECT want website got null
+   q=ΓÇö cons=[!category.neq=poper website] clar=ΓÇö sells=ΓÇö viol=ΓÇö
+
+[chaos/c040] BELL FOUUNDRIES SPLIT PLS
+   LOCATION want split got null (raw "null")
+   q=ΓÇö cons=[] clar=underspecified_scope sells=ΓÇö viol=ΓÇö
+
+[chaos/c041] find me 30 mushroom farms outsidde chattanooga, not chains, insta if possible thx
+   LOCATION want chattanooga got null (raw "null")
+   q==30 cons=[!category.neq=chains] clar=ΓÇö sells=ΓÇö viol=ΓÇö
+
+[chaos/c043] ok so i do penetration teesting n im tryna find like coblbers around dunedin that dont got a site phone would b great thx asap
+   RELATION want lacks_asset got none
+   OBJECT want website got null
+   q=ΓÇö cons=[] clar=ΓÇö sells=penetration teesting and im trying viol=ΓÇö
+
+[chaos/c044] OK SO I  DO SUBTITLING  N IM  TRYNA FIND LIKE  ORTHOTICS  CLINICS AROUND  BRAGA THAT DONT  GOT A SITE, PHONE WOULD B GREAT, THX...
+   RELATION want lacks_asset got none
+   OBJECT want website got null
+   q=ΓÇö cons=[] clar=ΓÇö sells=subtitling and im trying viol=ΓÇö
+
+[chaos/c045] can u get me ok so i do food safety audiitng n im tryna find like seed libraries around aarhus that dont got a site, phone would b great, thx as many as u can??
+   RELATION want lacks_asset got unknown
+   OBJECT want website got null
+   q=ΓÇö cons=[] clar=unreadable_relation sells=ΓÇö viol=ΓÇö
+
+[chaos/c047] need some  foundes round leuven  tryna bring on ai safety researcher  ppl rn
+   ENTITY want person got unknown
+   q=ΓÇö cons=[] clar=ΓÇö sells=ΓÇö viol=ΓÇö
+
+[chaos/c048] tryna find need some founders round napier tryna bring on quantity surveyor ppl rn?
+   ENTITY want person got unknown
+   q=ΓÇö cons=[] clar=missing_target sells=ΓÇö viol=ΓÇö
+
+[chaos/c051] tryna find NEED SOME FOUDERS ROUND  HAMILTON TRYNA BRING ON ORTHODONTIST  PPL RN
+   ENTITY want person got unknown
+   q=ΓÇö cons=[] clar=missing_target sells=ΓÇö viol=ΓÇö
+
+[chaos/c052] who around waterord needs someone for waste haulage asap
+   LOCATION want waterford got waterord (raw "around waterord")
+   q=ΓÇö cons=[] clar=missing_target sells=ΓÇö viol=ΓÇö
+
+[chaos/c055] BOARD GAME CAF├ëS GEEELONG PLS
+   LOCATION want geelong got GEEELONG (raw "GEEELONG")
+   q=ΓÇö cons=[] clar=ΓÇö sells=ΓÇö viol=ΓÇö
+
+[chaos/c057] need some funders round mombasa tryna bring on agronomist ppl rn today
+   ENTITY want person got unknown
+   q=ΓÇö cons=[] clar=ΓÇö sells=ΓÇö viol=ΓÇö
+
+[chaos/c058] any  bell foundries  near mombassa no  proper  website  n got phone?
+   LOCATION want mombasa got mombassa (raw "near mombassa")
+   q=ΓÇö cons=[] clar=ΓÇö sells=ΓÇö viol=ΓÇö
+
+[chaos/c059] who around inverness needs someeone for patent dafting asap as many as u can
+   OBJECT want patent drafting got someeone
+   q=ΓÇö cons=[] clar=missing_target sells=ΓÇö viol=ΓÇö
+
+[chaos/c063] find me 40 board game caf├⌐s outtside turku, not chains, insta if pssible
+   LOCATION want turku got null (raw "null")
+   q==40 cons=[!category.neq=chains] clar=ΓÇö sells=ΓÇö viol=ΓÇö
+
+[chaos/c065] who arouund hsincuh needs someone for trade show fabrication asap as many as u can
+   LOCATION want hsinchu got null (raw "null")
+   q=ΓÇö cons=[] clar=ΓÇö sells=ΓÇö viol=ΓÇö
+
+[chaos/c066] any choocolatiers near inverness no proper websitte n got phone?
+   RELATION want lacks_asset got none
+   OBJECT want website got null
+   q=ΓÇö cons=[!category.neq=proper websitte] clar=ΓÇö sells=ΓÇö viol=ΓÇö
+
+[chaos/c069] help me find need pharmacovigilance startups p├⌐cs funded this yr + founders names if u can
+   ENTITY want company got unknown
+   LOCATION want p├⌐cs got null (raw "null")
+   q=ΓÇö cons=[] clar=ΓÇö sells=ΓÇö viol=ΓÇö
+
+[chaos/c070] help me find ok so i do trade show fabrication n im tryna find like piano tuners around mombasa that dont got a site, phone would b great, thx??
+   RELATION want lacks_asset got unknown
+   OBJECT want website got null
+   q=ΓÇö cons=[] clar=unreadable_relation sells=ΓÇö viol=ΓÇö
+
+[chaos/c072] dive  shools  arhus pls
+   LOCATION want aarhus got null (raw "null")
+   q=ΓÇö cons=[] clar=underspecified_scope sells=ΓÇö viol=ΓÇö
+
+[chaos/c073] ok so i  do ISO certification n im tryna  find  like  sailmakers aronud  swansae  that  dont got a  site,  phone would b  great,  thx
+   RELATION want lacks_asset got none
+   OBJECT want website got null
+   LOCATION want swansea got null (raw "null")
+   q=ΓÇö cons=[] clar=underspecified_scope sells=iso certification and im trying viol=ΓÇö
+
+[chaos/c074] gimme ok so i do fleet maintenance n im tryna find like quilt shops aroound chattanooga that dont got a site, phone would b great, thx if poss
+   RELATION want lacks_asset got unknown
+   OBJECT want website got null
+   LOCATION want chattanooga got null (raw "null")
+   q=ΓÇö cons=[] clar=unreadable_relation sells=ΓÇö viol=ΓÇö
+
+[chaos/c075] who around enscehde needs someoone for trade show fabrication asap
+   OBJECT want trade show fabrication got someoone
+   LOCATION want enschede got enscehde (raw "around enscehde")
+   q=ΓÇö cons=[] clar=missing_target sells=ΓÇö viol=ΓÇö
+
+[chaos/c076] can u get me ok so i do patent draafting n im tryna find like quilt shops around ko┼íice that dont got a site, phone would b great, thx rn...
+   RELATION want lacks_asset got unknown
+   OBJECT want website got null
+   q=ΓÇö cons=[] clar=unreadable_relation sells=ΓÇö viol=ΓÇö

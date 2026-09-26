@@ -1,0 +1,30 @@
+{
+  "configured": true,
+  "tables": {
+    "idx_businesses": {
+      "http": 206,
+      "rows": 609387,
+      "success": true
+    },
+    "idx_companies": {
+      "http": 206,
+      "rows": 79014,
+      "success": true
+    },
+    "idx_people": {
+      "http": 206,
+      "rows": 399397,
+      "success": true
+    },
+    "idx_investors": {
+      "http": 404,
+      "rows": null,
+      "success": false
+    },
+    "idx_jobs": {
+      "http": 404,
+      "rows": null,
+      "success": false
+    }
+  }
+}

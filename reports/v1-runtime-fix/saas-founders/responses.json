@@ -1,0 +1,58 @@
+{
+  "query": "saas founders",
+  "responseObserved": true,
+  "errors": [],
+  "requests": [
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvc3BlYy1zZWFyY2guZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6ImdldFNwZWNGbGFnX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvc2VhcmNoLmZ1bmN0aW9ucy50cz90c3Mtc2VydmVyZm4tc3BsaXQiLCJleHBvcnQiOiJnZXRSZW1haW5pbmdTZWFyY2hlc19jcmVhdGVTZXJ2ZXJGbl9oYW5kbGVyIn0",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvcHJvZmlsZS5mdW5jdGlvbnMudHM_dHNzLXNlcnZlcmZuLXNwbGl0IiwiZXhwb3J0IjoiZ2V0TXlQcm9maWxlX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvdHJhbnNjcmlwdC5mdW5jdGlvbnMudHM_dHNzLXNlcnZlcmZuLXNwbGl0IiwiZXhwb3J0IjoiZ2V0VHJhbnNjcmlwdF9jcmVhdGVTZXJ2ZXJGbl9oYW5kbGVyIn0?payload=%7B%22t%22%3A%7B%22t%22%3A10%2C%22i%22%3A0%2C%22p%22%3A%7B%22k%22%3A%5B%22data%22%5D%2C%22v%22%3A%5B%7B%22t%22%3A10%2C%22i%22%3A1%2C%22p%22%3A%7B%22k%22%3A%5B%22conversationId%22%5D%2C%22v%22%3A%5B%7B%22t%22%3A1%2C%22s%22%3A%2283775911-3efb-42a6-aa40-51453ab9cd2c%3Af5168fde-a704-4c24-afe5-9469d41b3c94%22%7D%5D%7D%2C%22o%22%3A0%7D%5D%7D%2C%22o%22%3A0%7D%2C%22f%22%3A63%2C%22m%22%3A%5B%5D%7D",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvcHJvamVjdHMuZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6Imxpc3RQcm9qZWN0c19jcmVhdGVTZXJ2ZXJGbl9oYW5kbGVyIn0",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvbGVhZHMuZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6Imxpc3RTYXZlZExlYWRzX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvc3BlYy1zZWFyY2guZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6ImdldFNwZWNGbGFnX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvbGVhZHMuZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6Imxpc3RIaXN0b3J5X2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvc3BlYy1zZWFyY2guZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6ImdldFNwZWNGbGFnX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvdHJhbnNjcmlwdC5mdW5jdGlvbnMudHM_dHNzLXNlcnZlcmZuLXNwbGl0IiwiZXhwb3J0Ijoic2F2ZVRyYW5zY3JpcHRfY3JlYXRlU2VydmVyRm5faGFuZGxlciJ9",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvc3BlYy1zZWFyY2guZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6InJ1blNwZWNTZWFyY2hfY3JlYXRlU2VydmVyRm5faGFuZGxlciJ9",
+      "status": 200
+    }
+  ],
+  "responses": [
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvc3BlYy1zZWFyY2guZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6InJ1blNwZWNTZWFyY2hfY3JlYXRlU2VydmVyRm5faGFuZGxlciJ9",
+      "status": 200,
+      "body": "{\"t\":10,\"i\":0,\"p\":{\"k\":[\"result\",\"error\",\"context\"],\"v\":[{\"t\":10,\"i\":1,\"p\":{\"k\":[\"questions\",\"clarify\",\"rows\",\"dbMeta\",\"rejected\",\"liveDiscovery\",\"pendingEnrichment\",\"moreAvailableMessage\",\"offset\",\"limit\",\"hasMore\",\"totalAvailable\",\"spec\",\"outcome\",\"diagnostics\",\"retrievalTrace\",\"search_run_id\",\"conversation_id\",\"turn_id\",\"request_id\",\"qualified_count\"],\"v\":[{\"t\":9,\"i\":2,\"a\":[{\"t\":1,\"s\":\"Which location should I focus on (city, region, or country)?\"},{\"t\":1,\"s\":\"What seniority level (e.g. junior, senior, lead, principal)?\"}],\"o\":0},{\"t\":9,\"i\":3,\"a\":[{\"t\":10,\"i\":4,\"p\":{\"k\":[\"id\",\"question\",\"options\",\"allowOther\"],\"v\":[{\"t\":1,\"s\":\"entity_location\"},{\"t\":1,\"s\":\"Which location should I focus on (city, region, or country)?\"},{\"t\":9,\"i\":5,\"a\":[],\"o\":0},{\"t\":2,\"s\":2}]},\"o\":0},{\"t\":10,\"i\":6,\"p\":{\"k\":[\"id\",\"question\",\"options\",\"allowOther\"],\"v\":[{\"t\":1,\"s\":\"entity_seniority\"},{\"t\":1,\"s\":\"What seniority level (e.g. junior, senior, lead, principal)?\"},{\"t\":9,\"i\":7,\"a\":[{\"t\":10,\"i\":8,\"p\":{\"k\":[\"id\",\"label\",\"hint\"],\"v\":[{\"t\":1,\"s\":\"junior\"},{\"t\":1,\"s\":\"Junior\"},{\"t\":1,\"s\":\"Entry-level roles\"}]},\"o\":0},{\"t\":10,\"i\":9,\"p\":{\"k\":[\"id\",\"label\",\"hint\"],\"v\":[{\"t\":1,\"s\":\"senior\"},{\"t\":1,\"s\":\"Senior\"},{\"t\":1,\"s\":\"Experienced roles\"}]},\"o\":0},{\"t\":10,\"i\":10,\"p\":{\"k\":[\"id\",\"label\",\"hint\"],\"v\":[{\"t\":1,\"s\":\"lead\"},{\"t\":1,\"s\":\"Lead\"},{\"t\":1,\"s\":\"Team leads\"}]},\"o\":0}],\"o\":0},{\"t\":2,\"s\":2}]},\"o\":0}],\"o\":0},{\"t\":9,\"i\":11,\"a\":[],\"o\":0},{\"t\":9,\"i\":12,\"a\":[{\"t\":10,\"i\":13,\"p\":{\"k\":[\"dbHit\",\"engine\",\"partitionsRead\",\"rowsScanned\",\"rowsReturned\",\"coverageIncomplete\",\"stopReason\"],\"v\":[{\"t\":2,\"s\":3},{\"t\":1,\"s\":\"s3-parquet\"},{\"t\":9,\"i\":14,\"a\":[{\"t\":1,\"s\":\"processed/people_by_country/_part=united-states/data_0.parquet\"},{\"t\":1,\"s\":\"processed/people_by_country/_part=india/data_0.parquet\"},{\"t\":1,\"s\":\"processed/people_by_country/_part=canada/data_0.parquet\"},{\"t\":1,\"s\":\"processed/people_by_country/_part=canada/data_1.parquet\"}],\"o\":0},{\"t\":0,\"s\":391358},{\"t\":0,\"s\":0},{\"t\":2,\"s\":2},{\"t\":1,\"s\":\"deadline\"}]},\"o\":0},{\"t\":10,\"i\":15,\"p\":{\"k\":[\"dbHit\",\"engine\",\"partitionsRead\",\"rowsScanned\",\"rowsReturned\"],\"v\":[{\"t\":2,\"s\":2},{\"t\":1,\"s\":\"live-browser\"},{\"t\":9,\"i\":16,\"a\":[{\"t\":1,\"s\":\"live-gapfill(3)\"}],\"o\":0},{\"t\":0,\"s\":3},{\"t\":0,\"s\":3}]},\"o\":0}],\"o\":0},{\"t\":0,\"s\":0},{\"t\":1,\"s\":\"completed\"},{\"t\":0,\"s\":0},{\"t\":2,\"s\":0},{\"t\":0,\"s\":0},{\"t\":0,\"s\":50},{\"t\":2,\"s\":3},{\"t\":2,\"s\":0},{\"t\":10,\"i\":17,\"p\":{\"k\":[\"entity\",\"criteria\",\"missing\",\"signal_required\",\"signal_types\",\"signal_recency\",\"status\",\"raw_query\",\"locationSuggestion\"],\"v\":[{\"t\":1,\"s\":\"person\"},{\"t\":9,\"i\":18,\"a\":[{\"t\":10,\"i\":19,\"p\":{\"k\":[\"field\",\"value\",\"stated\",\"confidence\"],\"v\":[{\"t\":1,\"s\":\"role\"},{\"t\":1,\"s\":\"founder\"},{\"t\":2,\"s\":2},{\"t\":0,\"s\":1}]},\"o\":0},{\"t\":10,\"i\":20,\"p\":{\"k\":[\"field\",\"value\",\"stated\",\"confidence\"],\"v\":[{\"t\":1,\"s\":\"industry\"},{\"t\":1,\"s\":\"SaaS\"},{\"t\":2,\"s\":2},{\"t\":0,\"s\":1}]},\"o\":0}],\"o\":0},{\"t\":9,\"i\":21,\"a\":[],\"o\":0},{\"t\":2,\"s\":3},{\"t\":9,\"i\":22,\"a\":[],\"o\":0},{\"t\":2,\"s\":0},{\"t\":1,\"s\":\"ready_to_search\"},{\"t\":1,\"s\":\"saas founders\"},{\"t\":2,\"s\":0}]},\"o\":0},{\"t\":1,\"s\":\"NO_QUALIFIED_RESULTS\"},{\"t\":9,\"i\":23,\"a\":[{\"t\":10,\"i\":24,\"p\":{\"k\":[\"code\",\"source\",\"detail\"],\"v\":[{\"t\":1,\"s\":\"SOURCE_UNAVAILABLE\"},{\"t\":1,\"s\":\"s3-parquet\"},{\"t\":1,\"s\":\"Stored people scan reached its time budget; coverage is incomplete.\"}]},\"o\":0},{\"t\":10,\"i\":25,\"p\":{\"k\":[\"code\",\"source\",\"detail\"],\"v\":[{\"t\":1,\"s\":\"SOURCE_UNAVAILABLE\"},{\"t\":1,\"s\":\"direct-http\"},{\"t\":1,\"s\":\"SEARXNG_UNREACHABLE: fetch failed\"}]},\"o\":0},{\"t\":10,\"i\":26,\"p\":{\"k\":[\"code\",\"source\",\"detail\"],\"v\":[{\"t\":1,\"s\":\"SOURCE_UNAVAILABLE\"},{\"t\":1,\"s\":\"searxng\"},{\"t\":1,\"s\":\"SEARXNG_UNREACHABLE: fetch failed\"}]},\"o\":0}],\"o\":0},{\"t\":10,\"i\":27,\"p\":{\"k\":[\"sources\",\"rawCandidates\",\"postSpecFilter\",\"complete\",\"pendingEnrichment\",\"qualificationRejected\",\"returned\",\"reason\"],\"v\":[{\"t\":9,\"i\":28,\"a\":[{\"t\":10,\"i\":29,\"p\":{\"k\":[\"source\",\"partitions\",\"scanned\",\"matched\"],\"v\":[{\"t\":1,\"s\":\"s3-parquet\"},{\"t\":4,\"i\":14},{\"t\":0,\"s\":391358},{\"t\":0,\"s\":0}]},\"o\":0},{\"t\":10,\"i\":30,\"p\":{\"k\":[\"source\",\"partitions\",\"scanned\",\"matched\"],\"v\":[{\"t\":1,\"s\":\"live-browser\"},{\"t\":4,\"i\":16},{\"t\":0,\"s\":3},{\"t\":0,\"s\":3}]},\"o\":0}],\"o\":0},{\"t\":0,\"s\":0},{\"t\":0,\"s\":0},{\"t\":0,\"s\":0},{\"t\":0,\"s\":0},{\"t\":0,\"s\":0},{\"t\":0,\"s\":0},{\"t\":1,\"s\":\"SOURCE_UNAVAILABLE\"}]},\"o\":0},{\"t\":1,\"s\":\"run_cefd0bc4\"},{\"t\":1,\"s\":\"83775911-3efb-42a6-aa40-51453ab9cd2c:f5168fde-a704-4c24-afe5-9469d41b3c94\"},{\"t\":1,\"s\":\"1790253658435-cqy2eyx8xvm\"},{\"t\":1,\"s\":\"req_a378f828\"},{\"t\":0,\"s\":0}]},\"o\":0},{\"t\":2,\"s\":1},{\"t\":11,\"i\":31,\"p\":{\"k\":[],\"v\":[]},\"o\":0}]},\"o\":0}"
+    }
+  ]
+}

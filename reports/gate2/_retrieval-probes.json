@@ -1,0 +1,1190 @@
+[
+  {
+    "entity": "business",
+    "query": "HVAC companies in Calgary",
+    "spec": {
+      "entity": "company",
+      "criteria": [
+        {
+          "field": "location",
+          "value": "Calgary",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_id",
+          "value": "geo:city:calgary",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "city",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_country",
+          "value": "CA",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_parents",
+          "value": "geo:country:ca",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "HVAC companies in Calgary",
+      "locationSuggestion": null
+    },
+    "dbMeta": [],
+    "stored_candidates": 0,
+    "rows_after_filters": 0,
+    "complete_usable": 0,
+    "pending_enrichment": 0,
+    "live_gapfill_triggered": true,
+    "live_status": "db_thin_gapfill_pending",
+    "qualified_rows": 0,
+    "final_returned": 0,
+    "timing_ms": 60096,
+    "source": []
+  },
+  {
+    "entity": "business",
+    "query": "restaurants in Austin",
+    "spec": {
+      "entity": "business",
+      "criteria": [
+        {
+          "field": "category",
+          "value": "restaurants",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location",
+          "value": "Austin",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_id",
+          "value": "geo:city:austin",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "city",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_country",
+          "value": "US",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_parents",
+          "value": "geo:country:us",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "restaurants in Austin",
+      "locationSuggestion": null
+    },
+    "dbMeta": [
+      {
+        "dbHit": true,
+        "engine": "s3-parquet",
+        "partitionsRead": [
+          "processed/local-businesses/by_country/(gazetteer: 2 file(s) for \"Austin\": us,austin)",
+          "(exact=6 nearby=0 for \"Austin\")"
+        ],
+        "rowsScanned": 101,
+        "rowsReturned": 6
+      }
+    ],
+    "stored_candidates": 6,
+    "rows_after_filters": 6,
+    "complete_usable": 5,
+    "pending_enrichment": 1,
+    "live_gapfill_triggered": false,
+    "live_status": "not_required",
+    "qualified_rows": 5,
+    "final_returned": 5,
+    "timing_ms": 7687,
+    "source": [
+      "s3-parquet"
+    ]
+  },
+  {
+    "entity": "business",
+    "query": "dentists in London",
+    "spec": {
+      "entity": "business",
+      "criteria": [
+        {
+          "field": "category",
+          "value": "dentists",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location",
+          "value": "London",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_id",
+          "value": "geo:city:london",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "city",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_country",
+          "value": "GB",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_parents",
+          "value": "geo:metro:greater-london,geo:country:gb",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "dentists in London",
+      "locationSuggestion": null
+    },
+    "dbMeta": [
+      {
+        "dbHit": false,
+        "engine": "s3-parquet",
+        "partitionsRead": [
+          "processed/local-businesses/by_country/(gazetteer: 1 file(s) for \"London\": gb)",
+          "(exact=0 nearby=0 for \"London\")"
+        ],
+        "rowsScanned": 400000,
+        "rowsReturned": 0
+      },
+      {
+        "dbHit": false,
+        "engine": "provider-osm",
+        "partitionsRead": [
+          "overpass(London)"
+        ],
+        "rowsScanned": 0,
+        "rowsReturned": 0
+      }
+    ],
+    "stored_candidates": 0,
+    "rows_after_filters": 0,
+    "complete_usable": 0,
+    "pending_enrichment": 0,
+    "live_gapfill_triggered": true,
+    "live_status": "db_thin_gapfill_pending",
+    "qualified_rows": 0,
+    "final_returned": 0,
+    "timing_ms": 33691,
+    "source": [
+      "s3-parquet",
+      "provider-osm"
+    ]
+  },
+  {
+    "entity": "business",
+    "query": "plumbers in Pune",
+    "spec": {
+      "entity": "business",
+      "criteria": [
+        {
+          "field": "category",
+          "value": "plumbers",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location",
+          "value": "Pune",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_id",
+          "value": "geo:city:pune",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "city",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_country",
+          "value": "IN",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_parents",
+          "value": "geo:country:in",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "plumbers in Pune",
+      "locationSuggestion": null
+    },
+    "dbMeta": [
+      {
+        "dbHit": true,
+        "engine": "s3-parquet",
+        "partitionsRead": [
+          "processed/local-businesses/by_country/(gazetteer: 1 file(s) for \"Pune\": in)",
+          "(exact=6 nearby=0 for \"Pune\")"
+        ],
+        "rowsScanned": 93799,
+        "rowsReturned": 6
+      }
+    ],
+    "stored_candidates": 6,
+    "rows_after_filters": 6,
+    "complete_usable": 5,
+    "pending_enrichment": 0,
+    "live_gapfill_triggered": false,
+    "live_status": "not_required",
+    "qualified_rows": 5,
+    "final_returned": 5,
+    "timing_ms": 40426,
+    "source": [
+      "s3-parquet"
+    ]
+  },
+  {
+    "entity": "business",
+    "query": "marketing agencies in Berlin",
+    "spec": {
+      "entity": "company",
+      "criteria": [
+        {
+          "field": "industry",
+          "value": "marketing",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "business_model",
+          "value": "agency",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location",
+          "value": "Berlin",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_id",
+          "value": "geo:city:berlin",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "city",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_country",
+          "value": "DE",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_parents",
+          "value": "geo:country:de",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "marketing agencies in Berlin",
+      "locationSuggestion": null
+    },
+    "dbMeta": [],
+    "stored_candidates": 0,
+    "rows_after_filters": 0,
+    "complete_usable": 0,
+    "pending_enrichment": 0,
+    "live_gapfill_triggered": true,
+    "live_status": "db_thin_gapfill_pending",
+    "qualified_rows": 0,
+    "final_returned": 0,
+    "timing_ms": 60010,
+    "source": []
+  },
+  {
+    "entity": "business",
+    "query": "sailmakers in Ubud Bali",
+    "spec": {
+      "entity": "unknown",
+      "criteria": [
+        {
+          "field": "location",
+          "value": "Ubud Bali",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_id",
+          "value": "geo:stated:ubud-bali",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "stated",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [
+        "entity"
+      ],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "needs_clarification",
+      "raw_query": "sailmakers in Ubud Bali",
+      "locationSuggestion": null
+    },
+    "dbMeta": [],
+    "stored_candidates": 0,
+    "rows_after_filters": 0,
+    "complete_usable": 0,
+    "pending_enrichment": 0,
+    "live_gapfill_triggered": false,
+    "live_status": "not_required",
+    "qualified_rows": 0,
+    "final_returned": 0,
+    "timing_ms": 23,
+    "source": []
+  },
+  {
+    "entity": "person",
+    "query": "founders in Canada",
+    "spec": {
+      "entity": "person",
+      "criteria": [
+        {
+          "field": "role",
+          "value": "founder",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location",
+          "value": "Canada",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_id",
+          "value": "geo:country:ca",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "country",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_country",
+          "value": "CA",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "founders in Canada",
+      "locationSuggestion": null
+    },
+    "dbMeta": [
+      {
+        "dbHit": true,
+        "engine": "s3-parquet",
+        "partitionsRead": [
+          "processed/people_by_country/ (resolved shards for \"Canada\": 2 file(s))"
+        ],
+        "rowsScanned": 1024,
+        "rowsReturned": 6
+      }
+    ],
+    "stored_candidates": 6,
+    "rows_after_filters": 6,
+    "complete_usable": 5,
+    "pending_enrichment": 0,
+    "live_gapfill_triggered": false,
+    "live_status": "not_required",
+    "qualified_rows": 5,
+    "final_returned": 5,
+    "timing_ms": 1626,
+    "source": [
+      "s3-parquet"
+    ]
+  },
+  {
+    "entity": "person",
+    "query": "copywriters in New York",
+    "spec": {
+      "entity": "unknown",
+      "criteria": [
+        {
+          "field": "location",
+          "value": "New York",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_id",
+          "value": "geo:city:new-york",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "city",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_country",
+          "value": "US",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_parents",
+          "value": "geo:country:us",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [
+        "entity"
+      ],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "needs_clarification",
+      "raw_query": "copywriters in New York",
+      "locationSuggestion": null
+    },
+    "dbMeta": [],
+    "stored_candidates": 0,
+    "rows_after_filters": 0,
+    "complete_usable": 0,
+    "pending_enrichment": 0,
+    "live_gapfill_triggered": false,
+    "live_status": "not_required",
+    "qualified_rows": 0,
+    "final_returned": 0,
+    "timing_ms": 4,
+    "source": []
+  },
+  {
+    "entity": "person",
+    "query": "software engineers in Bengaluru",
+    "spec": {
+      "entity": "person",
+      "criteria": [
+        {
+          "field": "industry",
+          "value": "software",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location",
+          "value": "Bangalore",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_id",
+          "value": "geo:city:bangalore",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "city",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_country",
+          "value": "IN",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_parents",
+          "value": "geo:country:in",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [
+        "role"
+      ],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "software engineers in Bengaluru",
+      "locationSuggestion": null
+    },
+    "dbMeta": [
+      {
+        "dbHit": false,
+        "engine": "s3-parquet",
+        "partitionsRead": [
+          "processed/people_by_country/ (resolved shards for \"IN\": 2 file(s))"
+        ],
+        "rowsScanned": 25048,
+        "rowsReturned": 0
+      }
+    ],
+    "stored_candidates": 0,
+    "rows_after_filters": 0,
+    "complete_usable": 0,
+    "pending_enrichment": 0,
+    "live_gapfill_triggered": true,
+    "live_status": "db_thin_gapfill_pending",
+    "qualified_rows": 0,
+    "final_returned": 0,
+    "timing_ms": 2663,
+    "source": [
+      "s3-parquet"
+    ]
+  },
+  {
+    "entity": "person",
+    "query": "designers in Manchester",
+    "spec": {
+      "entity": "person",
+      "criteria": [
+        {
+          "field": "location",
+          "value": "Manchester",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_id",
+          "value": "geo:stated:manchester",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "stated",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [
+        "role"
+      ],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "designers in Manchester",
+      "locationSuggestion": null
+    },
+    "dbMeta": [
+      {
+        "dbHit": true,
+        "engine": "s3-parquet",
+        "partitionsRead": [
+          "processed/people_by_country/ (size-ordered, 12 largest)"
+        ],
+        "rowsScanned": 220507,
+        "rowsReturned": 6
+      }
+    ],
+    "stored_candidates": 6,
+    "rows_after_filters": 6,
+    "complete_usable": 5,
+    "pending_enrichment": 0,
+    "live_gapfill_triggered": false,
+    "live_status": "not_required",
+    "qualified_rows": 5,
+    "final_returned": 5,
+    "timing_ms": 12372,
+    "source": [
+      "s3-parquet"
+    ]
+  },
+  {
+    "entity": "person",
+    "query": "sales managers in Singapore",
+    "spec": {
+      "entity": "person",
+      "criteria": [
+        {
+          "field": "role",
+          "value": "manager",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location",
+          "value": "Singapore",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_id",
+          "value": "geo:country:sg",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "country",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_country",
+          "value": "SG",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "sales managers in Singapore",
+      "locationSuggestion": null
+    },
+    "dbMeta": [
+      {
+        "dbHit": true,
+        "engine": "s3-parquet",
+        "partitionsRead": [
+          "processed/people_by_country/ (resolved shards for \"Singapore\": 2 file(s))"
+        ],
+        "rowsScanned": 8,
+        "rowsReturned": 6
+      }
+    ],
+    "stored_candidates": 6,
+    "rows_after_filters": 6,
+    "complete_usable": 5,
+    "pending_enrichment": 0,
+    "live_gapfill_triggered": false,
+    "live_status": "not_required",
+    "qualified_rows": 5,
+    "final_returned": 5,
+    "timing_ms": 373,
+    "source": [
+      "s3-parquet"
+    ]
+  },
+  {
+    "entity": "person",
+    "query": "marine biologists in Reykjavik",
+    "spec": {
+      "entity": "unknown",
+      "criteria": [
+        {
+          "field": "location",
+          "value": "Reykjavik",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_id",
+          "value": "geo:stated:reykjavik",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "stated",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [
+        "entity"
+      ],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "needs_clarification",
+      "raw_query": "marine biologists in Reykjavik",
+      "locationSuggestion": null
+    },
+    "dbMeta": [],
+    "stored_candidates": 0,
+    "rows_after_filters": 0,
+    "complete_usable": 0,
+    "pending_enrichment": 0,
+    "live_gapfill_triggered": false,
+    "live_status": "not_required",
+    "qualified_rows": 0,
+    "final_returned": 0,
+    "timing_ms": 5,
+    "source": []
+  },
+  {
+    "entity": "company",
+    "query": "SaaS companies in Toronto",
+    "spec": {
+      "entity": "company",
+      "criteria": [
+        {
+          "field": "industry",
+          "value": "SaaS",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location",
+          "value": "Toronto",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_id",
+          "value": "geo:city:toronto",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "city",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_country",
+          "value": "CA",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_parents",
+          "value": "geo:admin:ontario,geo:country:ca,geo:metro:gta",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "SaaS companies in Toronto",
+      "locationSuggestion": null
+    },
+    "dbMeta": [],
+    "stored_candidates": 0,
+    "rows_after_filters": 0,
+    "complete_usable": 0,
+    "pending_enrichment": 0,
+    "live_gapfill_triggered": true,
+    "live_status": "db_thin_gapfill_pending",
+    "qualified_rows": 0,
+    "final_returned": 0,
+    "timing_ms": 60012,
+    "source": []
+  },
+  {
+    "entity": "company",
+    "query": "construction companies in Dallas",
+    "spec": {
+      "entity": "company",
+      "criteria": [
+        {
+          "field": "industry",
+          "value": "construction",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location",
+          "value": "Dallas",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_id",
+          "value": "geo:city:dallas",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "city",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_country",
+          "value": "US",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_parents",
+          "value": "geo:country:us",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "construction companies in Dallas",
+      "locationSuggestion": null
+    },
+    "dbMeta": [
+      {
+        "dbHit": true,
+        "engine": "s3-parquet",
+        "partitionsRead": [
+          "processed/companies_by_initial/ (size-ordered, 8 largest)"
+        ],
+        "rowsScanned": 14858,
+        "rowsReturned": 6
+      }
+    ],
+    "stored_candidates": 6,
+    "rows_after_filters": 6,
+    "complete_usable": 0,
+    "pending_enrichment": 0,
+    "live_gapfill_triggered": true,
+    "live_status": "db_thin_gapfill_pending",
+    "qualified_rows": 0,
+    "final_returned": 0,
+    "timing_ms": 10461,
+    "source": [
+      "s3-parquet"
+    ]
+  },
+  {
+    "entity": "company",
+    "query": "healthcare companies in London",
+    "spec": {
+      "entity": "company",
+      "criteria": [
+        {
+          "field": "industry",
+          "value": "Healthcare",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location",
+          "value": "London",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_id",
+          "value": "geo:city:london",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "city",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_country",
+          "value": "GB",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_parents",
+          "value": "geo:metro:greater-london,geo:country:gb",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "healthcare companies in London",
+      "locationSuggestion": null
+    },
+    "dbMeta": [],
+    "stored_candidates": 0,
+    "rows_after_filters": 0,
+    "complete_usable": 0,
+    "pending_enrichment": 0,
+    "live_gapfill_triggered": true,
+    "live_status": "db_thin_gapfill_pending",
+    "qualified_rows": 0,
+    "final_returned": 0,
+    "timing_ms": 60013,
+    "source": []
+  },
+  {
+    "entity": "company",
+    "query": "AI companies in San Francisco",
+    "spec": {
+      "entity": "company",
+      "criteria": [
+        {
+          "field": "industry",
+          "value": "AI",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location",
+          "value": "San Francisco",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_id",
+          "value": "geo:city:san-francisco",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "city",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_country",
+          "value": "US",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_parents",
+          "value": "geo:metro:bay-area,geo:country:us,geo:metro:silicon-valley",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "AI companies in San Francisco",
+      "locationSuggestion": null
+    },
+    "dbMeta": [
+      {
+        "dbHit": true,
+        "engine": "s3-parquet",
+        "partitionsRead": [
+          "processed/companies_by_initial/ (size-ordered, 8 largest)"
+        ],
+        "rowsScanned": 2727,
+        "rowsReturned": 6
+      }
+    ],
+    "stored_candidates": 6,
+    "rows_after_filters": 6,
+    "complete_usable": 0,
+    "pending_enrichment": 0,
+    "live_gapfill_triggered": true,
+    "live_status": "db_thin_gapfill_pending",
+    "qualified_rows": 0,
+    "final_returned": 0,
+    "timing_ms": 13490,
+    "source": [
+      "s3-parquet"
+    ]
+  },
+  {
+    "entity": "company",
+    "query": "ecommerce companies in Mumbai",
+    "spec": {
+      "entity": "company",
+      "criteria": [
+        {
+          "field": "industry",
+          "value": "E-commerce",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location",
+          "value": "Mumbai",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_id",
+          "value": "geo:city:mumbai",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "city",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_country",
+          "value": "IN",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_parents",
+          "value": "geo:country:in",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "ecommerce companies in Mumbai",
+      "locationSuggestion": null
+    },
+    "dbMeta": [],
+    "stored_candidates": 0,
+    "rows_after_filters": 0,
+    "complete_usable": 0,
+    "pending_enrichment": 0,
+    "live_gapfill_triggered": true,
+    "live_status": "db_thin_gapfill_pending",
+    "qualified_rows": 0,
+    "final_returned": 0,
+    "timing_ms": 60013,
+    "source": []
+  },
+  {
+    "entity": "company",
+    "query": "aquaculture companies in Bergen",
+    "spec": {
+      "entity": "company",
+      "criteria": [
+        {
+          "field": "location",
+          "value": "Bergen",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_id",
+          "value": "geo:stated:bergen",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "stated",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "aquaculture companies in Bergen",
+      "locationSuggestion": null
+    },
+    "dbMeta": [
+      {
+        "dbHit": false,
+        "engine": "s3-parquet",
+        "partitionsRead": [
+          "processed/companies_by_initial/ (size-ordered, 8 largest)",
+          "processed/companies_by_initial/ (widened +102 shard(s))"
+        ],
+        "rowsScanned": 1602141,
+        "rowsReturned": 0
+      }
+    ],
+    "stored_candidates": 0,
+    "rows_after_filters": 0,
+    "complete_usable": 0,
+    "pending_enrichment": 0,
+    "live_gapfill_triggered": true,
+    "live_status": "db_thin_gapfill_pending",
+    "qualified_rows": 0,
+    "final_returned": 0,
+    "timing_ms": 213456,
+    "source": [
+      "s3-parquet"
+    ]
+  }
+]

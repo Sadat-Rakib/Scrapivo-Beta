@@ -19,7 +19,7 @@ type Props = {
   questions: ClarifyQuestion[];
   /** Plain-English summary of what the search currently assumed. */
   refinement?: string;
-  onApply: (answers: ClarifyAnswers) => void;
+  onApply: (answers: ClarifyAnswers, opts?: { force?: boolean }) => void;
   onDismiss: () => void;
   disabled?: boolean;
 };
@@ -160,7 +160,7 @@ export function ClarifyPanel({ questions, refinement, onApply, onDismiss, disabl
             variant="ghost"
             className="h-7 text-xs"
             disabled={disabled}
-            onClick={() => (isLast ? onApply(answers) : setStep((s) => s + 1))}
+            onClick={() => (isLast ? onApply(answers, { force: true }) : setStep((s) => s + 1))}
           >
             {isLast ? "Search with defaults" : "Skip"}
           </Button>
@@ -179,7 +179,7 @@ export function ClarifyPanel({ questions, refinement, onApply, onDismiss, disabl
               size="sm"
               className="h-7 text-xs"
               disabled={disabled}
-              onClick={() => onApply(answers)}
+              onClick={() => onApply(answers, { force: true })}
             >
               Search
             </Button>

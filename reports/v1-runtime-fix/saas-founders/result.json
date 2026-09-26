@@ -1,0 +1,147 @@
+{
+  "questions": [
+    "Which location should I focus on (city, region, or country)?",
+    "What seniority level (e.g. junior, senior, lead, principal)?"
+  ],
+  "clarify": [
+    {
+      "id": "entity_location",
+      "question": "Which location should I focus on (city, region, or country)?",
+      "options": [],
+      "allowOther": true
+    },
+    {
+      "id": "entity_seniority",
+      "question": "What seniority level (e.g. junior, senior, lead, principal)?",
+      "options": [
+        {
+          "id": "junior",
+          "label": "Junior",
+          "hint": "Entry-level roles"
+        },
+        {
+          "id": "senior",
+          "label": "Senior",
+          "hint": "Experienced roles"
+        },
+        {
+          "id": "lead",
+          "label": "Lead",
+          "hint": "Team leads"
+        }
+      ],
+      "allowOther": true
+    }
+  ],
+  "rows": [],
+  "dbMeta": [
+    {
+      "dbHit": false,
+      "engine": "s3-parquet",
+      "partitionsRead": [
+        "processed/people_by_country/_part=united-states/data_0.parquet",
+        "processed/people_by_country/_part=india/data_0.parquet",
+        "processed/people_by_country/_part=canada/data_0.parquet",
+        "processed/people_by_country/_part=canada/data_1.parquet"
+      ],
+      "rowsScanned": 391358,
+      "rowsReturned": 0,
+      "coverageIncomplete": true,
+      "stopReason": "deadline"
+    },
+    {
+      "dbHit": true,
+      "engine": "live-browser",
+      "partitionsRead": [
+        "live-gapfill(3)"
+      ],
+      "rowsScanned": 3,
+      "rowsReturned": 3
+    }
+  ],
+  "rejected": 0,
+  "liveDiscovery": "completed",
+  "pendingEnrichment": 0,
+  "moreAvailableMessage": null,
+  "offset": 0,
+  "limit": 50,
+  "hasMore": false,
+  "totalAvailable": null,
+  "spec": {
+    "entity": "person",
+    "criteria": [
+      {
+        "field": "role",
+        "value": "founder",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "industry",
+        "value": "SaaS",
+        "stated": true,
+        "confidence": 1
+      }
+    ],
+    "missing": [],
+    "signal_required": false,
+    "signal_types": [],
+    "signal_recency": null,
+    "status": "ready_to_search",
+    "raw_query": "saas founders",
+    "locationSuggestion": null
+  },
+  "outcome": "NO_QUALIFIED_RESULTS",
+  "diagnostics": [
+    {
+      "code": "SOURCE_UNAVAILABLE",
+      "source": "s3-parquet",
+      "detail": "Stored people scan reached its time budget; coverage is incomplete."
+    },
+    {
+      "code": "SOURCE_UNAVAILABLE",
+      "source": "direct-http",
+      "detail": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "code": "SOURCE_UNAVAILABLE",
+      "source": "searxng",
+      "detail": "SEARXNG_UNREACHABLE: fetch failed"
+    }
+  ],
+  "retrievalTrace": {
+    "sources": [
+      {
+        "source": "s3-parquet",
+        "partitions": [
+          "processed/people_by_country/_part=united-states/data_0.parquet",
+          "processed/people_by_country/_part=india/data_0.parquet",
+          "processed/people_by_country/_part=canada/data_0.parquet",
+          "processed/people_by_country/_part=canada/data_1.parquet"
+        ],
+        "scanned": 391358,
+        "matched": 0
+      },
+      {
+        "source": "live-browser",
+        "partitions": [
+          "live-gapfill(3)"
+        ],
+        "scanned": 3,
+        "matched": 3
+      }
+    ],
+    "rawCandidates": 0,
+    "postSpecFilter": 0,
+    "complete": 0,
+    "pendingEnrichment": 0,
+    "qualificationRejected": 0,
+    "returned": 0,
+    "reason": "SOURCE_UNAVAILABLE"
+  },
+  "search_run_id": "run_cefd0bc4",
+  "conversation_id": "83775911-3efb-42a6-aa40-51453ab9cd2c:f5168fde-a704-4c24-afe5-9469d41b3c94",
+  "turn_id": "1790253658435-cqy2eyx8xvm",
+  "request_id": "req_a378f828",
+  "qualified_count": 0
+}

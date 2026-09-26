@@ -1,5 +1,7 @@
 // =====================================================================
-// CASL / CAN-SPAM compliance gate — must pass before any CEM is sent.
+// Jurisdiction-aware compliance gate — must pass before any CEM is sent.
+// CASL remains the strictest default when lead geo is Canada; GDPR / CAN-SPAM
+// / CCPA extras apply by lead location (Phase E).
 // =====================================================================
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { verifyEmailDeep } from "@/lib/contact/verify-contact.server";
@@ -8,6 +10,11 @@ import {
   type ConsentAssessment,
   type ContactProvenance,
 } from "@/lib/contact/provenance";
+import {
+  jurisdictionDraftHints,
+  resolveJurisdiction,
+  type OutreachJurisdiction,
+} from "@/lib/outreach/jurisdiction";
 
 export type GateInput = {
   userId: string;
@@ -26,6 +33,9 @@ export type GateInput = {
   fromEmail?: string | null;
   /** When true, evaluate without inserting outreach_compliance. */
   dryRun?: boolean;
+  /** Lead geo for jurisdiction routing (Phase E). */
+  leadCountry?: string | null;
+  leadLocation?: string | null;
 };
 
 export type GateResult =
@@ -35,12 +45,14 @@ export type GateResult =
       assessment: ConsentAssessment;
       verifierTier: string;
       reasons: string[];
+      jurisdiction: OutreachJurisdiction;
     }
   | {
       ok: false;
       reasons: string[];
       assessment?: ConsentAssessment;
       verifierTier?: string;
+      jurisdiction?: OutreachJurisdiction;
     };
 
 function mapBasis(basis: ConsentAssessment["basis"]): string {
@@ -59,15 +71,42 @@ export async function runComplianceGate(
   const senderName = (input.senderName || "").trim();
   const address = (input.senderPhysicalAddress || "").trim();
   const fromEmail = (input.fromEmail || "").trim();
+  const jurisdiction = resolveJurisdiction({
+    country: input.leadCountry,
+    location: input.leadLocation,
+  });
+  const jHints = jurisdictionDraftHints(jurisdiction);
+  reasons.push(`Jurisdiction: ${jHints.label}`);
 
   if (!senderName) reasons.push("Set your sender name in Settings (CASL identification).");
-  if (!address) reasons.push("Set your physical mailing address in Settings (CASL / CAN-SPAM).");
+  if (!address) {
+    if (jurisdiction === "can_spam" || jurisdiction === "can_spam_ccpa" || jurisdiction === "casl") {
+      reasons.push("Set your physical mailing address in Settings (CAN-SPAM / CASL).");
+    } else if (jurisdiction === "gdpr") {
+      reasons.push("Set your organisation contact address in Settings (GDPR transparency).");
+    } else {
+      reasons.push("Set your physical mailing address in Settings.");
+    }
+  }
   if (!fromEmail) reasons.push("Set outreach from-email in Settings (must be verified in Resend).");
   if (!email) reasons.push("No recipient email on this lead — Resolve contact first.");
   if (!subject) reasons.push("Email subject is empty.");
   if (!body) reasons.push("Email body is empty.");
   if (/\b(free money|act now!!!|guaranteed income)\b/i.test(subject)) {
     reasons.push("Subject looks deceptive / spammy — revise before sending.");
+  }
+  if (jurisdiction === "gdpr" && !/unsubscribe|opt.?out|stop|erasure|data subject/i.test(body)) {
+    reasons.push("GDPR draft should mention opt-out / data-subject rights.");
+  }
+  if (
+    (jurisdiction === "can_spam" || jurisdiction === "can_spam_ccpa" || jurisdiction === "casl") &&
+    !/unsubscribe|opt.?out|stop/i.test(body)
+  ) {
+    reasons.push("Commercial email must include a clear unsubscribe / STOP mechanism.");
+  }
+  if (jurisdiction === "can_spam_ccpa" && !/california|ccpa|do not sell/i.test(body)) {
+    // Soft notice only — do not hard-fail; footer from draft covers it.
+    reasons.push("CCPA: California residents may request access or deletion (ensure privacy link).");
   }
 
   if (email) {
@@ -117,7 +156,7 @@ export async function runComplianceGate(
     !body ||
     !assessment.outreach_ready ||
     uniqueReasons.some((r) =>
-      /suppressed|Disposable|verification failed|Catch-all|inconclusive|deceptive|empty|Set your|No recipient/i.test(
+      /suppressed|Disposable|verification failed|Catch-all|inconclusive|deceptive|empty|Set your|No recipient|must include a clear unsubscribe|should mention opt-out/i.test(
         r,
       ),
     );
@@ -128,6 +167,7 @@ export async function runComplianceGate(
       reasons: uniqueReasons,
       assessment,
       verifierTier,
+      jurisdiction,
     };
   }
 
@@ -138,6 +178,7 @@ export async function runComplianceGate(
       assessment,
       verifierTier,
       reasons: uniqueReasons,
+      jurisdiction,
     };
   }
 
@@ -171,6 +212,7 @@ export async function runComplianceGate(
       ],
       assessment,
       verifierTier,
+      jurisdiction,
     };
   }
 
@@ -180,5 +222,6 @@ export async function runComplianceGate(
     assessment,
     verifierTier,
     reasons: uniqueReasons,
+    jurisdiction,
   };
 }

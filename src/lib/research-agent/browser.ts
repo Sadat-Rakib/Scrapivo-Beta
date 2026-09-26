@@ -90,6 +90,7 @@ export interface AgentBrowser {
   scroll(session: BrowserSession, target: string | null, direction: "up" | "down" | "left" | "right"): Promise<BrowserObservation>;
   waitFor(session: BrowserSession, condition: WaitCondition): Promise<BrowserObservation>;
   extract(session: BrowserSession, schema: ExtractionSchema): Promise<ExtractionResult>;
+  extractLinks?(session: BrowserSession, selector: string, timeoutMs?: number): Promise<PageSnapshot["links"]>;
   screenshot(session: BrowserSession): Promise<string>;
   close(session: BrowserSession): Promise<void>;
 }

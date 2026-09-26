@@ -1,0 +1,178 @@
+{
+  "key": "asia_region_v3_part2.csv",
+  "size": 183288,
+  "last_modified": "2026-09-08 00:14:23+00:00",
+  "columns": [
+    "fullname",
+    "firstname",
+    "lastname",
+    "Title",
+    "dsfsd",
+    "company",
+    "email",
+    "Email Status",
+    "Seniority",
+    "Departments",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Stage",
+    "# Employees",
+    "Industry"
+  ],
+  "row_count": 863,
+  "sampled_rows": 863,
+  "delimiter": ",",
+  "roles": {
+    "fullname": "last_name",
+    "firstname": "first_name",
+    "lastname": "last_name",
+    "Title": "title",
+    "dsfsd": "other",
+    "company": "company",
+    "email": "email",
+    "Email Status": "email",
+    "Seniority": "other",
+    "Departments": "other",
+    "First Phone": "phone",
+    "Work Direct Phone": "phone",
+    "Home Phone": "phone",
+    "Mobile Phone": "phone",
+    "Corporate Phone": "phone",
+    "Other Phone": "phone",
+    "Stage": "other",
+    "# Employees": "employees",
+    "Industry": "industry"
+  },
+  "missing_pct": {
+    "fullname": 0.1,
+    "firstname": 0.1,
+    "lastname": 0.8,
+    "Title": 0.0,
+    "dsfsd": 0.0,
+    "company": 0.0,
+    "email": 0.0,
+    "Email Status": 0.0,
+    "Seniority": 0.0,
+    "Departments": 32.4,
+    "First Phone": 6.4,
+    "Work Direct Phone": 100.0,
+    "Home Phone": 100.0,
+    "Mobile Phone": 99.3,
+    "Corporate Phone": 6.7,
+    "Other Phone": 100.0,
+    "Stage": 0.0,
+    "# Employees": 0.0,
+    "Industry": 3.5
+  },
+  "samples": {
+    "fullname": [
+      "Mohit",
+      "Gorakshnath",
+      "Shailendra"
+    ],
+    "firstname": [
+      "Mohit",
+      "Gorakshnath",
+      "Shailendra"
+    ],
+    "lastname": [
+      "Gupta",
+      "Dushing",
+      "Mishra"
+    ],
+    "Title": [
+      "Assistant Vice President",
+      "Senior Territory Manager",
+      "Global Head of Sustainability: Grains, Oilseeds, Edible Oil, Wheat Milling, Feed & Freight"
+    ],
+    "dsfsd": [
+      "IndiaMART",
+      "BASF",
+      "Olam Agri"
+    ],
+    "company": [
+      "IndiaMART",
+      "BASF",
+      "Olam Agri"
+    ],
+    "email": [
+      "mohit.gupta2@indiamart.com",
+      "gorakshnath.dushing@basf.com",
+      "shailmishra@olamagri.com"
+    ],
+    "Email Status": [
+      "Verified",
+      "Verified",
+      "Verified"
+    ],
+    "Seniority": [
+      "Vp",
+      "Manager",
+      "Head"
+    ],
+    "First Phone": [
+      "'+91 12 0677 7777",
+      "'+49 621 600",
+      "'+65 6339 4100"
+    ],
+    "Corporate Phone": [
+      "'+91 12 0677 7777",
+      "'+49 621 600",
+      "'+65 6339 4100"
+    ],
+    "Stage": [
+      "Cold",
+      "Cold",
+      "Cold"
+    ],
+    "# Employees": [
+      "17000",
+      "112000",
+      "1900"
+    ],
+    "Industry": [
+      "online media",
+      "chemicals",
+      "food production"
+    ],
+    "Departments": [
+      "Sales",
+      "Operations",
+      "Sales"
+    ],
+    "Mobile Phone": [
+      "'+91 99622 75774",
+      "'+60 10-719 7220",
+      "'+65 6512 7422"
+    ]
+  },
+  "validity": {
+    "email": "3/3 valid-shape",
+    "Email Status": "0/3 valid-shape",
+    "First Phone": "3/3 valid-shape",
+    "Mobile Phone": "3/3 valid-shape",
+    "Corporate Phone": "3/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [],
+  "activity_match_keys": [
+    "fullname",
+    "firstname",
+    "lastname",
+    "company",
+    "email",
+    "Email Status",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone"
+  ]
+}

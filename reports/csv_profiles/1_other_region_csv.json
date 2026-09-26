@@ -1,0 +1,414 @@
+{
+  "key": "1-other_region.csv",
+  "size": 2129788,
+  "last_modified": "2026-09-08 00:15:05+00:00",
+  "columns": [
+    "fullname",
+    "firstname",
+    "lastname",
+    "Title",
+    "Company",
+    "company",
+    "email",
+    "Email Status",
+    "Seniority",
+    "Departments",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Stage",
+    "# Employees",
+    "Industry",
+    "Keywords",
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "City",
+    "State",
+    "Country",
+    "Company Address",
+    "Company City",
+    "Company State",
+    "Company Country",
+    "Company Phone",
+    "SEO Description",
+    "Technologies",
+    "Annual Revenue",
+    "Total Funding",
+    "Latest Funding",
+    "Latest Funding Amount",
+    "Last Raised At",
+    "Email Sent",
+    "Email Open",
+    "Email Bounced",
+    "Replied",
+    "Demoed",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
+  "row_count": 1205,
+  "sampled_rows": 1205,
+  "delimiter": ",",
+  "roles": {
+    "fullname": "last_name",
+    "firstname": "first_name",
+    "lastname": "last_name",
+    "Title": "title",
+    "Company": "company",
+    "company": "company",
+    "email": "email",
+    "Email Status": "email",
+    "Seniority": "other",
+    "Departments": "other",
+    "First Phone": "phone",
+    "Work Direct Phone": "phone",
+    "Home Phone": "phone",
+    "Mobile Phone": "phone",
+    "Corporate Phone": "phone",
+    "Other Phone": "phone",
+    "Stage": "other",
+    "# Employees": "employees",
+    "Industry": "industry",
+    "Keywords": "descriptive",
+    "Person Linkedin Url": "linkedin",
+    "Website": "website",
+    "Company Linkedin Url": "linkedin",
+    "Facebook Url": "social",
+    "Twitter Url": "social",
+    "City": "other",
+    "State": "other",
+    "Country": "country",
+    "Company Address": "company",
+    "Company City": "company",
+    "Company State": "company",
+    "Company Country": "company",
+    "Company Phone": "phone",
+    "SEO Description": "descriptive",
+    "Technologies": "tech",
+    "Annual Revenue": "other",
+    "Total Funding": "other",
+    "Latest Funding": "other",
+    "Latest Funding Amount": "other",
+    "Last Raised At": "other",
+    "Email Sent": "email",
+    "Email Open": "email",
+    "Email Bounced": "email",
+    "Replied": "other",
+    "Demoed": "other",
+    "": "other"
+  },
+  "missing_pct": {
+    "fullname": 0.0,
+    "firstname": 0.0,
+    "lastname": 0.1,
+    "Title": 0.0,
+    "Company": 0.0,
+    "company": 0.0,
+    "email": 0.0,
+    "Email Status": 0.0,
+    "Seniority": 0.0,
+    "Departments": 32.7,
+    "First Phone": 5.1,
+    "Work Direct Phone": 100.0,
+    "Home Phone": 100.0,
+    "Mobile Phone": 100.0,
+    "Corporate Phone": 5.1,
+    "Other Phone": 99.9,
+    "Stage": 0.0,
+    "# Employees": 0.0,
+    "Industry": 1.4,
+    "Keywords": 15.6,
+    "Person Linkedin Url": 0.0,
+    "Website": 0.0,
+    "Company Linkedin Url": 0.0,
+    "Facebook Url": 11.7,
+    "Twitter Url": 12.1,
+    "City": 20.2,
+    "State": 15.8,
+    "Country": 4.6,
+    "Company Address": 0.0,
+    "Company City": 3.9,
+    "Company State": 8.3,
+    "Company Country": 0.0,
+    "Company Phone": 4.7,
+    "SEO Description": 12.9,
+    "Technologies": 0.0,
+    "Annual Revenue": 10.4,
+    "Total Funding": 74.8,
+    "Latest Funding": 74.4,
+    "Latest Funding Amount": 75.0,
+    "Last Raised At": 74.4,
+    "Email Sent": 100.0,
+    "Email Open": 0.0,
+    "Email Bounced": 0.0,
+    "Replied": 0.0,
+    "Demoed": 0.0,
+    "": 99.6
+  },
+  "samples": {
+    "fullname": [
+      "Glen",
+      "Jacqui",
+      "Diana"
+    ],
+    "firstname": [
+      "Glen",
+      "Jacqui",
+      "Diana"
+    ],
+    "lastname": [
+      "Horner",
+      "Robertson",
+      "Chua"
+    ],
+    "Title": [
+      "Managed Services Senior Specialist / Sales Management Chapter Lead - Telstra Enterprise",
+      "Channel Manager",
+      "Head of Commercial Finance ANZ"
+    ],
+    "Company": [
+      "Telstra",
+      "Elanco",
+      "Elanco"
+    ],
+    "company": [
+      "Telstra",
+      "Elanco",
+      "Elanco"
+    ],
+    "email": [
+      "glen.horner@team.telstra.com",
+      "jacqui.robertson@elanco.com",
+      "diana.chua@elancoah.com"
+    ],
+    "Email Status": [
+      "Verified",
+      "Verified",
+      "Verified"
+    ],
+    "Seniority": [
+      "Manager",
+      "Manager",
+      "Head"
+    ],
+    "Departments": [
+      "Sales",
+      "Sales",
+      "Finance"
+    ],
+    "First Phone": [
+      "'+61 1300 368 387",
+      "'+1 877-352-6261",
+      "'+1 877-352-6261"
+    ],
+    "Corporate Phone": [
+      "'+61 1300 368 387",
+      "'+1 877-352-6261",
+      "'+1 877-352-6261"
+    ],
+    "Stage": [
+      "Cold",
+      "Cold",
+      "Cold"
+    ],
+    "# Employees": [
+      "36000",
+      "10000",
+      "10000"
+    ],
+    "Industry": [
+      "telecommunications",
+      "pharmaceuticals",
+      "pharmaceuticals"
+    ],
+    "Keywords": [
+      "food safety, food production, animal health, pets",
+      "food safety, food production, animal health, pets",
+      "sustainability, food security, luminescent, horticulture, agriculture, greenhouses, farming, protected cropping"
+    ],
+    "Person Linkedin Url": [
+      "http://www.linkedin.com/in/glenhorner",
+      "http://www.linkedin.com/in/jacqui-robertson-465a1753",
+      "http://www.linkedin.com/in/diana-chua-1b866651"
+    ],
+    "Website": [
+      "http://www.telstra.com.au",
+      "http://www.elanco.com",
+      "http://www.elanco.com"
+    ],
+    "Company Linkedin Url": [
+      "http://www.linkedin.com/company/telstra",
+      "http://www.linkedin.com/company/elanco",
+      "http://www.linkedin.com/company/elanco"
+    ],
+    "Facebook Url": [
+      "http://www.facebook.com/telstra24x7",
+      "https://www.facebook.com/elancoanimalhealth/",
+      "https://www.facebook.com/elancoanimalhealth/"
+    ],
+    "Twitter Url": [
+      "http://www.twitter.com/telstra",
+      "https://twitter.com/Elanco/",
+      "https://twitter.com/Elanco/"
+    ],
+    "City": [
+      "Sydney",
+      "Sydney",
+      "Sydney"
+    ],
+    "State": [
+      "New South Wales",
+      "New South Wales",
+      "New South Wales"
+    ],
+    "Country": [
+      "Australia",
+      "Australia",
+      "Australia"
+    ],
+    "Company Address": [
+      "The Rocks, New South Wales, Australia, 2000",
+      "United Kingdom",
+      "United Kingdom"
+    ],
+    "Company City": [
+      "The Rocks",
+      "Oakland",
+      "The Rocks"
+    ],
+    "Company State": [
+      "New South Wales",
+      "California",
+      "New South Wales"
+    ],
+    "Company Country": [
+      "Australia",
+      "United Kingdom",
+      "United Kingdom"
+    ],
+    "Company Phone": [
+      "'+61 1300 368 387",
+      "'+1 877-352-6261",
+      "'+1 877-352-6261"
+    ],
+    "SEO Description": [
+      "The knowledge- and development partner in plant physiology, plant health and cultivation techniques.",
+      "Bakker Brothers is a seed company with a long and rich tradition.",
+      "Enabling Agriculture...first, for the Farmers"
+    ],
+    "Technologies": [
+      "Gmail, Google Apps, Remote",
+      "Remote",
+      "Gmail, Google Apps, Google Cloud Hosting, AI"
+    ],
+    "Annual Revenue": [
+      "1900000",
+      "4450000000",
+      "4450000000"
+    ],
+    "Email Open": [
+      "False",
+      "False",
+      "False"
+    ],
+    "Email Bounced": [
+      "False",
+      "False",
+      "False"
+    ],
+    "Replied": [
+      "False",
+      "False",
+      "False"
+    ],
+    "Demoed": [
+      "False",
+      "False",
+      "False"
+    ],
+    "Total Funding": [
+      "1759600000",
+      "1759600000",
+      "58500000"
+    ],
+    "Latest Funding": [
+      "Debt Financing",
+      "Debt Financing",
+      "Series C"
+    ],
+    "Latest Funding Amount": [
+      "250000000",
+      "250000000",
+      "23000000"
+    ],
+    "Last Raised At": [
+      "3/1/2022",
+      "3/1/2022",
+      "10/1/2021"
+    ],
+    "": [
+      "Other",
+      "Other",
+      "Other"
+    ],
+    "Other Phone": [
+      "'+61 405 881 556"
+    ]
+  },
+  "validity": {
+    "email": "3/3 valid-shape",
+    "Email Status": "0/3 valid-shape",
+    "First Phone": "3/3 valid-shape",
+    "Corporate Phone": "3/3 valid-shape",
+    "Other Phone": "1/1 valid-shape",
+    "Company Phone": "3/3 valid-shape",
+    "Email Open": "0/3 valid-shape",
+    "Email Bounced": "0/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url"
+  ],
+  "activity_match_keys": [
+    "fullname",
+    "firstname",
+    "lastname",
+    "Company",
+    "company",
+    "email",
+    "Email Status",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "Company Address",
+    "Company City",
+    "Company State",
+    "Company Country",
+    "Company Phone",
+    "Email Sent",
+    "Email Open",
+    "Email Bounced"
+  ]
+}

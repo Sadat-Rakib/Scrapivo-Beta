@@ -245,7 +245,7 @@ export async function queryObjectIndexForSpec(
     const termGroups: PostingCandidate[][] = [];
     let dimensionHadObject = false;
     for (const term of dimension.terms) {
-      const bucket = postingBucket(term, manifest.postingBucketHexChars);
+      const bucket = await postingBucket(term, manifest.postingBucketHexChars);
       const key = `${PREFIX}/versions/${manifest.version}/postings/${entity}/${dimension.dimension}/${bucket}.pidx`;
       if (!available.has(key)) continue;
       dimensionHadObject = true;

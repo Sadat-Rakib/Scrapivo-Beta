@@ -18,7 +18,7 @@ import { searchCompaniesDB, companyCategoryMatches } from "@/lib/canonical/compa
 import { searchBusinessesDB, craftMatches } from "@/lib/canonical/businesses.server";
 import { searchInvestorsDB } from "@/lib/canonical/investors.server";
 import { COUNTRY_ISO } from "@/lib/search/search-spec-extract";
-import { countryHintForCity } from "@/lib/search/location-resolver";
+import { countryHintForCity, locationSatisfies, resolveCanonicalLocation } from "@/lib/search/location-resolver";
 import { useIndexedSearch, useObjectSearchIndex } from "@/lib/search/flag";
 import { queryIndexForSpec } from "@/lib/indexed/search-index.server";
 import { queryObjectIndexForSpec } from "@/lib/object-index/search.server";
@@ -37,6 +37,7 @@ import { missingRequiredFields } from "@/lib/search/completeness";
 import { formatPlace, markSoftDuplicates } from "@/lib/search/format-place";
 import { makeEvidence } from "@/lib/search/evidence";
 import type { Evidence } from "@/lib/search/evidence";
+import { mergeDuplicateCandidates } from "@/lib/search/candidate-merge";
 import { normalizeRole } from "@/lib/search/search-spec-extract";
 // NOTE: provider modules stay behind dynamic import() at their use sites.
 // This file is statically imported by client routes, and the provider
@@ -46,7 +47,12 @@ import type { searchOsmLocalBusinesses } from "@/lib/search/osm-local-businesses
 import type { fetchSpecJobs } from "@/lib/search/jobs-provider";
 import type { EnrichRowFn } from "@/lib/search/enrich-incomplete";
 import type { LiveGapfillDeps } from "@/lib/search/live-gapfill";
-import { entityModeQuestion, entityOfferQuestion, subjectFromQuery } from "@/lib/search/clarifier";
+import {
+  entityModeQuestion,
+  entityOfferQuestion,
+  entityQuestionsForSpec,
+  subjectFromQuery,
+} from "@/lib/search/clarifier";
 
 export interface SpecSearchDeps {
   people?: typeof searchPeopleDB;
@@ -72,18 +78,38 @@ export interface SpecSearchDeps {
   >;
   /** M3: abort in-flight work when signalled. */
   signal?: AbortSignal | null;
+  browserProgress?: (event: { action: string; source?: string; detail?: string }) => void;
 }
 
 export interface SpecRow {
   kind: "person" | "company" | "business" | "investor" | "job";
   title: string;
   detail: string;
+  role?: string | null;
+  company?: string | null;
   email?: string | null;
   phone?: string | null;
   /** Phone-country safety (Phase 1.5): 'mismatch-hidden'/'invalid-hidden'
    *  means a wrong-country or garbage number was suppressed — never shown. */
   phoneStatus?: import("@/lib/search/phone-safety").PhoneStatus;
   url?: string | null;
+  /** Discovery or observation page; never an entity destination by itself. */
+  source_url?: string | null;
+  /** Confirmed first-party company or business site. */
+  website_url?: string | null;
+  /** Public contact page observed on the confirmed first-party site. */
+  contact_page_url?: string | null;
+  /** Canonical public person profile. */
+  profile_url?: string | null;
+  /** Actual job posting or application destination. */
+  apply_url?: string | null;
+  /** Bounded absence research; the claim still requires subject-bound evidence. */
+  no_website_verification?: {
+    structured_source_url?: string | null;
+    structured_absence: boolean;
+    exact_queries: string[];
+    official_site_found?: string | null;
+  };
   /** Registry key of the retrieved DB row (anti-hallucination boundary:
    *  index-served rows must carry a key from this run's retrieval set). */
   key?: string | null;
@@ -147,25 +173,53 @@ export interface SpecRow {
   >;
 }
 
+/**
+ * Canonical opportunity stamp: when the Spec hunts an opportunity
+ * (e.g. no_website), candidate rows must carry it BEFORE completeness runs —
+ * otherwise a legitimate no-site candidate is judged incomplete by every
+ * check that evaluates completeness before applyWhyMatchGate gets to stamp.
+ * Row-level value always wins (browser-observed text beats spec copy).
+ */
+export function stampSpecOpportunity(row: SpecRow, spec?: SearchSpec): SpecRow {
+  if (!spec || row.opportunity) return row;
+  const opp = fieldOf(spec, "opportunity");
+  return opp ? { ...row, opportunity: opp } : row;
+}
+
 /** Apply mojibake repair to all user-visible string fields. Never invents. */
-export function sanitizeSpecRow(row: SpecRow): SpecRow {
+export function sanitizeSpecRow(row: SpecRow, spec?: SearchSpec): SpecRow {
+  const stamped = stampSpecOpportunity(row, spec);
   const s = (v: string | null | undefined) =>
     v == null ? v : fixMojibake(v);
+  const sourceUrl = s(stamped.source_url) ?? null;
+  const sourceIsDiscovery = ["list", "directory", "aggregator", "job_board", "article", "institute", "social_post"].includes(stamped.source_page_type ?? "");
+  const legacyUrl = s(stamped.url) ?? null;
+  const safeLegacy = sourceIsDiscovery || (sourceUrl && legacyUrl === sourceUrl) ? null : legacyUrl;
+  const websiteUrl = s(stamped.website_url) ?? (["company", "business", "investor"].includes(stamped.kind) ? safeLegacy : null);
+  const profileUrl = s(stamped.profile_url) ?? (stamped.kind === "person" && safeLegacy !== websiteUrl ? safeLegacy : null);
+  const applyUrl = s(stamped.apply_url) ?? (stamped.kind === "job" ? safeLegacy : null);
+  const destination = stamped.kind === "job" ? applyUrl : stamped.kind === "person" ? profileUrl ?? websiteUrl : websiteUrl;
   const out: SpecRow = {
-    ...row,
-    title: fixMojibake(row.title ?? ""),
-    detail: fixMojibake(row.detail ?? ""),
-    email: s(row.email) ?? null,
-    phone: s(row.phone) ?? null,
-    url: s(row.url) ?? null,
-    category: s(row.category) ?? null,
-    location: s(row.location) ?? null,
-    country: s(row.country) ?? null,
-    sector: s(row.sector) ?? null,
-    industry: s(row.industry) ?? null,
-    stage: s(row.stage) ?? null,
-    check: s(row.check) ?? null,
-    why_match: s(row.why_match) ?? null,
+    ...stamped,
+    title: fixMojibake(stamped.title ?? ""),
+    detail: fixMojibake(stamped.detail ?? ""),
+    role: s(stamped.role) ?? null,
+    company: s(stamped.company) ?? null,
+    email: s(stamped.email) ?? null,
+    phone: s(stamped.phone) ?? null,
+    source_url: sourceUrl ?? (sourceIsDiscovery ? legacyUrl : null),
+    website_url: websiteUrl,
+    profile_url: profileUrl,
+    apply_url: applyUrl,
+    url: destination ?? null,
+    category: s(stamped.category) ?? null,
+    location: s(stamped.location) ?? null,
+    country: s(stamped.country) ?? null,
+    sector: s(stamped.sector) ?? null,
+    industry: s(stamped.industry) ?? null,
+    stage: s(stamped.stage) ?? null,
+    check: s(stamped.check) ?? null,
+    why_match: s(stamped.why_match) ?? null,
   };
   const miss = missingRequiredFields({
     kind: out.kind,
@@ -184,9 +238,6 @@ export function sanitizeSpecRow(row: SpecRow): SpecRow {
   out.complete = miss.length === 0;
   return out;
 }
-
-/** Below this many complete rows, live gapfill runs even without signal_required. */
-const THIN_COMPLETE = 5;
 
 const QUESTION_TEMPLATES: Record<string, (spec: SearchSpec) => string> = {
   entity: () => "Are you looking for people, companies, local businesses, or investors?",
@@ -327,14 +378,15 @@ export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
     const role = fieldOf(spec, "role");
     const industry = fieldOf(spec, "industry");
     const location = fieldOf(spec, "location");
-    if (role && !personRoleMatches(row.title, role))
+    if (role && !personRoleMatches(row.role ?? row.title, role))
       return false;
-    if (industry && !like(row.industry ?? row.detail, industry)) return false;
+    if (industry && !like(row.industry ?? row.detail, industry) && !( /^saas$/i.test(industry) && /software[ -]as[ -]a[ -]service/i.test(row.industry ?? "") )) return false;
     if (location && !locationOk(row.country, row.location, row.detail, location)) return false;
   }
   if (spec.entity === "business") {
     const cat = fieldOf(spec, "category");
     const location = fieldOf(spec, "location");
+    const requestedGeo = location ? resolveCanonicalLocation(location) : null;
     if (cat && !craftMatches(row.category, cat) && !like(row.title, cat) && !like(row.detail, cat))
       return false;
     const model = fieldOf(spec, "business_model");
@@ -346,7 +398,9 @@ export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
       )
     )
       return false;
-    if (location) {
+    if (location && requestedGeo?.kind === "metro") {
+      if (!locationSatisfies(row.location ?? row.detail ?? "", requestedGeo)) return false;
+    } else if (location) {
       const isoList = COUNTRY_ISO[location.toLowerCase().trim()];
       if (isoList) {
         // Country query ("Canada"): strict ISO gate. DB stores "CA",
@@ -416,7 +470,7 @@ export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
     const location = fieldOf(spec, "location");
     const seniority = fieldOf(spec, "seniority");
     const employment = fieldOf(spec, "employment");
-    if (role && !like(row.title, role)) return false;
+    if (role && !role.toLowerCase().split(/\s+/).every((term) => term && new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(row.title))) return false;
     if (location && !locationOk(row.country, row.location, row.detail, location)) return false;
     if (seniority && !like(row.title, seniority) && !like(row.detail, seniority)) return false;
     if (employment && !like(row.title, employment) && !like(row.detail, employment)) {
@@ -425,6 +479,77 @@ export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
     }
   }
   return true;
+}
+
+/** Role wording that counts as an explicitly stated role on a person row. */
+const ROLE_WORD_RE =
+  /\b(founder|co-?founder|ceo|cto|cfo|coo|owner|partner|president|director|head\s+of|engineer|developer|designer|manager|consultant|accountant|attorney|lawyer|dentist|plumber|electrician|realtor|recruiter|marketer|freelancer|photographer|architect)\b/i;
+
+/**
+ * Pre-research gate: reject KNOWN HARD CONTRADICTIONS only. Unknown is
+ * researchable — a partial candidate may be missing exactly the facts
+ * (role/industry/location/website/contact) that enrichment exists to
+ * establish. Strict rowSatisfiesSpec stays the post-research judge; this
+ * gate only decides whether a candidate survives INTO research.
+ */
+export function rowCouldSatisfySpec(spec: SearchSpec, row: SpecRow): boolean {
+  if (spec.entity === "person") {
+    const role = fieldOf(spec, "role");
+    const industry = fieldOf(spec, "industry");
+    const location = fieldOf(spec, "location");
+    if (role) {
+      const explicitRole =
+        (row.role && row.role.trim()) ||
+        (row.title && ROLE_WORD_RE.test(row.title) ? row.title : null);
+      if (explicitRole && !personRoleMatches(explicitRole, role)) return false;
+    }
+    if (
+      industry &&
+      row.industry &&
+      row.industry.trim() &&
+      !like(row.industry, industry) &&
+      !(/^saas$/i.test(industry) && /software[ -]as[ -]a[ -]service/i.test(row.industry))
+    )
+      return false;
+    if (location && (row.location || row.country) && !locationOk(row.country, row.location, "", location))
+      return false;
+    return true;
+  }
+  if (spec.entity === "business") {
+    const cat = fieldOf(spec, "category");
+    const location = fieldOf(spec, "location");
+    if (
+      cat &&
+      row.category &&
+      row.category.trim() &&
+      !craftMatches(row.category, cat) &&
+      !like(row.title, cat) &&
+      !like(row.detail, cat)
+    )
+      return false;
+    if (location && (row.location || row.country) && !locationOk(row.country, row.location, "", location))
+      return false;
+    return true;
+  }
+  if (spec.entity === "company") {
+    const cat = fieldOf(spec, "category") ?? fieldOf(spec, "industry");
+    const location = fieldOf(spec, "location");
+    if (
+      cat &&
+      row.category &&
+      row.category.trim() &&
+      !companyCategoryMatches(row.category, cat) &&
+      !companyCategoryMatches(row.detail, cat) &&
+      !like(row.title, cat)
+    )
+      return false;
+    if (location && (row.location || row.country) && !locationOk(row.country, row.location, "", location))
+      return false;
+    return true;
+  }
+  // investor/job rows are structured enough that strict validation is the
+  // contradiction judge; no researchable-unknown gap has been shown there.
+  return rowSatisfiesSpec(spec, row);
 }
 
 /**
@@ -450,6 +575,8 @@ function locationOk(
 
 export interface SpecSearchResult {
   spec: SearchSpec;
+  executionPlan?: import("@/lib/search/source-plan").SourcePlan;
+  providerAttempts?: import("@/lib/search/source-plan").ProviderDiagnostic[];
   questions: string[];
   clarify: import("@/lib/search/clarifier").ClarifyQuestion[];
   rows: SpecRow[];
@@ -500,9 +627,15 @@ export interface SpecSearchResult {
     sources: Array<{ source: string; partitions: string[]; scanned: number; matched: number }>;
     rawCandidates: number;
     postSpecFilter: number;
+    /** Candidates that entered query-aware enrichment (complete + researchable). */
+    researchable?: number;
+    /** Rows that came back through enrichment (researched candidates). */
+    researched?: number;
     complete: number;
     pendingEnrichment: number;
     qualificationRejected: number;
+    /** Theorem-qualified rows after the final gate. */
+    qualified?: number;
     returned: number;
     reason: "NO_DATA" | "NO_PARTITION" | "NO_INDEX_COVERAGE" | "NO_LOCATION_ROUTE" |
       "NO_CATEGORY_MATCH" | "NO_ROLE_MATCH" | "FILTERED_BY_SPEC" | "INCOMPLETE" |
@@ -599,6 +732,8 @@ async function fetchS3Tier(
     location: string | null;
     category: string | null;
     limit: number;
+    signal?: AbortSignal | null;
+    deadline?: number;
   },
 ): Promise<{ rows: SpecRow[]; meta: DbHitMeta | null }> {
   const { role, industry, location, category, limit } = params;
@@ -626,6 +761,8 @@ async function fetchS3Tier(
       country: countryQuery ?? undefined,
       city: cityQuery ?? undefined,
       limit,
+      signal: params.signal,
+      deadline: params.deadline,
     });
     return {
       rows: r.rows.map((p, i) => {
@@ -671,12 +808,15 @@ async function fetchS3Tier(
           entity_resolved: true,
           page_type: "person_page" as const,
           identity_confidence: 0.85,
+          role: title,
+          company,
           title: `${p.name ?? "?"} — ${p.title ?? "?"} @ ${p.company_name ?? "?"}`,
           detail: [company, p.city, p.country, p.industry, p.website].filter(has).join(" · "),
           email: p.email,
           phone: checkPhone(p.phone, p.country ?? "").phone,
           phoneStatus: checkPhone(p.phone, p.country ?? "").status,
           url: p.personal_linkedin,
+          profile_url: p.personal_linkedin,
           industry: p.industry,
           country: p.country,
           location: p.city ?? p.country,
@@ -709,6 +849,7 @@ async function fetchS3Tier(
           phone: checkPhone(c.phone, "").phone,
           phoneStatus: checkPhone(c.phone, "").status,
           url: c.website,
+          website_url: c.website,
           category: c.category,
           location: c.location,
           opportunity: fieldOf(spec, "opportunity"),
@@ -718,9 +859,13 @@ async function fetchS3Tier(
     };
   }
   if (spec.entity === "business") {
+    const requestedGeo = location ? resolveCanonicalLocation(location) : null;
+    const readerLocation = requestedGeo?.kind === "metro"
+      ? requestedGeo.member_ids.find((id) => id.startsWith("geo:city:"))?.slice("geo:city:".length) ?? location
+      : location;
     const r = await businesses({
       category: category ?? undefined,
-      location: location ?? undefined,
+      location: readerLocation ?? undefined,
       limit,
     });
     return {
@@ -741,11 +886,22 @@ async function fetchS3Tier(
           phone: checkPhone(b.phone, b.country ?? "").phone,
           phoneStatus: checkPhone(b.phone, b.country ?? "").status,
           url: b.website,
+          website_url: b.website,
+          source_url: `db://businesses/${encodeURIComponent(entity_id)}`,
           category: b.category,
           location:
             formatPlace([b.locality, b.region]) || b.locality || b.region || null,
           country: b.country,
           opportunity: fieldOf(spec, "opportunity"),
+          evidence: [makeEvidence({
+            source_url: `db://businesses/${encodeURIComponent(entity_id)}`,
+            source_type: "db",
+            excerpt: [b.name, b.category, formatPlace([b.locality, b.region]), b.phone ? `phone ${b.phone}` : null].filter(Boolean).join(" · "),
+            evidence_type: "identity",
+            supports: "identity",
+            extraction_method: "stored_business_record",
+            subject: entity_id,
+          })],
         };
       }),
       meta: r.meta,
@@ -790,6 +946,8 @@ async function fetchS3Tier(
           // A public profile is a usable investor contact route when a firm
           // site is absent; do not discard the 8k-row corpus on website alone.
           url: v.website ?? v.linkedin,
+          website_url: v.website,
+          profile_url: v.linkedin,
         };
       }),
       meta: r.meta,
@@ -813,7 +971,7 @@ export async function runSpecSearchCore(
     request_id?: string;
   } = {},
 ): Promise<SpecSearchResult> {
-  const { createSearchRun, finalizeSearchOutcome, throwIfAborted } = await import(
+  const { createSearchRun, finalizeSearchOutcome, throwIfAborted, searchAbortCode } = await import(
     "@/lib/search/search-run"
   );
   const runIds = createSearchRun({
@@ -888,7 +1046,9 @@ export async function runSpecSearchCore(
     hasMore: false,
     totalAvailable: null as number | null,
   };
-  const base = extractSearchSpec(query);
+  const { understandSearchSpec, isActionableFrame } = await import("@/lib/understanding/to-search-spec");
+  const base = await understandSearchSpec(query, answers, deps.signal);
+  if (deps.signal?.aborted) return withRun({ spec: base, ...pageInfo }, 0, true);
   // Merge prior answers as stated criteria (multi-turn without session store).
   const criteria = [...base.criteria];
   for (const [field, value] of Object.entries(answers)) {
@@ -900,7 +1060,29 @@ export async function runSpecSearchCore(
     else criteria.push(stated);
   }
   const { buildSpec } = await import("@/lib/search/search-spec");
-  const spec: SearchSpec = { ...base, criteria };
+  // Structured entity answer (unknown-entity clarify round): the deterministic
+  // understanding fallback cannot read prior-answer context, so the entity
+  // pick types the spec here. Option-label and canonical forms both accepted.
+  const entityAnswer = (answers["entity"] ?? "").trim().toLowerCase();
+  const ENTITY_ANSWER_ALIASES: Record<string, SearchSpec["entity"]> = {
+    people: "person",
+    person: "person",
+    companies: "company",
+    company: "company",
+    "local businesses": "business",
+    "local-businesses": "business",
+    business: "business",
+    investors: "investor",
+    investor: "investor",
+    jobs: "job",
+    job: "job",
+  };
+  const entityPick = ENTITY_ANSWER_ALIASES[entityAnswer];
+  const spec: SearchSpec = {
+    ...base,
+    criteria,
+    ...(entityPick && base.entity === "unknown" ? { entity: entityPick } : {}),
+  };
   const { computeMissing } = await import("@/lib/search/search-spec");
   spec.missing = computeMissing(spec);
   spec.status = spec.missing.length ? "needs_clarification" : "ready_to_search";
@@ -913,7 +1095,7 @@ export async function runSpecSearchCore(
   // once ready, an unstated mode blocks with exactly one question. The offer
   // question follows ONLY a selling answer, so just-looking never sees it.
   // Explicit "Search" (force) and investor/unknown entities bypass the gate.
-  if (!opts.force && isDirectoryEntity(spec.entity) && spec.status === "ready_to_search") {
+  if (!opts.force && !isActionableFrame(spec) && isDirectoryEntity(spec.entity) && spec.status === "ready_to_search") {
     const modeCrit = criteria.find((c) => c.field === "mode");
     const offerCrit = criteria.find((c) => c.field === "offer");
     let mode = detectModeFromQuery(query);
@@ -992,6 +1174,19 @@ export async function runSpecSearchCore(
     if (mode === "selling" && !criteria.some((c) => c.field === "offer" && c.value.trim())) {
       return gateReturn([entityOfferQuestion(subjectFromQuery(query, spec.entity))]);
     }
+    if (
+      isDirectoryEntity(spec.entity) &&
+      !fieldOf(spec, "location") &&
+      !fieldOf(spec, "geo_scope")
+    ) {
+      const locationQuestion = entityQuestionsForSpec({
+        entity: spec.entity,
+        missing: ["location"],
+        raw_query: query,
+        locationSuggestion: spec.locationSuggestion,
+      })[0];
+      if (locationQuestion) return gateReturn([locationQuestion]);
+    }
     // ICP follow-up (Phase 1.4): exactly one question per round, only when
     // the answer can change retrieval or the pitch. Website offers ask site
     // preference (drives the no_website filter); marketing asks channel
@@ -1007,7 +1202,9 @@ export async function runSpecSearchCore(
         const needsFollowUp =
           ((def.id === "websites" || def.id === "design") && !hasSite) ||
           (def.id === "marketing" && !hasChannel);
-        if (needsFollowUp) {
+        // An alternative non-website offer keeps this search actionable without
+        // requiring the user to choose a website state first.
+        if (needsFollowUp && !/\bor\b/i.test(offerText)) {
           const target = spec.entity === "company" ? "these companies" : "these businesses";
           return gateReturn([def.followUp(target, def.id === "design" ? "design" : "website")]);
         }
@@ -1072,6 +1269,8 @@ export async function runSpecSearchCore(
     : (deps.index ?? (useObjectSearchIndex() ? queryObjectIndexForSpec : queryIndexForSpec));
   const dbMeta: DbHitMeta[] = [];
   let rows: SpecRow[] = [];
+  let liveCandidateCount = 0;
+  let liveSpecMatchCount = 0;
   // Paging state (Phase 1.8): fetchedHitCap (a source hit its fetch window)
   // and pageBaseOffset (matches to skip) feed applyPage in the shared tail.
   let fetchedHitCap = false;
@@ -1123,7 +1322,9 @@ export async function runSpecSearchCore(
           runJobs({
             query: role ?? category ?? industry ?? query,
             location: location ?? undefined,
-            limit: fetchWindow,
+            // Provider ranking is broad; inspect enough jobs before the strict
+            // Spec filter so a relevant remote country match is not truncated.
+            limit: Math.max(fetchWindow, 100),
             seniority: fieldOf(spec, "seniority") ?? undefined,
             employment: fieldOf(spec, "employment") ?? undefined,
           }),
@@ -1282,7 +1483,8 @@ export async function runSpecSearchCore(
               email: contact.emails?.[0] ?? null,
               phone: phone.phone,
               phoneStatus: phone.status,
-              url: l.full_post_url ?? null,
+              url: null,
+              source_url: l.full_post_url ?? null,
               category: normaliseOsmCraft(tag, category),
               location,
               country: planIso,
@@ -1342,16 +1544,24 @@ export async function runSpecSearchCore(
           );
           continue;
         }
+        const s3TimeoutMs = spec.entity === "company" && fieldOf(spec, "location_kind") === "city"
+          ? Math.min(step.timeoutMs, 5_000)
+          : step.timeoutMs;
         const t = await withTierTimeout(
           fetchS3Tier(
             spec,
             { people, companies, businesses, investors },
-            { role, industry, location, category, limit: fetchWindow },
+            { role, industry, location, category, limit: fetchWindow,
+              signal: deps.signal, deadline: Date.now() + Math.min(15_000, Math.max(1, s3TimeoutMs - 50)) },
           ),
-          step.timeoutMs,
+          s3TimeoutMs,
           "s3-parquet",
         );
         if (t.meta) dbMeta.push(t.meta);
+        if (t.meta?.coverageIncomplete) routeDiagnostics.push({
+          code: "SOURCE_UNAVAILABLE", source: "s3-parquet",
+          detail: "Stored people scan reached its time budget; coverage is incomplete.",
+        });
         rows.push(...t.rows);
         if (t.rows.length === fetchWindow) fetchedHitCap = true;
         const kept = t.rows.filter((x) => rowSatisfiesSpec(spec, x));
@@ -1470,9 +1680,13 @@ export async function runSpecSearchCore(
         const t = await fetchS3Tier(
           spec,
           { people, companies, businesses, investors },
-          { role, industry, location, category, limit: fetchWindow },
+          { role, industry, location, category, limit: fetchWindow, signal: deps.signal },
         );
         if (t.meta) dbMeta.push(t.meta);
+        if (t.meta?.coverageIncomplete) routeDiagnostics.push({
+          code: "SOURCE_UNAVAILABLE", source: "s3-parquet",
+          detail: "Stored people scan reached its time budget; coverage is incomplete.",
+        });
         rows = t.rows;
         if (t.rows.length === fetchWindow) fetchedHitCap = true;
         pageBaseOffset = effOffset;
@@ -1511,9 +1725,10 @@ export async function runSpecSearchCore(
     (spec.entity === "business" || spec.entity === "company")
   ) {
     for (let i = kept.length - 1; i >= 0; i--) {
+      const entitySite = sanitizeSpecRow(kept[i]).website_url;
       if (opp === "no_website") {
-        if (kept[i].url) kept.splice(i, 1);
-      } else if (!(kept[i].url && !kept[i].email && !kept[i].phone)) {
+        if (entitySite) kept.splice(i, 1);
+      } else if (!(entitySite && !kept[i].email && !kept[i].phone)) {
         kept.splice(i, 1);
       }
     }
@@ -1521,7 +1736,9 @@ export async function runSpecSearchCore(
 
   // Phase A: sanitize (mojibake) + completeness split. Incomplete rows never
   // hit the first page as fake-complete; they go to the enrich queue.
-  let sanitized = kept.map(sanitizeSpecRow);
+  // Sanitize stamps the Spec opportunity first so no_website candidates are
+  // judged by the no-site completeness rule from the very first split.
+  let sanitized = kept.map((r) => sanitizeSpecRow(r, spec));
   let completeRows = sanitized.filter((r) => r.complete);
   let incompleteRows = sanitized.filter((r) => !r.complete);
 
@@ -1538,6 +1755,7 @@ export async function runSpecSearchCore(
       const { enrichIncompleteRows } = await import("@/lib/search/enrich-incomplete");
       const enriched = await enrichIncompleteRows(incompleteRows, {
         enrichFn: enrichOpt ?? undefined,
+        signal: deps.signal,
       });
       completeRows = [...completeRows, ...enriched.complete];
       incompleteRows = enriched.stillIncomplete;
@@ -1549,23 +1767,74 @@ export async function runSpecSearchCore(
     }
   }
 
-  // Phase C: live gapfill when signal_required or DB thin after completeness.
+  // Phase C: qualify the DB candidates before deciding whether the page is full.
   // deps.liveGapfill=null skips; under vitest undefined skips unless injected.
+  const enrichedDbKeys = new Set<string>();
+  // Research known candidates before spending discovery budget on replacements.
+  try {
+    throwIfAborted(deps.signal);
+    const { enrichCandidatesForSpec } = await import("@/lib/search/enrichment-run");
+    const known = mergeDuplicateCandidates([...completeRows, ...incompleteRows]);
+    const enriched = await enrichCandidatesForSpec(known, spec, {
+      signal: deps.signal,
+      maxContactCandidates: process.env.VITEST ? 0 : 8,
+      maxPaidCalls: 0,
+      adapters: deps.enrichmentAdapters,
+    });
+    const checked = enriched.rows.map((r) => sanitizeSpecRow(r, spec));
+    completeRows = checked.filter((row) => row.complete);
+    incompleteRows = checked.filter((row) => !row.complete);
+    checked.forEach((row) => enrichedDbKeys.add(row.entity_id ?? row.key ?? ""));
+  } catch (error) {
+    if (!deps.signal?.aborted) console.warn("[enrich-db]", error instanceof Error ? error.message : error);
+  }
   let liveDiscovery: SpecSearchResult["liveDiscovery"] =
     completeRows.length === 0 ? "db_thin_gapfill_pending" : "not_required";
+  const { applyWhyMatchGate } = await import("@/lib/search/live-gapfill");
+  const qualifiedDbCount = applyWhyMatchGate(completeRows, spec, !!spec.signal_required).kept.length;
+  const requestedTarget = pageBaseOffset + limit;
+  const { buildSourcePlan } = await import("@/lib/search/source-plan");
+  let executionPlan = buildSourcePlan(spec, undefined, { desiredCount: requestedTarget });
+  let providerAttempts: import("@/lib/search/source-plan").ProviderDiagnostic[] = [];
+  const forceLiveDiscovery = process.env.NODE_ENV !== "production" && process.env.FORCE_LIVE_DISCOVERY === "true";
+  let liveIncompleteRows: SpecRow[] = [];
+  // RC: the 120s hard deadline must finalize accumulated candidates, not
+  // erase them. Only user cancellation / stale runs discard work.
+  let deadlineHit = false;
+  const deadlineNow = () => deps.signal?.aborted === true && searchAbortCode(deps.signal) === "SEARCH_DEADLINE";
+  if (forceLiveDiscovery) {
+    console.info("[spec-run] forced live discovery", { search_run_id: runIds.search_run_id });
+  }
   const liveOpt =
     deps.liveGapfill !== undefined
       ? deps.liveGapfill
       : process.env.VITEST
         ? null
         : {};
-  if (liveOpt !== null && (spec.signal_required || completeRows.length < THIN_COMPLETE)) {
+  if (liveOpt !== null && (forceLiveDiscovery || spec.signal_required || fieldOf(spec, "needs_live") === "true" || qualifiedDbCount < requestedTarget)) {
     try {
       const { runLiveGapfill } = await import("@/lib/search/live-gapfill");
       const live = await runLiveGapfill(spec, {
         ...(liveOpt ?? {}),
+        searchRunId: runIds.search_run_id,
         signal: deps.signal,
+        onBrowserProgress: deps.browserProgress,
+        desiredCount: Math.min(requestedTarget, 5),
+        initialCandidates: [...completeRows, ...incompleteRows],
+        // Verification order fix: stamp the Spec opportunity BEFORE judging
+        // completeness, so a no-site candidate with structured absence + two
+        // exact checks counts as verified and stops burning browser budget.
+        // Researchable spec match (hard contradictions only), not strict —
+        // unknown facts are what research is resolving.
+        isVerified: (row) => {
+          const prepared = sanitizeSpecRow(row, spec);
+          return rowCouldSatisfySpec(spec, prepared) && prepared.complete === true &&
+            applyWhyMatchGate([prepared], spec, !!spec.signal_required).kept.length === 1;
+        },
       });
+      executionPlan = live.plan ?? executionPlan;
+      providerAttempts = live.diagnostics ?? [];
+      liveDiscovery = "completed";
       if (live.diagnostics?.length) {
         for (const d of live.diagnostics) {
           if (d.outcome === "SOURCE_UNAVAILABLE" || d.outcome === "SOURCE_ERROR") {
@@ -1578,6 +1847,7 @@ export async function runSpecSearchCore(
         }
       }
       if (live.rows.length) {
+        liveCandidateCount = live.rows.length;
         dbMeta.push({
           dbHit: true,
           engine: live.engine,
@@ -1585,11 +1855,15 @@ export async function runSpecSearchCore(
           rowsScanned: live.scanned,
           rowsReturned: live.rows.length,
         });
+        // Pre-research gate: drop only hard contradictions. Unknown
+        // role/industry/location is researchable, not rejectable — the strict
+        // rowSatisfiesSpec runs after enrichment, on the final split.
         const liveSanitized = live.rows
-          .map(sanitizeSpecRow)
-          .filter((r) => rowSatisfiesSpec(spec, r));
-        const liveComplete = liveSanitized.filter((r) => r.complete !== false);
-        completeRows = [...completeRows, ...liveComplete];
+          .map((r) => sanitizeSpecRow(r, spec))
+          .filter((r) => rowCouldSatisfySpec(spec, r));
+        liveSpecMatchCount = liveSanitized.length;
+        completeRows = [...completeRows, ...liveSanitized.filter((r) => r.complete !== false)];
+        liveIncompleteRows = liveSanitized.filter((r) => r.complete === false);
         liveDiscovery = "completed";
       } else if (spec.signal_required) {
         liveDiscovery = "completed";
@@ -1609,8 +1883,8 @@ export async function runSpecSearchCore(
               rowsReturned: social.rows.length,
             });
             const socialSanitized = social.rows
-              .map(sanitizeSpecRow)
-              .filter((r) => rowSatisfiesSpec(spec, r));
+              .map((r) => sanitizeSpecRow(r, spec))
+              .filter((r) => rowCouldSatisfySpec(spec, r));
             completeRows = [
               ...completeRows,
               ...socialSanitized.filter((r) => r.complete !== false),
@@ -1637,6 +1911,152 @@ export async function runSpecSearchCore(
         }
       }
     } catch (e) {
+      if (deadlineNow()) {
+        deadlineHit = true;
+        console.warn(
+          "[deadline] live gapfill stopped at hard deadline; finalizing accumulated candidates",
+        );
+      } else if (e instanceof Error && e.message === "SEARCH_CANCELLED") {
+        return withRun(
+          {
+            spec,
+            questions: [],
+            clarify: [],
+            rows: [],
+            dbMeta,
+            rejected: rows.length - kept.length,
+            liveDiscovery,
+            ...pageInfo,
+          },
+          0,
+          true,
+        );
+      } else {
+        console.warn("[live-gapfill] failed:", e instanceof Error ? e.message : e);
+        if (spec.signal_required) liveDiscovery = "required_pending_phase7";
+      }
+    }
+  }
+
+  // Browser candidates may need the same completeness enrichment as DB rows.
+  // A deadline that fired mid-browser (which returned its rows anyway) must
+  // not re-enter research phases here.
+  if (deadlineNow()) deadlineHit = true;
+  if (!deadlineHit && liveIncompleteRows.length && enrichOpt !== null) {
+    try {
+      const { enrichIncompleteRows } = await import("@/lib/search/enrich-incomplete");
+      const enriched = await enrichIncompleteRows(liveIncompleteRows, { enrichFn: enrichOpt ?? undefined, signal: deps.signal });
+      completeRows = [...completeRows, ...enriched.complete];
+      liveIncompleteRows = enriched.stillIncomplete;
+    } catch (e) {
+      console.warn("[enrich] live incomplete enrich failed:", e instanceof Error ? e.message : e);
+    }
+  }
+  incompleteRows = [...incompleteRows, ...liveIncompleteRows];
+
+  // DB and live providers can discover the same canonical entity.
+  completeRows = mergeDuplicateCandidates(completeRows).map((r) => sanitizeSpecRow(r, spec));
+
+  // M8: query-aware enrichment BEFORE qualification when required fields
+  // are missing. Never: qualify → deliver → enrich later for blocking fields.
+  // Non-blocking failures stay diagnostics; absence alone does not reject.
+  //
+  // Researchable pool: incomplete-but-identity-resolved candidates run the
+  // SAME query-aware enrichment as complete ones — a partial candidate often
+  // needs exactly this research (site resolution, contacts) to become
+  // complete. Completeness is recomputed after enrichment, then the final
+  // strict split happens: complete → qualification, incomplete → pending.
+  let researchableCount = 0;
+  let researchedCount = 0;
+  if (!deadlineHit) {
+    try {
+      throwIfAborted(deps.signal);
+      const { enrichCandidatesForSpec } = await import("@/lib/search/enrichment-run");
+      const knownRows = completeRows.filter((row) => enrichedDbKeys.has(row.entity_id ?? row.key ?? ""));
+      const researchable = mergeDuplicateCandidates([...completeRows, ...incompleteRows]).filter(
+        (row) => !enrichedDbKeys.has(row.entity_id ?? row.key ?? ""),
+      );
+      researchableCount = researchable.length;
+      const enriched = await enrichCandidatesForSpec(researchable, spec, {
+        signal: deps.signal,
+        maxContactCandidates: process.env.VITEST ? 0 : 8,
+        maxPaidCalls: 0,
+        adapters: deps.enrichmentAdapters,
+      });
+      researchedCount = enriched.rows.length;
+      const checked = [...knownRows, ...enriched.rows].map((r) => sanitizeSpecRow(r, spec));
+      completeRows = checked.filter((r) => r.complete);
+      incompleteRows = checked.filter((r) => !r.complete);
+      for (const d of enriched.diagnostics) {
+        if (d.error && (d.error.includes("unavailable") || d.error === "adapter_not_wired")) {
+          routeDiagnostics.push({
+            code: "SOURCE_UNAVAILABLE",
+            source: `enrich:${d.provider}`,
+            detail: d.error,
+          });
+        }
+      }
+    } catch (e) {
+      if (deadlineNow()) {
+        deadlineHit = true;
+        console.warn(
+          "[deadline] query-aware enrichment stopped at hard deadline; finalizing accumulated candidates",
+        );
+      } else if (e instanceof Error && e.message === "SEARCH_CANCELLED") {
+        return withRun(
+          {
+            spec,
+            questions: [],
+            clarify: [],
+            rows: [],
+            dbMeta,
+            rejected: rows.length - kept.length,
+            liveDiscovery,
+            ...pageInfo,
+          },
+          0,
+          true,
+        );
+      } else {
+        console.warn("[enrich-m8] failed:", e instanceof Error ? e.message : e);
+      }
+    }
+  }
+
+  const qualificationInputCount = completeRows.length;
+  const { qualifyLead } = await import("@/lib/search/qualify");
+  const rejectionSummary = completeRows.map((row) => ({ row, decision: qualifyLead(row, spec, row.evidence) }))
+    .filter(({ decision }) => decision.disposition !== "qualified")
+    .slice(0, 8).map(({ row, decision }) => ({ name: row.title, code: decision.reject_code, reason: decision.label }));
+  if (rejectionSummary.length) console.info("[qualification-rejected]", JSON.stringify({ search_run_id: runIds.search_run_id, candidates: rejectionSummary }));
+  // Always apply qualification / why-match — including when live was skipped
+  // (vitest) so signal_required still drops directory contamination.
+  // M1: this is the ONLY path into delivery — no alternate qualification.
+  // On the hard deadline the gate still runs: it is synchronous, and only
+  // theorem-qualified rows may ever be delivered. User cancellation discards.
+  if (deps.signal?.aborted && !deadlineNow()) {
+    return withRun(
+      {
+        spec,
+        questions: [],
+        clarify: [],
+        rows: [],
+        dbMeta,
+        rejected: rows.length - kept.length,
+        liveDiscovery,
+        ...pageInfo,
+      },
+      0,
+      true,
+    );
+  }
+  try {
+    const { applyWhyMatchGate } = await import("@/lib/search/live-gapfill");
+    completeRows = applyWhyMatchGate(completeRows, spec, !!spec.signal_required).kept;
+    // Belt-and-suspenders: only theorem-qualified rows may be delivered.
+    completeRows = completeRows.filter((r) => r.disposition === "qualified");
+  } catch (e) {
+    if (!deadlineNow()) {
       if (e instanceof Error && e.message === "SEARCH_CANCELLED") {
         return withRun(
           {
@@ -1653,82 +2073,9 @@ export async function runSpecSearchCore(
           true,
         );
       }
-      console.warn("[live-gapfill] failed:", e instanceof Error ? e.message : e);
-      if (spec.signal_required) liveDiscovery = "required_pending_phase7";
+      // optional import failure — do not deliver ungated rows
+      completeRows = [];
     }
-  }
-
-  // M8: query-aware enrichment BEFORE qualification when required fields
-  // are missing. Never: qualify → deliver → enrich later for blocking fields.
-  // Non-blocking failures stay diagnostics; absence alone does not reject.
-  try {
-    throwIfAborted(deps.signal);
-    const { enrichCandidatesForSpec } = await import("@/lib/search/enrichment-run");
-    const enriched = await enrichCandidatesForSpec(completeRows, spec, {
-      signal: deps.signal,
-      maxContactCandidates: process.env.VITEST ? 0 : 8,
-      maxPaidCalls: 0,
-      adapters: deps.enrichmentAdapters,
-    });
-    completeRows = enriched.rows;
-    for (const d of enriched.diagnostics) {
-      if (d.error && (d.error.includes("unavailable") || d.error === "adapter_not_wired")) {
-        routeDiagnostics.push({
-          code: "SOURCE_UNAVAILABLE",
-          source: `enrich:${d.provider}`,
-          detail: d.error,
-        });
-      }
-    }
-  } catch (e) {
-    if (e instanceof Error && e.message === "SEARCH_CANCELLED") {
-      return withRun(
-        {
-          spec,
-          questions: [],
-          clarify: [],
-          rows: [],
-          dbMeta,
-          rejected: rows.length - kept.length,
-          liveDiscovery,
-          ...pageInfo,
-        },
-        0,
-        true,
-      );
-    }
-    console.warn("[enrich-m8] failed:", e instanceof Error ? e.message : e);
-  }
-
-  const qualificationInputCount = completeRows.length;
-  // Always apply qualification / why-match — including when live was skipped
-  // (vitest) so signal_required still drops directory contamination.
-  // M1: this is the ONLY path into delivery — no alternate qualification.
-  try {
-    throwIfAborted(deps.signal);
-    const { applyWhyMatchGate } = await import("@/lib/search/live-gapfill");
-    completeRows = applyWhyMatchGate(completeRows, spec, !!spec.signal_required).kept;
-    // Belt-and-suspenders: only theorem-qualified rows may be delivered.
-    completeRows = completeRows.filter((r) => r.disposition === "qualified");
-  } catch (e) {
-    if (e instanceof Error && e.message === "SEARCH_CANCELLED") {
-      return withRun(
-        {
-          spec,
-          questions: [],
-          clarify: [],
-          rows: [],
-          dbMeta,
-          rejected: rows.length - kept.length,
-          liveDiscovery,
-          ...pageInfo,
-        },
-        0,
-        true,
-      );
-    }
-    // optional import failure — do not deliver ungated rows
-    completeRows = [];
   }
 
   // Phase 1D: stamp VERIFIED + best-effort write-back (never blocks UI).
@@ -1814,18 +2161,29 @@ export async function runSpecSearchCore(
   }
   // Permanent run journal (locked observability): one JSON line per search —
   // query, spec, per-source hit meta, validation rejects, final count.
+  if (page.length === 0 && spec.criteria.some((criterion) => criterion.field === "opportunity" && criterion.value === "no_website")) {
+    routeDiagnostics.push({
+      code: "NO_QUALIFIED_RESULTS",
+      source: "no-website-verification",
+      detail: "No business completed structured-source and exact-name website-absence verification. A missing website field alone is not evidence that no official site exists.",
+    });
+  }
   const fin = finalizeSearchOutcome(routeDiagnostics, {
     qualifiedCount: page.length,
-    cancelled: deps.signal?.aborted === true,
+    // The hard deadline is not a cancellation: accumulated qualified rows
+    // finalize normally instead of being reported as SEARCH_CANCELLED.
+    cancelled: deps.signal?.aborted === true && !deadlineNow(),
   });
+  const rawCandidateCount = rows.length + liveCandidateCount;
+  const postSpecFilterCount = kept.length + liveSpecMatchCount;
   const zeroReason: NonNullable<SpecSearchResult["retrievalTrace"]>["reason"] =
     page.length > 0
       ? "RESULTS"
-      : routeDiagnostics.some((d) => /timeout/i.test(d.detail ?? ""))
+      : rawCandidateCount === 0 && routeDiagnostics.some((d) => /timeout/i.test(d.detail ?? ""))
         ? "TIMEOUT"
-        : routeDiagnostics.some((d) => d.code === "SOURCE_UNAVAILABLE")
+        : rawCandidateCount === 0 && routeDiagnostics.some((d) => d.code === "SOURCE_UNAVAILABLE")
           ? "SOURCE_UNAVAILABLE"
-      : rows.length === 0
+      : rawCandidateCount === 0
         ? dbMeta.some((m) => m.partitionsRead.some((p) => /no gazetteer hit/i.test(p)))
           ? "NO_LOCATION_ROUTE"
           : dbMeta.some((m) => m.partitionsRead.some((p) => /resolved shards.*0 file|refused|stored_source_unavailable/i.test(p)))
@@ -1838,7 +2196,7 @@ export async function runSpecSearchCore(
                 : (category || industry || fieldOf(spec, "investor_sector"))
                   ? "NO_CATEGORY_MATCH"
                   : "NO_DATA"
-        : kept.length === 0
+        : postSpecFilterCount === 0
           ? "FILTERED_BY_SPEC"
           : incompleteRows.length > 0 && qualificationInputCount === 0
             ? "INCOMPLETE"
@@ -1850,11 +2208,14 @@ export async function runSpecSearchCore(
       scanned: m.rowsScanned,
       matched: m.rowsReturned,
     })),
-    rawCandidates: rows.length,
-    postSpecFilter: kept.length,
+    rawCandidates: rawCandidateCount,
+    postSpecFilter: postSpecFilterCount,
+    researchable: researchableCount || qualificationInputCount,
+    researched: researchedCount || undefined,
     complete: qualificationInputCount,
     pendingEnrichment: incompleteRows.length,
     qualificationRejected: Math.max(0, qualificationInputCount - completeRows.length),
+    qualified: completeRows.length,
     returned: page.length,
     reason: zeroReason,
   };
@@ -1869,14 +2230,15 @@ export async function runSpecSearchCore(
           status: spec.status,
           signal_required: spec.signal_required,
           dbMeta,
-          retrieved: rows.length,
-          rejected: rows.length - kept.length,
+          retrieved: rawCandidateCount,
+          rejected: rawCandidateCount - postSpecFilterCount,
           returned: page.length,
           qualified_count: page.length,
           pendingEnrichment: incompleteRows.length,
           offset: effOffset,
           hasMore,
           liveDiscovery,
+          deadline: deadlineHit || undefined,
           retrievalTrace,
           search_run_id: runIds.search_run_id,
           outcome: fin.outcome,
@@ -1890,7 +2252,7 @@ export async function runSpecSearchCore(
       clarify: thinClarify,
       rows: page,
       dbMeta,
-      rejected: rows.length - kept.length,
+      rejected: rawCandidateCount - postSpecFilterCount,
       liveDiscovery,
       pendingEnrichment: incompleteRows.length,
       moreAvailableMessage,
@@ -1901,9 +2263,11 @@ export async function runSpecSearchCore(
       outcome: fin.outcome,
       diagnostics: fin.diagnostics,
       retrievalTrace,
+      executionPlan,
+      providerAttempts,
     },
     page.length,
-    deps.signal?.aborted === true,
+    deps.signal?.aborted === true && !deadlineNow(),
   );
 }
 
@@ -1937,13 +2301,36 @@ export const runSpecSearch = createServerFn({ method: "POST" })
       })
       .parse(d),
   )
-  .handler(async ({ data }): Promise<SpecSearchResult> => {
-    return runSpecSearchCore(data.query, {}, data.limit, data.answers, {
-      force: data.force,
-      offset: data.offset,
-      search_run_id: data.search_run_id,
-      conversation_id: data.conversation_id,
-      turn_id: data.turn_id,
-      request_id: data.request_id,
-    });
+  .handler(async ({ data, context }): Promise<SpecSearchResult> => {
+    const { getRequest } = await import("@tanstack/react-start/server");
+    const runId = data.search_run_id;
+    const ownerId = context.userId;
+    const { beginRegisteredSearchRun } = await import("@/lib/search/search-run.server");
+    const registered = runId ? beginRegisteredSearchRun({ ownerId, runId, conversationId: data.conversation_id, signal: getRequest().signal }) : undefined;
+    const { beginSearchBrowserProgress, publishSearchBrowserProgress, finishSearchBrowserProgress } = await import("@/lib/search/search-browser-progress.server");
+    if (runId) beginSearchBrowserProgress(runId, ownerId);
+    try {
+      return await runSpecSearchCore(data.query, {
+        signal: registered?.signal ?? getRequest().signal,
+        browserProgress: runId ? (event) => publishSearchBrowserProgress(runId, ownerId, event) : undefined,
+      }, data.limit, data.answers, {
+        force: data.force,
+        offset: data.offset,
+        search_run_id: runId,
+        conversation_id: data.conversation_id,
+        turn_id: data.turn_id,
+        request_id: data.request_id,
+      });
+    } finally {
+      registered?.finish();
+      if (runId) finishSearchBrowserProgress(runId, ownerId);
+    }
+  });
+
+export const getSearchBrowserProgress = createServerFn({ method: "POST" })
+  .middleware([requireMyAuth])
+  .inputValidator((data: unknown) => z.object({ search_run_id: z.string().min(1).max(80), after: z.number().int().min(0).default(0) }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { readSearchBrowserProgress } = await import("@/lib/search/search-browser-progress.server");
+    return readSearchBrowserProgress(data.search_run_id, context.userId, data.after);
   });

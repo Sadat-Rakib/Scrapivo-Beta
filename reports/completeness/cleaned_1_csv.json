@@ -1,0 +1,68 @@
+{
+  "key": "cleaned-1.csv",
+  "entity": "person",
+  "rows": 9850,
+  "required_fields": [
+    "Name",
+    "Company",
+    "Title",
+    "Email",
+    "Phone",
+    "Website",
+    "Social(any)",
+    "Location"
+  ],
+  "absent_columns": [],
+  "complete": 9468,
+  "incomplete": 382,
+  "complete_pct": 96.1,
+  "missing_counts": {
+    "Location": 56,
+    "Phone": 327,
+    "Company": 4,
+    "Title": 4
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Phone"
+      ],
+      "rows": 321
+    },
+    {
+      "missing": [
+        "Location"
+      ],
+      "rows": 54
+    },
+    {
+      "missing": [
+        "Company",
+        "Phone",
+        "Title"
+      ],
+      "rows": 3
+    },
+    {
+      "missing": [
+        "Location",
+        "Phone"
+      ],
+      "rows": 2
+    },
+    {
+      "missing": [
+        "Company",
+        "Phone"
+      ],
+      "rows": 1
+    },
+    {
+      "missing": [
+        "Title"
+      ],
+      "rows": 1
+    }
+  ],
+  "people_bonus_rows": 0
+}

@@ -1,0 +1,374 @@
+[
+  {
+    "key": "1- europe_region.csv",
+    "size": 4176304,
+    "last_modified": "2026-09-08 00:13:50+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "1-americas_region.csv",
+    "size": 7817803,
+    "last_modified": "2026-09-08 00:14:37+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "1-asia_region.csv",
+    "size": 4314580,
+    "last_modified": "2026-09-08 00:14:15+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "1-other_region.csv",
+    "size": 2129788,
+    "last_modified": "2026-09-08 00:15:05+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "1.csv",
+    "size": 44474836,
+    "last_modified": "2026-09-08 00:12:13+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "2.csv",
+    "size": 44503473,
+    "last_modified": "2026-09-08 00:12:13+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "3.csv",
+    "size": 42049653,
+    "last_modified": "2026-09-08 00:12:13+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "4.csv",
+    "size": 42197002,
+    "last_modified": "2026-09-08 00:12:13+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "5.csv",
+    "size": 48207427,
+    "last_modified": "2026-09-08 00:12:13+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "6.csv",
+    "size": 18934248,
+    "last_modified": "2026-09-08 00:12:13+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "Coaches 1.6K_CATEGORIZED.csv",
+    "size": 304140,
+    "last_modified": "2026-09-08 00:12:24+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "Contractors - data111112_CATEGORIZED.csv",
+    "size": 16596847,
+    "last_modified": "2026-09-08 00:12:34+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "Healthcare & Wellness 2.1k_CATEGORIZED.csv",
+    "size": 3029809,
+    "last_modified": "2026-09-08 00:12:42+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "Lakta SaaS Database 47,493.csv",
+    "size": 20616491,
+    "last_modified": "2026-09-07 16:41:28+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "Lending List filesaver-All_Sep 03 25 2_49 pm.csv",
+    "size": 3326233,
+    "last_modified": "2026-09-08 00:12:46+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "Professional Services 47.5k_CATEGORIZED.csv",
+    "size": 26125515,
+    "last_modified": "2026-09-08 00:12:13+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "Vanda 105k Apollo leads.csv",
+    "size": 112578207,
+    "last_modified": "2026-09-08 00:12:13+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "Vanda Closer Data Master List of CXO 112924.csv",
+    "size": 36881114,
+    "last_modified": "2026-09-08 00:12:13+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "americas_region_v2.csv",
+    "size": 8261510,
+    "last_modified": "2026-09-08 00:14:46+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "americas_region_v3_part1.csv",
+    "size": 3488010,
+    "last_modified": "2026-09-08 00:14:50+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "americas_region_v3_part2.csv",
+    "size": 971322,
+    "last_modified": "2026-09-08 00:14:52+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "americas_region_v4.csv",
+    "size": 1099341,
+    "last_modified": "2026-09-08 00:14:53+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "americas_region_v5.csv",
+    "size": 3512576,
+    "last_modified": "2026-09-08 00:14:58+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "americas_region_v6.csv",
+    "size": 4326637,
+    "last_modified": "2026-09-08 00:15:02+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "apollo-contacts-export (1) (1)_OK_ONLY_MILLIONVERIFIER.COM (3)_CATEGORIZED.csv",
+    "size": 61280108,
+    "last_modified": "2026-09-08 00:12:13+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "apollo-contacts-export (1) (2)_CATCH_ALL_AND_UNKNOWN_MILLIONVERIFIER.COM-All deliverable emails-20250728_CATEGORIZED.csv",
+    "size": 4313004,
+    "last_modified": "2026-09-08 00:13:09+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "apollo-contacts-export (1) (2)_CATCH_ALL_AND_UNKNOWN_MILLIONVERIFIER.COM_CATEGORIZED.csv",
+    "size": 8493810,
+    "last_modified": "2026-09-08 00:13:04+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "apollo-contacts-export (1) (2)_OK_ONLY_MILLIONVERIFIER.COM_CATEGORIZED.csv",
+    "size": 7716195,
+    "last_modified": "2026-09-08 00:13:16+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "apollo-contacts-export (1)_OK_ONLY_MILLIONVERIFIER.COM (1)_CATEGORIZED.csv",
+    "size": 20091863,
+    "last_modified": "2026-09-08 00:12:13+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "apollo-contacts-export (5)_CATCH_ALL_AND_UNKNOWN_MILLIONVERIFIER.COM-All deliverable emails-20250728 (1)_CATEGORIZED.csv",
+    "size": 7690714,
+    "last_modified": "2026-09-08 00:13:37+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "apollo-contacts-export (5)_CATCH_ALL_AND_UNKNOWN_MILLIONVERIFIER.COM-All deliverable emails-20250728_CATEGORIZED.csv",
+    "size": 7690714,
+    "last_modified": "2026-09-08 00:13:44+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "apollo-contacts-export (5)_CATCH_ALL_AND_UNKNOWN_MILLIONVERIFIER.COM_CATEGORIZED.csv",
+    "size": 11960536,
+    "last_modified": "2026-09-08 00:13:26+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "apollo-contacts-export (6)_OK_ONLY_MILLIONVERIFIER.COM (1).csv",
+    "size": 16446892,
+    "last_modified": "2026-09-08 00:12:19+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "apollo-contacts-export_OK_ONLY_MILLIONVERIFIER.COM (1)_CATEGORIZED.csv",
+    "size": 41081568,
+    "last_modified": "2026-09-08 00:12:13+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "asia_region_v2.csv",
+    "size": 4124413,
+    "last_modified": "2026-09-08 00:14:20+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "asia_region_v3_part1.csv",
+    "size": 1560302,
+    "last_modified": "2026-09-08 00:14:23+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "asia_region_v3_part2.csv",
+    "size": 183288,
+    "last_modified": "2026-09-08 00:14:23+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "asia_region_v4.csv",
+    "size": 177742,
+    "last_modified": "2026-09-08 00:14:24+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "asia_region_v5.csv",
+    "size": 1188528,
+    "last_modified": "2026-09-08 00:14:26+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "asia_region_v6.csv",
+    "size": 1709899,
+    "last_modified": "2026-09-08 00:14:11+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "cleaned-1.csv",
+    "size": 19702834,
+    "last_modified": "2026-09-08 00:12:14+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "cleaned-2.csv",
+    "size": 19247748,
+    "last_modified": "2026-09-08 00:12:14+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "cleaned-3.csv",
+    "size": 14005982,
+    "last_modified": "2026-09-08 00:15:20+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "cleaned-4.csv",
+    "size": 9671438,
+    "last_modified": "2026-09-08 00:15:31+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "cleaned-5.csv",
+    "size": 7333953,
+    "last_modified": "2026-09-08 00:15:40+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "cleaned-6.csv",
+    "size": 8902272,
+    "last_modified": "2026-09-08 00:15:51+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "crunchbase_1.6m-1.7m.csv",
+    "size": 59150270,
+    "last_modified": "2026-09-08 00:12:14+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "crunchbase_1.7-1.8m.csv",
+    "size": 59373788,
+    "last_modified": "2026-09-08 00:12:14+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "crunchbase_1.8m-1.9m.csv",
+    "size": 59248679,
+    "last_modified": "2026-09-08 00:12:14+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "europe_region_v2.csv",
+    "size": 4654743,
+    "last_modified": "2026-09-08 00:13:56+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "europe_region_v3_part1.csv",
+    "size": 1416379,
+    "last_modified": "2026-09-08 00:13:59+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "europe_region_v3_part2.csv",
+    "size": 396951,
+    "last_modified": "2026-09-08 00:14:00+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "europe_region_v4.csv",
+    "size": 462371,
+    "last_modified": "2026-09-08 00:14:00+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "europe_region_v5.csv",
+    "size": 2126393,
+    "last_modified": "2026-09-08 00:14:03+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "europe_region_v6.csv",
+    "size": 2052369,
+    "last_modified": "2026-09-08 00:14:08+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "other_region_v2.csv",
+    "size": 2329183,
+    "last_modified": "2026-09-08 00:15:07+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "other_region_v3.csv",
+    "size": 1323404,
+    "last_modified": "2026-09-08 00:15:08+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "other_region_v4.csv",
+    "size": 675584,
+    "last_modified": "2026-09-08 00:15:09+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "other_region_v5.csv",
+    "size": 560342,
+    "last_modified": "2026-09-08 00:15:10+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "other_region_v6.csv",
+    "size": 912519,
+    "last_modified": "2026-09-08 00:15:12+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "staffing & recruiting- 20.3k CSV.csv",
+    "size": 18850617,
+    "last_modified": "2026-09-08 00:12:13+00:00",
+    "extension": "csv"
+  },
+  {
+    "key": "trucking- 15.6k.csv",
+    "size": 13452176,
+    "last_modified": "2026-09-08 00:12:56+00:00",
+    "extension": "csv"
+  }
+]

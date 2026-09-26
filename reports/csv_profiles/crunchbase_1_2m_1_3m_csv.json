@@ -1,0 +1,365 @@
+{
+  "key": "crunchbase_1.2m-1.3m.csv",
+  "size": 58485770,
+  "last_modified": "2026-09-08 00:12:15+00:00",
+  "columns": [
+    "id",
+    "created_at",
+    "name",
+    "short_description",
+    "semrush_global_rank",
+    "semrush_visits_latest_month",
+    "num_investors",
+    "funding_total",
+    "num_exits",
+    "num_funding_rounds",
+    "last_funding_type",
+    "last_funding_at",
+    "num_acquisitions",
+    "apptopia_total_apps",
+    "apptopia_total_downloads",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "num_investments",
+    "num_lead_investments",
+    "num_lead_investors",
+    "listed_stock_symbol",
+    "company_type",
+    "hub_tags",
+    "operating_status",
+    "founded_on",
+    "categories",
+    "founders",
+    "website",
+    "ipo_status",
+    "num_employees_enum",
+    "locations",
+    "growth_insight_description",
+    "growth_insight_indicator",
+    "growth_insight_direction",
+    "growth_insight_confidence",
+    "investor_insight_description",
+    "permalink",
+    "url"
+  ],
+  "row_count": 100000,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "id": "other",
+    "created_at": "other",
+    "name": "full_name",
+    "short_description": "descriptive",
+    "semrush_global_rank": "other",
+    "semrush_visits_latest_month": "other",
+    "num_investors": "other",
+    "funding_total": "other",
+    "num_exits": "other",
+    "num_funding_rounds": "other",
+    "last_funding_type": "other",
+    "last_funding_at": "other",
+    "num_acquisitions": "other",
+    "apptopia_total_apps": "other",
+    "apptopia_total_downloads": "other",
+    "contact_email": "email",
+    "phone_number": "phone",
+    "facebook": "social",
+    "linkedin": "linkedin",
+    "twitter": "social",
+    "num_investments": "other",
+    "num_lead_investments": "other",
+    "num_lead_investors": "other",
+    "listed_stock_symbol": "other",
+    "company_type": "company",
+    "hub_tags": "other",
+    "operating_status": "other",
+    "founded_on": "other",
+    "categories": "other",
+    "founders": "other",
+    "website": "website",
+    "ipo_status": "other",
+    "num_employees_enum": "employees",
+    "locations": "other",
+    "growth_insight_description": "descriptive",
+    "growth_insight_indicator": "other",
+    "growth_insight_direction": "other",
+    "growth_insight_confidence": "other",
+    "investor_insight_description": "descriptive",
+    "permalink": "other",
+    "url": "website"
+  },
+  "missing_pct": {
+    "id": 0.0,
+    "created_at": 0.0,
+    "name": 0.0,
+    "short_description": 0.0,
+    "semrush_global_rank": 63.1,
+    "semrush_visits_latest_month": 63.1,
+    "num_investors": 91.1,
+    "funding_total": 91.5,
+    "num_exits": 99.8,
+    "num_funding_rounds": 89.1,
+    "last_funding_type": 89.1,
+    "last_funding_at": 89.0,
+    "num_acquisitions": 97.7,
+    "apptopia_total_apps": 91.0,
+    "apptopia_total_downloads": 98.2,
+    "contact_email": 27.3,
+    "phone_number": 20.4,
+    "facebook": 46.6,
+    "linkedin": 21.8,
+    "twitter": 57.7,
+    "num_investments": 99.5,
+    "num_lead_investments": 99.8,
+    "num_lead_investors": 93.9,
+    "listed_stock_symbol": 99.4,
+    "company_type": 2.1,
+    "hub_tags": 99.8,
+    "operating_status": 0.0,
+    "founded_on": 14.2,
+    "categories": 3.2,
+    "founders": 76.6,
+    "website": 5.1,
+    "ipo_status": 1.9,
+    "num_employees_enum": 13.6,
+    "locations": 5.2,
+    "growth_insight_description": 97.3,
+    "growth_insight_indicator": 97.3,
+    "growth_insight_direction": 98.8,
+    "growth_insight_confidence": 98.8,
+    "investor_insight_description": 99.3,
+    "permalink": 0.0,
+    "url": 0.0
+  },
+  "samples": {
+    "id": [
+      "169080ca-a6ee-45dd-bd5c-3b6813a8d317",
+      "11281dff-42b5-c444-3ebf-bc4271414890",
+      "32518a08-8025-48ba-9439-b056f87cea86"
+    ],
+    "created_at": [
+      "2024-08-19 03:31:17.263582+00",
+      "2024-08-19 03:31:17.263582+00",
+      "2024-08-19 03:31:17.263582+00"
+    ],
+    "name": [
+      "Intellex Forensics",
+      "Intellex Strategic Consulting",
+      "Intellex Systems"
+    ],
+    "short_description": [
+      "Intellex provides strategic consulting to small companies and businesses in California, New York, and Nevada.",
+      "Intelligence System Provider",
+      "Intellexal Solutions is a digital communication and mobile marketing company."
+    ],
+    "semrush_global_rank": [
+      "6312560",
+      "14238619",
+      "2323288"
+    ],
+    "semrush_visits_latest_month": [
+      "1049",
+      "58",
+      "8407"
+    ],
+    "contact_email": [
+      "contact@intellexforensics.com",
+      "info@intellexstrategy.com",
+      "mail@intellexip.com"
+    ],
+    "phone_number": [
+      "+1 612 455 4555",
+      "(714) 627-2456",
+      "(780) 448-9149"
+    ],
+    "facebook": [
+      "https://www.facebook.com/intellexforensicsinc",
+      "https://www.facebook.com/IntellexSystems/",
+      "https://www.facebook.com/intellexip"
+    ],
+    "linkedin": [
+      "https://www.linkedin.com/company/intellex-forensics-inc",
+      "https://www.linkedin.com/company/intellex-systems-inc./",
+      "https://www.linkedin.com/company/intellexip-advocates"
+    ],
+    "twitter": [
+      "https://www.twitter.com/ContactIntellex",
+      "https://twitter.com/IntellexSystems",
+      "https://twitter.com/IntellexIP"
+    ],
+    "company_type": [
+      "for_profit",
+      "for_profit",
+      "for_profit"
+    ],
+    "operating_status": [
+      "active",
+      "active",
+      "active"
+    ],
+    "founded_on": [
+      "2013-01-01",
+      "1996-01-01",
+      "2009-01-01"
+    ],
+    "categories": [
+      "Accounting",
+      "Consulting, Legal, Small and Medium Businesses",
+      "Recruiting, Staffing Agency"
+    ],
+    "website": [
+      "https://intellexforensics.com",
+      "http://intellexstrategy.com/about-us/",
+      "https://intellexsystems.com/"
+    ],
+    "ipo_status": [
+      "private",
+      "private",
+      "private"
+    ],
+    "num_employees_enum": [
+      "c_00011_00050",
+      "c_00011_00050",
+      "c_00101_00250"
+    ],
+    "locations": [
+      "European Union (EU), Europe, Middle East, and Africa (EMEA)",
+      "Greater Los Angeles Area, West Coast, Western US",
+      "Asia-Pacific (APAC)"
+    ],
+    "permalink": [
+      "intellex-forensics",
+      "intellex-strategic-consulting",
+      "intellex-systems"
+    ],
+    "url": [
+      "https://www.crunchbase.com/organization/intellex-forensics",
+      "https://www.crunchbase.com/organization/intellex-strategic-consulting",
+      "https://www.crunchbase.com/organization/intellex-systems"
+    ],
+    "founders": [
+      "Avraham Shahak Avni, Tal Dilian",
+      "Aoon Abbas Shah",
+      "Amit Sethi, David Chan, Rashi Dhir, Rudy Darken"
+    ],
+    "num_investors": [
+      "1",
+      "2",
+      "1"
+    ],
+    "num_funding_rounds": [
+      "1",
+      "1",
+      "1"
+    ],
+    "last_funding_type": [
+      "seed",
+      "seed",
+      "series_a"
+    ],
+    "last_funding_at": [
+      "2021-04-14",
+      "2024-03-13",
+      "2023-07-17"
+    ],
+    "apptopia_total_apps": [
+      "1",
+      "2",
+      "13"
+    ],
+    "growth_insight_description": [
+      "IntelliCulture closed $3.5 million after validating its 'enterprise farming playbook' in the US.",
+      "Intelligent Security Systems - ISS has hired new personnel to expand its market presence.",
+      "Inter & Co experienced a positive financial trend as its market capitalization increased by US$197 million in a week."
+    ],
+    "growth_insight_indicator": [
+      "growing",
+      "growing",
+      "growing"
+    ],
+    "funding_total": [
+      "0",
+      "100000000",
+      "90000"
+    ],
+    "num_lead_investors": [
+      "2",
+      "1",
+      "1"
+    ],
+    "num_acquisitions": [
+      "1",
+      "1",
+      "1"
+    ],
+    "growth_insight_direction": [
+      "c400_growing",
+      "c400_growing",
+      "c400_growing"
+    ],
+    "growth_insight_confidence": [
+      "c300_medium",
+      "c400_high",
+      "c300_medium"
+    ],
+    "apptopia_total_downloads": [
+      "12",
+      "1432",
+      "670"
+    ],
+    "num_exits": [
+      "1",
+      "1",
+      "1"
+    ],
+    "num_investments": [
+      "1",
+      "2",
+      "1"
+    ],
+    "num_lead_investments": [
+      "1",
+      "1",
+      "1"
+    ],
+    "listed_stock_symbol": [
+      "NASDAQ:NTLA",
+      "AMEX:IDN",
+      "NASDAQ:INBS"
+    ],
+    "investor_insight_description": [],
+    "hub_tags": [
+      "exited_unicorn",
+      "pledge_one_percent",
+      "cbvp"
+    ]
+  },
+  "validity": {
+    "contact_email": "3/3 valid-shape",
+    "phone_number": "3/3 valid-shape"
+  },
+  "entity": "company",
+  "entity_confidence": 0.85,
+  "entity_why": "value-checked override: name=organization name; founders/company_type/num_employees_enum/funding/ipo_status present; no person first/last-name columns",
+  "social_cols": [
+    "facebook",
+    "linkedin",
+    "twitter",
+    "website",
+    "url"
+  ],
+  "activity_match_keys": [
+    "name",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "company_type",
+    "website",
+    "url"
+  ]
+}

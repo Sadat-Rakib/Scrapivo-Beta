@@ -1,0 +1,176 @@
+{
+  "key": "apollo-contacts-export (6)_OK_ONLY_MILLIONVERIFIER.COM (1).csv",
+  "size": 16446892,
+  "last_modified": "2026-09-08 00:12:19+00:00",
+  "columns": [
+    "First Name",
+    "Last Name",
+    "Title",
+    "Comp name",
+    "Website",
+    "Email",
+    "Phone",
+    "Comp Phone",
+    "Employees",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter",
+    "Country",
+    "Industry",
+    "Tech Used",
+    "Keywords",
+    "SEO Description"
+  ],
+  "row_count": 9472,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "First Name": "first_name",
+    "Last Name": "last_name",
+    "Title": "title",
+    "Comp name": "other",
+    "Website": "website",
+    "Email": "email",
+    "Phone": "phone",
+    "Comp Phone": "phone",
+    "Employees": "employees",
+    "Pers Linkedin": "linkedin",
+    "Comp Linkedin": "linkedin",
+    "Facebook": "social",
+    "Twitter": "social",
+    "Country": "country",
+    "Industry": "industry",
+    "Tech Used": "tech",
+    "Keywords": "descriptive",
+    "SEO Description": "descriptive"
+  },
+  "missing_pct": {
+    "First Name": 0.0,
+    "Last Name": 0.5,
+    "Title": 0.0,
+    "Comp name": 0.0,
+    "Website": 0.0,
+    "Email": 0.0,
+    "Phone": 100.0,
+    "Comp Phone": 19.4,
+    "Employees": 4.0,
+    "Pers Linkedin": 0.0,
+    "Comp Linkedin": 4.0,
+    "Facebook": 44.6,
+    "Twitter": 56.6,
+    "Country": 0.0,
+    "Industry": 4.0,
+    "Tech Used": 4.5,
+    "Keywords": 4.1,
+    "SEO Description": 100.0
+  },
+  "samples": {
+    "First Name": [
+      "John",
+      "Ruben",
+      "Dan"
+    ],
+    "Last Name": [
+      "Hernandez",
+      "Vardanyan",
+      "Manoukian"
+    ],
+    "Title": [
+      "Owner / Partner",
+      "Founder & CEO",
+      "CEO / President - Track Record"
+    ],
+    "Comp name": [
+      "ON Advertising",
+      "Joomag",
+      "Renaissance"
+    ],
+    "Website": [
+      "https://onadvertising.com",
+      "https://joomag.com",
+      "https://rencomgroup.com"
+    ],
+    "Email": [
+      "jhernandez@onadvertising.com",
+      "ruben@joomag.com",
+      "dmanoukian@rencomgroup.com"
+    ],
+    "Comp Phone": [
+      "'+1 480-705-6623",
+      "'+1 818-488-0567",
+      "'+1 610-278-0840"
+    ],
+    "Employees": [
+      "42",
+      "38",
+      "87"
+    ],
+    "Pers Linkedin": [
+      "http://www.linkedin.com/in/john-hernandez-1690292",
+      "http://www.linkedin.com/in/rubenvardanyan",
+      "http://www.linkedin.com/in/dmanoukian"
+    ],
+    "Comp Linkedin": [
+      "http://www.linkedin.com/company/on-advertising",
+      "http://www.linkedin.com/company/joomag",
+      "http://www.linkedin.com/company/renaissance_2"
+    ],
+    "Facebook": [
+      "https://facebook.com/ONAdPhx/",
+      "https://facebook.com/joomag",
+      "https://www.facebook.com/RenaissancePA/"
+    ],
+    "Twitter": [
+      "https://twitter.com/onadphx",
+      "https://twitter.com/Joomag",
+      "https://twitter.com/rencomgroup"
+    ],
+    "Country": [
+      "United States",
+      "United States",
+      "United States"
+    ],
+    "Industry": [
+      "marketing & advertising",
+      "information technology & services",
+      "marketing & advertising"
+    ],
+    "Tech Used": [
+      "Cloudflare DNS, Gmail, Google Apps, CloudFlare Hosting, Remote, , AI, Render, TikTok, Data Analytics,",
+      "Blue Host, Mobile Friendly, WordPress.org, Google Font API, Google Tag Manager, Circle, TikTok",
+      "NSOne, Gmail, Google Apps, Squarespace ECommerce, Mobile Friendly, IoT, SharePoint, Flutter, Android, Python, Node.js"
+    ],
+    "Keywords": [
+      "social media & email marketing, advertising services, marketing & advertising",
+      "advertising services, marketing & advertising",
+      "storytelliong, email strategy, email marketing, email consultancy, marketing services, marketing & advertising"
+    ]
+  },
+  "validity": {
+    "Email": "3/3 valid-shape",
+    "Comp Phone": "3/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Website",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter"
+  ],
+  "activity_match_keys": [
+    "First Name",
+    "Last Name",
+    "Website",
+    "Email",
+    "Phone",
+    "Comp Phone",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter"
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "seed": 90311,
+  "holdout": [
+    {
+      "id": "h000a",
+      "prompt": "millwrights looking for clients",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_client"
+      },
+      "pairWith": "h000b"
+    },
+    {
+      "id": "h000b",
+      "prompt": "businesses looking for millwrights",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "business",
+          "company"
+        ],
+        "relation": "needs_service",
+        "object": "millwright"
+      },
+      "pairWith": "h000a"
+    },
+    {
+      "id": "h002a",
+      "prompt": "investors funding pharmacovigilance startups in Swansea",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "investor",
+        "location": "swansea"
+      },
+      "pairWith": "h002b"
+    },
+    {
+      "id": "h002b",
+      "prompt": "pharmacovigilance startups in Swansea raising money",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "company",
+        "relation": "seeking_funding",
+        "location": "swansea"
+      },
+      "pairWith": "h002a"
+    },
+    {
+      "id": "h004",
+      "prompt": "firms in Aberystwyth that provide trade show fabrication",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "object": "trade show fabrication",
+        "location": "aberystwyth",
+        "intent_signal_required": false
+      },
+      "note": "offers_service"
+    },
+    {
+      "id": "h005",
+      "prompt": "firms in Enschede that provide waste haulage",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "object": "waste haulage",
+        "location": "enschede",
+        "intent_signal_required": false
+      },
+      "note": "offers_service"
+    }
+  ],
+  "chaos": [
+    {
+      "id": "c000a",
+      "prompt": "hi investors funding defence startups in dunedin",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "entity_type": "investor",
+        "location": "dunedin"
+      },
+      "pairWith": "c000b"
+    },
+    {
+      "id": "c000b",
+      "prompt": "defence startups in Dunedin raising money 🚀",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "entity_type": "company",
+        "relation": "seeking_funding",
+        "location": "dunedin"
+      },
+      "pairWith": "c000a"
+    },
+    {
+      "id": "c002",
+      "prompt": "find me  20 cider houses otside  maribor not chains insta if possible",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "quantity": 20,
+        "location": "maribor",
+        "min_constraints": 1,
+        "negated": [
+          "category"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ]
+      },
+      "note": "chaos_quantity_constraints"
+    },
+    {
+      "id": "c003",
+      "prompt": "find me 40  mushroom farms outsied  boise, not chains, insta if possible rn",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "quantity": 40,
+        "location": "boise",
+        "min_constraints": 1,
+        "negated": [
+          "category"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ]
+      },
+      "note": "chaos_quantity_constraints"
+    }
+  ]
+}

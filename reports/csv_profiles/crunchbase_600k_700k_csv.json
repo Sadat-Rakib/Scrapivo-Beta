@@ -1,0 +1,364 @@
+{
+  "key": "crunchbase_600k-700k.csv",
+  "size": 58769121,
+  "last_modified": "2026-09-08 00:12:15+00:00",
+  "columns": [
+    "id",
+    "created_at",
+    "name",
+    "short_description",
+    "semrush_global_rank",
+    "semrush_visits_latest_month",
+    "num_investors",
+    "funding_total",
+    "num_exits",
+    "num_funding_rounds",
+    "last_funding_type",
+    "last_funding_at",
+    "num_acquisitions",
+    "apptopia_total_apps",
+    "apptopia_total_downloads",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "num_investments",
+    "num_lead_investments",
+    "num_lead_investors",
+    "listed_stock_symbol",
+    "company_type",
+    "hub_tags",
+    "operating_status",
+    "founded_on",
+    "categories",
+    "founders",
+    "website",
+    "ipo_status",
+    "num_employees_enum",
+    "locations",
+    "growth_insight_description",
+    "growth_insight_indicator",
+    "growth_insight_direction",
+    "growth_insight_confidence",
+    "investor_insight_description",
+    "permalink",
+    "url"
+  ],
+  "row_count": 100000,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "id": "other",
+    "created_at": "other",
+    "name": "full_name",
+    "short_description": "descriptive",
+    "semrush_global_rank": "other",
+    "semrush_visits_latest_month": "other",
+    "num_investors": "other",
+    "funding_total": "other",
+    "num_exits": "other",
+    "num_funding_rounds": "other",
+    "last_funding_type": "other",
+    "last_funding_at": "other",
+    "num_acquisitions": "other",
+    "apptopia_total_apps": "other",
+    "apptopia_total_downloads": "other",
+    "contact_email": "email",
+    "phone_number": "phone",
+    "facebook": "social",
+    "linkedin": "linkedin",
+    "twitter": "social",
+    "num_investments": "other",
+    "num_lead_investments": "other",
+    "num_lead_investors": "other",
+    "listed_stock_symbol": "other",
+    "company_type": "company",
+    "hub_tags": "other",
+    "operating_status": "other",
+    "founded_on": "other",
+    "categories": "other",
+    "founders": "other",
+    "website": "website",
+    "ipo_status": "other",
+    "num_employees_enum": "employees",
+    "locations": "other",
+    "growth_insight_description": "descriptive",
+    "growth_insight_indicator": "other",
+    "growth_insight_direction": "other",
+    "growth_insight_confidence": "other",
+    "investor_insight_description": "descriptive",
+    "permalink": "other",
+    "url": "website"
+  },
+  "missing_pct": {
+    "id": 0.0,
+    "created_at": 0.0,
+    "name": 0.0,
+    "short_description": 0.0,
+    "semrush_global_rank": 61.7,
+    "semrush_visits_latest_month": 61.7,
+    "num_investors": 91.6,
+    "funding_total": 91.9,
+    "num_exits": 100.0,
+    "num_funding_rounds": 89.5,
+    "last_funding_type": 89.5,
+    "last_funding_at": 89.2,
+    "num_acquisitions": 98.7,
+    "apptopia_total_apps": 93.5,
+    "apptopia_total_downloads": 98.2,
+    "contact_email": 27.1,
+    "phone_number": 25.4,
+    "facebook": 45.3,
+    "linkedin": 23.6,
+    "twitter": 56.5,
+    "num_investments": 99.7,
+    "num_lead_investments": 99.9,
+    "num_lead_investors": 94.4,
+    "listed_stock_symbol": 99.6,
+    "company_type": 3.2,
+    "hub_tags": 99.8,
+    "operating_status": 0.0,
+    "founded_on": 16.9,
+    "categories": 4.5,
+    "founders": 74.6,
+    "website": 5.5,
+    "ipo_status": 3.4,
+    "num_employees_enum": 15.2,
+    "locations": 6.6,
+    "growth_insight_description": 97.5,
+    "growth_insight_indicator": 97.5,
+    "growth_insight_direction": 99.0,
+    "growth_insight_confidence": 99.0,
+    "investor_insight_description": 98.8,
+    "permalink": 0.0,
+    "url": 0.0
+  },
+  "samples": {
+    "id": [
+      "bbb4cecd-fdce-4a0d-ac8a-bbe695d15e21",
+      "94ffad05-6612-4a5d-8248-3015c5f572ae",
+      "9d78171c-6bf5-38a0-f62e-d1b500897a6f"
+    ],
+    "created_at": [
+      "2024-08-17 11:58:45.010218+00",
+      "2024-08-17 11:58:45.010218+00",
+      "2024-08-17 11:58:45.010218+00"
+    ],
+    "name": [
+      "Danville Oral & Maxillofacial Surgery & Dental Implant Center",
+      "Danville Orthopedic & Athletic Rehab",
+      "Danville Partners"
+    ],
+    "short_description": [
+      "Danville Orthopedic & Athletic Rehab offers physical therapy, occupational therapy, and aquatic therapy.",
+      "Danville Partners is a private equity firm.",
+      "Danville Pediatrics offers comprehensive treatment and primary health care services for children."
+    ],
+    "phone_number": [
+      "+1 859 236 1130",
+      "+1 434 836 4158",
+      "(216) 544-2600"
+    ],
+    "facebook": [
+      "https://www.facebook.com/profile.php?id=100054247191262",
+      "https://www.facebook.com/doarpt",
+      "https://www.facebook.com/danvillepediatricdentistry"
+    ],
+    "linkedin": [
+      "https://www.linkedin.com/company/danville-oral-maxillofacial-surgery/",
+      "https://www.linkedin.com/company/danville-orthopedic-&-athletic-rehab",
+      "https://www.linkedin.com/company/dewittwordsmith"
+    ],
+    "company_type": [
+      "for_profit",
+      "for_profit",
+      "for_profit"
+    ],
+    "operating_status": [
+      "active",
+      "active",
+      "active"
+    ],
+    "founded_on": [
+      "1976-01-01",
+      "1989-01-01",
+      "2000-01-01"
+    ],
+    "categories": [
+      "Dental, Health Care, Medical",
+      "Health Care, Rehabilitation, Therapeutics, Wellness",
+      "Health Care, Medical, Wellness"
+    ],
+    "website": [
+      "https://www.danvilleoms.com",
+      "https://www.doarpt.com",
+      "https://www.drozzie.com"
+    ],
+    "ipo_status": [
+      "private",
+      "private",
+      "private"
+    ],
+    "num_employees_enum": [
+      "c_00011_00050",
+      "c_00011_00050",
+      "c_00001_00010"
+    ],
+    "locations": [
+      "Southern US",
+      "East Coast, Southern US",
+      "Greater Los Angeles Area, West Coast, Western US"
+    ],
+    "permalink": [
+      "danville-oms",
+      "danville-orthopedic-athletic-rehab",
+      "danville-partners"
+    ],
+    "url": [
+      "https://www.crunchbase.com/organization/danville-oms",
+      "https://www.crunchbase.com/organization/danville-orthopedic-athletic-rehab",
+      "https://www.crunchbase.com/organization/danville-partners"
+    ],
+    "contact_email": [
+      "info@doarpt.com",
+      "mag@danvillepartners.com",
+      "info@drozzie.com"
+    ],
+    "twitter": [
+      "https://twitter.com/doarpt",
+      "https://twitter.com/dp_chamber",
+      "https://twitter.com/GoDanRiver"
+    ],
+    "semrush_global_rank": [
+      "10598704",
+      "1454870",
+      "3699593"
+    ],
+    "semrush_visits_latest_month": [
+      "213",
+      "17229",
+      "3317"
+    ],
+    "founders": [
+      "Gail Adams, Harry Adams",
+      "Junqiang Li",
+      "Brian Jawor"
+    ],
+    "num_investors": [
+      "3",
+      "6",
+      "1"
+    ],
+    "funding_total": [
+      "120000000",
+      "13000000",
+      "100000000"
+    ],
+    "num_funding_rounds": [
+      "2",
+      "2",
+      "1"
+    ],
+    "last_funding_type": [
+      "series_a",
+      "series_a",
+      "grant"
+    ],
+    "last_funding_at": [
+      "2021-10-14",
+      "2016-12-22",
+      "2023-06-28"
+    ],
+    "num_lead_investors": [
+      "1",
+      "1",
+      "1"
+    ],
+    "apptopia_total_apps": [
+      "1",
+      "2",
+      "1"
+    ],
+    "investor_insight_description": [],
+    "num_acquisitions": [
+      "1",
+      "1",
+      "1"
+    ],
+    "apptopia_total_downloads": [
+      "30886",
+      "5306",
+      "3431"
+    ],
+    "num_investments": [
+      "1",
+      "1",
+      "1"
+    ],
+    "growth_insight_description": [
+      "Dapple Security raised $2.3 million in a pre-seed funding round.",
+      "DartPoints upgraded its Cincinnati data center, enhancing local business connectivity.",
+      "Dash Living and PGIM Real Estate expanded their existing partnership through the acquisition of The Sheung Wan by Ovolo."
+    ],
+    "growth_insight_indicator": [
+      "growing",
+      "growing",
+      "growing"
+    ],
+    "hub_tags": [
+      "cbvp",
+      "unicorn",
+      "exited_unicorn"
+    ],
+    "growth_insight_direction": [
+      "c400_growing",
+      "c400_growing",
+      "c400_growing"
+    ],
+    "growth_insight_confidence": [
+      "c400_high",
+      "c400_high",
+      "c400_high"
+    ],
+    "listed_stock_symbol": [
+      "LSE:DAR",
+      "FRA:D3XA",
+      "IST:DARDL"
+    ],
+    "num_exits": [
+      "2",
+      "4"
+    ],
+    "num_lead_investments": [
+      "1",
+      "5",
+      "1"
+    ]
+  },
+  "validity": {
+    "contact_email": "3/3 valid-shape",
+    "phone_number": "3/3 valid-shape"
+  },
+  "entity": "company",
+  "entity_confidence": 0.85,
+  "entity_why": "value-checked override: name=organization name; founders/company_type/num_employees_enum/funding/ipo_status present; no person first/last-name columns",
+  "social_cols": [
+    "facebook",
+    "linkedin",
+    "twitter",
+    "website",
+    "url"
+  ],
+  "activity_match_keys": [
+    "name",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "company_type",
+    "website",
+    "url"
+  ]
+}

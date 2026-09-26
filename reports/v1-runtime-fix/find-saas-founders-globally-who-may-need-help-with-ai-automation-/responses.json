@@ -1,0 +1,128 @@
+{
+  "query": "Find SaaS founders globally who may need help with AI automation.",
+  "responseObserved": false,
+  "errors": [],
+  "requests": [
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvc3BlYy1zZWFyY2guZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6ImdldFNwZWNGbGFnX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvbGVhZHMuZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6Imxpc3RTYXZlZExlYWRzX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvcHJvZmlsZS5mdW5jdGlvbnMudHM_dHNzLXNlcnZlcmZuLXNwbGl0IiwiZXhwb3J0IjoiZ2V0TXlQcm9maWxlX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvcHJvamVjdHMuZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6Imxpc3RQcm9qZWN0c19jcmVhdGVTZXJ2ZXJGbl9oYW5kbGVyIn0",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvc2VhcmNoLmZ1bmN0aW9ucy50cz90c3Mtc2VydmVyZm4tc3BsaXQiLCJleHBvcnQiOiJnZXRSZW1haW5pbmdTZWFyY2hlc19jcmVhdGVTZXJ2ZXJGbl9oYW5kbGVyIn0",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvbGVhZHMuZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6Imxpc3RTYXZlZExlYWRzX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvcHJvamVjdHMuZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6Imxpc3RQcm9qZWN0c19jcmVhdGVTZXJ2ZXJGbl9oYW5kbGVyIn0",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvbGVhZHMuZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6Imxpc3RIaXN0b3J5X2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvdHJhbnNjcmlwdC5mdW5jdGlvbnMudHM_dHNzLXNlcnZlcmZuLXNwbGl0IiwiZXhwb3J0IjoiZ2V0VHJhbnNjcmlwdF9jcmVhdGVTZXJ2ZXJGbl9oYW5kbGVyIn0?payload=%7B%22t%22%3A%7B%22t%22%3A10%2C%22i%22%3A0%2C%22p%22%3A%7B%22k%22%3A%5B%22data%22%5D%2C%22v%22%3A%5B%7B%22t%22%3A10%2C%22i%22%3A1%2C%22p%22%3A%7B%22k%22%3A%5B%22conversationId%22%5D%2C%22v%22%3A%5B%7B%22t%22%3A1%2C%22s%22%3A%2283775911-3efb-42a6-aa40-51453ab9cd2c%3A296a41c9-47be-473e-8595-0cef551b0a87%22%7D%5D%7D%2C%22o%22%3A0%7D%5D%7D%2C%22o%22%3A0%7D%2C%22f%22%3A63%2C%22m%22%3A%5B%5D%7D",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvc3BlYy1zZWFyY2guZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6ImdldFNwZWNGbGFnX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvcHJvZmlsZS5mdW5jdGlvbnMudHM_dHNzLXNlcnZlcmZuLXNwbGl0IiwiZXhwb3J0IjoiZ2V0TXlQcm9maWxlX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvc3BlYy1zZWFyY2guZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6ImdldFNwZWNGbGFnX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvdHJhbnNjcmlwdC5mdW5jdGlvbnMudHM_dHNzLXNlcnZlcmZuLXNwbGl0IiwiZXhwb3J0Ijoic2F2ZVRyYW5zY3JpcHRfY3JlYXRlU2VydmVyRm5faGFuZGxlciJ9",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvc3BlYy1zZWFyY2guZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6ImdldFNwZWNGbGFnX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvc2VhcmNoLmZ1bmN0aW9ucy50cz90c3Mtc2VydmVyZm4tc3BsaXQiLCJleHBvcnQiOiJnZXRSZW1haW5pbmdTZWFyY2hlc19jcmVhdGVTZXJ2ZXJGbl9oYW5kbGVyIn0",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvcHJvZmlsZS5mdW5jdGlvbnMudHM_dHNzLXNlcnZlcmZuLXNwbGl0IiwiZXhwb3J0IjoiZ2V0TXlQcm9maWxlX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvbGVhZHMuZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6Imxpc3RTYXZlZExlYWRzX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvcHJvamVjdHMuZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6Imxpc3RQcm9qZWN0c19jcmVhdGVTZXJ2ZXJGbl9oYW5kbGVyIn0",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvc3BlYy1zZWFyY2guZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6ImdldFNwZWNGbGFnX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvdHJhbnNjcmlwdC5mdW5jdGlvbnMudHM_dHNzLXNlcnZlcmZuLXNwbGl0IiwiZXhwb3J0IjoiZ2V0VHJhbnNjcmlwdF9jcmVhdGVTZXJ2ZXJGbl9oYW5kbGVyIn0?payload=%7B%22t%22%3A%7B%22t%22%3A10%2C%22i%22%3A0%2C%22p%22%3A%7B%22k%22%3A%5B%22data%22%5D%2C%22v%22%3A%5B%7B%22t%22%3A10%2C%22i%22%3A1%2C%22p%22%3A%7B%22k%22%3A%5B%22conversationId%22%5D%2C%22v%22%3A%5B%7B%22t%22%3A1%2C%22s%22%3A%2283775911-3efb-42a6-aa40-51453ab9cd2c%3A296a41c9-47be-473e-8595-0cef551b0a87%22%7D%5D%7D%2C%22o%22%3A0%7D%5D%7D%2C%22o%22%3A0%7D%2C%22f%22%3A63%2C%22m%22%3A%5B%5D%7D",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvbGVhZHMuZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6Imxpc3RIaXN0b3J5X2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvdHJhbnNjcmlwdC5mdW5jdGlvbnMudHM_dHNzLXNlcnZlcmZuLXNwbGl0IiwiZXhwb3J0Ijoic2F2ZVRyYW5zY3JpcHRfY3JlYXRlU2VydmVyRm5faGFuZGxlciJ9",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvbGVhZHMuZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6Imxpc3RTYXZlZExlYWRzX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvcHJvZmlsZS5mdW5jdGlvbnMudHM_dHNzLXNlcnZlcmZuLXNwbGl0IiwiZXhwb3J0IjoiZ2V0TXlQcm9maWxlX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvc2VhcmNoLmZ1bmN0aW9ucy50cz90c3Mtc2VydmVyZm4tc3BsaXQiLCJleHBvcnQiOiJnZXRSZW1haW5pbmdTZWFyY2hlc19jcmVhdGVTZXJ2ZXJGbl9oYW5kbGVyIn0",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvcHJvamVjdHMuZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6Imxpc3RQcm9qZWN0c19jcmVhdGVTZXJ2ZXJGbl9oYW5kbGVyIn0",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvcHJvZmlsZS5mdW5jdGlvbnMudHM_dHNzLXNlcnZlcmZuLXNwbGl0IiwiZXhwb3J0IjoiZ2V0TXlQcm9maWxlX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvc2VhcmNoLmZ1bmN0aW9ucy50cz90c3Mtc2VydmVyZm4tc3BsaXQiLCJleHBvcnQiOiJnZXRSZW1haW5pbmdTZWFyY2hlc19jcmVhdGVTZXJ2ZXJGbl9oYW5kbGVyIn0",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvbGVhZHMuZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6Imxpc3RTYXZlZExlYWRzX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvcHJvamVjdHMuZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6Imxpc3RQcm9qZWN0c19jcmVhdGVTZXJ2ZXJGbl9oYW5kbGVyIn0",
+      "status": 200
+    }
+  ],
+  "responses": []
+}

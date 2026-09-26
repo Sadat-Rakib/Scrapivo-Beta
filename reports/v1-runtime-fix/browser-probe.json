@@ -1,0 +1,879 @@
+{
+  "spec": {
+    "entity": "person",
+    "criteria": [
+      {
+        "field": "role",
+        "value": "founder",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "industry",
+        "value": "SaaS",
+        "stated": true,
+        "confidence": 1
+      }
+    ],
+    "missing": [],
+    "signal_required": false,
+    "signal_types": [],
+    "signal_recency": null,
+    "status": "ready_to_search",
+    "raw_query": "saas founders",
+    "locationSuggestion": null
+  },
+  "durationMs": 53071,
+  "rows": [
+    {
+      "key": "browser:ba1694fb7513307400b94bfc",
+      "entity_id": "browser:ba1694fb7513307400b94bfc",
+      "entity_resolved": true,
+      "identity_confidence": 0.85,
+      "kind": "person",
+      "title": "Andrew Breen",
+      "role": "Founder & CEO",
+      "company": "Outshine",
+      "detail": "Founder & CEO | Outshine | SaaS | Andrew Breen Founder & CEO Outshine",
+      "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "email": null,
+      "phone": null,
+      "category": null,
+      "industry": "SaaS",
+      "location": null,
+      "country": null,
+      "sector": null,
+      "stage": null,
+      "employer": "Outshine",
+      "salary": null,
+      "opportunity": null,
+      "page_type": "entity_page",
+      "source_page_type": "unknown",
+      "resolution_method": "browser_observed_subject",
+      "evidence": [
+        {
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:ba1694fb7513307400b94bfc",
+          "excerpt": "Andrew Breen\nFounder & CEO\nOutshine",
+          "confidence": 0.85,
+          "extraction_method": "browser_observed_text",
+          "observed_at": "2026-09-25T13:45:08.180Z",
+          "claim_parameters": {
+            "role": "Founder & CEO",
+            "organization_name": "Outshine",
+            "organization_entity_id": "company:browser:9f4e6a5c66c92eb5be9dba32",
+            "relationship": "founder",
+            "role_currentness": "current_role"
+          }
+        },
+        {
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:ba1694fb7513307400b94bfc",
+          "excerpt": "Top 25 B2B SaaS Founder List of 2024: Andrew Breen\nFounder & CEO\nOutshine",
+          "confidence": 0.7,
+          "extraction_method": "browser_named_founder_cohort",
+          "observed_at": "2026-09-25T13:45:08.180Z",
+          "claim_parameters": {
+            "industry": "SaaS"
+          }
+        }
+      ],
+      "field_provenance": {
+        "role": {
+          "value": "Founder & CEO",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.180Z",
+          "confidence": 0.85
+        },
+        "company": {
+          "value": "Outshine",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.180Z",
+          "confidence": 0.85
+        },
+        "industry": {
+          "value": "SaaS",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.180Z",
+          "confidence": 0.85
+        }
+      },
+      "verification_status": "discovered",
+      "why_match": "Andrew Breen Founder & CEO Outshine"
+    },
+    {
+      "key": "browser:08131916d57672e52c30428d",
+      "entity_id": "browser:08131916d57672e52c30428d",
+      "entity_resolved": true,
+      "identity_confidence": 0.85,
+      "kind": "person",
+      "title": "David Chevalier",
+      "role": "Co-Founder & CEO",
+      "company": "Surfe",
+      "detail": "Co-Founder & CEO | Surfe | SaaS | David Chevalier Co-Founder & CEO Surfe",
+      "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "email": null,
+      "phone": null,
+      "category": null,
+      "industry": "SaaS",
+      "location": null,
+      "country": null,
+      "sector": null,
+      "stage": null,
+      "employer": "Surfe",
+      "salary": null,
+      "opportunity": null,
+      "page_type": "entity_page",
+      "source_page_type": "unknown",
+      "resolution_method": "browser_observed_subject",
+      "evidence": [
+        {
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:08131916d57672e52c30428d",
+          "excerpt": "David Chevalier\nCo-Founder & CEO\nSurfe\nView Bio",
+          "confidence": 0.85,
+          "extraction_method": "browser_observed_text",
+          "observed_at": "2026-09-25T13:45:08.183Z",
+          "claim_parameters": {
+            "role": "Co-Founder & CEO",
+            "organization_name": "Surfe",
+            "organization_entity_id": "company:browser:86dab442d84194e764c38402",
+            "relationship": "founder",
+            "role_currentness": "current_role"
+          }
+        },
+        {
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:08131916d57672e52c30428d",
+          "excerpt": "Top 25 B2B SaaS Founder List of 2024: David Chevalier\nCo-Founder & CEO\nSurfe\nView Bio",
+          "confidence": 0.7,
+          "extraction_method": "browser_named_founder_cohort",
+          "observed_at": "2026-09-25T13:45:08.183Z",
+          "claim_parameters": {
+            "industry": "SaaS"
+          }
+        }
+      ],
+      "field_provenance": {
+        "role": {
+          "value": "Co-Founder & CEO",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.183Z",
+          "confidence": 0.85
+        },
+        "company": {
+          "value": "Surfe",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.183Z",
+          "confidence": 0.85
+        },
+        "industry": {
+          "value": "SaaS",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.183Z",
+          "confidence": 0.85
+        }
+      },
+      "verification_status": "discovered",
+      "why_match": "David Chevalier Co-Founder & CEO Surfe"
+    },
+    {
+      "key": "browser:5e455071e6d37b811b715c24",
+      "entity_id": "browser:5e455071e6d37b811b715c24",
+      "entity_resolved": true,
+      "identity_confidence": 0.85,
+      "kind": "person",
+      "title": "Alex Circei",
+      "role": "CEO & Co-Founder",
+      "company": "Waydev",
+      "detail": "CEO & Co-Founder | Waydev | SaaS | Alex Circei CEO & Co-Founder Waydev",
+      "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "email": null,
+      "phone": null,
+      "category": null,
+      "industry": "SaaS",
+      "location": null,
+      "country": null,
+      "sector": null,
+      "stage": null,
+      "employer": "Waydev",
+      "salary": null,
+      "opportunity": null,
+      "page_type": "entity_page",
+      "source_page_type": "unknown",
+      "resolution_method": "browser_observed_subject",
+      "evidence": [
+        {
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:5e455071e6d37b811b715c24",
+          "excerpt": "Alex Circei\nCEO & Co-Founder\nWaydev",
+          "confidence": 0.85,
+          "extraction_method": "browser_observed_text",
+          "observed_at": "2026-09-25T13:45:08.185Z",
+          "claim_parameters": {
+            "role": "CEO & Co-Founder",
+            "organization_name": "Waydev",
+            "organization_entity_id": "company:browser:bf72c0b7c55421647e6c3ff3",
+            "relationship": "founder",
+            "role_currentness": "current_role"
+          }
+        },
+        {
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:5e455071e6d37b811b715c24",
+          "excerpt": "Top 25 B2B SaaS Founder List of 2024: Alex Circei\nCEO & Co-Founder\nWaydev",
+          "confidence": 0.7,
+          "extraction_method": "browser_named_founder_cohort",
+          "observed_at": "2026-09-25T13:45:08.185Z",
+          "claim_parameters": {
+            "industry": "SaaS"
+          }
+        }
+      ],
+      "field_provenance": {
+        "role": {
+          "value": "CEO & Co-Founder",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.185Z",
+          "confidence": 0.85
+        },
+        "company": {
+          "value": "Waydev",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.185Z",
+          "confidence": 0.85
+        },
+        "industry": {
+          "value": "SaaS",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.185Z",
+          "confidence": 0.85
+        }
+      },
+      "verification_status": "discovered",
+      "why_match": "Alex Circei CEO & Co-Founder Waydev"
+    },
+    {
+      "key": "browser:56461b541415e4c644896321",
+      "entity_id": "browser:56461b541415e4c644896321",
+      "entity_resolved": true,
+      "identity_confidence": 0.85,
+      "kind": "person",
+      "title": "Mark Corbett",
+      "role": "Founder",
+      "company": "Thrust Carbon",
+      "detail": "Founder | Thrust Carbon | SaaS | Mark Corbett Founder Thrust Carbon",
+      "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "email": null,
+      "phone": null,
+      "category": null,
+      "industry": "SaaS",
+      "location": null,
+      "country": null,
+      "sector": null,
+      "stage": null,
+      "employer": "Thrust Carbon",
+      "salary": null,
+      "opportunity": null,
+      "page_type": "entity_page",
+      "source_page_type": "unknown",
+      "resolution_method": "browser_observed_subject",
+      "evidence": [
+        {
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:56461b541415e4c644896321",
+          "excerpt": "Mark Corbett\nFounder\nThrust Carbon",
+          "confidence": 0.85,
+          "extraction_method": "browser_observed_text",
+          "observed_at": "2026-09-25T13:45:08.185Z",
+          "claim_parameters": {
+            "role": "Founder",
+            "organization_name": "Thrust Carbon",
+            "organization_entity_id": "company:browser:a3278b717c77d7eb26d49a42",
+            "relationship": "founder",
+            "role_currentness": "current_role"
+          }
+        },
+        {
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:56461b541415e4c644896321",
+          "excerpt": "Top 25 B2B SaaS Founder List of 2024: Mark Corbett\nFounder\nThrust Carbon",
+          "confidence": 0.7,
+          "extraction_method": "browser_named_founder_cohort",
+          "observed_at": "2026-09-25T13:45:08.185Z",
+          "claim_parameters": {
+            "industry": "SaaS"
+          }
+        }
+      ],
+      "field_provenance": {
+        "role": {
+          "value": "Founder",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.185Z",
+          "confidence": 0.85
+        },
+        "company": {
+          "value": "Thrust Carbon",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.185Z",
+          "confidence": 0.85
+        },
+        "industry": {
+          "value": "SaaS",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.185Z",
+          "confidence": 0.85
+        }
+      },
+      "verification_status": "discovered",
+      "why_match": "Mark Corbett Founder Thrust Carbon"
+    },
+    {
+      "key": "browser:676fc6bc4f664c3a4b33a9f4",
+      "entity_id": "browser:676fc6bc4f664c3a4b33a9f4",
+      "entity_resolved": true,
+      "identity_confidence": 0.85,
+      "kind": "person",
+      "title": "Pranjal Daga",
+      "role": "Co-Founder & Co-CEO",
+      "company": "Accend",
+      "detail": "Co-Founder & Co-CEO | Accend | SaaS | Pranjal Daga Co-Founder & Co-CEO Accend",
+      "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "email": null,
+      "phone": null,
+      "category": null,
+      "industry": "SaaS",
+      "location": null,
+      "country": null,
+      "sector": null,
+      "stage": null,
+      "employer": "Accend",
+      "salary": null,
+      "opportunity": null,
+      "page_type": "entity_page",
+      "source_page_type": "unknown",
+      "resolution_method": "browser_observed_subject",
+      "evidence": [
+        {
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:676fc6bc4f664c3a4b33a9f4",
+          "excerpt": "Pranjal Daga\nCo-Founder & Co-CEO\nAccend",
+          "confidence": 0.85,
+          "extraction_method": "browser_observed_text",
+          "observed_at": "2026-09-25T13:45:08.186Z",
+          "claim_parameters": {
+            "role": "Co-Founder & Co-CEO",
+            "organization_name": "Accend",
+            "organization_entity_id": "company:browser:ddd4e58162681700321bb9de",
+            "relationship": "founder",
+            "role_currentness": "current_role"
+          }
+        },
+        {
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:676fc6bc4f664c3a4b33a9f4",
+          "excerpt": "Top 25 B2B SaaS Founder List of 2024: Pranjal Daga\nCo-Founder & Co-CEO\nAccend",
+          "confidence": 0.7,
+          "extraction_method": "browser_named_founder_cohort",
+          "observed_at": "2026-09-25T13:45:08.186Z",
+          "claim_parameters": {
+            "industry": "SaaS"
+          }
+        }
+      ],
+      "field_provenance": {
+        "role": {
+          "value": "Co-Founder & Co-CEO",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.186Z",
+          "confidence": 0.85
+        },
+        "company": {
+          "value": "Accend",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.186Z",
+          "confidence": 0.85
+        },
+        "industry": {
+          "value": "SaaS",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.186Z",
+          "confidence": 0.85
+        }
+      },
+      "verification_status": "discovered",
+      "why_match": "Pranjal Daga Co-Founder & Co-CEO Accend"
+    },
+    {
+      "key": "browser:4883eae488d9af7f777de8fe",
+      "entity_id": "browser:4883eae488d9af7f777de8fe",
+      "entity_resolved": true,
+      "identity_confidence": 0.85,
+      "kind": "person",
+      "title": "Garry Drummond",
+      "role": "CEO & Founder",
+      "company": "LOCH Technologies",
+      "detail": "CEO & Founder | LOCH Technologies | SaaS | Garry Drummond CEO & Founder LOCH Technologies",
+      "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "email": null,
+      "phone": null,
+      "category": null,
+      "industry": "SaaS",
+      "location": null,
+      "country": null,
+      "sector": null,
+      "stage": null,
+      "employer": "LOCH Technologies",
+      "salary": null,
+      "opportunity": null,
+      "page_type": "entity_page",
+      "source_page_type": "unknown",
+      "resolution_method": "browser_observed_subject",
+      "evidence": [
+        {
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:4883eae488d9af7f777de8fe",
+          "excerpt": "Garry Drummond\nCEO & Founder\nLOCH Technologies",
+          "confidence": 0.85,
+          "extraction_method": "browser_observed_text",
+          "observed_at": "2026-09-25T13:45:08.186Z",
+          "claim_parameters": {
+            "role": "CEO & Founder",
+            "organization_name": "LOCH Technologies",
+            "organization_entity_id": "company:browser:3ab33b347cc6776b7cbcf3f6",
+            "relationship": "founder",
+            "role_currentness": "current_role"
+          }
+        },
+        {
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:4883eae488d9af7f777de8fe",
+          "excerpt": "Top 25 B2B SaaS Founder List of 2024: Garry Drummond\nCEO & Founder\nLOCH Technologies",
+          "confidence": 0.7,
+          "extraction_method": "browser_named_founder_cohort",
+          "observed_at": "2026-09-25T13:45:08.186Z",
+          "claim_parameters": {
+            "industry": "SaaS"
+          }
+        }
+      ],
+      "field_provenance": {
+        "role": {
+          "value": "CEO & Founder",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.186Z",
+          "confidence": 0.85
+        },
+        "company": {
+          "value": "LOCH Technologies",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.186Z",
+          "confidence": 0.85
+        },
+        "industry": {
+          "value": "SaaS",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.186Z",
+          "confidence": 0.85
+        }
+      },
+      "verification_status": "discovered",
+      "why_match": "Garry Drummond CEO & Founder LOCH Technologies"
+    },
+    {
+      "key": "browser:f5025ce0245bbdd14c068ea5",
+      "entity_id": "browser:f5025ce0245bbdd14c068ea5",
+      "entity_resolved": true,
+      "identity_confidence": 0.85,
+      "kind": "person",
+      "title": "Jennifer Dulski",
+      "role": "CEO & Founder",
+      "company": "Rising Team",
+      "detail": "CEO & Founder | Rising Team | SaaS | Jennifer Dulski CEO & Founder Rising Team",
+      "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "email": null,
+      "phone": null,
+      "category": null,
+      "industry": "SaaS",
+      "location": null,
+      "country": null,
+      "sector": null,
+      "stage": null,
+      "employer": "Rising Team",
+      "salary": null,
+      "opportunity": null,
+      "page_type": "entity_page",
+      "source_page_type": "unknown",
+      "resolution_method": "browser_observed_subject",
+      "evidence": [
+        {
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:f5025ce0245bbdd14c068ea5",
+          "excerpt": "Jennifer Dulski\nCEO & Founder\nRising Team",
+          "confidence": 0.85,
+          "extraction_method": "browser_observed_text",
+          "observed_at": "2026-09-25T13:45:08.187Z",
+          "claim_parameters": {
+            "role": "CEO & Founder",
+            "organization_name": "Rising Team",
+            "organization_entity_id": "company:browser:8d8cfceb690373be8ae5b198",
+            "relationship": "founder",
+            "role_currentness": "current_role"
+          }
+        },
+        {
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:f5025ce0245bbdd14c068ea5",
+          "excerpt": "Top 25 B2B SaaS Founder List of 2024: Jennifer Dulski\nCEO & Founder\nRising Team",
+          "confidence": 0.7,
+          "extraction_method": "browser_named_founder_cohort",
+          "observed_at": "2026-09-25T13:45:08.187Z",
+          "claim_parameters": {
+            "industry": "SaaS"
+          }
+        }
+      ],
+      "field_provenance": {
+        "role": {
+          "value": "CEO & Founder",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.187Z",
+          "confidence": 0.85
+        },
+        "company": {
+          "value": "Rising Team",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.187Z",
+          "confidence": 0.85
+        },
+        "industry": {
+          "value": "SaaS",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.187Z",
+          "confidence": 0.85
+        }
+      },
+      "verification_status": "discovered",
+      "why_match": "Jennifer Dulski CEO & Founder Rising Team"
+    },
+    {
+      "key": "browser:fd66e50a8154173add9891a9",
+      "entity_id": "browser:fd66e50a8154173add9891a9",
+      "entity_resolved": true,
+      "identity_confidence": 0.85,
+      "kind": "person",
+      "title": "Henrik Grim",
+      "role": "CEO & Co-Founder",
+      "company": "Mimo",
+      "detail": "CEO & Co-Founder | Mimo | SaaS | Henrik Grim CEO & Co-Founder Mimo",
+      "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "email": null,
+      "phone": null,
+      "category": null,
+      "industry": "SaaS",
+      "location": null,
+      "country": null,
+      "sector": null,
+      "stage": null,
+      "employer": "Mimo",
+      "salary": null,
+      "opportunity": null,
+      "page_type": "entity_page",
+      "source_page_type": "unknown",
+      "resolution_method": "browser_observed_subject",
+      "evidence": [
+        {
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:fd66e50a8154173add9891a9",
+          "excerpt": "Henrik Grim\nCEO & Co-Founder\nMimo",
+          "confidence": 0.85,
+          "extraction_method": "browser_observed_text",
+          "observed_at": "2026-09-25T13:45:08.188Z",
+          "claim_parameters": {
+            "role": "CEO & Co-Founder",
+            "organization_name": "Mimo",
+            "organization_entity_id": "company:browser:b3ee8617ec975f9fc26e6438",
+            "relationship": "founder",
+            "role_currentness": "current_role"
+          }
+        },
+        {
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:fd66e50a8154173add9891a9",
+          "excerpt": "Top 25 B2B SaaS Founder List of 2024: Henrik Grim\nCEO & Co-Founder\nMimo",
+          "confidence": 0.7,
+          "extraction_method": "browser_named_founder_cohort",
+          "observed_at": "2026-09-25T13:45:08.188Z",
+          "claim_parameters": {
+            "industry": "SaaS"
+          }
+        }
+      ],
+      "field_provenance": {
+        "role": {
+          "value": "CEO & Co-Founder",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.188Z",
+          "confidence": 0.85
+        },
+        "company": {
+          "value": "Mimo",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.188Z",
+          "confidence": 0.85
+        },
+        "industry": {
+          "value": "SaaS",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.188Z",
+          "confidence": 0.85
+        }
+      },
+      "verification_status": "discovered",
+      "why_match": "Henrik Grim CEO & Co-Founder Mimo"
+    },
+    {
+      "key": "browser:27eeb389678a9f66306e8850",
+      "entity_id": "browser:27eeb389678a9f66306e8850",
+      "entity_resolved": true,
+      "identity_confidence": 0.85,
+      "kind": "person",
+      "title": "Ajay Kamble",
+      "role": "CEO & Co-Founder",
+      "company": "Revalgo",
+      "detail": "CEO & Co-Founder | Revalgo | SaaS | Ajay Kamble CEO & Co-Founder Revalgo",
+      "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "email": null,
+      "phone": null,
+      "category": null,
+      "industry": "SaaS",
+      "location": null,
+      "country": null,
+      "sector": null,
+      "stage": null,
+      "employer": "Revalgo",
+      "salary": null,
+      "opportunity": null,
+      "page_type": "entity_page",
+      "source_page_type": "unknown",
+      "resolution_method": "browser_observed_subject",
+      "evidence": [
+        {
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:27eeb389678a9f66306e8850",
+          "excerpt": "Ajay Kamble\nCEO & Co-Founder\nRevalgo",
+          "confidence": 0.85,
+          "extraction_method": "browser_observed_text",
+          "observed_at": "2026-09-25T13:45:08.188Z",
+          "claim_parameters": {
+            "role": "CEO & Co-Founder",
+            "organization_name": "Revalgo",
+            "organization_entity_id": "company:browser:7b551658ae8340fc60fc8253",
+            "relationship": "founder",
+            "role_currentness": "current_role"
+          }
+        },
+        {
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:27eeb389678a9f66306e8850",
+          "excerpt": "Top 25 B2B SaaS Founder List of 2024: Ajay Kamble\nCEO & Co-Founder\nRevalgo",
+          "confidence": 0.7,
+          "extraction_method": "browser_named_founder_cohort",
+          "observed_at": "2026-09-25T13:45:08.188Z",
+          "claim_parameters": {
+            "industry": "SaaS"
+          }
+        }
+      ],
+      "field_provenance": {
+        "role": {
+          "value": "CEO & Co-Founder",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.188Z",
+          "confidence": 0.85
+        },
+        "company": {
+          "value": "Revalgo",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.188Z",
+          "confidence": 0.85
+        },
+        "industry": {
+          "value": "SaaS",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.188Z",
+          "confidence": 0.85
+        }
+      },
+      "verification_status": "discovered",
+      "why_match": "Ajay Kamble CEO & Co-Founder Revalgo"
+    },
+    {
+      "key": "browser:0f2fa357c72fc001f5af886c",
+      "entity_id": "browser:0f2fa357c72fc001f5af886c",
+      "entity_resolved": true,
+      "identity_confidence": 0.85,
+      "kind": "person",
+      "title": "Amir Kaplan",
+      "role": "Co-Founder & CEO",
+      "company": "ifeel",
+      "detail": "Co-Founder & CEO | ifeel | SaaS | Amir Kaplan Co-Founder & CEO ifeel",
+      "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "email": null,
+      "phone": null,
+      "category": null,
+      "industry": "SaaS",
+      "location": null,
+      "country": null,
+      "sector": null,
+      "stage": null,
+      "employer": "ifeel",
+      "salary": null,
+      "opportunity": null,
+      "page_type": "entity_page",
+      "source_page_type": "unknown",
+      "resolution_method": "browser_observed_subject",
+      "evidence": [
+        {
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:0f2fa357c72fc001f5af886c",
+          "excerpt": "Amir Kaplan\nCo-Founder & CEO\nifeel",
+          "confidence": 0.85,
+          "extraction_method": "browser_observed_text",
+          "observed_at": "2026-09-25T13:45:08.189Z",
+          "claim_parameters": {
+            "role": "Co-Founder & CEO",
+            "organization_name": "ifeel",
+            "organization_entity_id": "company:browser:e60a3d353aca8aaf8efff251",
+            "relationship": "founder",
+            "role_currentness": "current_role"
+          }
+        },
+        {
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:0f2fa357c72fc001f5af886c",
+          "excerpt": "Top 25 B2B SaaS Founder List of 2024: Amir Kaplan\nCo-Founder & CEO\nifeel",
+          "confidence": 0.7,
+          "extraction_method": "browser_named_founder_cohort",
+          "observed_at": "2026-09-25T13:45:08.189Z",
+          "claim_parameters": {
+            "industry": "SaaS"
+          }
+        }
+      ],
+      "field_provenance": {
+        "role": {
+          "value": "Co-Founder & CEO",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.189Z",
+          "confidence": 0.85
+        },
+        "company": {
+          "value": "ifeel",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.189Z",
+          "confidence": 0.85
+        },
+        "industry": {
+          "value": "SaaS",
+          "source": "browser_observed_text",
+          "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "observed_at": "2026-09-25T13:45:08.189Z",
+          "confidence": 0.85
+        }
+      },
+      "verification_status": "discovered",
+      "why_match": "Amir Kaplan Co-Founder & CEO ifeel"
+    }
+  ]
+}

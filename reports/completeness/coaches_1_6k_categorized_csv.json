@@ -1,0 +1,71 @@
+{
+  "key": "Coaches 1.6K_CATEGORIZED.csv",
+  "entity": "person",
+  "rows": 1598,
+  "required_fields": [
+    "Name",
+    "Company",
+    "Title",
+    "Email",
+    "Phone",
+    "Website",
+    "Social(any)",
+    "Location"
+  ],
+  "absent_columns": [],
+  "complete": 0,
+  "incomplete": 1598,
+  "complete_pct": 0.0,
+  "missing_counts": {
+    "Phone": 1598,
+    "Location": 385,
+    "Social(any)": 123,
+    "Website": 220
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Phone"
+      ],
+      "rows": 1073
+    },
+    {
+      "missing": [
+        "Location",
+        "Phone",
+        "Website"
+      ],
+      "rows": 197
+    },
+    {
+      "missing": [
+        "Location",
+        "Phone"
+      ],
+      "rows": 188
+    },
+    {
+      "missing": [
+        "Phone",
+        "Social(any)"
+      ],
+      "rows": 117
+    },
+    {
+      "missing": [
+        "Phone",
+        "Website"
+      ],
+      "rows": 17
+    },
+    {
+      "missing": [
+        "Phone",
+        "Social(any)",
+        "Website"
+      ],
+      "rows": 6
+    }
+  ],
+  "people_bonus_rows": 0
+}

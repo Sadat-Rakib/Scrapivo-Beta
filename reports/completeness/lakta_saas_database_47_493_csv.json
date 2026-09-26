@@ -1,0 +1,88 @@
+{
+  "key": "Lakta SaaS Database 47,493.csv",
+  "entity": "company",
+  "rows": 47496,
+  "required_fields": [
+    "CompanyName",
+    "Website",
+    "Location",
+    "Category",
+    "Email",
+    "Phone",
+    "Social(any)"
+  ],
+  "absent_columns": [
+    "Email",
+    "Phone"
+  ],
+  "complete": 0,
+  "incomplete": 47496,
+  "complete_pct": 0.0,
+  "missing_counts": {
+    "Website": 21236,
+    "Category": 2826,
+    "Location": 517
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "MISSINGCOL:Email",
+        "MISSINGCOL:Phone"
+      ],
+      "rows": 26033
+    },
+    {
+      "missing": [
+        "MISSINGCOL:Email",
+        "MISSINGCOL:Phone",
+        "Website"
+      ],
+      "rows": 18121
+    },
+    {
+      "missing": [
+        "Category",
+        "MISSINGCOL:Email",
+        "MISSINGCOL:Phone",
+        "Website"
+      ],
+      "rows": 2724
+    },
+    {
+      "missing": [
+        "Location",
+        "MISSINGCOL:Email",
+        "MISSINGCOL:Phone",
+        "Website"
+      ],
+      "rows": 390
+    },
+    {
+      "missing": [
+        "Location",
+        "MISSINGCOL:Email",
+        "MISSINGCOL:Phone"
+      ],
+      "rows": 126
+    },
+    {
+      "missing": [
+        "Category",
+        "MISSINGCOL:Email",
+        "MISSINGCOL:Phone"
+      ],
+      "rows": 101
+    },
+    {
+      "missing": [
+        "Category",
+        "Location",
+        "MISSINGCOL:Email",
+        "MISSINGCOL:Phone",
+        "Website"
+      ],
+      "rows": 1
+    }
+  ],
+  "people_bonus_rows": 36202
+}

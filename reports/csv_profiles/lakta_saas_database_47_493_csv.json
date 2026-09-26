@@ -1,0 +1,187 @@
+{
+  "key": "Lakta SaaS Database 47,493.csv",
+  "size": 20616491,
+  "last_modified": "2026-09-07 16:41:28+00:00",
+  "columns": [
+    "logo_url",
+    "company_name",
+    "latka_url",
+    "linkedin_url",
+    "website_or_social_url",
+    "funding",
+    "founder_latka_url",
+    "location",
+    "country_page_url",
+    "industry",
+    "industry_page_url",
+    "revenue",
+    "growth_percent",
+    "twitter_url",
+    "revenue_alt",
+    "founder_name",
+    "extra",
+    "website_url"
+  ],
+  "row_count": 47496,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "logo_url": "website",
+    "company_name": "company",
+    "latka_url": "website",
+    "linkedin_url": "linkedin",
+    "website_or_social_url": "website",
+    "funding": "other",
+    "founder_latka_url": "website",
+    "location": "other",
+    "country_page_url": "website",
+    "industry": "industry",
+    "industry_page_url": "website",
+    "revenue": "other",
+    "growth_percent": "other",
+    "twitter_url": "social",
+    "revenue_alt": "other",
+    "founder_name": "other",
+    "extra": "other",
+    "website_url": "website"
+  },
+  "missing_pct": {
+    "logo_url": 3.0,
+    "company_name": 0.0,
+    "latka_url": 0.0,
+    "linkedin_url": 0.0,
+    "website_or_social_url": 0.8,
+    "funding": 42.2,
+    "founder_latka_url": 0.0,
+    "location": 0.2,
+    "country_page_url": 0.2,
+    "industry": 0.2,
+    "industry_page_url": 0.2,
+    "revenue": 45.1,
+    "growth_percent": 53.1,
+    "twitter_url": 81.7,
+    "revenue_alt": 46.7,
+    "founder_name": 3.4,
+    "extra": 16.4,
+    "website_url": 19.1
+  },
+  "samples": {
+    "logo_url": [
+      "https://storage.getlatka.com/images/briq.com.png",
+      "https://storage.getlatka.com/images/submagic.co.png",
+      "https://storage.getlatka.com/images/zapmail.ai.png"
+    ],
+    "company_name": [
+      "briq",
+      "SubMagic",
+      "Zapmail"
+    ],
+    "latka_url": [
+      "https://getlatka.com/companies/briq.com",
+      "https://getlatka.com/companies/submagic.co",
+      "https://getlatka.com/companies/zapmail"
+    ],
+    "linkedin_url": [
+      "https://www.linkedin.com/company/briqhq/",
+      "https://www.linkedin.com/company/submagic",
+      "https://zapmail.ai/"
+    ],
+    "website_or_social_url": [
+      "https://briq.com/",
+      "https://submagic.co/",
+      "https://marsx.dev/"
+    ],
+    "funding": [
+      "$54M",
+      "$571.4K",
+      "$87.5M"
+    ],
+    "founder_latka_url": [
+      "https://getlatka.com/people/",
+      "https://getlatka.com/people/",
+      "https://getlatka.com/people/"
+    ],
+    "location": [
+      "(US)",
+      "France",
+      "(US)"
+    ],
+    "country_page_url": [
+      "https://getlatka.com/companies/countries/united-states/regions/",
+      "https://getlatka.com/companies/countries/france",
+      "https://getlatka.com/companies/countries/united-states/regions/"
+    ],
+    "industry": [
+      "Artificial Intelligence Software",
+      "Artificial Intelligence Software",
+      "Artificial Intelligence Software"
+    ],
+    "industry_page_url": [
+      "https://getlatka.com/companies/industries/artificial-intelligence-software",
+      "https://getlatka.com/companies/industries/artificial-intelligence-software",
+      "https://getlatka.com/companies/industries/artificial-intelligence-software"
+    ],
+    "revenue": [
+      "$1M",
+      "$8M",
+      "$43M"
+    ],
+    "growth_percent": [
+      "400.00%",
+      "325.00%",
+      "16.28%"
+    ],
+    "twitter_url": [
+      "https://twitter.com/marsxdev",
+      "https://twitter.com/pendoio",
+      "http://twitter.com/brightedge"
+    ],
+    "revenue_alt": [
+      "$1.5M",
+      "$27.8M",
+      "$100M"
+    ],
+    "founder_name": [
+      "John Rush",
+      "Jake Castillo",
+      "David Karandish"
+    ],
+    "extra": [
+      "Crunchbase icon",
+      "Crunchbase icon",
+      "Crunchbase icon"
+    ],
+    "website_url": [
+      "https://capacity.com/",
+      "https://voxpopme.com/",
+      "https://www.crunchbase.com/organization/pendo-io"
+    ]
+  },
+  "validity": {},
+  "entity": "company",
+  "entity_confidence": 0.7,
+  "entity_why": "company columns, no person-name columns",
+  "social_cols": [
+    "logo_url",
+    "latka_url",
+    "linkedin_url",
+    "website_or_social_url",
+    "founder_latka_url",
+    "country_page_url",
+    "industry_page_url",
+    "twitter_url",
+    "website_url"
+  ],
+  "activity_match_keys": [
+    "logo_url",
+    "company_name",
+    "latka_url",
+    "linkedin_url",
+    "website_or_social_url",
+    "founder_latka_url",
+    "country_page_url",
+    "industry_page_url",
+    "twitter_url",
+    "website_url"
+  ]
+}

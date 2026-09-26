@@ -1,0 +1,545 @@
+{
+  "questions": [
+    "Any particular business model (agency, brand, D2C, B2B, B2C), or all?"
+  ],
+  "clarify": [
+    {
+      "id": "entity_business_model",
+      "question": "Any particular business model (agency, brand, D2C, B2B, B2C), or all?",
+      "options": [
+        {
+          "id": "agency",
+          "label": "Agency",
+          "hint": "Service agencies"
+        },
+        {
+          "id": "brand",
+          "label": "Brand",
+          "hint": "Product brands"
+        },
+        {
+          "id": "d2c",
+          "label": "D2C",
+          "hint": "Direct-to-consumer"
+        },
+        {
+          "id": "b2b",
+          "label": "B2B",
+          "hint": "Selling to businesses"
+        },
+        {
+          "id": "b2c",
+          "label": "B2C",
+          "hint": "Selling to consumers"
+        }
+      ],
+      "allowOther": true
+    }
+  ],
+  "rows": [],
+  "dbMeta": [
+    {
+      "dbHit": false,
+      "engine": "pg-index",
+      "partitionsRead": [
+        "idx_businesses(country,city_norm,category)"
+      ],
+      "rowsScanned": 0,
+      "rowsReturned": 0,
+      "elapsedMs": 555,
+      "indexUsed": "idx_biz_country_citynorm_cat"
+    },
+    {
+      "dbHit": true,
+      "engine": "s3-parquet",
+      "partitionsRead": [
+        "processed/local-businesses/by_country/gb.parquet",
+        "processed/local-businesses/by_country/ca.parquet",
+        "(exact=51 nearby=0 for \"Edmonton\")"
+      ],
+      "rowsScanned": 698416,
+      "rowsReturned": 51
+    },
+    {
+      "dbHit": true,
+      "engine": "live-osm+browser",
+      "partitionsRead": [
+        "live-gapfill(84)"
+      ],
+      "rowsScanned": 84,
+      "rowsReturned": 79
+    }
+  ],
+  "rejected": 56,
+  "liveDiscovery": "completed",
+  "pendingEnrichment": 33,
+  "moreAvailableMessage": "There are more verified leads — want to see them?",
+  "offset": 0,
+  "limit": 50,
+  "hasMore": true,
+  "totalAvailable": null,
+  "spec": {
+    "entity": "business",
+    "criteria": [
+      {
+        "field": "opportunity",
+        "value": "no_website",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "category",
+        "value": "HVAC",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "location",
+        "value": "Edmonton",
+        "stated": true,
+        "confidence": 0.5
+      },
+      {
+        "field": "location_id",
+        "value": "geo:stated:edmonton",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "location_kind",
+        "value": "stated",
+        "stated": true,
+        "confidence": 1
+      }
+    ],
+    "missing": [],
+    "signal_required": false,
+    "signal_types": [],
+    "signal_recency": null,
+    "status": "ready_to_search",
+    "raw_query": "Find HVAC businesses in Edmonton without websites.",
+    "locationSuggestion": null,
+    "understanding": {
+      "version": "u1",
+      "input": {
+        "raw": "Find HVAC businesses in Edmonton without websites.",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "lead_discovery",
+        "raw": "Find HVAC businesses in Edmonton without websites.",
+        "confidence": 0.5
+      },
+      "prospecting_mode": {
+        "value": "opportunity_based",
+        "raw": "without websites.",
+        "confidence": 0.5
+      },
+      "target": {
+        "entity_type": {
+          "value": "business",
+          "raw": "HVAC businesses",
+          "confidence": 0.5
+        },
+        "entity_ambiguous": false,
+        "entity_subtype": null,
+        "role": null,
+        "job_title": null,
+        "industry": {
+          "value": "HVAC",
+          "raw": "HVAC",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "category": {
+          "value": "HVAC",
+          "raw": "HVAC",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "business_type": null,
+        "niche": null,
+        "company_stage": null,
+        "technologies": [],
+        "descriptors": []
+      },
+      "relation": {
+        "type": {
+          "value": "lacks_asset",
+          "raw": "without websites.",
+          "confidence": 0.5
+        },
+        "label": null,
+        "object": {
+          "value": "website",
+          "raw": "website",
+          "normalized": "website",
+          "confidence": 0.5
+        },
+        "direction": {
+          "value": "subject_to_object",
+          "raw": "without websites.",
+          "confidence": 0.5
+        }
+      },
+      "organization_context": {
+        "on_behalf_of_company": "unknown",
+        "company": null
+      },
+      "user_context": {
+        "selling": null,
+        "objective": null,
+        "notes": []
+      },
+      "location": {
+        "value": "Edmonton",
+        "raw": "in Edmonton",
+        "scope": "in",
+        "radius": null,
+        "radius_unit": null,
+        "country_code": null,
+        "canonical": "Edmonton",
+        "confidence": 0.5
+      },
+      "temporal": null,
+      "constraints": [
+        {
+          "field": "website",
+          "operator": "exists",
+          "value": null,
+          "unit": null,
+          "negated": true,
+          "raw": "website",
+          "confidence": 0.5
+        }
+      ],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": false,
+        "reasons": []
+      },
+      "quantity": null,
+      "required_fields": [],
+      "preferred_fields": [],
+      "contact_requirements": [],
+      "verification": [],
+      "output": [],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": false,
+        "fields": [],
+        "reason": null,
+        "question": null
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": null,
+        "model": null,
+        "prompt_version": "u1-v15",
+        "latency_ms": 130,
+        "fallback_used": false,
+        "cached": true,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": null,
+          "repair_attempted": false,
+          "repair_reason": null,
+          "repair_success": null
+        },
+        "notes": []
+      }
+    }
+  },
+  "outcome": "NO_QUALIFIED_RESULTS",
+  "diagnostics": [],
+  "retrievalTrace": {
+    "sources": [
+      {
+        "source": "pg-index",
+        "partitions": [
+          "idx_businesses(country,city_norm,category)"
+        ],
+        "scanned": 0,
+        "matched": 0
+      },
+      {
+        "source": "s3-parquet",
+        "partitions": [
+          "processed/local-businesses/by_country/gb.parquet",
+          "processed/local-businesses/by_country/ca.parquet",
+          "(exact=51 nearby=0 for \"Edmonton\")"
+        ],
+        "scanned": 698416,
+        "matched": 51
+      },
+      {
+        "source": "live-osm+browser",
+        "partitions": [
+          "live-gapfill(84)"
+        ],
+        "scanned": 84,
+        "matched": 79
+      }
+    ],
+    "rawCandidates": 130,
+    "postSpecFilter": 74,
+    "complete": 40,
+    "pendingEnrichment": 33,
+    "qualificationRejected": 40,
+    "returned": 0,
+    "reason": "FAILED_QUALIFICATION"
+  },
+  "executionPlan": {
+    "requirements": {
+      "entityTypes": [
+        "business"
+      ],
+      "claims": [
+        "no_website"
+      ],
+      "needsDiscovery": true,
+      "needsIdentityResolution": true,
+      "needsLocation": true,
+      "needsTemporal": false,
+      "opportunity": "no_website"
+    },
+    "steps": [
+      {
+        "providerId": "indexed-db",
+        "costTier": 0,
+        "role": "primary",
+        "reason": "primary_tier_L0:indexed-db+identity",
+        "capabilities": {
+          "id": "indexed-db",
+          "label": "Indexed / internal DB",
+          "entityTypes": [
+            "person",
+            "company",
+            "business",
+            "investor",
+            "job"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": true,
+          "locationSupport": true,
+          "temporalSupport": false,
+          "costTier": 0,
+          "live": false
+        }
+      },
+      {
+        "providerId": "company-registry",
+        "costTier": 1,
+        "role": "primary",
+        "reason": "primary_tier_L1:company-registry+identity",
+        "capabilities": {
+          "id": "company-registry",
+          "label": "Company / entity registry",
+          "entityTypes": [
+            "company",
+            "business",
+            "investor"
+          ],
+          "claims": [
+            "funding",
+            "identity"
+          ],
+          "discovery": false,
+          "identityResolution": true,
+          "locationSupport": true,
+          "temporalSupport": true,
+          "costTier": 1,
+          "live": false
+        }
+      },
+      {
+        "providerId": "osm-local",
+        "costTier": 1,
+        "role": "primary",
+        "reason": "primary_tier_L1:osm-local+no_website+identity",
+        "capabilities": {
+          "id": "osm-local",
+          "label": "OpenStreetMap local businesses",
+          "entityTypes": [
+            "business"
+          ],
+          "claims": [
+            "no_website"
+          ],
+          "discovery": true,
+          "identityResolution": true,
+          "locationSupport": true,
+          "temporalSupport": false,
+          "costTier": 1,
+          "live": true
+        }
+      },
+      {
+        "providerId": "direct-http",
+        "costTier": 2,
+        "role": "primary",
+        "reason": "primary_tier_L2:direct-http",
+        "capabilities": {
+          "id": "direct-http",
+          "label": "Direct HTTP fetch",
+          "entityTypes": [
+            "company",
+            "business",
+            "person"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": false,
+          "costTier": 2,
+          "live": true
+        }
+      },
+      {
+        "providerId": "html-parser",
+        "costTier": 3,
+        "role": "primary",
+        "reason": "primary_tier_L3:html-parser",
+        "capabilities": {
+          "id": "html-parser",
+          "label": "HTML parser",
+          "entityTypes": [
+            "company",
+            "business",
+            "person",
+            "job"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": false,
+          "costTier": 3,
+          "live": true
+        }
+      },
+      {
+        "providerId": "browser-automation",
+        "costTier": 5,
+        "role": "escalation",
+        "reason": "escalate_after_free_ladder:browser-automation",
+        "capabilities": {
+          "id": "browser-automation",
+          "label": "Browser automation",
+          "entityTypes": [
+            "company",
+            "business",
+            "person",
+            "job"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": false,
+          "costTier": 5,
+          "live": true,
+          "escalateOnly": true
+        }
+      }
+    ],
+    "skipped": [
+      {
+        "providerId": "searxng",
+        "reason": "claim_capability_mismatch"
+      },
+      {
+        "providerId": "sitemap-jsonld",
+        "reason": "claim_capability_mismatch"
+      },
+      {
+        "providerId": "agentic-browser",
+        "reason": "claim_capability_mismatch"
+      },
+      {
+        "providerId": "paid-serp",
+        "reason": "claim_capability_mismatch"
+      },
+      {
+        "providerId": "jobs-fleet",
+        "reason": "entity_type_mismatch"
+      }
+    ],
+    "researchPlan": {
+      "discoveryQueries": [
+        "HVAC Edmonton",
+        "HVAC business Edmonton",
+        "HVAC \"no website\" Edmonton"
+      ],
+      "requiredFields": [
+        "name",
+        "industry",
+        "no_website_evidence",
+        "location",
+        "contact",
+        "identity_evidence"
+      ],
+      "desiredCount": 5,
+      "stoppingRules": {
+        "maxQueries": 3,
+        "maxPages": 15,
+        "maxCandidates": 15,
+        "maxNoProgressQueries": 2
+      }
+    }
+  },
+  "providerAttempts": [
+    {
+      "provider": "indexed-db",
+      "entitiesResolved": 0,
+      "qualified": 0,
+      "attempted": false,
+      "succeeded": false,
+      "artifactsFound": 0,
+      "error": "handled_outside_live_gapfill",
+      "role": "primary",
+      "costTier": 0
+    },
+    {
+      "provider": "company-registry",
+      "entitiesResolved": 0,
+      "qualified": 0,
+      "attempted": false,
+      "succeeded": false,
+      "artifactsFound": 0,
+      "error": "handled_outside_live_gapfill",
+      "role": "primary",
+      "costTier": 1
+    },
+    {
+      "provider": "osm-local",
+      "entitiesResolved": 0,
+      "qualified": 0,
+      "attempted": true,
+      "succeeded": true,
+      "artifactsFound": 78,
+      "role": "primary",
+      "costTier": 1
+    },
+    {
+      "provider": "browser-live",
+      "attempted": true,
+      "succeeded": true,
+      "artifactsFound": 6,
+      "entitiesResolved": 0,
+      "qualified": 0
+    }
+  ],
+  "search_run_id": "run_3b04573b",
+  "conversation_id": "83775911-3efb-42a6-aa40-51453ab9cd2c:18755bc6-012e-430f-87b7-d16f50ee20c4",
+  "turn_id": "1790344945422-tmzdpxyzhln",
+  "request_id": "req_28c2e457",
+  "qualified_count": 0
+}

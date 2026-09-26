@@ -107,6 +107,8 @@ export type LocalBusinessRow = {
   category?: string;
   address?: string;
   phone?: string;
+  /** Phase 1.5 safety: why a phone is absent (mismatch/invalid = suppressed). */
+  phoneStatus?: import("@/lib/search/phone-safety").PhoneStatus;
   email?: string;
   website?: string;
   domain?: string;
@@ -124,6 +126,10 @@ export type LocalBusinessRow = {
   evidence?: import("@/lib/intelligence/evidence").EvidenceClaim[];
   /** Canonical entity id when resolved. */
   entity_id?: string;
+  /** Evidence-backed why-match from the search pipeline. */
+  why_match?: string;
+  /** Soft flag: same phone+address as another row on this page. */
+  soft_duplicate?: boolean;
 };
 
 /** Derive filterable opportunity tags from observed fields only. */
@@ -183,6 +189,84 @@ export type LeadSegments = {
   local: LocalBusinessRow[];
 };
 
+/** Sources whose rows ARE the posting (boards, catalogs, aggregators). */
+const JOB_NATIVE_SOURCES = new Set([
+  "ashby",
+  "greenhouse",
+  "lever",
+  "smartrecruiters",
+  "workable",
+  "recruitee",
+  "jobcatalog",
+  "freehire",
+  "githubjobs",
+  "workatastartup",
+  "remoteok",
+  "workingnomads",
+  "jobicy",
+  "arbeitnow",
+]);
+
+const GENERIC_WEB_SOURCES = /searxng|webboolean|serpapi|tavily|reddit|quora|devto/i;
+const JOB_SHAPED_RE = /\b(hiring|hire|job|jobs|role|opening|apply|career|engineer|developer)\b/i;
+
+/** JOB_DISCOVERY re-rank: job-native leads above generic web-search cards;
+ *  non-job-shaped web rows demoted. Pure — unit-tested. */
+export function applyJobDiscoveryBoost(items: Array<{ lead: Lead; text: string }>): Lead[] {
+  return items.map(({ lead, text }) => {
+    const src = (lead.source ?? "").toLowerCase();
+    if (JOB_NATIVE_SOURCES.has(src)) {
+      return {
+        ...lead,
+        score: (lead.score ?? 0) + 12,
+        match_reasons: [...(lead.match_reasons ?? []), "Job-board posting"].slice(0, 6),
+      };
+    }
+    if (GENERIC_WEB_SOURCES.test(src) && !JOB_SHAPED_RE.test(text)) {
+      return {
+        ...lead,
+        score: (lead.score ?? 0) - 12,
+        match_reasons: [...(lead.match_reasons ?? []), "Not job-shaped"].slice(0, 6),
+      };
+    }
+    return lead;
+  });
+}
+
+/** Compose a local-business About from structured fields only — never the
+ *  raw address dump, never invented. Evidence sentence reflects observed
+ *  website/phone/email presence. */
+export function composeLocalAbout(input: {
+  category?: string | null;
+  place?: string | null;
+  website?: string | null;
+  phone?: string | null;
+  email?: string | null;
+}): string | null {
+  const rawCat = (input.category ?? "").replace(/_/g, " ").trim();
+  const cat = rawCat ? rawCat.charAt(0).toUpperCase() + rawCat.slice(1) : "";
+  const place = (input.place ?? "").trim();
+  const head = cat || place ? `${cat ? `${cat} business` : "Local business"}${place ? ` in ${place}` : ""}.` : null;
+  const hasSite = !!input.website;
+  const hasPhone = !!input.phone;
+  const hasEmail = !!input.email;
+  let evidence: string | null = null;
+  if (!hasSite && (hasPhone || hasEmail)) {
+    const via = [hasPhone ? "phone" : null, hasEmail ? "email" : null]
+      .filter(Boolean)
+      .join("/");
+    evidence = `No website found — reachable by ${via} instead.`;
+  } else if (!hasSite && !hasPhone && !hasEmail) {
+    evidence = "No website, phone, or email listed.";
+  } else if (hasSite && hasPhone) {
+    evidence = "Has website and phone.";
+  } else if (hasSite) {
+    evidence = "Has website — no phone listed.";
+  }
+  if (!head) return evidence;
+  return evidence ? `${head} ${evidence}` : head;
+}
+
 const LOCAL_SOURCES = new Set(["osm", "geoapify", "foursquare", "coreclaw_maps", "smb", "overture"]);
 
 /** Build Local Businesses tab from Places/OSM leads (not dumped into Posts). */
@@ -221,16 +305,25 @@ export function buildLocalBusinesses(rawLeads: Lead[]): LocalBusinessRow[] {
             })()
           : undefined);
       const address = ext.address || undefined;
+      const category = l.platform_label || l.platform;
+      const composedAbout = composeLocalAbout({
+        category,
+        place: address,
+        website,
+        phone: ext.phones?.[0],
+        email: ext.emails?.[0],
+      });
       return {
         key,
         name: ext.company || l.author || l.title || key,
-        category: l.platform_label || l.platform,
+        category,
         address,
         phone: ext.phones?.[0],
         email: ext.emails?.[0],
         website,
         domain,
         description:
+          composedAbout ||
           address ||
           l.why_match ||
           l.snippet ||
@@ -501,6 +594,12 @@ function looksLikeCompanyName(name: string): boolean {
 // Seeker / provider phrasing — people offering services, not asking for them.
 const SEEKER_PHRASE_RE =
   /\b(i(?:'| a)?m a|i am a|available for (hire|work)|open to work|looking for (work|a (job|role|position|gig))|for hire|hire me|my (portfolio|rates)|seeking (work|opportunities))\b/i;
+
+/** Shared seeker vocabulary (single owner): true when the text reads as a
+ *  person offering services rather than an employer posting an opening. */
+export function isSeekerPhrasing(text: string): boolean {
+  return SEEKER_PHRASE_RE.test(text ?? "");
+}
 // Align with ingest buyer signals — "looking for developer" (no article) must count.
 const BUYER_PHRASE_RE =
   /\b(need(s|ed)?(\s+(a|an|someone|help|this|\w+))?|looking for(\s+(a|an|someone|help|\w+))?|looking to (hire|find|get)|hiring|who can (help|build|make|design|develop)|any(one)? (recommend|know|recs|recommendations?)|willing to pay|budget|freelance(r)? needed|seeking (a|an|freelancer)|want(s|ed)? (a|an|someone)|can someone (help|build|make)|recommend a|paid (gig|project)|help wanted)\b/i;

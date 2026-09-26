@@ -249,7 +249,31 @@ export async function searchSiteDorks(
     }
   }
 
-  if (out.length >= 3 || !hasGoogleSerpProvider()) return out;
+  const { logProviderUse, shouldSkipPaidSerp } = await import("./provider-ladder");
+  if (out.length) {
+    logProviderUse({
+      provider_used: "searxng",
+      fallback_reason: null,
+      cost_class: "self_hosted",
+      operation: "site-dorks",
+      success: true,
+      result_count: out.length,
+    });
+  }
+  const paidGate = shouldSkipPaidSerp({ freeResultCount: out.length, sufficientAt: 3 });
+  if (paidGate.skip || !hasGoogleSerpProvider()) {
+    if (paidGate.skip) {
+      logProviderUse({
+        provider_used: "paid-serp-skipped",
+        fallback_reason: paidGate.reason,
+        cost_class: "paid",
+        operation: "site-dorks",
+        success: false,
+        result_count: 0,
+      });
+    }
+    return out;
+  }
 
   for (const q of queries.slice(0, 3)) {
     try {
@@ -272,6 +296,16 @@ export async function searchSiteDorks(
     } catch {
       /* continue */
     }
+  }
+  if (out.length) {
+    logProviderUse({
+      provider_used: "hosted-google-serp",
+      fallback_reason: paidGate.reason,
+      cost_class: "paid",
+      operation: "site-dorks",
+      success: true,
+      result_count: out.length,
+    });
   }
   return out;
 }

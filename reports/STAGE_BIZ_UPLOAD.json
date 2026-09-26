@@ -1,0 +1,366 @@
+[
+  {
+    "key": "processed/local-businesses/by_country/ae.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/am.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/ar.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/at.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/au.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/austin.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/az.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/bd.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/be.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/bg.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/bh.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/bo.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/br.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/ca.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/ch.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/cl.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/co.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/cr.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/cy.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/cz.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/de.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/dk.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/do.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/ec.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/ee.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/eg.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/es.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/fi.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/fr.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/gb.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/ge.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/gh.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/gr.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/gt.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/hk.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/hr.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/hu.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/id.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/ie.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/il.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/in.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/is.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/it.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/jo.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/jp.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/ke.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/kr.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/kw.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/kz.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/lb.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/lk.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/lt.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/lu.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/lv.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/ma.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/mt.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/mx.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/my.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/ng.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/nl.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/no.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/np.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/nz.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/om.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/pa.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/pe.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/ph.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/pk.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/pl.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/pr.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/pt.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/py.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/qa.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/ro.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/rs.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/sa.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/se.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/sg.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/si.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/sk.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/th.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/tn.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/tr.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/tw.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/tz.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/ua.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/us.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/uy.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/uz.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/vn.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/local-businesses/by_country/za.parquet",
+    "status": "uploaded-verified"
+  }
+]

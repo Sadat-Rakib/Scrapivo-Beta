@@ -1,0 +1,92 @@
+{
+  "key": "americas_region_v6.csv",
+  "entity": "person",
+  "rows": 5481,
+  "required_fields": [
+    "Name",
+    "Company",
+    "Title",
+    "Email",
+    "Phone",
+    "Website",
+    "Social(any)",
+    "Location"
+  ],
+  "absent_columns": [],
+  "complete": 5108,
+  "incomplete": 373,
+  "complete_pct": 93.2,
+  "missing_counts": {
+    "Social(any)": 267,
+    "Phone": 173,
+    "Website": 3,
+    "Name": 1,
+    "Company": 3,
+    "Title": 3
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Social(any)"
+      ],
+      "rows": 195
+    },
+    {
+      "missing": [
+        "Phone"
+      ],
+      "rows": 104
+    },
+    {
+      "missing": [
+        "Phone",
+        "Social(any)"
+      ],
+      "rows": 66
+    },
+    {
+      "missing": [
+        "Social(any)",
+        "Website"
+      ],
+      "rows": 2
+    },
+    {
+      "missing": [
+        "Company",
+        "Phone",
+        "Social(any)",
+        "Title"
+      ],
+      "rows": 2
+    },
+    {
+      "missing": [
+        "Website"
+      ],
+      "rows": 1
+    },
+    {
+      "missing": [
+        "Name",
+        "Social(any)"
+      ],
+      "rows": 1
+    },
+    {
+      "missing": [
+        "Company",
+        "Phone",
+        "Social(any)"
+      ],
+      "rows": 1
+    },
+    {
+      "missing": [
+        "Title"
+      ],
+      "rows": 1
+    }
+  ],
+  "people_bonus_rows": 0
+}

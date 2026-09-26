@@ -1,0 +1,122 @@
+{
+  "approved": true,
+  "canonical_entity": "company",
+  "cluster_files": 8,
+  "cohort": "s3-new-2026-09",
+  "decisions": [
+    {
+      "canonical": "Company Name",
+      "evidence": "org-name values; override recorded",
+      "sources": [
+        "name"
+      ],
+      "status": "proposed",
+      "transform": "trim"
+    },
+    {
+      "canonical": "Website",
+      "evidence": "website + url both 0-5% missing; same-host check at transform",
+      "sources": [
+        "website",
+        "url"
+      ],
+      "status": "proposed",
+      "transform": "host-compare; corporate site wins, other to evidence"
+    },
+    {
+      "canonical": "Industry",
+      "evidence": "multi-value category strings",
+      "sources": [
+        "categories"
+      ],
+      "status": "proposed",
+      "transform": "split, trim, taxonomy map (raw kept)"
+    },
+    {
+      "canonical": "Employees",
+      "evidence": "range-enum strings",
+      "sources": [
+        "num_employees_enum"
+      ],
+      "status": "proposed",
+      "transform": "enum map"
+    },
+    {
+      "canonical": "Email/Phone/LinkedIn/Facebook/Twitter",
+      "evidence": "contact_* columns; 19-59% missing",
+      "sources": [
+        "contact_email",
+        "phone_number",
+        "linkedin",
+        "facebook",
+        "twitter"
+      ],
+      "status": "proposed",
+      "transform": "standard validity normalize"
+    },
+    {
+      "canonical": "Description/Founded/Status/Location",
+      "evidence": "self-describing",
+      "sources": [
+        "short_description",
+        "founded_on",
+        "operating_status",
+        "ipo_status",
+        "company_type",
+        "locations"
+      ],
+      "status": "proposed",
+      "transform": "trim; date-parse founded_on"
+    },
+    {
+      "canonical": "Funding{total,rounds,last_type,last_at}",
+      "evidence": "funding_* columns",
+      "sources": [
+        "funding_total",
+        "num_funding_rounds",
+        "last_funding_type",
+        "last_funding_at"
+      ],
+      "status": "proposed",
+      "transform": "numeric/date parse"
+    },
+    {
+      "canonical": "External IDs (provenance)",
+      "evidence": "record identity",
+      "sources": [
+        "id",
+        "permalink",
+        "created_at"
+      ],
+      "status": "proposed",
+      "transform": "carry verbatim"
+    }
+  ],
+  "entity_override": {
+    "from": "person (0.9 heuristic via name->full_name)",
+    "reason": "name values are organizations; founders/company_type/employees/funding present; no first/last-name columns",
+    "to": "company (0.85)"
+  },
+  "est_rows": 707492,
+  "evidence_block": [
+    "semrush_*",
+    "apptopia_*",
+    "hub_tags",
+    "growth_insight_*",
+    "investor_insight_*",
+    "num_investors/exits/acquisitions/investments/lead_*",
+    "listed_stock_symbol"
+  ],
+  "family": "E-crunchbase",
+  "founders": "founder name list -> future person-seed queue, NOT auto-created persons",
+  "approver": "user",
+  "date": "2026-09-08",
+  "ambiguity_resolutions": {
+    "A1_website_conflicts": "corporate-site-wins after same-host check; loser to evidence",
+    "A2_mystery_columns": "inspect values at transform; map or document-drop",
+    "A3_backup_emails": "ordered fallback evidence; primary stays canonical Email",
+    "A4_duplicate_pair": "closed: apollo (5)...(1)_CATEGORIZED.csv excluded (SHA-verified), raw preserved",
+    "A5_cross_file_overlap": "dedupe analysis report-only at Stage C; no merges/deletes",
+    "campaign_engagement": "DEFERRED per user 2026-09-08; carried inert, revisit at live-activity stage"
+  }
+}

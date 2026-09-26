@@ -50,7 +50,9 @@ export function ChatHistoryPanel() {
               onClick={() => {
                 navigate({
                   to: "/discover",
-                  search: { q: h.query },
+                  search: (h as any).conversation_id
+                    ? { conversation: (h as any).conversation_id as string }
+                    : { q: h.query },
                 });
               }}
               className="w-full flex gap-3 text-left p-3 rounded-xl hover:bg-sidebar-accent/40 transition-colors group cursor-pointer"

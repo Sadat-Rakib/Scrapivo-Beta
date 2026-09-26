@@ -1,0 +1,175 @@
+{
+  "key": "6.csv",
+  "entity": "person",
+  "rows": 32096,
+  "required_fields": [
+    "Name",
+    "Company",
+    "Title",
+    "Email",
+    "Phone",
+    "Website",
+    "Social(any)",
+    "Location"
+  ],
+  "absent_columns": [],
+  "complete": 27375,
+  "incomplete": 4721,
+  "complete_pct": 85.3,
+  "missing_counts": {
+    "Phone": 984,
+    "Social(any)": 1533,
+    "Location": 267,
+    "Email": 2669,
+    "Website": 12,
+    "Name": 3,
+    "Company": 21,
+    "Title": 21
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Email"
+      ],
+      "rows": 2444
+    },
+    {
+      "missing": [
+        "Social(any)"
+      ],
+      "rows": 930
+    },
+    {
+      "missing": [
+        "Phone"
+      ],
+      "rows": 440
+    },
+    {
+      "missing": [
+        "Phone",
+        "Social(any)"
+      ],
+      "rows": 390
+    },
+    {
+      "missing": [
+        "Location"
+      ],
+      "rows": 235
+    },
+    {
+      "missing": [
+        "Email",
+        "Social(any)"
+      ],
+      "rows": 95
+    },
+    {
+      "missing": [
+        "Email",
+        "Phone",
+        "Social(any)"
+      ],
+      "rows": 66
+    },
+    {
+      "missing": [
+        "Email",
+        "Phone"
+      ],
+      "rows": 51
+    },
+    {
+      "missing": [
+        "Company",
+        "Phone",
+        "Social(any)",
+        "Title"
+      ],
+      "rows": 19
+    },
+    {
+      "missing": [
+        "Email",
+        "Location"
+      ],
+      "rows": 9
+    },
+    {
+      "missing": [
+        "Social(any)",
+        "Website"
+      ],
+      "rows": 9
+    },
+    {
+      "missing": [
+        "Location",
+        "Phone",
+        "Social(any)"
+      ],
+      "rows": 8
+    },
+    {
+      "missing": [
+        "Location",
+        "Social(any)"
+      ],
+      "rows": 7
+    },
+    {
+      "missing": [
+        "Location",
+        "Phone"
+      ],
+      "rows": 5
+    },
+    {
+      "missing": [
+        "Email",
+        "Location",
+        "Social(any)"
+      ],
+      "rows": 3
+    },
+    {
+      "missing": [
+        "Phone",
+        "Social(any)",
+        "Website"
+      ],
+      "rows": 2
+    },
+    {
+      "missing": [
+        "Company",
+        "Phone",
+        "Social(any)"
+      ],
+      "rows": 2
+    },
+    {
+      "missing": [
+        "Title"
+      ],
+      "rows": 2
+    },
+    {
+      "missing": [
+        "Website"
+      ],
+      "rows": 1
+    },
+    {
+      "missing": [
+        "Email",
+        "Name",
+        "Phone",
+        "Social(any)"
+      ],
+      "rows": 1
+    }
+  ],
+  "people_bonus_rows": 0
+}

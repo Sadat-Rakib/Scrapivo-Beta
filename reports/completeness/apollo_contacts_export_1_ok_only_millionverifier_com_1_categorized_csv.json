@@ -1,0 +1,38 @@
+{
+  "key": "apollo-contacts-export (1)_OK_ONLY_MILLIONVERIFIER.COM (1)_CATEGORIZED.csv",
+  "entity": "person",
+  "rows": 12665,
+  "required_fields": [
+    "Name",
+    "Company",
+    "Title",
+    "Email",
+    "Phone",
+    "Website",
+    "Social(any)",
+    "Location"
+  ],
+  "absent_columns": [],
+  "complete": 11084,
+  "incomplete": 1581,
+  "complete_pct": 87.5,
+  "missing_counts": {
+    "Phone": 1580,
+    "Name": 1
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Phone"
+      ],
+      "rows": 1580
+    },
+    {
+      "missing": [
+        "Name"
+      ],
+      "rows": 1
+    }
+  ],
+  "people_bonus_rows": 0
+}

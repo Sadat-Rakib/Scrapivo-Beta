@@ -1,0 +1,365 @@
+{
+  "key": "crunchbase_700k-800k.csv",
+  "size": 59125094,
+  "last_modified": "2026-09-08 00:12:15+00:00",
+  "columns": [
+    "id",
+    "created_at",
+    "name",
+    "short_description",
+    "semrush_global_rank",
+    "semrush_visits_latest_month",
+    "num_investors",
+    "funding_total",
+    "num_exits",
+    "num_funding_rounds",
+    "last_funding_type",
+    "last_funding_at",
+    "num_acquisitions",
+    "apptopia_total_apps",
+    "apptopia_total_downloads",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "num_investments",
+    "num_lead_investments",
+    "num_lead_investors",
+    "listed_stock_symbol",
+    "company_type",
+    "hub_tags",
+    "operating_status",
+    "founded_on",
+    "categories",
+    "founders",
+    "website",
+    "ipo_status",
+    "num_employees_enum",
+    "locations",
+    "growth_insight_description",
+    "growth_insight_indicator",
+    "growth_insight_direction",
+    "growth_insight_confidence",
+    "investor_insight_description",
+    "permalink",
+    "url"
+  ],
+  "row_count": 100000,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "id": "other",
+    "created_at": "other",
+    "name": "full_name",
+    "short_description": "descriptive",
+    "semrush_global_rank": "other",
+    "semrush_visits_latest_month": "other",
+    "num_investors": "other",
+    "funding_total": "other",
+    "num_exits": "other",
+    "num_funding_rounds": "other",
+    "last_funding_type": "other",
+    "last_funding_at": "other",
+    "num_acquisitions": "other",
+    "apptopia_total_apps": "other",
+    "apptopia_total_downloads": "other",
+    "contact_email": "email",
+    "phone_number": "phone",
+    "facebook": "social",
+    "linkedin": "linkedin",
+    "twitter": "social",
+    "num_investments": "other",
+    "num_lead_investments": "other",
+    "num_lead_investors": "other",
+    "listed_stock_symbol": "other",
+    "company_type": "company",
+    "hub_tags": "other",
+    "operating_status": "other",
+    "founded_on": "other",
+    "categories": "other",
+    "founders": "other",
+    "website": "website",
+    "ipo_status": "other",
+    "num_employees_enum": "employees",
+    "locations": "other",
+    "growth_insight_description": "descriptive",
+    "growth_insight_indicator": "other",
+    "growth_insight_direction": "other",
+    "growth_insight_confidence": "other",
+    "investor_insight_description": "descriptive",
+    "permalink": "other",
+    "url": "website"
+  },
+  "missing_pct": {
+    "id": 0.0,
+    "created_at": 0.0,
+    "name": 0.0,
+    "short_description": 0.0,
+    "semrush_global_rank": 63.5,
+    "semrush_visits_latest_month": 63.5,
+    "num_investors": 94.1,
+    "funding_total": 94.3,
+    "num_exits": 99.8,
+    "num_funding_rounds": 92.8,
+    "last_funding_type": 92.8,
+    "last_funding_at": 92.5,
+    "num_acquisitions": 98.7,
+    "apptopia_total_apps": 95.2,
+    "apptopia_total_downloads": 98.7,
+    "contact_email": 25.6,
+    "phone_number": 17.3,
+    "facebook": 44.2,
+    "linkedin": 24.3,
+    "twitter": 63.6,
+    "num_investments": 99.6,
+    "num_lead_investments": 99.9,
+    "num_lead_investors": 96.6,
+    "listed_stock_symbol": 99.8,
+    "company_type": 2.7,
+    "hub_tags": 99.9,
+    "operating_status": 0.0,
+    "founded_on": 16.7,
+    "categories": 4.1,
+    "founders": 83.3,
+    "website": 4.8,
+    "ipo_status": 2.5,
+    "num_employees_enum": 15.6,
+    "locations": 5.8,
+    "growth_insight_description": 98.7,
+    "growth_insight_indicator": 98.7,
+    "growth_insight_direction": 99.3,
+    "growth_insight_confidence": 99.3,
+    "investor_insight_description": 98.9,
+    "permalink": 0.0,
+    "url": 0.0
+  },
+  "samples": {
+    "id": [
+      "3a3a6529-df50-4615-85f8-824ebedec16a",
+      "d9489e5f-fcc6-4a05-9873-cd39de1ca343",
+      "90962a5d-ad92-4353-b3c1-17006ed71d61"
+    ],
+    "created_at": [
+      "2024-08-17 17:42:11.741391+00",
+      "2024-08-17 17:42:11.741391+00",
+      "2024-08-17 17:42:11.741391+00"
+    ],
+    "name": [
+      "Dysautonomia Support South Africa",
+      "Dysave Desatascos",
+      "Dysco"
+    ],
+    "short_description": [
+      "Dysave Desatascos is a waste management company.",
+      "Dysco is a platform to showcase work for people of all industries and professions.",
+      "Dyscover all the best deals around you and get them delivered to your doorstep within hours!"
+    ],
+    "contact_email": [
+      "info@dysautonomia-support-sa.org.za",
+      "info@dysavedesatascos.com",
+      "galen@dyscover.me"
+    ],
+    "phone_number": [
+      "+27 71 642 5350",
+      "+34 0941 146 977",
+      "(541)525-0631"
+    ],
+    "facebook": [
+      "https://www.facebook.com/DysautonomiaSupportSouthAfrica",
+      "https://www.facebook.com/Dysave-2002-SL-413440018832833/",
+      "https://www.facebook.com/ruhrgetriebe"
+    ],
+    "linkedin": [
+      "https://www.linkedin.com/company/dysautonomia-support-south-africa",
+      "https://www.linkedin.com/company/dysco/",
+      "https://www.linkedin.com/company/ruhrgetriebe-kg"
+    ],
+    "twitter": [
+      "https://x.com/dysautonomiaza",
+      "https://twitter.com/dyshapp_",
+      "https://twitter.com/DyslexiaAction"
+    ],
+    "company_type": [
+      "non_profit",
+      "for_profit",
+      "for_profit"
+    ],
+    "operating_status": [
+      "active",
+      "active",
+      "active"
+    ],
+    "founded_on": [
+      "2018-01-01",
+      "2006-01-01",
+      "2016-01-01"
+    ],
+    "categories": [
+      "Advocacy, Non Profit, Social",
+      "Industrial, Recycling, Waste Management",
+      "Internet, Professional Networking"
+    ],
+    "website": [
+      "https://dysautonomia-support-sa.org.za",
+      "https://dysavedesatascos.com",
+      "http://dyscoapp.com"
+    ],
+    "ipo_status": [
+      "private",
+      "private",
+      "private"
+    ],
+    "num_employees_enum": [
+      "c_00001_00010",
+      "c_00001_00010",
+      "c_00001_00010"
+    ],
+    "locations": [
+      "Europe, Middle East, and Africa (EMEA)",
+      "European Union (EU), Europe, Middle East, and Africa (EMEA)",
+      "Asia-Pacific (APAC)"
+    ],
+    "permalink": [
+      "dysautonomia-support-south-africa",
+      "dysave-desatascos",
+      "dysco"
+    ],
+    "url": [
+      "https://www.crunchbase.com/organization/dysautonomia-support-south-africa",
+      "https://www.crunchbase.com/organization/dysave-desatascos",
+      "https://www.crunchbase.com/organization/dysco"
+    ],
+    "apptopia_total_apps": [
+      "1",
+      "1",
+      "1"
+    ],
+    "founders": [
+      "Khrisha Shah, Mishal Shah",
+      "Nikhil Raj, Rohit Vineet, Sharique Samsudheen",
+      "Galen Mittermann"
+    ],
+    "num_investors": [
+      "1",
+      "7",
+      "1"
+    ],
+    "num_funding_rounds": [
+      "1",
+      "2",
+      "2"
+    ],
+    "last_funding_type": [
+      "seed",
+      "seed",
+      "pre_seed"
+    ],
+    "last_funding_at": [
+      "2014-01-01",
+      "2016-02-10",
+      "2021-02-22"
+    ],
+    "semrush_global_rank": [
+      "15928147",
+      "14720682",
+      "7114413"
+    ],
+    "semrush_visits_latest_month": [
+      "1",
+      "37",
+      "890"
+    ],
+    "funding_total": [
+      "50000",
+      "0",
+      "421057"
+    ],
+    "num_lead_investors": [
+      "1",
+      "2",
+      "4"
+    ],
+    "growth_insight_description": [
+      "D’Ieteren Group reported a significant financial gain due to the performance of its subsidiary, Belron.",
+      "E & J Gallo Winery entered the beer category through a strategic investment in Montucky Cold Snacks.",
+      "E Tech Group received new investment from Graham Partners, setting the stage for continued growth and innovation."
+    ],
+    "growth_insight_indicator": [
+      "growing",
+      "growing",
+      "growing"
+    ],
+    "num_exits": [
+      "2",
+      "5",
+      "5"
+    ],
+    "num_acquisitions": [
+      "2",
+      "1",
+      "1"
+    ],
+    "apptopia_total_downloads": [
+      "359007",
+      "183",
+      "10"
+    ],
+    "num_investments": [
+      "2",
+      "14",
+      "1"
+    ],
+    "investor_insight_description": [],
+    "growth_insight_direction": [
+      "c400_growing",
+      "c400_growing",
+      "c400_growing"
+    ],
+    "growth_insight_confidence": [
+      "c400_high",
+      "c400_high",
+      "c300_medium"
+    ],
+    "listed_stock_symbol": [
+      "NSE:EFACTOR",
+      "TSX:EINC",
+      "FRA:K2I"
+    ],
+    "num_lead_investments": [
+      "2",
+      "4",
+      "1"
+    ],
+    "hub_tags": [
+      "cbvp",
+      "cbvp",
+      "unicorn"
+    ]
+  },
+  "validity": {
+    "contact_email": "3/3 valid-shape",
+    "phone_number": "3/3 valid-shape"
+  },
+  "entity": "company",
+  "entity_confidence": 0.85,
+  "entity_why": "value-checked override: name=organization name; founders/company_type/num_employees_enum/funding/ipo_status present; no person first/last-name columns",
+  "social_cols": [
+    "facebook",
+    "linkedin",
+    "twitter",
+    "website",
+    "url"
+  ],
+  "activity_match_keys": [
+    "name",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "company_type",
+    "website",
+    "url"
+  ]
+}

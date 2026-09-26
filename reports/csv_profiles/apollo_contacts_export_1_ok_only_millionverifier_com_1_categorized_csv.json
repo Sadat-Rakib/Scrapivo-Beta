@@ -1,0 +1,176 @@
+{
+  "key": "apollo-contacts-export (1)_OK_ONLY_MILLIONVERIFIER.COM (1)_CATEGORIZED.csv",
+  "size": 20091863,
+  "last_modified": "2026-09-08 00:12:13+00:00",
+  "columns": [
+    "First Name",
+    "Last Name",
+    "Title",
+    "Comp name",
+    "Website",
+    "Email",
+    "Phone",
+    "Comp Phone",
+    "Employees",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter",
+    "Country",
+    "Industry",
+    "Tech Used",
+    "Keywords",
+    "SEO Description"
+  ],
+  "row_count": 12665,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "First Name": "first_name",
+    "Last Name": "last_name",
+    "Title": "title",
+    "Comp name": "other",
+    "Website": "website",
+    "Email": "email",
+    "Phone": "phone",
+    "Comp Phone": "phone",
+    "Employees": "employees",
+    "Pers Linkedin": "linkedin",
+    "Comp Linkedin": "linkedin",
+    "Facebook": "social",
+    "Twitter": "social",
+    "Country": "country",
+    "Industry": "industry",
+    "Tech Used": "tech",
+    "Keywords": "descriptive",
+    "SEO Description": "descriptive"
+  },
+  "missing_pct": {
+    "First Name": 0.0,
+    "Last Name": 0.2,
+    "Title": 0.0,
+    "Comp name": 0.0,
+    "Website": 0.0,
+    "Email": 0.0,
+    "Phone": 100.0,
+    "Comp Phone": 13.4,
+    "Employees": 0.1,
+    "Pers Linkedin": 0.0,
+    "Comp Linkedin": 0.1,
+    "Facebook": 40.4,
+    "Twitter": 61.0,
+    "Country": 0.0,
+    "Industry": 0.8,
+    "Tech Used": 0.4,
+    "Keywords": 1.7,
+    "SEO Description": 100.0
+  },
+  "samples": {
+    "First Name": [
+      "Nick",
+      "Frank",
+      "Karen"
+    ],
+    "Last Name": [
+      "Jooma",
+      "Adell",
+      "Costa"
+    ],
+    "Title": [
+      "Chief Executive Officer",
+      "Owner",
+      "Founder/CEO/Psychotherapist"
+    ],
+    "Comp name": [
+      "Infinite Allergy Labs",
+      "Pharmaco-Kinesis Corporation",
+      "BROOKLYN PSYCHOTHERAPY"
+    ],
+    "Website": [
+      "https://infiniteallergylabs.com",
+      "https://pharmaco-kinesis.com",
+      "https://brooklynpsychotherapy.org"
+    ],
+    "Email": [
+      "njooma@infiniteallergylabs.com",
+      "frank.adell@pharmaco-kinesis.com",
+      "karen@brooklynpsychotherapy.org"
+    ],
+    "Comp Phone": [
+      "'+1 678-905-1495",
+      "'+1 310-641-2700",
+      "'+1 347-474-8464"
+    ],
+    "Employees": [
+      "19",
+      "12",
+      "37"
+    ],
+    "Pers Linkedin": [
+      "http://www.linkedin.com/in/nick-jooma-b6b9b029",
+      "http://www.linkedin.com/in/frank-adell-b9355026",
+      "http://www.linkedin.com/in/karen-costa-2b8a8180"
+    ],
+    "Comp Linkedin": [
+      "http://www.linkedin.com/company/infinite-wellness-labs",
+      "http://www.linkedin.com/company/pharmaco-kinesis-corporation",
+      "http://www.linkedin.com/company/brooklyn-psychotherapy-lcsw-pc"
+    ],
+    "Country": [
+      "United States",
+      "United States",
+      "United States"
+    ],
+    "Industry": [
+      "health, wellness & fitness",
+      "medical devices",
+      "mental health care"
+    ],
+    "Tech Used": [
+      "Outlook, Remote",
+      "Outlook, Blue Host, Microsoft Office 365, Google Cloud Hosting, Varnish, , Remote",
+      "Outlook, Microsoft Office 365, reCAPTCHA, Mobile Friendly, WordPress.org, Google Font API, Remote"
+    ],
+    "Keywords": [
+      "medicare supplements, employee benefits, individual & family health insurance",
+      "food, health markets, specialty food",
+      "business insurance, life insurance, home insurance, insurance advice, auto insurance, medicare supplements, b2b"
+    ],
+    "Facebook": [
+      "https://facebook.com/pharmacokinesis",
+      "https://facebook.com/gotinyhealth/",
+      "https://www.facebook.com/SIHCinc"
+    ],
+    "Twitter": [
+      "https://twitter.com/pharmacokinesis",
+      "https://twitter.com/GetTinyHealth",
+      "https://twitter.com/ruckus_games"
+    ]
+  },
+  "validity": {
+    "Email": "3/3 valid-shape",
+    "Comp Phone": "3/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Website",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter"
+  ],
+  "activity_match_keys": [
+    "First Name",
+    "Last Name",
+    "Website",
+    "Email",
+    "Phone",
+    "Comp Phone",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter"
+  ]
+}

@@ -1,0 +1,337 @@
+{
+  "seed": 9172981,
+  "holdout": [
+    {
+      "id": "h000a",
+      "prompt": "wind turbine technicians who serve farriers in Saskatoon",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "location": "saskatoon"
+      },
+      "pairWith": "h000b"
+    },
+    {
+      "id": "h000b",
+      "prompt": "farriers in Saskatoon who need a wind turbine technician",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "needs_service",
+        "object": "wind turbine technician",
+        "location": "saskatoon"
+      },
+      "pairWith": "h000a"
+    },
+    {
+      "id": "h002a",
+      "prompt": "agronomists looking for clients",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_client"
+      },
+      "pairWith": "h002b"
+    },
+    {
+      "id": "h002b",
+      "prompt": "businesses looking for agronomists",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "business",
+          "company"
+        ],
+        "relation": "needs_service",
+        "object": "agronomist"
+      },
+      "pairWith": "h002a"
+    },
+    {
+      "id": "h004a",
+      "prompt": "investors funding aquaculture startups in Maribor",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "investor",
+        "location": "maribor"
+      },
+      "pairWith": "h004b"
+    },
+    {
+      "id": "h004b",
+      "prompt": "aquaculture startups in Maribor raising money",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "seeking_funding",
+        "location": "maribor"
+      },
+      "pairWith": "h004a"
+    },
+    {
+      "id": "h006",
+      "prompt": "piano tuners within 50 km of Arequipa",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "arequipa",
+        "location_scope": "within_radius",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity_radius"
+    },
+    {
+      "id": "h007",
+      "prompt": "I need at least 25 hydroponic farms in Leuven",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "quantity_min": 25,
+        "location": "leuven"
+      },
+      "note": "quantity_minimum"
+    },
+    {
+      "id": "h008",
+      "prompt": "orthodontists in Salta looking for clients",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_client",
+        "location": "salta"
+      },
+      "note": "seeking_client"
+    },
+    {
+      "id": "h009",
+      "prompt": "give me 30 cider houses in Enschede",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "quantity": 30,
+        "location": "enschede",
+        "relation": "none"
+      },
+      "note": "quantity_exact"
+    },
+    {
+      "id": "h010",
+      "prompt": "clinical psychologists attending Mobile World Congress",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": [
+          "attending_event",
+          "custom"
+        ]
+      },
+      "note": "attending_event"
+    },
+    {
+      "id": "h011",
+      "prompt": "roasteries in Enschede",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "task_type": "lead_discovery",
+        "prospecting_mode": "fit_based",
+        "relation": "none",
+        "location": "enschede",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity"
+    },
+    {
+      "id": "h012",
+      "prompt": "orthodontist job postings in Turku from the last month",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "task_type": "job_discovery",
+        "prospecting_mode": "job_based",
+        "entity_type": "job",
+        "relation": "none",
+        "location": "turku",
+        "temporal": true
+      },
+      "note": "jobs"
+    },
+    {
+      "id": "h013",
+      "prompt": "sports clubs in Ann Arbor that need grant writing",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "entity_type": [
+          "organization",
+          "business",
+          "company",
+          "other"
+        ],
+        "relation": "needs_service",
+        "location": "ann arbor"
+      },
+      "note": "organization"
+    },
+    {
+      "id": "h014",
+      "prompt": "give me 40 optometrists in Mombasa",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "quantity": 40,
+        "location": "mombasa",
+        "relation": "none"
+      },
+      "note": "quantity_exact"
+    },
+    {
+      "id": "h015",
+      "prompt": "freelance quantity surveyors under $200/hour, excluding Trois-Rivières",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "no_location": true,
+        "negated": [
+          "location"
+        ]
+      },
+      "note": "excluded_location"
+    },
+    {
+      "id": "h016",
+      "prompt": "Give me 100 optometrists in Inverness, phone number required, Instagram if possible, verify they are currently open, and output a table I can paste into Notion",
+      "set": "holdout",
+      "size": "large",
+      "expect": {
+        "location": "inverness",
+        "quantity": 100,
+        "required_fields": [
+          "phone"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ],
+        "min_verification": 1
+      },
+      "note": "long_form"
+    },
+    {
+      "id": "h017",
+      "prompt": "hospitals in Curitiba that need patent drafting",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "organization",
+          "business",
+          "company",
+          "other"
+        ],
+        "relation": "needs_service",
+        "location": "curitiba"
+      },
+      "note": "organization"
+    },
+    {
+      "id": "h018",
+      "prompt": "wind turbine technicians in Curitiba looking for clients",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_client",
+        "location": "curitiba"
+      },
+      "note": "seeking_client"
+    },
+    {
+      "id": "h019",
+      "prompt": "saunas in Tulsa",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "task_type": "lead_discovery",
+        "prospecting_mode": "fit_based",
+        "relation": "none",
+        "location": "tulsa",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity"
+    },
+    {
+      "id": "h020",
+      "prompt": "give me 30 roasteries in Napier",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "quantity": 30,
+        "location": "napier",
+        "relation": "none"
+      },
+      "note": "quantity_exact"
+    },
+    {
+      "id": "h021",
+      "prompt": "agronomists attending Anuga",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "entity_type": "person",
+        "relation": [
+          "attending_event",
+          "custom"
+        ]
+      },
+      "note": "attending_event"
+    },
+    {
+      "id": "h022",
+      "prompt": "companies in Maribor using Zoho",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "uses_technology",
+        "object": "zoho",
+        "location": "maribor"
+      },
+      "note": "uses_technology"
+    },
+    {
+      "id": "h023",
+      "prompt": "I'm selling patent drafting to small firms. Find me 100+ piano tuners in Windhoek that don't have a real website, phone required, socials if possible, verify they exist, and give me a table plus outreach drafts.",
+      "set": "holdout",
+      "size": "large",
+      "expect": {
+        "prospecting_mode": "opportunity_based",
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "windhoek",
+        "quantity_min": 100,
+        "user_selling": "patent drafting",
+        "required_fields": [
+          "phone"
+        ],
+        "min_verification": 1,
+        "output": [
+          "table",
+          "outreach_drafts"
+        ]
+      },
+      "note": "long_form_opportunity"
+    }
+  ],
+  "chaos": []
+}

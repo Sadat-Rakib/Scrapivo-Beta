@@ -1,0 +1,365 @@
+{
+  "key": "crunchbase_2.3m-2.4m.csv",
+  "size": 59086754,
+  "last_modified": "2026-09-08 00:12:14+00:00",
+  "columns": [
+    "id",
+    "created_at",
+    "name",
+    "short_description",
+    "semrush_global_rank",
+    "semrush_visits_latest_month",
+    "num_investors",
+    "funding_total",
+    "num_exits",
+    "num_funding_rounds",
+    "last_funding_type",
+    "last_funding_at",
+    "num_acquisitions",
+    "apptopia_total_apps",
+    "apptopia_total_downloads",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "num_investments",
+    "num_lead_investments",
+    "num_lead_investors",
+    "listed_stock_symbol",
+    "company_type",
+    "hub_tags",
+    "operating_status",
+    "founded_on",
+    "categories",
+    "founders",
+    "website",
+    "ipo_status",
+    "num_employees_enum",
+    "locations",
+    "growth_insight_description",
+    "growth_insight_indicator",
+    "growth_insight_direction",
+    "growth_insight_confidence",
+    "investor_insight_description",
+    "permalink",
+    "url"
+  ],
+  "row_count": 100000,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "id": "other",
+    "created_at": "other",
+    "name": "full_name",
+    "short_description": "descriptive",
+    "semrush_global_rank": "other",
+    "semrush_visits_latest_month": "other",
+    "num_investors": "other",
+    "funding_total": "other",
+    "num_exits": "other",
+    "num_funding_rounds": "other",
+    "last_funding_type": "other",
+    "last_funding_at": "other",
+    "num_acquisitions": "other",
+    "apptopia_total_apps": "other",
+    "apptopia_total_downloads": "other",
+    "contact_email": "email",
+    "phone_number": "phone",
+    "facebook": "social",
+    "linkedin": "linkedin",
+    "twitter": "social",
+    "num_investments": "other",
+    "num_lead_investments": "other",
+    "num_lead_investors": "other",
+    "listed_stock_symbol": "other",
+    "company_type": "company",
+    "hub_tags": "other",
+    "operating_status": "other",
+    "founded_on": "other",
+    "categories": "other",
+    "founders": "other",
+    "website": "website",
+    "ipo_status": "other",
+    "num_employees_enum": "employees",
+    "locations": "other",
+    "growth_insight_description": "descriptive",
+    "growth_insight_indicator": "other",
+    "growth_insight_direction": "other",
+    "growth_insight_confidence": "other",
+    "investor_insight_description": "descriptive",
+    "permalink": "other",
+    "url": "website"
+  },
+  "missing_pct": {
+    "id": 0.0,
+    "created_at": 0.0,
+    "name": 0.0,
+    "short_description": 0.1,
+    "semrush_global_rank": 59.5,
+    "semrush_visits_latest_month": 59.5,
+    "num_investors": 87.2,
+    "funding_total": 87.5,
+    "num_exits": 99.9,
+    "num_funding_rounds": 84.0,
+    "last_funding_type": 84.0,
+    "last_funding_at": 83.9,
+    "num_acquisitions": 97.7,
+    "apptopia_total_apps": 91.0,
+    "apptopia_total_downloads": 97.5,
+    "contact_email": 25.9,
+    "phone_number": 25.0,
+    "facebook": 38.6,
+    "linkedin": 23.4,
+    "twitter": 51.1,
+    "num_investments": 99.5,
+    "num_lead_investments": 99.8,
+    "num_lead_investors": 91.6,
+    "listed_stock_symbol": 99.5,
+    "company_type": 2.7,
+    "hub_tags": 99.7,
+    "operating_status": 0.0,
+    "founded_on": 16.1,
+    "categories": 4.1,
+    "founders": 71.0,
+    "website": 4.0,
+    "ipo_status": 2.2,
+    "num_employees_enum": 14.2,
+    "locations": 6.5,
+    "growth_insight_description": 96.5,
+    "growth_insight_indicator": 96.5,
+    "growth_insight_direction": 98.3,
+    "growth_insight_confidence": 98.3,
+    "investor_insight_description": 99.0,
+    "permalink": 0.0,
+    "url": 0.0
+  },
+  "samples": {
+    "id": [
+      "ed7e348f-0b9b-c5ac-2593-06d9d83b1869",
+      "5a7e1f34-f999-4871-9cfb-95307ce5f5f7",
+      "5e8433d6-e936-4629-a31f-fc501c8b3c9a"
+    ],
+    "created_at": [
+      "2024-08-22 19:58:15.525936+00",
+      "2024-08-22 19:58:15.525936+00",
+      "2024-08-22 19:58:15.525936+00"
+    ],
+    "name": [
+      "SpesNet Pte. Ltd.",
+      "Spesa Marche",
+      "Spesafacile"
+    ],
+    "short_description": [
+      "SpesNet specialises in the streamlining of processes linking funders with healthcare professionals.",
+      "Spesa Marche is an online store that offers cured meats, cheeses, olives, olive oil, wine, liqueurs, and truffles.",
+      "Spesafacile is an online grocery store."
+    ],
+    "contact_email": [
+      "healthcare@spesnet.co.za",
+      "info@spesamarche.it",
+      "info@spesafacile.com"
+    ],
+    "phone_number": [
+      "012 683 0340",
+      "+39 0736 254378",
+      "+39 02 8362 6709"
+    ],
+    "num_investments": [
+      "2",
+      "1",
+      "1"
+    ],
+    "num_lead_investments": [
+      "2",
+      "1",
+      "1"
+    ],
+    "company_type": [
+      "for_profit",
+      "for_profit",
+      "for_profit"
+    ],
+    "operating_status": [
+      "active",
+      "active",
+      "active"
+    ],
+    "founded_on": [
+      "2010-01-01",
+      "2013-01-01",
+      "2020-01-01"
+    ],
+    "categories": [
+      "Health Care, Information Technology",
+      "E-Commerce, Food and Beverage, Shopping",
+      "E-Commerce, Internet, Publishing"
+    ],
+    "website": [
+      "http://www.spesnet.co.za",
+      "http://www.spesamarche.it",
+      "https://www.spesafacile.com/"
+    ],
+    "ipo_status": [
+      "private",
+      "private",
+      "private"
+    ],
+    "num_employees_enum": [
+      "c_00051_00100",
+      "c_00011_00050",
+      "c_00011_00050"
+    ],
+    "locations": [
+      "Europe, Middle East, and Africa (EMEA)",
+      "European Union (EU), Europe, Middle East, and Africa (EMEA)",
+      "European Union (EU), Europe, Middle East, and Africa (EMEA)"
+    ],
+    "permalink": [
+      "spesnet-pte-ltd",
+      "spesa-marche",
+      "spesafacile"
+    ],
+    "url": [
+      "https://www.crunchbase.com/organization/spesnet-pte-ltd",
+      "https://www.crunchbase.com/organization/spesa-marche",
+      "https://www.crunchbase.com/organization/spesafacile"
+    ],
+    "facebook": [
+      "https://www.facebook.com/spesamarche",
+      "https://www.facebook.com/spesafacile.co",
+      "https://www.facebook.com/spesasicura"
+    ],
+    "linkedin": [
+      "https://www.linkedin.com/company/spesa-marche/",
+      "https://www.linkedin.com/company/spesafacile/",
+      "https://www.linkedin.com/company/spesanaco"
+    ],
+    "twitter": [
+      "https://twitter.com/spesamarche",
+      "https://twitter.com/spesafacile",
+      "https://twitter.com/SpesanaCo"
+    ],
+    "funding_total": [
+      "100000",
+      "350000",
+      "100000"
+    ],
+    "num_funding_rounds": [
+      "1",
+      "1",
+      "1"
+    ],
+    "last_funding_type": [
+      "seed",
+      "debt_financing",
+      "seed"
+    ],
+    "last_funding_at": [
+      "2021-02-01",
+      "2022-05-27",
+      "2017-12-15"
+    ],
+    "apptopia_total_apps": [
+      "2",
+      "1",
+      "1"
+    ],
+    "apptopia_total_downloads": [
+      "10",
+      "128",
+      "30706"
+    ],
+    "founders": [
+      "Carla Balch",
+      "Christopher Slatt, Yahor Shadryn",
+      "Benjamin Manford, Kingsley Mensah"
+    ],
+    "growth_insight_description": [
+      "Sphere 3D upgraded its fleet and mined 20.4 Bitcoin in June.",
+      "Spherity secured €2.5 million to advance decentralised identity management on a global scale.",
+      "Spiber Inc. raised over JPY 10 billion in funding to strengthen its mass production and sales initiatives."
+    ],
+    "growth_insight_indicator": [
+      "growing",
+      "growing",
+      "growing"
+    ],
+    "semrush_global_rank": [
+      "2129976",
+      "5266147",
+      "9073382"
+    ],
+    "semrush_visits_latest_month": [
+      "9534",
+      "1463",
+      "35"
+    ],
+    "num_investors": [
+      "1",
+      "4",
+      "1"
+    ],
+    "hub_tags": [
+      "cbvp",
+      "cbvp",
+      "unicorn"
+    ],
+    "investor_insight_description": [],
+    "num_lead_investors": [
+      "1",
+      "2",
+      "1"
+    ],
+    "num_acquisitions": [
+      "1",
+      "1",
+      "1"
+    ],
+    "growth_insight_direction": [
+      "c400_growing",
+      "c400_growing",
+      "c400_growing"
+    ],
+    "growth_insight_confidence": [
+      "c300_medium",
+      "c300_medium",
+      "c300_medium"
+    ],
+    "num_exits": [
+      "1",
+      "1",
+      "2"
+    ],
+    "listed_stock_symbol": [
+      "NASDAQ:ANY",
+      "TSXV:SFX",
+      "NSE:SPICEJET"
+    ]
+  },
+  "validity": {
+    "contact_email": "3/3 valid-shape",
+    "phone_number": "3/3 valid-shape"
+  },
+  "entity": "company",
+  "entity_confidence": 0.85,
+  "entity_why": "value-checked override: name=organization name; founders/company_type/num_employees_enum/funding/ipo_status present; no person first/last-name columns",
+  "social_cols": [
+    "facebook",
+    "linkedin",
+    "twitter",
+    "website",
+    "url"
+  ],
+  "activity_match_keys": [
+    "name",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "company_type",
+    "website",
+    "url"
+  ]
+}

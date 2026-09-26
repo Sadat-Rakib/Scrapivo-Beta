@@ -1,0 +1,50 @@
+import type { SpecRow } from "@/lib/spec-search.functions";
+import type { SearchSpec } from "./search-spec";
+import type { Qualification } from "./qualify";
+import { queryRequiredFields } from "./canonical-contract";
+import { missingRequiredFields } from "./completeness";
+
+export type ResearchNeed = "identity" | "role" | "company" | "industry" | "location" | "website" | "profile" | "contact" | "signal" | "topic" | "no_website_verification";
+export type ResearchStatus = "discovered" | "researching" | "ready_for_qualification" | "verified" | "exhausted" | "rejected";
+
+const requested = (spec: SearchSpec, field: string) => spec.criteria.some((criterion) => criterion.field === field);
+
+/** The next browser action follows the current qualification result and the user's required fields. */
+export function computeResearchNeeds(row: SpecRow, spec: SearchSpec, qualification: Qualification): ResearchNeed[] {
+  const destination = row.kind === "person" ? row.profile_url ?? row.website_url : row.kind === "job" ? row.apply_url : row.website_url;
+  const incomplete = missingRequiredFields({ ...row, url: destination ?? null });
+  const wantsPublicContact = /public contact details?/i.test(spec.raw_query) && !row.email && !row.phone && !row.contact_page_url;
+  if (qualification.disposition === "qualified" && incomplete.length === 0 && !wantsPublicContact) return [];
+  if (qualification.reject_code === "ENTITY_TYPE_MISMATCH" || qualification.reject_code === "LOCATION_MISMATCH") return [];
+  const needs: ResearchNeed[] = [];
+  const add = (need: ResearchNeed) => { if (!needs.includes(need)) needs.push(need); };
+  if (!row.entity_resolved || qualification.reject_code === "ENTITY_UNRESOLVED" || qualification.reject_code === "PROVISIONAL_ENTITY" || qualification.reject_code === "IDENTITY_AMBIGUOUS") add("identity");
+  if (row.kind === "person" || requested(spec, "role")) {
+    if (!row.role || ["EMPLOYMENT_UNPROVEN", "CURRENTNESS_MISMATCH", "ASSOCIATED_COMPANY_UNRESOLVED"].includes(qualification.reject_code ?? "")) add("role");
+    if (!row.company) add("company");
+  }
+  if (requested(spec, "industry") && !row.industry || requested(spec, "category") && !row.category) add("industry");
+  if (requested(spec, "location") && !row.location) add("location");
+  if (row.kind === "person") { if (!row.profile_url && !row.website_url) add("profile"); }
+  else if (row.kind === "job") { if (!row.apply_url) add("website"); }
+  else if (!row.website_url && !requested(spec, "opportunity")) add("website");
+  if (requested(spec, "opportunity") && spec.criteria.some((criterion) => criterion.field === "opportunity" && criterion.value === "no_website") && !row.website_url) add("no_website_verification");
+  const required = queryRequiredFields(spec);
+  if (required.some((field) => (field === "email" && !row.email) || (field === "phone" && !row.phone)) || wantsPublicContact) add("contact");
+  if (requested(spec, "content_topic") && qualification.reject_code === "NO_CLAIM_EVIDENCE") add("topic");
+  if (spec.signal_required && ["NO_CLAIM_EVIDENCE", "CLAIM_NOT_SUBJECT_BOUND"].includes(qualification.reject_code ?? "")) add("signal");
+  if (qualification.reject_code === "MISSING_QUERY_REQUIRED") for (const field of required) {
+    if (field === "email" || field === "phone") add("contact");
+    else if (field === "url") add(row.kind === "person" ? "profile" : "website");
+  }
+  if (qualification.reject_code === "NO_CLAIM_EVIDENCE" && needs.length === 0 && requested(spec, "opportunity")) add("no_website_verification");
+  return needs;
+}
+
+export function researchStatus(qualification: Qualification, needs: ResearchNeed[], exhausted = false): ResearchStatus {
+  if (qualification.disposition === "qualified" && needs.length === 0) return "verified";
+  if (["ENTITY_TYPE_MISMATCH", "LOCATION_MISMATCH"].includes(qualification.reject_code ?? "")) return "rejected";
+  if (qualification.reject_code === "CLAIM_PARAMETER_MISMATCH" && qualification.disposition === "dropped") return "rejected";
+  if (exhausted || needs.length === 0) return "exhausted";
+  return "researching";
+}

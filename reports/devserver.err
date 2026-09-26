@@ -1,0 +1,28 @@
+$ vite dev
+Error: Error transforming route file C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/routes/_authenticated/discover.tsx: SyntaxError: Unexpected token (693:6)
+    at file:///C:/Users/mirsa/OneDrive/Desktop/Scrapivo%20(2)/node_modules/@tanstack/router-generator/dist/esm/generator.js:127:13
+    at async generate (file:///C:/Users/mirsa/OneDrive/Desktop/Scrapivo%20(2)/node_modules/@tanstack/router-plugin/dist/esm/core/router-generator-plugin.js:38:4)
+    at async PluginContext.watchChange (file:///C:/Users/mirsa/OneDrive/Desktop/Scrapivo%20(2)/node_modules/@tanstack/router-plugin/dist/esm/core/router-generator-plugin.js:48:4)
+    at async Promise.all (index 1)
+    at async EnvironmentPluginContainer.hookParallel (file:///C:/Users/mirsa/OneDrive/Desktop/Scrapivo%20(2)/node_modules/vite/dist/node/chunks/config.js:28665:3)
+    at async EnvironmentPluginContainer.watchChange (file:///C:/Users/mirsa/OneDrive/Desktop/Scrapivo%20(2)/node_modules/vite/dist/node/chunks/config.js:28825:3)
+    at async Promise.all (index 0)
+    at async FSWatcher.<anonymous> (file:///C:/Users/mirsa/OneDrive/Desktop/Scrapivo%20(2)/node_modules/vite/dist/node/chunks/config.js:25582:3)
+Error: Error transforming route file C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/routes/_authenticated/discover.tsx: SyntaxError: Adjacent JSX elements must be wrapped in an enclosing tag. Did you want a JSX fragment <>...</>? (2155:8)
+    at file:///C:/Users/mirsa/OneDrive/Desktop/Scrapivo%20(2)/node_modules/@tanstack/router-generator/dist/esm/generator.js:127:13
+    at async generate (file:///C:/Users/mirsa/OneDrive/Desktop/Scrapivo%20(2)/node_modules/@tanstack/router-plugin/dist/esm/core/router-generator-plugin.js:38:4)
+    at async PluginContext.watchChange (file:///C:/Users/mirsa/OneDrive/Desktop/Scrapivo%20(2)/node_modules/@tanstack/router-plugin/dist/esm/core/router-generator-plugin.js:48:4)
+    at async Promise.all (index 1)
+    at async EnvironmentPluginContainer.hookParallel (file:///C:/Users/mirsa/OneDrive/Desktop/Scrapivo%20(2)/node_modules/vite/dist/node/chunks/config.js:28665:3)
+    at async EnvironmentPluginContainer.watchChange (file:///C:/Users/mirsa/OneDrive/Desktop/Scrapivo%20(2)/node_modules/vite/dist/node/chunks/config.js:28825:3)
+    at async Promise.all (index 0)
+    at async FSWatcher.<anonymous> (file:///C:/Users/mirsa/OneDrive/Desktop/Scrapivo%20(2)/node_modules/vite/dist/node/chunks/config.js:25582:3)
+Error: Error transforming route file C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/routes/_authenticated/discover.tsx: SyntaxError: Adjacent JSX elements must be wrapped in an enclosing tag. Did you want a JSX fragment <>...</>? (2154:8)
+    at file:///C:/Users/mirsa/OneDrive/Desktop/Scrapivo%20(2)/node_modules/@tanstack/router-generator/dist/esm/generator.js:127:13
+    at async generate (file:///C:/Users/mirsa/OneDrive/Desktop/Scrapivo%20(2)/node_modules/@tanstack/router-plugin/dist/esm/core/router-generator-plugin.js:38:4)
+    at async PluginContext.watchChange (file:///C:/Users/mirsa/OneDrive/Desktop/Scrapivo%20(2)/node_modules/@tanstack/router-plugin/dist/esm/core/router-generator-plugin.js:48:4)
+    at async Promise.all (index 1)
+    at async EnvironmentPluginContainer.hookParallel (file:///C:/Users/mirsa/OneDrive/Desktop/Scrapivo%20(2)/node_modules/vite/dist/node/chunks/config.js:28665:3)
+    at async EnvironmentPluginContainer.watchChange (file:///C:/Users/mirsa/OneDrive/Desktop/Scrapivo%20(2)/node_modules/vite/dist/node/chunks/config.js:28825:3)
+    at async Promise.all (index 0)
+    at async FSWatcher.<anonymous> (file:///C:/Users/mirsa/OneDrive/Desktop/Scrapivo%20(2)/node_modules/vite/dist/node/chunks/config.js:25582:3)

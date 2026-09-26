@@ -102,6 +102,13 @@ async function queryBusinesses(
     phone: checkPhone(b.phone, b.country ?? "").phone,
     phoneStatus: checkPhone(b.phone, b.country ?? "").status,
     url: b.website ?? null,
+    website_url: b.website ?? null,
+    // The indexed Overture record explicitly stores a null website field.
+    // Keep that structured fact as an unverified research seed only.
+    no_website_verification: opportunity === "no_website" && !b.website &&
+      typeof b.registry_key === "string" && b.registry_key.startsWith("overture:")
+      ? { structured_source_url: b.registry_key, structured_absence: true, exact_queries: [] }
+      : undefined,
     category: b.category ?? null,
     location: [b.city, b.region].filter(has).join(", ") || null,
     country: b.country ?? null,
@@ -204,15 +211,21 @@ async function queryPeople(
     .range(offset, offset + limit - 1);
   if (role) {
     const normalizedRole = normalizeRole(role);
-    // Loader collapses every founder/co-founder variant to exact `founder`.
-    // Equality uses the country+role index and avoids the measured statement
-    // timeout from `%founder%` plus quality sort. Other roles keep contained
-    // matching until their normalization families are backfilled.
-    q = normalizedRole === "founder"
+    // Country-scoped founder lookups use the country+role B-tree. Worldwide
+    // lookups use the role trigram index because the B-tree starts with country.
+    q = normalizedRole === "founder" && cc
       ? q.eq("role_norm", "founder")
       : q.ilike("role_norm", `%${normalizedRole.replace(/[%_]/g, "")}%`);
   }
-  if (industry) q = q.ilike("industry", `%${industry.replace(/[%_]/g, "").trim()}%`);
+  if (industry) {
+    const safeIndustry = industry.replace(/[%_,]/g, "").trim();
+    const industryTerms = /^saas$/i.test(safeIndustry)
+      ? ["saas", "software as a service"]
+      : [safeIndustry];
+    q = industryTerms.length > 1
+      ? q.or(industryTerms.map((term) => `industry.ilike.%${term}%`).join(","))
+      : q.ilike("industry", `%${safeIndustry}%`);
+  }
   if (cc) q = q.eq("country", cc);
   if (location && !COUNTRY_ISO[location.toLowerCase().trim()]) {
     q = q.eq("city_norm", normCityLookup(location));
@@ -286,6 +299,10 @@ function hasGeoPredicate(spec: SearchSpec): boolean {
   return normCityLookup(location).length > 0; // city query (hint or bare)
 }
 
+function hasSelectivePersonPredicate(spec: SearchSpec): boolean {
+  return !!(fieldOf(spec, "role") || fieldOf(spec, "industry"));
+}
+
 /**
  * Indexed counterpart to the S3 readers in runSpecSearchCore. Returns null
  * for entities with no index table (investor/job/unknown) AND for specs
@@ -301,10 +318,10 @@ export async function queryIndexForSpec(
   const required = new Set(queryRequiredFields(spec));
   const requireEmail = required.has("email");
   const requirePhone = required.has("phone");
-  if (
-    (spec.entity === "business" || spec.entity === "company" || spec.entity === "person") &&
-    !hasGeoPredicate(spec)
-  ) {
+  const geoBound = hasGeoPredicate(spec);
+  const unboundedDirectory = (spec.entity === "business" || spec.entity === "company") && !geoBound;
+  const unboundedPeople = spec.entity === "person" && !geoBound && !hasSelectivePersonPredicate(spec);
+  if (unboundedDirectory || unboundedPeople) {
     if (typeof console !== "undefined") {
       console.info(`[index-skip] index_skipped_unconstrained entity=${spec.entity}`);
     }

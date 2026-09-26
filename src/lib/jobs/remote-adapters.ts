@@ -171,6 +171,14 @@ export function ensureRemoteJobAdaptersRegistered(): void {
     },
   });
   registerJobSource({
+    id: "source-internshala",
+    label: "Internshala",
+    fetch: async (f) => {
+      const { fetchInternshalaJobs } = await import("./remote-fetchers.server");
+      return fetchInternshalaJobs(f.query, f.location);
+    },
+  });
+  registerJobSource({
     id: "source-4dayweek",
     label: "4dayweek",
     fetch: async (f) => {
@@ -214,8 +222,12 @@ export function ensureRemoteJobAdaptersRegistered(): void {
     id: "source-hn",
     label: "Hacker News",
     fetch: async (f) => {
-      const { searchHackerNews } = await import("@/lib/search/sources.server");
-      return wrap(() => searchHackerNews(qxFrom(f)), "source-hn", "hn");
+      // Hiring-thread ONLY: the full searchHackerNews mixes "Who is hiring"
+      // comments with broad buyer-intent/Show-HN sweeps (freelancer profiles,
+      // product pitches) — wrong shape for a jobs fleet. Legacy Discover
+      // buyer-intent keeps the full function untouched.
+      const { searchHackerNewsHiringThread } = await import("@/lib/search/sources.server");
+      return wrap(() => searchHackerNewsHiringThread(qxFrom(f)), "source-hn", "hn");
     },
   });
   registerJobSource({

@@ -1,0 +1,18 @@
+﻿use_default_settings: true
+
+server:
+  secret_key: "scrapivo-local-dev-secret-key-32chars"
+  limiter: false
+  image_proxy: false
+  method: "GET"
+
+search:
+  formats:
+    - html
+    - json
+
+botdetection:
+  ip_limit: false
+  ip_lists:
+    pass_ip:
+      - 0.0.0.0/0

@@ -44,6 +44,7 @@ import {
 } from "./provenance";
 import { normalizePhones, type ParsedPhone } from "./phone";
 import { isCrawlAllowed, robotsCrawlDelayMs } from "./robots.server";
+import { throwIfAborted } from "../search/search-run";
 
 // ── types ───────────────────────────────────────────────────────────────────
 
@@ -410,11 +411,13 @@ export async function dmarcContacts(domain: string): Promise<HarvestedEmail[]> {
  * address, which makes it both the cleanest possible harvest and a reliable
  * signal that the org has a real security/ops function.
  */
-export async function securityTxtContacts(domain: string): Promise<HarvestedEmail[]> {
+export async function securityTxtContacts(domain: string, signal?: AbortSignal): Promise<HarvestedEmail[]> {
   const urls = [`https://${domain}/.well-known/security.txt`, `https://${domain}/security.txt`];
   for (const url of urls) {
+    throwIfAborted(signal);
     try {
-      const body = await resilientText(url, { retries: 0 });
+      const body = await resilientText(url, { retries: 0, signal });
+      throwIfAborted(signal);
       if (!body || /<html/i.test(body.slice(0, 400)) || !/contact\s*:/i.test(body)) continue;
       const out: HarvestedEmail[] = [];
       for (const m of body.matchAll(/^contact\s*:\s*(.+)$/gim)) {
@@ -852,8 +855,11 @@ async function harvestPage(
   url: string,
   domain: string,
   relevanceTokens?: string[],
+  signal?: AbortSignal,
 ): Promise<PageHarvest | null> {
-  const html = await resilientText(url, { retries: 1 }).catch(() => "");
+  throwIfAborted(signal);
+  const html = await resilientText(url, { retries: 1, signal }).catch(() => "");
+  throwIfAborted(signal);
   if (!html) return null;
 
   const title = (html.match(/<title[^>]*>([^<]+)/i)?.[1] || "").trim();
@@ -1030,6 +1036,7 @@ const FALLBACK_PATHS = [
 ];
 
 export type HarvestOptions = {
+  signal?: AbortSignal;
   /** Company-name tokens used to reject a homepage that isn't this company. */
   companyTokens?: string[];
   /** Max pages to fetch (each is a network round-trip). */
@@ -1051,6 +1058,7 @@ export async function harvestDomainContacts(
   rawDomain: string,
   opts: HarvestOptions = {},
 ): Promise<DomainHarvest> {
+  throwIfAborted(opts.signal);
   const domain = (rawDomain || "")
     .toLowerCase()
     .replace(/^https?:\/\//, "")
@@ -1101,12 +1109,13 @@ export async function harvestDomainContacts(
   const [mx, dmarc, securityTxt, homeAllowed, crawlDelayMs] = await Promise.all([
     detectMailProvider(domain),
     dmarcContacts(domain),
-    securityTxtContacts(domain),
+    securityTxtContacts(domain, opts.signal),
     opts.ignoreRobots
       ? Promise.resolve({ allowed: true, crawlDelayMs: 0, reason: "skipped" })
       : isCrawlAllowed(`https://${domain}/`),
     opts.ignoreRobots ? Promise.resolve(0) : robotsCrawlDelayMs(domain),
   ]);
+  throwIfAborted(opts.signal);
 
   result.mx_provider = mx.provider;
   result.mx_hosts = mx.hosts;
@@ -1133,6 +1142,7 @@ export async function harvestDomainContacts(
   let homeHtmlChecked = false;
 
   while (queue.length && fetched < maxPages) {
+    throwIfAborted(opts.signal);
     const url = queue.shift()!;
     const key = url.replace(/\/$/, "");
     if (visited.has(key)) continue;
@@ -1140,6 +1150,7 @@ export async function harvestDomainContacts(
 
     if (!opts.ignoreRobots) {
       const decision = await isCrawlAllowed(url);
+      throwIfAborted(opts.signal);
       if (!decision.allowed) {
         result.skipped_by_robots.push(`${url} (${decision.reason})`);
         continue;
@@ -1148,7 +1159,7 @@ export async function harvestDomainContacts(
 
     // Only the homepage is relevance-checked against the company name; deeper
     // pages (an /impressum, a /security.txt) legitimately may not repeat it.
-    const page = await harvestPage(url, domain, !homeHtmlChecked ? opts.companyTokens : undefined);
+    const page = await harvestPage(url, domain, !homeHtmlChecked ? opts.companyTokens : undefined, opts.signal);
     fetched++;
     if (!page) continue;
     result.pages.push(page.capture);

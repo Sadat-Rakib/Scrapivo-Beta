@@ -1,0 +1,192 @@
+{
+  "key": "europe_region_v4.csv",
+  "size": 462371,
+  "last_modified": "2026-09-08 00:14:00+00:00",
+  "columns": [
+    "fullname",
+    "firstname",
+    "lastname",
+    "Title",
+    "asd",
+    "company",
+    "email",
+    "Email Status",
+    "Seniority",
+    "Departments",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Stage",
+    "# Employees",
+    "Industry",
+    "Keywords"
+  ],
+  "row_count": 1442,
+  "sampled_rows": 1442,
+  "delimiter": ",",
+  "roles": {
+    "fullname": "last_name",
+    "firstname": "first_name",
+    "lastname": "last_name",
+    "Title": "title",
+    "asd": "other",
+    "company": "company",
+    "email": "email",
+    "Email Status": "email",
+    "Seniority": "other",
+    "Departments": "other",
+    "First Phone": "phone",
+    "Work Direct Phone": "phone",
+    "Home Phone": "phone",
+    "Mobile Phone": "phone",
+    "Corporate Phone": "phone",
+    "Other Phone": "phone",
+    "Stage": "other",
+    "# Employees": "employees",
+    "Industry": "industry",
+    "Keywords": "descriptive"
+  },
+  "missing_pct": {
+    "fullname": 0.0,
+    "firstname": 0.0,
+    "lastname": 0.3,
+    "Title": 0.0,
+    "asd": 0.0,
+    "company": 0.0,
+    "email": 0.0,
+    "Email Status": 0.0,
+    "Seniority": 0.0,
+    "Departments": 21.2,
+    "First Phone": 8.7,
+    "Work Direct Phone": 100.0,
+    "Home Phone": 100.0,
+    "Mobile Phone": 98.3,
+    "Corporate Phone": 8.7,
+    "Other Phone": 99.5,
+    "Stage": 0.0,
+    "# Employees": 0.1,
+    "Industry": 1.1,
+    "Keywords": 20.9
+  },
+  "samples": {
+    "fullname": [
+      "Rob",
+      "Martina",
+      "Martijn"
+    ],
+    "firstname": [
+      "Rob",
+      "Martina",
+      "Martijn"
+    ],
+    "lastname": [
+      "Eling",
+      "Zamponi",
+      "Mechelen"
+    ],
+    "Title": [
+      "Team Lead R&D",
+      "Key Account Manager",
+      "Product Manager"
+    ],
+    "asd": [
+      "Ridder",
+      "Signify",
+      "Priva"
+    ],
+    "company": [
+      "Ridder",
+      "Signify",
+      "Priva"
+    ],
+    "email": [
+      "r.eling@ridder.com",
+      "martina.zamponi@signify.com",
+      "martijn.van.mechelen@priva.com"
+    ],
+    "Email Status": [
+      "Verified",
+      "Verified",
+      "Verified"
+    ],
+    "Seniority": [
+      "Manager",
+      "Manager",
+      "Manager"
+    ],
+    "Departments": [
+      "Engineering & Technical",
+      "Sales",
+      "Product"
+    ],
+    "First Phone": [
+      "'+31 34 141 6854",
+      "'+31 40 275 0000",
+      "'+31 17 452 2282"
+    ],
+    "Corporate Phone": [
+      "'+31 34 141 6854",
+      "'+31 40 275 0000",
+      "'+31 17 452 2282"
+    ],
+    "Stage": [
+      "Cold",
+      "Cold",
+      "Cold"
+    ],
+    "# Employees": [
+      "230",
+      "34000",
+      "1300"
+    ],
+    "Industry": [
+      "farming",
+      "electrical/electronic manufacturing",
+      "information technology & services"
+    ],
+    "Keywords": [
+      "agrar, betriebsmittel, ecommerce, startup",
+      "software, agroculture software, agroculture solutions, cloud, mobile, business optimization",
+      "developing, r, d, marketing"
+    ],
+    "Mobile Phone": [
+      "'+47 977 23 199",
+      "'+20 114 550 5530",
+      "'+1 713-269-4024"
+    ],
+    "Other Phone": [
+      "'+44 175 930 2545",
+      "'+47 977 06 434",
+      "'+46 733 58 75 97"
+    ]
+  },
+  "validity": {
+    "email": "3/3 valid-shape",
+    "Email Status": "0/3 valid-shape",
+    "First Phone": "3/3 valid-shape",
+    "Mobile Phone": "3/3 valid-shape",
+    "Corporate Phone": "3/3 valid-shape",
+    "Other Phone": "3/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [],
+  "activity_match_keys": [
+    "fullname",
+    "firstname",
+    "lastname",
+    "company",
+    "email",
+    "Email Status",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone"
+  ]
+}

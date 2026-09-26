@@ -1,0 +1,798 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: ship-it.spec.ts >> real pipeline: Find 10 SaaS founders globally who may need help with AI automation.
+- Location: e2e\ship-it.spec.ts:13:30
+
+# Error details
+
+```
+Error: expect(received).toBe(expected) // Object.is equality
+
+Expected: "QUALIFIED_RESULTS"
+Received: "NO_QUALIFIED_RESULTS"
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=f1e1]:
+  - generic [ref=f1e2]:
+    - complementary [ref=f1e3]:
+      - generic [ref=f1e4]:
+        - button "Close sidebar" [ref=f1e6]:
+          - img "Scrapivo" [ref=f1e8]
+          - generic [ref=f1e9]: Scrapivo
+        - navigation [ref=f1e10]:
+          - link "Home" [ref=f1e11] [cursor=pointer]:
+            - /url: /discover
+          - link "Memory" [ref=f1e16] [cursor=pointer]:
+            - /url: /memory
+          - link "Watches" [ref=f1e26] [cursor=pointer]:
+            - /url: /watches
+          - link "Saved" [ref=f1e31] [cursor=pointer]:
+            - /url: /saved
+          - link "Guides" [ref=f1e35] [cursor=pointer]:
+            - /url: /guides
+          - generic [ref=f1e39]: Support & Account
+          - link "Help" [ref=f1e40] [cursor=pointer]:
+            - /url: /help
+        - generic [ref=f1e45]:
+          - generic [ref=f1e46]:
+            - generic [ref=f1e47]: 0/5
+            - generic [ref=f1e48]: 25/09/2026
+            - progressbar [ref=f1e49]
+          - generic [ref=f1e52]:
+            - button "E e2e.scrapivo.test.001@gmail.com Manage account" [ref=f1e53]:
+              - generic [ref=f1e54]: E
+              - generic [ref=f1e55]:
+                - generic [ref=f1e56]: e2e.scrapivo.test.001@gmail.com
+                - generic [ref=f1e57]: Manage account
+            - button "Settings" [ref=f1e58]
+    - generic [ref=f1e62]:
+      - banner [ref=f1e63]:
+        - generic [ref=f1e64]: Home
+        - button "New chat" [ref=f1e67]
+      - main [ref=f1e70]:
+        - generic [ref=f1e72]:
+          - generic [ref=f1e75]:
+            - generic [ref=f1e76]: Find 10 SaaS founders globally who may need help with AI automation.
+            - generic [ref=f1e78]:
+              - generic [ref=f1e79]:
+                - text: Results for
+                - generic [ref=f1e80]: "\"Find 10 SaaS founders globally who may need help with AI automation.\""
+                - generic [ref=f1e81]: · 0 results
+              - generic [ref=f1e82]:
+                - button "Watch signal" [ref=f1e83] [cursor=pointer]
+                - generic [ref=f1e84]:
+                  - button "Cards" [ref=f1e85]
+                  - button "Lists" [ref=f1e86]
+                - button "Clear" [ref=f1e87]
+            - button "Fold (0 results)" [ref=f1e92]
+          - generic [ref=f1e97]:
+            - textbox "fi" [active] [ref=f1e99]
+            - generic [ref=f1e100]:
+              - button "Add attachment" [ref=f1e101]
+              - button "Search mode" [ref=f1e104]:
+                - generic [ref=f1e108]: Mode
+              - button "Thinker" [ref=f1e111]
+              - button "Voice input" [ref=f1e122] [cursor=pointer]
+              - button "Send" [disabled] [ref=f1e123]
+    - complementary [ref=f1e126]:
+      - generic [ref=f1e128]:
+        - generic [ref=f1e129]:
+          - heading "Chat History" [level=2] [ref=f1e131]
+          - textbox "Search..." [ref=f1e136]
+        - generic [ref=f1e137]:
+          - button "Find 10 plumbers in Austin with no website. Include their public phone numbers and emails when available. 0 results · 3 minutes ago" [ref=f1e138] [cursor=pointer]:
+            - generic [ref=f1e144]:
+              - generic [ref=f1e145]: Find 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.
+              - generic [ref=f1e146]:
+                - generic [ref=f1e147]: 0 results
+                - generic [ref=f1e148]: ·
+                - generic [ref=f1e149]: 3 minutes ago
+          - button "Find 10 plumbers in Austin with no website. Include their public phone numbers and emails when available. 0 results · 10 minutes ago" [ref=f1e150] [cursor=pointer]:
+            - generic [ref=f1e156]:
+              - generic [ref=f1e157]: Find 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.
+              - generic [ref=f1e158]:
+                - generic [ref=f1e159]: 0 results
+                - generic [ref=f1e160]: ·
+                - generic [ref=f1e161]: 10 minutes ago
+          - button "Find HVAC companies in Edmonton. 0 results · about 3 hours ago" [ref=f1e162] [cursor=pointer]:
+            - generic [ref=f1e168]:
+              - generic [ref=f1e169]: Find HVAC companies in Edmonton.
+              - generic [ref=f1e170]:
+                - generic [ref=f1e171]: 0 results
+                - generic [ref=f1e172]: ·
+                - generic [ref=f1e173]: about 3 hours ago
+          - button "Find SaaS founders globally who may need help with AI automation. 0 results · about 3 hours ago" [ref=f1e174] [cursor=pointer]:
+            - generic [ref=f1e180]:
+              - generic [ref=f1e181]: Find SaaS founders globally who may need help with AI automation.
+              - generic [ref=f1e182]:
+                - generic [ref=f1e183]: 0 results
+                - generic [ref=f1e184]: ·
+                - generic [ref=f1e185]: about 3 hours ago
+          - button "Find SaaS founders globally who may need help with AI automation. 0 results · about 3 hours ago" [ref=f1e186] [cursor=pointer]:
+            - generic [ref=f1e192]:
+              - generic [ref=f1e193]: Find SaaS founders globally who may need help with AI automation.
+              - generic [ref=f1e194]:
+                - generic [ref=f1e195]: 0 results
+                - generic [ref=f1e196]: ·
+                - generic [ref=f1e197]: about 3 hours ago
+          - button "Find SaaS founders globally who may need help with AI automation. 0 results · about 8 hours ago" [ref=f1e198] [cursor=pointer]:
+            - generic [ref=f1e204]:
+              - generic [ref=f1e205]: Find SaaS founders globally who may need help with AI automation.
+              - generic [ref=f1e206]:
+                - generic [ref=f1e207]: 0 results
+                - generic [ref=f1e208]: ·
+                - generic [ref=f1e209]: about 8 hours ago
+          - button "Find remote AI automation jobs in Canada. 0 results · about 8 hours ago" [ref=f1e210] [cursor=pointer]:
+            - generic [ref=f1e216]:
+              - generic [ref=f1e217]: Find remote AI automation jobs in Canada.
+              - generic [ref=f1e218]:
+                - generic [ref=f1e219]: 0 results
+                - generic [ref=f1e220]: ·
+                - generic [ref=f1e221]: about 8 hours ago
+          - button "Find remote AI automation jobs in Canada. 0 results · about 8 hours ago" [ref=f1e222] [cursor=pointer]:
+            - generic [ref=f1e228]:
+              - generic [ref=f1e229]: Find remote AI automation jobs in Canada.
+              - generic [ref=f1e230]:
+                - generic [ref=f1e231]: 0 results
+                - generic [ref=f1e232]: ·
+                - generic [ref=f1e233]: about 8 hours ago
+          - button "Find remote AI automation jobs in Canada. 0 results · about 8 hours ago" [ref=f1e234] [cursor=pointer]:
+            - generic [ref=f1e240]:
+              - generic [ref=f1e241]: Find remote AI automation jobs in Canada.
+              - generic [ref=f1e242]:
+                - generic [ref=f1e243]: 0 results
+                - generic [ref=f1e244]: ·
+                - generic [ref=f1e245]: about 8 hours ago
+          - button "Find remote AI automation jobs in Canada. 0 results · about 8 hours ago" [ref=f1e246] [cursor=pointer]:
+            - generic [ref=f1e252]:
+              - generic [ref=f1e253]: Find remote AI automation jobs in Canada.
+              - generic [ref=f1e254]:
+                - generic [ref=f1e255]: 0 results
+                - generic [ref=f1e256]: ·
+                - generic [ref=f1e257]: about 8 hours ago
+          - button "Find copywriters in New York who talk about AI content or AI slop. 0 results · about 8 hours ago" [ref=f1e258] [cursor=pointer]:
+            - generic [ref=f1e264]:
+              - generic [ref=f1e265]: Find copywriters in New York who talk about AI content or AI slop.
+              - generic [ref=f1e266]:
+                - generic [ref=f1e267]: 0 results
+                - generic [ref=f1e268]: ·
+                - generic [ref=f1e269]: about 8 hours ago
+          - button "Find copywriters in New York who talk about AI content or AI slop. 0 results · about 8 hours ago" [ref=f1e270] [cursor=pointer]:
+            - generic [ref=f1e276]:
+              - generic [ref=f1e277]: Find copywriters in New York who talk about AI content or AI slop.
+              - generic [ref=f1e278]:
+                - generic [ref=f1e279]: 0 results
+                - generic [ref=f1e280]: ·
+                - generic [ref=f1e281]: about 8 hours ago
+          - button "Find HVAC companies in the Greater Toronto Area that could need a better website or automation. 0 results · about 8 hours ago" [ref=f1e282] [cursor=pointer]:
+            - generic [ref=f1e288]:
+              - generic [ref=f1e289]: Find HVAC companies in the Greater Toronto Area that could need a better website or automation.
+              - generic [ref=f1e290]:
+                - generic [ref=f1e291]: 0 results
+                - generic [ref=f1e292]: ·
+                - generic [ref=f1e293]: about 8 hours ago
+          - button "Find HVAC companies in the Greater Toronto Area that could need a better website or automation. 0 results · about 8 hours ago" [ref=f1e294] [cursor=pointer]:
+            - generic [ref=f1e300]:
+              - generic [ref=f1e301]: Find HVAC companies in the Greater Toronto Area that could need a better website or automation.
+              - generic [ref=f1e302]:
+                - generic [ref=f1e303]: 0 results
+                - generic [ref=f1e304]: ·
+                - generic [ref=f1e305]: about 8 hours ago
+          - button "Find HVAC companies in the Greater Toronto Area that could need a better website or automation. 0 results · about 8 hours ago" [ref=f1e306] [cursor=pointer]:
+            - generic [ref=f1e312]:
+              - generic [ref=f1e313]: Find HVAC companies in the Greater Toronto Area that could need a better website or automation.
+              - generic [ref=f1e314]:
+                - generic [ref=f1e315]: 0 results
+                - generic [ref=f1e316]: ·
+                - generic [ref=f1e317]: about 8 hours ago
+          - button "Find HVAC companies in the Greater Toronto Area that could need a better website or automation. 0 results · about 8 hours ago" [ref=f1e318] [cursor=pointer]:
+            - generic [ref=f1e324]:
+              - generic [ref=f1e325]: Find HVAC companies in the Greater Toronto Area that could need a better website or automation.
+              - generic [ref=f1e326]:
+                - generic [ref=f1e327]: 0 results
+                - generic [ref=f1e328]: ·
+                - generic [ref=f1e329]: about 8 hours ago
+          - button "Find HVAC companies in the Greater Toronto Area that could need a better website or automation. 0 results · about 8 hours ago" [ref=f1e330] [cursor=pointer]:
+            - generic [ref=f1e336]:
+              - generic [ref=f1e337]: Find HVAC companies in the Greater Toronto Area that could need a better website or automation.
+              - generic [ref=f1e338]:
+                - generic [ref=f1e339]: 0 results
+                - generic [ref=f1e340]: ·
+                - generic [ref=f1e341]: about 8 hours ago
+          - button "Find HVAC companies in the Greater Toronto Area that could need a better website or automation. 0 results · about 8 hours ago" [ref=f1e342] [cursor=pointer]:
+            - generic [ref=f1e348]:
+              - generic [ref=f1e349]: Find HVAC companies in the Greater Toronto Area that could need a better website or automation.
+              - generic [ref=f1e350]:
+                - generic [ref=f1e351]: 0 results
+                - generic [ref=f1e352]: ·
+                - generic [ref=f1e353]: about 8 hours ago
+          - button "Find HVAC companies in Edmonton. 0 results · about 8 hours ago" [ref=f1e354] [cursor=pointer]:
+            - generic [ref=f1e360]:
+              - generic [ref=f1e361]: Find HVAC companies in Edmonton.
+              - generic [ref=f1e362]:
+                - generic [ref=f1e363]: 0 results
+                - generic [ref=f1e364]: ·
+                - generic [ref=f1e365]: about 8 hours ago
+          - button "Find HVAC businesses in Edmonton without websites. 0 results · about 8 hours ago" [ref=f1e366] [cursor=pointer]:
+            - generic [ref=f1e372]:
+              - generic [ref=f1e373]: Find HVAC businesses in Edmonton without websites.
+              - generic [ref=f1e374]:
+                - generic [ref=f1e375]: 0 results
+                - generic [ref=f1e376]: ·
+                - generic [ref=f1e377]: about 8 hours ago
+          - button "Find HVAC businesses in Edmonton without websites. 0 results · about 8 hours ago" [ref=f1e378] [cursor=pointer]:
+            - generic [ref=f1e384]:
+              - generic [ref=f1e385]: Find HVAC businesses in Edmonton without websites.
+              - generic [ref=f1e386]:
+                - generic [ref=f1e387]: 0 results
+                - generic [ref=f1e388]: ·
+                - generic [ref=f1e389]: about 8 hours ago
+          - button "Find HVAC businesses in Edmonton without websites. 0 results · about 8 hours ago" [ref=f1e390] [cursor=pointer]:
+            - generic [ref=f1e396]:
+              - generic [ref=f1e397]: Find HVAC businesses in Edmonton without websites.
+              - generic [ref=f1e398]:
+                - generic [ref=f1e399]: 0 results
+                - generic [ref=f1e400]: ·
+                - generic [ref=f1e401]: about 8 hours ago
+          - button "Find HVAC companies in Edmonton. 0 results · about 8 hours ago" [ref=f1e402] [cursor=pointer]:
+            - generic [ref=f1e408]:
+              - generic [ref=f1e409]: Find HVAC companies in Edmonton.
+              - generic [ref=f1e410]:
+                - generic [ref=f1e411]: 0 results
+                - generic [ref=f1e412]: ·
+                - generic [ref=f1e413]: about 8 hours ago
+          - button "Find HVAC companies in Edmonton. 0 results · about 8 hours ago" [ref=f1e414] [cursor=pointer]:
+            - generic [ref=f1e420]:
+              - generic [ref=f1e421]: Find HVAC companies in Edmonton.
+              - generic [ref=f1e422]:
+                - generic [ref=f1e423]: 0 results
+                - generic [ref=f1e424]: ·
+                - generic [ref=f1e425]: about 8 hours ago
+          - button "Find SaaS founders globally who may need help with AI automation. 10 results · about 8 hours ago" [ref=f1e426] [cursor=pointer]:
+            - generic [ref=f1e432]:
+              - generic [ref=f1e433]: Find SaaS founders globally who may need help with AI automation.
+              - generic [ref=f1e434]:
+                - generic [ref=f1e435]: 10 results
+                - generic [ref=f1e436]: ·
+                - generic [ref=f1e437]: about 8 hours ago
+          - button "Find SaaS founders globally who may need help with AI automation. 0 results · about 8 hours ago" [ref=f1e438] [cursor=pointer]:
+            - generic [ref=f1e444]:
+              - generic [ref=f1e445]: Find SaaS founders globally who may need help with AI automation.
+              - generic [ref=f1e446]:
+                - generic [ref=f1e447]: 0 results
+                - generic [ref=f1e448]: ·
+                - generic [ref=f1e449]: about 8 hours ago
+          - button "Find SaaS founders globally who may need help with AI automation. 0 results · about 8 hours ago" [ref=f1e450] [cursor=pointer]:
+            - generic [ref=f1e456]:
+              - generic [ref=f1e457]: Find SaaS founders globally who may need help with AI automation.
+              - generic [ref=f1e458]:
+                - generic [ref=f1e459]: 0 results
+                - generic [ref=f1e460]: ·
+                - generic [ref=f1e461]: about 8 hours ago
+          - button "Find SaaS founders globally who may need help with AI automation. 0 results · about 8 hours ago" [ref=f1e462] [cursor=pointer]:
+            - generic [ref=f1e468]:
+              - generic [ref=f1e469]: Find SaaS founders globally who may need help with AI automation.
+              - generic [ref=f1e470]:
+                - generic [ref=f1e471]: 0 results
+                - generic [ref=f1e472]: ·
+                - generic [ref=f1e473]: about 8 hours ago
+          - button "Find SaaS founders globally who may need help with AI automation. 0 results · about 9 hours ago" [ref=f1e474] [cursor=pointer]:
+            - generic [ref=f1e480]:
+              - generic [ref=f1e481]: Find SaaS founders globally who may need help with AI automation.
+              - generic [ref=f1e482]:
+                - generic [ref=f1e483]: 0 results
+                - generic [ref=f1e484]: ·
+                - generic [ref=f1e485]: about 9 hours ago
+          - button "Find SaaS founders globally who may need help with AI automation. 0 results · about 12 hours ago" [ref=f1e486] [cursor=pointer]:
+            - generic [ref=f1e492]:
+              - generic [ref=f1e493]: Find SaaS founders globally who may need help with AI automation.
+              - generic [ref=f1e494]:
+                - generic [ref=f1e495]: 0 results
+                - generic [ref=f1e496]: ·
+                - generic [ref=f1e497]: about 12 hours ago
+          - button "Find SaaS founders globally who may need help with AI automation. 0 results · about 12 hours ago" [ref=f1e498] [cursor=pointer]:
+            - generic [ref=f1e504]:
+              - generic [ref=f1e505]: Find SaaS founders globally who may need help with AI automation.
+              - generic [ref=f1e506]:
+                - generic [ref=f1e507]: 0 results
+                - generic [ref=f1e508]: ·
+                - generic [ref=f1e509]: about 12 hours ago
+          - button "Find SaaS founders globally who may need help with AI automation. 0 results · about 12 hours ago" [ref=f1e510] [cursor=pointer]:
+            - generic [ref=f1e516]:
+              - generic [ref=f1e517]: Find SaaS founders globally who may need help with AI automation.
+              - generic [ref=f1e518]:
+                - generic [ref=f1e519]: 0 results
+                - generic [ref=f1e520]: ·
+                - generic [ref=f1e521]: about 12 hours ago
+          - button "Find SaaS founders globally who may need help with AI automation. 0 results · about 20 hours ago" [ref=f1e522] [cursor=pointer]:
+            - generic [ref=f1e528]:
+              - generic [ref=f1e529]: Find SaaS founders globally who may need help with AI automation.
+              - generic [ref=f1e530]:
+                - generic [ref=f1e531]: 0 results
+                - generic [ref=f1e532]: ·
+                - generic [ref=f1e533]: about 20 hours ago
+          - button "Find SaaS founders globally who may need help with AI automation. 0 results · about 20 hours ago" [ref=f1e534] [cursor=pointer]:
+            - generic [ref=f1e540]:
+              - generic [ref=f1e541]: Find SaaS founders globally who may need help with AI automation.
+              - generic [ref=f1e542]:
+                - generic [ref=f1e543]: 0 results
+                - generic [ref=f1e544]: ·
+                - generic [ref=f1e545]: about 20 hours ago
+          - button "Find SaaS founders globally who may need help with AI automation. 0 results · about 20 hours ago" [ref=f1e546] [cursor=pointer]:
+            - generic [ref=f1e552]:
+              - generic [ref=f1e553]: Find SaaS founders globally who may need help with AI automation.
+              - generic [ref=f1e554]:
+                - generic [ref=f1e555]: 0 results
+                - generic [ref=f1e556]: ·
+                - generic [ref=f1e557]: about 20 hours ago
+          - button "saas founders 0 results · 1 day ago" [ref=f1e558] [cursor=pointer]:
+            - generic [ref=f1e564]:
+              - generic [ref=f1e565]: saas founders
+              - generic [ref=f1e566]:
+                - generic [ref=f1e567]: 0 results
+                - generic [ref=f1e568]: ·
+                - generic [ref=f1e569]: 1 day ago
+          - button "saas founders 0 results · 1 day ago" [ref=f1e570] [cursor=pointer]:
+            - generic [ref=f1e576]:
+              - generic [ref=f1e577]: saas founders
+              - generic [ref=f1e578]:
+                - generic [ref=f1e579]: 0 results
+                - generic [ref=f1e580]: ·
+                - generic [ref=f1e581]: 1 day ago
+          - button "saas founders 0 results · 1 day ago" [ref=f1e582] [cursor=pointer]:
+            - generic [ref=f1e588]:
+              - generic [ref=f1e589]: saas founders
+              - generic [ref=f1e590]:
+                - generic [ref=f1e591]: 0 results
+                - generic [ref=f1e592]: ·
+                - generic [ref=f1e593]: 1 day ago
+          - button "find me local businesses who require websites in Canada 0 results · 1 day ago" [ref=f1e594] [cursor=pointer]:
+            - generic [ref=f1e600]:
+              - generic [ref=f1e601]: find me local businesses who require websites in Canada
+              - generic [ref=f1e602]:
+                - generic [ref=f1e603]: 0 results
+                - generic [ref=f1e604]: ·
+                - generic [ref=f1e605]: 1 day ago
+          - button "saas founders 0 results · 1 day ago" [ref=f1e606] [cursor=pointer]:
+            - generic [ref=f1e612]:
+              - generic [ref=f1e613]: saas founders
+              - generic [ref=f1e614]:
+                - generic [ref=f1e615]: 0 results
+                - generic [ref=f1e616]: ·
+                - generic [ref=f1e617]: 1 day ago
+          - button "yo need founders i can reach out to rn 0 results · 12 days ago" [ref=f1e618] [cursor=pointer]:
+            - generic [ref=f1e624]:
+              - generic [ref=f1e625]: yo need founders i can reach out to rn
+              - generic [ref=f1e626]:
+                - generic [ref=f1e627]: 0 results
+                - generic [ref=f1e628]: ·
+                - generic [ref=f1e629]: 12 days ago
+          - button "yo find me businesses rn 0 results · 12 days ago" [ref=f1e630] [cursor=pointer]:
+            - generic [ref=f1e636]:
+              - generic [ref=f1e637]: yo find me businesses rn
+              - generic [ref=f1e638]:
+                - generic [ref=f1e639]: 0 results
+                - generic [ref=f1e640]: ·
+                - generic [ref=f1e641]: 12 days ago
+          - button "yo need companies rn 0 results · 12 days ago" [ref=f1e642] [cursor=pointer]:
+            - generic [ref=f1e648]:
+              - generic [ref=f1e649]: yo need companies rn
+              - generic [ref=f1e650]:
+                - generic [ref=f1e651]: 0 results
+                - generic [ref=f1e652]: ·
+                - generic [ref=f1e653]: 12 days ago
+          - button "I need investors 0 results · 12 days ago" [ref=f1e654] [cursor=pointer]:
+            - generic [ref=f1e660]:
+              - generic [ref=f1e661]: I need investors
+              - generic [ref=f1e662]:
+                - generic [ref=f1e663]: 0 results
+                - generic [ref=f1e664]: ·
+                - generic [ref=f1e665]: 12 days ago
+          - button "I need SaaS founders in New York 0 results · 12 days ago" [ref=f1e666] [cursor=pointer]:
+            - generic [ref=f1e672]:
+              - generic [ref=f1e673]: I need SaaS founders in New York
+              - generic [ref=f1e674]:
+                - generic [ref=f1e675]: 0 results
+                - generic [ref=f1e676]: ·
+                - generic [ref=f1e677]: 12 days ago
+          - button "bro i need businesses plz asap 0 results · 12 days ago" [ref=f1e678] [cursor=pointer]:
+            - generic [ref=f1e684]:
+              - generic [ref=f1e685]: bro i need businesses plz asap
+              - generic [ref=f1e686]:
+                - generic [ref=f1e687]: 0 results
+                - generic [ref=f1e688]: ·
+                - generic [ref=f1e689]: 12 days ago
+          - button "plumbers in Austin 100 results · 12 days ago" [ref=f1e690] [cursor=pointer]:
+            - generic [ref=f1e696]:
+              - generic [ref=f1e697]: plumbers in Austin
+              - generic [ref=f1e698]:
+                - generic [ref=f1e699]: 100 results
+                - generic [ref=f1e700]: ·
+                - generic [ref=f1e701]: 12 days ago
+          - button "yo need founders i can reach out to rn 0 results · 12 days ago" [ref=f1e702] [cursor=pointer]:
+            - generic [ref=f1e708]:
+              - generic [ref=f1e709]: yo need founders i can reach out to rn
+              - generic [ref=f1e710]:
+                - generic [ref=f1e711]: 0 results
+                - generic [ref=f1e712]: ·
+                - generic [ref=f1e713]: 12 days ago
+          - button "yo find me businesses rn 0 results · 12 days ago" [ref=f1e714] [cursor=pointer]:
+            - generic [ref=f1e720]:
+              - generic [ref=f1e721]: yo find me businesses rn
+              - generic [ref=f1e722]:
+                - generic [ref=f1e723]: 0 results
+                - generic [ref=f1e724]: ·
+                - generic [ref=f1e725]: 12 days ago
+          - button "yo need companies rn 0 results · 12 days ago" [ref=f1e726] [cursor=pointer]:
+            - generic [ref=f1e732]:
+              - generic [ref=f1e733]: yo need companies rn
+              - generic [ref=f1e734]:
+                - generic [ref=f1e735]: 0 results
+                - generic [ref=f1e736]: ·
+                - generic [ref=f1e737]: 12 days ago
+          - button "I need investors 0 results · 12 days ago" [ref=f1e738] [cursor=pointer]:
+            - generic [ref=f1e744]:
+              - generic [ref=f1e745]: I need investors
+              - generic [ref=f1e746]:
+                - generic [ref=f1e747]: 0 results
+                - generic [ref=f1e748]: ·
+                - generic [ref=f1e749]: 12 days ago
+          - button "I need SaaS founders in New York 0 results · 12 days ago" [ref=f1e750] [cursor=pointer]:
+            - generic [ref=f1e756]:
+              - generic [ref=f1e757]: I need SaaS founders in New York
+              - generic [ref=f1e758]:
+                - generic [ref=f1e759]: 0 results
+                - generic [ref=f1e760]: ·
+                - generic [ref=f1e761]: 12 days ago
+          - button "bro i need businesses plz asap 0 results · 12 days ago" [ref=f1e762] [cursor=pointer]:
+            - generic [ref=f1e768]:
+              - generic [ref=f1e769]: bro i need businesses plz asap
+              - generic [ref=f1e770]:
+                - generic [ref=f1e771]: 0 results
+                - generic [ref=f1e772]: ·
+                - generic [ref=f1e773]: 12 days ago
+          - button "yo need founders i can reach out to rn 0 results · 12 days ago" [ref=f1e774] [cursor=pointer]:
+            - generic [ref=f1e780]:
+              - generic [ref=f1e781]: yo need founders i can reach out to rn
+              - generic [ref=f1e782]:
+                - generic [ref=f1e783]: 0 results
+                - generic [ref=f1e784]: ·
+                - generic [ref=f1e785]: 12 days ago
+          - button "yo find me businesses rn 0 results · 12 days ago" [ref=f1e786] [cursor=pointer]:
+            - generic [ref=f1e792]:
+              - generic [ref=f1e793]: yo find me businesses rn
+              - generic [ref=f1e794]:
+                - generic [ref=f1e795]: 0 results
+                - generic [ref=f1e796]: ·
+                - generic [ref=f1e797]: 12 days ago
+          - button "yo need companies rn 0 results · 12 days ago" [ref=f1e798] [cursor=pointer]:
+            - generic [ref=f1e804]:
+              - generic [ref=f1e805]: yo need companies rn
+              - generic [ref=f1e806]:
+                - generic [ref=f1e807]: 0 results
+                - generic [ref=f1e808]: ·
+                - generic [ref=f1e809]: 12 days ago
+          - button "I need investors 0 results · 12 days ago" [ref=f1e810] [cursor=pointer]:
+            - generic [ref=f1e816]:
+              - generic [ref=f1e817]: I need investors
+              - generic [ref=f1e818]:
+                - generic [ref=f1e819]: 0 results
+                - generic [ref=f1e820]: ·
+                - generic [ref=f1e821]: 12 days ago
+          - button "bro i need businesses plz asap 0 results · 12 days ago" [ref=f1e822] [cursor=pointer]:
+            - generic [ref=f1e828]:
+              - generic [ref=f1e829]: bro i need businesses plz asap
+              - generic [ref=f1e830]:
+                - generic [ref=f1e831]: 0 results
+                - generic [ref=f1e832]: ·
+                - generic [ref=f1e833]: 12 days ago
+          - button "yo need founders i can reach out to rn 0 results · 12 days ago" [ref=f1e834] [cursor=pointer]:
+            - generic [ref=f1e840]:
+              - generic [ref=f1e841]: yo need founders i can reach out to rn
+              - generic [ref=f1e842]:
+                - generic [ref=f1e843]: 0 results
+                - generic [ref=f1e844]: ·
+                - generic [ref=f1e845]: 12 days ago
+          - button "yo find me businesses rn 0 results · 12 days ago" [ref=f1e846] [cursor=pointer]:
+            - generic [ref=f1e852]:
+              - generic [ref=f1e853]: yo find me businesses rn
+              - generic [ref=f1e854]:
+                - generic [ref=f1e855]: 0 results
+                - generic [ref=f1e856]: ·
+                - generic [ref=f1e857]: 12 days ago
+          - button "yo need companies rn 0 results · 12 days ago" [ref=f1e858] [cursor=pointer]:
+            - generic [ref=f1e864]:
+              - generic [ref=f1e865]: yo need companies rn
+              - generic [ref=f1e866]:
+                - generic [ref=f1e867]: 0 results
+                - generic [ref=f1e868]: ·
+                - generic [ref=f1e869]: 12 days ago
+          - button "I need investors 0 results · 12 days ago" [ref=f1e870] [cursor=pointer]:
+            - generic [ref=f1e876]:
+              - generic [ref=f1e877]: I need investors
+              - generic [ref=f1e878]:
+                - generic [ref=f1e879]: 0 results
+                - generic [ref=f1e880]: ·
+                - generic [ref=f1e881]: 12 days ago
+          - button "bro i need businesses plz asap 0 results · 12 days ago" [ref=f1e882] [cursor=pointer]:
+            - generic [ref=f1e888]:
+              - generic [ref=f1e889]: bro i need businesses plz asap
+              - generic [ref=f1e890]:
+                - generic [ref=f1e891]: 0 results
+                - generic [ref=f1e892]: ·
+                - generic [ref=f1e893]: 12 days ago
+          - button "plumbers in Austin 100 results · 12 days ago" [ref=f1e894] [cursor=pointer]:
+            - generic [ref=f1e900]:
+              - generic [ref=f1e901]: plumbers in Austin
+              - generic [ref=f1e902]:
+                - generic [ref=f1e903]: 100 results
+                - generic [ref=f1e904]: ·
+                - generic [ref=f1e905]: 12 days ago
+          - button "plumbers in Austin 50 results · 14 days ago" [ref=f1e906] [cursor=pointer]:
+            - generic [ref=f1e912]:
+              - generic [ref=f1e913]: plumbers in Austin
+              - generic [ref=f1e914]:
+                - generic [ref=f1e915]: 50 results
+                - generic [ref=f1e916]: ·
+                - generic [ref=f1e917]: 14 days ago
+          - button "yo need founders i can reach out to rn 0 results · 14 days ago" [ref=f1e918] [cursor=pointer]:
+            - generic [ref=f1e924]:
+              - generic [ref=f1e925]: yo need founders i can reach out to rn
+              - generic [ref=f1e926]:
+                - generic [ref=f1e927]: 0 results
+                - generic [ref=f1e928]: ·
+                - generic [ref=f1e929]: 14 days ago
+          - button "yo find me businesses rn 0 results · 14 days ago" [ref=f1e930] [cursor=pointer]:
+            - generic [ref=f1e936]:
+              - generic [ref=f1e937]: yo find me businesses rn
+              - generic [ref=f1e938]:
+                - generic [ref=f1e939]: 0 results
+                - generic [ref=f1e940]: ·
+                - generic [ref=f1e941]: 14 days ago
+          - button "yo need companies rn 0 results · 14 days ago" [ref=f1e942] [cursor=pointer]:
+            - generic [ref=f1e948]:
+              - generic [ref=f1e949]: yo need companies rn
+              - generic [ref=f1e950]:
+                - generic [ref=f1e951]: 0 results
+                - generic [ref=f1e952]: ·
+                - generic [ref=f1e953]: 14 days ago
+          - button "I need investors 0 results · 14 days ago" [ref=f1e954] [cursor=pointer]:
+            - generic [ref=f1e960]:
+              - generic [ref=f1e961]: I need investors
+              - generic [ref=f1e962]:
+                - generic [ref=f1e963]: 0 results
+                - generic [ref=f1e964]: ·
+                - generic [ref=f1e965]: 14 days ago
+          - button "bro i need businesses plz asap 0 results · 14 days ago" [ref=f1e966] [cursor=pointer]:
+            - generic [ref=f1e972]:
+              - generic [ref=f1e973]: bro i need businesses plz asap
+              - generic [ref=f1e974]:
+                - generic [ref=f1e975]: 0 results
+                - generic [ref=f1e976]: ·
+                - generic [ref=f1e977]: 14 days ago
+          - button "yo need founders i can reach out to rn 0 results · 14 days ago" [ref=f1e978] [cursor=pointer]:
+            - generic [ref=f1e984]:
+              - generic [ref=f1e985]: yo need founders i can reach out to rn
+              - generic [ref=f1e986]:
+                - generic [ref=f1e987]: 0 results
+                - generic [ref=f1e988]: ·
+                - generic [ref=f1e989]: 14 days ago
+          - button "yo need founders i can reach out to rn 0 results · 14 days ago" [ref=f1e990] [cursor=pointer]:
+            - generic [ref=f1e996]:
+              - generic [ref=f1e997]: yo need founders i can reach out to rn
+              - generic [ref=f1e998]:
+                - generic [ref=f1e999]: 0 results
+                - generic [ref=f1e1000]: ·
+                - generic [ref=f1e1001]: 14 days ago
+          - button "yo find me businesses rn 0 results · 14 days ago" [ref=f1e1002] [cursor=pointer]:
+            - generic [ref=f1e1008]:
+              - generic [ref=f1e1009]: yo find me businesses rn
+              - generic [ref=f1e1010]:
+                - generic [ref=f1e1011]: 0 results
+                - generic [ref=f1e1012]: ·
+                - generic [ref=f1e1013]: 14 days ago
+          - button "yo need companies rn 0 results · 14 days ago" [ref=f1e1014] [cursor=pointer]:
+            - generic [ref=f1e1020]:
+              - generic [ref=f1e1021]: yo need companies rn
+              - generic [ref=f1e1022]:
+                - generic [ref=f1e1023]: 0 results
+                - generic [ref=f1e1024]: ·
+                - generic [ref=f1e1025]: 14 days ago
+          - button "I need investors 0 results · 14 days ago" [ref=f1e1026] [cursor=pointer]:
+            - generic [ref=f1e1032]:
+              - generic [ref=f1e1033]: I need investors
+              - generic [ref=f1e1034]:
+                - generic [ref=f1e1035]: 0 results
+                - generic [ref=f1e1036]: ·
+                - generic [ref=f1e1037]: 14 days ago
+          - button "bro i need businesses plz asap 0 results · 14 days ago" [ref=f1e1038] [cursor=pointer]:
+            - generic [ref=f1e1044]:
+              - generic [ref=f1e1045]: bro i need businesses plz asap
+              - generic [ref=f1e1046]:
+                - generic [ref=f1e1047]: 0 results
+                - generic [ref=f1e1048]: ·
+                - generic [ref=f1e1049]: 14 days ago
+          - button "yo need founders i can reach out to rn 0 results · 14 days ago" [ref=f1e1050] [cursor=pointer]:
+            - generic [ref=f1e1056]:
+              - generic [ref=f1e1057]: yo need founders i can reach out to rn
+              - generic [ref=f1e1058]:
+                - generic [ref=f1e1059]: 0 results
+                - generic [ref=f1e1060]: ·
+                - generic [ref=f1e1061]: 14 days ago
+          - button "yo find me businesses rn 0 results · 14 days ago" [ref=f1e1062] [cursor=pointer]:
+            - generic [ref=f1e1068]:
+              - generic [ref=f1e1069]: yo find me businesses rn
+              - generic [ref=f1e1070]:
+                - generic [ref=f1e1071]: 0 results
+                - generic [ref=f1e1072]: ·
+                - generic [ref=f1e1073]: 14 days ago
+          - button "yo need companies rn 0 results · 14 days ago" [ref=f1e1074] [cursor=pointer]:
+            - generic [ref=f1e1080]:
+              - generic [ref=f1e1081]: yo need companies rn
+              - generic [ref=f1e1082]:
+                - generic [ref=f1e1083]: 0 results
+                - generic [ref=f1e1084]: ·
+                - generic [ref=f1e1085]: 14 days ago
+          - button "I need investors 0 results · 14 days ago" [ref=f1e1086] [cursor=pointer]:
+            - generic [ref=f1e1092]:
+              - generic [ref=f1e1093]: I need investors
+              - generic [ref=f1e1094]:
+                - generic [ref=f1e1095]: 0 results
+                - generic [ref=f1e1096]: ·
+                - generic [ref=f1e1097]: 14 days ago
+          - button "bro i need businesses plz asap 0 results · 14 days ago" [ref=f1e1098] [cursor=pointer]:
+            - generic [ref=f1e1104]:
+              - generic [ref=f1e1105]: bro i need businesses plz asap
+              - generic [ref=f1e1106]:
+                - generic [ref=f1e1107]: 0 results
+                - generic [ref=f1e1108]: ·
+                - generic [ref=f1e1109]: 14 days ago
+          - button "plumbers in Austin 50 results · 14 days ago" [ref=f1e1110] [cursor=pointer]:
+            - generic [ref=f1e1116]:
+              - generic [ref=f1e1117]: plumbers in Austin
+              - generic [ref=f1e1118]:
+                - generic [ref=f1e1119]: 50 results
+                - generic [ref=f1e1120]: ·
+                - generic [ref=f1e1121]: 14 days ago
+          - button "plumbers in Austin 50 results · 14 days ago" [ref=f1e1122] [cursor=pointer]:
+            - generic [ref=f1e1128]:
+              - generic [ref=f1e1129]: plumbers in Austin
+              - generic [ref=f1e1130]:
+                - generic [ref=f1e1131]: 50 results
+                - generic [ref=f1e1132]: ·
+                - generic [ref=f1e1133]: 14 days ago
+          - button "plumbers in Austin 50 results · 14 days ago" [ref=f1e1134] [cursor=pointer]:
+            - generic [ref=f1e1140]:
+              - generic [ref=f1e1141]: plumbers in Austin
+              - generic [ref=f1e1142]:
+                - generic [ref=f1e1143]: 50 results
+                - generic [ref=f1e1144]: ·
+                - generic [ref=f1e1145]: 14 days ago
+          - button "dentists in Pune 0 results · 14 days ago" [ref=f1e1146] [cursor=pointer]:
+            - generic [ref=f1e1152]:
+              - generic [ref=f1e1153]: dentists in Pune
+              - generic [ref=f1e1154]:
+                - generic [ref=f1e1155]: 0 results
+                - generic [ref=f1e1156]: ·
+                - generic [ref=f1e1157]: 14 days ago
+          - button "dentists in Pune 0 results · 14 days ago" [ref=f1e1158] [cursor=pointer]:
+            - generic [ref=f1e1164]:
+              - generic [ref=f1e1165]: dentists in Pune
+              - generic [ref=f1e1166]:
+                - generic [ref=f1e1167]: 0 results
+                - generic [ref=f1e1168]: ·
+                - generic [ref=f1e1169]: 14 days ago
+          - button "dentists in Pune 50 results · 14 days ago" [ref=f1e1170] [cursor=pointer]:
+            - generic [ref=f1e1176]:
+              - generic [ref=f1e1177]: dentists in Pune
+              - generic [ref=f1e1178]:
+                - generic [ref=f1e1179]: 50 results
+                - generic [ref=f1e1180]: ·
+                - generic [ref=f1e1181]: 14 days ago
+          - button "dentists in Pune 0 results · 14 days ago" [ref=f1e1182] [cursor=pointer]:
+            - generic [ref=f1e1188]:
+              - generic [ref=f1e1189]: dentists in Pune
+              - generic [ref=f1e1190]:
+                - generic [ref=f1e1191]: 0 results
+                - generic [ref=f1e1192]: ·
+                - generic [ref=f1e1193]: 14 days ago
+          - button "dentists in Pune 0 results · 14 days ago" [ref=f1e1194] [cursor=pointer]:
+            - generic [ref=f1e1200]:
+              - generic [ref=f1e1201]: dentists in Pune
+              - generic [ref=f1e1202]:
+                - generic [ref=f1e1203]: 0 results
+                - generic [ref=f1e1204]: ·
+                - generic [ref=f1e1205]: 14 days ago
+          - button "dentists in Pune 0 results · 14 days ago" [ref=f1e1206] [cursor=pointer]:
+            - generic [ref=f1e1212]:
+              - generic [ref=f1e1213]: dentists in Pune
+              - generic [ref=f1e1214]:
+                - generic [ref=f1e1215]: 0 results
+                - generic [ref=f1e1216]: ·
+                - generic [ref=f1e1217]: 14 days ago
+          - button "dentists in Pune 0 results · 14 days ago" [ref=f1e1218] [cursor=pointer]:
+            - generic [ref=f1e1224]:
+              - generic [ref=f1e1225]: dentists in Pune
+              - generic [ref=f1e1226]:
+                - generic [ref=f1e1227]: 0 results
+                - generic [ref=f1e1228]: ·
+                - generic [ref=f1e1229]: 14 days ago
+          - button "dentists in Pune 50 results · 14 days ago" [ref=f1e1230] [cursor=pointer]:
+            - generic [ref=f1e1236]:
+              - generic [ref=f1e1237]: dentists in Pune
+              - generic [ref=f1e1238]:
+                - generic [ref=f1e1239]: 50 results
+                - generic [ref=f1e1240]: ·
+                - generic [ref=f1e1241]: 14 days ago
+          - button "dentists in Pune 0 results · 14 days ago" [ref=f1e1242] [cursor=pointer]:
+            - generic [ref=f1e1248]:
+              - generic [ref=f1e1249]: dentists in Pune
+              - generic [ref=f1e1250]:
+                - generic [ref=f1e1251]: 0 results
+                - generic [ref=f1e1252]: ·
+                - generic [ref=f1e1253]: 14 days ago
+          - button "dentists in Pune 0 results · 14 days ago" [ref=f1e1254] [cursor=pointer]:
+            - generic [ref=f1e1260]:
+              - generic [ref=f1e1261]: dentists in Pune
+              - generic [ref=f1e1262]:
+                - generic [ref=f1e1263]: 0 results
+                - generic [ref=f1e1264]: ·
+                - generic [ref=f1e1265]: 14 days ago
+          - button "dentists in Pune 0 results · 14 days ago" [ref=f1e1266] [cursor=pointer]:
+            - generic [ref=f1e1272]:
+              - generic [ref=f1e1273]: dentists in Pune
+              - generic [ref=f1e1274]:
+                - generic [ref=f1e1275]: 0 results
+                - generic [ref=f1e1276]: ·
+                - generic [ref=f1e1277]: 14 days ago
+          - button "dentists in Pune 0 results · 14 days ago" [ref=f1e1278] [cursor=pointer]:
+            - generic [ref=f1e1284]:
+              - generic [ref=f1e1285]: dentists in Pune
+              - generic [ref=f1e1286]:
+                - generic [ref=f1e1287]: 0 results
+                - generic [ref=f1e1288]: ·
+                - generic [ref=f1e1289]: 14 days ago
+          - button "dentists in Pune 0 results · 14 days ago" [ref=f1e1290] [cursor=pointer]:
+            - generic [ref=f1e1296]:
+              - generic [ref=f1e1297]: dentists in Pune
+              - generic [ref=f1e1298]:
+                - generic [ref=f1e1299]: 0 results
+                - generic [ref=f1e1300]: ·
+                - generic [ref=f1e1301]: 14 days ago
+          - button "dentists in Pune 0 results · 14 days ago" [ref=f1e1302] [cursor=pointer]:
+            - generic [ref=f1e1308]:
+              - generic [ref=f1e1309]: dentists in Pune
+              - generic [ref=f1e1310]:
+                - generic [ref=f1e1311]: 0 results
+                - generic [ref=f1e1312]: ·
+                - generic [ref=f1e1313]: 14 days ago
+          - button "dentists in Pune 0 results · 14 days ago" [ref=f1e1314] [cursor=pointer]:
+            - generic [ref=f1e1320]:
+              - generic [ref=f1e1321]: dentists in Pune
+              - generic [ref=f1e1322]:
+                - generic [ref=f1e1323]: 0 results
+                - generic [ref=f1e1324]: ·
+                - generic [ref=f1e1325]: 14 days ago
+          - button "plumbers in Austin 40 results · 15 days ago" [ref=f1e1326] [cursor=pointer]:
+            - generic [ref=f1e1332]:
+              - generic [ref=f1e1333]: plumbers in Austin
+              - generic [ref=f1e1334]:
+                - generic [ref=f1e1335]: 40 results
+                - generic [ref=f1e1336]: ·
+                - generic [ref=f1e1337]: 15 days ago
+        - button "Create new chat" [ref=f1e1339] [cursor=pointer]
+      - button "Collapse history panel" [ref=f1e1340]
+  - region "Notifications alt+T":
+    - list:
+      - listitem [ref=f1e1343]:
+        - generic [ref=f1e1347]: No leads passed verification for this search. Try broadening criteria or refining the query.
+```

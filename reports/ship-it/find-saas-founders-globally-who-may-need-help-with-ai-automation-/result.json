@@ -1,0 +1,1247 @@
+{
+  "questions": [],
+  "clarify": [],
+  "rows": [
+    {
+      "key": "browser:e0139b04c2c97b57d6b5e2ae",
+      "entity_id": "browser:e0139b04c2c97b57d6b5e2ae",
+      "entity_resolved": true,
+      "identity_confidence": 0.85,
+      "kind": "person",
+      "title": "Andrew Breen",
+      "role": "Founder & CEO",
+      "company": "Outshine",
+      "detail": "Founder & CEO | Outshine | SaaS | Andrew Breen | Founder & CEO | Outshine",
+      "url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+      "email": null,
+      "phone": null,
+      "category": null,
+      "industry": "SaaS",
+      "location": null,
+      "country": null,
+      "sector": null,
+      "stage": null,
+      "employer": "Outshine",
+      "salary": null,
+      "opportunity": null,
+      "page_type": "entity_page",
+      "source_page_type": "list",
+      "resolution_method": "browser_observed_subject",
+      "evidence": [
+        {
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:e0139b04c2c97b57d6b5e2ae",
+          "excerpt": "Andrew Breen | Founder & CEO | Outshine",
+          "confidence": 0.85,
+          "extraction_method": "browser_observed_text",
+          "observed_at": "2026-09-25T19:05:01.735Z",
+          "claim_parameters": {
+            "role": "Founder & CEO",
+            "organization_name": "Outshine",
+            "organization_entity_id": "company:browser:22730da23f5c8fb8f1a8ef4a",
+            "relationship": "founder",
+            "role_currentness": "current_role"
+          }
+        },
+        {
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:e0139b04c2c97b57d6b5e2ae",
+          "excerpt": "Top 25 B2B Saas Founders of 2024: Andrew Breen | Founder & CEO | Outshine",
+          "confidence": 0.7,
+          "extraction_method": "browser_named_founder_cohort",
+          "observed_at": "2026-09-25T19:05:01.735Z",
+          "claim_parameters": {
+            "industry": "SaaS"
+          }
+        }
+      ],
+      "field_provenance": {
+        "role": {
+          "value": "Founder & CEO",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.735Z",
+          "confidence": 0.85
+        },
+        "company": {
+          "value": "Outshine",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.735Z",
+          "confidence": 0.85
+        },
+        "industry": {
+          "value": "SaaS",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.735Z",
+          "confidence": 0.85
+        }
+      },
+      "verification_status": "discovered",
+      "why_match": "Identity · Andrew Breen | Founder & CEO | Outshine",
+      "check": null,
+      "missingFields": [],
+      "complete": true,
+      "relevance_score": 0.8,
+      "intent_score": 0,
+      "disposition": "qualified",
+      "disposition_label": null
+    },
+    {
+      "key": "browser:c5f4bce047b11c1d8bf3096f",
+      "entity_id": "browser:c5f4bce047b11c1d8bf3096f",
+      "entity_resolved": true,
+      "identity_confidence": 0.85,
+      "kind": "person",
+      "title": "David Chevalier",
+      "role": "Co-Founder & CEO",
+      "company": "Surfe",
+      "detail": "Co-Founder & CEO | Surfe | SaaS | David Chevalier | Co-Founder & CEO | Surfe",
+      "url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+      "email": null,
+      "phone": null,
+      "category": null,
+      "industry": "SaaS",
+      "location": null,
+      "country": null,
+      "sector": null,
+      "stage": null,
+      "employer": "Surfe",
+      "salary": null,
+      "opportunity": null,
+      "page_type": "entity_page",
+      "source_page_type": "list",
+      "resolution_method": "browser_observed_subject",
+      "evidence": [
+        {
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:c5f4bce047b11c1d8bf3096f",
+          "excerpt": "David Chevalier | Co-Founder & CEO | Surfe",
+          "confidence": 0.85,
+          "extraction_method": "browser_observed_text",
+          "observed_at": "2026-09-25T19:05:01.737Z",
+          "claim_parameters": {
+            "role": "Co-Founder & CEO",
+            "organization_name": "Surfe",
+            "organization_entity_id": "company:browser:6bff171c1a387d5d44302da9",
+            "relationship": "founder",
+            "role_currentness": "current_role"
+          }
+        },
+        {
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:c5f4bce047b11c1d8bf3096f",
+          "excerpt": "Top 25 B2B Saas Founders of 2024: David Chevalier | Co-Founder & CEO | Surfe",
+          "confidence": 0.7,
+          "extraction_method": "browser_named_founder_cohort",
+          "observed_at": "2026-09-25T19:05:01.737Z",
+          "claim_parameters": {
+            "industry": "SaaS"
+          }
+        }
+      ],
+      "field_provenance": {
+        "role": {
+          "value": "Co-Founder & CEO",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.737Z",
+          "confidence": 0.85
+        },
+        "company": {
+          "value": "Surfe",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.737Z",
+          "confidence": 0.85
+        },
+        "industry": {
+          "value": "SaaS",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.737Z",
+          "confidence": 0.85
+        }
+      },
+      "verification_status": "discovered",
+      "why_match": "Identity · David Chevalier | Co-Founder & CEO | Surfe",
+      "check": null,
+      "missingFields": [],
+      "complete": true,
+      "relevance_score": 0.8,
+      "intent_score": 0,
+      "disposition": "qualified",
+      "disposition_label": null
+    },
+    {
+      "key": "browser:05c572d98b19287d6d96bd2f",
+      "entity_id": "browser:05c572d98b19287d6d96bd2f",
+      "entity_resolved": true,
+      "identity_confidence": 0.85,
+      "kind": "person",
+      "title": "Alex Circei",
+      "role": "Co-Founder and CEO",
+      "company": "Waydev",
+      "detail": "Co-Founder and CEO | Waydev | SaaS | Alex Circei | Co-Founder and CEO | Waydev",
+      "url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+      "email": null,
+      "phone": null,
+      "category": null,
+      "industry": "SaaS",
+      "location": null,
+      "country": null,
+      "sector": null,
+      "stage": null,
+      "employer": "Waydev",
+      "salary": null,
+      "opportunity": null,
+      "page_type": "entity_page",
+      "source_page_type": "list",
+      "resolution_method": "browser_observed_subject",
+      "evidence": [
+        {
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:05c572d98b19287d6d96bd2f",
+          "excerpt": "Alex Circei | Co-Founder and CEO | Waydev",
+          "confidence": 0.85,
+          "extraction_method": "browser_observed_text",
+          "observed_at": "2026-09-25T19:05:01.738Z",
+          "claim_parameters": {
+            "role": "Co-Founder and CEO",
+            "organization_name": "Waydev",
+            "organization_entity_id": "company:browser:2daf11f2b1d0b9734e5e28d2",
+            "relationship": "founder",
+            "role_currentness": "current_role"
+          }
+        },
+        {
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:05c572d98b19287d6d96bd2f",
+          "excerpt": "Top 25 B2B Saas Founders of 2024: Alex Circei | Co-Founder and CEO | Waydev",
+          "confidence": 0.7,
+          "extraction_method": "browser_named_founder_cohort",
+          "observed_at": "2026-09-25T19:05:01.738Z",
+          "claim_parameters": {
+            "industry": "SaaS"
+          }
+        }
+      ],
+      "field_provenance": {
+        "role": {
+          "value": "Co-Founder and CEO",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.738Z",
+          "confidence": 0.85
+        },
+        "company": {
+          "value": "Waydev",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.738Z",
+          "confidence": 0.85
+        },
+        "industry": {
+          "value": "SaaS",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.738Z",
+          "confidence": 0.85
+        }
+      },
+      "verification_status": "discovered",
+      "why_match": "Identity · Alex Circei | Co-Founder and CEO | Waydev",
+      "check": null,
+      "missingFields": [],
+      "complete": true,
+      "relevance_score": 0.8,
+      "intent_score": 0,
+      "disposition": "qualified",
+      "disposition_label": null
+    },
+    {
+      "key": "browser:9c2ca35e17cefa0d70a32a47",
+      "entity_id": "browser:9c2ca35e17cefa0d70a32a47",
+      "entity_resolved": true,
+      "identity_confidence": 0.85,
+      "kind": "person",
+      "title": "Mark Corbett",
+      "role": "Founder",
+      "company": "Thrust Carbon",
+      "detail": "Founder | Thrust Carbon | SaaS | Mark Corbett | Founder | Thrust Carbon",
+      "url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+      "email": null,
+      "phone": null,
+      "category": null,
+      "industry": "SaaS",
+      "location": null,
+      "country": null,
+      "sector": null,
+      "stage": null,
+      "employer": "Thrust Carbon",
+      "salary": null,
+      "opportunity": null,
+      "page_type": "entity_page",
+      "source_page_type": "list",
+      "resolution_method": "browser_observed_subject",
+      "evidence": [
+        {
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:9c2ca35e17cefa0d70a32a47",
+          "excerpt": "Mark Corbett | Founder | Thrust Carbon",
+          "confidence": 0.85,
+          "extraction_method": "browser_observed_text",
+          "observed_at": "2026-09-25T19:05:01.739Z",
+          "claim_parameters": {
+            "role": "Founder",
+            "organization_name": "Thrust Carbon",
+            "organization_entity_id": "company:browser:38c28e1c0560d98a6ac8b41c",
+            "relationship": "founder",
+            "role_currentness": "current_role"
+          }
+        },
+        {
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:9c2ca35e17cefa0d70a32a47",
+          "excerpt": "Top 25 B2B Saas Founders of 2024: Mark Corbett | Founder | Thrust Carbon",
+          "confidence": 0.7,
+          "extraction_method": "browser_named_founder_cohort",
+          "observed_at": "2026-09-25T19:05:01.739Z",
+          "claim_parameters": {
+            "industry": "SaaS"
+          }
+        }
+      ],
+      "field_provenance": {
+        "role": {
+          "value": "Founder",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.739Z",
+          "confidence": 0.85
+        },
+        "company": {
+          "value": "Thrust Carbon",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.739Z",
+          "confidence": 0.85
+        },
+        "industry": {
+          "value": "SaaS",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.739Z",
+          "confidence": 0.85
+        }
+      },
+      "verification_status": "discovered",
+      "why_match": "Identity · Mark Corbett | Founder | Thrust Carbon",
+      "check": null,
+      "missingFields": [],
+      "complete": true,
+      "relevance_score": 0.8,
+      "intent_score": 0,
+      "disposition": "qualified",
+      "disposition_label": null
+    },
+    {
+      "key": "browser:e3f43111ff214abcb9f5b700",
+      "entity_id": "browser:e3f43111ff214abcb9f5b700",
+      "entity_resolved": true,
+      "identity_confidence": 0.85,
+      "kind": "person",
+      "title": "Pranjal Daga",
+      "role": "Co-Founder and Co-CEO",
+      "company": "Accend (YC S23)",
+      "detail": "Co-Founder and Co-CEO | Accend (YC S23) | SaaS | Pranjal Daga | Co-Founder and Co-CEO | Accend (YC S23)",
+      "url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+      "email": null,
+      "phone": null,
+      "category": null,
+      "industry": "SaaS",
+      "location": null,
+      "country": null,
+      "sector": null,
+      "stage": null,
+      "employer": "Accend (YC S23)",
+      "salary": null,
+      "opportunity": null,
+      "page_type": "entity_page",
+      "source_page_type": "list",
+      "resolution_method": "browser_observed_subject",
+      "evidence": [
+        {
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:e3f43111ff214abcb9f5b700",
+          "excerpt": "Pranjal Daga | Co-Founder and Co-CEO | Accend (YC S23)",
+          "confidence": 0.85,
+          "extraction_method": "browser_observed_text",
+          "observed_at": "2026-09-25T19:05:01.740Z",
+          "claim_parameters": {
+            "role": "Co-Founder and Co-CEO",
+            "organization_name": "Accend (YC S23)",
+            "organization_entity_id": "company:browser:f27440f2df3bc4d24bff89b1",
+            "relationship": "founder",
+            "role_currentness": "current_role"
+          }
+        },
+        {
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:e3f43111ff214abcb9f5b700",
+          "excerpt": "Top 25 B2B Saas Founders of 2024: Pranjal Daga | Co-Founder and Co-CEO | Accend (YC S23)",
+          "confidence": 0.7,
+          "extraction_method": "browser_named_founder_cohort",
+          "observed_at": "2026-09-25T19:05:01.740Z",
+          "claim_parameters": {
+            "industry": "SaaS"
+          }
+        }
+      ],
+      "field_provenance": {
+        "role": {
+          "value": "Co-Founder and Co-CEO",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.740Z",
+          "confidence": 0.85
+        },
+        "company": {
+          "value": "Accend (YC S23)",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.740Z",
+          "confidence": 0.85
+        },
+        "industry": {
+          "value": "SaaS",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.740Z",
+          "confidence": 0.85
+        }
+      },
+      "verification_status": "discovered",
+      "why_match": "Identity · Pranjal Daga | Co-Founder and Co-CEO | Accend (YC S23)",
+      "check": null,
+      "missingFields": [],
+      "complete": true,
+      "relevance_score": 0.8,
+      "intent_score": 0,
+      "disposition": "qualified",
+      "disposition_label": null
+    },
+    {
+      "key": "browser:d93a68a1e9f8d7febc0d8361",
+      "entity_id": "browser:d93a68a1e9f8d7febc0d8361",
+      "entity_resolved": true,
+      "identity_confidence": 0.85,
+      "kind": "person",
+      "title": "Jennifer Dulski",
+      "role": "CEO & Founder",
+      "company": "Rising Team",
+      "detail": "CEO & Founder | Rising Team | SaaS | Jennifer Dulski | CEO & Founder | Rising Team",
+      "url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+      "email": null,
+      "phone": null,
+      "category": null,
+      "industry": "SaaS",
+      "location": null,
+      "country": null,
+      "sector": null,
+      "stage": null,
+      "employer": "Rising Team",
+      "salary": null,
+      "opportunity": null,
+      "page_type": "entity_page",
+      "source_page_type": "list",
+      "resolution_method": "browser_observed_subject",
+      "evidence": [
+        {
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:d93a68a1e9f8d7febc0d8361",
+          "excerpt": "Jennifer Dulski | CEO & Founder | Rising Team",
+          "confidence": 0.85,
+          "extraction_method": "browser_observed_text",
+          "observed_at": "2026-09-25T19:05:01.744Z",
+          "claim_parameters": {
+            "role": "CEO & Founder",
+            "organization_name": "Rising Team",
+            "organization_entity_id": "company:browser:282705e214f2fdb1e38583a8",
+            "relationship": "founder",
+            "role_currentness": "current_role"
+          }
+        },
+        {
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:d93a68a1e9f8d7febc0d8361",
+          "excerpt": "Top 25 B2B Saas Founders of 2024: Jennifer Dulski | CEO & Founder | Rising Team",
+          "confidence": 0.7,
+          "extraction_method": "browser_named_founder_cohort",
+          "observed_at": "2026-09-25T19:05:01.744Z",
+          "claim_parameters": {
+            "industry": "SaaS"
+          }
+        }
+      ],
+      "field_provenance": {
+        "role": {
+          "value": "CEO & Founder",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.744Z",
+          "confidence": 0.85
+        },
+        "company": {
+          "value": "Rising Team",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.744Z",
+          "confidence": 0.85
+        },
+        "industry": {
+          "value": "SaaS",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.744Z",
+          "confidence": 0.85
+        }
+      },
+      "verification_status": "discovered",
+      "why_match": "Identity · Jennifer Dulski | CEO & Founder | Rising Team",
+      "check": null,
+      "missingFields": [],
+      "complete": true,
+      "relevance_score": 0.8,
+      "intent_score": 0,
+      "disposition": "qualified",
+      "disposition_label": null
+    },
+    {
+      "key": "browser:f06c3c45e39099ecd53961b7",
+      "entity_id": "browser:f06c3c45e39099ecd53961b7",
+      "entity_resolved": true,
+      "identity_confidence": 0.85,
+      "kind": "person",
+      "title": "Henrik Grim",
+      "role": "Co-Founder & CEO",
+      "company": "Mimo",
+      "detail": "Co-Founder & CEO | Mimo | SaaS | Henrik Grim | Co-Founder & CEO | Mimo",
+      "url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+      "email": null,
+      "phone": null,
+      "category": null,
+      "industry": "SaaS",
+      "location": null,
+      "country": null,
+      "sector": null,
+      "stage": null,
+      "employer": "Mimo",
+      "salary": null,
+      "opportunity": null,
+      "page_type": "entity_page",
+      "source_page_type": "list",
+      "resolution_method": "browser_observed_subject",
+      "evidence": [
+        {
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:f06c3c45e39099ecd53961b7",
+          "excerpt": "Henrik Grim | Co-Founder & CEO | Mimo",
+          "confidence": 0.85,
+          "extraction_method": "browser_observed_text",
+          "observed_at": "2026-09-25T19:05:01.745Z",
+          "claim_parameters": {
+            "role": "Co-Founder & CEO",
+            "organization_name": "Mimo",
+            "organization_entity_id": "company:browser:1eb52f8c56dded8346dc732b",
+            "relationship": "founder",
+            "role_currentness": "current_role"
+          }
+        },
+        {
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:f06c3c45e39099ecd53961b7",
+          "excerpt": "Top 25 B2B Saas Founders of 2024: Henrik Grim | Co-Founder & CEO | Mimo",
+          "confidence": 0.7,
+          "extraction_method": "browser_named_founder_cohort",
+          "observed_at": "2026-09-25T19:05:01.745Z",
+          "claim_parameters": {
+            "industry": "SaaS"
+          }
+        }
+      ],
+      "field_provenance": {
+        "role": {
+          "value": "Co-Founder & CEO",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.745Z",
+          "confidence": 0.85
+        },
+        "company": {
+          "value": "Mimo",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.745Z",
+          "confidence": 0.85
+        },
+        "industry": {
+          "value": "SaaS",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.745Z",
+          "confidence": 0.85
+        }
+      },
+      "verification_status": "discovered",
+      "why_match": "Identity · Henrik Grim | Co-Founder & CEO | Mimo",
+      "check": null,
+      "missingFields": [],
+      "complete": true,
+      "relevance_score": 0.8,
+      "intent_score": 0,
+      "disposition": "qualified",
+      "disposition_label": null
+    },
+    {
+      "key": "browser:8ebe1662ef7377d24215f937",
+      "entity_id": "browser:8ebe1662ef7377d24215f937",
+      "entity_resolved": true,
+      "identity_confidence": 0.85,
+      "kind": "person",
+      "title": "Ajay Kamble",
+      "role": "Co-Founder & CEO",
+      "company": "Revalgo",
+      "detail": "Co-Founder & CEO | Revalgo | SaaS | Ajay Kamble | Co-Founder & CEO | Revalgo",
+      "url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+      "email": null,
+      "phone": null,
+      "category": null,
+      "industry": "SaaS",
+      "location": null,
+      "country": null,
+      "sector": null,
+      "stage": null,
+      "employer": "Revalgo",
+      "salary": null,
+      "opportunity": null,
+      "page_type": "entity_page",
+      "source_page_type": "list",
+      "resolution_method": "browser_observed_subject",
+      "evidence": [
+        {
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:8ebe1662ef7377d24215f937",
+          "excerpt": "Ajay Kamble | Co-Founder & CEO | Revalgo",
+          "confidence": 0.85,
+          "extraction_method": "browser_observed_text",
+          "observed_at": "2026-09-25T19:05:01.746Z",
+          "claim_parameters": {
+            "role": "Co-Founder & CEO",
+            "organization_name": "Revalgo",
+            "organization_entity_id": "company:browser:3d4ad5adb79b6409eb9de274",
+            "relationship": "founder",
+            "role_currentness": "current_role"
+          }
+        },
+        {
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "source_type": "web",
+          "evidence_type": "identity",
+          "supports": "identity",
+          "subject": "browser:8ebe1662ef7377d24215f937",
+          "excerpt": "Top 25 B2B Saas Founders of 2024: Ajay Kamble | Co-Founder & CEO | Revalgo",
+          "confidence": 0.7,
+          "extraction_method": "browser_named_founder_cohort",
+          "observed_at": "2026-09-25T19:05:01.746Z",
+          "claim_parameters": {
+            "industry": "SaaS"
+          }
+        }
+      ],
+      "field_provenance": {
+        "role": {
+          "value": "Co-Founder & CEO",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.746Z",
+          "confidence": 0.85
+        },
+        "company": {
+          "value": "Revalgo",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.746Z",
+          "confidence": 0.85
+        },
+        "industry": {
+          "value": "SaaS",
+          "source": "browser_observed_text",
+          "source_url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+          "observed_at": "2026-09-25T19:05:01.746Z",
+          "confidence": 0.85
+        }
+      },
+      "verification_status": "discovered",
+      "why_match": "Identity · Ajay Kamble | Co-Founder & CEO | Revalgo",
+      "check": null,
+      "missingFields": [],
+      "complete": true,
+      "relevance_score": 0.8,
+      "intent_score": 0,
+      "disposition": "qualified",
+      "disposition_label": null
+    }
+  ],
+  "dbMeta": [
+    {
+      "dbHit": false,
+      "engine": "pg-index",
+      "partitionsRead": [
+        "idx_people(country,city_norm,role_norm)"
+      ],
+      "rowsScanned": 0,
+      "rowsReturned": 0,
+      "elapsedMs": 4689,
+      "indexUsed": "idx_ppl_country_citynorm_rolenorm"
+    },
+    {
+      "dbHit": true,
+      "engine": "live-web+browser",
+      "partitionsRead": [
+        "live-gapfill(24)"
+      ],
+      "rowsScanned": 24,
+      "rowsReturned": 24
+    }
+  ],
+  "rejected": 8,
+  "liveDiscovery": "completed",
+  "pendingEnrichment": 0,
+  "moreAvailableMessage": null,
+  "offset": 0,
+  "limit": 50,
+  "hasMore": false,
+  "totalAvailable": null,
+  "spec": {
+    "entity": "person",
+    "criteria": [
+      {
+        "field": "geo_scope",
+        "value": "worldwide",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "role",
+        "value": "founder",
+        "stated": true,
+        "confidence": 0.5
+      },
+      {
+        "field": "industry",
+        "value": "SaaS",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "offer",
+        "value": "AI automation",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "mode",
+        "value": "selling",
+        "stated": true,
+        "confidence": 1
+      }
+    ],
+    "missing": [],
+    "signal_required": false,
+    "signal_types": [],
+    "signal_recency": null,
+    "status": "ready_to_search",
+    "raw_query": "Find SaaS founders globally who may need help with AI automation.",
+    "locationSuggestion": null,
+    "understanding": {
+      "version": "u1",
+      "input": {
+        "raw": "Find SaaS founders globally who may need help with AI automation.",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "lead_discovery",
+        "raw": null,
+        "confidence": 0.95
+      },
+      "prospecting_mode": {
+        "value": "fit_based",
+        "raw": "may need",
+        "confidence": 0.95
+      },
+      "target": {
+        "entity_type": {
+          "value": "person",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "entity_ambiguous": false,
+        "entity_subtype": null,
+        "role": {
+          "value": "founder",
+          "raw": "founders",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "job_title": null,
+        "industry": {
+          "value": "SaaS",
+          "raw": "SaaS",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "category": null,
+        "business_type": null,
+        "niche": null,
+        "company_stage": null,
+        "technologies": [],
+        "descriptors": []
+      },
+      "relation": {
+        "type": {
+          "value": "none",
+          "raw": "may need",
+          "confidence": 0.95
+        },
+        "direction": {
+          "value": "none",
+          "raw": "may need",
+          "confidence": 0.95
+        },
+        "label": null,
+        "object": null
+      },
+      "organization_context": {
+        "on_behalf_of_company": "unknown",
+        "company": null
+      },
+      "user_context": {
+        "selling": {
+          "service": {
+            "value": "AI automation",
+            "raw": "may need",
+            "normalized": null,
+            "confidence": 0.85
+          },
+          "product": null
+        },
+        "objective": null,
+        "notes": []
+      },
+      "location": {
+        "value": "global",
+        "raw": "globally",
+        "scope": "global",
+        "radius": null,
+        "radius_unit": null,
+        "country_code": null,
+        "canonical": "global",
+        "confidence": 0.5
+      },
+      "temporal": null,
+      "constraints": [],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": false,
+        "reasons": []
+      },
+      "quantity": null,
+      "required_fields": [],
+      "preferred_fields": [],
+      "contact_requirements": [],
+      "verification": [],
+      "output": [],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": false,
+        "fields": [],
+        "reason": null,
+        "question": null
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": null,
+        "model": null,
+        "prompt_version": "u1-v15",
+        "latency_ms": 132,
+        "fallback_used": false,
+        "cached": true,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": null,
+          "repair_attempted": false,
+          "repair_reason": null,
+          "repair_success": null
+        },
+        "notes": [
+          "Modal need describes potential fit; expressed buying intent is not required."
+        ]
+      }
+    }
+  },
+  "outcome": "QUALIFIED_RESULTS",
+  "diagnostics": [],
+  "retrievalTrace": {
+    "sources": [
+      {
+        "source": "pg-index",
+        "partitions": [
+          "idx_people(country,city_norm,role_norm)"
+        ],
+        "scanned": 0,
+        "matched": 0
+      },
+      {
+        "source": "live-web+browser",
+        "partitions": [
+          "live-gapfill(24)"
+        ],
+        "scanned": 24,
+        "matched": 24
+      }
+    ],
+    "rawCandidates": 24,
+    "postSpecFilter": 16,
+    "complete": 16,
+    "pendingEnrichment": 0,
+    "qualificationRejected": 8,
+    "returned": 8,
+    "reason": "RESULTS"
+  },
+  "executionPlan": {
+    "requirements": {
+      "entityTypes": [
+        "person"
+      ],
+      "claims": [],
+      "needsDiscovery": true,
+      "needsIdentityResolution": true,
+      "needsLocation": false,
+      "needsTemporal": false,
+      "opportunity": null
+    },
+    "steps": [
+      {
+        "providerId": "indexed-db",
+        "costTier": 0,
+        "role": "primary",
+        "reason": "primary_tier_L0:indexed-db+identity",
+        "capabilities": {
+          "id": "indexed-db",
+          "label": "Indexed / internal DB",
+          "entityTypes": [
+            "person",
+            "company",
+            "business",
+            "investor",
+            "job"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": true,
+          "locationSupport": true,
+          "temporalSupport": false,
+          "costTier": 0,
+          "live": false
+        }
+      },
+      {
+        "providerId": "direct-http",
+        "costTier": 2,
+        "role": "primary",
+        "reason": "primary_tier_L2:direct-http",
+        "capabilities": {
+          "id": "direct-http",
+          "label": "Direct HTTP fetch",
+          "entityTypes": [
+            "company",
+            "business",
+            "person"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": false,
+          "costTier": 2,
+          "live": true
+        }
+      },
+      {
+        "providerId": "searxng",
+        "costTier": 2,
+        "role": "primary",
+        "reason": "primary_tier_L2:searxng",
+        "capabilities": {
+          "id": "searxng",
+          "label": "SearXNG (self-hosted web)",
+          "entityTypes": [
+            "person",
+            "company",
+            "business",
+            "investor",
+            "job"
+          ],
+          "claims": [
+            "hiring",
+            "service_request",
+            "funding",
+            "social_ask"
+          ],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": true,
+          "temporalSupport": true,
+          "costTier": 2,
+          "live": true
+        }
+      },
+      {
+        "providerId": "html-parser",
+        "costTier": 3,
+        "role": "primary",
+        "reason": "primary_tier_L3:html-parser",
+        "capabilities": {
+          "id": "html-parser",
+          "label": "HTML parser",
+          "entityTypes": [
+            "company",
+            "business",
+            "person",
+            "job"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": false,
+          "costTier": 3,
+          "live": true
+        }
+      },
+      {
+        "providerId": "browser-automation",
+        "costTier": 5,
+        "role": "escalation",
+        "reason": "escalate_after_free_ladder:browser-automation",
+        "capabilities": {
+          "id": "browser-automation",
+          "label": "Browser automation",
+          "entityTypes": [
+            "company",
+            "business",
+            "person",
+            "job"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": false,
+          "costTier": 5,
+          "live": true,
+          "escalateOnly": true
+        }
+      },
+      {
+        "providerId": "agentic-browser",
+        "costTier": 6,
+        "role": "escalation",
+        "reason": "escalate_after_free_ladder:agentic-browser",
+        "capabilities": {
+          "id": "agentic-browser",
+          "label": "Agentic browser",
+          "entityTypes": [
+            "company",
+            "business",
+            "person"
+          ],
+          "claims": [
+            "service_request",
+            "hiring",
+            "social_ask"
+          ],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": true,
+          "costTier": 6,
+          "live": true,
+          "escalateOnly": true
+        }
+      },
+      {
+        "providerId": "paid-serp",
+        "costTier": 7,
+        "role": "escalation",
+        "reason": "escalate_after_free_ladder:paid-serp",
+        "capabilities": {
+          "id": "paid-serp",
+          "label": "Paid SERP API",
+          "entityTypes": [
+            "person",
+            "company",
+            "business",
+            "investor",
+            "job"
+          ],
+          "claims": [
+            "hiring",
+            "service_request",
+            "funding",
+            "social_ask"
+          ],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": true,
+          "temporalSupport": true,
+          "costTier": 7,
+          "live": true,
+          "escalateOnly": true
+        }
+      }
+    ],
+    "skipped": [
+      {
+        "providerId": "osm-local",
+        "reason": "entity_type_mismatch"
+      },
+      {
+        "providerId": "company-registry",
+        "reason": "entity_type_mismatch"
+      },
+      {
+        "providerId": "sitemap-jsonld",
+        "reason": "entity_type_mismatch"
+      },
+      {
+        "providerId": "jobs-fleet",
+        "reason": "entity_type_mismatch"
+      }
+    ],
+    "researchPlan": {
+      "discoveryQueries": [
+        "\"founder\" SaaS",
+        "\"co-founder\" SaaS",
+        "\"Founder & CEO\" SaaS",
+        "site:linkedin.com/in \"founder\" SaaS",
+        "site:linkedin.com/in \"co-founder\" SaaS",
+        "site:linkedin.com/in \"Founder & CEO\" SaaS",
+        "founder SaaS startup"
+      ],
+      "requiredFields": [
+        "name",
+        "role",
+        "company",
+        "industry",
+        "website_or_profile",
+        "identity_evidence"
+      ],
+      "desiredCount": 5,
+      "stoppingRules": {
+        "maxQueries": 7,
+        "maxPages": 15,
+        "maxCandidates": 15,
+        "maxNoProgressQueries": 2
+      }
+    }
+  },
+  "providerAttempts": [
+    {
+      "provider": "indexed-db",
+      "entitiesResolved": 0,
+      "qualified": 0,
+      "attempted": false,
+      "succeeded": false,
+      "artifactsFound": 0,
+      "error": "handled_outside_live_gapfill",
+      "role": "primary",
+      "costTier": 0
+    },
+    {
+      "provider": "direct-http",
+      "entitiesResolved": 0,
+      "qualified": 0,
+      "attempted": true,
+      "succeeded": true,
+      "artifactsFound": 15,
+      "role": "primary",
+      "costTier": 2
+    },
+    {
+      "provider": "browser-live",
+      "attempted": true,
+      "succeeded": true,
+      "artifactsFound": 9,
+      "entitiesResolved": 0,
+      "qualified": 0
+    }
+  ],
+  "search_run_id": "run_8e30e4e0",
+  "conversation_id": "83775911-3efb-42a6-aa40-51453ab9cd2c:85cefea9-88ff-4c50-a2b5-8b1f806aaf63",
+  "turn_id": "1790363047941-asayqeryxgg",
+  "request_id": "req_9e205845",
+  "qualified_count": 8
+}

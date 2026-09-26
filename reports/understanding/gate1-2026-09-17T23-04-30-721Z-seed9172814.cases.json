@@ -1,0 +1,54 @@
+{
+  "seed": 9172814,
+  "holdout": [
+    {
+      "id": "h000a",
+      "prompt": "actuarys who serve quilt shops in Pécs",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "location": "pécs"
+      },
+      "pairWith": "h000b"
+    },
+    {
+      "id": "h000b",
+      "prompt": "quilt shops in Pécs who need a actuary",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "needs_service",
+        "object": "actuary",
+        "location": "pécs"
+      },
+      "pairWith": "h000a"
+    },
+    {
+      "id": "h002a",
+      "prompt": "subtitling agencies in Ann Arbor",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "ann arbor",
+        "clarification": "forbidden"
+      },
+      "pairWith": "h002b"
+    },
+    {
+      "id": "h002b",
+      "prompt": "companies in Ann Arbor needing subtitling",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "needs_service",
+        "object": "subtitling",
+        "location": "ann arbor",
+        "intent_signal_required": true
+      },
+      "pairWith": "h002a"
+    }
+  ],
+  "chaos": []
+}

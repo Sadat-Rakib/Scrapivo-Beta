@@ -1,0 +1,365 @@
+{
+  "key": "crunchbase_2.6m-2.7m.csv",
+  "size": 59037835,
+  "last_modified": "2026-09-08 00:12:14+00:00",
+  "columns": [
+    "id",
+    "created_at",
+    "name",
+    "short_description",
+    "semrush_global_rank",
+    "semrush_visits_latest_month",
+    "num_investors",
+    "funding_total",
+    "num_exits",
+    "num_funding_rounds",
+    "last_funding_type",
+    "last_funding_at",
+    "num_acquisitions",
+    "apptopia_total_apps",
+    "apptopia_total_downloads",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "num_investments",
+    "num_lead_investments",
+    "num_lead_investors",
+    "listed_stock_symbol",
+    "company_type",
+    "hub_tags",
+    "operating_status",
+    "founded_on",
+    "categories",
+    "founders",
+    "website",
+    "ipo_status",
+    "num_employees_enum",
+    "locations",
+    "growth_insight_description",
+    "growth_insight_indicator",
+    "growth_insight_direction",
+    "growth_insight_confidence",
+    "investor_insight_description",
+    "permalink",
+    "url"
+  ],
+  "row_count": 100000,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "id": "other",
+    "created_at": "other",
+    "name": "full_name",
+    "short_description": "descriptive",
+    "semrush_global_rank": "other",
+    "semrush_visits_latest_month": "other",
+    "num_investors": "other",
+    "funding_total": "other",
+    "num_exits": "other",
+    "num_funding_rounds": "other",
+    "last_funding_type": "other",
+    "last_funding_at": "other",
+    "num_acquisitions": "other",
+    "apptopia_total_apps": "other",
+    "apptopia_total_downloads": "other",
+    "contact_email": "email",
+    "phone_number": "phone",
+    "facebook": "social",
+    "linkedin": "linkedin",
+    "twitter": "social",
+    "num_investments": "other",
+    "num_lead_investments": "other",
+    "num_lead_investors": "other",
+    "listed_stock_symbol": "other",
+    "company_type": "company",
+    "hub_tags": "other",
+    "operating_status": "other",
+    "founded_on": "other",
+    "categories": "other",
+    "founders": "other",
+    "website": "website",
+    "ipo_status": "other",
+    "num_employees_enum": "employees",
+    "locations": "other",
+    "growth_insight_description": "descriptive",
+    "growth_insight_indicator": "other",
+    "growth_insight_direction": "other",
+    "growth_insight_confidence": "other",
+    "investor_insight_description": "descriptive",
+    "permalink": "other",
+    "url": "website"
+  },
+  "missing_pct": {
+    "id": 0.0,
+    "created_at": 0.0,
+    "name": 0.0,
+    "short_description": 0.0,
+    "semrush_global_rank": 58.9,
+    "semrush_visits_latest_month": 58.9,
+    "num_investors": 90.8,
+    "funding_total": 91.2,
+    "num_exits": 99.8,
+    "num_funding_rounds": 88.8,
+    "last_funding_type": 88.8,
+    "last_funding_at": 88.5,
+    "num_acquisitions": 98.2,
+    "apptopia_total_apps": 93.6,
+    "apptopia_total_downloads": 98.3,
+    "contact_email": 25.2,
+    "phone_number": 21.0,
+    "facebook": 41.4,
+    "linkedin": 22.2,
+    "twitter": 55.4,
+    "num_investments": 99.6,
+    "num_lead_investments": 99.8,
+    "num_lead_investors": 93.8,
+    "listed_stock_symbol": 99.3,
+    "company_type": 3.5,
+    "hub_tags": 99.8,
+    "operating_status": 0.0,
+    "founded_on": 17.7,
+    "categories": 5.1,
+    "founders": 74.2,
+    "website": 5.3,
+    "ipo_status": 3.1,
+    "num_employees_enum": 14.8,
+    "locations": 7.5,
+    "growth_insight_description": 96.8,
+    "growth_insight_indicator": 96.8,
+    "growth_insight_direction": 98.6,
+    "growth_insight_confidence": 98.6,
+    "investor_insight_description": 98.8,
+    "permalink": 0.0,
+    "url": 0.0
+  },
+  "samples": {
+    "id": [
+      "cd3fb06f-9af8-4044-9ce4-a3dfb388dd19",
+      "a77d3ff2-7c90-40af-ac83-0146465ab0c9",
+      "f32bd880-aa01-4ba8-8077-5febbddf79da"
+    ],
+    "created_at": [
+      "2024-08-24 08:43:03.555682+00",
+      "2024-08-24 08:43:03.555682+00",
+      "2024-08-24 08:43:03.555682+00"
+    ],
+    "name": [
+      "Vanguard Office Building",
+      "Vanguard Online Marketing",
+      "Vanguard Online Media"
+    ],
+    "short_description": [
+      "Vanguard Office Building is an office space leasing company that offers maintenance, management, and cleaning services.",
+      "Vanguard Online Media",
+      "E-commerce omnichannel retail company"
+    ],
+    "phone_number": [
+      "+1 989 791 1099",
+      "+1 843-422-7458",
+      "+1 717 524 9627"
+    ],
+    "facebook": [
+      "https://www.facebook.com/p/Vanguard-Building-100064008186815",
+      "https://www.facebook.com/vanguardonlinemktg",
+      "https://www.facebook.com/vanguardpackaging"
+    ],
+    "company_type": [
+      "for_profit",
+      "for_profit",
+      "for_profit"
+    ],
+    "operating_status": [
+      "active",
+      "active",
+      "active"
+    ],
+    "founded_on": [
+      "1986-01-01",
+      "2018-01-01",
+      "1975-01-01"
+    ],
+    "categories": [
+      "Facilities Support Services, Leasing, Property Management, Rental",
+      "Advertising, Consulting, Digital Marketing, Lead Generation, SEO, Web Design",
+      "Advertising, E-Commerce, Internet, News"
+    ],
+    "website": [
+      "http://www.vanguardbuildingleasing.com",
+      "https://vanguardonlinemarketing.com",
+      "https://www.vanguardoutpost.com"
+    ],
+    "ipo_status": [
+      "private",
+      "private",
+      "private"
+    ],
+    "num_employees_enum": [
+      "c_00001_00010",
+      "c_00011_00050",
+      "c_00001_00010"
+    ],
+    "locations": [
+      "Great Lakes, Midwestern US",
+      "East Coast, Southern US",
+      "Greater Chicago Area, Great Lakes, Midwestern US"
+    ],
+    "permalink": [
+      "vanguard-office-building",
+      "vanguard-online-marketing",
+      "vanguard-online-media"
+    ],
+    "url": [
+      "https://www.crunchbase.com/organization/vanguard-office-building",
+      "https://www.crunchbase.com/organization/vanguard-online-marketing",
+      "https://www.crunchbase.com/organization/vanguard-online-media"
+    ],
+    "contact_email": [
+      "ed@vanguardonlinemarketing.com",
+      "wes@vanguardoutpost.com",
+      "info@vanguardpailung.com"
+    ],
+    "linkedin": [
+      "https://www.linkedin.com/company/vanguard-online-marketing/",
+      "https://www.linkedin.com/company/vanguard-outpost",
+      "https://www.linkedin.com/company/vanguard-companies"
+    ],
+    "twitter": [
+      "https://twitter.com/vanguardolmrkt",
+      "https://twitter.com/outpostvanguard",
+      "https://www.twitter.com/vanguardpkg"
+    ],
+    "founders": [
+      "Edward Gelb",
+      "Wes Hagarman",
+      "Bryce Lawrence"
+    ],
+    "semrush_global_rank": [
+      "3087658",
+      "11404943",
+      "6289722"
+    ],
+    "semrush_visits_latest_month": [
+      "4979",
+      "162",
+      "1050"
+    ],
+    "num_investors": [
+      "3",
+      "1",
+      "1"
+    ],
+    "num_funding_rounds": [
+      "2",
+      "1",
+      "1"
+    ],
+    "last_funding_type": [
+      "debt_financing",
+      "private_equity",
+      "series_b"
+    ],
+    "last_funding_at": [
+      "2019-08-12",
+      "2014-01-01",
+      "2022-04-01"
+    ],
+    "num_lead_investors": [
+      "1",
+      "1",
+      "1"
+    ],
+    "apptopia_total_apps": [
+      "3",
+      "1",
+      "1"
+    ],
+    "funding_total": [
+      "430000000",
+      "1000000",
+      "10000000"
+    ],
+    "growth_insight_description": [
+      "Vanquis Banking Group (LON:VANQ) investors experienced a loss of 84% if they invested five years ago.",
+      "Vantis Vascular raised $5 million in funding to drive innovation in vascular interventions.",
+      "Var Meta's Threads platform reached 175 million users after a year."
+    ],
+    "growth_insight_indicator": [
+      "growing",
+      "growing",
+      "growing"
+    ],
+    "num_acquisitions": [
+      "1",
+      "1",
+      "1"
+    ],
+    "apptopia_total_downloads": [
+      "1296",
+      "11",
+      "5"
+    ],
+    "growth_insight_direction": [
+      "c400_growing",
+      "c200_declining",
+      "c400_growing"
+    ],
+    "growth_insight_confidence": [
+      "c400_high",
+      "c400_high",
+      "c400_high"
+    ],
+    "listed_stock_symbol": [
+      "TSXV:VYC",
+      "TSXV:VSR",
+      "OTC:VTGDF"
+    ],
+    "num_exits": [
+      "4",
+      "2",
+      "1"
+    ],
+    "num_investments": [
+      "9",
+      "1",
+      "6"
+    ],
+    "num_lead_investments": [
+      "6",
+      "1",
+      "1"
+    ],
+    "investor_insight_description": [],
+    "hub_tags": [
+      "unicorn",
+      "cbvp",
+      "cbvp"
+    ]
+  },
+  "validity": {
+    "contact_email": "3/3 valid-shape",
+    "phone_number": "3/3 valid-shape"
+  },
+  "entity": "company",
+  "entity_confidence": 0.85,
+  "entity_why": "value-checked override: name=organization name; founders/company_type/num_employees_enum/funding/ipo_status present; no person first/last-name columns",
+  "social_cols": [
+    "facebook",
+    "linkedin",
+    "twitter",
+    "website",
+    "url"
+  ],
+  "activity_match_keys": [
+    "name",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "company_type",
+    "website",
+    "url"
+  ]
+}

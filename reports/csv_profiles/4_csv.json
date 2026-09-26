@@ -1,0 +1,516 @@
+{
+  "key": "4.csv",
+  "size": 42197002,
+  "last_modified": "2026-09-08 00:12:13+00:00",
+  "columns": [
+    "First Name",
+    "Last Name",
+    "Title",
+    "Company",
+    "Company Name for Emails",
+    "Email",
+    "Email Status",
+    "Seniority",
+    "Departments",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Stage",
+    "# Employees",
+    "Industry",
+    "Keywords",
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "City",
+    "State",
+    "Country",
+    "Company Address",
+    "Company City",
+    "Company State",
+    "Company Country",
+    "Company Phone",
+    "SEO Description",
+    "Technologies",
+    "Annual Revenue",
+    "Total Funding",
+    "Latest Funding",
+    "Latest Funding Amount",
+    "Last Raised At",
+    "Email Sent",
+    "Email Open",
+    "Email Bounced",
+    "Replied",
+    "Demoed",
+    "Number of Retail Locations",
+    "Apollo Contact Id",
+    "Apollo Account Id",
+    "Primary Email Source",
+    "Secondary Email",
+    "Secondary Email Source",
+    "Tertiary Email",
+    "Tertiary Email Source",
+    "Primary Intent Topic",
+    "Primary Intent Score",
+    "Secondary Intent Topic",
+    "Secondary Intent Score",
+    "Contact at Client That Moved Jobs",
+    "Head of Partnerships?",
+    "Client Facing Team?",
+    "Head Of CS 50+ Reps",
+    "in TAM?",
+    "CXplained - Head of CX",
+    "Years In Current Position?",
+    "CXplained - Owner",
+    "Deal Stage",
+    "Simplified Job Title"
+  ],
+  "row_count": 24999,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "First Name": "first_name",
+    "Last Name": "last_name",
+    "Title": "title",
+    "Company": "company",
+    "Company Name for Emails": "email",
+    "Email": "email",
+    "Email Status": "email",
+    "Seniority": "other",
+    "Departments": "other",
+    "First Phone": "phone",
+    "Work Direct Phone": "phone",
+    "Home Phone": "phone",
+    "Mobile Phone": "phone",
+    "Corporate Phone": "phone",
+    "Other Phone": "phone",
+    "Stage": "other",
+    "# Employees": "employees",
+    "Industry": "industry",
+    "Keywords": "descriptive",
+    "Person Linkedin Url": "linkedin",
+    "Website": "website",
+    "Company Linkedin Url": "linkedin",
+    "Facebook Url": "social",
+    "Twitter Url": "social",
+    "City": "other",
+    "State": "other",
+    "Country": "country",
+    "Company Address": "company",
+    "Company City": "company",
+    "Company State": "company",
+    "Company Country": "company",
+    "Company Phone": "phone",
+    "SEO Description": "descriptive",
+    "Technologies": "tech",
+    "Annual Revenue": "other",
+    "Total Funding": "other",
+    "Latest Funding": "other",
+    "Latest Funding Amount": "other",
+    "Last Raised At": "other",
+    "Email Sent": "email",
+    "Email Open": "email",
+    "Email Bounced": "email",
+    "Replied": "other",
+    "Demoed": "other",
+    "Number of Retail Locations": "other",
+    "Apollo Contact Id": "other",
+    "Apollo Account Id": "company",
+    "Primary Email Source": "email",
+    "Secondary Email": "email",
+    "Secondary Email Source": "email",
+    "Tertiary Email": "email",
+    "Tertiary Email Source": "email",
+    "Primary Intent Topic": "other",
+    "Primary Intent Score": "other",
+    "Secondary Intent Topic": "other",
+    "Secondary Intent Score": "other",
+    "Contact at Client That Moved Jobs": "other",
+    "Head of Partnerships?": "other",
+    "Client Facing Team?": "other",
+    "Head Of CS 50+ Reps": "other",
+    "in TAM?": "other",
+    "CXplained - Head of CX": "other",
+    "Years In Current Position?": "title",
+    "CXplained - Owner": "other",
+    "Deal Stage": "other",
+    "Simplified Job Title": "title"
+  },
+  "missing_pct": {
+    "First Name": 0.0,
+    "Last Name": 0.9,
+    "Title": 0.0,
+    "Company": 0.0,
+    "Company Name for Emails": 0.0,
+    "Email": 41.5,
+    "Email Status": 0.0,
+    "Seniority": 0.0,
+    "Departments": 36.0,
+    "First Phone": 4.0,
+    "Work Direct Phone": 100.0,
+    "Home Phone": 100.0,
+    "Mobile Phone": 99.7,
+    "Corporate Phone": 4.1,
+    "Other Phone": 99.9,
+    "Stage": 0.1,
+    "# Employees": 0.1,
+    "Industry": 0.8,
+    "Keywords": 8.6,
+    "Person Linkedin Url": 0.0,
+    "Website": 0.1,
+    "Company Linkedin Url": 0.1,
+    "Facebook Url": 8.6,
+    "Twitter Url": 10.3,
+    "City": 16.9,
+    "State": 12.8,
+    "Country": 0.8,
+    "Company Address": 0.2,
+    "Company City": 11.3,
+    "Company State": 9.1,
+    "Company Country": 0.2,
+    "Company Phone": 3.6,
+    "SEO Description": 15.4,
+    "Technologies": 0.2,
+    "Annual Revenue": 10.2,
+    "Total Funding": 45.8,
+    "Latest Funding": 44.8,
+    "Latest Funding Amount": 47.3,
+    "Last Raised At": 44.8,
+    "Email Sent": 100.0,
+    "Email Open": 0.1,
+    "Email Bounced": 0.0,
+    "Replied": 0.0,
+    "Demoed": 0.0,
+    "Number of Retail Locations": 74.7,
+    "Apollo Contact Id": 0.1,
+    "Apollo Account Id": 0.1,
+    "Primary Email Source": 41.5,
+    "Secondary Email": 99.4,
+    "Secondary Email Source": 99.4,
+    "Tertiary Email": 100.0,
+    "Tertiary Email Source": 100.0,
+    "Primary Intent Topic": 100.0,
+    "Primary Intent Score": 100.0,
+    "Secondary Intent Topic": 100.0,
+    "Secondary Intent Score": 100.0,
+    "Contact at Client That Moved Jobs": 100.0,
+    "Head of Partnerships?": 100.0,
+    "Client Facing Team?": 100.0,
+    "Head Of CS 50+ Reps": 100.0,
+    "in TAM?": 100.0,
+    "CXplained - Head of CX": 100.0,
+    "Years In Current Position?": 100.0,
+    "CXplained - Owner": 100.0,
+    "Deal Stage": 100.0,
+    "Simplified Job Title": 100.0
+  },
+  "samples": {
+    "First Name": [
+      "Terry",
+      "Marie-Cecile",
+      "Tim"
+    ],
+    "Last Name": [
+      "Birch",
+      "Martin-Gruffy",
+      "Bettington"
+    ],
+    "Title": [
+      "Senior Application Manager",
+      "Head of Legal Operations",
+      "Executive Vice President Global Strategy and Market Development"
+    ],
+    "Company": [
+      "Telstra",
+      "Syngenta Group",
+      "Elanco"
+    ],
+    "Company Name for Emails": [
+      "Telstra",
+      "Syngenta Group",
+      "Elanco"
+    ],
+    "Email": [
+      "terry.birch@telstra.com.au",
+      "lizzy.certihr@abagri.com",
+      "voorttammy@deere.com"
+    ],
+    "Email Status": [
+      "Guessed",
+      "Unavailable",
+      "Unavailable"
+    ],
+    "Seniority": [
+      "Manager",
+      "Head",
+      "Vp"
+    ],
+    "First Phone": [
+      "'+61 1300 368 387",
+      "'+41 61 323 11 11",
+      "'+1 877-352-6261"
+    ],
+    "Corporate Phone": [
+      "'+61 1300 368 387",
+      "'+41 61 323 11 11",
+      "'+1 877-352-6261"
+    ],
+    "Stage": [
+      "Cold",
+      "Cold",
+      "Cold"
+    ],
+    "# Employees": [
+      "36000",
+      "60000",
+      "10000"
+    ],
+    "Industry": [
+      "telecommunications",
+      "agriculture",
+      "pharmaceuticals"
+    ],
+    "Keywords": [
+      "agribusiness, crop protection, seeds, farming, biotechnology, sustainable agriculture",
+      "food safety, food production, animal health, pets",
+      "agriculture, construction, forestry, turf care, golf, technology"
+    ],
+    "Person Linkedin Url": [
+      "http://www.linkedin.com/in/terrybirch",
+      "http://www.linkedin.com/in/marie-cecile-martin",
+      "http://www.linkedin.com/in/timbettington"
+    ],
+    "Website": [
+      "http://www.telstra.com.au",
+      "http://www.syngentagroup.com",
+      "http://www.elanco.com"
+    ],
+    "Company Linkedin Url": [
+      "http://www.linkedin.com/company/telstra",
+      "http://www.linkedin.com/company/syngentagroup",
+      "http://www.linkedin.com/company/elanco"
+    ],
+    "Facebook Url": [
+      "http://www.facebook.com/telstra24x7",
+      "https://www.facebook.com/elancoanimalhealth/",
+      "https://facebook.com/abagricareers"
+    ],
+    "Twitter Url": [
+      "http://www.twitter.com/telstra",
+      "https://twitter.com/SyngentaGroup",
+      "https://twitter.com/Elanco/"
+    ],
+    "City": [
+      "Melbourne",
+      "Basel",
+      "Zionsville"
+    ],
+    "State": [
+      "Victoria",
+      "Basel-Stadt",
+      "Indiana"
+    ],
+    "Country": [
+      "Australia",
+      "Switzerland",
+      "United States"
+    ],
+    "Company Address": [
+      "The Rocks, New South Wales, Australia, 2000",
+      "67 Rosentalstrasse, Basel, Basel-Stadt, Switzerland, 4058",
+      "United Kingdom"
+    ],
+    "Company City": [
+      "The Rocks",
+      "Basel",
+      "Moline"
+    ],
+    "Company State": [
+      "New South Wales",
+      "Basel-Stadt",
+      "England"
+    ],
+    "Company Country": [
+      "Australia",
+      "Switzerland",
+      "United Kingdom"
+    ],
+    "Company Phone": [
+      "'+61 1300 368 387",
+      "'+41 61 323 11 11",
+      "'+1 877-352-6261"
+    ],
+    "SEO Description": [
+      "Reversing climate change through conscious nature-based interventions",
+      "Our Purpose: make the world more sustainable by building trust in society through innovation.",
+      "Get free shipping on qualified Millstead products or Buy Online Pick Up in Store today."
+    ],
+    "Technologies": [
+      "Gmail, Google Apps, Google Font API, YouTube, Mobile Friendly, WordPress.org, Circle, AI",
+      "Amazon AWS",
+      "Gmail, Google Apps, Google Cloud Hosting, AI"
+    ],
+    "Annual Revenue": [
+      "1900000",
+      "32200000000",
+      "4450000000"
+    ],
+    "Email Open": [
+      "FALSE",
+      "FALSE",
+      "FALSE"
+    ],
+    "Email Bounced": [
+      "FALSE",
+      "FALSE",
+      "FALSE"
+    ],
+    "Replied": [
+      "FALSE",
+      "FALSE",
+      "FALSE"
+    ],
+    "Demoed": [
+      "FALSE",
+      "FALSE",
+      "FALSE"
+    ],
+    "Number of Retail Locations": [
+      "14",
+      "14",
+      "1767"
+    ],
+    "Apollo Contact Id": [
+      "66dd166505efe5000126d7d4",
+      "66dd166505efe5000126d875",
+      "66dd166505efe5000126d8c5"
+    ],
+    "Apollo Account Id": [
+      "61d8beff379e850001e13fb5",
+      "66c2429c6a3a9b0001c66bdc",
+      "62a3f71c76d1bc00017082b1"
+    ],
+    "Primary Email Source": [
+      "User Managed",
+      "User Managed",
+      "User Managed"
+    ],
+    "Departments": [
+      "Legal, Operations",
+      "Operations",
+      "Human Resources"
+    ],
+    "Total Funding": [
+      "1759600000",
+      "400000000",
+      "1759600000"
+    ],
+    "Latest Funding": [
+      "Debt Financing",
+      "Other",
+      "Debt Financing"
+    ],
+    "Latest Funding Amount": [
+      "250000000",
+      "400000000",
+      "250000000"
+    ],
+    "Last Raised At": [
+      "3/1/2022",
+      "9/1/2021",
+      "3/1/2022"
+    ],
+    "Secondary Email": [
+      "precisionsafetyjpr@live.com",
+      "sarang_ladda@yahoo.com",
+      "sureshnan@yahoo.com"
+    ],
+    "Secondary Email Source": [
+      "Fulfilled by Apollo",
+      "Fulfilled by Apollo",
+      "Fulfilled by Apollo"
+    ],
+    "Work Direct Phone": [
+      "'+41 61 323 11 11",
+      "'+31 40 275 0000"
+    ],
+    "Other Phone": [
+      "'+41 61 323 11 11",
+      "'+31 40 275 0000",
+      "'+372 5649 4349"
+    ],
+    "Mobile Phone": [
+      "'+971 56 175 0549",
+      "'+65 9880 0213",
+      "'+372 5341 8784"
+    ],
+    "Email Sent": [
+      "TRUE"
+    ]
+  },
+  "validity": {
+    "Company Name for Emails": "0/3 valid-shape",
+    "Email": "3/3 valid-shape",
+    "Email Status": "0/3 valid-shape",
+    "First Phone": "3/3 valid-shape",
+    "Work Direct Phone": "2/2 valid-shape",
+    "Mobile Phone": "3/3 valid-shape",
+    "Corporate Phone": "3/3 valid-shape",
+    "Other Phone": "3/3 valid-shape",
+    "Company Phone": "3/3 valid-shape",
+    "Email Sent": "0/1 valid-shape",
+    "Email Open": "0/3 valid-shape",
+    "Email Bounced": "0/3 valid-shape",
+    "Primary Email Source": "0/3 valid-shape",
+    "Secondary Email": "3/3 valid-shape",
+    "Secondary Email Source": "0/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url"
+  ],
+  "activity_match_keys": [
+    "First Name",
+    "Last Name",
+    "Company",
+    "Company Name for Emails",
+    "Email",
+    "Email Status",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "Company Address",
+    "Company City",
+    "Company State",
+    "Company Country",
+    "Company Phone",
+    "Email Sent",
+    "Email Open",
+    "Email Bounced",
+    "Apollo Account Id",
+    "Primary Email Source",
+    "Secondary Email",
+    "Secondary Email Source",
+    "Tertiary Email",
+    "Tertiary Email Source"
+  ]
+}

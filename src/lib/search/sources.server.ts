@@ -371,25 +371,21 @@ async function fetchRedditJson(
     }
   }
 
-  // Unauthenticated fallback (www → old.reddit.com).
+  // Unauthenticated www/old.reddit.com *.json is obsolete: measured 2026-09
+  // returns 403 (anti-bot) then 404 on old.reddit — not recoverable by UA swap.
+  // Treat 403/404/429 as blocked so callers fail closed and prefer Arctic Shift
+  // (searchRedditRss) / OAuth instead of counting empty pages as coverage.
   try {
     const res = await resilientFetch(url, {
       headers: { ...REDDIT_UA, Accept: "application/json" },
     });
     if (res.ok) return { data: (await res.json()) as any, status: res.status, blocked: false };
-    if (res.status === 403) {
-      const oldUrl = url.replace("www.reddit.com", "old.reddit.com");
-      const res2 = await resilientFetch(oldUrl, { headers: { Accept: "application/json" } });
-      if (res2.ok) return { data: (await res2.json()) as any, status: res2.status, blocked: false };
-      return {
-        data: null,
-        status: res2.status,
-        blocked: res2.status === 403 || res2.status === 429,
-      };
+    if (res.status === 403 || res.status === 404 || res.status === 429) {
+      return { data: null, status: res.status, blocked: true };
     }
-    return { data: null, status: res.status, blocked: res.status === 429 };
+    return { data: null, status: res.status, blocked: false };
   } catch {
-    return { data: null, status: 0, blocked: false };
+    return { data: null, status: 0, blocked: true };
   }
 }
 
@@ -602,7 +598,15 @@ function jobBoardTerms(qx: ExpandedQueries): string[] {
 // =====================================================================
 // Hacker News — monthly "Who is hiring?" + "Seeking Freelancer?" threads
 // =====================================================================
-export async function searchHackerNews(qx: ExpandedQueries): Promise<SourceLead[]> {
+/**
+ * Hiring-thread half ONLY (job-openings use): monthly "Who is hiring?"
+ * comments with seeker/profile posts dropped. Extracted verbatim from
+ * searchHackerNews so the jobs fleet can consume openings without the broad
+ * buyer-intent sweeps (Show-HN pitches, freelancer profiles) below.
+ */
+export async function searchHackerNewsHiringThread(
+  qx: ExpandedQueries,
+): Promise<SourceLead[]> {
   const out: SourceLead[] = [];
   const months = [
     "January",
@@ -673,6 +677,13 @@ export async function searchHackerNews(qx: ExpandedQueries): Promise<SourceLead[
       }
     }
   } catch {}
+  return out;
+}
+
+export async function searchHackerNews(qx: ExpandedQueries): Promise<SourceLead[]> {
+  // Hiring-thread half comes from the extracted function above (single
+  // owner); only the broad buyer-intent sweeps remain inline here.
+  const out = await searchHackerNewsHiringThread(qx);
 
   // Broad buyer intent across ALL of Hacker News, not just the hiring thread.
   //
@@ -3294,13 +3305,33 @@ async function searchAllSourcesInner(
     const sourceCounts: Record<string, number> = fileLeads.length
       ? { localbiz_file: fileLeads.length }
       : {};
+    // Hallucination filters on the merged directory set (file rows were
+    // filtered at score time; live rows get the same treatment per task):
+    //  - opportunity filter drops live rows that contradict the ask
+    //    (e.g. a row WITH a website under a no_website hunt);
+    //  - country-contradicting phones are stripped, rows stay.
+    let dirFilter: ((leads: SourceLead[]) => SourceLead[]) | null = null;
+    try {
+      const mod = await import("../local/businesses-file-source");
+      const opportunity = prefs?.localOpportunity ?? null;
+      dirFilter = (leads) => mod.applyDirectoryOpportunityFilter(leads, opportunity);
+    } catch (e) {
+      console.warn("[sources] directory opportunity filter failed", e);
+    }
     settled.forEach((r, i) => {
-      if (r.status === "fulfilled" && r.value.length) {
-        all.push(...r.value);
-        sourcesPresent.add(dirNames[i]);
-        sourceCounts[dirNames[i]] = r.value.length;
-      }
+      if (r.status !== "fulfilled" || !r.value.length) return;
+      const rows = dirFilter ? dirFilter(r.value) : r.value;
+      if (!rows.length) return;
+      all.push(...rows);
+      sourcesPresent.add(dirNames[i]);
+      sourceCounts[dirNames[i]] = rows.length;
     });
+    try {
+      const mod = await import("../local/businesses-file-source");
+      mod.sanitizeDirectoryLeadPhones(all, mod.countryForLocation(loc));
+    } catch (e) {
+      console.warn("[sources] directory phone sanity failed", e);
+    }
     return finishSearch(all, sourcesPresent, sourceCounts, classified, qx, {});
   }
 

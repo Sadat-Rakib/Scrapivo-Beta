@@ -1,0 +1,10 @@
+import { loadEnvFile } from "node:process";
+loadEnvFile(".env");
+const { buildSpec, stated } = await import("../src/lib/search/search-spec");
+const { runLiveGapfill } = await import("../src/lib/search/live-gapfill");
+const spec = buildSpec({ entity: "business", raw_query: "plumbers in Austin with no website", criteria: [stated("category", "plumber"), stated("location", "Austin"), stated("opportunity", "no_website")] });
+let seeds: any[] = [];
+const result = await runLiveGapfill(spec, { desiredCount: 10, browser: async (_spec, options) => { seeds = options.initialCandidates ?? []; return []; } });
+const rows = result.rows;
+console.log(JSON.stringify({ rows: rows.length, noSite: rows.filter(r => !r.website_url).length, structured: rows.filter(r => r.no_website_verification?.structured_absence).length, sourced: rows.filter(r => !!r.no_website_verification?.structured_source_url).length, seeds: seeds.length, diagnostics: result.diagnostics, steps: result.plan?.steps.map((s:any) => s.providerId), sample: rows.slice(0, 5).map(r => ({title:r.title, kind:r.kind, site:r.website_url, source:r.source_url, verification:r.no_website_verification, category:r.category, location:r.location})) }));
+process.exit(0);

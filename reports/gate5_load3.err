@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "C:\Users\mirsa\OneDrive\Desktop\Scrapivo (2)\scripts\pipeline\store.py", line 1119, in <module>
+    pg_load_main()
+    ~~~~~~~~~~~~^^
+  File "C:\Users\mirsa\OneDrive\Desktop\Scrapivo (2)\scripts\pipeline\store.py", line 1021, in pg_load_main
+    conn.autocommit = False
+    ^^^^^^^^^^^^^^^
+psycopg2.ProgrammingError: set_session cannot be used inside a transaction

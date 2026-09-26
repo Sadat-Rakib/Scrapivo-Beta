@@ -360,7 +360,10 @@ export function evaluateQualifiedLeadTheorem(
         fieldOf(spec, "location_id") != null
           ? resolveCanonicalLocation(fieldOf(spec, "location")!)
           : fieldOf(spec, "location");
-      if (required && !locationSatisfies(String(loc), required)) {
+      const normalizedCountryMatches = typeof required === "object" && required?.kind === "country" &&
+        typeof f.country === "string" && !!required.country_code &&
+        f.country.toUpperCase() === required.country_code.toUpperCase();
+      if (required && !normalizedCountryMatches && !locationSatisfies(String(loc), required)) {
         return {
           ok: false,
           reject_code: "LOCATION_MISMATCH",

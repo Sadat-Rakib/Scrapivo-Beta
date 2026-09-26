@@ -1,0 +1,365 @@
+{
+  "key": "crunchbase_1.8m-1.9m.csv",
+  "size": 59248679,
+  "last_modified": "2026-09-08 00:12:14+00:00",
+  "columns": [
+    "id",
+    "created_at",
+    "name",
+    "short_description",
+    "semrush_global_rank",
+    "semrush_visits_latest_month",
+    "num_investors",
+    "funding_total",
+    "num_exits",
+    "num_funding_rounds",
+    "last_funding_type",
+    "last_funding_at",
+    "num_acquisitions",
+    "apptopia_total_apps",
+    "apptopia_total_downloads",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "num_investments",
+    "num_lead_investments",
+    "num_lead_investors",
+    "listed_stock_symbol",
+    "company_type",
+    "hub_tags",
+    "operating_status",
+    "founded_on",
+    "categories",
+    "founders",
+    "website",
+    "ipo_status",
+    "num_employees_enum",
+    "locations",
+    "growth_insight_description",
+    "growth_insight_indicator",
+    "growth_insight_direction",
+    "growth_insight_confidence",
+    "investor_insight_description",
+    "permalink",
+    "url"
+  ],
+  "row_count": 100000,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "id": "other",
+    "created_at": "other",
+    "name": "full_name",
+    "short_description": "descriptive",
+    "semrush_global_rank": "other",
+    "semrush_visits_latest_month": "other",
+    "num_investors": "other",
+    "funding_total": "other",
+    "num_exits": "other",
+    "num_funding_rounds": "other",
+    "last_funding_type": "other",
+    "last_funding_at": "other",
+    "num_acquisitions": "other",
+    "apptopia_total_apps": "other",
+    "apptopia_total_downloads": "other",
+    "contact_email": "email",
+    "phone_number": "phone",
+    "facebook": "social",
+    "linkedin": "linkedin",
+    "twitter": "social",
+    "num_investments": "other",
+    "num_lead_investments": "other",
+    "num_lead_investors": "other",
+    "listed_stock_symbol": "other",
+    "company_type": "company",
+    "hub_tags": "other",
+    "operating_status": "other",
+    "founded_on": "other",
+    "categories": "other",
+    "founders": "other",
+    "website": "website",
+    "ipo_status": "other",
+    "num_employees_enum": "employees",
+    "locations": "other",
+    "growth_insight_description": "descriptive",
+    "growth_insight_indicator": "other",
+    "growth_insight_direction": "other",
+    "growth_insight_confidence": "other",
+    "investor_insight_description": "descriptive",
+    "permalink": "other",
+    "url": "website"
+  },
+  "missing_pct": {
+    "id": 0.0,
+    "created_at": 0.0,
+    "name": 0.0,
+    "short_description": 0.0,
+    "semrush_global_rank": 61.2,
+    "semrush_visits_latest_month": 61.2,
+    "num_investors": 90.8,
+    "funding_total": 91.7,
+    "num_exits": 99.8,
+    "num_funding_rounds": 89.2,
+    "last_funding_type": 89.2,
+    "last_funding_at": 89.1,
+    "num_acquisitions": 98.0,
+    "apptopia_total_apps": 93.6,
+    "apptopia_total_downloads": 98.5,
+    "contact_email": 25.7,
+    "phone_number": 19.1,
+    "facebook": 40.8,
+    "linkedin": 20.1,
+    "twitter": 56.6,
+    "num_investments": 99.5,
+    "num_lead_investments": 99.7,
+    "num_lead_investors": 93.7,
+    "listed_stock_symbol": 99.7,
+    "company_type": 2.5,
+    "hub_tags": 99.8,
+    "operating_status": 0.0,
+    "founded_on": 17.3,
+    "categories": 3.8,
+    "founders": 77.3,
+    "website": 3.9,
+    "ipo_status": 2.0,
+    "num_employees_enum": 13.0,
+    "locations": 6.0,
+    "growth_insight_description": 97.3,
+    "growth_insight_indicator": 97.3,
+    "growth_insight_direction": 99.0,
+    "growth_insight_confidence": 99.0,
+    "investor_insight_description": 99.0,
+    "permalink": 0.0,
+    "url": 0.0
+  },
+  "samples": {
+    "id": [
+      "eb869748-d0dc-4d74-bbba-aa5602d89c73",
+      "c21133f0-2a0e-44f8-9e1e-f9e37a051368",
+      "ce1e90fd-3491-41cc-8b39-242e7ef19597"
+    ],
+    "created_at": [
+      "2024-08-20 12:00:18.182727+00",
+      "2024-08-20 12:00:18.182727+00",
+      "2024-08-20 12:00:18.182727+00"
+    ],
+    "name": [
+      "Optical Systems Engineering Group",
+      "Optical Tel",
+      "Optical Telecom"
+    ],
+    "short_description": [
+      "Optical Tel is a telecommunications company offers video, internet, and telephone services.",
+      "Optical Telecom is a wireless solutions provider focused on in-building and outdoor Distributed Antenna Systems (DAS).",
+      "Optical Valley Venture Capital engaged in investment management and consulting."
+    ],
+    "contact_email": [
+      "spaulding@optsysengr.com",
+      "support@opticaltel.com",
+      "info@opticaltelecom.com"
+    ],
+    "phone_number": [
+      "+1 904-374-2379",
+      "+1.888.274.7635",
+      "(972) 931-0360"
+    ],
+    "linkedin": [
+      "https://www.linkedin.com/company/optical-systems-engineering-group/",
+      "https://www.linkedin.com/company/opticaltel/",
+      "https://www.linkedin.com/company/optical-&-telecommunication-solutions-inc."
+    ],
+    "company_type": [
+      "for_profit",
+      "for_profit",
+      "for_profit"
+    ],
+    "operating_status": [
+      "active",
+      "active",
+      "active"
+    ],
+    "founded_on": [
+      "2015-01-01",
+      "2004-01-01",
+      "1989-01-01"
+    ],
+    "categories": [
+      "Analytics, Industrial Design, Industrial Engineering, Manufacturing",
+      "Consulting, Internet, Telecommunications, Video",
+      "Telecommunications"
+    ],
+    "website": [
+      "https://www.optsysengr.com",
+      "https://www.opticaltel.com",
+      "http://www.optelsol.com/"
+    ],
+    "ipo_status": [
+      "private",
+      "private",
+      "private"
+    ],
+    "num_employees_enum": [
+      "c_00001_00010",
+      "c_00101_00250",
+      "c_00051_00100"
+    ],
+    "locations": [
+      "East Coast, Southern US",
+      "Greater Miami Area, East Coast, Southern US",
+      "Dallas/Fort Worth Metroplex, Southern US"
+    ],
+    "permalink": [
+      "optical-systems-engineering-group",
+      "optical-telecommunications",
+      "optical-telecom"
+    ],
+    "url": [
+      "https://www.crunchbase.com/organization/optical-systems-engineering-group",
+      "https://www.crunchbase.com/organization/optical-telecommunications",
+      "https://www.crunchbase.com/organization/optical-telecom"
+    ],
+    "semrush_global_rank": [
+      "2924440",
+      "8272418",
+      "14291065"
+    ],
+    "semrush_visits_latest_month": [
+      "5461",
+      "588",
+      "53"
+    ],
+    "facebook": [
+      "https://www.facebook.com/OpticalTel/",
+      "https://www.facebook.com/opticaltestcalibration/",
+      "https://www.facebook.com/profile.php?id=100063551473699"
+    ],
+    "twitter": [
+      "https://twitter.com/opticaltel?lang=en",
+      "https://www.twitter.com/OTCltd",
+      "https://twitter.com/opticalwaters"
+    ],
+    "num_investors": [
+      "1",
+      "1",
+      "1"
+    ],
+    "funding_total": [
+      "255492",
+      "10000000",
+      "50000"
+    ],
+    "num_funding_rounds": [
+      "1",
+      "1",
+      "1"
+    ],
+    "last_funding_type": [
+      "grant",
+      "seed",
+      "series_a"
+    ],
+    "last_funding_at": [
+      "2022-01-06",
+      "2018-01-01",
+      "2004-10-26"
+    ],
+    "num_lead_investors": [
+      "1",
+      "1",
+      "1"
+    ],
+    "founders": [
+      "Meir Bartur",
+      "Hadar Pedhazur",
+      "Jörgen Steijer, Mattias Hansson"
+    ],
+    "apptopia_total_apps": [
+      "1",
+      "6",
+      "5"
+    ],
+    "growth_insight_description": [
+      "Optimo Loan secured $10 million in funding to strengthen its MSME lending operations.",
+      "Optimum Retailing reported a breakout year in 2023, indicating a positive financial trend.",
+      "Opus1.io received an investment from Five Elms Capital to accelerate its growth."
+    ],
+    "growth_insight_indicator": [
+      "growing",
+      "growing",
+      "growing"
+    ],
+    "growth_insight_direction": [
+      "c400_growing",
+      "c400_growing",
+      "c300_stable"
+    ],
+    "growth_insight_confidence": [
+      "c300_medium",
+      "c300_medium",
+      "c200_low"
+    ],
+    "investor_insight_description": [],
+    "num_acquisitions": [
+      "1",
+      "1",
+      "1"
+    ],
+    "apptopia_total_downloads": [
+      "10524",
+      "20",
+      "3"
+    ],
+    "listed_stock_symbol": [
+      "OTC:OPGX",
+      "NASDAQ:OPHC",
+      "NASDAQ:OPCH"
+    ],
+    "num_investments": [
+      "1",
+      "2",
+      "2"
+    ],
+    "num_lead_investments": [
+      "1",
+      "1",
+      "1"
+    ],
+    "num_exits": [
+      "1",
+      "1",
+      "2"
+    ],
+    "hub_tags": [
+      "unicorn",
+      "cbvp",
+      "pledge_one_percent"
+    ]
+  },
+  "validity": {
+    "contact_email": "3/3 valid-shape",
+    "phone_number": "3/3 valid-shape"
+  },
+  "entity": "company",
+  "entity_confidence": 0.85,
+  "entity_why": "value-checked override: name=organization name; founders/company_type/num_employees_enum/funding/ipo_status present; no person first/last-name columns",
+  "social_cols": [
+    "facebook",
+    "linkedin",
+    "twitter",
+    "website",
+    "url"
+  ],
+  "activity_match_keys": [
+    "name",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "company_type",
+    "website",
+    "url"
+  ]
+}

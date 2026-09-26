@@ -201,7 +201,11 @@ export function LeadCard({
         )}
       <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
         <span className="truncate">
-          {!isDirectory ? (lead.author ?? "anon") : ""}
+          {!isDirectory
+            ? (lead.source.startsWith("canonical-")
+              ? (lead.author ?? "")
+              : (lead.author ?? "anon"))
+            : ""}
           {!isDirectory && lead.engagement != null ? ` · ${lead.engagement} eng.` : ""}
         </span>
         <span className="flex items-center gap-1 shrink-0">

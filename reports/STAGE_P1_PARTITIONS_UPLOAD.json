@@ -1,0 +1,1890 @@
+[
+  {
+    "key": "processed/companies_by_initial/_part=%21/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%22/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%23/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%24/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%26/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%27/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%28/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%2A/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%2B/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%2C/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%2F/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%3A/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%3C/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%3D/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%3E/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%3F/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%40/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%5B/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%5C/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%60/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%7B/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%7D/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C2%B0/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C2%B4/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C2%BF/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C3%A0/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C3%A1/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C3%A2/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C3%A4/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C3%A5/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C3%A7/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C3%A8/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C3%A9/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C3%AA/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C3%AB/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C3%AD/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C3%B1/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C3%B2/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C3%B3/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C3%B4/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C3%B5/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C3%B6/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C3%B8/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C3%BA/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C3%BC/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C4%81/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C4%8D/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C4%91/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C4%93/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C4%B1/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C5%82/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C5%91/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C5%99/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C5%9B/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C5%9F/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C5%A1/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C5%BC/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%C8%99/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%E2%80%8B/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%E2%80%8D/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%E2%80%8E/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%E2%80%98/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%E2%80%99/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%E2%80%9A/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%E2%80%9C/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%E2%80%A6/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%ED%94%8C/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%EF%B8%8F/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%EF%BC%93/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%EF%BD%84/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=%F0%9D%97%99/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=-/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=0/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=1/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=2/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=3/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=4/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=5/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=6/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=7/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=8/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=9/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=_/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=a/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=b/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=c/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=d/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=e/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=f/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=g/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=h/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=i/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=j/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=k/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=l/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=m/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=n/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=o/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=p/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=q/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=r/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=s/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=t/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=u/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=v/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=w/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=x/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=y/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/companies_by_initial/_part=z/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=afghanistan/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=afghanistan/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=albania/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=albania/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=algeria/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=algeria/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=american-samoa/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=andorra/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=angola/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=argentina/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=argentina/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=arizona/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=armenia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=armenia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=australia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=australia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=austria/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=austria/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=azerbaijan/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=azerbaijan/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=bahrain/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=bahrain/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=bangladesh/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=bangladesh/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=barbados/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=barbados/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=beijing/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=belarus/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=belarus/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=belgium/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=belize/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=benin/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=benin/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=berlin/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=bogota/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=bolivia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=bolivia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=bosnia-and-herzegovina/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=bosnia-and-herzegovina/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=boston/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=botswana/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=botswana/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=brazil/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=brazil/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=bulgaria/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=bulgaria/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=burkina-faso/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=burkina-faso/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=burundi/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=california/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=california/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=cambodia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=cambodia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=cameroon/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=cameroon/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=canada/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=canada/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=catalonia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=central-african-republic/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=central-african-republic/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=chad/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=chad/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=chile/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=chile/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=china/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=china/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=colombia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=colombia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=colorado/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=costa-rica/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=costa-rica/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=cote-d-ivoire/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=cote-d-ivoire/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=croatia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=croatia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=cuba/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=curacao/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=cyprus/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=czech-republic/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=czech-republic/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=czechia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=czechia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=democratic-republic-of-the-congo/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=denmark/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=denmark/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=djibouti/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=djibouti/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=dominican-republic/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=dubois/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=ecuador/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=ecuador/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=egypt/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=egypt/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=el-salvador/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=el-salvador/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=eritrea/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=estonia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=estonia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=ethiopia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=ethiopia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=federal-territory-of-kuala-lumpur/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=fiji/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=finland/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=finland/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=flanders/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=france/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=france/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=gabon/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=gauteng/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=georgia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=georgia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=germany/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=germany/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=ghana/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=ghana/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=greece/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=greece/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=guadeloupe/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=guam/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=guatemala/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=guatemala/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=guinea/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=haiti/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=haiti/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=hamburg/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=haryana/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=hawaii/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=honduras/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=hong-kong/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=hong-kong/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=https-www-facebook-com-cbc-/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=hungary/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=hungary/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=iceland/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=iceland/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=illinois/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=india/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=india/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=indonesia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=indonesia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=iowa/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=iran/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=iran/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=iraq/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=iraq/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=ireland/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=ireland/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=isle-of-man/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=israel/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=israel/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=italy/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=italy/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=ithaca/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=jamaica/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=japan/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=japan/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=jordan/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=jordan/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=kazakhstan/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=kazakhstan/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=kenya/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=kenya/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=kosovo/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=kosovo/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=kuwait/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=kuwait/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=kuwait/data_2.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=kyrgyzstan/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=laos/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=laos/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=latvia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=latvia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=lebanon/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=lebanon/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=lesotho/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=liberia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=liberia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=libya/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=lithuania/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=lithuania/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=lombardy/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=luxembourg/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=luxembourg/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=madagascar/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=maharashtra/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=malawi/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=malawi/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=malaysia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=malaysia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=mali/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=mali/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=malta/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=malta/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=marshall-islands/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=marshall-islands/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=masovian-voivodeship/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=mauritania/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=mauritius/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=melbourne/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=mexico-city/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=mexico/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=mexico/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=missouri/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=moldova/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=moldova/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=mongolia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=mongolia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=montenegro/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=montenegro/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=morocco/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=morocco/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=mozambique/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=mozambique/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=myanmar-burma-/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=nairobi/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=namibia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=namibia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=nepal/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=nepal/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=netherlands/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=netherlands/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=new-south-wales/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=new-york/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=new-zealand/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=new-zealand/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=nicaragua/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=nicaragua/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=niger/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=niger/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=nigeria/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=nigeria/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=north-brabant/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=north-carolina/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=north-korea/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=north-macedonia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=north-macedonia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=north-rhine-westphalia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=norway/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=norway/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=oman/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=ontario/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=oregon/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=pakistan/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=pakistan/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=panama/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=panama/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=paraguay/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=paraguay/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=pennsylvania/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=peru/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=peru/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=philippines/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=philippines/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=poland/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=poland/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=portugal/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=portugal/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=provence-alpes-cote-d-azur/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=puerto-rico/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=puerto-rico/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=qatar/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=qatar/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=republic-of-indonesia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=republic-of-indonesia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=republic-of-the-congo/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=republic-of-the-union-of-myanmar/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=republic-of-the-union-of-myanmar/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=reunion/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=reunion/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=romania/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=romania/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=russia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=russia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=rwanda/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=rwanda/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=saint-lucia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=saudi-arabia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=saudi-arabia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=senegal/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=senegal/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=serbia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=serbia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=sierra-leone/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=singapore/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=singapore/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=slovakia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=slovakia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=slovenia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=slovenia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=somalia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=somalia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=south-africa/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=south-africa/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=south-korea/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=south-korea/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=south-sudan/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=south-sudan/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=spain/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=spain/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=sri-lanka/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=sri-lanka/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=state-of-goias/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=sudan/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=sudan/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=swaziland/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=swaziland/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=sweden/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=sweden/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=switzerland/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=switzerland/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=syria/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=taiwan/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=taiwan/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=tajikistan/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=tanzania/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=tanzania/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=thailand/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=thailand/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=the-bahamas/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=the-gambia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=timor-leste/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=timor-leste/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=togo/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=togo/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=trinidad-and-tobago/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=trinidad-and-tobago/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=tucson/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=tuerkiye/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=tuerkiye/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=tunisia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=tunisia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=turkey/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=turkey/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=turkmenistan/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=u-s-virgin-islands/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=u-s-virgin-islands/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=uganda/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=uganda/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=ukraine/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=ukraine/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=united-arab-emirates/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=united-arab-emirates/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=united-kingdom/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=united-kingdom/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=united-states/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=uruguay/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=uruguay/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=uttar-pradesh/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=uzbekistan/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=uzbekistan/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=vanuatu/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=venezuela/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=venezuela/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=vietnam/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=vietnam/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=yemen/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=yemen/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=zambia/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=zambia/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=zimbabwe/data_0.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=zimbabwe/data_1.parquet",
+    "status": "uploaded-verified"
+  },
+  {
+    "key": "processed/people_by_country/_part=zurich/data_0.parquet",
+    "status": "uploaded-verified"
+  }
+]

@@ -1,0 +1,52 @@
+{
+  "key": "trucking- 15.6k.csv",
+  "entity": "person",
+  "rows": 15536,
+  "required_fields": [
+    "Name",
+    "Company",
+    "Title",
+    "Email",
+    "Phone",
+    "Website",
+    "Social(any)",
+    "Location"
+  ],
+  "absent_columns": [],
+  "complete": 14916,
+  "incomplete": 620,
+  "complete_pct": 96.0,
+  "missing_counts": {
+    "Phone": 327,
+    "Social(any)": 300,
+    "Company": 1
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Phone"
+      ],
+      "rows": 319
+    },
+    {
+      "missing": [
+        "Social(any)"
+      ],
+      "rows": 292
+    },
+    {
+      "missing": [
+        "Phone",
+        "Social(any)"
+      ],
+      "rows": 8
+    },
+    {
+      "missing": [
+        "Company"
+      ],
+      "rows": 1
+    }
+  ],
+  "people_bonus_rows": 0
+}

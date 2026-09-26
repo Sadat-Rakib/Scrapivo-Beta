@@ -684,6 +684,9 @@ export const runSearch = createServerFn({ method: "POST" })
     // Companies-DB seed rows (hiring companies) — collected in the jobs
     // branch below, merged into the companies segment after segmentation.
     const companySeedRows: import("./search/lead-segments").CompanyRow[] = [];
+    // People-DB seed rows (directory + user CSVs) — collected below,
+    // merged into the people segment after segmentation.
+    const peopleSeedRows: import("./search/lead-segments").PersonRow[] = [];
 
     let {
       leads: raw,
@@ -695,6 +698,26 @@ export const runSearch = createServerFn({ method: "POST" })
       subredditBoosts,
       prefs,
     });
+
+    if (searchPlan.playbook === "GENERAL_PEOPLE") {
+      try {
+        const { searchCompletePeople } = await import("./people/local-file-source");
+        peopleSeedRows.push(
+          ...(await searchCompletePeople({
+            query: `${classified.coreSkill || ""} ${data.query}`,
+            role:
+              classified.roleTitle && classified.roleTitle !== classified.raw
+                ? classified.roleTitle
+                : null,
+            location: classified.location,
+            limit: 24,
+          })),
+        );
+        if (peopleSeedRows.length) sources = [...new Set([...sources, "people_db"])];
+      } catch (e) {
+        console.warn("[discover] people DB blend failed", e);
+      }
+    }
 
     if (searchPlan.playbook === "JOB_DISCOVERY") {
       try {
@@ -782,7 +805,7 @@ export const runSearch = createServerFn({ method: "POST" })
     const { enrichLeadWhy, scoreLead } = await import("./scoring");
     const { scoreUrgency, detectDemandBuckets, scoreIntentFit } =
       await import("./search/intent-lexicon");
-    const { segmentLeads } = await import("./search/lead-segments");
+    const { segmentLeads, applyJobDiscoveryBoost } = await import("./search/lead-segments");
 
     // Stage funnel tracing: SCRAPIVO_DEBUG_STAGES=1 prints per-source counts at
     // each attrition point, so "35 fetched but 3 shown" is diagnosable.
@@ -989,6 +1012,12 @@ export const runSearch = createServerFn({ method: "POST" })
         hasEvidenceUrl: !!lead.full_post_url,
       });
       lead.score = Math.round((lead.score ?? 0) * 0.7 + fit * 0.3);
+      // JOB_DISCOVERY merge: job-native leads rank above generic web-search
+      // cards; non-job-shaped web rows are demoted so postings win.
+      if (searchPlan.playbook === "JOB_DISCOVERY") {
+        const [boosted] = applyJobDiscoveryBoost([{ lead, text }]);
+        return boosted;
+      }
       return lead;
     });
 
@@ -1364,7 +1393,12 @@ export const runSearch = createServerFn({ method: "POST" })
         ...companySeedRows.filter((s) => !segments.companies.some((c) => c.key === s.key)),
         ...segments.companies,
       ].slice(0, 150),
-      people: segments.people.slice(0, 150),
+      people: [
+        // People-DB directory rows lead — verified directory records,
+        // not name-extracted posts.
+        ...peopleSeedRows.filter((s) => !segments.people.some((p) => p.key === s.key)),
+        ...segments.people,
+      ].slice(0, 150),
       local: (segments.local || []).slice(0, 150),
     };
 

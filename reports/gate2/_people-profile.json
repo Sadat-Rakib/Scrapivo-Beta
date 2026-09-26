@@ -1,0 +1,322 @@
+{
+  "total": 484325,
+  "countries": 219,
+  "cities": 10144,
+  "titles": 110732,
+  "industries": 168,
+  "company": 484325,
+  "website": 484325,
+  "email": 484325,
+  "phone": 484325,
+  "linkedin": 484307,
+  "other_social": 415967,
+  "any_contact": 484325,
+  "duplicate_linkedin_extra": 84969,
+  "duplicate_website_extra": 369272,
+  "top_countries": [
+    [
+      "United States",
+      351216
+    ],
+    [
+      "India",
+      25048
+    ],
+    [
+      "Canada",
+      16904
+    ],
+    [
+      "Australia",
+      13734
+    ],
+    [
+      "Germany",
+      11950
+    ],
+    [
+      "United Kingdom",
+      6392
+    ],
+    [
+      "Brazil",
+      6160
+    ],
+    [
+      "Netherlands",
+      4412
+    ],
+    [
+      "Italy",
+      3104
+    ],
+    [
+      "France",
+      3089
+    ],
+    [
+      "China",
+      2789
+    ],
+    [
+      "Belgium",
+      2408
+    ],
+    [
+      "Spain",
+      2136
+    ],
+    [
+      "Indonesia",
+      1757
+    ],
+    [
+      "Mexico",
+      1753
+    ],
+    [
+      "Poland",
+      1727
+    ],
+    [
+      "Switzerland",
+      1644
+    ],
+    [
+      "Japan",
+      1521
+    ],
+    [
+      "Israel",
+      1466
+    ],
+    [
+      "Singapore",
+      1440
+    ],
+    [
+      "Norway",
+      1058
+    ],
+    [
+      "Argentina",
+      1056
+    ],
+    [
+      "Philippines",
+      1034
+    ],
+    [
+      "South Africa",
+      972
+    ],
+    [
+      "Malaysia",
+      897
+    ]
+  ],
+  "top_titles": [
+    [
+      "Financial Advisor",
+      45925
+    ],
+    [
+      "Owner",
+      23751
+    ],
+    [
+      "Chief Executive Officer",
+      15598
+    ],
+    [
+      "CEO",
+      11371
+    ],
+    [
+      "President",
+      8887
+    ],
+    [
+      "Vice President",
+      5900
+    ],
+    [
+      "Founder",
+      4880
+    ],
+    [
+      "Co-Founder",
+      3847
+    ],
+    [
+      "Assistant Manager",
+      3762
+    ],
+    [
+      "Financial Planner",
+      3113
+    ],
+    [
+      "Project Manager",
+      2798
+    ],
+    [
+      "Product Owner",
+      2797
+    ],
+    [
+      "President & CEO",
+      2736
+    ],
+    [
+      "Manager",
+      2444
+    ],
+    [
+      "Business Owner",
+      2438
+    ],
+    [
+      "Founder & CEO",
+      2118
+    ],
+    [
+      "Agency Owner",
+      2022
+    ],
+    [
+      "President and CEO",
+      1917
+    ],
+    [
+      "Store Manager",
+      1826
+    ],
+    [
+      "Senior Financial Advisor",
+      1744
+    ],
+    [
+      "President/CEO",
+      1685
+    ],
+    [
+      "Wealth Management Advisor",
+      1681
+    ],
+    [
+      "Department Supervisor",
+      1558
+    ],
+    [
+      "Product Manager",
+      1515
+    ],
+    [
+      "owner",
+      1506
+    ],
+    [
+      "Co-Owner",
+      1499
+    ],
+    [
+      "Sales Manager",
+      1369
+    ],
+    [
+      "Operations Manager",
+      1312
+    ],
+    [
+      "Account Manager",
+      1308
+    ],
+    [
+      "Founder and CEO",
+      1264
+    ]
+  ],
+  "top_industries": [
+    [
+      "financial services",
+      103076
+    ],
+    [
+      "chemicals",
+      28224
+    ],
+    [
+      "insurance",
+      27889
+    ],
+    [
+      "information technology & services",
+      27582
+    ],
+    [
+      "retail",
+      24750
+    ],
+    [
+      "machinery",
+      23277
+    ],
+    [
+      "staffing & recruiting",
+      22895
+    ],
+    [
+      "farming",
+      20665
+    ],
+    [
+      "telecommunications",
+      19052
+    ],
+    [
+      "transportation/trucking/railroad",
+      14735
+    ],
+    [
+      "higher education",
+      14607
+    ],
+    [
+      "electrical/electronic manufacturing",
+      9743
+    ],
+    [
+      "construction",
+      8331
+    ],
+    [
+      "agriculture",
+      8218
+    ],
+    [
+      "online media",
+      8202
+    ],
+    [
+      "marketing & advertising",
+      7810
+    ],
+    [
+      "research",
+      6388
+    ],
+    [
+      "banking",
+      6293
+    ],
+    [
+      "hospital & health care",
+      5727
+    ],
+    [
+      null,
+      5477
+    ]
+  ]
+}

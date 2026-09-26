@@ -1,0 +1,365 @@
+{
+  "key": "crunchbase_2.8m-2.87m.csv",
+  "size": 4256045,
+  "last_modified": "2026-09-08 00:28:30+00:00",
+  "columns": [
+    "id",
+    "created_at",
+    "name",
+    "short_description",
+    "semrush_global_rank",
+    "semrush_visits_latest_month",
+    "num_investors",
+    "funding_total",
+    "num_exits",
+    "num_funding_rounds",
+    "last_funding_type",
+    "last_funding_at",
+    "num_acquisitions",
+    "apptopia_total_apps",
+    "apptopia_total_downloads",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "num_investments",
+    "num_lead_investments",
+    "num_lead_investors",
+    "listed_stock_symbol",
+    "company_type",
+    "hub_tags",
+    "operating_status",
+    "founded_on",
+    "categories",
+    "founders",
+    "website",
+    "ipo_status",
+    "num_employees_enum",
+    "locations",
+    "growth_insight_description",
+    "growth_insight_indicator",
+    "growth_insight_direction",
+    "growth_insight_confidence",
+    "investor_insight_description",
+    "permalink",
+    "url"
+  ],
+  "row_count": 7492,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "id": "other",
+    "created_at": "other",
+    "name": "full_name",
+    "short_description": "descriptive",
+    "semrush_global_rank": "other",
+    "semrush_visits_latest_month": "other",
+    "num_investors": "other",
+    "funding_total": "other",
+    "num_exits": "other",
+    "num_funding_rounds": "other",
+    "last_funding_type": "other",
+    "last_funding_at": "other",
+    "num_acquisitions": "other",
+    "apptopia_total_apps": "other",
+    "apptopia_total_downloads": "other",
+    "contact_email": "email",
+    "phone_number": "phone",
+    "facebook": "social",
+    "linkedin": "linkedin",
+    "twitter": "social",
+    "num_investments": "other",
+    "num_lead_investments": "other",
+    "num_lead_investors": "other",
+    "listed_stock_symbol": "other",
+    "company_type": "company",
+    "hub_tags": "other",
+    "operating_status": "other",
+    "founded_on": "other",
+    "categories": "other",
+    "founders": "other",
+    "website": "website",
+    "ipo_status": "other",
+    "num_employees_enum": "employees",
+    "locations": "other",
+    "growth_insight_description": "descriptive",
+    "growth_insight_indicator": "other",
+    "growth_insight_direction": "other",
+    "growth_insight_confidence": "other",
+    "investor_insight_description": "descriptive",
+    "permalink": "other",
+    "url": "website"
+  },
+  "missing_pct": {
+    "id": 0.0,
+    "created_at": 0.0,
+    "name": 0.1,
+    "short_description": 0.1,
+    "semrush_global_rank": 62.2,
+    "semrush_visits_latest_month": 62.2,
+    "num_investors": 84.8,
+    "funding_total": 85.1,
+    "num_exits": 99.9,
+    "num_funding_rounds": 81.0,
+    "last_funding_type": 81.0,
+    "last_funding_at": 80.7,
+    "num_acquisitions": 98.5,
+    "apptopia_total_apps": 88.3,
+    "apptopia_total_downloads": 96.0,
+    "contact_email": 25.0,
+    "phone_number": 36.2,
+    "facebook": 45.8,
+    "linkedin": 30.1,
+    "twitter": 49.4,
+    "num_investments": 99.5,
+    "num_lead_investments": 99.8,
+    "num_lead_investors": 90.5,
+    "listed_stock_symbol": 99.9,
+    "company_type": 3.3,
+    "hub_tags": 99.8,
+    "operating_status": 0.0,
+    "founded_on": 15.0,
+    "categories": 7.4,
+    "founders": 63.3,
+    "website": 4.2,
+    "ipo_status": 2.1,
+    "num_employees_enum": 16.2,
+    "locations": 12.7,
+    "growth_insight_description": 97.0,
+    "growth_insight_indicator": 97.0,
+    "growth_insight_direction": 98.6,
+    "growth_insight_confidence": 98.6,
+    "investor_insight_description": 99.2,
+    "permalink": 0.0,
+    "url": 0.0
+  },
+  "samples": {
+    "id": [
+      "1c7b30a1-e36c-bc06-6871-a7bd0f214a3d",
+      "2658d168-d6d4-4a56-b998-48a4bfab10fc",
+      "94d9e616-4c29-52f3-01d2-4165d0ce039d"
+    ],
+    "created_at": [
+      "2024-08-23 21:17:06.188817+00",
+      "2024-08-23 21:20:40.732423+00",
+      "2024-08-23 21:23:21.097002+00"
+    ],
+    "name": [
+      "theBATstudio",
+      "theBIGzoo",
+      "theBOM"
+    ],
+    "short_description": [
+      "theBATstudio is a boutique consulting firm that provides brand, marketing, and operation strategies for enterprises.",
+      "The Big Zoo is the source for all things animals from pop culture to the darkest jungles and deepest oceans.",
+      "Provider of online marketing services to brands that want to compete in todays digital landscape."
+    ],
+    "contact_email": [
+      "info@thebatstudio.com",
+      "hello@thebrewroom.com",
+      "contact@thebsdb.com"
+    ],
+    "linkedin": [
+      "http://www.linkedin.com/company/thebatstudio",
+      "https://www.linkedin.com/company-beta/10992450",
+      "http://www.linkedin.com/company/thebrewroom"
+    ],
+    "twitter": [
+      "http://twitter.com/cjharmon",
+      "https://twitter.com/ourbomdotcom",
+      "http://twitter.com/thebrewroom"
+    ],
+    "company_type": [
+      "for_profit",
+      "for_profit",
+      "for_profit"
+    ],
+    "operating_status": [
+      "active",
+      "active",
+      "active"
+    ],
+    "founded_on": [
+      "2008-10-19",
+      "2016-01-01",
+      "2011-03-01"
+    ],
+    "categories": [
+      "Advertising, Brand Marketing, Content",
+      "Information Services, Service Industry",
+      "Beauty, Fashion, Lifestyle"
+    ],
+    "website": [
+      "http://www.thebatstudio.com",
+      "https://www.thebigzoo.com",
+      "http://ourbom.com"
+    ],
+    "ipo_status": [
+      "private",
+      "private",
+      "private"
+    ],
+    "num_employees_enum": [
+      "c_00001_00010",
+      "c_00001_00010",
+      "c_00001_00010"
+    ],
+    "locations": [
+      "San Francisco Bay Area, West Coast, Western US",
+      "Greater Houston Area, Southern US",
+      "Greater New York Area, East Coast, Northeastern US"
+    ],
+    "permalink": [
+      "thebatstudio",
+      "thebigzoo",
+      "thebom"
+    ],
+    "url": [
+      "https://www.crunchbase.com/organization/thebatstudio",
+      "https://www.crunchbase.com/organization/thebigzoo",
+      "https://www.crunchbase.com/organization/thebom"
+    ],
+    "facebook": [
+      "https://www.facebook.com/TheBigZoo/",
+      "https://www.facebook.com/the-black-owned-market-188330204843119",
+      "http://www.facebook.com/theBrewRoom"
+    ],
+    "semrush_global_rank": [
+      "1784108",
+      "10905871",
+      "1270882"
+    ],
+    "semrush_visits_latest_month": [
+      "12588",
+      "190",
+      "21495"
+    ],
+    "founders": [
+      "Michelle Dalzon",
+      "Sam Insalaco",
+      "Marissa Shipman"
+    ],
+    "phone_number": [
+      "(716)312-6568",
+      "510.522.3610",
+      "250 869 5952"
+    ],
+    "apptopia_total_apps": [
+      "1",
+      "6",
+      "23"
+    ],
+    "apptopia_total_downloads": [
+      "7687",
+      "367",
+      "10"
+    ],
+    "num_investors": [
+      "1",
+      "5",
+      "8"
+    ],
+    "funding_total": [
+      "500000",
+      "400000000",
+      "1707000"
+    ],
+    "num_funding_rounds": [
+      "1",
+      "2",
+      "2"
+    ],
+    "last_funding_type": [
+      "series_unknown",
+      "series_unknown",
+      "series_unknown"
+    ],
+    "last_funding_at": [
+      "2013-04-01",
+      "2022-06-20",
+      "2014-03-28"
+    ],
+    "num_lead_investors": [
+      "1",
+      "3",
+      "2"
+    ],
+    "num_investments": [
+      "1",
+      "27",
+      "2"
+    ],
+    "investor_insight_description": [],
+    "num_acquisitions": [
+      "2",
+      "1",
+      "2"
+    ],
+    "growth_insight_description": [
+      "In 2023, tix.africa achieved ₦2 billion in ticket sales and is now looking to enter the markets in Rwanda and the UK.",
+      "Trampay received a $250K boost to support Brazil's gig economy.",
+      "Transcosmos Japan started operations in India, showcasing its know-how developed in Japan and abroad."
+    ],
+    "growth_insight_indicator": [
+      "growing",
+      "growing",
+      "growing"
+    ],
+    "growth_insight_direction": [
+      "c400_growing",
+      "c400_growing",
+      "c400_growing"
+    ],
+    "growth_insight_confidence": [
+      "c400_high",
+      "c400_high",
+      "c400_high"
+    ],
+    "hub_tags": [
+      "cbvp",
+      "pledge_one_percent",
+      "emerging_unicorn"
+    ],
+    "num_exits": [
+      "10",
+      "1",
+      "1"
+    ],
+    "num_lead_investments": [
+      "11",
+      "2",
+      "1"
+    ],
+    "listed_stock_symbol": [
+      "NASDAQ:TRVG",
+      "NASDAQ:UCL",
+      "OTC:USEL"
+    ]
+  },
+  "validity": {
+    "contact_email": "3/3 valid-shape",
+    "phone_number": "3/3 valid-shape"
+  },
+  "entity": "company",
+  "entity_confidence": 0.85,
+  "entity_why": "value-checked override: name=organization name; founders/company_type/num_employees_enum/funding/ipo_status present; no person first/last-name columns",
+  "social_cols": [
+    "facebook",
+    "linkedin",
+    "twitter",
+    "website",
+    "url"
+  ],
+  "activity_match_keys": [
+    "name",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "company_type",
+    "website",
+    "url"
+  ]
+}

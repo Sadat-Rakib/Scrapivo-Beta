@@ -48,7 +48,16 @@ function HistoryPage() {
             </div>
             <button
               type="button"
-              onClick={() => navigate({ to: "/discover", search: { q: h.query } })}
+              onClick={() =>
+                navigate({
+                  to: "/discover",
+                  // Saved transcripts reopen exactly; legacy rows (no
+                  // conversation id) fall back to re-running the query.
+                  search: (h as any).conversation_id
+                    ? { conversation: (h as any).conversation_id as string }
+                    : { q: h.query },
+                })
+              }
               className="glass-pill px-3.5 py-1.5 text-xs font-medium text-white/80 hover:text-white flex items-center gap-1.5 shrink-0"
             >
               <RotateCw className="size-3.5" />

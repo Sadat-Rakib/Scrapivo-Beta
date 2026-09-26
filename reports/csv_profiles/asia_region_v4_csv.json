@@ -1,0 +1,182 @@
+{
+  "key": "asia_region_v4.csv",
+  "size": 177742,
+  "last_modified": "2026-09-08 00:14:24+00:00",
+  "columns": [
+    "fullname",
+    "firstname",
+    "lastname",
+    "Title",
+    "fdsfsd",
+    "company",
+    "email",
+    "Email Status",
+    "Seniority",
+    "Departments",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Stage",
+    "# Employees",
+    "Industry"
+  ],
+  "row_count": 829,
+  "sampled_rows": 829,
+  "delimiter": ",",
+  "roles": {
+    "fullname": "last_name",
+    "firstname": "first_name",
+    "lastname": "last_name",
+    "Title": "title",
+    "fdsfsd": "other",
+    "company": "company",
+    "email": "email",
+    "Email Status": "email",
+    "Seniority": "other",
+    "Departments": "other",
+    "First Phone": "phone",
+    "Work Direct Phone": "phone",
+    "Home Phone": "phone",
+    "Mobile Phone": "phone",
+    "Corporate Phone": "phone",
+    "Other Phone": "phone",
+    "Stage": "other",
+    "# Employees": "employees",
+    "Industry": "industry"
+  },
+  "missing_pct": {
+    "fullname": 0.0,
+    "firstname": 0.0,
+    "lastname": 0.6,
+    "Title": 0.0,
+    "fdsfsd": 0.0,
+    "company": 0.0,
+    "email": 0.0,
+    "Email Status": 0.0,
+    "Seniority": 0.0,
+    "Departments": 24.6,
+    "First Phone": 5.7,
+    "Work Direct Phone": 100.0,
+    "Home Phone": 100.0,
+    "Mobile Phone": 97.5,
+    "Corporate Phone": 6.3,
+    "Other Phone": 99.9,
+    "Stage": 0.0,
+    "# Employees": 0.1,
+    "Industry": 1.9
+  },
+  "samples": {
+    "fullname": [
+      "Sridharbabu",
+      "Jiangong",
+      "Mari"
+    ],
+    "firstname": [
+      "Sridharbabu",
+      "Jiangong",
+      "Mari"
+    ],
+    "lastname": [
+      "Jarugula",
+      "Zhang",
+      "Sugata"
+    ],
+    "Title": [
+      "Associate Manager",
+      "JD Retail Cloud VP",
+      "Marketing Communications Manager"
+    ],
+    "fdsfsd": [
+      "Elanco",
+      "JD.com",
+      "BASF"
+    ],
+    "company": [
+      "Elanco",
+      "JD.com",
+      "BASF"
+    ],
+    "email": [
+      "sridharbabu.jarugula@elancoah.com",
+      "jiangong@live.com",
+      "mari.sugata@basf.com"
+    ],
+    "Email Status": [
+      "Verified",
+      "Verified",
+      "Verified"
+    ],
+    "Seniority": [
+      "Manager",
+      "Vp",
+      "Manager"
+    ],
+    "First Phone": [
+      "'+1 877-352-6261",
+      "'+86 10 8911 6155",
+      "'+49 621 600"
+    ],
+    "Corporate Phone": [
+      "'+1 877-352-6261",
+      "'+86 10 8911 6155",
+      "'+49 621 600"
+    ],
+    "Stage": [
+      "Cold",
+      "Cold",
+      "Cold"
+    ],
+    "# Employees": [
+      "10000",
+      "310000",
+      "112000"
+    ],
+    "Industry": [
+      "pharmaceuticals",
+      "information technology & services",
+      "chemicals"
+    ],
+    "Departments": [
+      "Engineering & Technical",
+      "Marketing",
+      "Engineering & Technical, Information Technology"
+    ],
+    "Mobile Phone": [
+      "'+971 56 175 0549",
+      "'+65 9880 0213",
+      "'+65 9722 5199"
+    ],
+    "Other Phone": [
+      "'+65 6350 4482"
+    ]
+  },
+  "validity": {
+    "email": "3/3 valid-shape",
+    "Email Status": "0/3 valid-shape",
+    "First Phone": "3/3 valid-shape",
+    "Mobile Phone": "3/3 valid-shape",
+    "Corporate Phone": "3/3 valid-shape",
+    "Other Phone": "1/1 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [],
+  "activity_match_keys": [
+    "fullname",
+    "firstname",
+    "lastname",
+    "company",
+    "email",
+    "Email Status",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone"
+  ]
+}

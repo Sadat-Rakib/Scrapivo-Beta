@@ -2,7 +2,7 @@
  * Canonical people reader — S3 Parquet, country-partition pruned (Phase 1).
  * Every call returns rows + DbHitMeta proving the canonical dataset was hit.
  */
-import { listPartitionFilesBySize, readFiltered, type DbHitMeta } from "./read-parquet.server";
+import { isReadDeadline, listPartitionFilesBySize, readFiltered, type DbHitMeta } from "./read-parquet.server";
 import { COUNTRY_ISO } from "@/lib/search/search-spec-extract";
 
 export interface CanonicalPerson {
@@ -73,6 +73,8 @@ export interface PersonQuery {
   name?: string;
   company?: string;
   limit?: number;
+  signal?: AbortSignal | null;
+  deadline?: number;
 }
 
 const like = (v: unknown, needle: string) =>
@@ -111,32 +113,29 @@ export async function searchPeopleDB(
   q: PersonQuery,
 ): Promise<{ rows: CanonicalPerson[]; meta: DbHitMeta }> {
   const limit = Math.min(q.limit ?? 50, 200);
+  const budget = { signal: q.signal, deadline: q.deadline ?? Date.now() + 15_000 };
   let keys: string[];
-  const read: string[] = [];
+  try {
   if (q.country) {
     // Partition pruning via resolvePeopleShards: full names, abbreviations
     // ("USA"), and ISO codes ("IN") all resolve to existing shards only.
-    const all = (await listPartitionFilesBySize("processed/people_by_country/")).map(
+    const all = (await listPartitionFilesBySize("processed/people_by_country/", budget)).map(
       (f) => f.key,
     );
     keys = resolvePeopleShards(all, q.country);
-    read.push(
-      `processed/people_by_country/ (resolved shards for "${q.country}": ${keys.length} file(s))`,
-    );
     if (!keys.length) {
       return {
         rows: [],
-        meta: { dbHit: false, engine: "s3-parquet", partitionsRead: read, rowsScanned: 0, rowsReturned: 0 },
+        meta: { dbHit: false, engine: "s3-parquet", partitionsRead: [], rowsScanned: 0, rowsReturned: 0 },
       };
     }
   } else {
     // No country → size-ordered shards (largest first). readFiltered stops
     // at `limit`, so small shards are touched only when needed.
     const all = (
-      await listPartitionFilesBySize("processed/people_by_country/")
+      await listPartitionFilesBySize("processed/people_by_country/", budget)
     ).map((f) => f.key);
     keys = all.slice(0, 12);
-    read.push("processed/people_by_country/ (size-ordered, 12 largest)");
     const where = (r: Record<string, unknown>) =>
       (!q.role || personRoleMatches(r.title, q.role) || (q.role === "founder" && like(r.title, "found"))) &&
       (!q.industry || like(r.industry, q.industry)) &&
@@ -148,30 +147,33 @@ export async function searchPeopleDB(
       keys,
       columns: COLS,
       limit,
-      meta: { dbHit: false, engine: "s3-parquet", partitionsRead: read },
+      meta: { dbHit: false, engine: "s3-parquet", partitionsRead: [] },
       where,
+      ...budget,
     });
-    if (first.rows.length >= limit) return first;
+    if (first.rows.length >= limit || first.meta.coverageIncomplete) return first;
     // Thin first pass → widen to the remaining shards (whole prefix is only
     // ~62MB). Same bounded pattern as the companies reader.
     const rest = all.slice(12);
     if (!rest.length) return first;
-    read.push(`processed/people_by_country/ (widened +${rest.length} shard(s))`);
     const second = await readFiltered<CanonicalPerson>({
       keys: rest,
       columns: COLS,
-      limit,
-      meta: { dbHit: false, engine: "s3-parquet", partitionsRead: read },
+      limit: limit - first.rows.length,
+      meta: { dbHit: false, engine: "s3-parquet", partitionsRead: [] },
       where,
+      ...budget,
     });
     return {
       rows: [...first.rows, ...second.rows].slice(0, limit),
       meta: {
         ...second.meta,
-        partitionsRead: read,
+        partitionsRead: [...first.meta.partitionsRead, ...second.meta.partitionsRead],
         rowsScanned: first.meta.rowsScanned + second.meta.rowsScanned,
         rowsReturned: Math.min(limit, first.rows.length + second.rows.length),
         dbHit: first.rows.length + second.rows.length > 0,
+        coverageIncomplete: second.meta.coverageIncomplete,
+        stopReason: second.meta.stopReason,
       },
     };
   }
@@ -179,7 +181,8 @@ export async function searchPeopleDB(
     keys,
     columns: COLS,
     limit,
-    meta: { dbHit: false, engine: "s3-parquet", partitionsRead: read },
+    meta: { dbHit: false, engine: "s3-parquet", partitionsRead: [] },
+    ...budget,
     where: (r) =>
       (!q.role || personRoleMatches(r.title, q.role) || (q.role === "founder" && like(r.title, "found"))) &&
       (!q.industry || like(r.industry, q.industry)) &&
@@ -189,4 +192,14 @@ export async function searchPeopleDB(
       (!q.company || like(r.company_name, q.company)),
   });
   return first;
+  } catch (error) {
+    if (!isReadDeadline(error)) throw error;
+    return {
+      rows: [],
+      meta: {
+        dbHit: false, engine: "s3-parquet", partitionsRead: [], rowsScanned: 0,
+        rowsReturned: 0, coverageIncomplete: true, stopReason: "deadline",
+      },
+    };
+  }
 }

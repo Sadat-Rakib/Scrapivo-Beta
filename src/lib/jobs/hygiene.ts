@@ -29,14 +29,23 @@ export function sanitizeJobText(raw: string | null | undefined): string {
   // 2. Strip HTML tags
   text = text.replace(/<[^>]*>/g, " ");
 
-  // 3. Decode remaining entities
+  // 3. Decode remaining entities (named + numeric hex/decimal — ATS titles
+  // often ship `&#x28;Senior&#x29;` which named-entity passes leave intact).
   text = text
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&amp;/g, "&")
-    .replace(/&nbsp;/g, " ");
+    .replace(/&nbsp;/g, " ")
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, h) => {
+      const cp = Number.parseInt(h, 16);
+      return Number.isFinite(cp) && cp > 0 ? String.fromCodePoint(cp) : "";
+    })
+    .replace(/&#(\d+);/g, (_, d) => {
+      const cp = Number.parseInt(d, 10);
+      return Number.isFinite(cp) && cp > 0 ? String.fromCodePoint(cp) : "";
+    });
 
   // 4. Collapse whitespace
   return text.replace(/\s+/g, " ").trim();

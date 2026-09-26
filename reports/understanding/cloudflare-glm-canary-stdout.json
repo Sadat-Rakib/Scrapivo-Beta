@@ -1,0 +1,578 @@
+{
+  "canary": "fresh-job-semantics",
+  "provider": "cloudflare",
+  "model": "@cf/zai-org/glm-4.7-flash",
+  "prompt_version": "u1-v15",
+  "require_llm": true,
+  "no_cache": true,
+  "invalid": false,
+  "results": [
+    {
+      "id": "j001",
+      "prompt": "glassblowers in Liege looking for jobs",
+      "expected": "person / lead_discovery / seeking_job / job_based",
+      "pass": true,
+      "provider": "cloudflare:@cf/zai-org/glm-4.7-flash",
+      "model": "@cf/zai-org/glm-4.7-flash",
+      "prompt_version": "u1-v15",
+      "latency_ms": 21198,
+      "fallback_used": false,
+      "cached": false,
+      "repair_attempts": 0,
+      "usage": {
+        "prompt": 5346,
+        "completion": 1098
+      },
+      "error": null,
+      "violations": [],
+      "repairs": [
+        {
+          "code": "OBJECT_NORMALIZED",
+          "message": "object -> employment",
+          "path": "relation.object"
+        },
+        {
+          "code": "LOCATION_CANONICALIZED",
+          "message": "\"Liege\" -> Liege",
+          "path": "location.canonical"
+        },
+        {
+          "code": "INTENT_SIGNAL_SET",
+          "message": "relation \"seeking_job\" implies intent_signal_required=true",
+          "path": "evidence.intent_signal_required"
+        }
+      ],
+      "frame": {
+        "version": "u1",
+        "input": {
+          "raw": "glassblowers in Liege looking for jobs",
+          "normalized": null
+        },
+        "task_type": {
+          "value": "lead_discovery",
+          "raw": null,
+          "confidence": 0.9
+        },
+        "prospecting_mode": {
+          "value": "job_based",
+          "raw": null,
+          "confidence": 0.9
+        },
+        "target": {
+          "entity_type": {
+            "value": "person",
+            "raw": "glassblowers",
+            "confidence": 0.95
+          },
+          "entity_ambiguous": false,
+          "entity_subtype": null,
+          "role": {
+            "value": "glassblower",
+            "raw": "glassblowers",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "job_title": null,
+          "industry": null,
+          "category": null,
+          "business_type": null,
+          "niche": null,
+          "company_stage": null,
+          "technologies": [],
+          "descriptors": []
+        },
+        "relation": {
+          "type": {
+            "value": "seeking_job",
+            "raw": "looking for jobs",
+            "confidence": 0.95
+          },
+          "label": null,
+          "object": {
+            "value": "employment",
+            "raw": "jobs",
+            "normalized": "employment",
+            "confidence": 0.5
+          },
+          "direction": {
+            "value": "subject_to_object",
+            "raw": null,
+            "confidence": 0.9
+          }
+        },
+        "organization_context": {
+          "on_behalf_of_company": "no",
+          "company": null
+        },
+        "user_context": {
+          "selling": null,
+          "objective": null,
+          "notes": []
+        },
+        "location": {
+          "value": "Liege",
+          "raw": "in Liege",
+          "scope": "in",
+          "radius": null,
+          "radius_unit": null,
+          "country_code": null,
+          "canonical": "Liege",
+          "confidence": 0.5
+        },
+        "temporal": null,
+        "constraints": [],
+        "evidence": {
+          "claim_evidence_required": true,
+          "intent_signal_required": true,
+          "reasons": []
+        },
+        "quantity": null,
+        "required_fields": [],
+        "preferred_fields": [],
+        "contact_requirements": [],
+        "verification": [],
+        "output": [],
+        "source_preferences": [],
+        "enrichment_requirements": [],
+        "compound": {
+          "is_compound": false,
+          "subgoals": []
+        },
+        "clarification": {
+          "needed": false,
+          "fields": [],
+          "reason": null,
+          "question": null
+        },
+        "meta": {
+          "extractor": "llm",
+          "provider": "cloudflare:@cf/zai-org/glm-4.7-flash",
+          "model": "@cf/zai-org/glm-4.7-flash",
+          "prompt_version": "u1-v15",
+          "latency_ms": 21198,
+          "fallback_used": false,
+          "cached": false,
+          "notes": []
+        }
+      }
+    },
+    {
+      "id": "j002",
+      "prompt": "companies in Liege hiring glassblowers",
+      "expected": "company / lead_discovery / hiring / hiring_based",
+      "pass": true,
+      "provider": "cloudflare:@cf/zai-org/glm-4.7-flash",
+      "model": "@cf/zai-org/glm-4.7-flash",
+      "prompt_version": "u1-v15",
+      "latency_ms": 17952,
+      "fallback_used": false,
+      "cached": false,
+      "repair_attempts": 0,
+      "usage": {
+        "prompt": 5345,
+        "completion": 887
+      },
+      "error": null,
+      "violations": [],
+      "repairs": [
+        {
+          "code": "LOCATION_CANONICALIZED",
+          "message": "\"Liege\" -> Liege",
+          "path": "location.canonical"
+        },
+        {
+          "code": "INTENT_SIGNAL_SET",
+          "message": "relation \"hiring\" implies intent_signal_required=true",
+          "path": "evidence.intent_signal_required"
+        }
+      ],
+      "frame": {
+        "version": "u1",
+        "input": {
+          "raw": "companies in Liege hiring glassblowers",
+          "normalized": null
+        },
+        "task_type": {
+          "value": "lead_discovery",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "prospecting_mode": {
+          "value": "hiring_based",
+          "raw": null,
+          "confidence": 0.9
+        },
+        "target": {
+          "entity_type": {
+            "value": "business",
+            "raw": "companies",
+            "confidence": 0.95
+          },
+          "entity_ambiguous": false,
+          "entity_subtype": null,
+          "role": null,
+          "job_title": null,
+          "industry": null,
+          "category": null,
+          "business_type": null,
+          "niche": null,
+          "company_stage": null,
+          "technologies": [],
+          "descriptors": []
+        },
+        "relation": {
+          "type": {
+            "value": "hiring",
+            "raw": "hiring",
+            "confidence": 0.9
+          },
+          "label": null,
+          "object": {
+            "value": "glassblower",
+            "raw": "glassblowers",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "direction": {
+            "value": "subject_to_object",
+            "raw": null,
+            "confidence": 0.9
+          }
+        },
+        "organization_context": {
+          "on_behalf_of_company": "unknown",
+          "company": null
+        },
+        "user_context": {
+          "selling": null,
+          "objective": null,
+          "notes": []
+        },
+        "location": {
+          "value": "Liege",
+          "raw": "in Liege",
+          "scope": "in",
+          "radius": null,
+          "radius_unit": null,
+          "country_code": null,
+          "canonical": "Liege",
+          "confidence": 0.5
+        },
+        "temporal": null,
+        "constraints": [],
+        "evidence": {
+          "claim_evidence_required": true,
+          "intent_signal_required": true,
+          "reasons": []
+        },
+        "quantity": null,
+        "required_fields": [],
+        "preferred_fields": [],
+        "contact_requirements": [],
+        "verification": [],
+        "output": [],
+        "source_preferences": [],
+        "enrichment_requirements": [],
+        "compound": {
+          "is_compound": false,
+          "subgoals": []
+        },
+        "clarification": {
+          "needed": false,
+          "fields": [],
+          "reason": null,
+          "question": null
+        },
+        "meta": {
+          "extractor": "llm",
+          "provider": "cloudflare:@cf/zai-org/glm-4.7-flash",
+          "model": "@cf/zai-org/glm-4.7-flash",
+          "prompt_version": "u1-v15",
+          "latency_ms": 17952,
+          "fallback_used": false,
+          "cached": false,
+          "notes": []
+        }
+      }
+    },
+    {
+      "id": "j003",
+      "prompt": "glassblower job postings in Liege from the last two weeks",
+      "expected": "job / job_discovery / none / job_based / within_last 14d",
+      "pass": true,
+      "provider": "cloudflare:@cf/zai-org/glm-4.7-flash",
+      "model": "@cf/zai-org/glm-4.7-flash",
+      "prompt_version": "u1-v15",
+      "latency_ms": 23789,
+      "fallback_used": false,
+      "cached": false,
+      "repair_attempts": 0,
+      "usage": {
+        "prompt": 5350,
+        "completion": 1152
+      },
+      "error": null,
+      "violations": [],
+      "repairs": [
+        {
+          "code": "LOCATION_CANONICALIZED",
+          "message": "\"Liege\" -> Liege",
+          "path": "location.canonical"
+        }
+      ],
+      "frame": {
+        "version": "u1",
+        "input": {
+          "raw": "glassblower job postings in Liege from the last two weeks",
+          "normalized": null
+        },
+        "task_type": {
+          "value": "job_discovery",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "prospecting_mode": {
+          "value": "job_based",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "target": {
+          "entity_type": {
+            "value": "job",
+            "raw": "job postings",
+            "confidence": 0.95
+          },
+          "entity_ambiguous": false,
+          "entity_subtype": null,
+          "role": null,
+          "job_title": {
+            "value": "glassblower",
+            "raw": "glassblower",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "industry": null,
+          "category": null,
+          "business_type": null,
+          "niche": null,
+          "company_stage": null,
+          "technologies": [],
+          "descriptors": []
+        },
+        "relation": {
+          "type": {
+            "value": "none",
+            "raw": null,
+            "confidence": 0.95
+          },
+          "label": null,
+          "object": null,
+          "direction": {
+            "value": "none",
+            "raw": null,
+            "confidence": 0.95
+          }
+        },
+        "organization_context": {
+          "on_behalf_of_company": "unknown",
+          "company": null
+        },
+        "user_context": {
+          "selling": null,
+          "objective": null,
+          "notes": []
+        },
+        "location": {
+          "value": "Liege",
+          "raw": "in Liege",
+          "scope": "in",
+          "radius": null,
+          "radius_unit": null,
+          "country_code": null,
+          "canonical": "Liege",
+          "confidence": 0.5
+        },
+        "temporal": {
+          "relation": "within_last",
+          "window": "2w",
+          "year": null,
+          "raw": "from the last two weeks",
+          "confidence": 0.5
+        },
+        "constraints": [],
+        "evidence": {
+          "claim_evidence_required": true,
+          "intent_signal_required": false,
+          "reasons": []
+        },
+        "quantity": null,
+        "required_fields": [],
+        "preferred_fields": [],
+        "contact_requirements": [],
+        "verification": [],
+        "output": [],
+        "source_preferences": [],
+        "enrichment_requirements": [],
+        "compound": {
+          "is_compound": false,
+          "subgoals": []
+        },
+        "clarification": {
+          "needed": false,
+          "fields": [],
+          "reason": null,
+          "question": null
+        },
+        "meta": {
+          "extractor": "llm",
+          "provider": "cloudflare:@cf/zai-org/glm-4.7-flash",
+          "model": "@cf/zai-org/glm-4.7-flash",
+          "prompt_version": "u1-v15",
+          "latency_ms": 23789,
+          "fallback_used": false,
+          "cached": false,
+          "notes": []
+        }
+      }
+    },
+    {
+      "id": "j004",
+      "prompt": "manufacturers around Bielsko-Biala that need warehouse automation",
+      "expected": "company / needs_service / warehouse automation",
+      "pass": true,
+      "provider": "cloudflare:@cf/zai-org/glm-4.7-flash",
+      "model": "@cf/zai-org/glm-4.7-flash",
+      "prompt_version": "u1-v15",
+      "latency_ms": 33764,
+      "fallback_used": false,
+      "cached": false,
+      "repair_attempts": 0,
+      "usage": {
+        "prompt": 5349,
+        "completion": 1318
+      },
+      "error": null,
+      "violations": [],
+      "repairs": [
+        {
+          "code": "LOCATION_CANONICALIZED",
+          "message": "\"Bielsko-Biala\" -> Bielsko-Biala",
+          "path": "location.canonical"
+        }
+      ],
+      "frame": {
+        "version": "u1",
+        "input": {
+          "raw": "manufacturers around Bielsko-Biala that need warehouse automation",
+          "normalized": null
+        },
+        "task_type": {
+          "value": "lead_discovery",
+          "raw": null,
+          "confidence": 0.9
+        },
+        "prospecting_mode": {
+          "value": "intent_based",
+          "raw": null,
+          "confidence": 0.9
+        },
+        "target": {
+          "entity_type": {
+            "value": "business",
+            "raw": "manufacturers",
+            "confidence": 0.95
+          },
+          "entity_ambiguous": false,
+          "entity_subtype": null,
+          "role": null,
+          "job_title": null,
+          "industry": null,
+          "category": {
+            "value": "manufacturing",
+            "raw": "manufacturers",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "business_type": null,
+          "niche": null,
+          "company_stage": null,
+          "technologies": [],
+          "descriptors": []
+        },
+        "relation": {
+          "type": {
+            "value": "needs_service",
+            "raw": "need warehouse automation",
+            "confidence": 0.9
+          },
+          "label": null,
+          "object": {
+            "value": "warehouse automation",
+            "raw": "warehouse automation",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "direction": {
+            "value": "subject_to_object",
+            "raw": null,
+            "confidence": 0.9
+          }
+        },
+        "organization_context": {
+          "on_behalf_of_company": "unknown",
+          "company": null
+        },
+        "user_context": {
+          "selling": null,
+          "objective": null,
+          "notes": []
+        },
+        "location": {
+          "value": "Bielsko-Biala",
+          "raw": "around Bielsko-Biala",
+          "scope": "near",
+          "radius": null,
+          "radius_unit": null,
+          "country_code": null,
+          "canonical": "Bielsko-Biala",
+          "confidence": 0.5
+        },
+        "temporal": null,
+        "constraints": [],
+        "evidence": {
+          "claim_evidence_required": true,
+          "intent_signal_required": true,
+          "reasons": []
+        },
+        "quantity": null,
+        "required_fields": [],
+        "preferred_fields": [],
+        "contact_requirements": [],
+        "verification": [],
+        "output": [],
+        "source_preferences": [],
+        "enrichment_requirements": [],
+        "compound": {
+          "is_compound": false,
+          "subgoals": []
+        },
+        "clarification": {
+          "needed": false,
+          "fields": [],
+          "reason": null,
+          "question": null
+        },
+        "meta": {
+          "extractor": "llm",
+          "provider": "cloudflare:@cf/zai-org/glm-4.7-flash",
+          "model": "@cf/zai-org/glm-4.7-flash",
+          "prompt_version": "u1-v15",
+          "latency_ms": 33764,
+          "fallback_used": false,
+          "cached": false,
+          "notes": []
+        }
+      }
+    }
+  ]
+}

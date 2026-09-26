@@ -2,9 +2,13 @@ import { describe, expect, it } from "vitest";
 import {
   filterBusinessFileRecords,
   resolveRegionFiles,
+  phoneMatchesCountry,
+  sanitizeDirectoryLeadPhones,
+  applyDirectoryOpportunityFilter,
   type BusinessFileRecord,
   type RegionManifestEntry,
 } from "../businesses-file-source";
+import type { Lead } from "../../scoring";
 
 const rec = (over: Partial<BusinessFileRecord> = {}): BusinessFileRecord => ({
   source: "overture",
@@ -208,5 +212,69 @@ describe("scoreRecord — extraCrafts fallback (classifier mis-picks)", () => {
       location: "Austin",
     });
     expect(score.length).toBe(1);
+  });
+});
+
+const lead = (over: Record<string, unknown> = {}): Lead =>
+  ({
+    source: "osm",
+    platform: "Local business",
+    title: "Acme Plumbing",
+    snippet: "123 Main St, Austin · Phone: +1 512-555-0100",
+    full_post_url: "https://www.openstreetmap.org/node/1",
+    author: "Acme Plumbing",
+    score: 50,
+    ...over,
+  }) as Lead;
+
+describe("phoneMatchesCountry", () => {
+  it("accepts matching prefixes and unjudgeable numbers", () => {
+    expect(phoneMatchesCountry("+91 98765 43210", "IN")).toBe(true);
+    expect(phoneMatchesCountry("+1 512-555-0100", "US")).toBe(true);
+    expect(phoneMatchesCountry("512-555-0100", "IN")).toBe(true); // no "+" → keep
+    expect(phoneMatchesCountry(null, "IN")).toBe(true);
+  });
+  it("rejects contradicting prefixes", () => {
+    expect(phoneMatchesCountry("+1 512-555-0100", "IN")).toBe(false);
+    expect(phoneMatchesCountry("+91 98765 43210", "US")).toBe(false);
+  });
+});
+
+describe("sanitizeDirectoryLeadPhones", () => {
+  it("strips the wrong number but keeps the row", () => {
+    const rows = [
+      lead({ phones: ["+1 512-555-0100"] }),
+      lead({ phones: ["+91 98765 43210"] }),
+    ];
+    const stripped = sanitizeDirectoryLeadPhones(rows, "IN");
+    expect(stripped).toBe(1);
+    expect(rows).toHaveLength(2);
+    expect((rows[0] as Lead & { phones?: string[] }).phones).toBeUndefined();
+    expect(rows[0].snippet).not.toContain("+1 512-555-0100");
+    expect((rows[1] as Lead & { phones?: string[] }).phones).toEqual(["+91 98765 43210"]);
+  });
+  it("is a no-op without a country", () => {
+    const rows = [lead({ phones: ["+1 512-555-0100"] })];
+    expect(sanitizeDirectoryLeadPhones(rows, null)).toBe(0);
+    expect((rows[0] as Lead & { phones?: string[] }).phones).toHaveLength(1);
+  });
+});
+
+describe("applyDirectoryOpportunityFilter", () => {
+  it("no_website drops rows with websites", () => {
+    const withSite = lead({ full_post_url: "https://acme.example.com", company_domain: "acme.example.com" });
+    const without = lead({ full_post_url: "https://www.openstreetmap.org/node/1" });
+    const out = applyDirectoryOpportunityFilter([withSite, without], "no_website");
+    expect(out).toEqual([without]);
+  });
+  it("has_phone keeps only rows with phones", () => {
+    const withPhone = lead({ phones: ["+91 1"] } as Partial<Lead> as Record<string, unknown>);
+    const out = applyDirectoryOpportunityFilter([withPhone, lead()], "has_phone");
+    expect(out).toEqual([withPhone]);
+  });
+  it("passes everything through for null/any", () => {
+    const rows = [lead(), lead()];
+    expect(applyDirectoryOpportunityFilter(rows, null)).toEqual(rows);
+    expect(applyDirectoryOpportunityFilter(rows, "any")).toEqual(rows);
   });
 });

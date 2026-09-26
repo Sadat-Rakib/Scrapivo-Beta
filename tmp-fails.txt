@@ -1,0 +1,59 @@
+﻿ : OBJECT â€” want ~"recruiting" Â· got null
+ : NO_BLOCKING_VIOLATIONS â€” RELATION_OBJECT_MISSING@relation.object
+ : RELATION_HAS_OBJECT â€” offers_service with no object
+ : QUANTITY_NOT_LOST â€” prompt names an amount; quantity is null
+ : CONSTRAINTS â€” want >=1 Â· got 0 []
+ : RELATION_HAS_OBJECT â€” hiring with no object
+ : TEMPORAL_NOT_LOST â€” prompt names a time; frame.temporal is null
+ : REQUIRED_FIELDS â€” want email Â· got name,website,evidence
+ : CLARIFICATION â€” want required Â· got not needed []
+ : ROLE â€” want ~"head of talent" Â· got "heads of talent"
+ : prospecting_mode â€” relation "investing_in" implies prospecting_mode event_based (was unknown)
+ : constraints â€” lacks_asset(website) recorded as a negated exists constraint
+ : usines Â· dentists Â· none Â· Perth
+ : usines Â· orthodontists Â· none Â· Adelaide
+ : ompan Â· startups Â· hiring Â· Helsinki
+ : erso Â· founders Â· asking_for_help Â· â€”
+ : prospecting_mode â€” relation "partnered_with" implies prospecting_mode event_based (was fit_based)
+ : ENTITY_TYPE â€” want person Â· got company
+ : NEGATION â€” want negated location Â· got category
+ : constraints â€” lacks_asset(booking system) recorded as a negated exists constraint
+ : usines Â· chocolatiers Â· none Â· Tulsa
+ : rganizatio Â· dive schools Â· none Â· Inverness
+ : nknow Â· â€” Â· none Â· Waterford
+ : nknow Â· â€” Â· none Â· Hamilton
+ : nknow Â· â€” Â· none Â· Cebu
+ : usines Â· chocolatiers Â· none Â· Daugavpils
+ : RELATION â€” want hiring Â· got none
+ : INTENT_SIGNAL â€” want true Â· got false
+ : RELATION â€” want needs_service Â· got none
+ : OBJECT â€” want ~"voiceover" Â· got null
+ : OBJECT â€” want ~"trade show fabrication" Â· got trade show fabriccation
+ : ENTITY_TYPE â€” want investor Â· got company
+ : OBJECT â€” want ~"quantity surveyor" Â· got quantty surveyors
+ : OBJECT â€” want ~"grant writing" Â· got grant writinng
+ : OBJECT â€” want ~"grant writing" Â· got sommeone
+ : LOCATION â€” want ~"mombasa" Â· got null
+ : LOCATION â€” want ~"pereira" Â· got preeira
+ : LOCATION â€” want ~"timiÈ™oara" Â· got null
+ : LOCATION â€” want ~"busan" Â· got null
+ : LOCATION â€” want ~"kumasi" Â· got kumais
+ : LOCATION â€” want ~"koÅ¡ice" Â· got null
+ : USER_CONTEXT â€” want ~"iso certification" Â· got iso certificaiton and im
+ : USER_CONTEXT â€” want ~"iso certification" Â· got iso cerrtification and im
+ : USER_CONTEXT â€” want ~"iso certification" Â· got iso certificatoin and im
+ : RELATION â€” want lacks_asset Â· got none
+ : OBJECT â€” want ~"website" Â· got null
+ : LOCATION â€” want ~"waterford" Â· got wtaerford
+ : LOCATION â€” want ~"saskatoon" Â· got null
+ : OBJECT â€” want ~"technical translation" Â· got tehcnical transltaion
+ : LOCATION â€” want ~"tromsÃ¸" Â· got null
+ : USER_CONTEXT â€” want ~"subtitling" Â· got subtitlign and im
+ : usines Â· chocolatiers Â· none Â· sfax
+ : usines Â· mushoom farms Â· none Â· gaboronne
+ : usines Â· hydroponic farms Â· none Â· mommbasa
+ : nknow Â· â€” Â· none Â· maribor
+ : nknow Â· â€” Â· none Â· Ã¶rebro
+ : usines Â· orthotics clinics Â· none Â· kelowna
+ : usines Â· quilt shops Â· none Â· Ã–REBRO
+ : usines Â· coobblers Â· none Â· â€”

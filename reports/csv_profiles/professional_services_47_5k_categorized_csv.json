@@ -1,0 +1,182 @@
+{
+  "key": "Professional Services 47.5k_CATEGORIZED.csv",
+  "size": 26125515,
+  "last_modified": "2026-09-08 00:12:13+00:00",
+  "columns": [
+    "First Name",
+    "Last Name",
+    "Title",
+    "Comp name",
+    "Website",
+    "Email",
+    "Phone",
+    "Comp Phone",
+    "Employees",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter",
+    "Country",
+    "Industry",
+    "Tech Used",
+    "Keywords",
+    "SEO Description"
+  ],
+  "row_count": 47511,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "First Name": "first_name",
+    "Last Name": "last_name",
+    "Title": "title",
+    "Comp name": "other",
+    "Website": "website",
+    "Email": "email",
+    "Phone": "phone",
+    "Comp Phone": "phone",
+    "Employees": "employees",
+    "Pers Linkedin": "linkedin",
+    "Comp Linkedin": "linkedin",
+    "Facebook": "social",
+    "Twitter": "social",
+    "Country": "country",
+    "Industry": "industry",
+    "Tech Used": "tech",
+    "Keywords": "descriptive",
+    "SEO Description": "descriptive"
+  },
+  "missing_pct": {
+    "First Name": 0.0,
+    "Last Name": 0.2,
+    "Title": 0.0,
+    "Comp name": 0.0,
+    "Website": 0.0,
+    "Email": 0.0,
+    "Phone": 5.3,
+    "Comp Phone": 5.3,
+    "Employees": 0.0,
+    "Pers Linkedin": 0.0,
+    "Comp Linkedin": 0.1,
+    "Facebook": 32.9,
+    "Twitter": 44.0,
+    "Country": 0.0,
+    "Industry": 1.1,
+    "Tech Used": 100.0,
+    "Keywords": 23.8,
+    "SEO Description": 34.0
+  },
+  "samples": {
+    "First Name": [
+      "Mary",
+      "Emmanuel",
+      "David"
+    ],
+    "Last Name": [
+      "O'Brien",
+      "Colliot",
+      "Salgado"
+    ],
+    "Title": [
+      "Founder and CEO",
+      "CEO",
+      "Chief Executive Officer"
+    ],
+    "Comp name": [
+      "OBI Creative",
+      "Ally Medical",
+      "Everest Rehabilitation Hospitals, LLC"
+    ],
+    "Website": [
+      "http://www.obicreative.com",
+      "http://www.allymedical.com",
+      "http://www.everestrehab.com"
+    ],
+    "Email": [
+      "mobrien@obicreative.com",
+      "ecolliot@allymedical.com",
+      "dsalgado@everestrehab.com"
+    ],
+    "Phone": [
+      "+1 212-367-2655",
+      "+1 281-280-0911",
+      "+1 469-713-1145"
+    ],
+    "Comp Phone": [
+      "+1 212-367-2655",
+      "+1 281-280-0911",
+      "+1 469-713-1145"
+    ],
+    "Employees": [
+      "69",
+      "87",
+      "92"
+    ],
+    "Pers Linkedin": [
+      "http://www.linkedin.com/in/maryannobrien",
+      "http://www.linkedin.com/in/emmanuel-colliot-b9234",
+      "http://www.linkedin.com/in/david-salgado-090213a"
+    ],
+    "Comp Linkedin": [
+      "http://www.linkedin.com/company/obi-creative",
+      "http://www.linkedin.com/company/ally-medical",
+      "http://www.linkedin.com/company/everest-rehab"
+    ],
+    "Facebook": [
+      "https://facebook.com/obicreative",
+      "https://www.facebook.com/prismhealthntx",
+      "https://facebook.com/MedTrustStaffing"
+    ],
+    "Twitter": [
+      "https://twitter.com/OBI_Creative",
+      "https://twitter.com/AllyMedicalER/",
+      "https://twitter.com/prismhealthntx"
+    ],
+    "Country": [
+      "United States",
+      "United States",
+      "United States"
+    ],
+    "Industry": [
+      "marketing & advertising",
+      "hospital & health care",
+      "hospital & health care"
+    ],
+    "Keywords": [
+      "emergency",
+      "staffing, nursing, medical, recruiting, government contracting, healthcare",
+      "primary & behavioral health care, dental health care, care management services"
+    ],
+    "SEO Description": [
+      "Welcome to Loeffler Randall. Discover our collection of beautiful, handcrafted styles from shoes to RTW to accessories.",
+      "Beautiful essentials for a healthier, more sustainable home. ð¡ One tree planted for every order. ð³",
+      "Affordable for dinner with the whole family, or come by for chips, artisanal salsas and a microbrew with friends."
+    ]
+  },
+  "validity": {
+    "Email": "3/3 valid-shape",
+    "Phone": "3/3 valid-shape",
+    "Comp Phone": "3/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Website",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter"
+  ],
+  "activity_match_keys": [
+    "First Name",
+    "Last Name",
+    "Website",
+    "Email",
+    "Phone",
+    "Comp Phone",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter"
+  ]
+}

@@ -56,6 +56,7 @@ import {
   type DiscoveredPhone,
 } from "./people-finder.server";
 import { ROLE_LOCALPARTS } from "./contact-finder.server";
+import { throwIfAborted } from "../search/search-run";
 
 export type EmailRecord = {
   email: string;
@@ -96,6 +97,7 @@ export type ContactDiscovery = {
 };
 
 export type DiscoverOptions = {
+  signal?: AbortSignal;
   company: string;
   domain?: string;
   /** Target person, when the lead named one. */
@@ -118,6 +120,7 @@ const MAX_VERIFY_HARVESTED = 5;
 const MAX_DERIVED_CANDIDATES = 4;
 
 export async function discoverContacts(opts: DiscoverOptions): Promise<ContactDiscovery> {
+  throwIfAborted(opts.signal);
   const notes: string[] = [];
   const result: ContactDiscovery = {
     domain: opts.domain,
@@ -143,7 +146,9 @@ export async function discoverContacts(opts: DiscoverOptions): Promise<ContactDi
     result.harvest = await harvestDomainContacts(opts.domain, {
       companyTokens,
       maxPages: opts.maxPages ?? 6,
+      signal: opts.signal,
     });
+    throwIfAborted(opts.signal);
     result.mx_provider = result.harvest.mx_provider;
     notes.push(
       `Harvested ${result.harvest.pages.filter((p) => p.ok).length}/${result.harvest.pages.length} pages, ` +
@@ -185,7 +190,9 @@ export async function discoverContacts(opts: DiscoverOptions): Promise<ContactDi
   // Search-based person discovery is only worth its latency when the site
   // didn't name anyone. It also costs SearXNG queries, which are rate-limited.
   if (!opts.freeOnly && people.filter((p) => p.role_title).length === 0) {
+    throwIfAborted(opts.signal);
     const viaSearch = await findPeopleViaSearch(opts.company, opts.roles ?? []).catch(() => []);
+    throwIfAborted(opts.signal);
     for (const p of viaSearch) {
       if (!people.some((x) => x.name.toLowerCase() === p.name.toLowerCase())) people.push(p);
     }
@@ -196,7 +203,9 @@ export async function discoverContacts(opts: DiscoverOptions): Promise<ContactDi
   }
 
   if (!opts.skipRegistries) {
+    throwIfAborted(opts.signal);
     const officers = await companiesHouseOfficers(opts.company).catch(() => []);
+    throwIfAborted(opts.signal);
     for (const o of officers) {
       if (!people.some((x) => x.name.toLowerCase() === o.name.toLowerCase())) people.push(o);
     }
@@ -232,7 +241,9 @@ export async function discoverContacts(opts: DiscoverOptions): Promise<ContactDi
     });
 
     for (const h of ordered.slice(0, MAX_VERIFY_HARVESTED)) {
+      throwIfAborted(opts.signal);
       const verification = await verifyEmailDeep(h.email, { freeOnly: opts.freeOnly });
+      throwIfAborted(opts.signal);
       if (result.catch_all === null && verification.catch_all !== null)
         result.catch_all = verification.catch_all;
 
@@ -291,8 +302,10 @@ export async function discoverContacts(opts: DiscoverOptions): Promise<ContactDi
   }
 
   if (result.harvest && targetName && !alreadyHaveTarget && parsePersonName(targetName).ok) {
+    throwIfAborted(opts.signal);
     const { getLearnedPatterns } = await import("./domain-memory.server");
     const learnedPatterns = await getLearnedPatterns(result.harvest.domain);
+    throwIfAborted(opts.signal);
     const candidates = deriveEmailCandidates(targetName, result.harvest.domain, {
       inference: result.pattern ?? undefined,
       limit: MAX_DERIVED_CANDIDATES,
@@ -302,6 +315,7 @@ export async function discoverContacts(opts: DiscoverOptions): Promise<ContactDi
 
     if (candidates.length) {
       const { best, catch_all } = await verifyCandidates(candidates, { freeOnly: opts.freeOnly });
+      throwIfAborted(opts.signal);
       if (result.catch_all === null) result.catch_all = catch_all;
 
       if (catch_all === true) {
@@ -369,7 +383,9 @@ export async function discoverContacts(opts: DiscoverOptions): Promise<ContactDi
   }
 
   if (!opts.skipRegistries) {
+    throwIfAborted(opts.signal);
     const edgar = await secEdgarCompany(opts.company).catch(() => null);
+    throwIfAborted(opts.signal);
     if (edgar) {
       const phone = edgarPhoneToDiscovered(edgar);
       if (phone) {
@@ -382,6 +398,7 @@ export async function discoverContacts(opts: DiscoverOptions): Promise<ContactDi
         opts.company,
         opts.countryHint ?? result.harvest?.country_hint,
       ).catch(() => []);
+      throwIfAborted(opts.signal);
       phoneCandidates.push(...osm);
       if (osm.length)
         notes.push(
@@ -392,10 +409,12 @@ export async function discoverContacts(opts: DiscoverOptions): Promise<ContactDi
 
   const seenE164 = new Set<string>();
   for (const cand of phoneCandidates.slice(0, 8)) {
+    throwIfAborted(opts.signal);
     const verification = await verifyPhone(
       cand.raw,
       opts.countryHint ?? result.harvest?.country_hint,
     );
+    throwIfAborted(opts.signal);
     if (!verification.e164 || seenE164.has(verification.e164)) continue;
     seenE164.add(verification.e164);
     const provenance = [cand.provenance];
@@ -443,5 +462,6 @@ export async function discoverContacts(opts: DiscoverOptions): Promise<ContactDi
     `${result.emails.length} email(s), ${result.phones.length} phone(s); ${ready} carry a documented CASL implied-consent basis.`,
   );
 
+  throwIfAborted(opts.signal);
   return result;
 }

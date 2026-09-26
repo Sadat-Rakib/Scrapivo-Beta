@@ -1,0 +1,619 @@
+{
+  "key": "other_region_v3.csv",
+  "size": 1323404,
+  "last_modified": "2026-09-08 00:15:08+00:00",
+  "columns": [
+    "First Name",
+    "Last Name",
+    "Title",
+    "Company",
+    "Company Name for Emails",
+    "Email",
+    "Email Status",
+    "Seniority",
+    "Departments",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Stage",
+    "# Employees",
+    "Industry",
+    "Keywords",
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "City",
+    "State",
+    "Country",
+    "Company Address",
+    "Company City",
+    "Company State",
+    "Company Country",
+    "Company Phone",
+    "SEO Description",
+    "Technologies",
+    "Annual Revenue",
+    "Total Funding",
+    "Latest Funding",
+    "Latest Funding Amount",
+    "Last Raised At",
+    "Email Sent",
+    "Email Open",
+    "Email Bounced",
+    "Replied",
+    "Demoed",
+    "Number of Retail Locations",
+    "Apollo Contact Id",
+    "Apollo Account Id",
+    "Primary Email Source",
+    "Secondary Email",
+    "Secondary Email Source",
+    "Tertiary Email",
+    "Tertiary Email Source",
+    "Primary Intent Topic",
+    "Primary Intent Score",
+    "Secondary Intent Topic",
+    "Secondary Intent Score",
+    "Contact at Client That Moved Jobs",
+    "Head of Partnerships?",
+    "Client Facing Team?",
+    "Head Of CS 50+ Reps",
+    "in TAM?",
+    "CXplained - Head of CX",
+    "Years In Current Position?",
+    "CXplained - Owner",
+    "Deal Stage",
+    "Simplified Job Title",
+    "email",
+    "username",
+    "domain",
+    "status",
+    "overall_score",
+    "is_safe_to_send",
+    "is_valid_syntax",
+    "is_disposable",
+    "is_role_account",
+    "mx_accepts_mail",
+    "mx_records",
+    "can_connect_smtp",
+    "has_inbox_full",
+    "is_catch_all"
+  ],
+  "row_count": 693,
+  "sampled_rows": 693,
+  "delimiter": ",",
+  "roles": {
+    "First Name": "first_name",
+    "Last Name": "last_name",
+    "Title": "title",
+    "Company": "company",
+    "Company Name for Emails": "email",
+    "Email": "email",
+    "Email Status": "email",
+    "Seniority": "other",
+    "Departments": "other",
+    "First Phone": "phone",
+    "Work Direct Phone": "phone",
+    "Home Phone": "phone",
+    "Mobile Phone": "phone",
+    "Corporate Phone": "phone",
+    "Other Phone": "phone",
+    "Stage": "other",
+    "# Employees": "employees",
+    "Industry": "industry",
+    "Keywords": "descriptive",
+    "Person Linkedin Url": "linkedin",
+    "Website": "website",
+    "Company Linkedin Url": "linkedin",
+    "Facebook Url": "social",
+    "Twitter Url": "social",
+    "City": "other",
+    "State": "other",
+    "Country": "country",
+    "Company Address": "company",
+    "Company City": "company",
+    "Company State": "company",
+    "Company Country": "company",
+    "Company Phone": "phone",
+    "SEO Description": "descriptive",
+    "Technologies": "tech",
+    "Annual Revenue": "other",
+    "Total Funding": "other",
+    "Latest Funding": "other",
+    "Latest Funding Amount": "other",
+    "Last Raised At": "other",
+    "Email Sent": "email",
+    "Email Open": "email",
+    "Email Bounced": "email",
+    "Replied": "other",
+    "Demoed": "other",
+    "Number of Retail Locations": "other",
+    "Apollo Contact Id": "other",
+    "Apollo Account Id": "company",
+    "Primary Email Source": "email",
+    "Secondary Email": "email",
+    "Secondary Email Source": "email",
+    "Tertiary Email": "email",
+    "Tertiary Email Source": "email",
+    "Primary Intent Topic": "other",
+    "Primary Intent Score": "other",
+    "Secondary Intent Topic": "other",
+    "Secondary Intent Score": "other",
+    "Contact at Client That Moved Jobs": "other",
+    "Head of Partnerships?": "other",
+    "Client Facing Team?": "other",
+    "Head Of CS 50+ Reps": "other",
+    "in TAM?": "other",
+    "CXplained - Head of CX": "other",
+    "Years In Current Position?": "title",
+    "CXplained - Owner": "other",
+    "Deal Stage": "other",
+    "Simplified Job Title": "title",
+    "email": "email",
+    "username": "other",
+    "domain": "website",
+    "status": "other",
+    "overall_score": "other",
+    "is_safe_to_send": "other",
+    "is_valid_syntax": "other",
+    "is_disposable": "other",
+    "is_role_account": "company",
+    "mx_accepts_mail": "email",
+    "mx_records": "other",
+    "can_connect_smtp": "other",
+    "has_inbox_full": "other",
+    "is_catch_all": "other"
+  },
+  "missing_pct": {
+    "First Name": 0.0,
+    "Last Name": 0.1,
+    "Title": 0.1,
+    "Company": 0.0,
+    "Company Name for Emails": 0.0,
+    "Email": 0.0,
+    "Email Status": 0.0,
+    "Seniority": 0.1,
+    "Departments": 26.4,
+    "First Phone": 8.1,
+    "Work Direct Phone": 100.0,
+    "Home Phone": 100.0,
+    "Mobile Phone": 99.7,
+    "Corporate Phone": 8.1,
+    "Other Phone": 100.0,
+    "Stage": 0.0,
+    "# Employees": 0.0,
+    "Industry": 2.0,
+    "Keywords": 17.0,
+    "Person Linkedin Url": 0.0,
+    "Website": 0.0,
+    "Company Linkedin Url": 0.0,
+    "Facebook Url": 13.1,
+    "Twitter Url": 12.1,
+    "City": 22.2,
+    "State": 15.4,
+    "Country": 5.5,
+    "Company Address": 0.1,
+    "Company City": 3.8,
+    "Company State": 7.1,
+    "Company Country": 0.1,
+    "Company Phone": 7.8,
+    "SEO Description": 15.2,
+    "Technologies": 0.4,
+    "Annual Revenue": 15.2,
+    "Total Funding": 68.7,
+    "Latest Funding": 67.7,
+    "Latest Funding Amount": 69.6,
+    "Last Raised At": 67.7,
+    "Email Sent": 100.0,
+    "Email Open": 0.0,
+    "Email Bounced": 0.0,
+    "Replied": 0.0,
+    "Demoed": 0.0,
+    "Number of Retail Locations": 63.5,
+    "Apollo Contact Id": 0.0,
+    "Apollo Account Id": 0.0,
+    "Primary Email Source": 0.0,
+    "Secondary Email": 78.9,
+    "Secondary Email Source": 78.9,
+    "Tertiary Email": 100.0,
+    "Tertiary Email Source": 100.0,
+    "Primary Intent Topic": 100.0,
+    "Primary Intent Score": 100.0,
+    "Secondary Intent Topic": 100.0,
+    "Secondary Intent Score": 100.0,
+    "Contact at Client That Moved Jobs": 100.0,
+    "Head of Partnerships?": 100.0,
+    "Client Facing Team?": 100.0,
+    "Head Of CS 50+ Reps": 100.0,
+    "in TAM?": 100.0,
+    "CXplained - Head of CX": 100.0,
+    "Years In Current Position?": 100.0,
+    "CXplained - Owner": 100.0,
+    "Deal Stage": 100.0,
+    "Simplified Job Title": 100.0,
+    "email": 0.0,
+    "username": 0.0,
+    "domain": 0.0,
+    "status": 0.0,
+    "overall_score": 0.0,
+    "is_safe_to_send": 0.0,
+    "is_valid_syntax": 0.0,
+    "is_disposable": 0.0,
+    "is_role_account": 0.0,
+    "mx_accepts_mail": 0.0,
+    "mx_records": 0.0,
+    "can_connect_smtp": 0.0,
+    "has_inbox_full": 0.0,
+    "is_catch_all": 0.0
+  },
+  "samples": {
+    "First Name": [
+      "Mandy",
+      "Martin",
+      "Luke"
+    ],
+    "Last Name": [
+      "McKinnon",
+      "Krige",
+      "Rogers"
+    ],
+    "Title": [
+      "Principle Lead",
+      "Head of Sales Enablement _ SASSA",
+      "Senior Technical Project Manager"
+    ],
+    "Company": [
+      "Telstra",
+      "Elanco",
+      "Telstra"
+    ],
+    "Company Name for Emails": [
+      "Telstra",
+      "Elanco",
+      "Telstra"
+    ],
+    "Email": [
+      "mandy.mckinnon@team.telstra.com",
+      "martin.krige@elancoah.com",
+      "luke.rogers@team.telstra.com"
+    ],
+    "Email Status": [
+      "Verified",
+      "Verified",
+      "Verified"
+    ],
+    "Seniority": [
+      "Manager",
+      "Head",
+      "Manager"
+    ],
+    "First Phone": [
+      "'+61 1300 368 387",
+      "'+1 877-352-6261",
+      "'+61 1300 368 387"
+    ],
+    "Corporate Phone": [
+      "'+61 1300 368 387",
+      "'+1 877-352-6261",
+      "'+61 1300 368 387"
+    ],
+    "Stage": [
+      "Cold",
+      "Cold",
+      "Cold"
+    ],
+    "# Employees": [
+      "36000.0",
+      "10000.0",
+      "36000.0"
+    ],
+    "Industry": [
+      "telecommunications",
+      "pharmaceuticals",
+      "telecommunications"
+    ],
+    "Keywords": [
+      "food safety, food production, animal health, pets",
+      "agriculture technology, hardware & software creation, design & manufacturing, internet of things, aquaculture",
+      "chemicals, performance products, functional materials, solutions, agricultural solutions, oil, gas"
+    ],
+    "Person Linkedin Url": [
+      "http://www.linkedin.com/in/mandy-mckinnon-77792a22",
+      "http://www.linkedin.com/in/martin-krige-339576111",
+      "http://www.linkedin.com/in/luke-rogers-616524126"
+    ],
+    "Website": [
+      "http://www.telstra.com.au",
+      "http://www.elanco.com",
+      "http://www.telstra.com.au"
+    ],
+    "Company Linkedin Url": [
+      "http://www.linkedin.com/company/telstra",
+      "http://www.linkedin.com/company/elanco",
+      "http://www.linkedin.com/company/telstra"
+    ],
+    "Facebook Url": [
+      "http://www.facebook.com/telstra24x7",
+      "https://www.facebook.com/elancoanimalhealth/",
+      "http://www.facebook.com/telstra24x7"
+    ],
+    "Twitter Url": [
+      "http://www.twitter.com/telstra",
+      "https://twitter.com/Elanco/",
+      "http://www.twitter.com/telstra"
+    ],
+    "City": [
+      "Melbourne",
+      "Johannesburg",
+      "Melbourne"
+    ],
+    "State": [
+      "Victoria",
+      "Gauteng",
+      "Victoria"
+    ],
+    "Country": [
+      "Australia",
+      "South Africa",
+      "Australia"
+    ],
+    "Company Address": [
+      "The Rocks, New South Wales, Australia, 2000",
+      "United Kingdom",
+      "The Rocks, New South Wales, Australia, 2000"
+    ],
+    "Company City": [
+      "The Rocks",
+      "The Rocks",
+      "Singapore"
+    ],
+    "Company State": [
+      "New South Wales",
+      "New South Wales",
+      "Akershus"
+    ],
+    "Company Country": [
+      "Australia",
+      "United Kingdom",
+      "Australia"
+    ],
+    "Company Phone": [
+      "'+61 1300 368 387",
+      "'+1 877-352-6261",
+      "'+61 1300 368 387"
+    ],
+    "SEO Description": [
+      "TOMRA's mission is to transform how we all obtain, use and reuse the planet's resources to enable a world without waste.",
+      "An industry-specific, modular solution that integrates an array of agribusiness applications.",
+      "Bakker Brothers is a seed company with a long and rich tradition."
+    ],
+    "Technologies": [
+      "Outlook, Mobile Friendly, Google Places, Google Font API, Woo Commerce, WordPress.org, Google Maps",
+      "Outlook, MailChimp SPF, Microsoft Office 365, Google Tag Manager, Mobile Friendly, Apache, Google Font API",
+      "Outlook, Mobile Friendly, Google Places, Google Font API, Woo Commerce, WordPress.org, Google Maps"
+    ],
+    "Annual Revenue": [
+      "1900000",
+      "4450000000",
+      "1900000"
+    ],
+    "Email Open": [
+      "False",
+      "False",
+      "False"
+    ],
+    "Email Bounced": [
+      "False",
+      "False",
+      "False"
+    ],
+    "Replied": [
+      "False",
+      "False",
+      "False"
+    ],
+    "Demoed": [
+      "False",
+      "False",
+      "False"
+    ],
+    "Number of Retail Locations": [
+      "14",
+      "14",
+      "14"
+    ],
+    "Apollo Contact Id": [
+      "66dec4acd420fa0001d1a812",
+      "66dec45fd420fa0001d17385",
+      "66dec46ed420fa0001d17847"
+    ],
+    "Apollo Account Id": [
+      "61d8beff379e850001e13fb5",
+      "62a3f71c76d1bc00017082b1",
+      "61d8beff379e850001e13fb5"
+    ],
+    "Primary Email Source": [
+      "Fulfilled by Apollo",
+      "Fulfilled by Apollo",
+      "Fulfilled by Apollo"
+    ],
+    "email": [
+      "mandy.mckinnon@team.telstra.com",
+      "martin.krige@elancoah.com",
+      "luke.rogers@team.telstra.com"
+    ],
+    "username": [
+      "mandy.mckinnon",
+      "martin.krige",
+      "luke.rogers"
+    ],
+    "domain": [
+      "team.telstra.com",
+      "elancoah.com",
+      "team.telstra.com"
+    ],
+    "status": [
+      "safe",
+      "safe",
+      "safe"
+    ],
+    "overall_score": [
+      "98",
+      "98",
+      "98"
+    ],
+    "is_safe_to_send": [
+      "True",
+      "True",
+      "True"
+    ],
+    "is_valid_syntax": [
+      "True",
+      "True",
+      "True"
+    ],
+    "is_disposable": [
+      "False",
+      "False",
+      "False"
+    ],
+    "is_role_account": [
+      "False",
+      "False",
+      "False"
+    ],
+    "mx_accepts_mail": [
+      "True",
+      "True",
+      "True"
+    ],
+    "mx_records": [
+      "team-telstra-com.mail.protection.outlook.com",
+      "elancoah-com.mail.protection.outlook.com",
+      "team-telstra-com.mail.protection.outlook.com"
+    ],
+    "can_connect_smtp": [
+      "True",
+      "True",
+      "True"
+    ],
+    "has_inbox_full": [
+      "False",
+      "False",
+      "False"
+    ],
+    "is_catch_all": [
+      "False",
+      "False",
+      "False"
+    ],
+    "Departments": [
+      "Sales",
+      "Engineering & Technical",
+      "Sales"
+    ],
+    "Total Funding": [
+      "1759600000.0",
+      "2535000000.0",
+      "471781000.0"
+    ],
+    "Latest Funding": [
+      "Debt Financing",
+      "Debt Financing",
+      "Debt Financing"
+    ],
+    "Latest Funding Amount": [
+      "250000000.0",
+      "550000000.0",
+      "181683000.0"
+    ],
+    "Last Raised At": [
+      "3/1/2022",
+      "6/1/2024",
+      "12/1/2020"
+    ],
+    "Secondary Email": [
+      "johan.meintjes@basf.com",
+      "raman.sinha@team.telstra.com",
+      "nick.mccormack@team.telstra.com"
+    ],
+    "Secondary Email Source": [
+      "Fulfilled by Apollo",
+      "Fulfilled by Apollo",
+      "Fulfilled by Apollo"
+    ],
+    "Mobile Phone": [
+      "'+64 27 705 2581",
+      "'+61 418 162 821"
+    ]
+  },
+  "validity": {
+    "Company Name for Emails": "0/3 valid-shape",
+    "Email": "3/3 valid-shape",
+    "Email Status": "0/3 valid-shape",
+    "First Phone": "3/3 valid-shape",
+    "Mobile Phone": "2/2 valid-shape",
+    "Corporate Phone": "3/3 valid-shape",
+    "Company Phone": "3/3 valid-shape",
+    "Email Open": "0/3 valid-shape",
+    "Email Bounced": "0/3 valid-shape",
+    "Primary Email Source": "0/3 valid-shape",
+    "Secondary Email": "3/3 valid-shape",
+    "Secondary Email Source": "0/3 valid-shape",
+    "email": "3/3 valid-shape",
+    "mx_accepts_mail": "0/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "domain"
+  ],
+  "activity_match_keys": [
+    "First Name",
+    "Last Name",
+    "Company",
+    "Company Name for Emails",
+    "Email",
+    "Email Status",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "Company Address",
+    "Company City",
+    "Company State",
+    "Company Country",
+    "Company Phone",
+    "Email Sent",
+    "Email Open",
+    "Email Bounced",
+    "Apollo Account Id",
+    "Primary Email Source",
+    "Secondary Email",
+    "Secondary Email Source",
+    "Tertiary Email",
+    "Tertiary Email Source",
+    "email",
+    "domain",
+    "is_role_account",
+    "mx_accepts_mail"
+  ]
+}

@@ -1,0 +1,662 @@
+{
+  "questions": [
+    "Any particular business model (agency, brand, D2C, B2B, B2C), or all?"
+  ],
+  "clarify": [
+    {
+      "id": "entity_business_model",
+      "question": "Any particular business model (agency, brand, D2C, B2B, B2C), or all?",
+      "options": [
+        {
+          "id": "agency",
+          "label": "Agency",
+          "hint": "Service agencies"
+        },
+        {
+          "id": "brand",
+          "label": "Brand",
+          "hint": "Product brands"
+        },
+        {
+          "id": "d2c",
+          "label": "D2C",
+          "hint": "Direct-to-consumer"
+        },
+        {
+          "id": "b2b",
+          "label": "B2B",
+          "hint": "Selling to businesses"
+        },
+        {
+          "id": "b2c",
+          "label": "B2C",
+          "hint": "Selling to consumers"
+        }
+      ],
+      "allowOther": true
+    }
+  ],
+  "rows": [],
+  "dbMeta": [
+    {
+      "dbHit": false,
+      "engine": "pg-index",
+      "partitionsRead": [
+        "idx_businesses(country,city_norm,category)"
+      ],
+      "rowsScanned": 0,
+      "rowsReturned": 0,
+      "elapsedMs": 150,
+      "indexUsed": "idx_biz_country_citynorm_cat"
+    },
+    {
+      "dbHit": false,
+      "engine": "s3-parquet",
+      "partitionsRead": [
+        "processed/local-businesses/by_country/ca.parquet",
+        "(exact=0 nearby=0 for \"toronto\")"
+      ],
+      "rowsScanned": 400000,
+      "rowsReturned": 0
+    },
+    {
+      "dbHit": true,
+      "engine": "live-web",
+      "partitionsRead": [
+        "live-gapfill(15)"
+      ],
+      "rowsScanned": 15,
+      "rowsReturned": 15
+    }
+  ],
+  "rejected": 15,
+  "liveDiscovery": "completed",
+  "pendingEnrichment": 0,
+  "moreAvailableMessage": null,
+  "offset": 0,
+  "limit": 50,
+  "hasMore": false,
+  "totalAvailable": null,
+  "spec": {
+    "entity": "business",
+    "criteria": [
+      {
+        "field": "category",
+        "value": "hvac",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "location",
+        "value": "Greater Toronto Area",
+        "stated": true,
+        "confidence": 0.5
+      },
+      {
+        "field": "location_id",
+        "value": "geo:metro:gta",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "location_kind",
+        "value": "metro",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "location_country",
+        "value": "CA",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "location_scope",
+        "value": "greater",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "location_parents",
+        "value": "geo:admin:ontario,geo:country:ca",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "offer",
+        "value": "better website or automation",
+        "stated": true,
+        "confidence": 1
+      },
+      {
+        "field": "mode",
+        "value": "selling",
+        "stated": true,
+        "confidence": 1
+      }
+    ],
+    "missing": [],
+    "signal_required": false,
+    "signal_types": [],
+    "signal_recency": null,
+    "status": "ready_to_search",
+    "raw_query": "Find HVAC companies in the Greater Toronto Area that could need a better website or automation.",
+    "locationSuggestion": null,
+    "understanding": {
+      "version": "u1",
+      "input": {
+        "raw": "Find HVAC companies in the Greater Toronto Area that could need a better website or automation.",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "lead_discovery",
+        "raw": null,
+        "confidence": 0.95
+      },
+      "prospecting_mode": {
+        "value": "fit_based",
+        "raw": "could need",
+        "confidence": 0.95
+      },
+      "target": {
+        "entity_type": {
+          "value": "business",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "entity_ambiguous": false,
+        "entity_subtype": null,
+        "role": null,
+        "job_title": null,
+        "industry": null,
+        "category": null,
+        "business_type": null,
+        "niche": null,
+        "company_stage": null,
+        "technologies": [],
+        "descriptors": []
+      },
+      "relation": {
+        "type": {
+          "value": "none",
+          "raw": "could need",
+          "confidence": 0.95
+        },
+        "direction": {
+          "value": "none",
+          "raw": "could need",
+          "confidence": 0.95
+        },
+        "label": null,
+        "object": null
+      },
+      "organization_context": {
+        "on_behalf_of_company": "unknown",
+        "company": null
+      },
+      "user_context": {
+        "selling": {
+          "service": {
+            "value": "better website or automation",
+            "raw": "could need",
+            "normalized": null,
+            "confidence": 0.85
+          },
+          "product": null
+        },
+        "objective": null,
+        "notes": []
+      },
+      "location": {
+        "value": "Greater Toronto Area",
+        "raw": "in the Greater Toronto Area",
+        "scope": "in",
+        "radius": null,
+        "radius_unit": null,
+        "country_code": "CA",
+        "canonical": "Greater Toronto Area",
+        "confidence": 0.5
+      },
+      "temporal": null,
+      "constraints": [],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": false,
+        "reasons": []
+      },
+      "quantity": null,
+      "required_fields": [
+        {
+          "value": "website",
+          "raw": "Find HVAC companies in the Greater Toronto Area that could need a better website or automation",
+          "normalized": "website",
+          "confidence": 0.7
+        }
+      ],
+      "preferred_fields": [],
+      "contact_requirements": [],
+      "verification": [],
+      "output": [],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": false,
+        "fields": [],
+        "reason": null,
+        "question": null
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": null,
+        "model": null,
+        "prompt_version": "u1-v15",
+        "latency_ms": 107,
+        "fallback_used": false,
+        "cached": true,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": null,
+          "repair_attempted": false,
+          "repair_reason": null,
+          "repair_success": null
+        },
+        "notes": [
+          "Modal need describes potential fit; expressed buying intent is not required."
+        ]
+      }
+    }
+  },
+  "outcome": "NO_QUALIFIED_RESULTS",
+  "diagnostics": [],
+  "retrievalTrace": {
+    "sources": [
+      {
+        "source": "pg-index",
+        "partitions": [
+          "idx_businesses(country,city_norm,category)"
+        ],
+        "scanned": 0,
+        "matched": 0
+      },
+      {
+        "source": "s3-parquet",
+        "partitions": [
+          "processed/local-businesses/by_country/ca.parquet",
+          "(exact=0 nearby=0 for \"toronto\")"
+        ],
+        "scanned": 400000,
+        "matched": 0
+      },
+      {
+        "source": "live-web",
+        "partitions": [
+          "live-gapfill(15)"
+        ],
+        "scanned": 15,
+        "matched": 15
+      }
+    ],
+    "rawCandidates": 15,
+    "postSpecFilter": 0,
+    "complete": 0,
+    "pendingEnrichment": 0,
+    "qualificationRejected": 0,
+    "returned": 0,
+    "reason": "FILTERED_BY_SPEC"
+  },
+  "executionPlan": {
+    "requirements": {
+      "entityTypes": [
+        "business"
+      ],
+      "claims": [],
+      "needsDiscovery": true,
+      "needsIdentityResolution": true,
+      "needsLocation": true,
+      "needsTemporal": false,
+      "opportunity": null
+    },
+    "steps": [
+      {
+        "providerId": "indexed-db",
+        "costTier": 0,
+        "role": "primary",
+        "reason": "primary_tier_L0:indexed-db+identity",
+        "capabilities": {
+          "id": "indexed-db",
+          "label": "Indexed / internal DB",
+          "entityTypes": [
+            "person",
+            "company",
+            "business",
+            "investor",
+            "job"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": true,
+          "locationSupport": true,
+          "temporalSupport": false,
+          "costTier": 0,
+          "live": false
+        }
+      },
+      {
+        "providerId": "company-registry",
+        "costTier": 1,
+        "role": "primary",
+        "reason": "primary_tier_L1:company-registry+identity",
+        "capabilities": {
+          "id": "company-registry",
+          "label": "Company / entity registry",
+          "entityTypes": [
+            "company",
+            "business",
+            "investor"
+          ],
+          "claims": [
+            "funding",
+            "identity"
+          ],
+          "discovery": false,
+          "identityResolution": true,
+          "locationSupport": true,
+          "temporalSupport": true,
+          "costTier": 1,
+          "live": false
+        }
+      },
+      {
+        "providerId": "osm-local",
+        "costTier": 1,
+        "role": "primary",
+        "reason": "primary_tier_L1:osm-local+identity",
+        "capabilities": {
+          "id": "osm-local",
+          "label": "OpenStreetMap local businesses",
+          "entityTypes": [
+            "business"
+          ],
+          "claims": [
+            "no_website"
+          ],
+          "discovery": true,
+          "identityResolution": true,
+          "locationSupport": true,
+          "temporalSupport": false,
+          "costTier": 1,
+          "live": true
+        }
+      },
+      {
+        "providerId": "direct-http",
+        "costTier": 2,
+        "role": "primary",
+        "reason": "primary_tier_L2:direct-http",
+        "capabilities": {
+          "id": "direct-http",
+          "label": "Direct HTTP fetch",
+          "entityTypes": [
+            "company",
+            "business",
+            "person"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": false,
+          "costTier": 2,
+          "live": true
+        }
+      },
+      {
+        "providerId": "searxng",
+        "costTier": 2,
+        "role": "primary",
+        "reason": "primary_tier_L2:searxng",
+        "capabilities": {
+          "id": "searxng",
+          "label": "SearXNG (self-hosted web)",
+          "entityTypes": [
+            "person",
+            "company",
+            "business",
+            "investor",
+            "job"
+          ],
+          "claims": [
+            "hiring",
+            "service_request",
+            "funding",
+            "social_ask"
+          ],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": true,
+          "temporalSupport": true,
+          "costTier": 2,
+          "live": true
+        }
+      },
+      {
+        "providerId": "html-parser",
+        "costTier": 3,
+        "role": "primary",
+        "reason": "primary_tier_L3:html-parser",
+        "capabilities": {
+          "id": "html-parser",
+          "label": "HTML parser",
+          "entityTypes": [
+            "company",
+            "business",
+            "person",
+            "job"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": false,
+          "costTier": 3,
+          "live": true
+        }
+      },
+      {
+        "providerId": "sitemap-jsonld",
+        "costTier": 4,
+        "role": "primary",
+        "reason": "primary_tier_L4:sitemap-jsonld",
+        "capabilities": {
+          "id": "sitemap-jsonld",
+          "label": "Sitemap / RSS / JSON-LD / OpenGraph",
+          "entityTypes": [
+            "company",
+            "business",
+            "job"
+          ],
+          "claims": [
+            "hiring",
+            "funding"
+          ],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": true,
+          "costTier": 4,
+          "live": true
+        }
+      },
+      {
+        "providerId": "browser-automation",
+        "costTier": 5,
+        "role": "escalation",
+        "reason": "escalate_after_free_ladder:browser-automation",
+        "capabilities": {
+          "id": "browser-automation",
+          "label": "Browser automation",
+          "entityTypes": [
+            "company",
+            "business",
+            "person",
+            "job"
+          ],
+          "claims": [],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": false,
+          "costTier": 5,
+          "live": true,
+          "escalateOnly": true
+        }
+      },
+      {
+        "providerId": "agentic-browser",
+        "costTier": 6,
+        "role": "escalation",
+        "reason": "escalate_after_free_ladder:agentic-browser",
+        "capabilities": {
+          "id": "agentic-browser",
+          "label": "Agentic browser",
+          "entityTypes": [
+            "company",
+            "business",
+            "person"
+          ],
+          "claims": [
+            "service_request",
+            "hiring",
+            "social_ask"
+          ],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": false,
+          "temporalSupport": true,
+          "costTier": 6,
+          "live": true,
+          "escalateOnly": true
+        }
+      },
+      {
+        "providerId": "paid-serp",
+        "costTier": 7,
+        "role": "escalation",
+        "reason": "escalate_after_free_ladder:paid-serp",
+        "capabilities": {
+          "id": "paid-serp",
+          "label": "Paid SERP API",
+          "entityTypes": [
+            "person",
+            "company",
+            "business",
+            "investor",
+            "job"
+          ],
+          "claims": [
+            "hiring",
+            "service_request",
+            "funding",
+            "social_ask"
+          ],
+          "discovery": true,
+          "identityResolution": false,
+          "locationSupport": true,
+          "temporalSupport": true,
+          "costTier": 7,
+          "live": true,
+          "escalateOnly": true
+        }
+      }
+    ],
+    "skipped": [
+      {
+        "providerId": "jobs-fleet",
+        "reason": "entity_type_mismatch"
+      }
+    ],
+    "researchPlan": {
+      "discoveryQueries": [
+        "hvac Greater Toronto Area",
+        "hvac business Greater Toronto Area",
+        "hvac contact Greater Toronto Area"
+      ],
+      "requiredFields": [
+        "name",
+        "industry",
+        "website_or_profile",
+        "location",
+        "contact",
+        "identity_evidence"
+      ],
+      "desiredCount": 5,
+      "stoppingRules": {
+        "maxQueries": 3,
+        "maxPages": 15,
+        "maxCandidates": 15,
+        "maxNoProgressQueries": 2
+      }
+    }
+  },
+  "providerAttempts": [
+    {
+      "provider": "indexed-db",
+      "entitiesResolved": 0,
+      "qualified": 0,
+      "attempted": false,
+      "succeeded": false,
+      "artifactsFound": 0,
+      "error": "handled_outside_live_gapfill",
+      "role": "primary",
+      "costTier": 0
+    },
+    {
+      "provider": "company-registry",
+      "entitiesResolved": 0,
+      "qualified": 0,
+      "attempted": false,
+      "succeeded": false,
+      "artifactsFound": 0,
+      "error": "handled_outside_live_gapfill",
+      "role": "primary",
+      "costTier": 1
+    },
+    {
+      "provider": "osm-local",
+      "entitiesResolved": 0,
+      "qualified": 0,
+      "attempted": true,
+      "succeeded": true,
+      "artifactsFound": 0,
+      "role": "primary",
+      "costTier": 1
+    },
+    {
+      "provider": "direct-http",
+      "entitiesResolved": 0,
+      "qualified": 0,
+      "attempted": true,
+      "succeeded": true,
+      "artifactsFound": 15,
+      "role": "primary",
+      "costTier": 2
+    },
+    {
+      "provider": "browser-live",
+      "attempted": true,
+      "succeeded": true,
+      "artifactsFound": 0,
+      "entitiesResolved": 0,
+      "qualified": 0
+    }
+  ],
+  "search_run_id": "run_353105d6",
+  "conversation_id": "83775911-3efb-42a6-aa40-51453ab9cd2c:a3048e7f-1fdd-4af2-962e-9b105688f7ef",
+  "turn_id": "1790345790876-7ar8etm7c4g",
+  "request_id": "req_d18830af",
+  "qualified_count": 0
+}

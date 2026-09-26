@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { awaitSearchWork, throwIfAborted } from "./search-run";
 
 const CHROME_UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
@@ -31,6 +32,7 @@ function sleep(ms: number): Promise<void> {
 async function curlImpersonateFetch(
   url: string,
   headers: Record<string, string>,
+  signal?: AbortSignal | null,
 ): Promise<Response | null> {
   const bin = process.env.CURL_IMPERSONATE_BIN;
   if (!bin) return null;
@@ -40,7 +42,7 @@ async function curlImpersonateFetch(
     for (const [k, v] of Object.entries(headers)) {
       args.push("-H", `${k}: ${v}`);
     }
-    const proc = spawn(bin, args, { stdio: ["ignore", "pipe", "pipe"] });
+    const proc = spawn(bin, args, { stdio: ["ignore", "pipe", "pipe"], signal: signal ?? undefined, windowsHide: true });
     const chunks: Buffer[] = [];
     proc.stdout.on("data", (c: Buffer) => chunks.push(c));
     proc.on("close", (code) => {
@@ -76,10 +78,12 @@ export async function resilientFetch(
 
   let lastError: unknown;
   for (let attempt = 0; attempt <= retries; attempt++) {
-    if (attempt > 0) await sleep(retryDelayMs * 2 ** (attempt - 1));
+    throwIfAborted(init.signal);
+    if (attempt > 0) await awaitSearchWork(sleep(retryDelayMs * 2 ** (attempt - 1)), init.signal);
 
     try {
-      const viaCurl = await curlImpersonateFetch(url, headers);
+      const viaCurl = await curlImpersonateFetch(url, headers, init.signal);
+      throwIfAborted(init.signal);
       if (viaCurl && viaCurl.ok) return viaCurl;
 
       const res = await fetch(url, { ...init, headers });
@@ -90,6 +94,7 @@ export async function resilientFetch(
       }
       return res;
     } catch (e) {
+      throwIfAborted(init.signal);
       lastError = e;
     }
   }

@@ -1,0 +1,239 @@
+{
+  "key": "europe_region_v3_part2.csv",
+  "size": 396951,
+  "last_modified": "2026-09-08 00:14:00+00:00",
+  "columns": [
+    "fullname",
+    "firstname",
+    "lastname",
+    "Title",
+    "asdas",
+    "company",
+    "email",
+    "Email Status",
+    "Seniority",
+    "Departments",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Stage",
+    "# Employees",
+    "Industry",
+    "Keywords",
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "City"
+  ],
+  "row_count": 780,
+  "sampled_rows": 780,
+  "delimiter": ",",
+  "roles": {
+    "fullname": "last_name",
+    "firstname": "first_name",
+    "lastname": "last_name",
+    "Title": "title",
+    "asdas": "other",
+    "company": "company",
+    "email": "email",
+    "Email Status": "email",
+    "Seniority": "other",
+    "Departments": "other",
+    "First Phone": "phone",
+    "Work Direct Phone": "phone",
+    "Home Phone": "phone",
+    "Mobile Phone": "phone",
+    "Corporate Phone": "phone",
+    "Other Phone": "phone",
+    "Stage": "other",
+    "# Employees": "employees",
+    "Industry": "industry",
+    "Keywords": "descriptive",
+    "Person Linkedin Url": "linkedin",
+    "Website": "website",
+    "Company Linkedin Url": "linkedin",
+    "Facebook Url": "social",
+    "Twitter Url": "social",
+    "City": "other"
+  },
+  "missing_pct": {
+    "fullname": 0.0,
+    "firstname": 0.0,
+    "lastname": 0.3,
+    "Title": 0.0,
+    "asdas": 0.0,
+    "company": 0.0,
+    "email": 0.0,
+    "Email Status": 0.0,
+    "Seniority": 0.0,
+    "Departments": 18.2,
+    "First Phone": 11.7,
+    "Work Direct Phone": 100.0,
+    "Home Phone": 100.0,
+    "Mobile Phone": 100.0,
+    "Corporate Phone": 11.7,
+    "Other Phone": 100.0,
+    "Stage": 0.0,
+    "# Employees": 0.0,
+    "Industry": 0.8,
+    "Keywords": 27.1,
+    "Person Linkedin Url": 0.0,
+    "Website": 0.0,
+    "Company Linkedin Url": 0.0,
+    "Facebook Url": 15.9,
+    "Twitter Url": 16.4,
+    "City": 18.7
+  },
+  "samples": {
+    "fullname": [
+      "Jacinda",
+      "Thorsten",
+      "Yinying"
+    ],
+    "firstname": [
+      "Jacinda",
+      "Thorsten",
+      "Yinying"
+    ],
+    "lastname": [
+      "Love",
+      "Ensinger",
+      "Huang"
+    ],
+    "Title": [
+      "Communications and Marketing Manager",
+      "Partnership Manager - DACH",
+      "Product Manager"
+    ],
+    "asdas": [
+      "Freeport East",
+      "Agreena",
+      "DENSO CORPORATION"
+    ],
+    "company": [
+      "Freeport East",
+      "Agreena",
+      "DENSO"
+    ],
+    "email": [
+      "jacinda.love@freeporteast.co.uk",
+      "thorsten.ensinger@agreena.com",
+      "y.huang1@eu.denso.com"
+    ],
+    "Email Status": [
+      "Verified",
+      "Verified",
+      "Verified"
+    ],
+    "Seniority": [
+      "Manager",
+      "Manager",
+      "Manager"
+    ],
+    "Departments": [
+      "Marketing",
+      "Product",
+      "Operations, Sales"
+    ],
+    "First Phone": [
+      "'+44 12 5524 2000",
+      "'+45 27 38 68 43",
+      "'+1 310-834-6352"
+    ],
+    "Corporate Phone": [
+      "'+44 12 5524 2000",
+      "'+45 27 38 68 43",
+      "'+1 310-834-6352"
+    ],
+    "Stage": [
+      "Cold",
+      "Cold",
+      "Cold"
+    ],
+    "# Employees": [
+      "10",
+      "350",
+      "168000"
+    ],
+    "Industry": [
+      "international trade & development",
+      "farming",
+      "automotive"
+    ],
+    "Keywords": [
+      "green energy, innovation, ports, transportation, green hydrogen, technology & agritech",
+      "digital, trading, insuretech, carbon",
+      "chemicals, performance products, functional materials, solutions, agricultural solutions, oil, gas"
+    ],
+    "Person Linkedin Url": [
+      "http://www.linkedin.com/in/jacindalove",
+      "http://www.linkedin.com/in/thorsten-ensinger",
+      "http://www.linkedin.com/in/yinying-huang"
+    ],
+    "Website": [
+      "http://www.freeporteast.com",
+      "http://www.agreena.com",
+      "http://www.denso.com"
+    ],
+    "Company Linkedin Url": [
+      "http://www.linkedin.com/company/freeport-east",
+      "http://www.linkedin.com/company/agreena",
+      "http://www.linkedin.com/company/denso"
+    ],
+    "Twitter Url": [
+      "https://twitter.com/FreeportEast",
+      "https://twitter.com/agreenaapp",
+      "https://twitter.com/densoeurope?lang=en"
+    ],
+    "City": [
+      "Harwich",
+      "Mannheim",
+      "Zuerich"
+    ],
+    "Facebook Url": [
+      "https://facebook.com/AgreenaApp/",
+      "https://www.facebook.com/DENSOCorporation/",
+      "https://facebook.com/basf.apac/"
+    ]
+  },
+  "validity": {
+    "email": "3/3 valid-shape",
+    "Email Status": "0/3 valid-shape",
+    "First Phone": "3/3 valid-shape",
+    "Corporate Phone": "3/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url"
+  ],
+  "activity_match_keys": [
+    "fullname",
+    "firstname",
+    "lastname",
+    "company",
+    "email",
+    "Email Status",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url"
+  ]
+}

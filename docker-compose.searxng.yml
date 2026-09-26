@@ -1,0 +1,14 @@
+# Local SearXNG for Scrapivo Discover (SEARXNG_URL=http://127.0.0.1:8888).
+# Start: docker compose -f docker-compose.searxng.yml up -d
+# Stop:  docker compose -f docker-compose.searxng.yml down
+services:
+  searxng:
+    image: searxng/searxng:latest
+    container_name: scrapivo-searxng
+    restart: unless-stopped
+    ports:
+      - "8888:8080"
+    volumes:
+      - ./config/searxng/settings.yml:/etc/searxng/settings.yml:ro
+    environment:
+      - SEARXNG_BASE_URL=http://127.0.0.1:8888/

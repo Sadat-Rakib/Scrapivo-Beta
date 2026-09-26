@@ -1,0 +1,176 @@
+{
+  "key": "apollo-contacts-export (1) (2)_CATCH_ALL_AND_UNKNOWN_MILLIONVERIFIER.COM_CATEGORIZED.csv",
+  "size": 8493810,
+  "last_modified": "2026-09-08 00:13:04+00:00",
+  "columns": [
+    "First Name",
+    "Last Name",
+    "Title",
+    "Comp name",
+    "Website",
+    "Email",
+    "Phone",
+    "Comp Phone",
+    "Employees",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter",
+    "Country",
+    "Industry",
+    "Tech Used",
+    "Keywords",
+    "SEO Description"
+  ],
+  "row_count": 3799,
+  "sampled_rows": 3799,
+  "delimiter": ",",
+  "roles": {
+    "First Name": "first_name",
+    "Last Name": "last_name",
+    "Title": "title",
+    "Comp name": "other",
+    "Website": "website",
+    "Email": "email",
+    "Phone": "phone",
+    "Comp Phone": "phone",
+    "Employees": "employees",
+    "Pers Linkedin": "linkedin",
+    "Comp Linkedin": "linkedin",
+    "Facebook": "social",
+    "Twitter": "social",
+    "Country": "country",
+    "Industry": "industry",
+    "Tech Used": "tech",
+    "Keywords": "descriptive",
+    "SEO Description": "descriptive"
+  },
+  "missing_pct": {
+    "First Name": 0.0,
+    "Last Name": 0.4,
+    "Title": 0.0,
+    "Comp name": 0.0,
+    "Website": 0.0,
+    "Email": 0.0,
+    "Phone": 100.0,
+    "Comp Phone": 0.5,
+    "Employees": 16.7,
+    "Pers Linkedin": 0.0,
+    "Comp Linkedin": 16.7,
+    "Facebook": 17.5,
+    "Twitter": 17.8,
+    "Country": 0.0,
+    "Industry": 16.7,
+    "Tech Used": 17.2,
+    "Keywords": 16.7,
+    "SEO Description": 100.0
+  },
+  "samples": {
+    "First Name": [
+      "James",
+      "Daniel",
+      "Michael"
+    ],
+    "Last Name": [
+      "Butler",
+      "Jennings",
+      "Zarcone"
+    ],
+    "Title": [
+      "Northeast Regional CEO",
+      "Vice President, Chief Product Owner - Distribution Platform",
+      "Executive vice president and HeadCorporate Affairs-Chief of Staff Office of the Chairman and CEO"
+    ],
+    "Comp name": [
+      "USI Insurance Services",
+      "Prudential Equity Group",
+      "metlife pet insurance"
+    ],
+    "Website": [
+      "https://usi.com",
+      "https://prudential.com",
+      "https://metlife.com"
+    ],
+    "Email": [
+      "jim.butler@usi.com",
+      "daniel.jennings@prudential.com",
+      "mzarcone@metlife.com"
+    ],
+    "Comp Phone": [
+      "'+1 914-749-8500",
+      "'+1 973-802-6000",
+      "'+1 800-638-5433"
+    ],
+    "Employees": [
+      "10000",
+      "16000",
+      "45000"
+    ],
+    "Pers Linkedin": [
+      "http://www.linkedin.com/in/james-m-butler-9b81471b9",
+      "http://www.linkedin.com/in/daniel-jennings-clu-b232885",
+      "http://www.linkedin.com/in/michael-zarcone-7b5a8388"
+    ],
+    "Comp Linkedin": [
+      "http://www.linkedin.com/company/usi-insurance-services",
+      "http://www.linkedin.com/company/prudential-financial",
+      "http://www.linkedin.com/company/metlife"
+    ],
+    "Facebook": [
+      "https://facebook.com/usiins/",
+      "https://facebook.com/Prudential/",
+      "https://www.facebook.com/metlife"
+    ],
+    "Twitter": [
+      "https://www.twitter.com/usiins",
+      "https://twitter.com/prudential/",
+      "https://twitter.com/metlife"
+    ],
+    "Country": [
+      "United States",
+      "United States",
+      "United States"
+    ],
+    "Industry": [
+      "insurance",
+      "financial services",
+      "insurance"
+    ],
+    "Tech Used": [
+      "Microsoft Office 365, Contently, Citrix NetScaler, Salesforce, MongoDB, ExactTarget, Workday",
+      "Akamai, Microsoft Office 365, ExactTarget, Adobe Marketing Cloud, Salesforce",
+      "Cloudflare DNS, Microsoft Office 365, CloudFlare Hosting, Bluekai, The Trade Desk, Taleo, Workday, Salesforce"
+    ],
+    "Keywords": [
+      "insurance, finance, services, financial services, auto insurance, home & rental insurance, life insurance",
+      "insurance, finance, services, financial services, auto insurance, home & rental insurance, life insurance",
+      "insurance, finance, services, financial services, auto insurance, home & rental insurance, life insurance"
+    ]
+  },
+  "validity": {
+    "Email": "3/3 valid-shape",
+    "Comp Phone": "3/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Website",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter"
+  ],
+  "activity_match_keys": [
+    "First Name",
+    "Last Name",
+    "Website",
+    "Email",
+    "Phone",
+    "Comp Phone",
+    "Pers Linkedin",
+    "Comp Linkedin",
+    "Facebook",
+    "Twitter"
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "key": "Professional Services 47.5k_CATEGORIZED.csv",
+  "entity": "person",
+  "rows": 47511,
+  "required_fields": [
+    "Name",
+    "Company",
+    "Title",
+    "Email",
+    "Phone",
+    "Website",
+    "Social(any)",
+    "Location"
+  ],
+  "absent_columns": [],
+  "complete": 44214,
+  "incomplete": 3297,
+  "complete_pct": 93.1,
+  "missing_counts": {
+    "Phone": 3294,
+    "Name": 2,
+    "Title": 4,
+    "Company": 7
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Phone"
+      ],
+      "rows": 3287
+    },
+    {
+      "missing": [
+        "Company",
+        "Phone"
+      ],
+      "rows": 4
+    },
+    {
+      "missing": [
+        "Company",
+        "Phone",
+        "Title"
+      ],
+      "rows": 3
+    },
+    {
+      "missing": [
+        "Name"
+      ],
+      "rows": 2
+    },
+    {
+      "missing": [
+        "Title"
+      ],
+      "rows": 1
+    }
+  ],
+  "people_bonus_rows": 0
+}

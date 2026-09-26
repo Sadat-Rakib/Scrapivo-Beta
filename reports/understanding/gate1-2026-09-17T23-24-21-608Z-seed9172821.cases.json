@@ -1,0 +1,55 @@
+{
+  "seed": 9172821,
+  "holdout": [
+    {
+      "id": "h000a",
+      "prompt": "quantity surveyors who serve upholsterers in Enschede",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "location": "enschede"
+      },
+      "pairWith": "h000b"
+    },
+    {
+      "id": "h000b",
+      "prompt": "upholsterers in Enschede who need a quantity surveyor",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "needs_service",
+        "object": "quantity surveyor",
+        "location": "enschede"
+      },
+      "pairWith": "h000a"
+    },
+    {
+      "id": "h002a",
+      "prompt": "investors funding port logistics startups in Saskatoon",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "investor",
+        "location": "saskatoon"
+      },
+      "pairWith": "h002b"
+    },
+    {
+      "id": "h002b",
+      "prompt": "port logistics startups in Saskatoon raising money",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "seeking_funding",
+        "location": "saskatoon"
+      },
+      "pairWith": "h002a"
+    }
+  ],
+  "chaos": []
+}

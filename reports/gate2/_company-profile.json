@@ -1,0 +1,259 @@
+{
+  "total": 1602141,
+  "locations": 69,
+  "categories": 515607,
+  "website": 1602141,
+  "email": 1602141,
+  "phone": 1602141,
+  "linkedin": 1446814,
+  "other_social": 1302165,
+  "any_contact": 1602141,
+  "description": 1602140,
+  "funding": 93670,
+  "duplicate_external": 1,
+  "duplicate_website_extra": 551,
+  "top_locations": [
+    [
+      "European Union (EU), Europe, Middle East, and Africa (EMEA)",
+      297552
+    ],
+    [
+      "Europe, Middle East, and Africa (EMEA)",
+      187415
+    ],
+    [
+      "Asia-Pacific (APAC)",
+      152793
+    ],
+    [
+      "Latin America",
+      79411
+    ],
+    [
+      "Greater New York Area, East Coast, Northeastern US",
+      60148
+    ],
+    [
+      "Southern US",
+      58180
+    ],
+    [
+      "Great Lakes, Midwestern US",
+      56421
+    ],
+    [
+      "Asia-Pacific (APAC), Australasia",
+      55182
+    ],
+    [
+      "East Coast, Southern US",
+      53237
+    ],
+    [
+      "Greater Los Angeles Area, West Coast, Western US",
+      45946
+    ],
+    [
+      "Western US",
+      30508
+    ],
+    [
+      "European Union (EU), Nordic Countries, Scandinavia, Europe, Middle East, and Africa (EMEA)",
+      28404
+    ],
+    [
+      "Asia-Pacific (APAC), Association of Southeast Asian Nations (ASEAN), Southeast Asia",
+      28236
+    ],
+    [
+      "West Coast, Western US",
+      26773
+    ],
+    [
+      "Great Lakes",
+      26422
+    ],
+    [
+      "Midwestern US",
+      25370
+    ],
+    [
+      "Greater Chicago Area, Great Lakes, Midwestern US",
+      24777
+    ],
+    [
+      "San Francisco Bay Area, West Coast, Western US",
+      23375
+    ],
+    [
+      "Greater Miami Area, East Coast, Southern US",
+      21360
+    ],
+    [
+      "East Coast, New England, Northeastern US",
+      20121
+    ],
+    [
+      "Dallas/Fort Worth Metroplex, Southern US",
+      19248
+    ],
+    [
+      "Greater Boston Area, East Coast, New England, Northeastern US",
+      18213
+    ],
+    [
+      "Europe, Middle East, and Africa (EMEA), Gulf Cooperation Council (GCC), Middle East, Middle East and North Africa (MENA)",
+      17564
+    ],
+    [
+      "Greater Atlanta Area, East Coast, Southern US",
+      15408
+    ],
+    [
+      "Greater Houston Area, Southern US",
+      15363
+    ],
+    [
+      "Washington DC Metro Area, East Coast, Southern US",
+      15191
+    ],
+    [
+      "San Francisco Bay Area, Silicon Valley, West Coast, Western US",
+      13870
+    ],
+    [
+      "Europe, Middle East, and Africa (EMEA), Middle East, Middle East and North Africa (MENA), Europe, Middle East, and Africa (EMEA)",
+      13604
+    ],
+    [
+      "Great Lakes, Northeastern US",
+      12929
+    ],
+    [
+      "Greater Denver Area, Western US",
+      12613
+    ]
+  ],
+  "top_categories": [
+    [
+      "Dental, Health Care, Medical",
+      5620
+    ],
+    [
+      "Information Technology, Software",
+      5154
+    ],
+    [
+      "Software",
+      5061
+    ],
+    [
+      "Real Estate",
+      4715
+    ],
+    [
+      "Manufacturing",
+      4666
+    ],
+    [
+      "Education",
+      4533
+    ],
+    [
+      "Information Technology",
+      4452
+    ],
+    [
+      "Industrial, Machinery Manufacturing, Manufacturing",
+      4444
+    ],
+    [
+      "Health Care",
+      4091
+    ],
+    [
+      "Health Care, Hospital, Medical",
+      4024
+    ],
+    [
+      "Human Resources, Recruiting, Staffing Agency",
+      3840
+    ],
+    [
+      "Financial Services",
+      3593
+    ],
+    [
+      "Industrial, Manufacturing, Product Design",
+      3395
+    ],
+    [
+      "Property Management, Real Estate, Residential",
+      3254
+    ],
+    [
+      "Advertising, Marketing",
+      3245
+    ],
+    [
+      "Consulting",
+      3094
+    ],
+    [
+      "Consulting, Information Technology, Software",
+      3018
+    ],
+    [
+      "Freight Service, Logistics, Transportation",
+      2831
+    ],
+    [
+      "Accounting, Consulting, Financial Services",
+      2803
+    ],
+    [
+      "E-Commerce",
+      2766
+    ],
+    [
+      "Industrial, Manufacturing, Wholesale",
+      2614
+    ],
+    [
+      "Industrial, Manufacturing, Mechanical Engineering",
+      2348
+    ],
+    [
+      "Health Care, Medical, Wellness",
+      2334
+    ],
+    [
+      "Industrial, Industrial Manufacturing, Manufacturing",
+      2153
+    ],
+    [
+      "Banking, Finance, Financial Services",
+      2125
+    ],
+    [
+      "Property Management, Real Estate, Rental Property",
+      1950
+    ],
+    [
+      "Construction",
+      1892
+    ],
+    [
+      "Industrial, Industrial Engineering, Manufacturing",
+      1870
+    ],
+    [
+      "Advertising",
+      1848
+    ],
+    [
+      "Architecture, Construction, Interior Design",
+      1841
+    ]
+  ]
+}

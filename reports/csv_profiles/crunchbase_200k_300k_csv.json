@@ -1,0 +1,361 @@
+{
+  "key": "crunchbase_200k-300k.csv",
+  "size": 59482073,
+  "last_modified": "2026-09-08 00:12:14+00:00",
+  "columns": [
+    "id",
+    "created_at",
+    "name",
+    "short_description",
+    "semrush_global_rank",
+    "semrush_visits_latest_month",
+    "num_investors",
+    "funding_total",
+    "num_exits",
+    "num_funding_rounds",
+    "last_funding_type",
+    "last_funding_at",
+    "num_acquisitions",
+    "apptopia_total_apps",
+    "apptopia_total_downloads",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "num_investments",
+    "num_lead_investments",
+    "num_lead_investors",
+    "listed_stock_symbol",
+    "company_type",
+    "hub_tags",
+    "operating_status",
+    "founded_on",
+    "categories",
+    "founders",
+    "website",
+    "ipo_status",
+    "num_employees_enum",
+    "locations",
+    "growth_insight_description",
+    "growth_insight_indicator",
+    "growth_insight_direction",
+    "growth_insight_confidence",
+    "investor_insight_description",
+    "permalink",
+    "url"
+  ],
+  "row_count": 100000,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "id": "other",
+    "created_at": "other",
+    "name": "full_name",
+    "short_description": "descriptive",
+    "semrush_global_rank": "other",
+    "semrush_visits_latest_month": "other",
+    "num_investors": "other",
+    "funding_total": "other",
+    "num_exits": "other",
+    "num_funding_rounds": "other",
+    "last_funding_type": "other",
+    "last_funding_at": "other",
+    "num_acquisitions": "other",
+    "apptopia_total_apps": "other",
+    "apptopia_total_downloads": "other",
+    "contact_email": "email",
+    "phone_number": "phone",
+    "facebook": "social",
+    "linkedin": "linkedin",
+    "twitter": "social",
+    "num_investments": "other",
+    "num_lead_investments": "other",
+    "num_lead_investors": "other",
+    "listed_stock_symbol": "other",
+    "company_type": "company",
+    "hub_tags": "other",
+    "operating_status": "other",
+    "founded_on": "other",
+    "categories": "other",
+    "founders": "other",
+    "website": "website",
+    "ipo_status": "other",
+    "num_employees_enum": "employees",
+    "locations": "other",
+    "growth_insight_description": "descriptive",
+    "growth_insight_indicator": "other",
+    "growth_insight_direction": "other",
+    "growth_insight_confidence": "other",
+    "investor_insight_description": "descriptive",
+    "permalink": "other",
+    "url": "website"
+  },
+  "missing_pct": {
+    "id": 0.0,
+    "created_at": 0.0,
+    "name": 0.0,
+    "short_description": 0.0,
+    "semrush_global_rank": 60.8,
+    "semrush_visits_latest_month": 60.8,
+    "num_investors": 91.5,
+    "funding_total": 92.1,
+    "num_exits": 99.9,
+    "num_funding_rounds": 89.6,
+    "last_funding_type": 89.6,
+    "last_funding_at": 89.4,
+    "num_acquisitions": 98.8,
+    "apptopia_total_apps": 94.6,
+    "apptopia_total_downloads": 98.5,
+    "contact_email": 22.9,
+    "phone_number": 21.9,
+    "facebook": 35.1,
+    "linkedin": 24.1,
+    "twitter": 55.5,
+    "num_investments": 99.9,
+    "num_lead_investments": 100.0,
+    "num_lead_investors": 94.6,
+    "listed_stock_symbol": 99.7,
+    "company_type": 2.9,
+    "hub_tags": 99.7,
+    "operating_status": 0.0,
+    "founded_on": 18.0,
+    "categories": 3.5,
+    "founders": 75.3,
+    "website": 4.2,
+    "ipo_status": 2.1,
+    "num_employees_enum": 14.8,
+    "locations": 7.2,
+    "growth_insight_description": 98.2,
+    "growth_insight_indicator": 98.2,
+    "growth_insight_direction": 99.2,
+    "growth_insight_confidence": 99.2,
+    "investor_insight_description": 99.1,
+    "permalink": 0.0,
+    "url": 0.0
+  },
+  "samples": {
+    "id": [
+      "17505358-03d6-5504-6a4e-c0f55a58a5ae",
+      "7c691e22-e7a6-421d-8341-7c819944bd48",
+      "aaeb8c3b-22cc-4d2a-ac4d-72d0d3bd127b"
+    ],
+    "created_at": [
+      "2024-08-19 22:11:40.964153+00",
+      "2024-08-19 22:11:40.964153+00",
+      "2024-08-19 22:11:40.964153+00"
+    ],
+    "name": [
+      "Art Center College of Design",
+      "Art Center Of Corpus Christi",
+      "Art Center of the Bluegrass"
+    ],
+    "short_description": [
+      "Art Center College of Design has achieved an international reputation for preparing artists and designers",
+      "The Art Center Of Corpus Christi is a non-profit organization dedicated to helping the local artistic community.",
+      "Art Central is a is an online education platform dedicated to the education and training of Performing Arts."
+    ],
+    "semrush_global_rank": [
+      "302942",
+      "8381028",
+      "4481405"
+    ],
+    "semrush_visits_latest_month": [
+      "129126",
+      "544",
+      "2133"
+    ],
+    "funding_total": [
+      "124000000",
+      "0",
+      "40000"
+    ],
+    "last_funding_at": [
+      "2019-07-26",
+      "2023-06-01",
+      "2013-07-25"
+    ],
+    "apptopia_total_apps": [
+      "4",
+      "2",
+      "3"
+    ],
+    "contact_email": [
+      "hr@artcenter.edu",
+      "info@artcentercc.org",
+      "admin@artcenterky.org"
+    ],
+    "phone_number": [
+      "626 396-2200",
+      "361.884.6406",
+      "+1 859 236 4054"
+    ],
+    "facebook": [
+      "https://www.facebook.com/artcenteredu/",
+      "https://www.facebook.com/artcentercorpuschristi",
+      "https://www.facebook.com/artcenterky/"
+    ],
+    "linkedin": [
+      "https://www.linkedin.com/edu/school?id=17802",
+      "https://www.linkedin.com/company/art-center-of-corpus-christi",
+      "https://www.linkedin.com/company/art-center-of-the-bluegrass/"
+    ],
+    "twitter": [
+      "https://twitter.com/artcenteredu",
+      "https://twitter.com/artexpertsinc1",
+      "https://twitter.com/artchaosmos"
+    ],
+    "operating_status": [
+      "active",
+      "active",
+      "active"
+    ],
+    "founded_on": [
+      "1930-01-01",
+      "1972-01-01",
+      "2003-01-01"
+    ],
+    "categories": [
+      "Art, Education, Interior Design",
+      "Art, Non Profit",
+      "Art, Communities, Non Profit"
+    ],
+    "founders": [
+      "Edward A. Adams",
+      "Ruben Babaev",
+      "Mark Espanol"
+    ],
+    "locations": [
+      "Greater Los Angeles Area, West Coast, Western US",
+      "Southern US",
+      "Southern US"
+    ],
+    "permalink": [
+      "art-center-college-of-design",
+      "art-center-of-corpus-christi",
+      "art-center-of-the-bluegrass"
+    ],
+    "url": [
+      "https://www.crunchbase.com/organization/art-center-college-of-design",
+      "https://www.crunchbase.com/organization/art-center-of-corpus-christi",
+      "https://www.crunchbase.com/organization/art-center-of-the-bluegrass"
+    ],
+    "num_investors": [
+      "1",
+      "1",
+      "3"
+    ],
+    "num_funding_rounds": [
+      "1",
+      "1",
+      "1"
+    ],
+    "last_funding_type": [
+      "grant",
+      "seed",
+      "angel"
+    ],
+    "num_lead_investors": [
+      "1",
+      "1",
+      "1"
+    ],
+    "company_type": [
+      "non_profit",
+      "non_profit",
+      "for_profit"
+    ],
+    "website": [
+      "https://www.artcentercc.org",
+      "https://artcenterky.org",
+      "http://www.artcentralhongkong.com"
+    ],
+    "ipo_status": [
+      "private",
+      "private",
+      "private"
+    ],
+    "num_employees_enum": [
+      "c_00001_00010",
+      "c_00001_00010",
+      "c_00011_00050"
+    ],
+    "apptopia_total_downloads": [
+      "2",
+      "2321",
+      "6"
+    ],
+    "num_acquisitions": [
+      "1",
+      "2",
+      "3"
+    ],
+    "growth_insight_description": [
+      "Art Money, an art financial technology platform, is on the brink of collapse after it paused operations to recapitalize."
+    ],
+    "growth_insight_indicator": [
+      "declining",
+      "growing",
+      "growing"
+    ],
+    "growth_insight_direction": [
+      "c200_declining",
+      "c400_growing",
+      "c400_growing"
+    ],
+    "growth_insight_confidence": [
+      "c400_high",
+      "c300_medium",
+      "c400_high"
+    ],
+    "num_investments": [
+      "1",
+      "1",
+      "1"
+    ],
+    "listed_stock_symbol": [
+      "NASDAQ:ARTW",
+      "BSE:AMG",
+      "NASDAQ:ARTL"
+    ],
+    "hub_tags": [
+      "pledge_one_percent",
+      "pledge_one_percent",
+      "cbvp"
+    ],
+    "investor_insight_description": [],
+    "num_exits": [
+      "1",
+      "1",
+      "1"
+    ],
+    "num_lead_investments": [
+      "4"
+    ]
+  },
+  "validity": {
+    "contact_email": "3/3 valid-shape",
+    "phone_number": "3/3 valid-shape"
+  },
+  "entity": "company",
+  "entity_confidence": 0.85,
+  "entity_why": "value-checked override: name=organization name; founders/company_type/num_employees_enum/funding/ipo_status present; no person first/last-name columns",
+  "social_cols": [
+    "facebook",
+    "linkedin",
+    "twitter",
+    "website",
+    "url"
+  ],
+  "activity_match_keys": [
+    "name",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "company_type",
+    "website",
+    "url"
+  ]
+}

@@ -36,6 +36,7 @@ function defaultRunner(args: string[], signal?: AbortSignal | null): Promise<str
       args,
       { windowsHide: true, maxBuffer: 4 * 1024 * 1024, timeout: 30_000, killSignal: "SIGTERM" },
       (error, stdout, stderr) => {
+        signal?.removeEventListener("abort", abort);
         if (error) {
           reject(new Error((stderr || stdout || error.message).trim()));
           return;
@@ -76,7 +77,7 @@ function classifyPage(text: string, url: string): PageSnapshot["pageType"] {
 
 function friction(text: string): PageSnapshot["friction"] {
   const found: PageSnapshot["friction"] = [];
-  if (/captcha|verify you are human|challenge-platform/i.test(text)) found.push("CAPTCHA");
+  if (/captcha|verify you are human|challenge-platform|confirm this search was made by a human|complete the following challenge/i.test(text)) found.push("CAPTCHA");
   if (/sign in|log in to continue|authentication required/i.test(text)) found.push("LOGIN_WALL");
   if (/too many requests|rate limit/i.test(text)) found.push("RATE_LIMIT");
   if (/access denied|request blocked|forbidden/i.test(text)) found.push("ACCESS_BLOCK");
@@ -239,7 +240,7 @@ export class AgentBrowserCliAdapter implements AgentBrowser {
     for (const [field, descriptor] of Object.entries(schema.fields)) {
       try {
         const command = descriptor.attribute
-          ? ["get", "attr", descriptor.attribute, descriptor.selector]
+          ? ["get", "attr", descriptor.selector, descriptor.attribute]
           : ["get", "text", descriptor.selector];
         const data = (await this.command(session, command)).data ?? {};
         values[field] = String(data.value ?? data.text ?? data.attribute ?? "") || null;
@@ -256,6 +257,19 @@ export class AgentBrowserCliAdapter implements AgentBrowser {
     };
   }
 
+  async extractLinks(session: BrowserSession, selector: string, timeoutMs = 5000): Promise<PageSnapshot["links"]> {
+    const script = `(async () => {
+      const deadline = Date.now() + ${Math.max(0, Math.min(timeoutMs, 8000))};
+      while (!document.querySelector(${JSON.stringify(selector)}) && Date.now() < deadline) {
+        await new Promise(resolve => setTimeout(resolve, 150));
+      }
+      return Array.from(document.querySelectorAll(${JSON.stringify(selector)})).slice(0, 15)
+        .map((a, i) => ({ref: 'result-' + i, name: (a.textContent || '').trim().slice(0, 300), url: a.href}));
+    })()`;
+    const data = (await this.command(session, ["eval", script])).data;
+    return Array.isArray(data?.result) ? data.result as PageSnapshot["links"] : [];
+  }
+
   async screenshot(session: BrowserSession): Promise<string> {
     this.action(session, "screenshot");
     const file = path.join(session.screenshotDirectory, `${Date.now()}-${session.counters.screenshots}.png`);
@@ -267,7 +281,8 @@ export class AgentBrowserCliAdapter implements AgentBrowser {
 
   async close(session: BrowserSession): Promise<void> {
     try {
-      await this.command(session, ["close"]);
+      // Cleanup must still execute after cancellation aborts the run's commands.
+      parse(await this.runner(this.args(session, ["close"])));
     } finally {
       session.lastSnapshot = null;
     }

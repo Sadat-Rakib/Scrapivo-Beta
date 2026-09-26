@@ -1,0 +1,126 @@
+{
+  "key": "5.csv",
+  "entity": "person",
+  "rows": 124353,
+  "required_fields": [
+    "Name",
+    "Company",
+    "Title",
+    "Email",
+    "Phone",
+    "Website",
+    "Social(any)",
+    "Location"
+  ],
+  "absent_columns": [],
+  "complete": 13564,
+  "incomplete": 110789,
+  "complete_pct": 10.9,
+  "missing_counts": {
+    "Email": 110154,
+    "Phone": 100302,
+    "Location": 99557,
+    "Website": 99359,
+    "Company": 99356,
+    "Name": 99356,
+    "Title": 99354,
+    "Social(any)": 99354
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Company",
+        "Email",
+        "Location",
+        "Name",
+        "Phone",
+        "Social(any)",
+        "Title",
+        "Website"
+      ],
+      "rows": 99354
+    },
+    {
+      "missing": [
+        "Email"
+      ],
+      "rows": 10291
+    },
+    {
+      "missing": [
+        "Phone"
+      ],
+      "rows": 485
+    },
+    {
+      "missing": [
+        "Email",
+        "Phone"
+      ],
+      "rows": 447
+    },
+    {
+      "missing": [
+        "Location"
+      ],
+      "rows": 140
+    },
+    {
+      "missing": [
+        "Email",
+        "Location"
+      ],
+      "rows": 48
+    },
+    {
+      "missing": [
+        "Location",
+        "Phone"
+      ],
+      "rows": 8
+    },
+    {
+      "missing": [
+        "Email",
+        "Location",
+        "Phone"
+      ],
+      "rows": 7
+    },
+    {
+      "missing": [
+        "Email",
+        "Website"
+      ],
+      "rows": 3
+    },
+    {
+      "missing": [
+        "Company",
+        "Email"
+      ],
+      "rows": 2
+    },
+    {
+      "missing": [
+        "Email",
+        "Name"
+      ],
+      "rows": 2
+    },
+    {
+      "missing": [
+        "Website"
+      ],
+      "rows": 1
+    },
+    {
+      "missing": [
+        "Phone",
+        "Website"
+      ],
+      "rows": 1
+    }
+  ],
+  "people_bonus_rows": 0
+}

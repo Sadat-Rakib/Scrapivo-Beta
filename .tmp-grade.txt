@@ -1,0 +1,32 @@
+﻿Gate 1 grader ┬╖ seed=7777 ┬╖ holdout=80 ┬╖ chaos=80 ┬╖ extractor=deterministic
+
+TRAIN (88 cases)
+...................x 20/88 ~0s left
+.x.........x.x.....x 40/88 ~0s left
+xxx...x...x......... 60/88 ~0s left
+....xx.x.........xx. 80/88 ~0s left
+x.....xx
+
+HOLDOUT (80 cases)
+....x.x.x.x..x..x... 20/80 ~0s left
+x..x.xxx....x...xx.x 40/80 ~0s left
+.x.xx.xx...x........ 60/80 ~0s left
+.xx....xxxx.x..x...x 80/80 ~0s left
+
+
+CHAOS (80 cases)
+x..x..xxxxx.x.xxxxx. 20/80 ~0s left
+.x.xxxxx..x.......x. 40/80 ~0s left
+xx.xxx.xx..xx.xx.xxx 60/80 ~0s left
+...x.xx..xx.xxxxx... 80/80 ~0s left
+
+
+TRAIN: 70/88 checks passed ┬╖ 8/8 pairs distinct
+HOLDOUT: 50/80 checks passed ┬╖ 10/10 pairs distinct
+CHAOS: 35/80 checks passed ┬╖ 10/10 pairs distinct
+
+Report:  C:\Users\mirsa\OneDrive\Desktop\Scrapivo (2)\reports\understanding\gate1-2026-09-16T20-47-06-621Z-seed7777.md
+Cases:   C:\Users\mirsa\OneDrive\Desktop\Scrapivo (2)\reports\understanding\gate1-2026-09-16T20-47-06-621Z-seed7777.cases.json
+
+This is not a verdict. It means the implementation did not violate its automated expectations.
+Gate 1 closes after the HOLDOUT and CHAOS frames in that report have been read.

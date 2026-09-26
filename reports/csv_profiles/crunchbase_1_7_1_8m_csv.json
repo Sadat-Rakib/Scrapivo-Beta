@@ -1,0 +1,365 @@
+{
+  "key": "crunchbase_1.7-1.8m.csv",
+  "size": 59373788,
+  "last_modified": "2026-09-08 00:12:14+00:00",
+  "columns": [
+    "id",
+    "created_at",
+    "name",
+    "short_description",
+    "semrush_global_rank",
+    "semrush_visits_latest_month",
+    "num_investors",
+    "funding_total",
+    "num_exits",
+    "num_funding_rounds",
+    "last_funding_type",
+    "last_funding_at",
+    "num_acquisitions",
+    "apptopia_total_apps",
+    "apptopia_total_downloads",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "num_investments",
+    "num_lead_investments",
+    "num_lead_investors",
+    "listed_stock_symbol",
+    "company_type",
+    "hub_tags",
+    "operating_status",
+    "founded_on",
+    "categories",
+    "founders",
+    "website",
+    "ipo_status",
+    "num_employees_enum",
+    "locations",
+    "growth_insight_description",
+    "growth_insight_indicator",
+    "growth_insight_direction",
+    "growth_insight_confidence",
+    "investor_insight_description",
+    "permalink",
+    "url"
+  ],
+  "row_count": 100000,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "id": "other",
+    "created_at": "other",
+    "name": "full_name",
+    "short_description": "descriptive",
+    "semrush_global_rank": "other",
+    "semrush_visits_latest_month": "other",
+    "num_investors": "other",
+    "funding_total": "other",
+    "num_exits": "other",
+    "num_funding_rounds": "other",
+    "last_funding_type": "other",
+    "last_funding_at": "other",
+    "num_acquisitions": "other",
+    "apptopia_total_apps": "other",
+    "apptopia_total_downloads": "other",
+    "contact_email": "email",
+    "phone_number": "phone",
+    "facebook": "social",
+    "linkedin": "linkedin",
+    "twitter": "social",
+    "num_investments": "other",
+    "num_lead_investments": "other",
+    "num_lead_investors": "other",
+    "listed_stock_symbol": "other",
+    "company_type": "company",
+    "hub_tags": "other",
+    "operating_status": "other",
+    "founded_on": "other",
+    "categories": "other",
+    "founders": "other",
+    "website": "website",
+    "ipo_status": "other",
+    "num_employees_enum": "employees",
+    "locations": "other",
+    "growth_insight_description": "descriptive",
+    "growth_insight_indicator": "other",
+    "growth_insight_direction": "other",
+    "growth_insight_confidence": "other",
+    "investor_insight_description": "descriptive",
+    "permalink": "other",
+    "url": "website"
+  },
+  "missing_pct": {
+    "id": 0.0,
+    "created_at": 0.0,
+    "name": 0.0,
+    "short_description": 0.0,
+    "semrush_global_rank": 63.0,
+    "semrush_visits_latest_month": 63.0,
+    "num_investors": 87.0,
+    "funding_total": 87.6,
+    "num_exits": 99.8,
+    "num_funding_rounds": 84.2,
+    "last_funding_type": 84.2,
+    "last_funding_at": 84.0,
+    "num_acquisitions": 98.2,
+    "apptopia_total_apps": 93.6,
+    "apptopia_total_downloads": 98.4,
+    "contact_email": 28.0,
+    "phone_number": 23.2,
+    "facebook": 46.3,
+    "linkedin": 21.9,
+    "twitter": 58.7,
+    "num_investments": 99.5,
+    "num_lead_investments": 99.8,
+    "num_lead_investors": 90.8,
+    "listed_stock_symbol": 99.2,
+    "company_type": 2.6,
+    "hub_tags": 99.8,
+    "operating_status": 0.0,
+    "founded_on": 16.6,
+    "categories": 3.5,
+    "founders": 72.4,
+    "website": 4.4,
+    "ipo_status": 1.8,
+    "num_employees_enum": 14.4,
+    "locations": 5.7,
+    "growth_insight_description": 95.9,
+    "growth_insight_indicator": 95.9,
+    "growth_insight_direction": 98.3,
+    "growth_insight_confidence": 98.3,
+    "investor_insight_description": 99.3,
+    "permalink": 0.0,
+    "url": 0.0
+  },
+  "samples": {
+    "id": [
+      "771c4754-8ec1-f321-3af9-e7d2b69ebb35",
+      "8bfb7d25-c9bc-42ee-82e2-ae7aab6a588b",
+      "3a7c601c-9948-4ee1-a575-53a477cbf757"
+    ],
+    "created_at": [
+      "2024-08-20 06:49:07.081422+00",
+      "2024-08-20 06:49:07.081422+00",
+      "2024-08-20 06:49:07.081422+00"
+    ],
+    "name": [
+      "Nettico",
+      "Nettie",
+      "Nettie Pickleball"
+    ],
+    "short_description": [
+      "Increase the value of your network.",
+      "Nettify is a Wi-Fi entertainment company that provides innovative wireless networking solutions for hospitality.",
+      "Nettilasku.fi is an easy-to-use browser software whose entrepreneur can register and send and receive invoices."
+    ],
+    "facebook": [
+      "https://www.facebook.com/pages/Nettico/687008114726601",
+      "https://www.facebook.com/nettiezorgdichtbij",
+      "https://www.facebook.com/playnettie"
+    ],
+    "linkedin": [
+      "https://www.linkedin.com/in/pakastin",
+      "https://www.linkedin.com/company/nettie/",
+      "https://www.linkedin.com/company/nettiepickleball"
+    ],
+    "twitter": [
+      "https://twitter.com/nettico_app",
+      "https://twitter.com/nettieregelt",
+      "https://twitter.com/playnettie"
+    ],
+    "company_type": [
+      "for_profit",
+      "for_profit",
+      "for_profit"
+    ],
+    "operating_status": [
+      "active",
+      "active",
+      "active"
+    ],
+    "categories": [
+      "Consulting",
+      "Health Care, Mobile Apps, Personal Health",
+      "E-Commerce, Manufacturing, Retail, Sporting Goods, Sports"
+    ],
+    "website": [
+      "http://netti.co",
+      "http://www.nettie.nu",
+      "https://playnettie.com"
+    ],
+    "ipo_status": [
+      "private",
+      "private",
+      "private"
+    ],
+    "num_employees_enum": [
+      "c_00001_00010",
+      "c_00011_00050",
+      "c_00001_00010"
+    ],
+    "locations": [
+      "European Union (EU), Europe, Middle East, and Africa (EMEA)",
+      "European Union (EU), Europe, Middle East, and Africa (EMEA)",
+      "Greater New York Area, East Coast, Northeastern US"
+    ],
+    "permalink": [
+      "nettico",
+      "nettie",
+      "nettie-pickleball"
+    ],
+    "url": [
+      "https://www.crunchbase.com/organization/nettico",
+      "https://www.crunchbase.com/organization/nettie",
+      "https://www.crunchbase.com/organization/nettie-pickleball"
+    ],
+    "contact_email": [
+      "info@nettie.nu",
+      "hello@playnettie.com",
+      "info@nettience.com"
+    ],
+    "phone_number": [
+      "31 85 047 3557",
+      "+1-858-216-4380",
+      "+65 9160 9440"
+    ],
+    "founded_on": [
+      "2014-01-01",
+      "2021-01-01",
+      "2016-01-01"
+    ],
+    "semrush_global_rank": [
+      "4753543",
+      "3579461",
+      "2278933"
+    ],
+    "semrush_visits_latest_month": [
+      "1920",
+      "3614",
+      "7803"
+    ],
+    "founders": [
+      "Catherine Baxter",
+      "Pavel Pohl",
+      "Rowland Johnson"
+    ],
+    "growth_insight_description": [
+      "Network N took a controlling stake in Roucan.",
+      "Neudata teamed up with the Shanghai Data Exchange to meet the increasing Chinese demand for international data.",
+      "Neumann Kaffee Gruppe has entered the Indonesian market as the coffee market in the region grows."
+    ],
+    "growth_insight_indicator": [
+      "growing",
+      "growing",
+      "growing"
+    ],
+    "apptopia_total_apps": [
+      "1",
+      "3",
+      "2"
+    ],
+    "num_acquisitions": [
+      "1",
+      "1",
+      "1"
+    ],
+    "apptopia_total_downloads": [
+      "5834",
+      "1196",
+      "31"
+    ],
+    "num_investors": [
+      "3",
+      "1",
+      "1"
+    ],
+    "funding_total": [
+      "500000",
+      "0",
+      "500000"
+    ],
+    "num_funding_rounds": [
+      "1",
+      "1",
+      "2"
+    ],
+    "last_funding_type": [
+      "seed",
+      "seed",
+      "pre_seed"
+    ],
+    "last_funding_at": [
+      "2011-08-11",
+      "2023-05-10",
+      "2024-03-31"
+    ],
+    "num_lead_investors": [
+      "1",
+      "1",
+      "4"
+    ],
+    "listed_stock_symbol": [
+      "FRA:DMMN",
+      "OTC:NTFL",
+      "OTC:NWCN"
+    ],
+    "num_investments": [
+      "1",
+      "2",
+      "5"
+    ],
+    "num_lead_investments": [
+      "1",
+      "1",
+      "2"
+    ],
+    "investor_insight_description": [],
+    "growth_insight_direction": [
+      "c400_growing",
+      "c400_growing",
+      "c400_growing"
+    ],
+    "growth_insight_confidence": [
+      "c300_medium",
+      "c300_medium",
+      "c300_medium"
+    ],
+    "num_exits": [
+      "1",
+      "2",
+      "2"
+    ],
+    "hub_tags": [
+      "cbvp",
+      "cbvp",
+      "cbvp"
+    ]
+  },
+  "validity": {
+    "contact_email": "3/3 valid-shape",
+    "phone_number": "3/3 valid-shape"
+  },
+  "entity": "company",
+  "entity_confidence": 0.85,
+  "entity_why": "value-checked override: name=organization name; founders/company_type/num_employees_enum/funding/ipo_status present; no person first/last-name columns",
+  "social_cols": [
+    "facebook",
+    "linkedin",
+    "twitter",
+    "website",
+    "url"
+  ],
+  "activity_match_keys": [
+    "name",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "company_type",
+    "website",
+    "url"
+  ]
+}

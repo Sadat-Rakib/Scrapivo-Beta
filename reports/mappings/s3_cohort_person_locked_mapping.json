@@ -1,0 +1,99 @@
+{
+  "approved": true,
+  "canonical_entity": "person",
+  "cluster_files": 17,
+  "cohort": "s3-new-2026-09",
+  "decisions": [
+    {
+      "canonical": "Company Name",
+      "evidence": "values identical per row to 'Company Name for Emails'; locked spec names Comp name",
+      "sources": [
+        "Comp name"
+      ],
+      "status": "proposed",
+      "transform": "trim; suffix-normalize for matching only"
+    },
+    {
+      "canonical": "Email",
+      "evidence": "RFC-shape values, Email Status=Verified; 0% missing (rep file)",
+      "sources": [
+        "Email"
+      ],
+      "status": "proposed",
+      "transform": "lowercase/trim/RFC-check"
+    },
+    {
+      "canonical": "Name",
+      "evidence": "locked Person spec; values First+Last",
+      "sources": [
+        "First Name",
+        "Last Name"
+      ],
+      "status": "proposed",
+      "transform": "trim+collapse-spaces join"
+    },
+    {
+      "canonical": "Phone",
+      "evidence": "locked spec: Comp Phone ONLY; personal Phone 100% missing here",
+      "sources": [
+        "Comp Phone"
+      ],
+      "status": "proposed",
+      "transform": "E.164-normalize"
+    },
+    {
+      "canonical": "Tools Used",
+      "evidence": "locked spec",
+      "sources": [
+        "Tech Used"
+      ],
+      "status": "proposed",
+      "transform": "split ,|;|/, trim, dedupe"
+    },
+    {
+      "canonical": "Title,Website,Employees,Personal LinkedIn,Company LinkedIn,Facebook,Twitter,Country,Industry",
+      "evidence": "1:1 locked spec columns",
+      "sources": [
+        "Title",
+        "Website",
+        "Employees",
+        "Pers Linkedin",
+        "Comp Linkedin",
+        "Facebook",
+        "Twitter",
+        "Country",
+        "Industry"
+      ],
+      "status": "proposed",
+      "transform": "trim; URL/ISO2 normalize where applicable"
+    }
+  ],
+  "drops": [
+    {
+      "columns": [
+        "Phone"
+      ],
+      "reason": "personal phone; locked privacy rule"
+    },
+    {
+      "columns": [
+        "Keywords",
+        "SEO Description"
+      ],
+      "reason": "locked spec drops"
+    }
+  ],
+  "est_rows": 691307,
+  "family": "A-locked-spec",
+  "note": "Includes Vanda CXO 275k, Vanda 105k, Contractors 112k, apollo exports, staffing/trucking/coaches/professional services.",
+  "approver": "user",
+  "date": "2026-09-08",
+  "ambiguity_resolutions": {
+    "A1_website_conflicts": "corporate-site-wins after same-host check; loser to evidence",
+    "A2_mystery_columns": "inspect values at transform; map or document-drop",
+    "A3_backup_emails": "ordered fallback evidence; primary stays canonical Email",
+    "A4_duplicate_pair": "closed: apollo (5)...(1)_CATEGORIZED.csv excluded (SHA-verified), raw preserved",
+    "A5_cross_file_overlap": "dedupe analysis report-only at Stage C; no merges/deletes",
+    "campaign_engagement": "DEFERRED per user 2026-09-08; carried inert, revisit at live-activity stage"
+  }
+}

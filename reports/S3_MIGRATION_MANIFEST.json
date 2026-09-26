@@ -1,0 +1,756 @@
+{
+  "bucket": "scrapivo-raw-data-2026-523220341033-us-east-2-an",
+  "region": "us-east-2",
+  "mode": "dry-run",
+  "items": [
+    {
+      "file": "BasicCompanyDataAsOneFile.zip",
+      "size": 492551925,
+      "entity": "companies",
+      "dest": "raw/companies/BasicCompanyDataAsOneFile.zip",
+      "note": ""
+    },
+    {
+      "file": "city_country_map.json",
+      "size": 22906126,
+      "entity": "other",
+      "dest": "raw/other/city_country_map.json",
+      "note": ""
+    },
+    {
+      "file": "companies_complete.jsonl",
+      "size": 250773905,
+      "entity": "companies",
+      "dest": "raw/companies/companies_complete.jsonl",
+      "note": ""
+    },
+    {
+      "file": "company_ats_tenants.json",
+      "size": 138452,
+      "entity": "other",
+      "dest": "raw/other/company_ats_tenants.json",
+      "note": ""
+    },
+    {
+      "file": "company_ats_tenants.json.prev",
+      "size": 1727,
+      "entity": "other",
+      "dest": null,
+      "note": "sidecar/backup: kept local, NOT migrated"
+    },
+    {
+      "file": "investors_complete.jsonl",
+      "size": 1138627,
+      "entity": "investors",
+      "dest": "raw/investors/investors_complete.jsonl",
+      "note": ""
+    },
+    {
+      "file": "investors_complete.jsonl.pre-bio-backfill.bak",
+      "size": 1121387,
+      "entity": "investors",
+      "dest": null,
+      "note": "sidecar/backup: kept local, NOT migrated"
+    },
+    {
+      "file": "investors_merged.json",
+      "size": 16563728,
+      "entity": "investors",
+      "dest": "raw/investors/investors_merged.json",
+      "note": ""
+    },
+    {
+      "file": "job_boards_catalog.json",
+      "size": 26876,
+      "entity": "other",
+      "dest": "raw/other/job_boards_catalog.json",
+      "note": ""
+    },
+    {
+      "file": "job_boards_catalog.json.prev",
+      "size": 9944,
+      "entity": "other",
+      "dest": null,
+      "note": "sidecar/backup: kept local, NOT migrated"
+    },
+    {
+      "file": "local_businesses_ae.jsonl",
+      "size": 70440178,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_ae.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_am.jsonl",
+      "size": 10802926,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_am.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_ar.jsonl",
+      "size": 321499345,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_ar.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_at.jsonl",
+      "size": 105732661,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_at.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_au.jsonl",
+      "size": 326500441,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_au.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_austin.jsonl",
+      "size": 77479541,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_austin.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_az.jsonl",
+      "size": 13493784,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_az.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_bd.jsonl",
+      "size": 107139148,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_bd.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_be.jsonl",
+      "size": 102822707,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_be.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_bg.jsonl",
+      "size": 37104612,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_bg.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_bh.jsonl",
+      "size": 7053301,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_bh.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_bo.jsonl",
+      "size": 36754100,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_bo.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_br.jsonl",
+      "size": 1680926151,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_br.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_ca.jsonl",
+      "size": 327782311,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_ca.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_ch.jsonl",
+      "size": 105160947,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_ch.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_cl.jsonl",
+      "size": 102375870,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_cl.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_co.jsonl",
+      "size": 102706053,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_co.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_cr.jsonl",
+      "size": 36224807,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_cr.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_cy.jsonl",
+      "size": 30553711,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_cy.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_cz.jsonl",
+      "size": 103650993,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_cz.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_de.jsonl",
+      "size": 333520144,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_de.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_dk.jsonl",
+      "size": 103038344,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_dk.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_do.jsonl",
+      "size": 35492880,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_do.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_ec.jsonl",
+      "size": 36397673,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_ec.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_ee.jsonl",
+      "size": 24309398,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_ee.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_eg.jsonl",
+      "size": 114165708,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_eg.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_es.jsonl",
+      "size": 328042909,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_es.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_fi.jsonl",
+      "size": 102747780,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_fi.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_fr.jsonl",
+      "size": 329846699,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_fr.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_gb.jsonl",
+      "size": 330202350,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_gb.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_ge.jsonl",
+      "size": 20715496,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_ge.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_gh.jsonl",
+      "size": 13969999,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_gh.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_gr.jsonl",
+      "size": 108461542,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_gr.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_gt.jsonl",
+      "size": 36686753,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_gt.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_hk.jsonl",
+      "size": 36294438,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_hk.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_hr.jsonl",
+      "size": 34877387,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_hr.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_hu.jsonl",
+      "size": 102192802,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_hu.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_id.jsonl",
+      "size": 321970121,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_id.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_ie.jsonl",
+      "size": 90321144,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_ie.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_il.jsonl",
+      "size": 71711772,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_il.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_in.jsonl",
+      "size": 1742768196,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_in.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_is.jsonl",
+      "size": 8901165,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_is.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_it.jsonl",
+      "size": 327100521,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_it.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_jo.jsonl",
+      "size": 28661406,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_jo.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_jp.jsonl",
+      "size": 329109832,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_jp.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_ke.jsonl",
+      "size": 35956049,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_ke.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_kr.jsonl",
+      "size": 110897082,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_kr.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_kw.jsonl",
+      "size": 12575755,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_kw.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_kz.jsonl",
+      "size": 18927653,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_kz.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_lb.jsonl",
+      "size": 22566531,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_lb.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_lk.jsonl",
+      "size": 36197634,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_lk.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_lt.jsonl",
+      "size": 33698530,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_lt.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_lu.jsonl",
+      "size": 15204717,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_lu.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_lv.jsonl",
+      "size": 30451382,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_lv.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_ma.jsonl",
+      "size": 36366898,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_ma.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_mt.jsonl",
+      "size": 10530002,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_mt.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_mx.jsonl",
+      "size": 323808096,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_mx.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_my.jsonl",
+      "size": 103827044,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_my.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_ng.jsonl",
+      "size": 57416015,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_ng.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_nl.jsonl",
+      "size": 105288125,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_nl.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_no.jsonl",
+      "size": 101229300,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_no.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_np.jsonl",
+      "size": 35746516,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_np.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_nz.jsonl",
+      "size": 105133044,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_nz.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_om.jsonl",
+      "size": 7475242,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_om.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_pa.jsonl",
+      "size": 14622646,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_pa.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_pe.jsonl",
+      "size": 104545463,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_pe.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_ph.jsonl",
+      "size": 102569100,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_ph.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_pk.jsonl",
+      "size": 105623605,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_pk.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_pl.jsonl",
+      "size": 105357804,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_pl.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_pr.jsonl",
+      "size": 35455199,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_pr.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_pt.jsonl",
+      "size": 105914465,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_pt.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_py.jsonl",
+      "size": 35611215,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_py.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_qa.jsonl",
+      "size": 11640485,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_qa.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_ro.jsonl",
+      "size": 103385076,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_ro.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_rs.jsonl",
+      "size": 36435494,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_rs.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_sa.jsonl",
+      "size": 62366504,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_sa.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_se.jsonl",
+      "size": 101381261,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_se.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_sg.jsonl",
+      "size": 57193866,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_sg.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_si.jsonl",
+      "size": 28392956,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_si.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_sk.jsonl",
+      "size": 35645474,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_sk.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_th.jsonl",
+      "size": 115069839,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_th.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_tn.jsonl",
+      "size": 29446261,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_tn.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_tr.jsonl",
+      "size": 315310428,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_tr.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_tw.jsonl",
+      "size": 35586730,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_tw.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_tz.jsonl",
+      "size": 10294207,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_tz.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_ua.jsonl",
+      "size": 113291177,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_ua.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_us.jsonl",
+      "size": 1654055995,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_us.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_uy.jsonl",
+      "size": 25509742,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_uy.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_uz.jsonl",
+      "size": 8668646,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_uz.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_vn.jsonl",
+      "size": 106248039,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_vn.jsonl",
+      "note": ""
+    },
+    {
+      "file": "local_businesses_za.jsonl",
+      "size": 105278242,
+      "entity": "local-businesses",
+      "dest": "raw/local-businesses/local_businesses_za.jsonl",
+      "note": ""
+    },
+    {
+      "file": "people_complete.jsonl",
+      "size": 15046,
+      "entity": "people",
+      "dest": "raw/people/people_complete.jsonl",
+      "note": ""
+    },
+    {
+      "file": "pipeline.duckdb",
+      "size": 226504704,
+      "entity": "other",
+      "dest": "raw/other/pipeline.duckdb",
+      "note": ""
+    },
+    {
+      "file": "regions_manifest.json",
+      "size": 16902,
+      "entity": "other",
+      "dest": "raw/other/regions_manifest.json",
+      "note": ""
+    },
+    {
+      "file": "workday_tenants.json",
+      "size": 131033,
+      "entity": "other",
+      "dest": "raw/other/workday_tenants.json",
+      "note": ""
+    },
+    {
+      "file": "workday_tenants.json.prev",
+      "size": 460,
+      "entity": "other",
+      "dest": null,
+      "note": "sidecar/backup: kept local, NOT migrated"
+    },
+    {
+      "file": "yc_company_linkedin.json",
+      "size": 59,
+      "entity": "other",
+      "dest": "raw/other/yc_company_linkedin.json",
+      "note": ""
+    }
+  ]
+}

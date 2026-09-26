@@ -1,0 +1,58 @@
+{
+  "query": "find me local businesses who require websites in Canada",
+  "responseObserved": true,
+  "errors": [],
+  "requests": [
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvc3BlYy1zZWFyY2guZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6ImdldFNwZWNGbGFnX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvcHJvZmlsZS5mdW5jdGlvbnMudHM_dHNzLXNlcnZlcmZuLXNwbGl0IiwiZXhwb3J0IjoiZ2V0TXlQcm9maWxlX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvc2VhcmNoLmZ1bmN0aW9ucy50cz90c3Mtc2VydmVyZm4tc3BsaXQiLCJleHBvcnQiOiJnZXRSZW1haW5pbmdTZWFyY2hlc19jcmVhdGVTZXJ2ZXJGbl9oYW5kbGVyIn0",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvbGVhZHMuZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6Imxpc3RTYXZlZExlYWRzX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvcHJvamVjdHMuZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6Imxpc3RQcm9qZWN0c19jcmVhdGVTZXJ2ZXJGbl9oYW5kbGVyIn0",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvdHJhbnNjcmlwdC5mdW5jdGlvbnMudHM_dHNzLXNlcnZlcmZuLXNwbGl0IiwiZXhwb3J0IjoiZ2V0VHJhbnNjcmlwdF9jcmVhdGVTZXJ2ZXJGbl9oYW5kbGVyIn0?payload=%7B%22t%22%3A%7B%22t%22%3A10%2C%22i%22%3A0%2C%22p%22%3A%7B%22k%22%3A%5B%22data%22%5D%2C%22v%22%3A%5B%7B%22t%22%3A10%2C%22i%22%3A1%2C%22p%22%3A%7B%22k%22%3A%5B%22conversationId%22%5D%2C%22v%22%3A%5B%7B%22t%22%3A1%2C%22s%22%3A%2283775911-3efb-42a6-aa40-51453ab9cd2c%3A9f78ea4f-6e31-4385-b68d-9aa4c3f2ba09%22%7D%5D%7D%2C%22o%22%3A0%7D%5D%7D%2C%22o%22%3A0%7D%2C%22f%22%3A63%2C%22m%22%3A%5B%5D%7D",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvc3BlYy1zZWFyY2guZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6ImdldFNwZWNGbGFnX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvbGVhZHMuZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6Imxpc3RIaXN0b3J5X2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvc3BlYy1zZWFyY2guZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6ImdldFNwZWNGbGFnX2NyZWF0ZVNlcnZlckZuX2hhbmRsZXIifQ",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvdHJhbnNjcmlwdC5mdW5jdGlvbnMudHM_dHNzLXNlcnZlcmZuLXNwbGl0IiwiZXhwb3J0Ijoic2F2ZVRyYW5zY3JpcHRfY3JlYXRlU2VydmVyRm5faGFuZGxlciJ9",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvc3BlYy1zZWFyY2guZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6InJ1blNwZWNTZWFyY2hfY3JlYXRlU2VydmVyRm5faGFuZGxlciJ9",
+      "status": 200
+    }
+  ],
+  "responses": [
+    {
+      "url": "http://127.0.0.1:8082/_serverFn/eyJmaWxlIjoiL3NyYy9saWIvc3BlYy1zZWFyY2guZnVuY3Rpb25zLnRzP3Rzcy1zZXJ2ZXJmbi1zcGxpdCIsImV4cG9ydCI6InJ1blNwZWNTZWFyY2hfY3JlYXRlU2VydmVyRm5faGFuZGxlciJ9",
+      "status": 200,
+      "body": "{\"t\":10,\"i\":0,\"p\":{\"k\":[\"result\",\"error\",\"context\"],\"v\":[{\"t\":10,\"i\":1,\"p\":{\"k\":[\"questions\",\"clarify\",\"rows\",\"dbMeta\",\"rejected\",\"liveDiscovery\",\"pendingEnrichment\",\"moreAvailableMessage\",\"offset\",\"limit\",\"hasMore\",\"totalAvailable\",\"spec\",\"outcome\",\"diagnostics\",\"retrievalTrace\",\"search_run_id\",\"conversation_id\",\"turn_id\",\"request_id\",\"qualified_count\"],\"v\":[{\"t\":9,\"i\":2,\"a\":[],\"o\":0},{\"t\":9,\"i\":3,\"a\":[],\"o\":0},{\"t\":9,\"i\":4,\"a\":[{\"t\":10,\"i\":5,\"p\":{\"k\":[\"kind\",\"key\",\"entity_id\",\"entity_resolved\",\"page_type\",\"identity_confidence\",\"title\",\"detail\",\"email\",\"phone\",\"phoneStatus\",\"url\",\"category\",\"location\",\"country\",\"opportunity\",\"sector\",\"industry\",\"stage\",\"check\",\"why_match\",\"missingFields\",\"complete\",\"evidence\",\"field_provenance\",\"relevance_score\",\"intent_score\",\"disposition\",\"disposition_label\",\"verification_status\"],\"v\":[{\"t\":1,\"s\":\"business\"},{\"t\":1,\"s\":\"overture:ce4b70c1-ac67-4836-ae63-81df907cb0f0\"},{\"t\":1,\"s\":\"overture:ce4b70c1-ac67-4836-ae63-81df907cb0f0\"},{\"t\":2,\"s\":2},{\"t\":1,\"s\":\"entity_page\"},{\"t\":0,\"s\":0.9},{\"t\":1,\"s\":\"Cluster Fcuk Farm and what the flock farm\"},{\"t\":1,\"s\":\"600 hwy-2, toronto, on, m4e 1r1, Toronto, ON, CA\"},{\"t\":2,\"s\":0},{\"t\":1,\"s\":\"+15879916030\"},{\"t\":1,\"s\":\"ok\"},{\"t\":2,\"s\":0},{\"t\":1,\"s\":\"farm\"},{\"t\":1,\"s\":\"Toronto, ON\"},{\"t\":1,\"s\":\"CA\"},{\"t\":1,\"s\":\"no_website\"},{\"t\":2,\"s\":0},{\"t\":2,\"s\":0},{\"t\":2,\"s\":0},{\"t\":2,\"s\":0},{\"t\":1,\"s\":\"No website · No website on file for Cluster Fcuk Farm and what the flock farm\"},{\"t\":9,\"i\":6,\"a\":[],\"o\":0},{\"t\":2,\"s\":2},{\"t\":9,\"i\":7,\"a\":[{\"t\":10,\"i\":8,\"p\":{\"k\":[\"source_url\",\"source_type\",\"excerpt\",\"evidence_type\",\"supports\",\"confidence\",\"subject\",\"event_at\",\"extraction_method\",\"observed_at\"],\"v\":[{\"t\":1,\"s\":\"entity:overture:ce4b70c1-ac67-4836-ae63-81df907cb0f0\"},{\"t\":1,\"s\":\"registry\"},{\"t\":1,\"s\":\"No website on file for Cluster Fcuk Farm and what the flock farm\"},{\"t\":1,\"s\":\"no_website\"},{\"t\":1,\"s\":\"opportunity\"},{\"t\":0,\"s\":0.75},{\"t\":1,\"s\":\"overture:ce4b70c1-ac67-4836-ae63-81df907cb0f0\"},{\"t\":2,\"s\":1},{\"t\":1,\"s\":\"enrichment\"},{\"t\":1,\"s\":\"2026-09-24T12:22:55.843Z\"}]},\"o\":0}],\"o\":0},{\"t\":10,\"i\":9,\"p\":{\"k\":[],\"v\":[]},\"o\":0},{\"t\":0,\"s\":0.75},{\"t\":0,\"s\":0.65},{\"t\":1,\"s\":\"qualified\"},{\"t\":2,\"s\":0},{\"t\":1,\"s\":\"verified\"}]},\"o\":0}],\"o\":0},{\"t\":9,\"i\":10,\"a\":[{\"t\":10,\"i\":11,\"p\":{\"k\":[\"dbHit\",\"engine\",\"partitionsRead\",\"rowsScanned\",\"rowsReturned\",\"elapsedMs\",\"indexUsed\"],\"v\":[{\"t\":2,\"s\":2},{\"t\":1,\"s\":\"pg-index\"},{\"t\":9,\"i\":12,\"a\":[{\"t\":1,\"s\":\"idx_businesses(country,city_norm,category)\"}],\"o\":0},{\"t\":0,\"s\":1},{\"t\":0,\"s\":1},{\"t\":0,\"s\":187},{\"t\":1,\"s\":\"idx_biz_country_citynorm_cat\"}]},\"o\":0},{\"t\":10,\"i\":13,\"p\":{\"k\":[\"dbHit\",\"engine\",\"partitionsRead\",\"rowsScanned\",\"rowsReturned\"],\"v\":[{\"t\":2,\"s\":2},{\"t\":1,\"s\":\"s3-parquet\"},{\"t\":9,\"i\":14,\"a\":[{\"t\":1,\"s\":\"processed/local-businesses/by_country/ca.parquet\"},{\"t\":1,\"s\":\"(exact=51 nearby=0 for \\\\\\\"Canada\\\\\\\")\"}],\"o\":0},{\"t\":0,\"s\":81},{\"t\":0,\"s\":51}]},\"o\":0}],\"o\":0},{\"t\":0,\"s\":3},{\"t\":1,\"s\":\"completed\"},{\"t\":0,\"s\":0},{\"t\":1,\"s\":\"There are more verified leads — want to see them?\"},{\"t\":0,\"s\":0},{\"t\":0,\"s\":50},{\"t\":2,\"s\":2},{\"t\":2,\"s\":0},{\"t\":10,\"i\":15,\"p\":{\"k\":[\"entity\",\"criteria\",\"missing\",\"signal_required\",\"signal_types\",\"signal_recency\",\"status\",\"raw_query\",\"locationSuggestion\"],\"v\":[{\"t\":1,\"s\":\"business\"},{\"t\":9,\"i\":16,\"a\":[{\"t\":10,\"i\":17,\"p\":{\"k\":[\"field\",\"value\",\"stated\",\"confidence\"],\"v\":[{\"t\":1,\"s\":\"location\"},{\"t\":1,\"s\":\"Canada\"},{\"t\":2,\"s\":2},{\"t\":0,\"s\":1}]},\"o\":0},{\"t\":10,\"i\":18,\"p\":{\"k\":[\"field\",\"value\",\"stated\",\"confidence\"],\"v\":[{\"t\":1,\"s\":\"location_id\"},{\"t\":1,\"s\":\"geo:country:ca\"},{\"t\":2,\"s\":2},{\"t\":0,\"s\":1}]},\"o\":0},{\"t\":10,\"i\":19,\"p\":{\"k\":[\"field\",\"value\",\"stated\",\"confidence\"],\"v\":[{\"t\":1,\"s\":\"location_kind\"},{\"t\":1,\"s\":\"country\"},{\"t\":2,\"s\":2},{\"t\":0,\"s\":1}]},\"o\":0},{\"t\":10,\"i\":20,\"p\":{\"k\":[\"field\",\"value\",\"stated\",\"confidence\"],\"v\":[{\"t\":1,\"s\":\"location_country\"},{\"t\":1,\"s\":\"CA\"},{\"t\":2,\"s\":2},{\"t\":0,\"s\":1}]},\"o\":0},{\"t\":10,\"i\":21,\"p\":{\"k\":[\"field\",\"value\",\"stated\",\"confidence\"],\"v\":[{\"t\":1,\"s\":\"opportunity\"},{\"t\":1,\"s\":\"no_website\"},{\"t\":2,\"s\":2},{\"t\":0,\"s\":1}]},\"o\":0},{\"t\":10,\"i\":22,\"p\":{\"k\":[\"field\",\"value\",\"stated\",\"confidence\"],\"v\":[{\"t\":1,\"s\":\"requested_product\"},{\"t\":1,\"s\":\"website\"},{\"t\":2,\"s\":2},{\"t\":0,\"s\":1}]},\"o\":0}],\"o\":0},{\"t\":9,\"i\":23,\"a\":[],\"o\":0},{\"t\":2,\"s\":2},{\"t\":9,\"i\":24,\"a\":[{\"t\":1,\"s\":\"service_request\"},{\"t\":1,\"s\":\"opportunity\"}],\"o\":0},{\"t\":2,\"s\":0},{\"t\":1,\"s\":\"ready_to_search\"},{\"t\":1,\"s\":\"find me local businesses who require websites in Canada\"},{\"t\":2,\"s\":0}]},\"o\":0},{\"t\":1,\"s\":\"QUALIFIED_RESULTS\"},{\"t\":9,\"i\":25,\"a\":[{\"t\":10,\"i\":26,\"p\":{\"k\":[\"code\",\"source\",\"detail\"],\"v\":[{\"t\":1,\"s\":\"SOURCE_ERROR\"},{\"t\":1,\"s\":\"browser-live\"},{\"t\":1,\"s\":\"groq:openai/gpt-oss-20b 413 (bad_request): {\\\\\\\"error\\\\\\\":{\\\\\\\"message\\\\\\\":\\\\\\\"Request too large for model `openai/gpt-oss-20b` in organization `org_01kdcnhph0fnfb7jc3575bscx9` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Requested 16021,\"}]},\"o\":0}],\"o\":0},{\"t\":10,\"i\":27,\"p\":{\"k\":[\"sources\",\"rawCandidates\",\"postSpecFilter\",\"complete\",\"pendingEnrichment\",\"qualificationRejected\",\"returned\",\"reason\"],\"v\":[{\"t\":9,\"i\":28,\"a\":[{\"t\":10,\"i\":29,\"p\":{\"k\":[\"source\",\"partitions\",\"scanned\",\"matched\"],\"v\":[{\"t\":1,\"s\":\"pg-index\"},{\"t\":4,\"i\":12},{\"t\":0,\"s\":1},{\"t\":0,\"s\":1}]},\"o\":0},{\"t\":10,\"i\":30,\"p\":{\"k\":[\"source\",\"partitions\",\"scanned\",\"matched\"],\"v\":[{\"t\":1,\"s\":\"s3-parquet\"},{\"t\":4,\"i\":14},{\"t\":0,\"s\":81},{\"t\":0,\"s\":51}]},\"o\":0}],\"o\":0},{\"t\":0,\"s\":52},{\"t\":0,\"s\":49},{\"t\":0,\"s\":49},{\"t\":0,\"s\":0},{\"t\":0,\"s\":48},{\"t\":0,\"s\":1},{\"t\":1,\"s\":\"RESULTS\"}]},\"o\":0},{\"t\":1,\"s\":\"run_44955aee\"},{\"t\":1,\"s\":\"83775911-3efb-42a6-aa40-51453ab9cd2c:9f78ea4f-6e31-4385-b68d-9aa4c3f2ba09\"},{\"t\":1,\"s\":\"1790252516015-wn5bmf7kmri\"},{\"t\":1,\"s\":\"req_4bcdc74a\"},{\"t\":0,\"s\":1}]},\"o\":0},{\"t\":2,\"s\":1},{\"t\":11,\"i\":31,\"p\":{\"k\":[],\"v\":[]},\"o\":0}]},\"o\":0}"
+    }
+  ]
+}

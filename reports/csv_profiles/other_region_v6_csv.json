@@ -1,0 +1,442 @@
+{
+  "key": "other_region_v6.csv",
+  "size": 912519,
+  "last_modified": "2026-09-08 00:15:12+00:00",
+  "columns": [
+    "First Name",
+    "Last Name",
+    "Title",
+    "Company",
+    "Company Name for Emails",
+    "Email",
+    "Email Status",
+    "Seniority",
+    "Departments",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Stage",
+    "# Employees",
+    "Industry",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "City",
+    "State",
+    "Country",
+    "Company City",
+    "Company State",
+    "Company Country",
+    "Company Phone",
+    "SEO Description",
+    "email",
+    "username",
+    "domain",
+    "status",
+    "overall_score",
+    "is_safe_to_send",
+    "is_valid_syntax",
+    "is_disposable",
+    "is_role_account",
+    "mx_accepts_mail",
+    "mx_records",
+    "can_connect_smtp",
+    "has_inbox_full",
+    "is_catch_all",
+    "is_deliverable",
+    "is_disabled",
+    "is_spamtrap",
+    "is_free_email",
+    "Region"
+  ],
+  "row_count": 1212,
+  "sampled_rows": 1212,
+  "delimiter": ",",
+  "roles": {
+    "First Name": "first_name",
+    "Last Name": "last_name",
+    "Title": "title",
+    "Company": "company",
+    "Company Name for Emails": "email",
+    "Email": "email",
+    "Email Status": "email",
+    "Seniority": "other",
+    "Departments": "other",
+    "First Phone": "phone",
+    "Work Direct Phone": "phone",
+    "Home Phone": "phone",
+    "Mobile Phone": "phone",
+    "Corporate Phone": "phone",
+    "Other Phone": "phone",
+    "Stage": "other",
+    "# Employees": "employees",
+    "Industry": "industry",
+    "Website": "website",
+    "Company Linkedin Url": "linkedin",
+    "Facebook Url": "social",
+    "Twitter Url": "social",
+    "City": "other",
+    "State": "other",
+    "Country": "country",
+    "Company City": "company",
+    "Company State": "company",
+    "Company Country": "company",
+    "Company Phone": "phone",
+    "SEO Description": "descriptive",
+    "email": "email",
+    "username": "other",
+    "domain": "website",
+    "status": "other",
+    "overall_score": "other",
+    "is_safe_to_send": "other",
+    "is_valid_syntax": "other",
+    "is_disposable": "other",
+    "is_role_account": "company",
+    "mx_accepts_mail": "email",
+    "mx_records": "other",
+    "can_connect_smtp": "other",
+    "has_inbox_full": "other",
+    "is_catch_all": "other",
+    "is_deliverable": "other",
+    "is_disabled": "other",
+    "is_spamtrap": "other",
+    "is_free_email": "email",
+    "Region": "other"
+  },
+  "missing_pct": {
+    "First Name": 0.0,
+    "Last Name": 0.2,
+    "Title": 0.2,
+    "Company": 0.2,
+    "Company Name for Emails": 0.2,
+    "Email": 0.0,
+    "Email Status": 0.0,
+    "Seniority": 0.2,
+    "Departments": 30.7,
+    "First Phone": 4.5,
+    "Work Direct Phone": 100.0,
+    "Home Phone": 100.0,
+    "Mobile Phone": 99.8,
+    "Corporate Phone": 4.6,
+    "Other Phone": 100.0,
+    "Stage": 0.0,
+    "# Employees": 0.2,
+    "Industry": 1.3,
+    "Website": 0.0,
+    "Company Linkedin Url": 0.2,
+    "Facebook Url": 6.9,
+    "Twitter Url": 10.2,
+    "City": 16.1,
+    "State": 12.7,
+    "Country": 4.9,
+    "Company City": 3.8,
+    "Company State": 2.8,
+    "Company Country": 0.2,
+    "Company Phone": 4.4,
+    "SEO Description": 11.9,
+    "email": 0.0,
+    "username": 0.0,
+    "domain": 0.0,
+    "status": 0.0,
+    "overall_score": 0.0,
+    "is_safe_to_send": 0.0,
+    "is_valid_syntax": 0.0,
+    "is_disposable": 0.0,
+    "is_role_account": 0.0,
+    "mx_accepts_mail": 0.0,
+    "mx_records": 0.0,
+    "can_connect_smtp": 0.0,
+    "has_inbox_full": 0.0,
+    "is_catch_all": 0.0,
+    "is_deliverable": 0.0,
+    "is_disabled": 0.0,
+    "is_spamtrap": 0.0,
+    "is_free_email": 0.0,
+    "Region": 0.0
+  },
+  "samples": {
+    "First Name": [
+      "Emma",
+      "Darryl",
+      "Akshay"
+    ],
+    "Last Name": [
+      "Weston",
+      "Piper",
+      "Agarwal"
+    ],
+    "Title": [
+      "CEO & Co Founder",
+      "Training Manager - ANZ",
+      "Co-Founder and Technical Director"
+    ],
+    "Company": [
+      "AgriDigital",
+      "CNH",
+      "Growit India"
+    ],
+    "Company Name for Emails": [
+      "AgriDigital",
+      "CNH",
+      "Growit India"
+    ],
+    "Email": [
+      "emma.weston@agridigital.io",
+      "darryl.piper@cnhind.com",
+      "akshay@thegrowit.com"
+    ],
+    "Email Status": [
+      "Verified",
+      "Verified",
+      "Verified"
+    ],
+    "Seniority": [
+      "Founder",
+      "Manager",
+      "Founder"
+    ],
+    "Departments": [
+      "C-Suite",
+      "Human Resources",
+      "C-Suite"
+    ],
+    "First Phone": [
+      "'+61 2 8067 9089",
+      "'+44 20 7925 1964",
+      "'+91 1800 889 6978"
+    ],
+    "Corporate Phone": [
+      "'+61 2 8067 9089",
+      "'+44 20 7925 1964",
+      "'+91 1800 889 6978"
+    ],
+    "Stage": [
+      "Cold",
+      "Cold",
+      "Cold"
+    ],
+    "# Employees": [
+      "17.0",
+      "29000.0",
+      "110.0"
+    ],
+    "Industry": [
+      "information technology & services",
+      "machinery",
+      "farming"
+    ],
+    "Website": [
+      "http://www.agridigital.io",
+      "http://www.cnh.com",
+      "http://www.thegrowit.com"
+    ],
+    "Company Linkedin Url": [
+      "http://www.linkedin.com/company/agridigital",
+      "http://www.linkedin.com/company/cnh",
+      "http://www.linkedin.com/company/growit-india"
+    ],
+    "Facebook Url": [
+      "https://www.facebook.com/agridigital.global/",
+      "https://facebook.com/CNHIndustrial",
+      "https://www.facebook.com/Growitindia"
+    ],
+    "Twitter Url": [
+      "https://twitter.com/Agri_Digital",
+      "https://twitter.com/cnhindustrial",
+      "https://twitter.com/growitindia?lang=en"
+    ],
+    "City": [
+      "Sydney",
+      "Sydney",
+      "Johannesburg"
+    ],
+    "State": [
+      "New South Wales",
+      "New South Wales",
+      "Gauteng"
+    ],
+    "Country": [
+      "Australia",
+      "Australia",
+      "South Africa"
+    ],
+    "Company City": [
+      "Sydney",
+      "London",
+      "Surat"
+    ],
+    "Company State": [
+      "New South Wales",
+      "England",
+      "Gujarat"
+    ],
+    "Company Country": [
+      "Australia",
+      "United Kingdom",
+      "India"
+    ],
+    "Company Phone": [
+      "'+61 2 8067 9089",
+      "'+44 20 7925 1964",
+      "'+91 1800 889 6978"
+    ],
+    "SEO Description": [
+      "Unlocking data, digital and research for a sustainable food future.",
+      "One cloud platform for Procurement, CTRM, Supply Chain, Sustainability and Treasury.",
+      "Web site created using create-react-app"
+    ],
+    "email": [
+      "emma.weston@agridigital.io",
+      "darryl.piper@cnhind.com",
+      "akshay@thegrowit.com"
+    ],
+    "username": [
+      "emma.weston",
+      "darryl.piper",
+      "akshay"
+    ],
+    "domain": [
+      "agridigital.io",
+      "cnhind.com",
+      "thegrowit.com"
+    ],
+    "status": [
+      "safe",
+      "safe",
+      "safe"
+    ],
+    "overall_score": [
+      "98",
+      "98",
+      "98"
+    ],
+    "is_safe_to_send": [
+      "True",
+      "True",
+      "True"
+    ],
+    "is_valid_syntax": [
+      "True",
+      "True",
+      "True"
+    ],
+    "is_disposable": [
+      "False",
+      "False",
+      "False"
+    ],
+    "is_role_account": [
+      "False",
+      "False",
+      "False"
+    ],
+    "mx_accepts_mail": [
+      "True",
+      "True",
+      "True"
+    ],
+    "mx_records": [
+      "alt1.aspmx.l.google.com; alt2.aspmx.l.google.com; aspmx.l.google.com; alt3.aspmx.l.google.com; alt4.aspmx.l.google.com",
+      "cnhind-com.mail.protection.outlook.com",
+      "elancoah-com.mail.protection.outlook.com"
+    ],
+    "can_connect_smtp": [
+      "True",
+      "True",
+      "True"
+    ],
+    "has_inbox_full": [
+      "False",
+      "False",
+      "False"
+    ],
+    "is_catch_all": [
+      "False",
+      "False",
+      "False"
+    ],
+    "is_deliverable": [
+      "True",
+      "True",
+      "True"
+    ],
+    "is_disabled": [
+      "False",
+      "False",
+      "False"
+    ],
+    "is_spamtrap": [
+      "False",
+      "False",
+      "False"
+    ],
+    "is_free_email": [
+      "False",
+      "False",
+      "False"
+    ],
+    "Region": [
+      "Other",
+      "Other",
+      "Other"
+    ],
+    "Mobile Phone": [
+      "'+61 410 616 000",
+      "'+20 100 111 7044",
+      "'+61 412 445 605"
+    ]
+  },
+  "validity": {
+    "Company Name for Emails": "0/3 valid-shape",
+    "Email": "3/3 valid-shape",
+    "Email Status": "0/3 valid-shape",
+    "First Phone": "3/3 valid-shape",
+    "Mobile Phone": "3/3 valid-shape",
+    "Corporate Phone": "3/3 valid-shape",
+    "Company Phone": "3/3 valid-shape",
+    "email": "3/3 valid-shape",
+    "mx_accepts_mail": "0/3 valid-shape",
+    "is_free_email": "0/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "domain"
+  ],
+  "activity_match_keys": [
+    "First Name",
+    "Last Name",
+    "Company",
+    "Company Name for Emails",
+    "Email",
+    "Email Status",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "Company City",
+    "Company State",
+    "Company Country",
+    "Company Phone",
+    "email",
+    "domain",
+    "is_role_account",
+    "mx_accepts_mail",
+    "is_free_email"
+  ]
+}

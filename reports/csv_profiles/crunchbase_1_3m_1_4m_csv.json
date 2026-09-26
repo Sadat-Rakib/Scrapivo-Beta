@@ -1,0 +1,365 @@
+{
+  "key": "crunchbase_1.3m-1.4m.csv",
+  "size": 58731387,
+  "last_modified": "2026-09-08 00:12:15+00:00",
+  "columns": [
+    "id",
+    "created_at",
+    "name",
+    "short_description",
+    "semrush_global_rank",
+    "semrush_visits_latest_month",
+    "num_investors",
+    "funding_total",
+    "num_exits",
+    "num_funding_rounds",
+    "last_funding_type",
+    "last_funding_at",
+    "num_acquisitions",
+    "apptopia_total_apps",
+    "apptopia_total_downloads",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "num_investments",
+    "num_lead_investments",
+    "num_lead_investors",
+    "listed_stock_symbol",
+    "company_type",
+    "hub_tags",
+    "operating_status",
+    "founded_on",
+    "categories",
+    "founders",
+    "website",
+    "ipo_status",
+    "num_employees_enum",
+    "locations",
+    "growth_insight_description",
+    "growth_insight_indicator",
+    "growth_insight_direction",
+    "growth_insight_confidence",
+    "investor_insight_description",
+    "permalink",
+    "url"
+  ],
+  "row_count": 100000,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "id": "other",
+    "created_at": "other",
+    "name": "full_name",
+    "short_description": "descriptive",
+    "semrush_global_rank": "other",
+    "semrush_visits_latest_month": "other",
+    "num_investors": "other",
+    "funding_total": "other",
+    "num_exits": "other",
+    "num_funding_rounds": "other",
+    "last_funding_type": "other",
+    "last_funding_at": "other",
+    "num_acquisitions": "other",
+    "apptopia_total_apps": "other",
+    "apptopia_total_downloads": "other",
+    "contact_email": "email",
+    "phone_number": "phone",
+    "facebook": "social",
+    "linkedin": "linkedin",
+    "twitter": "social",
+    "num_investments": "other",
+    "num_lead_investments": "other",
+    "num_lead_investors": "other",
+    "listed_stock_symbol": "other",
+    "company_type": "company",
+    "hub_tags": "other",
+    "operating_status": "other",
+    "founded_on": "other",
+    "categories": "other",
+    "founders": "other",
+    "website": "website",
+    "ipo_status": "other",
+    "num_employees_enum": "employees",
+    "locations": "other",
+    "growth_insight_description": "descriptive",
+    "growth_insight_indicator": "other",
+    "growth_insight_direction": "other",
+    "growth_insight_confidence": "other",
+    "investor_insight_description": "descriptive",
+    "permalink": "other",
+    "url": "website"
+  },
+  "missing_pct": {
+    "id": 0.0,
+    "created_at": 0.0,
+    "name": 0.0,
+    "short_description": 0.0,
+    "semrush_global_rank": 60.1,
+    "semrush_visits_latest_month": 60.1,
+    "num_investors": 91.6,
+    "funding_total": 92.2,
+    "num_exits": 99.8,
+    "num_funding_rounds": 89.9,
+    "last_funding_type": 89.9,
+    "last_funding_at": 89.7,
+    "num_acquisitions": 98.7,
+    "apptopia_total_apps": 94.1,
+    "apptopia_total_downloads": 98.3,
+    "contact_email": 27.4,
+    "phone_number": 20.8,
+    "facebook": 40.3,
+    "linkedin": 24.4,
+    "twitter": 59.1,
+    "num_investments": 99.6,
+    "num_lead_investments": 99.8,
+    "num_lead_investors": 94.3,
+    "listed_stock_symbol": 99.5,
+    "company_type": 3.7,
+    "hub_tags": 99.8,
+    "operating_status": 0.0,
+    "founded_on": 16.8,
+    "categories": 4.8,
+    "founders": 76.4,
+    "website": 5.5,
+    "ipo_status": 3.7,
+    "num_employees_enum": 15.7,
+    "locations": 7.2,
+    "growth_insight_description": 97.6,
+    "growth_insight_indicator": 97.6,
+    "growth_insight_direction": 98.8,
+    "growth_insight_confidence": 98.8,
+    "investor_insight_description": 98.8,
+    "permalink": 0.0,
+    "url": 0.0
+  },
+  "samples": {
+    "id": [
+      "ab6b5719-2de6-494a-bc1b-f9be2a66ee8c",
+      "a64e67a1-c761-43bc-9b90-ee6e5d972e15",
+      "c39c40d3-a2b5-4f89-aef8-049214d921b1"
+    ],
+    "created_at": [
+      "2024-08-19 08:25:03.792195+00",
+      "2024-08-19 08:25:03.792195+00",
+      "2024-08-19 08:25:03.792195+00"
+    ],
+    "name": [
+      "Kashiff Khan K group",
+      "Kashifuji Works",
+      "Kashii"
+    ],
+    "short_description": [
+      "Kashiff khan K Brand— Kashiff Khan is the Founder and Chairman of The K Group.",
+      "Kashii specializes in the design, development, installation, and after-sales of landscape designs as well as exteriors.",
+      "Kashikey is a supplier of gems and jewelry."
+    ],
+    "phone_number": [
+      "02266710330",
+      "+81-75-661-5271",
+      "+81 076-478-5111"
+    ],
+    "facebook": [
+      "https://www.facebook.com/thekgroupglobal",
+      "https://www.facebook.com/kashii.saiyou/",
+      "https://www.facebook.com/kashikoweb"
+    ],
+    "twitter": [
+      "https://twitter.com/thekgroupindia",
+      "https://twitter.com/kashii541",
+      "https://twitter.com/kashima_system?lang=es"
+    ],
+    "company_type": [
+      "non_profit",
+      "for_profit",
+      "for_profit"
+    ],
+    "operating_status": [
+      "closed",
+      "active",
+      "active"
+    ],
+    "founded_on": [
+      "2006-01-01",
+      "1913-02-11",
+      "1959-03-01"
+    ],
+    "founders": [
+      "Kashiff Khan",
+      "Robert Davies",
+      "Christophe Robilliard, José Manuel Palacios Díaz"
+    ],
+    "ipo_status": [
+      "private",
+      "private",
+      "private"
+    ],
+    "num_employees_enum": [
+      "c_00101_00250",
+      "c_00101_00250",
+      "c_00001_00010"
+    ],
+    "permalink": [
+      "kashiff-khan-k-group",
+      "kashifuji-works",
+      "kashii"
+    ],
+    "url": [
+      "https://www.crunchbase.com/organization/kashiff-khan-k-group",
+      "https://www.crunchbase.com/organization/kashifuji-works",
+      "https://www.crunchbase.com/organization/kashii"
+    ],
+    "categories": [
+      "Industrial, Manufacturing",
+      "Commercial, Digital Signage, Manufacturing",
+      "Jewelry, Manufacturing, Wholesale"
+    ],
+    "website": [
+      "http://www.kasifuji.co.jp",
+      "https://www.kashii.co.jp/",
+      "https://kashikey.co.jp"
+    ],
+    "locations": [
+      "Asia-Pacific (APAC)",
+      "Asia-Pacific (APAC)",
+      "Asia-Pacific (APAC)"
+    ],
+    "semrush_global_rank": [
+      "7168648",
+      "1838981",
+      "322251"
+    ],
+    "semrush_visits_latest_month": [
+      "870",
+      "11912",
+      "119101"
+    ],
+    "linkedin": [
+      "https://www.linkedin.com/company/kashikey/",
+      "https://www.linkedin.com/company/kashiko/about/",
+      "https://www.linkedin.com/company/kashima-system/"
+    ],
+    "contact_email": [
+      "rob@kashiko.co.uk",
+      "info@kashima-kakoh.co.jp",
+      "info@kashimasystem.com"
+    ],
+    "num_investors": [
+      "13",
+      "2",
+      "1"
+    ],
+    "num_funding_rounds": [
+      "1",
+      "4",
+      "1"
+    ],
+    "last_funding_type": [
+      "pre_seed",
+      "seed",
+      "series_unknown"
+    ],
+    "last_funding_at": [
+      "2022-08-22",
+      "2019-04-01",
+      "2015-01-15"
+    ],
+    "apptopia_total_apps": [
+      "2",
+      "2",
+      "1"
+    ],
+    "funding_total": [
+      "1795000",
+      "9000000",
+      "555944"
+    ],
+    "apptopia_total_downloads": [
+      "0",
+      "0",
+      "17574"
+    ],
+    "num_lead_investors": [
+      "1",
+      "1",
+      "9"
+    ],
+    "num_acquisitions": [
+      "1",
+      "2",
+      "1"
+    ],
+    "investor_insight_description": [],
+    "num_exits": [
+      "2",
+      "1",
+      "3"
+    ],
+    "num_investments": [
+      "6",
+      "4",
+      "1"
+    ],
+    "num_lead_investments": [
+      "1",
+      "3",
+      "1"
+    ],
+    "growth_insight_description": [
+      "Kaspar& secured CHF 2.5 million in seed funding and entered a strategic partnership with Avaloq.",
+      "Kaspi Bank utilized a 'Super App' to fuel its IPO. Additionally, S&P Global upgraded Kaspi Bank's ratings.",
+      "Kazyon acquired a 50% stake in the Saudi Arabian discount retailer Dukan. The transaction was carried out by EFG Hermes."
+    ],
+    "growth_insight_indicator": [
+      "growing",
+      "growing",
+      "growing"
+    ],
+    "growth_insight_direction": [
+      "c400_growing",
+      "c400_growing",
+      "c400_growing"
+    ],
+    "growth_insight_confidence": [
+      "c300_medium",
+      "c400_high",
+      "c400_high"
+    ],
+    "listed_stock_symbol": [
+      "NASDAQ:KSPI",
+      "OTC:KAKZF",
+      "NASDAQ:KSPN"
+    ],
+    "hub_tags": [
+      "cbvp",
+      "cbvp",
+      "unicorn"
+    ]
+  },
+  "validity": {
+    "contact_email": "3/3 valid-shape",
+    "phone_number": "3/3 valid-shape"
+  },
+  "entity": "company",
+  "entity_confidence": 0.85,
+  "entity_why": "value-checked override: name=organization name; founders/company_type/num_employees_enum/funding/ipo_status present; no person first/last-name columns",
+  "social_cols": [
+    "facebook",
+    "linkedin",
+    "twitter",
+    "website",
+    "url"
+  ],
+  "activity_match_keys": [
+    "name",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "company_type",
+    "website",
+    "url"
+  ]
+}

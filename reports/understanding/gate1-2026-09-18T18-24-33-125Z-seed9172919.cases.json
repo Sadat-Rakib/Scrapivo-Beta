@@ -1,0 +1,56 @@
+{
+  "seed": 9172919,
+  "holdout": [
+    {
+      "id": "h000a",
+      "prompt": "investors funding circular economy startups in Kumasi",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "investor",
+        "location": "kumasi"
+      },
+      "pairWith": "h000b"
+    },
+    {
+      "id": "h000b",
+      "prompt": "circular economy startups in Kumasi raising money",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "seeking_funding",
+        "location": "kumasi"
+      },
+      "pairWith": "h000a"
+    },
+    {
+      "id": "h002a",
+      "prompt": "mushroom farms in Tulsa",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "tulsa",
+        "clarification": "forbidden"
+      },
+      "pairWith": "h002b"
+    },
+    {
+      "id": "h002b",
+      "prompt": "mushroom farms in Tulsa with no website",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "tulsa"
+      },
+      "pairWith": "h002a"
+    }
+  ],
+  "chaos": []
+}

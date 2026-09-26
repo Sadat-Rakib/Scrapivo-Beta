@@ -1,0 +1,52 @@
+{
+  "key": "staffing & recruiting- 20.3k CSV.csv",
+  "entity": "person",
+  "rows": 20233,
+  "required_fields": [
+    "Name",
+    "Company",
+    "Title",
+    "Email",
+    "Phone",
+    "Website",
+    "Social(any)",
+    "Location"
+  ],
+  "absent_columns": [],
+  "complete": 19525,
+  "incomplete": 708,
+  "complete_pct": 96.5,
+  "missing_counts": {
+    "Social(any)": 171,
+    "Phone": 539,
+    "Company": 3
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Phone"
+      ],
+      "rows": 534
+    },
+    {
+      "missing": [
+        "Social(any)"
+      ],
+      "rows": 166
+    },
+    {
+      "missing": [
+        "Phone",
+        "Social(any)"
+      ],
+      "rows": 5
+    },
+    {
+      "missing": [
+        "Company"
+      ],
+      "rows": 3
+    }
+  ],
+  "people_bonus_rows": 0
+}

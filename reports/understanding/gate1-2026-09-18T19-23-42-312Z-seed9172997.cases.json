@@ -1,0 +1,332 @@
+{
+  "seed": 9172997,
+  "holdout": [
+    {
+      "id": "h000a",
+      "prompt": "optometrists in Kelowna",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "relation": "none",
+        "location": "kelowna",
+        "clarification": "forbidden"
+      },
+      "pairWith": "h000b"
+    },
+    {
+      "id": "h000b",
+      "prompt": "optometrists in Kelowna with no website",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "kelowna"
+      },
+      "pairWith": "h000a"
+    },
+    {
+      "id": "h002a",
+      "prompt": "companies in Daugavpils hiring quantity surveyors",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "hiring",
+        "location": "daugavpils",
+        "intent_signal_required": true
+      },
+      "pairWith": "h002b"
+    },
+    {
+      "id": "h002b",
+      "prompt": "quantity surveyors in Daugavpils looking for work",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_job",
+        "location": "daugavpils"
+      },
+      "pairWith": "h002a"
+    },
+    {
+      "id": "h004a",
+      "prompt": "orthodontists who serve bell foundries in Leuven",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "location": "leuven"
+      },
+      "pairWith": "h004b"
+    },
+    {
+      "id": "h004b",
+      "prompt": "bell foundries in Leuven who need a orthodontist",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "needs_service",
+        "object": "orthodontist",
+        "location": "leuven"
+      },
+      "pairWith": "h004a"
+    },
+    {
+      "id": "h006",
+      "prompt": "businesses partnered with Contentful",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": [
+          "partnered_with",
+          "custom"
+        ]
+      },
+      "note": "partnered_with"
+    },
+    {
+      "id": "h007",
+      "prompt": "clinical psychologists in Swansea looking for a job",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "job_based",
+        "entity_type": "person",
+        "relation": "seeking_job",
+        "location": "swansea"
+      },
+      "note": "person_seeking_job"
+    },
+    {
+      "id": "h008",
+      "prompt": "orthodontists in Daugavpils looking for clients",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_client",
+        "location": "daugavpils"
+      },
+      "note": "seeking_client"
+    },
+    {
+      "id": "h009",
+      "prompt": "bell foundries in Nagoya",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "task_type": "lead_discovery",
+        "prospecting_mode": "fit_based",
+        "relation": "none",
+        "location": "nagoya",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity"
+    },
+    {
+      "id": "h010",
+      "prompt": "upholsterers in Saskatoon",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "task_type": "lead_discovery",
+        "prospecting_mode": "fit_based",
+        "relation": "none",
+        "location": "saskatoon",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity"
+    },
+    {
+      "id": "h011",
+      "prompt": "board game cafés within 50 km of Pécs",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "pécs",
+        "location_scope": "within_radius",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity_radius"
+    },
+    {
+      "id": "h012",
+      "prompt": "I'm selling technical translation to small firms. Find me 150+ sailmakers in Maribor that don't have a real website, phone required, socials if possible, verify they exist, and give me a table plus outreach drafts.",
+      "set": "holdout",
+      "size": "large",
+      "expect": {
+        "prospecting_mode": "opportunity_based",
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "maribor",
+        "quantity_min": 150,
+        "user_selling": "technical translation",
+        "required_fields": [
+          "phone"
+        ],
+        "min_verification": 1,
+        "output": [
+          "table",
+          "outreach_drafts"
+        ]
+      },
+      "note": "long_form_opportunity"
+    },
+    {
+      "id": "h013",
+      "prompt": "companies in Tulsa using Unity",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "uses_technology",
+        "object": "unity",
+        "location": "tulsa"
+      },
+      "note": "uses_technology"
+    },
+    {
+      "id": "h014",
+      "prompt": "businesses partnered with Contentful",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": [
+          "partnered_with",
+          "custom"
+        ]
+      },
+      "note": "partnered_with"
+    },
+    {
+      "id": "h015",
+      "prompt": "companies in Vilnius using Contentful",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "uses_technology",
+        "object": "contentful",
+        "location": "vilnius"
+      },
+      "note": "uses_technology"
+    },
+    {
+      "id": "h016",
+      "prompt": "I need at least 15 piano tuners in Daugavpils",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "quantity_min": 15,
+        "location": "daugavpils"
+      },
+      "note": "quantity_minimum"
+    },
+    {
+      "id": "h017",
+      "prompt": "Give me 20 orthotics clinics in Örebro, phone number required, Instagram if possible, verify they are currently open, and output a table I can paste into Notion",
+      "set": "holdout",
+      "size": "large",
+      "expect": {
+        "location": "örebro",
+        "quantity": 20,
+        "required_fields": [
+          "phone"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ],
+        "min_verification": 1
+      },
+      "note": "long_form"
+    },
+    {
+      "id": "h018",
+      "prompt": "I sell warehouse automation. Find me 50 board game cafés in Ann Arbor.",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "none",
+        "prospecting_mode": "fit_based",
+        "user_selling": "warehouse automation",
+        "quantity": 50,
+        "location": "ann arbor"
+      },
+      "note": "user_context"
+    },
+    {
+      "id": "h019",
+      "prompt": "taxidermists in Hsinchu with no phone number",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "opportunity_based",
+        "relation": "lacks_asset",
+        "location": "hsinchu",
+        "min_constraints": 1,
+        "intent_signal_required": false
+      },
+      "note": "lacks_asset"
+    },
+    {
+      "id": "h020",
+      "prompt": "I sell food safety auditing. Find me 200 dive schools in Leuven.",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "none",
+        "prospecting_mode": "fit_based",
+        "user_selling": "food safety auditing",
+        "quantity": 200,
+        "location": "leuven"
+      },
+      "note": "user_context"
+    },
+    {
+      "id": "h021",
+      "prompt": "cider houses in Napier",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "task_type": "lead_discovery",
+        "prospecting_mode": "fit_based",
+        "relation": "none",
+        "location": "napier",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity"
+    },
+    {
+      "id": "h022",
+      "prompt": "circular economy startups in Dunedin that raised funding recently",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "prospecting_mode": "event_based",
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "received_funding",
+        "location": "dunedin",
+        "temporal": true
+      },
+      "note": "received_funding"
+    },
+    {
+      "id": "h023",
+      "prompt": "I sell packaging design. Find me 50 taxidermists in Tulsa.",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "none",
+        "prospecting_mode": "fit_based",
+        "user_selling": "packaging design",
+        "quantity": 50,
+        "location": "tulsa"
+      },
+      "note": "user_context"
+    }
+  ],
+  "chaos": []
+}

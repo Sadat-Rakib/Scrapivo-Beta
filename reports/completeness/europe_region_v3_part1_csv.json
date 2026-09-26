@@ -1,0 +1,31 @@
+{
+  "key": "europe_region_v3_part1.csv",
+  "entity": "person",
+  "rows": 779,
+  "required_fields": [
+    "Name",
+    "Company",
+    "Title",
+    "Email",
+    "Phone",
+    "Website",
+    "Social(any)",
+    "Location"
+  ],
+  "absent_columns": [],
+  "complete": 710,
+  "incomplete": 69,
+  "complete_pct": 91.1,
+  "missing_counts": {
+    "Phone": 69
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Phone"
+      ],
+      "rows": 69
+    }
+  ],
+  "people_bonus_rows": 0
+}

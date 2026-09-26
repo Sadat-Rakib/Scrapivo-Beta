@@ -46,7 +46,50 @@ const Input = z.object({
 export const prepareDynamicQuestions = createServerFn({ method: "POST" })
   .middleware([requireMyAuth])
   .inputValidator((d: unknown) => Input.parse(d))
-  .handler(async ({ data }): Promise<{ questions: ClarifyQuestion[] }> => {
+  .handler(async ({ data }): Promise<{
+    questions: ClarifyQuestion[];
+    specStatus?: "needs_clarification" | "ready_to_search";
+    specEntity?: string;
+  }> => {
+    // Spec-first (Phase 4): entity intents get missing-slot questions derived
+    // from the structured spec — never seller defaults, never zero questions
+    // when category+location are both missing.
+    const { extractSearchSpec } = await import("./search-spec-extract");
+    const spec = extractSearchSpec(data.query, {
+      statedLocation: data.tokens?.geo ?? data.memory?.location ?? null,
+      statedSector: data.tokens?.sector ?? null,
+    });
+    if (
+      (spec.entity === "person" ||
+        spec.entity === "company" ||
+        spec.entity === "business" ||
+        spec.entity === "investor") &&
+      spec.missing.length > 0
+    ) {
+      const { entityQuestionsForSpec } = await import("./clarifier");
+      const questions = entityQuestionsForSpec(spec);
+      if (questions.length > 0)
+        return {
+          questions,
+          specStatus: spec.status as "needs_clarification" | "ready_to_search",
+          specEntity: spec.entity,
+        };
+      // Entity known but no mappable slot (e.g. missing:["entity"] fallback
+      // can't happen here since entity is known) — continue to legacy flow.
+    }
+    if (
+      (spec.entity === "person" || spec.entity === "company" || spec.entity === "business") &&
+      spec.status === "ready_to_search"
+    ) {
+      // Complete spec → search instantly, zero questions (locked). Optionals
+      // surface after results, never as blockers. Investors keep their
+      // deterministic stage/sector/check branch below.
+      return {
+        questions: [],
+        specStatus: spec.status as "needs_clarification" | "ready_to_search",
+        specEntity: spec.entity,
+      };
+    }
     // Vertical-first: investor / local / job asks ALWAYS get the deterministic
     // per-vertical question sets, seeded with the slots the input already
     // stated — questions stay tailored to what the user typed and never drift

@@ -34,3 +34,35 @@ describe("buildMessageDraft", () => {
     expect(m.length).toBeLessThan(400);
   });
 });
+
+describe("vertical routing (regression: job/business must not get investor pitch)", () => {
+  it("routes job vertical to the candidate template", () => {
+    const { body } = buildEmailDraft(
+      { vertical: "job", name: "Sam Lee", firm: "Acme", postingTitle: "Frontend Engineer" },
+      { name: "Mir", senderRole: "web developer" },
+    );
+    expect(body).not.toContain("raising");
+    expect(body).toContain("Frontend Engineer");
+  });
+  it("routes business alias to the local template", () => {
+    const { body } = buildEmailDraft(
+      {
+        vertical: "business",
+        name: "Main St Plumbing",
+        category: "plumbing",
+        location: "Austin, TX",
+        noWebsite: true,
+      },
+      { name: "Mir", service: "websites" },
+    );
+    expect(body).not.toContain("raising");
+    expect(body).toContain("Main St Plumbing");
+  });
+  it("routes company vertical to the company template (not investor)", () => {
+    const { body } = buildEmailDraft(
+      { vertical: "company", name: "Acme", whyNow: "Hiring engineers" },
+      { name: "Mir", proof: "built X" },
+    );
+    expect(body).not.toContain("raising");
+  });
+});

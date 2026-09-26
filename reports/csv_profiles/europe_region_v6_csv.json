@@ -1,0 +1,448 @@
+{
+  "key": "europe_region_v6.csv",
+  "size": 2052369,
+  "last_modified": "2026-09-08 00:14:08+00:00",
+  "columns": [
+    "First Name",
+    "Last Name",
+    "Title",
+    "Company",
+    "Company Name for Emails",
+    "Email",
+    "Email Status",
+    "Seniority",
+    "Departments",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Stage",
+    "# Employees",
+    "Industry",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "City",
+    "State",
+    "Country",
+    "Company City",
+    "Company State",
+    "Company Country",
+    "Company Phone",
+    "SEO Description",
+    "email",
+    "username",
+    "domain",
+    "status",
+    "overall_score",
+    "is_safe_to_send",
+    "is_valid_syntax",
+    "is_disposable",
+    "is_role_account",
+    "mx_accepts_mail",
+    "mx_records",
+    "can_connect_smtp",
+    "has_inbox_full",
+    "is_catch_all",
+    "is_deliverable",
+    "is_disabled",
+    "is_spamtrap",
+    "is_free_email",
+    "Region"
+  ],
+  "row_count": 2699,
+  "sampled_rows": 2699,
+  "delimiter": ",",
+  "roles": {
+    "First Name": "first_name",
+    "Last Name": "last_name",
+    "Title": "title",
+    "Company": "company",
+    "Company Name for Emails": "email",
+    "Email": "email",
+    "Email Status": "email",
+    "Seniority": "other",
+    "Departments": "other",
+    "First Phone": "phone",
+    "Work Direct Phone": "phone",
+    "Home Phone": "phone",
+    "Mobile Phone": "phone",
+    "Corporate Phone": "phone",
+    "Other Phone": "phone",
+    "Stage": "other",
+    "# Employees": "employees",
+    "Industry": "industry",
+    "Website": "website",
+    "Company Linkedin Url": "linkedin",
+    "Facebook Url": "social",
+    "Twitter Url": "social",
+    "City": "other",
+    "State": "other",
+    "Country": "country",
+    "Company City": "company",
+    "Company State": "company",
+    "Company Country": "company",
+    "Company Phone": "phone",
+    "SEO Description": "descriptive",
+    "email": "email",
+    "username": "other",
+    "domain": "website",
+    "status": "other",
+    "overall_score": "other",
+    "is_safe_to_send": "other",
+    "is_valid_syntax": "other",
+    "is_disposable": "other",
+    "is_role_account": "company",
+    "mx_accepts_mail": "email",
+    "mx_records": "other",
+    "can_connect_smtp": "other",
+    "has_inbox_full": "other",
+    "is_catch_all": "other",
+    "is_deliverable": "other",
+    "is_disabled": "other",
+    "is_spamtrap": "other",
+    "is_free_email": "email",
+    "Region": "other"
+  },
+  "missing_pct": {
+    "First Name": 0.0,
+    "Last Name": 0.1,
+    "Title": 0.1,
+    "Company": 0.1,
+    "Company Name for Emails": 0.1,
+    "Email": 0.0,
+    "Email Status": 0.0,
+    "Seniority": 0.1,
+    "Departments": 27.1,
+    "First Phone": 6.8,
+    "Work Direct Phone": 100.0,
+    "Home Phone": 100.0,
+    "Mobile Phone": 98.9,
+    "Corporate Phone": 6.9,
+    "Other Phone": 99.6,
+    "Stage": 0.0,
+    "# Employees": 0.1,
+    "Industry": 0.8,
+    "Website": 0.0,
+    "Company Linkedin Url": 0.2,
+    "Facebook Url": 11.3,
+    "Twitter Url": 11.2,
+    "City": 21.2,
+    "State": 18.4,
+    "Country": 0.0,
+    "Company City": 6.0,
+    "Company State": 4.2,
+    "Company Country": 0.2,
+    "Company Phone": 6.7,
+    "SEO Description": 15.8,
+    "email": 0.0,
+    "username": 0.0,
+    "domain": 0.0,
+    "status": 0.0,
+    "overall_score": 0.0,
+    "is_safe_to_send": 0.0,
+    "is_valid_syntax": 0.0,
+    "is_disposable": 0.0,
+    "is_role_account": 0.0,
+    "mx_accepts_mail": 0.0,
+    "mx_records": 0.0,
+    "can_connect_smtp": 0.0,
+    "has_inbox_full": 0.0,
+    "is_catch_all": 0.0,
+    "is_deliverable": 0.0,
+    "is_disabled": 0.0,
+    "is_spamtrap": 0.0,
+    "is_free_email": 0.0,
+    "Region": 0.0
+  },
+  "samples": {
+    "First Name": [
+      "Gul",
+      "Alessandra",
+      "Beata"
+    ],
+    "Last Name": [
+      "Yesilova",
+      "Cuomo",
+      "Tomczyk"
+    ],
+    "Title": [
+      "Key Account Manager OEM",
+      "Logistics Manager",
+      "Laboratory Manager"
+    ],
+    "Company": [
+      "Signify",
+      "CNH",
+      "Home"
+    ],
+    "Company Name for Emails": [
+      "Signify",
+      "CNH",
+      "Home"
+    ],
+    "Email": [
+      "gul.yesilova@signify.com",
+      "alessandra.cuomo@cnhind.com",
+      "beata.tomczyk@agrocares.com"
+    ],
+    "Email Status": [
+      "Verified",
+      "Verified",
+      "Verified"
+    ],
+    "Seniority": [
+      "Manager",
+      "Manager",
+      "Manager"
+    ],
+    "Departments": [
+      "Sales",
+      "Operations",
+      "Product, Legal"
+    ],
+    "First Phone": [
+      "'+31 40 275 0000",
+      "'+44 20 7925 1964",
+      "'+31 85 400 2222"
+    ],
+    "Corporate Phone": [
+      "'+31 40 275 0000",
+      "'+44 20 7925 1964",
+      "'+31 85 400 2222"
+    ],
+    "Stage": [
+      "Cold",
+      "Cold",
+      "Cold"
+    ],
+    "# Employees": [
+      "34000.0",
+      "29000.0",
+      "52.0"
+    ],
+    "Industry": [
+      "electrical/electronic manufacturing",
+      "machinery",
+      "information technology & services"
+    ],
+    "Website": [
+      "http://www.signify.com",
+      "http://www.cnh.com",
+      "http://www.agrocares.com"
+    ],
+    "Company Linkedin Url": [
+      "http://www.linkedin.com/company/signifycompany",
+      "http://www.linkedin.com/company/cnh",
+      "http://www.linkedin.com/company/agrocares"
+    ],
+    "Facebook Url": [
+      "https://facebook.com/signify/",
+      "https://facebook.com/CNHIndustrial",
+      "https://web.facebook.com/AgroCares/"
+    ],
+    "Twitter Url": [
+      "https://twitter.com/signifycompany?lang=en",
+      "https://twitter.com/cnhindustrial",
+      "https://twitter.com/AgroCaresWorld"
+    ],
+    "City": [
+      "Ankara",
+      "Lille",
+      "Wageningen"
+    ],
+    "State": [
+      "Ankara Province",
+      "Hauts-de-France",
+      "Gelderland"
+    ],
+    "Country": [
+      "Turkey",
+      "France",
+      "Netherlands"
+    ],
+    "Company City": [
+      "Bridgewater",
+      "London",
+      "Wageningen"
+    ],
+    "Company State": [
+      "New Jersey",
+      "England",
+      "Gelderland"
+    ],
+    "Company Country": [
+      "United States",
+      "United Kingdom",
+      "Netherlands"
+    ],
+    "Company Phone": [
+      "'+31 40 275 0000",
+      "'+44 20 7925 1964",
+      "'+31 85 400 2222"
+    ],
+    "SEO Description": [
+      "Poultry lighting and poultry sensors for precision livestock farming, scheme compliance and animal welfare",
+      "We use aeroponics to design & build sustainable farming systems for indoor \nfarms, greenhouses & vertical farms.",
+      "TOMRA's mission is to transform how we all obtain, use and reuse the planet's resources to enable a world without waste."
+    ],
+    "email": [
+      "gul.yesilova@signify.com",
+      "alessandra.cuomo@cnhind.com",
+      "beata.tomczyk@agrocares.com"
+    ],
+    "username": [
+      "gul.yesilova",
+      "alessandra.cuomo",
+      "beata.tomczyk"
+    ],
+    "domain": [
+      "signify.com",
+      "cnhind.com",
+      "agrocares.com"
+    ],
+    "status": [
+      "safe",
+      "safe",
+      "safe"
+    ],
+    "overall_score": [
+      "98",
+      "98",
+      "98"
+    ],
+    "is_safe_to_send": [
+      "True",
+      "True",
+      "True"
+    ],
+    "is_valid_syntax": [
+      "True",
+      "True",
+      "True"
+    ],
+    "is_disposable": [
+      "False",
+      "False",
+      "False"
+    ],
+    "is_role_account": [
+      "False",
+      "False",
+      "False"
+    ],
+    "mx_accepts_mail": [
+      "True",
+      "True",
+      "True"
+    ],
+    "mx_records": [
+      "signify-com.mail.protection.outlook.com",
+      "cnhind-com.mail.protection.outlook.com",
+      "agrocares-com.mail.protection.outlook.com"
+    ],
+    "can_connect_smtp": [
+      "True",
+      "True",
+      "True"
+    ],
+    "has_inbox_full": [
+      "False",
+      "False",
+      "False"
+    ],
+    "is_catch_all": [
+      "False",
+      "False",
+      "False"
+    ],
+    "is_deliverable": [
+      "True",
+      "True",
+      "True"
+    ],
+    "is_disabled": [
+      "False",
+      "False",
+      "False"
+    ],
+    "is_spamtrap": [
+      "False",
+      "False",
+      "False"
+    ],
+    "is_free_email": [
+      "False",
+      "False",
+      "False"
+    ],
+    "Region": [
+      "Europe",
+      "Europe",
+      "Europe"
+    ],
+    "Other Phone": [
+      "'+44 797 990 0893",
+      "'+47 452 33 799",
+      "'+968 9199 5969"
+    ],
+    "Mobile Phone": [
+      "'+1 474-523-3799",
+      "'+47 917 67 029",
+      "'+65 9712 6747"
+    ]
+  },
+  "validity": {
+    "Company Name for Emails": "0/3 valid-shape",
+    "Email": "3/3 valid-shape",
+    "Email Status": "0/3 valid-shape",
+    "First Phone": "3/3 valid-shape",
+    "Mobile Phone": "3/3 valid-shape",
+    "Corporate Phone": "3/3 valid-shape",
+    "Other Phone": "3/3 valid-shape",
+    "Company Phone": "3/3 valid-shape",
+    "email": "3/3 valid-shape",
+    "mx_accepts_mail": "0/3 valid-shape",
+    "is_free_email": "0/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "domain"
+  ],
+  "activity_match_keys": [
+    "First Name",
+    "Last Name",
+    "Company",
+    "Company Name for Emails",
+    "Email",
+    "Email Status",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "Company City",
+    "Company State",
+    "Company Country",
+    "Company Phone",
+    "email",
+    "domain",
+    "is_role_account",
+    "mx_accepts_mail",
+    "is_free_email"
+  ]
+}

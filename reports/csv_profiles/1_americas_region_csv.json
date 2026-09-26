@@ -1,0 +1,448 @@
+{
+  "key": "1-americas_region.csv",
+  "size": 7817803,
+  "last_modified": "2026-09-08 00:14:37+00:00",
+  "columns": [
+    "fullname",
+    "firstname",
+    "lastname",
+    "Title",
+    "Company",
+    "company",
+    "email",
+    "Email Status",
+    "Seniority",
+    "Departments",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Stage",
+    "# Employees",
+    "Industry",
+    "Keywords",
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "City",
+    "State",
+    "Country",
+    "Company Address",
+    "Company City",
+    "Company State",
+    "Company Country",
+    "Company Phone",
+    "SEO Description",
+    "Technologies",
+    "Annual Revenue",
+    "Total Funding",
+    "Latest Funding",
+    "Latest Funding Amount",
+    "Last Raised At",
+    "Email Sent",
+    "Email Open",
+    "Email Bounced",
+    "Replied",
+    "Demoed",
+    "Number of Retail Locations",
+    "Apollo Contact Id",
+    "Apollo Account Id",
+    "Primary Email Source"
+  ],
+  "row_count": 4103,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "fullname": "last_name",
+    "firstname": "first_name",
+    "lastname": "last_name",
+    "Title": "title",
+    "Company": "company",
+    "company": "company",
+    "email": "email",
+    "Email Status": "email",
+    "Seniority": "other",
+    "Departments": "other",
+    "First Phone": "phone",
+    "Work Direct Phone": "phone",
+    "Home Phone": "phone",
+    "Mobile Phone": "phone",
+    "Corporate Phone": "phone",
+    "Other Phone": "phone",
+    "Stage": "other",
+    "# Employees": "employees",
+    "Industry": "industry",
+    "Keywords": "descriptive",
+    "Person Linkedin Url": "linkedin",
+    "Website": "website",
+    "Company Linkedin Url": "linkedin",
+    "Facebook Url": "social",
+    "Twitter Url": "social",
+    "City": "other",
+    "State": "other",
+    "Country": "country",
+    "Company Address": "company",
+    "Company City": "company",
+    "Company State": "company",
+    "Company Country": "company",
+    "Company Phone": "phone",
+    "SEO Description": "descriptive",
+    "Technologies": "tech",
+    "Annual Revenue": "other",
+    "Total Funding": "other",
+    "Latest Funding": "other",
+    "Latest Funding Amount": "other",
+    "Last Raised At": "other",
+    "Email Sent": "email",
+    "Email Open": "email",
+    "Email Bounced": "email",
+    "Replied": "other",
+    "Demoed": "other",
+    "Number of Retail Locations": "other",
+    "Apollo Contact Id": "other",
+    "Apollo Account Id": "company",
+    "Primary Email Source": "email"
+  },
+  "missing_pct": {
+    "fullname": 0.0,
+    "firstname": 0.0,
+    "lastname": 0.1,
+    "Title": 0.0,
+    "Company": 0.1,
+    "company": 0.1,
+    "email": 0.0,
+    "Email Status": 0.0,
+    "Seniority": 0.0,
+    "Departments": 43.3,
+    "First Phone": 2.6,
+    "Work Direct Phone": 100.0,
+    "Home Phone": 100.0,
+    "Mobile Phone": 100.0,
+    "Corporate Phone": 2.6,
+    "Other Phone": 100.0,
+    "Stage": 0.0,
+    "# Employees": 0.1,
+    "Industry": 0.4,
+    "Keywords": 7.5,
+    "Person Linkedin Url": 0.0,
+    "Website": 0.0,
+    "Company Linkedin Url": 0.1,
+    "Facebook Url": 4.2,
+    "Twitter Url": 5.9,
+    "City": 10.3,
+    "State": 6.3,
+    "Country": 0.0,
+    "Company Address": 0.2,
+    "Company City": 4.9,
+    "Company State": 3.4,
+    "Company Country": 0.2,
+    "Company Phone": 2.1,
+    "SEO Description": 14.7,
+    "Technologies": 0.2,
+    "Annual Revenue": 7.2,
+    "Total Funding": 36.1,
+    "Latest Funding": 35.3,
+    "Latest Funding Amount": 37.7,
+    "Last Raised At": 35.3,
+    "Email Sent": 100.0,
+    "Email Open": 0.1,
+    "Email Bounced": 0.0,
+    "Replied": 0.0,
+    "Demoed": 0.0,
+    "Number of Retail Locations": 75.0,
+    "Apollo Contact Id": 0.1,
+    "Apollo Account Id": 0.1,
+    "Primary Email Source": 0.0
+  },
+  "samples": {
+    "fullname": [
+      "Dustin",
+      "Douglas",
+      "Ermias"
+    ],
+    "firstname": [
+      "Dustin",
+      "Douglas",
+      "Ermias"
+    ],
+    "lastname": [
+      "Krompetz",
+      "Greulich",
+      "Bizuwork"
+    ],
+    "Title": [
+      "Executive Partner & Chief Operating Officer",
+      "Product Development Manager",
+      "Staff Software Engineer Team Lead"
+    ],
+    "Company": [
+      "M3 Agriculture Technologies",
+      "Pattersonfan",
+      "The Home Depot"
+    ],
+    "company": [
+      "M3 Agriculture",
+      "Pattersonfan",
+      "The Home Depot"
+    ],
+    "email": [
+      "dustin.krompetz@m3cg.us",
+      "dougg@pattersonfan.com",
+      "ermias_bizuwork@homedepot.com"
+    ],
+    "Email Status": [
+      "Verified",
+      "Verified",
+      "Verified"
+    ],
+    "Seniority": [
+      "C suite",
+      "Manager",
+      "Manager"
+    ],
+    "Departments": [
+      "C-Suite, Information Technology, Operations",
+      "Product",
+      "Engineering & Technical"
+    ],
+    "First Phone": [
+      "'+1 937-626-2122",
+      "'+1 803-691-4750",
+      "'+1 770-433-8211"
+    ],
+    "Corporate Phone": [
+      "'+1 937-626-2122",
+      "'+1 803-691-4750",
+      "'+1 770-433-8211"
+    ],
+    "Stage": [
+      "Cold",
+      "Cold",
+      "Cold"
+    ],
+    "# Employees": [
+      "11",
+      "53",
+      "463000"
+    ],
+    "Industry": [
+      "information technology & services",
+      "machinery",
+      "retail"
+    ],
+    "Person Linkedin Url": [
+      "http://www.linkedin.com/in/dustin-krompetz-0a64a34a",
+      "http://www.linkedin.com/in/douglas-greulich-23245b6a",
+      "http://www.linkedin.com/in/ermias-bizuwork"
+    ],
+    "Website": [
+      "http://www.m3agriculture.com",
+      "http://www.pattersonfan.com",
+      "http://www.homedepot.com"
+    ],
+    "Company Linkedin Url": [
+      "http://www.linkedin.com/company/m3agtech",
+      "http://www.linkedin.com/company/patterson-fan-company-inc",
+      "http://www.linkedin.com/company/the-home-depot"
+    ],
+    "City": [
+      "Gladwin",
+      "Atlanta",
+      "Williamston"
+    ],
+    "State": [
+      "Michigan",
+      "South Carolina",
+      "Georgia"
+    ],
+    "Country": [
+      "United States",
+      "United States",
+      "United States"
+    ],
+    "Company Address": [
+      "SUGARCRK Township, Ohio, United States, 45458",
+      "Blythewood, South Carolina, United States",
+      "2455 Paces Ferry Road Northwest, Atlanta, Georgia, United States, 30339"
+    ],
+    "Company City": [
+      "SUGARCRK Township",
+      "Blythewood",
+      "Atlanta"
+    ],
+    "Company State": [
+      "Ohio",
+      "South Carolina",
+      "Georgia"
+    ],
+    "Company Country": [
+      "United States",
+      "United States",
+      "United States"
+    ],
+    "Company Phone": [
+      "'+1 937-626-2122",
+      "'+1 803-691-4750",
+      "'+1 770-433-8211"
+    ],
+    "SEO Description": [
+      "Bosch Power Tools | Boschtools",
+      "Redwire is the Mission Partner of Choice for Civil, Commercial, and National Security Space.",
+      "Bosch Power Tools | Boschtools"
+    ],
+    "Technologies": [
+      "Cloudflare DNS, Outlook, Microsoft Office 365, CloudFlare Hosting, Wix, Mobile Friendly, React Native, Python, Node.js",
+      "Outlook, Nginx, Bootstrap Framework, Google Play, Apache, YouTube, Google Tag Manager, Mobile Friendly",
+      "Outlook, Bootstrap Framework, Google Analytics, ASP.NET, Mobile Friendly, Google Tag Manager, reCAPTCHA, Google Font API"
+    ],
+    "Total Funding": [
+      "510000",
+      "14500000000",
+      "22271422"
+    ],
+    "Latest Funding": [
+      "Debt Financing",
+      "Debt Financing",
+      "Other"
+    ],
+    "Latest Funding Amount": [
+      "510000",
+      "14500000000",
+      "6800000"
+    ],
+    "Last Raised At": [
+      "10/1/2019",
+      "5/1/2024",
+      "1/1/2024"
+    ],
+    "Email Open": [
+      "False",
+      "False",
+      "False"
+    ],
+    "Email Bounced": [
+      "False",
+      "False",
+      "False"
+    ],
+    "Replied": [
+      "False",
+      "False",
+      "False"
+    ],
+    "Demoed": [
+      "False",
+      "False",
+      "False"
+    ],
+    "Apollo Contact Id": [
+      "66c24138c0eb030001424026",
+      "66dec0060c0b5b00012cadff",
+      "66dec0060c0b5b00012cb18d"
+    ],
+    "Apollo Account Id": [
+      "66c2413ac0eb030001424213",
+      "61d8d6c7a882de00012e97b1",
+      "61d61230dd7a5300a443e301"
+    ],
+    "Primary Email Source": [
+      "Fulfilled by Apollo",
+      "Fulfilled by Apollo",
+      "Fulfilled by Apollo"
+    ],
+    "Keywords": [
+      "retail, home improvement, customer service, appliances, hardware stores, home & garden, nurseries & gardening, shopping",
+      "agricultural risk management, multi peril crop insurance, crop hail insurance, named peril insurance",
+      "education & research"
+    ],
+    "Facebook Url": [
+      "https://www.facebook.com/PattersonFan",
+      "https://www.facebook.com/homedepot",
+      "https://www.facebook.com/ProAgIns"
+    ],
+    "Twitter Url": [
+      "https://twitter.com/pattersonfanco",
+      "https://www.twitter.com/homedepot",
+      "https://twitter.com/ProAgIns"
+    ],
+    "Annual Revenue": [
+      "27000000",
+      "157000000000",
+      "75000000"
+    ],
+    "Number of Retail Locations": [
+      "1767",
+      "1767",
+      "1767"
+    ],
+    "Mobile Phone": [
+      "'+1 302-999-2785",
+      "'+1 989-284-6774"
+    ],
+    "Other Phone": [
+      "'+55 11 99370-4114",
+      "607-227-0851"
+    ],
+    "Email Sent": [
+      "6/22/2021",
+      "6/22/2021"
+    ]
+  },
+  "validity": {
+    "email": "3/3 valid-shape",
+    "Email Status": "0/3 valid-shape",
+    "First Phone": "3/3 valid-shape",
+    "Mobile Phone": "2/2 valid-shape",
+    "Corporate Phone": "3/3 valid-shape",
+    "Other Phone": "2/2 valid-shape",
+    "Company Phone": "3/3 valid-shape",
+    "Email Sent": "0/2 valid-shape",
+    "Email Open": "0/3 valid-shape",
+    "Email Bounced": "0/3 valid-shape",
+    "Primary Email Source": "0/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url"
+  ],
+  "activity_match_keys": [
+    "fullname",
+    "firstname",
+    "lastname",
+    "Company",
+    "company",
+    "email",
+    "Email Status",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "Company Address",
+    "Company City",
+    "Company State",
+    "Company Country",
+    "Company Phone",
+    "Email Sent",
+    "Email Open",
+    "Email Bounced",
+    "Apollo Account Id",
+    "Primary Email Source"
+  ]
+}

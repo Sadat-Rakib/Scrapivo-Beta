@@ -1,0 +1,543 @@
+{
+  "seed": 4242,
+  "holdout": [
+    {
+      "id": "h000a",
+      "prompt": "recruiters who serve cheesemongers in Barcelona",
+      "set": "holdout",
+      "expect": {
+        "relation": "offers_service",
+        "location": "barcelona"
+      },
+      "pairWith": "h000b"
+    },
+    {
+      "id": "h000b",
+      "prompt": "cheesemongers in Barcelona who need a recruiter",
+      "set": "holdout",
+      "expect": {
+        "relation": "needs_service",
+        "location": "barcelona"
+      },
+      "pairWith": "h000a"
+    },
+    {
+      "id": "h002a",
+      "prompt": "companies in Toronto using Salesforce",
+      "set": "holdout",
+      "expect": {
+        "relation": "uses_technology",
+        "location": "toronto"
+      },
+      "pairWith": "h002b"
+    },
+    {
+      "id": "h002b",
+      "prompt": "companies in Toronto looking to move off Salesforce",
+      "set": "holdout",
+      "expect": {
+        "location": "toronto"
+      },
+      "pairWith": "h002a"
+    },
+    {
+      "id": "h004a",
+      "prompt": "head of talents who serve kombucha breweries in Tuktoyaktuk",
+      "set": "holdout",
+      "expect": {
+        "relation": "offers_service",
+        "location": "tuktoyaktuk"
+      },
+      "pairWith": "h004b"
+    },
+    {
+      "id": "h004b",
+      "prompt": "kombucha breweries in Tuktoyaktuk who need a head of talent",
+      "set": "holdout",
+      "expect": {
+        "relation": "needs_service",
+        "location": "tuktoyaktuk"
+      },
+      "pairWith": "h004a"
+    },
+    {
+      "id": "h006",
+      "prompt": "find bike shops in Bilbao and also find head of talents in Bratislava who are hiring",
+      "set": "holdout",
+      "expect": {
+        "compound": true
+      },
+      "note": "compound"
+    },
+    {
+      "id": "h007",
+      "prompt": "payroll",
+      "set": "holdout",
+      "expect": {
+        "clarification": "required"
+      },
+      "note": "underspecified"
+    },
+    {
+      "id": "h008",
+      "prompt": "fintech companies in Leeds with at least 20 employees, not agencies",
+      "set": "holdout",
+      "expect": {
+        "location": "leeds",
+        "min_constraints": 2
+      },
+      "note": "constraints"
+    },
+    {
+      "id": "h009",
+      "prompt": "companies in Melbourne that need bookkeeping",
+      "set": "holdout",
+      "expect": {
+        "relation": "needs_service",
+        "object": "bookkeeping",
+        "location": "melbourne",
+        "intent_signal_required": true
+      },
+      "note": "company_needs_service"
+    },
+    {
+      "id": "h010",
+      "prompt": "copywriters in Malmö hiring operations leads",
+      "set": "holdout",
+      "expect": {
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "malmö",
+        "intent_signal_required": true
+      },
+      "note": "person_hiring"
+    },
+    {
+      "id": "h011",
+      "prompt": "marketing managers attending Hannover Messe",
+      "set": "holdout",
+      "expect": {
+        "entity_type": "person",
+        "relation": [
+          "attending_event",
+          "custom"
+        ]
+      },
+      "note": "attending_event"
+    },
+    {
+      "id": "h012",
+      "prompt": "companies in Berlin that need copywriting",
+      "set": "holdout",
+      "expect": {
+        "relation": "needs_service",
+        "object": "copywriting",
+        "location": "berlin",
+        "intent_signal_required": true
+      },
+      "note": "company_needs_service"
+    },
+    {
+      "id": "h013",
+      "prompt": "legal companies in Glasgow with at least 250 employees, not agencies",
+      "set": "holdout",
+      "expect": {
+        "location": "glasgow",
+        "min_constraints": 2
+      },
+      "note": "constraints"
+    },
+    {
+      "id": "h014",
+      "prompt": "locksmiths in Calgary with no website",
+      "set": "holdout",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "calgary",
+        "intent_signal_required": false
+      },
+      "note": "business_lacks_website"
+    },
+    {
+      "id": "h015",
+      "prompt": "podiatrists attending Collision",
+      "set": "holdout",
+      "expect": {
+        "entity_type": "person",
+        "relation": [
+          "attending_event",
+          "custom"
+        ]
+      },
+      "note": "attending_event"
+    },
+    {
+      "id": "h016",
+      "prompt": "grant writers attending Bett",
+      "set": "holdout",
+      "expect": {
+        "entity_type": "person",
+        "relation": [
+          "attending_event",
+          "custom"
+        ]
+      },
+      "note": "attending_event"
+    },
+    {
+      "id": "h017",
+      "prompt": "charities in Bilbao that need CRM setup",
+      "set": "holdout",
+      "expect": {
+        "entity_type": [
+          "organization",
+          "business",
+          "company",
+          "other"
+        ],
+        "relation": "needs_service",
+        "location": "bilbao"
+      },
+      "note": "organization"
+    },
+    {
+      "id": "h018",
+      "prompt": "companies in Bratislava that need branding",
+      "set": "holdout",
+      "expect": {
+        "relation": "needs_service",
+        "object": "branding",
+        "location": "bratislava",
+        "intent_signal_required": true
+      },
+      "note": "company_needs_service"
+    },
+    {
+      "id": "h019",
+      "prompt": "CRM setup agencies in Perth",
+      "set": "holdout",
+      "expect": {
+        "relation": "offers_service",
+        "object": "crm setup",
+        "location": "perth",
+        "intent_signal_required": false
+      },
+      "note": "agency_offers_service"
+    },
+    {
+      "id": "h020",
+      "prompt": "logistics companies in Ljubljana with at least 250 employees, not agencies",
+      "set": "holdout",
+      "expect": {
+        "location": "ljubljana",
+        "min_constraints": 2
+      },
+      "note": "constraints"
+    },
+    {
+      "id": "h021",
+      "prompt": "find driving schools in Manchester and also find podiatrists in Da Nang who are hiring",
+      "set": "holdout",
+      "expect": {
+        "compound": true
+      },
+      "note": "compound"
+    },
+    {
+      "id": "h022",
+      "prompt": "businesses partnered with Xero",
+      "set": "holdout",
+      "expect": {
+        "relation": [
+          "partnered_with",
+          "custom"
+        ]
+      },
+      "note": "partnered_with"
+    },
+    {
+      "id": "h023",
+      "prompt": "charities in Utrecht that need legal advice",
+      "set": "holdout",
+      "expect": {
+        "entity_type": [
+          "organization",
+          "business",
+          "company",
+          "other"
+        ],
+        "relation": "needs_service",
+        "location": "utrecht"
+      },
+      "note": "organization"
+    }
+  ],
+  "chaos": [
+    {
+      "id": "c000a",
+      "prompt": "podiatrists who serve dentists in trondheim",
+      "set": "chaos",
+      "expect": {
+        "relation": "offers_service",
+        "location": "trondheim"
+      },
+      "pairWith": "c000b"
+    },
+    {
+      "id": "c000b",
+      "prompt": "can u get me dentists in Trndheim who need a podiatrsit when u can",
+      "set": "chaos",
+      "expect": {
+        "relation": "needs_service",
+        "location": "trondheim"
+      },
+      "pairWith": "c000a"
+    },
+    {
+      "id": "c002a",
+      "prompt": "investors funding agritech startups in Copnehagen...",
+      "set": "chaos",
+      "expect": {
+        "entity_type": "investor",
+        "location": "copenhagen"
+      },
+      "pairWith": "c002b"
+    },
+    {
+      "id": "c002b",
+      "prompt": "agritech statups in Copenhgen raising money",
+      "set": "chaos",
+      "expect": {
+        "entity_type": "company",
+        "location": "copenhagen"
+      },
+      "pairWith": "c002a"
+    },
+    {
+      "id": "c004a",
+      "prompt": "branding agencies in Warsaw rn",
+      "set": "chaos",
+      "expect": {
+        "relation": "offers_service",
+        "location": "warsaw"
+      },
+      "pairWith": "c004b"
+    },
+    {
+      "id": "c004b",
+      "prompt": "companies in Warsaw needing branding as many as u can",
+      "set": "chaos",
+      "expect": {
+        "relation": "needs_service",
+        "location": "warsaw",
+        "intent_signal_required": true
+      },
+      "pairWith": "c004a"
+    },
+    {
+      "id": "c006",
+      "prompt": "businesses partnered with Rust",
+      "set": "chaos",
+      "expect": {
+        "relation": [
+          "partnered_with",
+          "custom"
+        ]
+      },
+      "note": "partnered_with"
+    },
+    {
+      "id": "c007",
+      "prompt": "ok so  vet clinics wtihin 10 miles of ausin",
+      "set": "chaos",
+      "expect": {
+        "location": "austin"
+      },
+      "note": "radius"
+    },
+    {
+      "id": "c008",
+      "prompt": "looking  for recruiment",
+      "set": "chaos",
+      "expect": {
+        "clarification": "required"
+      },
+      "note": "underspecified"
+    },
+    {
+      "id": "c009",
+      "prompt": "bike shops in Medellín with no website",
+      "set": "chaos",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "medellín",
+        "intent_signal_required": false
+      },
+      "note": "business_lacks_website"
+    },
+    {
+      "id": "c010",
+      "prompt": "law firms within 20 km of Glasgow",
+      "set": "chaos",
+      "expect": {
+        "location": "glasgow"
+      },
+      "note": "radius"
+    },
+    {
+      "id": "c011",
+      "prompt": "operatios leads in Da Nang looking for a job",
+      "set": "chaos",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_job",
+        "location": "da nang"
+      },
+      "note": "person_seeking_job"
+    },
+    {
+      "id": "c012",
+      "prompt": "ok so cybersecurity",
+      "set": "chaos",
+      "expect": {
+        "clarification": "required"
+      },
+      "note": "underspecified"
+    },
+    {
+      "id": "c013",
+      "prompt": "looking for grant writer job postiings in Lyon from the last month",
+      "set": "chaos",
+      "expect": {
+        "entity_type": [
+          "job",
+          "company"
+        ],
+        "location": "lyon"
+      },
+      "note": "jobs"
+    },
+    {
+      "id": "c014",
+      "prompt": "grant writers  in Gdansk hiring veterinarians",
+      "set": "chaos",
+      "expect": {
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "gdansk",
+        "intent_signal_required": true
+      },
+      "note": "person_hiring"
+    },
+    {
+      "id": "c015",
+      "prompt": "municipalities in tallinn that need payroll",
+      "set": "chaos",
+      "expect": {
+        "entity_type": [
+          "organization",
+          "business",
+          "company",
+          "other"
+        ],
+        "relation": "needs_service",
+        "location": "tallinn"
+      },
+      "note": "organization"
+    },
+    {
+      "id": "c016",
+      "prompt": "buisnesses partnered with Kubernetes thx",
+      "set": "chaos",
+      "expect": {
+        "relation": [
+          "partnered_with",
+          "custom"
+        ]
+      },
+      "note": "partnered_with"
+    },
+    {
+      "id": "c017",
+      "prompt": "commpanies in Bristol  using  Stripe asap",
+      "set": "chaos",
+      "expect": {
+        "relation": "uses_technology",
+        "object": "stripe",
+        "location": "bristol"
+      },
+      "note": "uses_technology"
+    },
+    {
+      "id": "c018",
+      "prompt": "yo backend engineer job postings in Calgray from the last month",
+      "set": "chaos",
+      "expect": {
+        "entity_type": [
+          "job",
+          "company"
+        ],
+        "location": "calgary"
+      },
+      "note": "jobs"
+    },
+    {
+      "id": "c019",
+      "prompt": "hey gyms withhin  10  km  of Leeds",
+      "set": "chaos",
+      "expect": {
+        "location": "leeds"
+      },
+      "note": "radius"
+    },
+    {
+      "id": "c020",
+      "prompt": "i  want recruiters in Bilbao  hiring head of talents",
+      "set": "chaos",
+      "expect": {
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "bilbao",
+        "intent_signal_required": true
+      },
+      "note": "person_hiring"
+    },
+    {
+      "id": "c021",
+      "prompt": "solicitors attneding Collisiion",
+      "set": "chaos",
+      "expect": {
+        "entity_type": "person",
+        "relation": [
+          "attending_event",
+          "custom"
+        ]
+      },
+      "note": "attending_event"
+    },
+    {
+      "id": "c022",
+      "prompt": "head of talents in copenhagen hiring backend engineers",
+      "set": "chaos",
+      "expect": {
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "copenhagen",
+        "intent_signal_required": true
+      },
+      "note": "person_hiring"
+    },
+    {
+      "id": "c023",
+      "prompt": "Give me 40 florists in Toronto, phone number required, Instagram if possible, veify they are currently open, and output a spreadsheet 🙏",
+      "set": "chaos",
+      "expect": {
+        "location": "toronto",
+        "quantity": 40
+      },
+      "note": "long_form"
+    }
+  ]
+}

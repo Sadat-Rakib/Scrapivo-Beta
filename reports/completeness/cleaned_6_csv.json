@@ -1,0 +1,120 @@
+{
+  "key": "cleaned-6.csv",
+  "entity": "person",
+  "rows": 11479,
+  "required_fields": [
+    "Name",
+    "Company",
+    "Title",
+    "Email",
+    "Phone",
+    "Website",
+    "Social(any)",
+    "Location"
+  ],
+  "absent_columns": [],
+  "complete": 10493,
+  "incomplete": 986,
+  "complete_pct": 91.4,
+  "missing_counts": {
+    "Social(any)": 634,
+    "Phone": 523,
+    "Location": 59,
+    "Website": 4,
+    "Name": 2,
+    "Company": 11,
+    "Title": 11
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Social(any)"
+      ],
+      "rows": 398
+    },
+    {
+      "missing": [
+        "Phone"
+      ],
+      "rows": 296
+    },
+    {
+      "missing": [
+        "Phone",
+        "Social(any)"
+      ],
+      "rows": 215
+    },
+    {
+      "missing": [
+        "Location"
+      ],
+      "rows": 53
+    },
+    {
+      "missing": [
+        "Company",
+        "Phone",
+        "Social(any)",
+        "Title"
+      ],
+      "rows": 10
+    },
+    {
+      "missing": [
+        "Location",
+        "Social(any)"
+      ],
+      "rows": 5
+    },
+    {
+      "missing": [
+        "Social(any)",
+        "Website"
+      ],
+      "rows": 3
+    },
+    {
+      "missing": [
+        "Website"
+      ],
+      "rows": 1
+    },
+    {
+      "missing": [
+        "Name",
+        "Social(any)"
+      ],
+      "rows": 1
+    },
+    {
+      "missing": [
+        "Name"
+      ],
+      "rows": 1
+    },
+    {
+      "missing": [
+        "Location",
+        "Phone",
+        "Social(any)"
+      ],
+      "rows": 1
+    },
+    {
+      "missing": [
+        "Company",
+        "Phone",
+        "Social(any)"
+      ],
+      "rows": 1
+    },
+    {
+      "missing": [
+        "Title"
+      ],
+      "rows": 1
+    }
+  ],
+  "people_bonus_rows": 0
+}

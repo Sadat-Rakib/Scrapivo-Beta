@@ -1,0 +1,175 @@
+{
+  "key": "crunchbase_1m-1.1m.csv",
+  "entity": "company",
+  "rows": 100000,
+  "required_fields": [
+    "CompanyName",
+    "Website",
+    "Location",
+    "Category",
+    "Email",
+    "Phone",
+    "Social(any)"
+  ],
+  "absent_columns": [],
+  "complete": 57595,
+  "incomplete": 42405,
+  "complete_pct": 57.6,
+  "missing_counts": {
+    "Location": 6407,
+    "Email": 26384,
+    "Social(any)": 12715,
+    "Phone": 19761,
+    "Category": 5052
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Email"
+      ],
+      "rows": 11491
+    },
+    {
+      "missing": [
+        "Phone"
+      ],
+      "rows": 6492
+    },
+    {
+      "missing": [
+        "Email",
+        "Phone"
+      ],
+      "rows": 5404
+    },
+    {
+      "missing": [
+        "Social(any)"
+      ],
+      "rows": 4342
+    },
+    {
+      "missing": [
+        "Email",
+        "Social(any)"
+      ],
+      "rows": 2379
+    },
+    {
+      "missing": [
+        "Email",
+        "Phone",
+        "Social(any)"
+      ],
+      "rows": 2019
+    },
+    {
+      "missing": [
+        "Location"
+      ],
+      "rows": 1819
+    },
+    {
+      "missing": [
+        "Category",
+        "Email",
+        "Phone"
+      ],
+      "rows": 917
+    },
+    {
+      "missing": [
+        "Category",
+        "Email",
+        "Location",
+        "Phone",
+        "Social(any)"
+      ],
+      "rows": 820
+    },
+    {
+      "missing": [
+        "Category"
+      ],
+      "rows": 733
+    },
+    {
+      "missing": [
+        "Email",
+        "Location",
+        "Phone",
+        "Social(any)"
+      ],
+      "rows": 694
+    },
+    {
+      "missing": [
+        "Category",
+        "Email",
+        "Phone",
+        "Social(any)"
+      ],
+      "rows": 658
+    },
+    {
+      "missing": [
+        "Email",
+        "Location",
+        "Phone"
+      ],
+      "rows": 630
+    },
+    {
+      "missing": [
+        "Phone",
+        "Social(any)"
+      ],
+      "rows": 577
+    },
+    {
+      "missing": [
+        "Location",
+        "Phone"
+      ],
+      "rows": 521
+    },
+    {
+      "missing": [
+        "Email",
+        "Location"
+      ],
+      "rows": 350
+    },
+    {
+      "missing": [
+        "Category",
+        "Email",
+        "Location",
+        "Phone"
+      ],
+      "rows": 317
+    },
+    {
+      "missing": [
+        "Category",
+        "Email"
+      ],
+      "rows": 307
+    },
+    {
+      "missing": [
+        "Category",
+        "Phone"
+      ],
+      "rows": 302
+    },
+    {
+      "missing": [
+        "Location",
+        "Social(any)"
+      ],
+      "rows": 259
+    }
+  ],
+  "people_bonus_rows": 21251
+}

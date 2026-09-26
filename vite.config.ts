@@ -17,6 +17,7 @@ export default defineConfig({
   vite: {
     // browser-whisper / transformers.js need cross-origin isolation for SAB threads
     server: {
+      watch: { ignored: ['**/reports/**', '**/test-results/**', '**/playwright-report/**'] },
       headers: {
         "Cross-Origin-Opener-Policy": "same-origin",
         "Cross-Origin-Embedder-Policy": "credentialless",

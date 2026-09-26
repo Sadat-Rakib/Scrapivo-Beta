@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "C:\Users\mirsa\OneDrive\Desktop\Scrapivo (2)\scripts\pipeline\store.py", line 1121, in <module>
+    pg_load_main()
+    ~~~~~~~~~~~~^^
+  File "C:\Users\mirsa\OneDrive\Desktop\Scrapivo (2)\scripts\pipeline\store.py", line 1116, in pg_load_main
+    print(json.dumps(report, ensure_ascii=False, indent=2))
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mirsa\AppData\Local\Programs\Python\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode characters in position 44101-44103: character maps to <undefined>

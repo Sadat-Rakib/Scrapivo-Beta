@@ -88,7 +88,7 @@ export function jobPostingToSpecRow(posting: JobPosting, prefix = "job"): SpecRo
     phone: null,
     url: posting.url,
     location: posting.location,
-    country: null,
+    country: /\bCanada\b|\b(?:ON|AB|QC|BC|MB|NB|NS|NL|PE|SK|YT|NT|NU),\s*CA\b/i.test(posting.location ?? "") ? "CA" : null,
     why_match: `Current structured posting on ${posting.board_id}`,
     evidence: [
       makeEvidence({

@@ -1,0 +1,4220 @@
+{
+  "people": {
+    "rows_profiled": 484325,
+    "columns": [
+      "name",
+      "title",
+      "company_name",
+      "website",
+      "website_alt",
+      "email",
+      "email_2",
+      "email_3",
+      "phone",
+      "employees",
+      "personal_linkedin",
+      "company_linkedin",
+      "facebook",
+      "twitter",
+      "country",
+      "industry",
+      "tools_used",
+      "city",
+      "seniority",
+      "email_status",
+      "email_pts",
+      "phone_pts",
+      "website_pts",
+      "linkedin_pts",
+      "quality_score",
+      "social_presence",
+      "activity_status",
+      "source_file",
+      "method",
+      "processed_at"
+    ],
+    "nonblank": {
+      "name": {
+        "rows": 484325,
+        "pct": 100.0
+      },
+      "title": {
+        "rows": 484325,
+        "pct": 100.0
+      },
+      "company_name": {
+        "rows": 484325,
+        "pct": 100.0
+      },
+      "website": {
+        "rows": 484325,
+        "pct": 100.0
+      },
+      "email": {
+        "rows": 484325,
+        "pct": 100.0
+      },
+      "phone": {
+        "rows": 484325,
+        "pct": 100.0
+      },
+      "personal_linkedin": {
+        "rows": 435356,
+        "pct": 89.89
+      },
+      "company_linkedin": {
+        "rows": 480677,
+        "pct": 99.25
+      },
+      "facebook": {
+        "rows": 401906,
+        "pct": 82.98
+      },
+      "twitter": {
+        "rows": 375921,
+        "pct": 77.62
+      },
+      "country": {
+        "rows": 484325,
+        "pct": 100.0
+      },
+      "industry": {
+        "rows": 478848,
+        "pct": 98.87
+      },
+      "tools_used": {
+        "rows": 387694,
+        "pct": 80.05
+      }
+    },
+    "unique": {
+      "name": 346098,
+      "title": 110732,
+      "company_name": 111867,
+      "website": 115053,
+      "email": 376188,
+      "phone": 112384,
+      "personal_linkedin": 350387,
+      "company_linkedin": 108744,
+      "facebook": 65612,
+      "twitter": 50231,
+      "country": 219,
+      "industry": 168,
+      "tools_used": 81582
+    },
+    "top": {
+      "name": [
+        [
+          "Michael Smith",
+          42
+        ],
+        [
+          "Mark Miller",
+          38
+        ],
+        [
+          "Scott Smith",
+          35
+        ],
+        [
+          "Manoj Kumar",
+          34
+        ],
+        [
+          "David Smith",
+          33
+        ],
+        [
+          "Michael Brown",
+          32
+        ],
+        [
+          "John Miller",
+          30
+        ],
+        [
+          "Abhishek Singh",
+          29
+        ],
+        [
+          "Praveen Kumar",
+          28
+        ],
+        [
+          "Rahul Kumar",
+          28
+        ],
+        [
+          "David Johnson",
+          28
+        ],
+        [
+          "Michael Johnson",
+          27
+        ],
+        [
+          "Andrew Smith",
+          25
+        ],
+        [
+          "Amit Kumar",
+          25
+        ],
+        [
+          "Jose Rodriguez",
+          25
+        ],
+        [
+          "Abhishek Kumar",
+          24
+        ],
+        [
+          "Amit Singh",
+          24
+        ],
+        [
+          "Kevin Smith",
+          24
+        ],
+        [
+          "Chris Johnson",
+          24
+        ],
+        [
+          "Brian Smith",
+          24
+        ]
+      ],
+      "title": [
+        [
+          "Financial Advisor",
+          45925
+        ],
+        [
+          "Owner",
+          23751
+        ],
+        [
+          "Chief Executive Officer",
+          15598
+        ],
+        [
+          "CEO",
+          11371
+        ],
+        [
+          "President",
+          8887
+        ],
+        [
+          "Vice President",
+          5900
+        ],
+        [
+          "Founder",
+          4880
+        ],
+        [
+          "Co-Founder",
+          3847
+        ],
+        [
+          "Assistant Manager",
+          3762
+        ],
+        [
+          "Financial Planner",
+          3113
+        ],
+        [
+          "Project Manager",
+          2798
+        ],
+        [
+          "Product Owner",
+          2797
+        ],
+        [
+          "President & CEO",
+          2736
+        ],
+        [
+          "Manager",
+          2444
+        ],
+        [
+          "Business Owner",
+          2438
+        ],
+        [
+          "Founder & CEO",
+          2118
+        ],
+        [
+          "Agency Owner",
+          2022
+        ],
+        [
+          "President and CEO",
+          1917
+        ],
+        [
+          "Store Manager",
+          1826
+        ],
+        [
+          "Senior Financial Advisor",
+          1744
+        ]
+      ],
+      "company_name": [
+        [
+          "BASF",
+          27182
+        ],
+        [
+          "The Home Depot",
+          23180
+        ],
+        [
+          "Edward Jones",
+          13762
+        ],
+        [
+          "Telstra",
+          11562
+        ],
+        [
+          "Merrill Lynch",
+          10448
+        ],
+        [
+          "John Deere",
+          9364
+        ],
+        [
+          "IndiaMART",
+          7646
+        ],
+        [
+          "Signify",
+          7535
+        ],
+        [
+          "FUJITSU",
+          7215
+        ],
+        [
+          "CNH",
+          6689
+        ],
+        [
+          "TELUS",
+          6601
+        ],
+        [
+          "Syngenta ANZ",
+          6595
+        ],
+        [
+          "Morgan Stanley",
+          6316
+        ],
+        [
+          "Corteva",
+          5235
+        ],
+        [
+          "Ameriprise Financial Services",
+          4896
+        ],
+        [
+          "www.law.cornell.edu",
+          4436
+        ],
+        [
+          "Elanco",
+          4261
+        ],
+        [
+          "UBS",
+          3957
+        ],
+        [
+          "Northwestern Mutual",
+          3550
+        ],
+        [
+          "Wells Fargo Advisors",
+          3144
+        ]
+      ],
+      "website": [
+        [
+          "http://www.basf.com",
+          27182
+        ],
+        [
+          "http://www.homedepot.com",
+          23180
+        ],
+        [
+          "http://www.edwardjones.com",
+          13762
+        ],
+        [
+          "http://www.telstra.com.au",
+          11562
+        ],
+        [
+          "http://www.ml.com",
+          10449
+        ],
+        [
+          "http://www.deere.com",
+          9364
+        ],
+        [
+          "http://www.indiamart.com",
+          7648
+        ],
+        [
+          "http://www.signify.com",
+          7538
+        ],
+        [
+          "http://www.fujitsu.com",
+          7288
+        ],
+        [
+          "http://www.cnh.com",
+          6689
+        ],
+        [
+          "http://www.telus.com",
+          6610
+        ],
+        [
+          "http://www.syngenta.com",
+          6595
+        ],
+        [
+          "http://www.morganstanley.com",
+          6307
+        ],
+        [
+          "http://www.corteva.com",
+          5235
+        ],
+        [
+          "http://www.cornell.edu",
+          4966
+        ],
+        [
+          "http://www.ameriprise.com",
+          4896
+        ],
+        [
+          "http://www.elanco.com",
+          4261
+        ],
+        [
+          "http://www.ubs.com",
+          3957
+        ],
+        [
+          "http://www.northwesternmutual.com",
+          3548
+        ],
+        [
+          "http://www.wellsfargoadvisors.com",
+          3144
+        ]
+      ],
+      "email": [
+        [
+          "asingh@indiamart.com",
+          39
+        ],
+        [
+          "paywith@indiamart.com",
+          22
+        ],
+        [
+          "sharma@indiamart.com",
+          20
+        ],
+        [
+          "amit@indiamart.com",
+          18
+        ],
+        [
+          "clim@basf.com",
+          18
+        ],
+        [
+          "kumar.rahul@indiamart.com",
+          15
+        ],
+        [
+          "ma@indiamart.com",
+          15
+        ],
+        [
+          "asif@indiamart.com",
+          15
+        ],
+        [
+          "mishraabhishek@indiamart.com",
+          15
+        ],
+        [
+          "vishal@indiamart.com",
+          14
+        ],
+        [
+          "saurabh@indiamart.com",
+          14
+        ],
+        [
+          "gaurav.gupta@indiamart.com",
+          12
+        ],
+        [
+          "gsharma@indiamart.com",
+          12
+        ],
+        [
+          "vinaykaushal@indiamart.com",
+          12
+        ],
+        [
+          "pk@ninjacart.com",
+          12
+        ],
+        [
+          "manish.kumawat@indiamart.com",
+          12
+        ],
+        [
+          "deepaks@indiamart.com",
+          12
+        ],
+        [
+          "ashishkumar@indiamart.com",
+          12
+        ],
+        [
+          "kumar.abhishek@indiamart.com",
+          12
+        ],
+        [
+          "daniel@homedepot.com",
+          12
+        ]
+      ],
+      "phone": [
+        [
+          "+49 621 600",
+          27163
+        ],
+        [
+          "+1 770-433-8211",
+          23031
+        ],
+        [
+          "+1 314-515-2000",
+          13762
+        ],
+        [
+          "+61 1300 368 387",
+          11523
+        ],
+        [
+          "+1 212-449-1000",
+          10436
+        ],
+        [
+          "+1 309-765-8000",
+          9363
+        ],
+        [
+          "+91 12 0677 7777",
+          7555
+        ],
+        [
+          "+31 40 275 0000",
+          7486
+        ],
+        [
+          "+41 61 323 11 11",
+          6841
+        ],
+        [
+          "+44 20 7925 1964",
+          6640
+        ],
+        [
+          "+1 212-761-4000",
+          6319
+        ],
+        [
+          "+81 362-52-2220",
+          6279
+        ],
+        [
+          "+1 250-218-8888",
+          6057
+        ],
+        [
+          "+1 833-267-8382",
+          5093
+        ],
+        [
+          "+1 607-254-4636",
+          4918
+        ],
+        [
+          "+1 612-671-8001",
+          4762
+        ],
+        [
+          "+1 877-352-6261",
+          4214
+        ],
+        [
+          "+41 44 234 11 11",
+          3958
+        ],
+        [
+          "+1 414-271-1444",
+          3672
+        ],
+        [
+          "+1 866-224-5708",
+          3069
+        ]
+      ],
+      "personal_linkedin": [
+        [
+          "http://www.linkedin.com/in/lourdes-lulu-ortiz-377053a2",
+          6
+        ],
+        [
+          "chemicals, performance products, functional materials, solutions, agricultural solutions, oil, gas",
+          5
+        ],
+        [
+          "http://www.linkedin.com/in/mandy-huggard-b463b62b",
+          5
+        ],
+        [
+          "http://www.linkedin.com/in/adam-mckinnon-7085b84",
+          5
+        ],
+        [
+          "http://www.linkedin.com/in/duane-dunn-4b90a916",
+          5
+        ],
+        [
+          "http://www.linkedin.com/in/noah-mcwilliams",
+          5
+        ],
+        [
+          "http://www.linkedin.com/in/ryanskjonsberg",
+          5
+        ],
+        [
+          "http://www.linkedin.com/in/jerry-hu-1975b857",
+          5
+        ],
+        [
+          "http://www.linkedin.com/in/brenda-anderson-20880317",
+          4
+        ],
+        [
+          "http://www.linkedin.com/in/neil-macdonald-ris-74b581b7",
+          4
+        ],
+        [
+          "http://www.linkedin.com/in/ishleen-chhatwal-0419bb90",
+          4
+        ],
+        [
+          "http://www.linkedin.com/in/lynn-jones-b0134a1b",
+          4
+        ],
+        [
+          "http://www.linkedin.com/in/welscher",
+          4
+        ],
+        [
+          "http://www.linkedin.com/in/sherry-gill-98600127",
+          4
+        ],
+        [
+          "education, university, research",
+          4
+        ],
+        [
+          "http://www.linkedin.com/in/kevin-martin-8288a7a9",
+          4
+        ],
+        [
+          "http://www.linkedin.com/in/jason-hellickson-16b04959",
+          4
+        ],
+        [
+          "http://www.linkedin.com/in/mark-mayo-60a073a",
+          4
+        ],
+        [
+          "http://www.linkedin.com/in/jimwsouthard",
+          4
+        ],
+        [
+          "http://www.linkedin.com/in/robert-h-a842604a",
+          4
+        ]
+      ],
+      "company_linkedin": [
+        [
+          "http://www.linkedin.com/company/basf",
+          27182
+        ],
+        [
+          "http://www.linkedin.com/company/the-home-depot",
+          23180
+        ],
+        [
+          "http://www.linkedin.com/company/edward-jones",
+          13762
+        ],
+        [
+          "http://www.linkedin.com/company/telstra",
+          11562
+        ],
+        [
+          "http://www.linkedin.com/company/merrilllynch",
+          10448
+        ],
+        [
+          "http://www.linkedin.com/company/john-deere",
+          9364
+        ],
+        [
+          "http://www.linkedin.com/company/indiamart-intermesh-limited",
+          7646
+        ],
+        [
+          "http://www.linkedin.com/company/signifycompany",
+          7534
+        ],
+        [
+          "http://www.linkedin.com/company/fujitsu",
+          7282
+        ],
+        [
+          "http://www.linkedin.com/company/cnh",
+          6689
+        ],
+        [
+          "http://www.linkedin.com/company/telus",
+          6610
+        ],
+        [
+          "http://www.linkedin.com/company/syngenta",
+          6595
+        ],
+        [
+          "http://www.linkedin.com/company/morgan-stanley",
+          6307
+        ],
+        [
+          "http://www.linkedin.com/company/corteva",
+          5235
+        ],
+        [
+          "http://www.linkedin.com/school/cornell-university",
+          4962
+        ],
+        [
+          "http://www.linkedin.com/company/ameriprise-financial-services-llc",
+          4896
+        ],
+        [
+          "http://www.linkedin.com/company/elanco",
+          4261
+        ],
+        [
+          "http://www.linkedin.com/company/ubs",
+          3957
+        ],
+        [
+          "http://www.linkedin.com/company/northwestern-mutual",
+          3548
+        ],
+        [
+          "http://www.linkedin.com/company/wells-fargo-advisors",
+          3144
+        ]
+      ],
+      "facebook": [
+        [
+          "https://facebook.com/basf.apac/",
+          27182
+        ],
+        [
+          "https://www.facebook.com/homedepot",
+          23180
+        ],
+        [
+          "https://www.facebook.com/edwardjones",
+          13762
+        ],
+        [
+          "http://www.facebook.com/telstra24x7",
+          11562
+        ],
+        [
+          "https://facebook.com/Merrill-Lynch-207161416043045/",
+          10448
+        ],
+        [
+          "https://facebook.com/JohnDeereUSCA",
+          9364
+        ],
+        [
+          "https://www.facebook.com/IndiaMART",
+          7646
+        ],
+        [
+          "https://facebook.com/signify/",
+          7534
+        ],
+        [
+          "https://www.facebook.com/FujitsuICT",
+          7285
+        ],
+        [
+          "https://www.facebook.com/Syngenta",
+          6765
+        ],
+        [
+          "https://facebook.com/CNHIndustrial",
+          6689
+        ],
+        [
+          "https://facebook.com/telus/",
+          6610
+        ],
+        [
+          "https://www.facebook.com/morganstanley",
+          6305
+        ],
+        [
+          "https://facebook.com/CortevaIN",
+          5235
+        ],
+        [
+          "https://www.facebook.com/Cornell",
+          4962
+        ],
+        [
+          "https://facebook.com/Ameriprise/",
+          4896
+        ],
+        [
+          "https://www.facebook.com/elancoanimalhealth/",
+          4261
+        ],
+        [
+          "https://facebook.com/UBSglobal",
+          3957
+        ],
+        [
+          "https://facebook.com/northwesternmutual",
+          3548
+        ],
+        [
+          "https://facebook.com/WellsFargoAdvisors",
+          3144
+        ]
+      ],
+      "twitter": [
+        [
+          "https://twitter.com/BASFCanada",
+          27182
+        ],
+        [
+          "https://www.twitter.com/homedepot",
+          23180
+        ],
+        [
+          "https://twitter.com/edwardjones",
+          13762
+        ],
+        [
+          "http://www.twitter.com/telstra",
+          11562
+        ],
+        [
+          "https://twitter.com/MerrillLynch",
+          10448
+        ],
+        [
+          "https://twitter.com/JohnDeere",
+          9364
+        ],
+        [
+          "https://twitter.com/IndiaMART",
+          7646
+        ],
+        [
+          "https://twitter.com/signifycompany?lang=en",
+          7534
+        ],
+        [
+          "https://twitter.com/Fujitsu_Global",
+          7285
+        ],
+        [
+          "https://twitter.com/cnhindustrial",
+          6689
+        ],
+        [
+          "https://twitter.com/Syngenta",
+          6626
+        ],
+        [
+          "https://twitter.com/telus",
+          6610
+        ],
+        [
+          "https://www.twitter.com/morganstanley",
+          6305
+        ],
+        [
+          "https://twitter.com/corteva",
+          5235
+        ],
+        [
+          "https://twitter.com/Cornell",
+          4962
+        ],
+        [
+          "https://twitter.com/ameriprise",
+          4896
+        ],
+        [
+          "https://twitter.com/Elanco/",
+          4261
+        ],
+        [
+          "https://twitter.com/UBS",
+          3957
+        ],
+        [
+          "https://twitter.com/nm_financial",
+          3548
+        ],
+        [
+          "https://twitter.com/WFAdvisors",
+          3144
+        ]
+      ],
+      "country": [
+        [
+          "United States",
+          351216
+        ],
+        [
+          "India",
+          25048
+        ],
+        [
+          "Canada",
+          16904
+        ],
+        [
+          "Australia",
+          13734
+        ],
+        [
+          "Germany",
+          11950
+        ],
+        [
+          "United Kingdom",
+          6392
+        ],
+        [
+          "Brazil",
+          6160
+        ],
+        [
+          "Netherlands",
+          4412
+        ],
+        [
+          "Italy",
+          3104
+        ],
+        [
+          "France",
+          3089
+        ],
+        [
+          "China",
+          2789
+        ],
+        [
+          "Belgium",
+          2408
+        ],
+        [
+          "Spain",
+          2136
+        ],
+        [
+          "Indonesia",
+          1757
+        ],
+        [
+          "Mexico",
+          1753
+        ],
+        [
+          "Poland",
+          1727
+        ],
+        [
+          "Switzerland",
+          1644
+        ],
+        [
+          "Japan",
+          1521
+        ],
+        [
+          "Israel",
+          1466
+        ],
+        [
+          "Singapore",
+          1440
+        ]
+      ],
+      "industry": [
+        [
+          "financial services",
+          103076
+        ],
+        [
+          "chemicals",
+          28224
+        ],
+        [
+          "insurance",
+          27889
+        ],
+        [
+          "information technology & services",
+          27582
+        ],
+        [
+          "retail",
+          24750
+        ],
+        [
+          "machinery",
+          23277
+        ],
+        [
+          "staffing & recruiting",
+          22895
+        ],
+        [
+          "farming",
+          20665
+        ],
+        [
+          "telecommunications",
+          19052
+        ],
+        [
+          "transportation/trucking/railroad",
+          14735
+        ],
+        [
+          "higher education",
+          14607
+        ],
+        [
+          "electrical/electronic manufacturing",
+          9743
+        ],
+        [
+          "construction",
+          8331
+        ],
+        [
+          "agriculture",
+          8218
+        ],
+        [
+          "online media",
+          8202
+        ],
+        [
+          "marketing & advertising",
+          7810
+        ],
+        [
+          "research",
+          6388
+        ],
+        [
+          "banking",
+          6293
+        ],
+        [
+          "hospital & health care",
+          5727
+        ],
+        [
+          "pharmaceuticals",
+          4999
+        ]
+      ],
+      "tools_used": [
+        [
+          "Amazon CloudFront, Route 53, Outlook, Microsoft Office 365, Amazon AWS, Adobe CQ, ExactTarget, VueJS, Microsoft Azure Monitor, Amazon SES, Drift, OneTrust, Salesforce Live Agent, Salesforce Service Cloud, Salesforce, SuccessFactors (SAP), Hotjar, LiveChat, Criteo, Vimeo, Mobile Friendly, Smartsupp, Tealium, Pixafy, RealPerson Chat (Optimise-IT), Google Maps (Non Paid Users), Google Dynamic Remarketing, Shutterstock, Wistia, Adobe Media Optimizer, Google Maps, AddThis, ShareThis, Facebook Login (Connect), Google Play, The Trade Desk, Google AdSense, Facebook Widget, Google translate API, Stripe, Bing Ads, Facebook Custom Audiences, Rubicon Project, Gettyimages, Multilingual, Taleo, Linkedin Marketing Solutions, Google Tag Manager, Taboola, Pardot, DoubleClick, ON24, Varnish, F5 BIG-IP, WordPress.org, Nginx, Disqus, reCAPTCHA, Typekit, Bootstrap Framework, Amazon Associates, Amadesa, Decibel Insight, DoubleClick Conversion, Google Font API, Google Analytics, Google translate widget, Google AdWords Conversion, Magento, Cedexis Radar, BounceExchange, YouTube, Apache, Ubuntu, Remote",
+          20902
+        ],
+        [
+          "Akamai, Akamai DNS, Zendesk, Google Cloud Hosting, Mixpanel, Brightcove, Backbone JS Library, Drupal, VueJS, Amazon SES, Pantheon, Microsoft Application Insights, WP Engine, Atlassian Cloud, Create React App, Omniture (Adobe), Salesforce Live Agent, Adobe Marketing Cloud, Salesforce, Adobe Media Optimizer, New Relic, Mobile Friendly, IBM Websphere, reCAPTCHA, Bazaarvoice, Certona, Google Tag Manager, Qualtrics, Google Analytics, Varnish, LivePerson Monitor, Nginx, SOASTA, ASP.NET",
+          17162
+        ],
+        [
+          "CloudFlare CDN, CloudFlare Hosting, Acquia Cloud, StackAdapt, The Trade Desk, Salesforce, Google Play, Google AdWords Conversion, Bootstrap Framework, Facebook Custom Audiences, Twitter Advertising, reCAPTCHA, Visual Website Optimizer, Qualtrics, New Relic, Gigya, Gravity Forms, DoubleClick, Google AdSense, Linkedin Marketing Solutions, Google Analytics, Google Dynamic Remarketing, DoubleClick Conversion, Bing Ads, Google Font API, Cedexis Radar, Open AdStream (Appnexus), Nginx, C3 Metrics, Facebook Login (Connect), Google Maps (Non Paid Users), Google Maps, Mobile Friendly, AppNexus, Adobe Media Optimizer, Cvent, Vimeo, Amazon Associates, Facebook Widget, Shutterstock, WordPress.org, Varnish, Disqus, DoubleClick Floodlight, Stripe, Typekit, Evergage, Kenexa, ON24, Google Tag Manager, iTunes, ClickTale",
+          13762
+        ],
+        [
+          "Microsoft Office 365, CSC Corporate Domains, Amazon AWS, Taboola Newsroom, Omniture (Adobe), Genesys, OneTrust, Citrix NetScaler, Kaltura, DoubleClick, DoubleClick Floodlight, Bootstrap Framework, Tealium, ASP.NET, SimpleReach, Liferay, Mobile Friendly, Adobe TestAndTarget, reCAPTCHA, Google Play, Google Tag Manager, Google Maps, Ruxit, Google Maps (Non Paid Users), Apache, AI",
+          10448
+        ],
+        [
+          "Amazon CloudFront, Akamai DNS, Route 53, Amazon AWS, Chartbeat, Ooyala, JQuery 2.1.1, TubeMogul, Adobe CQ, Eloqua, WP Engine, UPS, React Redux, Adobe Marketing Cloud, Salesforce Live Agent, Salesforce, Drupal, Zendesk, Microsoft Application Insights, SparkPost, Campaign Monitor, reCAPTCHA, Linkedin Marketing Solutions, DoubleClick, Marketo, DoubleClick Conversion, Bing Ads, Google Tag Manager, Google AdSense, JQuery 1.11.1, Yahoo Ad Manager Plus, Shutterstock, YouTube, Google Maps, Facebook Widget, Multilingual, Adobe Media Optimizer, DoubleVerify, DoubleClick Floodlight, WordPress.org, Google Play, ClickTale, LivePerson Monitor, DocuSign, Open AdStream (Appnexus), Bootstrap Framework, Braintree, Google Font API, Yahoo Analytics, Amcharts JS Library, Omniture (Adobe), Facebook Custom Audiences, Facebook Login (Connect), Zencoder, Paypal, Flashtalking, Mobile Friendly, Workday Recruit, Stripe, Google Analytics, Adobe TestAndTarget, Twitter Advertising, New Relic, Eventbrite, Ruby On Rails, Cloudinary, MailChimp, dynaTrace, Krux, Wistia, Walkme, Vimeo, Litmos, iTunes, Disqus, Dotomi",
+          8626
+        ],
+        [
+          "Akamai, Amazon SES, Microsoft Office 365, Bluekai, SuccessFactors (SAP), OneTrust, React Redux, SignalR, Adobe Marketing Cloud, Omniture (Adobe), Datadog, Google Dynamic Remarketing, Bootstrap Framework, FullStory, Quantcast, Facebook Custom Audiences, YouTube, Apache, Stripe, Google AdWords Conversion, Facebook Login (Connect), Google Tag Manager, AppDynamics, Linkedin Marketing Solutions, Walkme, SOASTA, Google Font API, Google Maps (Paid Users), Disqus, Cedexis Radar, ON24, DataXu, Mobile Friendly, The Trade Desk, IBM Websphere, CompuSystems, Facebook Widget, DoubleClick, Google Maps (Non Paid Users), Google Analytics, Twitter Advertising, New Relic, Adobe TestAndTarget, Google Maps, Google Play, Bazaarvoice, ShareThis, DoubleClick Floodlight, ASP.NET, WordPress.org, Vimeo, Microsoft-IIS, iTunes, DoubleClick Conversion, LiveRamp, Adobe Media Optimizer, Qualtrics, Remote",
+          7216
+        ],
+        [
+          "Akamai, ExactTarget, Pardot, Microsoft Office 365, Brightcove, Taleo, Adobe CQ, Atlassian Cloud, The Trade Desk, Omniture (Adobe), Adobe Marketing Cloud, Salesforce, Google Analytics, Apache, Google Tag Manager, Mobile Friendly, Typekit, WordPress.org, Linkedin Marketing Solutions, Qualtrics, F5 BIG-IP",
+          6305
+        ],
+        [
+          "Route 53, DynECT, Mailchimp Mandrill, Gmail, Google Apps, Google Cloud Hosting, Shutterstock, Google Dynamic Remarketing, Outbrain, Eloqua, Content.ad, Google Font API, YouTube, Plista, New Relic, AT Internet, Google AdWords Conversion, Google Play, Open AdStream (Appnexus), Google Remarketing, Integral Ad Science, Yandex Metrica, Marchex, Facebook Like Button, ASP.NET, Nginx, OpenX - Exchange, Zergnet, ShareThis, Ad Unit 728 x 90, Google Analytics, Adobe Media Optimizer, BuddyPress, Flashtalking, Ad Unit 320 x 50, Media.net, Google Plus, Commission Junction, Bootstrap Framework, RocketFuel, Adform, Bootstrap Framework v3.2.0, TribalFusion, Wordpress.com, DoubleClick, AngularJS, Mobile Friendly, iTunes, DoubleVerify, Google translate widget, Vimeo, AppNexus, Ad Unit 300 x 250, PubMatic, Bluekai, Facebook Custom Audiences, Google translate API, Amadesa, WordPress.org, DoubleClick Conversion, Unruly Media, Apache, Quantcast, Multilingual, Cedexis Radar, Amazon Associates, Google Tag Manager, Google AdSense, Sizmek (MediaMind), ON24, Basis",
+          5799
+        ],
+        [
+          "Akamai, Outlook, Microsoft Office 365, Amazon AWS, Adobe Marketing Cloud, Magento 2 Community, VueJS, Microsoft Azure Monitor, Jira, Atlassian Confluence, Atlassian Cloud, Salesforce, Linkedin Marketing Solutions, Facebook Login (Connect), Nginx, MediaMath, DoubleClick Floodlight, DoubleClick Conversion, YouTube, Facebook Custom Audiences, Stackla, Adobe CQ, WordPress.org, Google Plus, Google Analytics, Google Dynamic Remarketing, Mobile Friendly, Disqus, Apache, Multilingual, Kaltura, DoubleClick, Vimeo, Marketo, reCAPTCHA, Hotjar, LiveRamp, F5 BIG-IP, Google Play, Facebook Widget, Google Font API, Webex, Stripe, Adform, Eloqua, iTunes, SOASTA, AppNexus, Google Custom Search, Workday Recruit, Bootstrap Framework, Cedexis Radar, Adobe Media Optimizer, Google Tag Manager, Google Maps, Remote",
+          5794
+        ],
+        [
+          "Akamai, Akamai DNS, Outlook, Marketo, Microsoft Office 365, Microsoft Azure Hosting, Drupal, Eloqua, SendInBlue, Demandware, Grafana, Salesforce Commerce Cloud, Genesys, Atlassian Cloud, GitLab, Pardot, SparkPost, Salesforce, Amazon SES, RTB House, The Trade Desk, Hubspot, Baidu Ads, Ruby On Rails, Shutterstock, Facebook Custom Audiences, Mobile Friendly, WordPress.org, HRMDirect, DoubleClick, DoubleClick Conversion, Facebook Widget, SharpSpring, Qualtrics, ON24, AT Internet, SoundCloud, Linkedin Marketing Solutions, Vimeo, Bootstrap Framework, Facebook Login (Connect), ADEBiS, Bing Ads, Google Analytics, SOASTA, JQuery 1.11.1, Google Maps (Non Paid Users), YouTube, Twitter Advertising, DoubleClick Floodlight, Perfect Audience, Adobe Media Optimizer, ShareThis, AppNexus, Google Maps, Google Tag Manager, Apache, Taboola, Google Font API, Taleo, ASP.NET, Yahoo Retargeting, Google Custom Search, reCAPTCHA, Hotjar, Cedexis Radar, Google Dynamic Remarketing, Vidyard, Microsoft-IIS, Google AdSense, Google AdWords Conversion",
+          5712
+        ],
+        [
+          "Salesforce, SendInBlue, Microsoft Office 365, CloudFlare Hosting, Mimecast, Drupal, ExactTarget, Marketo, Atlassian Cloud, Amazon SES, React Redux, Visual-Basic-.NET, StackAdapt, The Trade Desk, Adobe Marketing Cloud, Pardot, Omniture (Adobe), StatusPage IO, Jira, Atlassian Confluence, React, Hubspot, JQuery 1.11.1, Google Maps (Non Paid Users), Google Dynamic Remarketing, DoubleClick, Quantcast, Cedexis Radar, Linkedin Marketing Solutions, Workday Recruit, Linkshare, Google AdWords Conversion, Mobile Friendly, Twitter Advertising, Vimeo, reCAPTCHA, Lithium Technologies, Segment.io, AngularJS, greyscale - grey, New Relic, Google Places, Taleo, Decibel Insight, MailChimp, Bing Ads, Facebook Custom Audiences, Mixpanel, Gravity Forms, Facebook Login (Connect), Facebook Widget, Zopim, Google Play, Google Analytics, Yahoo Ad Manager Plus, Boomerang JS library, Google Tag Manager, Qualtrics, Disqus, YouTube, GoToWebinar, DoubleClick Conversion, Stripe, Bootstrap Framework, Cloudinary, Google AdSense, Shutterstock, Kenshoo, DoubleClick Floodlight, Adobe Media Optimizer, Multilingual, Ruxit, ON24, UberFlip, Yahoo Analytics, Google Maps, FullStory, Google Font API, Amazon Associates, Breezy HR (formerly NimbleHR), WordPress.org, Content.ad, Liferay, Bootstrap Framework v3.2.0, Vision6, Remote",
+          5243
+        ],
+        [
+          "Salesforce, CSC Corporate Domains, ExactTarget, Mimecast, Microsoft Office 365, Zendesk, Amazon AWS, React Redux, Salesforce Live Agent, New Relic, reCAPTCHA, Facebook Custom Audiences, Google Tag Manager, Facebook Widget, SmartRecruiters, Kaltura, Adobe Media Optimizer, Vimeo, Google Analytics, Multilingual, Google Font API, Facebook Login (Connect), Mobile Friendly, Backbone JS Library, Bootstrap Framework, Cedexis Radar, YouTube, Hotjar, Remote",
+          5145
+        ],
+        [
+          "Akamai, Outlook, Microsoft Office 365, Microsoft Azure Hosting, MailChimp SPF, VueJS, Microsoft Azure Monitor, Atlassian Cloud, Salesforce, Amazon SES, Grafana, Microsoft Application Insights, OneTrust, Angular JS v1, Campaign Monitor, Mapbox, Microsoft Sharepoint, Marketo, Adobe Media Optimizer, AddThis, JQuery 1.11.1, Facebook Login (Connect), reCAPTCHA, New Relic, Gigya, DoubleClick Conversion, SiteCore, DoubleClick Floodlight, Amadesa, Multilingual, Google Analytics, Tynt, IBM Websphere, Vimeo, Google Tag Manager, Open AdStream (Appnexus), Quantcast, Pingdom, Typekit, YouTube, Facebook Widget, Google Maps (Non Paid Users), Google Font API, Comm100, Google Dynamic Remarketing, WordPress.org, SOASTA, ASP.NET, iCIMS, Facebook Custom Audiences, Google Maps, Google Places, Mobile Friendly, Kaltura, DoubleClick, Cedexis Radar, Liferay, Disqus, Bootstrap Framework, Stripe, Omniture (Adobe), Remote",
+          5012
+        ],
+        [
+          "Akamai, Microsoft Office 365, JQuery 2.1.1, Backbone JS Library, Adobe Marketing Cloud, React Redux, The Trade Desk, Omniture (Adobe), Salesforce Live Agent, Pardot, Salesforce, Vimeo, Zencoder, Google Analytics, React, Linkedin Marketing Solutions, Adobe Coldfusion, Bootstrap Framework, Google AdSense, Facebook Login (Connect), DataXu, ASP.NET, Mobile Friendly, Google Tag Manager, Lotame, Cornerstone On Demand, Facebook Custom Audiences, Google Dynamic Remarketing, AddThis, Adobe Media Optimizer, Bing Ads, Qualtrics, Workday Recruit, Sizmek (MediaMind), BugHerd, Kenexa, MediaMath, Google Maps, reCAPTCHA, Google Maps (Non Paid Users), Liferay, Facebook Widget, DoubleClick, Google AdWords Conversion, DoubleClick Conversion, Remote",
+          4896
+        ],
+        [
+          "Akamai, Akamai DNS, UltraDns, Outlook, Microsoft Office 365, Amazon AWS, Brightcove, Adobe Marketing Cloud, Adobe CQ, VueJS, Zendesk, Citrix NetScaler, Mapbox, Omniture (Adobe), Salesforce, Multilingual, Amadesa, Umantis, Google Maps (Paid Users), F5 BIG-IP, Mobile Friendly, Apache, Google Maps, Render, Android",
+          3957
+        ],
+        [
+          "UltraDns, Microsoft Office 365, Google Cloud Hosting, Akamai, Akamai DNS, Outlook, Adobe CQ, Eloqua, Zendesk, Adobe Marketing Cloud, VueJS, Pantheon, Microsoft Azure Monitor, Microsoft Application Insights, ServiceNow, Atlassian Cloud, Salesforce, Bluekai, Backbone JS Library, Omniture (Adobe), The Trade Desk, Google Dynamic Remarketing, Google Maps, reCAPTCHA, Hotjar, Adobe Media Optimizer, Linkedin Marketing Solutions, New Relic, Dropbox, WordPress.org, Facebook Login (Connect), YouTube, MediaMath, Typekit, Facebook Custom Audiences, Linkedin Widget, Bootstrap Framework, Twitter Advertising, BugHerd, Pingdom, Google Analytics, Linkedin Login, DoubleClick, Facebook Widget, DoubleClick Conversion, Google Tag Manager, Mobile Friendly, Nginx, Google Font API, Gigya, LiveRamp, Yahoo Analytics, Yahoo Ad Manager Plus, Qualtrics, DoubleClick Floodlight, TribalFusion, Google AdWords Conversion, Google AdSense, Remote,",
+          3867
+        ],
+        [
+          "Gmail, Outlook, Google Apps, Microsoft Azure Hosting, YouTube, Google Places, Ad Unit 300 x 250, Google AdWords Conversion, Open AdStream (Appnexus), Cloudinary, Eventbrite, MouseFlow, Google Plus, Optimizely, Greenhouse.io, DataXu, Altas Relaunched, Google Maps (Non Paid Users), Unica, StatCounter, SOASTA, Hubspot, Pusher, Backbone JS Library, Ad Unit 728 x 90, Eloqua, Adobe Media Optimizer, LiveRamp, DoubleClick Conversion, Baidu Ads, Cvent, Panopto, Amazon Associates, DoubleClick Floodlight, Mobile Friendly, HeapAnalytics, Braintree, Wix, WordPress.org, Ad Unit 320 x 50, Omniture (Adobe), Sojern, Paypal, New Relic, Typekit, Moat, Facebook Like Button, ShareThis, Google translate widget, AngularJS, Salesforce Live Agent, Visual Website Optimizer, CrazyEgg, SynXis (Sabre Hospitality), Google Custom Search, The Trade Desk, Quantcast, Workday Recruit, AB Tasty, Box.net, Django, Bootstrap Framework, Wordpress.com, Atlas by Facebook, iTunes, Flowplayer, DoubleVerify, Pardot, Twitter Advertising, Nginx, Ubuntu, Gravity Forms, Shutterstock, GoToWebinar, Wistia, Apache, greyscale - grey, Hotjar, Cedexis Radar, Intercom, SharpSpring, Bootstrap Framework v3.2.0, AppNexus, Perfect Audience, Drupal, Shareaholic Content Amplification, Customer.IO, Qualtrics, Segment.io, reCAPTCHA, Google Analytics, Integral Ad Science, Adform, AdRoll, SuccessFactors (SAP), Highcharts JS Library, DoubleClick, OpenSSL, Facebook Login (Connect), Constant Contact, Google Play, Reach Local, AddThis, Ruxit, Google translate API, Flashtalking, Truste, Facebook Custom Audiences, Salesforce, Stripe, JQuery 1.11.1, Vimeo, Google AdSense, Kaltura, Marketo, Emma, Pingdom, Google Tag Manager, MailChimp, Google Analytics Ecommerce Tracking, Google Font API, SumoMe, SurveyGizmo, Formstack, Facebook Widget, Canvas by Instructure, Piwik, Adobe Coldfusion, Linkedin Marketing Solutions, FullStory, Multilingual, Ruby On Rails, Google Dynamic Remarketing, Mixpanel, Amadesa, Formassembly, Bing Ads, Media.net, Phusion Passenger, Google Maps, DotNetNuke, ASP.NET, Varnish, UserLike, Blackboard LMS, Apple Pay",
+          3660
+        ],
+        [
+          "Amazon CloudFront, Route 53, Microsoft Office 365, Amazon AWS, JQuery 2.1.1, Adobe Marketing Cloud, Zendesk, VueJS, Atlassian Cloud, React Redux, The Trade Desk, RingCentral, Omniture (Adobe), Cedexis Radar, Adobe Media Optimizer, WordPress.org, New Relic, YouTube, Google AdSense, Disqus, HeapAnalytics, Google Dynamic Remarketing, Qualtrics, PC Recruiter, Google Maps (Non Paid Users), Tealium, DoubleClick, Google AdWords Conversion, Google Analytics, Yahoo Ad Manager Plus, DoubleClick Conversion, DoubleClick Floodlight, Twitter Advertising, Facebook Widget, Google Maps, Google Font API, Facebook Login (Connect), Workday Recruit, Eventbrite, Vimeo, Cvent, Google Tag Manager, Yahoo Analytics, Typekit, Bing Ads, Optimizely, Linkedin Marketing Solutions, Mobile Friendly, Facebook Custom Audiences, reCAPTCHA, Google Play",
+          3548
+        ],
+        [
+          "Outlook, Microsoft Office 365, Microsoft Azure Hosting, SAP, Amazon SES, Atlassian Cloud, Monday, StackAdapt, The Trade Desk, Salesforce, Genesys Cloud CX Platform, Criteo, MediaMath, Google Maps, ON24, DoubleClick, DoubleClick Floodlight, YouTube, Adobe Media Optimizer, Mobile Friendly, Google Analytics, Linkedin Marketing Solutions, Facebook Widget, Google AdWords Conversion, DoubleClick Conversion, Cedexis Radar, Google Font API, Tealium, Disqus, Shutterstock, Undertone, Hotjar, Google Places, Facebook Custom Audiences, Twitter Advertising, Google Dynamic Remarketing, Taboola, Yahoo Ad Manager Plus, Workday Recruit, Facebook Login (Connect), Vimeo, Bing Ads, Zemanta, Gigya, Amazon Associates, Google Tag Manager, New Relic, Gigya Registration, greyscale - grey, Wistia, Yahoo Analytics",
+          3170
+        ],
+        [
+          "Akamai, Akamai DNS, UltraDns, Microsoft Office 365, Adobe Marketing Cloud, WP Engine, Citrix NetScaler, Google AdWords Conversion, Facebook Login (Connect), AppDynamics, Facebook Custom Audiences, JW Player, Facebook Widget, Google Maps (Non Paid Users), Typekit, Google Maps, Mobile Friendly, Google Analytics, Adobe Media Optimizer, Hotjar, Google Tag Manager, Remote",
+          3144
+        ]
+      ]
+    },
+    "at_least_one_contact": {
+      "rows": 484325,
+      "pct": 100.0,
+      "missing_rows": 0,
+      "missing_pct": 0.0
+    },
+    "duplicate_values": {
+      "website": {
+        "values_repeated": 38773,
+        "extra_rows": 369272
+      },
+      "personal_linkedin": {
+        "values_repeated": 54550,
+        "extra_rows": 84969
+      }
+    }
+  },
+  "companies": {
+    "rows_profiled": 1602141,
+    "columns": [
+      "company_name",
+      "website",
+      "website_alt",
+      "location",
+      "category",
+      "email",
+      "phone",
+      "linkedin",
+      "facebook",
+      "twitter",
+      "description",
+      "founded",
+      "status",
+      "employees",
+      "funding_total",
+      "funding_rounds",
+      "funding_last_type",
+      "funding_last_at",
+      "external_id",
+      "permalink",
+      "founders",
+      "email_pts",
+      "phone_pts",
+      "website_pts",
+      "linkedin_pts",
+      "quality_score",
+      "social_presence",
+      "activity_status",
+      "source_file",
+      "method",
+      "processed_at"
+    ],
+    "nonblank": {
+      "company_name": {
+        "rows": 1602141,
+        "pct": 100.0
+      },
+      "website": {
+        "rows": 1602141,
+        "pct": 100.0
+      },
+      "location": {
+        "rows": 1602141,
+        "pct": 100.0
+      },
+      "category": {
+        "rows": 1602141,
+        "pct": 100.0
+      },
+      "email": {
+        "rows": 1602141,
+        "pct": 100.0
+      },
+      "phone": {
+        "rows": 1602141,
+        "pct": 100.0
+      },
+      "linkedin": {
+        "rows": 1446814,
+        "pct": 90.31
+      },
+      "facebook": {
+        "rows": 1202033,
+        "pct": 75.03
+      },
+      "twitter": {
+        "rows": 798558,
+        "pct": 49.84
+      },
+      "description": {
+        "rows": 1602140,
+        "pct": 100.0
+      },
+      "employees": {
+        "rows": 1490402,
+        "pct": 93.03
+      }
+    },
+    "unique": {
+      "company_name": 1548216,
+      "website": 1601590,
+      "location": 69,
+      "category": 515607,
+      "email": 1591313,
+      "phone": 1593590,
+      "linkedin": 1442967,
+      "facebook": 1198067,
+      "twitter": 795987,
+      "description": 1600263,
+      "employees": 9
+    },
+    "top": {
+      "company_name": [
+        [
+          "Evolve",
+          30
+        ],
+        [
+          "Cornerstone",
+          27
+        ],
+        [
+          "Momentum",
+          26
+        ],
+        [
+          "Genesis",
+          23
+        ],
+        [
+          "Compass",
+          22
+        ],
+        [
+          "Lighthouse",
+          22
+        ],
+        [
+          "Spectrum",
+          22
+        ],
+        [
+          "ACE",
+          21
+        ],
+        [
+          "ECS",
+          21
+        ],
+        [
+          "Quantum",
+          20
+        ],
+        [
+          "Elevate",
+          19
+        ],
+        [
+          "Focus",
+          19
+        ],
+        [
+          "Integra",
+          19
+        ],
+        [
+          "Nexus",
+          19
+        ],
+        [
+          "Synergy",
+          19
+        ],
+        [
+          "APS",
+          18
+        ],
+        [
+          "Abacus",
+          18
+        ],
+        [
+          "Apex",
+          18
+        ],
+        [
+          "Elite",
+          18
+        ],
+        [
+          "IMC",
+          18
+        ]
+      ],
+      "website": [
+        [
+          "https://www.",
+          10
+        ],
+        [
+          "https://ppid.lan.go.id/BakaSlot/vici-demo/",
+          10
+        ],
+        [
+          "https://heylink.me/link.indahjp/",
+          9
+        ],
+        [
+          "https://heylink.me/spmbet77_link/",
+          7
+        ],
+        [
+          "https://heylink.me/KEMBARJITU_PRO/",
+          6
+        ],
+        [
+          "https://heylink.me/daftarbonbon777/",
+          5
+        ],
+        [
+          "https://www.t8vip.cc/?af=123987",
+          5
+        ],
+        [
+          "https://www.t8vip.cc/?af=DRY4CW",
+          5
+        ],
+        [
+          "https://ceuvoegroup.carrd.co/",
+          5
+        ],
+        [
+          "https://kkslot77.co/",
+          5
+        ],
+        [
+          "https://servixer.com/",
+          5
+        ],
+        [
+          "https://verllyaling.site/",
+          4
+        ],
+        [
+          "https://apkpail.com/",
+          4
+        ],
+        [
+          "https://spg188.store/big",
+          4
+        ],
+        [
+          "https://freshwavegroup.com/",
+          4
+        ],
+        [
+          "https://roket123.store/",
+          4
+        ],
+        [
+          "https://redwirespace.com",
+          4
+        ],
+        [
+          "https://bio.site/gudangjoker",
+          3
+        ],
+        [
+          "https://apkpail.com/tiktok-18-apk/",
+          3
+        ],
+        [
+          "https://www.bthawk.com/",
+          3
+        ]
+      ],
+      "location": [
+        [
+          "European Union (EU), Europe, Middle East, and Africa (EMEA)",
+          297552
+        ],
+        [
+          "Europe, Middle East, and Africa (EMEA)",
+          187415
+        ],
+        [
+          "Asia-Pacific (APAC)",
+          152793
+        ],
+        [
+          "Latin America",
+          79411
+        ],
+        [
+          "Greater New York Area, East Coast, Northeastern US",
+          60148
+        ],
+        [
+          "Southern US",
+          58180
+        ],
+        [
+          "Great Lakes, Midwestern US",
+          56421
+        ],
+        [
+          "Asia-Pacific (APAC), Australasia",
+          55182
+        ],
+        [
+          "East Coast, Southern US",
+          53237
+        ],
+        [
+          "Greater Los Angeles Area, West Coast, Western US",
+          45946
+        ],
+        [
+          "Western US",
+          30508
+        ],
+        [
+          "European Union (EU), Nordic Countries, Scandinavia, Europe, Middle East, and Africa (EMEA)",
+          28404
+        ],
+        [
+          "Asia-Pacific (APAC), Association of Southeast Asian Nations (ASEAN), Southeast Asia",
+          28236
+        ],
+        [
+          "West Coast, Western US",
+          26773
+        ],
+        [
+          "Great Lakes",
+          26422
+        ],
+        [
+          "Midwestern US",
+          25370
+        ],
+        [
+          "Greater Chicago Area, Great Lakes, Midwestern US",
+          24777
+        ],
+        [
+          "San Francisco Bay Area, West Coast, Western US",
+          23375
+        ],
+        [
+          "Greater Miami Area, East Coast, Southern US",
+          21360
+        ],
+        [
+          "East Coast, New England, Northeastern US",
+          20121
+        ]
+      ],
+      "category": [
+        [
+          "Dental, Health Care, Medical",
+          5620
+        ],
+        [
+          "Information Technology, Software",
+          5154
+        ],
+        [
+          "Software",
+          5061
+        ],
+        [
+          "Real Estate",
+          4715
+        ],
+        [
+          "Manufacturing",
+          4666
+        ],
+        [
+          "Education",
+          4533
+        ],
+        [
+          "Information Technology",
+          4452
+        ],
+        [
+          "Industrial, Machinery Manufacturing, Manufacturing",
+          4444
+        ],
+        [
+          "Health Care",
+          4091
+        ],
+        [
+          "Health Care, Hospital, Medical",
+          4024
+        ],
+        [
+          "Human Resources, Recruiting, Staffing Agency",
+          3840
+        ],
+        [
+          "Financial Services",
+          3593
+        ],
+        [
+          "Industrial, Manufacturing, Product Design",
+          3395
+        ],
+        [
+          "Property Management, Real Estate, Residential",
+          3254
+        ],
+        [
+          "Advertising, Marketing",
+          3245
+        ],
+        [
+          "Consulting",
+          3094
+        ],
+        [
+          "Consulting, Information Technology, Software",
+          3018
+        ],
+        [
+          "Freight Service, Logistics, Transportation",
+          2831
+        ],
+        [
+          "Accounting, Consulting, Financial Services",
+          2803
+        ],
+        [
+          "E-Commerce",
+          2766
+        ]
+      ],
+      "email": [
+        [
+          "info@mysite.com",
+          150
+        ],
+        [
+          "info@example.com",
+          70
+        ],
+        [
+          "896.0248.469@gmail.com",
+          42
+        ],
+        [
+          "johrenk7@gmail.com",
+          29
+        ],
+        [
+          "support@dealerspike.com",
+          25
+        ],
+        [
+          "paulgregory0000@gmail.com",
+          24
+        ],
+        [
+          "info@mydomain.com",
+          19
+        ],
+        [
+          "contact@example.com",
+          18
+        ],
+        [
+          "info@company.com",
+          15
+        ],
+        [
+          "support@insiderealestate.com",
+          15
+        ],
+        [
+          "info@yourdomain.com",
+          14
+        ],
+        [
+          "accessibility@eyecarepro.net",
+          13
+        ],
+        [
+          "info@your-domain.com",
+          12
+        ],
+        [
+          "contact@business.com",
+          12
+        ],
+        [
+          "mail@example.com",
+          11
+        ],
+        [
+          "social@kindred.com",
+          11
+        ],
+        [
+          "enquiries@oaic.gov.au",
+          10
+        ],
+        [
+          "email@example.com",
+          10
+        ],
+        [
+          "contact@company.com",
+          10
+        ],
+        [
+          "crcguestexperience@gmail.com",
+          10
+        ]
+      ],
+      "phone": [
+        [
+          "896.0248.469",
+          161
+        ],
+        [
+          "+91 896.0248.469",
+          126
+        ],
+        [
+          "(961)885.7279",
+          47
+        ],
+        [
+          "+91 (961)885.7279",
+          34
+        ],
+        [
+          "91 896.0248.469",
+          24
+        ],
+        [
+          "961.885.7279",
+          21
+        ],
+        [
+          "7029.670.045",
+          21
+        ],
+        [
+          "91-896.0248.469",
+          19
+        ],
+        [
+          "+91-896.0248.469",
+          18
+        ],
+        [
+          "+91 9618.857.279",
+          17
+        ],
+        [
+          "+1-877-904-4227",
+          16
+        ],
+        [
+          "+91 (961)8857.279",
+          16
+        ],
+        [
+          "+91896.0248.469",
+          15
+        ],
+        [
+          "(800) 837.3734",
+          14
+        ],
+        [
+          "9618.857.279",
+          13
+        ],
+        [
+          "+91 961.885.7279",
+          13
+        ],
+        [
+          "+91 961.8857.279",
+          13
+        ],
+        [
+          "+1 916 445 1254",
+          12
+        ],
+        [
+          "91 (961)885.7279",
+          11
+        ],
+        [
+          "961.8857.279",
+          11
+        ]
+      ],
+      "linkedin": [
+        [
+          "https://www.linkedin.com/company/nsw-government",
+          73
+        ],
+        [
+          "https://www.linkedin.com/company/kelvin-grove-state-college",
+          58
+        ],
+        [
+          "https://www.linkedin.com/company/",
+          24
+        ],
+        [
+          "https://www.linkedin.com/company/imwebcorp",
+          17
+        ],
+        [
+          "https://www.linkedin.com/company",
+          16
+        ],
+        [
+          "https://www.linkedin.com/company/studio-dentistico",
+          14
+        ],
+        [
+          "https://www.linkedin.com/company/\u0431\u043e\u043b\u044c\u043d\u0438\u0446\u0430",
+          10
+        ],
+        [
+          "https://www.linkedin.com/company/wga-engenharia-e-consultoria-ltda",
+          10
+        ],
+        [
+          "https://www.linkedin.com/company/desempregado-e-agora",
+          10
+        ],
+        [
+          "https://www.linkedin.com/company/fujitsu",
+          9
+        ],
+        [
+          "https://www.linkedin.com/company/cma-shtm-polyu",
+          8
+        ],
+        [
+          "https://www.linkedin.com/company/private-tutoring-nwbaker",
+          8
+        ],
+        [
+          "https://www.linkedin.com/company/lanchonete-brasil",
+          8
+        ],
+        [
+          "https://www.linkedin.com/company/vision-metering-llc",
+          8
+        ],
+        [
+          "https://www.linkedin.com/company/university-of-cambridge",
+          7
+        ],
+        [
+          "https://www.linkedin.com/company/ibusinessbox",
+          7
+        ],
+        [
+          "https://www.linkedin.com/company/secretaria-municipal-de-educa\u00e7\u00e3o---semed",
+          6
+        ],
+        [
+          "https://www.linkedin.com/company/afc-urgent-care",
+          6
+        ],
+        [
+          "https://www.linkedin.com/company/pioneer-financial",
+          6
+        ],
+        [
+          "https://www.linkedin.com/company/yousuf-dewan-compnies",
+          6
+        ]
+      ],
+      "facebook": [
+        [
+          "https://www.facebook.com/profile.php",
+          473
+        ],
+        [
+          "https://www.facebook.com",
+          81
+        ],
+        [
+          "https://www.facebook.com/",
+          79
+        ],
+        [
+          "https://m.facebook.com/profile.php",
+          52
+        ],
+        [
+          "https://www.facebook.com/profile.php/",
+          10
+        ],
+        [
+          "https://www.facebook.com/BarcelonaTechCity",
+          7
+        ],
+        [
+          "https://www.facebook.com/wix",
+          7
+        ],
+        [
+          "https://m.facebook.com/profile.php/",
+          7
+        ],
+        [
+          "https://www.facebook.com/profile.php?",
+          6
+        ],
+        [
+          "https://www.facebook.com/servixer",
+          6
+        ],
+        [
+          "http://www.facebook.com/noboxsolutions",
+          5
+        ],
+        [
+          "http://www.facebook.com/",
+          5
+        ],
+        [
+          "https://facebook.com/",
+          5
+        ],
+        [
+          "https://www.facebook.com/getransportation",
+          4
+        ],
+        [
+          "https://www.facebook.com/keylanesoftware",
+          4
+        ],
+        [
+          "https://www.facebook.com/decisionresourcesgroup",
+          4
+        ],
+        [
+          "https://www.facebook.com/neogencorp",
+          4
+        ],
+        [
+          "https://www.facebook.com/lunarpages",
+          4
+        ],
+        [
+          "https://www.facebook.com/arrowfiveyearsout",
+          4
+        ],
+        [
+          "https://www.facebook.com/cbre",
+          4
+        ]
+      ],
+      "twitter": [
+        [
+          "https://twitter.com/",
+          32
+        ],
+        [
+          "https://twitter.com/home",
+          23
+        ],
+        [
+          "https://twitter.com",
+          8
+        ],
+        [
+          "http://www.twitter.com/",
+          7
+        ],
+        [
+          "https://twitter.com/roteskreuz_de",
+          6
+        ],
+        [
+          "https://twitter.com/grupgamma",
+          6
+        ],
+        [
+          "https://twitter.com/ceuvoe",
+          6
+        ],
+        [
+          "https://www.twitter.com/",
+          6
+        ],
+        [
+          "https://twitter.com/servixer",
+          6
+        ],
+        [
+          "https://twitter.com/pkfi",
+          5
+        ],
+        [
+          "https://twitter.com/wix",
+          5
+        ],
+        [
+          "https://twitter.com/royalmovingcoLA",
+          5
+        ],
+        [
+          "https://twitter.com/windsorcares",
+          5
+        ],
+        [
+          "https://www.twitter.com/https://twitter.com/",
+          4
+        ],
+        [
+          "https://twitter.com/intent/follow",
+          4
+        ],
+        [
+          "https://twitter.com/GROUPECOFINA",
+          4
+        ],
+        [
+          "https://twitter.com/dgtechappliance",
+          4
+        ],
+        [
+          "https://twitter.com/freshwavegroup",
+          4
+        ],
+        [
+          "https://twitter.com/muthootindia",
+          4
+        ],
+        [
+          "https://www.twitter.com/getransport",
+          3
+        ]
+      ],
+      "description": [
+        [
+          "Digital Marketing Agency",
+          193
+        ],
+        [
+          "SaaS",
+          133
+        ],
+        [
+          "Mobile App",
+          56
+        ],
+        [
+          "Software Development Company",
+          43
+        ],
+        [
+          "Digital Marketing Company",
+          32
+        ],
+        [
+          "Saas",
+          30
+        ],
+        [
+          "Marketing Agency",
+          26
+        ],
+        [
+          "Information Technology and Services",
+          18
+        ],
+        [
+          "Digital Agency",
+          17
+        ],
+        [
+          "Digital marketing agency",
+          15
+        ],
+        [
+          "Management Consulting",
+          14
+        ],
+        [
+          "Software Company",
+          14
+        ],
+        [
+          "Software development company",
+          13
+        ],
+        [
+          "Custom Software Development Company",
+          13
+        ],
+        [
+          "Digital Marketing",
+          13
+        ],
+        [
+          "Software Development",
+          13
+        ],
+        [
+          "Consulting",
+          12
+        ],
+        [
+          "Marketplace",
+          12
+        ],
+        [
+          "Law Firm",
+          11
+        ],
+        [
+          "IT Services and IT Consulting",
+          10
+        ]
+      ],
+      "employees": [
+        [
+          "c_00011_00050",
+          688395
+        ],
+        [
+          "c_00001_00010",
+          412271
+        ],
+        [
+          "c_00051_00100",
+          159341
+        ],
+        [
+          "c_00101_00250",
+          115242
+        ],
+        [
+          "c_00251_00500",
+          47070
+        ],
+        [
+          "c_00501_01000",
+          31491
+        ],
+        [
+          "c_01001_05000",
+          25639
+        ],
+        [
+          "c_05001_10000",
+          5487
+        ],
+        [
+          "c_10001_max",
+          5466
+        ]
+      ]
+    },
+    "at_least_one_contact": {
+      "rows": 1602141,
+      "pct": 100.0,
+      "missing_rows": 0,
+      "missing_pct": 0.0
+    },
+    "duplicate_values": {
+      "website": {
+        "values_repeated": 478,
+        "extra_rows": 551
+      },
+      "linkedin": {
+        "values_repeated": 3421,
+        "extra_rows": 3847
+      }
+    }
+  },
+  "investors": {
+    "rows_profiled": 8076,
+    "columns": [
+      "id",
+      "name",
+      "kind",
+      "firm",
+      "role",
+      "location_raw",
+      "location_city",
+      "location_country",
+      "stages",
+      "sectors",
+      "check_min_usd",
+      "check_max_usd",
+      "email",
+      "linkedin",
+      "website",
+      "image_url",
+      "bio",
+      "email_pts",
+      "phone_pts",
+      "website_pts",
+      "linkedin_pts",
+      "quality_score",
+      "social_presence",
+      "activity_status",
+      "provenance",
+      "processed_at"
+    ],
+    "nonblank": {
+      "id": {
+        "rows": 8076,
+        "pct": 100.0
+      },
+      "name": {
+        "rows": 8076,
+        "pct": 100.0
+      },
+      "kind": {
+        "rows": 8076,
+        "pct": 100.0
+      },
+      "firm": {
+        "rows": 6515,
+        "pct": 80.67
+      },
+      "role": {
+        "rows": 6572,
+        "pct": 81.38
+      },
+      "location_raw": {
+        "rows": 7076,
+        "pct": 87.62
+      },
+      "location_city": {
+        "rows": 7076,
+        "pct": 87.62
+      },
+      "location_country": {
+        "rows": 7076,
+        "pct": 87.62
+      },
+      "email": {
+        "rows": 2458,
+        "pct": 30.44
+      },
+      "linkedin": {
+        "rows": 7438,
+        "pct": 92.1
+      },
+      "website": {
+        "rows": 7485,
+        "pct": 92.68
+      },
+      "sectors": {
+        "rows": 8076,
+        "pct": 100.0
+      },
+      "stages": {
+        "rows": 8076,
+        "pct": 100.0
+      }
+    },
+    "unique": {
+      "id": 8076,
+      "name": 8056,
+      "kind": 2,
+      "firm": 2460,
+      "role": 913,
+      "location_raw": 756,
+      "location_city": 560,
+      "location_country": 240,
+      "email": 2458,
+      "linkedin": 7387,
+      "website": 2648,
+      "sectors": 259,
+      "stages": 23
+    },
+    "top": {
+      "id": [
+        [
+          "ent-5fc096e79efd",
+          1
+        ],
+        [
+          "ent-af006de58eff",
+          1
+        ],
+        [
+          "individual-68a06c02304e489b",
+          1
+        ],
+        [
+          "individual-65bc51a5068f42e9",
+          1
+        ],
+        [
+          "individual-94b72b65caa8808f",
+          1
+        ],
+        [
+          "individual-5d21d17e3fe8d82e",
+          1
+        ],
+        [
+          "individual-6376ed685d105036",
+          1
+        ],
+        [
+          "individual-5ec8bba87c2853b5",
+          1
+        ],
+        [
+          "individual-691521ff50914779",
+          1
+        ],
+        [
+          "individual-ff849bf623e20ffe",
+          1
+        ],
+        [
+          "individual-e387fee0cb84742c",
+          1
+        ],
+        [
+          "individual-0f071884fe033628",
+          1
+        ],
+        [
+          "individual-0f6fc5bb4619baad",
+          1
+        ],
+        [
+          "individual-37af199ff43d4e8b",
+          1
+        ],
+        [
+          "individual-4b3c7b6cba715e1e",
+          1
+        ],
+        [
+          "individual-2b727358385bcde9",
+          1
+        ],
+        [
+          "individual-6eba1056798febdc",
+          1
+        ],
+        [
+          "individual-65b1f58a9cd7452b",
+          1
+        ],
+        [
+          "individual-392a674b4c823c4f",
+          1
+        ],
+        [
+          "individual-39beca648291efc4",
+          1
+        ]
+      ],
+      "name": [
+        [
+          "Abhishek Sharma",
+          2
+        ],
+        [
+          "Andy Dunn",
+          2
+        ],
+        [
+          "Ankur Nagpal",
+          2
+        ],
+        [
+          "Brandon Deer",
+          2
+        ],
+        [
+          "Daniel Dines",
+          2
+        ],
+        [
+          "Drew Houston",
+          2
+        ],
+        [
+          "Jose Marin",
+          2
+        ],
+        [
+          "Michael Yang",
+          2
+        ],
+        [
+          "Raphael Danilo",
+          2
+        ],
+        [
+          "Zane Lackey",
+          2
+        ],
+        [
+          "Brian Long",
+          2
+        ],
+        [
+          "Varun Agarwal",
+          2
+        ],
+        [
+          "Adam Gross",
+          2
+        ],
+        [
+          "Alex Rigby",
+          2
+        ],
+        [
+          "Brian O'Kelley",
+          2
+        ],
+        [
+          "Florian Seroussi",
+          2
+        ],
+        [
+          "Jake Zeller",
+          2
+        ],
+        [
+          "Martin Tajur",
+          2
+        ],
+        [
+          "Maximilian Hasler",
+          2
+        ],
+        [
+          "Taz Patel",
+          2
+        ]
+      ],
+      "kind": [
+        [
+          "individual",
+          7439
+        ],
+        [
+          "firm",
+          637
+        ]
+      ],
+      "firm": [
+        [
+          "Antler",
+          114
+        ],
+        [
+          "a16z Scout Fund",
+          93
+        ],
+        [
+          "Accel",
+          84
+        ],
+        [
+          "Independent",
+          79
+        ],
+        [
+          "General Catalyst",
+          69
+        ],
+        [
+          "Lightspeed Venture Partners",
+          62
+        ],
+        [
+          "Insight Partners",
+          47
+        ],
+        [
+          "Sequoia Capital",
+          44
+        ],
+        [
+          "Headline",
+          32
+        ],
+        [
+          "a16z",
+          32
+        ],
+        [
+          "Index Ventures",
+          31
+        ],
+        [
+          "Khosla Ventures",
+          29
+        ],
+        [
+          "Duke Capital Partners",
+          28
+        ],
+        [
+          "Bain Capital Ventures",
+          26
+        ],
+        [
+          "Pegasus Tech Ventures",
+          26
+        ],
+        [
+          "Bessemer Venture Partners",
+          24
+        ],
+        [
+          "Greylock",
+          23
+        ],
+        [
+          "Alumni Ventures",
+          21
+        ],
+        [
+          "Greycroft",
+          21
+        ],
+        [
+          "NextGen Venture Partners",
+          21
+        ]
+      ],
+      "role": [
+        [
+          "Partner",
+          1157
+        ],
+        [
+          "Investor",
+          853
+        ],
+        [
+          "General Partner",
+          485
+        ],
+        [
+          "Managing Partner",
+          435
+        ],
+        [
+          "Principal",
+          282
+        ],
+        [
+          "Managing Director",
+          202
+        ],
+        [
+          "Founding Partner",
+          161
+        ],
+        [
+          "Associate",
+          117
+        ],
+        [
+          "Co-Founder and Managing Partner",
+          105
+        ],
+        [
+          "Founder and Managing Partner",
+          101
+        ],
+        [
+          "Co-Founder",
+          96
+        ],
+        [
+          "Co-Founder and General Partner",
+          84
+        ],
+        [
+          "Founder",
+          82
+        ],
+        [
+          "Senior Associate",
+          79
+        ],
+        [
+          "CEO",
+          78
+        ],
+        [
+          "Venture Partner",
+          76
+        ],
+        [
+          "Founder & CEO",
+          71
+        ],
+        [
+          "Analyst",
+          54
+        ],
+        [
+          "Founder and General Partner",
+          50
+        ],
+        [
+          "Co-Founder and Partner",
+          50
+        ]
+      ],
+      "location_raw": [
+        [
+          "Unknown",
+          769
+        ],
+        [
+          "San Francisco, California, United States",
+          571
+        ],
+        [
+          "New York, New York",
+          484
+        ],
+        [
+          "San Francisco, California",
+          483
+        ],
+        [
+          "New York, New York, United States",
+          372
+        ],
+        [
+          "San Francisco Bay Area",
+          263
+        ],
+        [
+          "Menlo Park, California",
+          192
+        ],
+        [
+          "United States",
+          182
+        ],
+        [
+          "London, England, United Kingdom",
+          136
+        ],
+        [
+          "Palo Alto, California",
+          134
+        ],
+        [
+          "Los Angeles, California",
+          109
+        ],
+        [
+          "Los Angeles, California, United States",
+          83
+        ],
+        [
+          "Boston, Massachusetts",
+          80
+        ],
+        [
+          "Palo Alto, California, United States",
+          75
+        ],
+        [
+          "Bengaluru, Karnataka, India",
+          73
+        ],
+        [
+          "Chicago, Illinois",
+          65
+        ],
+        [
+          "United Kingdom",
+          60
+        ],
+        [
+          "Boston, Massachusetts, United States",
+          57
+        ],
+        [
+          "New York City Metropolitan Area",
+          50
+        ],
+        [
+          "Berlin, Berlin, Germany",
+          49
+        ]
+      ],
+      "location_city": [
+        [
+          "San Francisco",
+          1093
+        ],
+        [
+          "New York",
+          872
+        ],
+        [
+          "Unknown",
+          769
+        ],
+        [
+          "San Francisco Bay Area",
+          263
+        ],
+        [
+          "Menlo Park",
+          230
+        ],
+        [
+          "Palo Alto",
+          222
+        ],
+        [
+          "Los Angeles",
+          195
+        ],
+        [
+          "United States",
+          182
+        ],
+        [
+          "London",
+          177
+        ],
+        [
+          "Boston",
+          145
+        ],
+        [
+          "Chicago",
+          109
+        ],
+        [
+          "Bengaluru",
+          76
+        ],
+        [
+          "Austin",
+          72
+        ],
+        [
+          "Cambridge",
+          69
+        ],
+        [
+          "Berlin",
+          67
+        ],
+        [
+          "United Kingdom",
+          60
+        ],
+        [
+          "Paris",
+          58
+        ],
+        [
+          "Washington",
+          57
+        ],
+        [
+          "Atlanta",
+          53
+        ],
+        [
+          "Brooklyn",
+          52
+        ]
+      ],
+      "location_country": [
+        [
+          "United States",
+          1944
+        ],
+        [
+          "California",
+          1133
+        ],
+        [
+          "Unknown",
+          769
+        ],
+        [
+          "New York",
+          532
+        ],
+        [
+          "United Kingdom",
+          275
+        ],
+        [
+          "San Francisco Bay Area",
+          263
+        ],
+        [
+          "India",
+          147
+        ],
+        [
+          "Massachusetts",
+          127
+        ],
+        [
+          "Germany",
+          115
+        ],
+        [
+          "Canada",
+          87
+        ],
+        [
+          "Colorado",
+          87
+        ],
+        [
+          "France",
+          86
+        ],
+        [
+          "USA",
+          86
+        ],
+        [
+          "Illinois",
+          67
+        ],
+        [
+          "Israel",
+          66
+        ],
+        [
+          "New York City Metropolitan Area",
+          50
+        ],
+        [
+          "Singapore",
+          48
+        ],
+        [
+          "Texas",
+          43
+        ],
+        [
+          "Multiple locations worldwide",
+          37
+        ],
+        [
+          "Los Angeles Metropolitan Area",
+          35
+        ]
+      ],
+      "email": [
+        [
+          "ahilaly@baincapital.com",
+          1
+        ],
+        [
+          "aaron.samuels@collidecap.com",
+          1
+        ],
+        [
+          "rredfield@406ventures.com",
+          1
+        ],
+        [
+          "kathryn@406ventures.com",
+          1
+        ],
+        [
+          "marin@406ventures.com",
+          1
+        ],
+        [
+          "austin@406ventures.com",
+          1
+        ],
+        [
+          "gbrooks@406ventures.com",
+          1
+        ],
+        [
+          "mcirino@406ventures.com",
+          1
+        ],
+        [
+          "gdracon@406ventures.com",
+          1
+        ],
+        [
+          "payal@406ventures.com",
+          1
+        ],
+        [
+          "ldonohue@406ventures.com",
+          1
+        ],
+        [
+          "kevin@406ventures.com",
+          1
+        ],
+        [
+          "nico.schoenenberger@10xfounders.com",
+          1
+        ],
+        [
+          "julian.wachtel@10xfounders.com",
+          1
+        ],
+        [
+          "jessica.lieber@10xfounders.com",
+          1
+        ],
+        [
+          "jan.becker@10xfounders.com",
+          1
+        ],
+        [
+          "andreas.etten@10xfounders.com",
+          1
+        ],
+        [
+          "ozge@212.vc",
+          1
+        ],
+        [
+          "kivanc@212.vc",
+          1
+        ],
+        [
+          "emin@212.vc",
+          1
+        ]
+      ],
+      "linkedin": [
+        [
+          "http://linkedin.com/company/about.me",
+          4
+        ],
+        [
+          "http://linkedin.com/company/angellist",
+          4
+        ],
+        [
+          "https://linkedin.com/company/antlerglobal",
+          3
+        ],
+        [
+          "https://linkedin.com/company/khosla-ventures",
+          3
+        ],
+        [
+          "https://linkedin.com/company/norwest-venture-partners",
+          3
+        ],
+        [
+          "https://linkedin.com/company/one-way-ventures",
+          3
+        ],
+        [
+          "https://linkedin.com/company/operator-collective",
+          3
+        ],
+        [
+          "https://linkedin.com/company/storm-ventures",
+          3
+        ],
+        [
+          "https://www.linkedin.com/in/dana-guthrie/",
+          2
+        ],
+        [
+          "https://www.linkedin.com/in/iakhund/",
+          2
+        ],
+        [
+          "https://www.linkedin.com/in/amazing-opportunity/",
+          2
+        ],
+        [
+          "https://linkedin.com/company/union-square-ventures",
+          2
+        ],
+        [
+          "https://linkedin.com/company/lerer-hippeau-ventures",
+          2
+        ],
+        [
+          "https://www.linkedin.com/in/mariogabriele/",
+          2
+        ],
+        [
+          "https://linkedin.com/company/craft-ventures",
+          2
+        ],
+        [
+          "https://www.linkedin.com/in/nikhil-krishnan-60400947/",
+          2
+        ],
+        [
+          "https://linkedin.com/company/point72-ventures",
+          2
+        ],
+        [
+          "https://www.linkedin.com/in/tahseen-rashid/",
+          2
+        ],
+        [
+          "https://www.linkedin.com/in/zachcoelius/",
+          2
+        ],
+        [
+          "https://www.linkedin.com/company/latticefund?",
+          2
+        ]
+      ],
+      "website": [
+        [
+          "https://antler.co",
+          114
+        ],
+        [
+          "https://a16z.com",
+          93
+        ],
+        [
+          "https://accel.com",
+          84
+        ],
+        [
+          "https://generalcatalyst.com",
+          70
+        ],
+        [
+          "https://lsvp.com",
+          63
+        ],
+        [
+          "http://www.insightpartners.com/",
+          47
+        ],
+        [
+          "https://sequoiacap.com",
+          45
+        ],
+        [
+          "https://headline.com",
+          32
+        ],
+        [
+          "https://indexventures.com",
+          32
+        ],
+        [
+          "http://www.a16z.com",
+          32
+        ],
+        [
+          "https://khoslaventures.com",
+          30
+        ],
+        [
+          "https://dukecapitalpartners.duke.edu",
+          29
+        ],
+        [
+          "https://pegasustechventures.com",
+          26
+        ],
+        [
+          "http://www.bvp.com",
+          24
+        ],
+        [
+          "https://nextgenvp.com",
+          22
+        ],
+        [
+          "https://greylock.com",
+          22
+        ],
+        [
+          "https://av.vc",
+          21
+        ],
+        [
+          "https://greycroft.com",
+          21
+        ],
+        [
+          "http://about.me",
+          21
+        ],
+        [
+          "https://craftventures.com",
+          20
+        ]
+      ],
+      "sectors": [
+        [
+          "Fintech",
+          2206
+        ],
+        [
+          "SaaS",
+          1690
+        ],
+        [
+          "Consumer",
+          1571
+        ],
+        [
+          "AI",
+          1556
+        ],
+        [
+          "Enterprise",
+          1389
+        ],
+        [
+          "Agentic AI AI Infrastructure Artificial Intelligence (AI) Foundational AI Generative AI",
+          1252
+        ],
+        [
+          "Health",
+          1141
+        ],
+        [
+          "Cybersecurity",
+          762
+        ],
+        [
+          "Biotech",
+          678
+        ],
+        [
+          "Deeptech / Hardware",
+          517
+        ],
+        [
+          "Climate",
+          511
+        ],
+        [
+          "Healthcare",
+          508
+        ],
+        [
+          "Media",
+          480
+        ],
+        [
+          "Crypto & Blockchain",
+          432
+        ],
+        [
+          "AI & ML",
+          357
+        ],
+        [
+          "Education",
+          348
+        ],
+        [
+          "Future of Work",
+          336
+        ],
+        [
+          "Web3 / Crypto",
+          336
+        ],
+        [
+          "Logistics",
+          316
+        ],
+        [
+          "Data",
+          313
+        ]
+      ],
+      "stages": [
+        [
+          "Seed",
+          3253
+        ],
+        [
+          "Series A",
+          2391
+        ],
+        [
+          "Pre-seed",
+          1579
+        ],
+        [
+          "Pre-Seed",
+          1224
+        ],
+        [
+          "Invest",
+          1079
+        ],
+        [
+          "Series B+",
+          957
+        ],
+        [
+          "early_stage",
+          803
+        ],
+        [
+          "Early Revenue",
+          765
+        ],
+        [
+          "Prototype",
+          598
+        ],
+        [
+          "Scaling",
+          447
+        ],
+        [
+          "Idea/Patent",
+          427
+        ],
+        [
+          "Late Stage",
+          404
+        ],
+        [
+          "Growth",
+          271
+        ],
+        [
+          "Series B",
+          162
+        ],
+        [
+          "pre_ipo",
+          72
+        ],
+        [
+          "Early Stage",
+          72
+        ],
+        [
+          "Series C",
+          39
+        ],
+        [
+          "series_d",
+          23
+        ],
+        [
+          "debt",
+          8
+        ],
+        [
+          "ipo",
+          4
+        ]
+      ]
+    },
+    "at_least_one_contact": {
+      "rows": 7564,
+      "pct": 93.66,
+      "missing_rows": 512,
+      "missing_pct": 6.34
+    },
+    "duplicate_values": {
+      "id": {
+        "values_repeated": 0,
+        "extra_rows": 0
+      },
+      "website": {
+        "values_repeated": 1370,
+        "extra_rows": 4837
+      },
+      "linkedin": {
+        "values_repeated": 41,
+        "extra_rows": 51
+      }
+    }
+  },
+  "businesses_sample": {
+    "rows_profiled": 455000,
+    "columns": [
+      "registry_id",
+      "name",
+      "category",
+      "category_raw",
+      "junk_flag",
+      "address",
+      "locality",
+      "region",
+      "country",
+      "lat",
+      "lon",
+      "phone",
+      "email",
+      "website",
+      "domain",
+      "confidence",
+      "evidence",
+      "quality_score",
+      "social_presence",
+      "activity_status",
+      "source_file"
+    ],
+    "nonblank": {
+      "registry_id": {
+        "rows": 455000,
+        "pct": 100.0
+      },
+      "name": {
+        "rows": 455000,
+        "pct": 100.0
+      },
+      "category": {
+        "rows": 440570,
+        "pct": 96.83
+      },
+      "category_raw": {
+        "rows": 440570,
+        "pct": 96.83
+      },
+      "locality": {
+        "rows": 434253,
+        "pct": 95.44
+      },
+      "region": {
+        "rows": 101988,
+        "pct": 22.41
+      },
+      "country": {
+        "rows": 455000,
+        "pct": 100.0
+      },
+      "phone": {
+        "rows": 308725,
+        "pct": 67.85
+      },
+      "email": {
+        "rows": 0,
+        "pct": 0.0
+      },
+      "website": {
+        "rows": 237959,
+        "pct": 52.3
+      },
+      "domain": {
+        "rows": 237688,
+        "pct": 52.24
+      },
+      "junk_flag": {
+        "rows": 455000,
+        "pct": 100.0
+      }
+    },
+    "unique": {
+      "registry_id": 454980,
+      "name": 424417,
+      "category": 1542,
+      "category_raw": 1557,
+      "locality": 14915,
+      "region": 1907,
+      "country": 90,
+      "phone": 292234,
+      "email": 0,
+      "website": 217874,
+      "domain": 169265,
+      "junk_flag": 2
+    },
+    "top": {
+      "registry_id": [
+        [
+          "de973b2c-0141-49b8-81c9-6bffbb97d5fd",
+          2
+        ],
+        [
+          "09fd7aaf-9e36-444d-b15a-6b522295da4e",
+          2
+        ],
+        [
+          "c1781196-cbea-4e71-a68f-ad13e5cea9b3",
+          2
+        ],
+        [
+          "0cd1d39b-9b1e-44e0-a16b-8e7b8ab35a26",
+          2
+        ],
+        [
+          "a51975ab-4428-4f28-9244-7e52eabf4a90",
+          2
+        ],
+        [
+          "a387b367-22d4-4b9a-bfeb-91f493995584",
+          2
+        ],
+        [
+          "3dd1ee6a-c4d3-432b-ab55-f27784390e6b",
+          2
+        ],
+        [
+          "96fa21cd-3d8b-4847-bf3d-9636ac50bfd9",
+          2
+        ],
+        [
+          "1fe91c01-13dc-44d4-b16a-d35541912314",
+          2
+        ],
+        [
+          "8fe6decd-294d-4df8-906f-acc32f0be708",
+          2
+        ],
+        [
+          "38f455fa-3e4c-41a5-bbfc-202f4d093a85",
+          2
+        ],
+        [
+          "7e17f952-8cf5-4593-8e7c-afe6670c8321",
+          2
+        ],
+        [
+          "be01953b-31af-40c9-8bfc-48647979253e",
+          2
+        ],
+        [
+          "f2834f7d-d803-4e56-8654-043fef601d98",
+          2
+        ],
+        [
+          "1313c14e-d69e-465e-9985-99a73d13c124",
+          2
+        ],
+        [
+          "856e67d8-1475-4615-91eb-cdf03d044e22",
+          2
+        ],
+        [
+          "04788529-f932-46ad-9d57-12bb0abf1592",
+          2
+        ],
+        [
+          "6bc0db8b-9361-422a-9477-bc5a3521224a",
+          2
+        ],
+        [
+          "7dd6d1fc-3241-45d9-a7a4-587b456fec52",
+          2
+        ],
+        [
+          "fcb37a28-2652-461d-8347-5367306d92b7",
+          2
+        ]
+      ],
+      "name": [
+        [
+          "Wildberries",
+          595
+        ],
+        [
+          "Shell",
+          522
+        ],
+        [
+          "TotalEnergies",
+          433
+        ],
+        [
+          "Western Union",
+          334
+        ],
+        [
+          "Starbucks",
+          320
+        ],
+        [
+          "McDonald's",
+          281
+        ],
+        [
+          "7-Eleven",
+          243
+        ],
+        [
+          "KFC",
+          239
+        ],
+        [
+          "\u30c0\u30a4\u30c9\u30fc\u30c9\u30ea\u30f3\u30b3",
+          225
+        ],
+        [
+          "\u0634\u0644",
+          217
+        ],
+        [
+          "The Church of Jesus Christ of Latter-day Saints",
+          216
+        ],
+        [
+          "Subway",
+          175
+        ],
+        [
+          "Lidl",
+          146
+        ],
+        [
+          "Burger King",
+          145
+        ],
+        [
+          "Pizza Hut",
+          133
+        ],
+        [
+          "OmanOil",
+          119
+        ],
+        [
+          "Studenac Market",
+          105
+        ],
+        [
+          "Bonjour",
+          98
+        ],
+        [
+          "Pepco",
+          96
+        ],
+        [
+          "ATM 7ELEVEN-FCTI",
+          92
+        ]
+      ],
+      "category": [
+        [
+          "restaurant",
+          36458
+        ],
+        [
+          "hotel",
+          35850
+        ],
+        [
+          "cafe",
+          16258
+        ],
+        [
+          "landmark_and_historical_building",
+          11493
+        ],
+        [
+          "school",
+          6912
+        ],
+        [
+          "beauty_salon",
+          6571
+        ],
+        [
+          "grocery_store",
+          6025
+        ],
+        [
+          "church_cathedral",
+          5988
+        ],
+        [
+          "shopping",
+          5763
+        ],
+        [
+          "gym",
+          5641
+        ],
+        [
+          "hospital",
+          4966
+        ],
+        [
+          "gas_station",
+          4954
+        ],
+        [
+          "central_government_office",
+          4854
+        ],
+        [
+          "clothing_store",
+          4574
+        ],
+        [
+          "beach",
+          4548
+        ],
+        [
+          "professional_services",
+          4456
+        ],
+        [
+          "dentist",
+          4445
+        ],
+        [
+          "automotive_repair",
+          4355
+        ],
+        [
+          "religious_organization",
+          4098
+        ],
+        [
+          "structure_and_geography",
+          3933
+        ]
+      ],
+      "category_raw": [
+        [
+          "hotel",
+          24730
+        ],
+        [
+          "restaurant",
+          17949
+        ],
+        [
+          "landmark_and_historical_building",
+          12365
+        ],
+        [
+          "beauty_salon",
+          7821
+        ],
+        [
+          "school",
+          6949
+        ],
+        [
+          "cafe",
+          6827
+        ],
+        [
+          "grocery_store",
+          6517
+        ],
+        [
+          "church_cathedral",
+          6008
+        ],
+        [
+          "shopping",
+          5962
+        ],
+        [
+          "beach",
+          5365
+        ],
+        [
+          "bar",
+          5202
+        ],
+        [
+          "hospital",
+          5163
+        ],
+        [
+          "gas_station",
+          5035
+        ],
+        [
+          "coffee_shop",
+          4964
+        ],
+        [
+          "central_government_office",
+          4906
+        ],
+        [
+          "professional_services",
+          4742
+        ],
+        [
+          "clothing_store",
+          4593
+        ],
+        [
+          "automotive_repair",
+          4387
+        ],
+        [
+          "accommodation",
+          4207
+        ],
+        [
+          "religious_organization",
+          4131
+        ]
+      ],
+      "locality": [
+        [
+          "Lagos",
+          6008
+        ],
+        [
+          "Singapore",
+          4854
+        ],
+        [
+          "Ensenada",
+          4403
+        ],
+        [
+          "Vigo",
+          4304
+        ],
+        [
+          "Bratislava",
+          4143
+        ],
+        [
+          "Colombo",
+          3806
+        ],
+        [
+          "\u0623\u0628\u0648\u0638\u0628\u064a",
+          3622
+        ],
+        [
+          "Ph\u00fa Qu\u1ed1c",
+          3533
+        ],
+        [
+          "Chiclayo",
+          3443
+        ],
+        [
+          "Hong Kong",
+          3427
+        ],
+        [
+          "\u0535\u0580\u0565\u0582\u0561\u0576",
+          3349
+        ],
+        [
+          "Austin",
+          3231
+        ],
+        [
+          "\u9ad8\u96c4\u5e02",
+          3148
+        ],
+        [
+          "Pasto",
+          3106
+        ],
+        [
+          "Puerto Princesa City",
+          2867
+        ],
+        [
+          "\u10d1\u10d0\u10d7\u10e3\u10db\u10d8",
+          2846
+        ],
+        [
+          "Klaip\u0117da",
+          2833
+        ],
+        [
+          "Reykjav\u00edkurborg",
+          2603
+        ],
+        [
+          "\u77f3\u57a3\u5e02",
+          2581
+        ],
+        [
+          "Timi\u0219oara",
+          2571
+        ]
+      ],
+      "region": [
+        [
+          "AC",
+          6512
+        ],
+        [
+          "CA",
+          5154
+        ],
+        [
+          "TX",
+          4994
+        ],
+        [
+          "LA",
+          4237
+        ],
+        [
+          "WA",
+          3982
+        ],
+        [
+          "02",
+          3913
+        ],
+        [
+          "88",
+          3866
+        ],
+        [
+          "WC",
+          3795
+        ],
+        [
+          "GJ",
+          3360
+        ],
+        [
+          "NIR",
+          2954
+        ],
+        [
+          "83",
+          2826
+        ],
+        [
+          "11",
+          2819
+        ],
+        [
+          "STL",
+          2266
+        ],
+        [
+          "GE",
+          1752
+        ],
+        [
+          "Vorarlberg",
+          1665
+        ],
+        [
+          "YT",
+          1658
+        ],
+        [
+          "Luxembourg",
+          1456
+        ],
+        [
+          "09",
+          1435
+        ],
+        [
+          "CO",
+          1420
+        ],
+        [
+          "31",
+          1417
+        ]
+      ],
+      "country": [
+        [
+          "US",
+          10000
+        ],
+        [
+          "AE",
+          5000
+        ],
+        [
+          "AM",
+          5000
+        ],
+        [
+          "AR",
+          5000
+        ],
+        [
+          "AT",
+          5000
+        ],
+        [
+          "AU",
+          5000
+        ],
+        [
+          "AZ",
+          5000
+        ],
+        [
+          "BD",
+          5000
+        ],
+        [
+          "BE",
+          5000
+        ],
+        [
+          "BG",
+          5000
+        ],
+        [
+          "BH",
+          5000
+        ],
+        [
+          "BO",
+          5000
+        ],
+        [
+          "BR",
+          5000
+        ],
+        [
+          "CA",
+          5000
+        ],
+        [
+          "CH",
+          5000
+        ],
+        [
+          "CL",
+          5000
+        ],
+        [
+          "CO",
+          5000
+        ],
+        [
+          "CR",
+          5000
+        ],
+        [
+          "CY",
+          5000
+        ],
+        [
+          "CZ",
+          5000
+        ]
+      ],
+      "phone": [
+        [
+          "+96880076626",
+          119
+        ],
+        [
+          "+38572000990",
+          92
+        ],
+        [
+          "+13629886700",
+          72
+        ],
+        [
+          "+18001288999",
+          51
+        ],
+        [
+          "+11246201305",
+          48
+        ],
+        [
+          "+19426792001",
+          46
+        ],
+        [
+          "+998781401414",
+          46
+        ],
+        [
+          "+994124930091",
+          42
+        ],
+        [
+          "+18002440404",
+          41
+        ],
+        [
+          "+18095424752",
+          40
+        ],
+        [
+          "+18183892121",
+          40
+        ],
+        [
+          "+18002758777",
+          37
+        ],
+        [
+          "+9118605005555",
+          36
+        ],
+        [
+          "+528183202020",
+          34
+        ],
+        [
+          "+17079375804",
+          34
+        ],
+        [
+          "+18001241222",
+          32
+        ],
+        [
+          "+17039001900",
+          31
+        ],
+        [
+          "+37061255515",
+          30
+        ],
+        [
+          "+31880333033",
+          30
+        ],
+        [
+          "+18334510105",
+          28
+        ]
+      ],
+      "email": [],
+      "website": [
+        [
+          "https://www.oomco.com/",
+          127
+        ],
+        [
+          "https://www.starbucks.com.kw",
+          117
+        ],
+        [
+          "https://www.7-eleven.com/",
+          113
+        ],
+        [
+          "https://www.studenac.hr/",
+          104
+        ],
+        [
+          "http://gmail.com/",
+          93
+        ],
+        [
+          "https://www.yalwa.com.au",
+          93
+        ],
+        [
+          "https://www.omantel.om/",
+          85
+        ],
+        [
+          "https://totalenergies.com.gh/",
+          83
+        ],
+        [
+          "https://www.posta.si/",
+          78
+        ],
+        [
+          "https://www.azercell.com/az/",
+          70
+        ],
+        [
+          "https://www.mcdonalds.com/",
+          69
+        ],
+        [
+          "http://www.mcdonaldsarabia.com/kuwait",
+          65
+        ],
+        [
+          "http://www.nahdionline.com/",
+          62
+        ],
+        [
+          "https://www.profi.ro/",
+          57
+        ],
+        [
+          "https://kapitalbank.az/",
+          54
+        ],
+        [
+          "https://www.dunkinksa.com/",
+          50
+        ],
+        [
+          "https://korzinka.uz/",
+          46
+        ],
+        [
+          "http://www.yperman.net",
+          45
+        ],
+        [
+          "https://podorozhnyk.ua/?utm_source=getpin&utm_medium=bingmaps&utm_content=link",
+          45
+        ],
+        [
+          "http://hotmail.com/",
+          43
+        ]
+      ],
+      "domain": [
+        [
+          "instagram.com",
+          5599
+        ],
+        [
+          "facebook.com",
+          1702
+        ],
+        [
+          "linktr.ee",
+          1342
+        ],
+        [
+          "wa.me",
+          951
+        ],
+        [
+          "youtube.com",
+          861
+        ],
+        [
+          "booking.com",
+          763
+        ],
+        [
+          "maps.app.goo.gl",
+          715
+        ],
+        [
+          "find.shell.com",
+          621
+        ],
+        [
+          "t.me",
+          510
+        ],
+        [
+          "bit.ly",
+          498
+        ],
+        [
+          "en.wikipedia.org",
+          451
+        ],
+        [
+          "tiktok.com",
+          420
+        ],
+        [
+          "sites.google.com",
+          373
+        ],
+        [
+          "twitter.com",
+          303
+        ],
+        [
+          "google.com",
+          300
+        ],
+        [
+          "goo.gl",
+          296
+        ],
+        [
+          "airbnb.com",
+          287
+        ],
+        [
+          "dancenter.de",
+          274
+        ],
+        [
+          "wa.link",
+          247
+        ],
+        [
+          "local.churchofjesuschrist.org",
+          225
+        ]
+      ],
+      "junk_flag": [
+        [
+          "0",
+          429175
+        ],
+        [
+          "1",
+          25825
+        ]
+      ]
+    },
+    "at_least_one_contact": {
+      "rows": 363540,
+      "pct": 79.9,
+      "missing_rows": 91460,
+      "missing_pct": 20.1
+    },
+    "duplicate_values": {
+      "registry_id": {
+        "values_repeated": 20,
+        "extra_rows": 20
+      },
+      "domain": {
+        "values_repeated": 17511,
+        "extra_rows": 68423
+      },
+      "website": {
+        "values_repeated": 8850,
+        "extra_rows": 20085
+      }
+    }
+  }
+}

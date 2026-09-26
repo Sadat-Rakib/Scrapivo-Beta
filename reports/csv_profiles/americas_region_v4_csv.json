@@ -1,0 +1,213 @@
+{
+  "key": "americas_region_v4.csv",
+  "size": 1099341,
+  "last_modified": "2026-09-08 00:14:53+00:00",
+  "columns": [
+    "fullname",
+    "firstname",
+    "lastname",
+    "Title",
+    "asdads",
+    "company",
+    "email",
+    "Email Status",
+    "Seniority",
+    "Departments",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Stage",
+    "# Employees",
+    "Industry",
+    "Keywords",
+    "Person Linkedin Url",
+    "Website"
+  ],
+  "row_count": 2623,
+  "sampled_rows": 2623,
+  "delimiter": ",",
+  "roles": {
+    "fullname": "last_name",
+    "firstname": "first_name",
+    "lastname": "last_name",
+    "Title": "title",
+    "asdads": "other",
+    "company": "company",
+    "email": "email",
+    "Email Status": "email",
+    "Seniority": "other",
+    "Departments": "other",
+    "First Phone": "phone",
+    "Work Direct Phone": "phone",
+    "Home Phone": "phone",
+    "Mobile Phone": "phone",
+    "Corporate Phone": "phone",
+    "Other Phone": "phone",
+    "Stage": "other",
+    "# Employees": "employees",
+    "Industry": "industry",
+    "Keywords": "descriptive",
+    "Person Linkedin Url": "linkedin",
+    "Website": "website"
+  },
+  "missing_pct": {
+    "fullname": 0.0,
+    "firstname": 0.0,
+    "lastname": 0.5,
+    "Title": 0.0,
+    "asdads": 0.0,
+    "company": 0.0,
+    "email": 0.0,
+    "Email Status": 0.0,
+    "Seniority": 0.0,
+    "Departments": 20.5,
+    "First Phone": 5.3,
+    "Work Direct Phone": 100.0,
+    "Home Phone": 100.0,
+    "Mobile Phone": 99.7,
+    "Corporate Phone": 5.3,
+    "Other Phone": 99.7,
+    "Stage": 0.0,
+    "# Employees": 0.5,
+    "Industry": 1.2,
+    "Keywords": 12.2,
+    "Person Linkedin Url": 0.0,
+    "Website": 0.3
+  },
+  "samples": {
+    "fullname": [
+      "Marco",
+      "Justin",
+      "Melanie"
+    ],
+    "firstname": [
+      "Marco",
+      "Justin",
+      "Melanie"
+    ],
+    "lastname": [
+      "Souza",
+      "Schnell",
+      "Moore"
+    ],
+    "Title": [
+      "Supervisor de Processos de Produção na BASF S/A.",
+      "Senior Manager - Credit Operations & Financial Services",
+      "Project Manager"
+    ],
+    "asdads": [
+      "BASF",
+      "The Home Depot",
+      "University of Illinois at Urbana-Champaign"
+    ],
+    "company": [
+      "BASF",
+      "The Home Depot",
+      "University of Illinois at Urbana-Champaign"
+    ],
+    "email": [
+      "marco.souza@basf.com",
+      "justin_schnell@homedepot.com",
+      "mamoore5@illinois.edu"
+    ],
+    "Email Status": [
+      "Guessed",
+      "Verified",
+      "Verified"
+    ],
+    "Seniority": [
+      "Manager",
+      "Manager",
+      "Manager"
+    ],
+    "First Phone": [
+      "'+49 621 600",
+      "'+1 770-433-8211",
+      "'+1 217-333-3077"
+    ],
+    "Corporate Phone": [
+      "'+49 621 600",
+      "'+1 770-433-8211",
+      "'+1 217-333-3077"
+    ],
+    "Stage": [
+      "Cold",
+      "Cold",
+      "Cold"
+    ],
+    "# Employees": [
+      "112000",
+      "463000",
+      "22000"
+    ],
+    "Industry": [
+      "chemicals",
+      "retail",
+      "higher education"
+    ],
+    "Keywords": [
+      "chemicals, performance products, functional materials, solutions, agricultural solutions, oil, gas",
+      "retail, home improvement, customer service, appliances, hardware stores, home & garden, nurseries & gardening, shopping",
+      "engineering, finance, information science, sciences, law, humanities, fine & applied arts, business, veterinary medicine"
+    ],
+    "Person Linkedin Url": [
+      "http://www.linkedin.com/in/marco-souza-598649b2",
+      "http://www.linkedin.com/in/justin-schnell-40520911",
+      "http://www.linkedin.com/in/melanie-rodriguez-8b366270"
+    ],
+    "Website": [
+      "http://www.basf.com",
+      "http://www.homedepot.com",
+      "http://www.illinois.edu"
+    ],
+    "Departments": [
+      "Finance, Operations",
+      "Engineering & Technical",
+      "C-Suite"
+    ],
+    "Other Phone": [
+      "917-880-4109",
+      "'+52 55 4949 7988",
+      "'+47 464 49 383"
+    ],
+    "Mobile Phone": [
+      "'+1 916-517-2482",
+      "'+27 83 677 8626",
+      "'+1 530-750-0150 ext 190"
+    ]
+  },
+  "validity": {
+    "email": "3/3 valid-shape",
+    "Email Status": "0/3 valid-shape",
+    "First Phone": "3/3 valid-shape",
+    "Mobile Phone": "3/3 valid-shape",
+    "Corporate Phone": "3/3 valid-shape",
+    "Other Phone": "3/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Person Linkedin Url",
+    "Website"
+  ],
+  "activity_match_keys": [
+    "fullname",
+    "firstname",
+    "lastname",
+    "company",
+    "email",
+    "Email Status",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Person Linkedin Url",
+    "Website"
+  ]
+}

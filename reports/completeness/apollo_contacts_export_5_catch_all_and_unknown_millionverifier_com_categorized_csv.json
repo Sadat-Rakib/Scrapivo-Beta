@@ -1,0 +1,31 @@
+{
+  "key": "apollo-contacts-export (5)_CATCH_ALL_AND_UNKNOWN_MILLIONVERIFIER.COM_CATEGORIZED.csv",
+  "entity": "person",
+  "rows": 7383,
+  "required_fields": [
+    "Name",
+    "Company",
+    "Title",
+    "Email",
+    "Phone",
+    "Website",
+    "Social(any)",
+    "Location"
+  ],
+  "absent_columns": [],
+  "complete": 7052,
+  "incomplete": 331,
+  "complete_pct": 95.5,
+  "missing_counts": {
+    "Phone": 331
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Phone"
+      ],
+      "rows": 331
+    }
+  ],
+  "people_bonus_rows": 0
+}

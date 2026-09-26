@@ -1,0 +1,536 @@
+[
+  {
+    "key": "processed/people/person.parquet",
+    "status": "uploaded-verified",
+    "local": 67787388,
+    "remote": 67787388
+  },
+  {
+    "key": "processed/companies/company.parquet",
+    "status": "uploaded-verified",
+    "local": 354965502,
+    "remote": 354965502
+  },
+  {
+    "key": "incomplete/person/1_americas_region_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 80928,
+    "remote": 80928
+  },
+  {
+    "key": "incomplete/person/1_asia_region_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 89448,
+    "remote": 89448
+  },
+  {
+    "key": "incomplete/person/1_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 834949,
+    "remote": 834949
+  },
+  {
+    "key": "incomplete/person/1_europe_region_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 88002,
+    "remote": 88002
+  },
+  {
+    "key": "incomplete/person/1_other_region_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 130022,
+    "remote": 130022
+  },
+  {
+    "key": "incomplete/person/2_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 813204,
+    "remote": 813204
+  },
+  {
+    "key": "incomplete/person/3_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 11929056,
+    "remote": 11929056
+  },
+  {
+    "key": "incomplete/person/4_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 14471055,
+    "remote": 14471055
+  },
+  {
+    "key": "incomplete/person/5_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 23552874,
+    "remote": 23552874
+  },
+  {
+    "key": "incomplete/person/6_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 2246973,
+    "remote": 2246973
+  },
+  {
+    "key": "incomplete/person/americas_region_v2_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 128402,
+    "remote": 128402
+  },
+  {
+    "key": "incomplete/person/americas_region_v3_part1_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 113577,
+    "remote": 113577
+  },
+  {
+    "key": "incomplete/person/americas_region_v3_part2_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 902540,
+    "remote": 902540
+  },
+  {
+    "key": "incomplete/person/americas_region_v4_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 1018601,
+    "remote": 1018601
+  },
+  {
+    "key": "incomplete/person/americas_region_v5_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 79426,
+    "remote": 79426
+  },
+  {
+    "key": "incomplete/person/americas_region_v6_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 235098,
+    "remote": 235098
+  },
+  {
+    "key": "incomplete/person/apollo_contacts_export_1_1_ok_only_millionverifier_com_3_categorized_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 4461028,
+    "remote": 4461028
+  },
+  {
+    "key": "incomplete/person/apollo_contacts_export_1_2_catch_all_and_unknown_millionverifier_com_all_deliverable_emails_20250728_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 3616,
+    "remote": 3616
+  },
+  {
+    "key": "incomplete/person/apollo_contacts_export_1_2_catch_all_and_unknown_millionverifier_com_categorized_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 28343,
+    "remote": 28343
+  },
+  {
+    "key": "incomplete/person/apollo_contacts_export_1_2_ok_only_millionverifier_com_categorized_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 11825,
+    "remote": 11825
+  },
+  {
+    "key": "incomplete/person/apollo_contacts_export_1_ok_only_millionverifier_com_1_categorized_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 2327262,
+    "remote": 2327262
+  },
+  {
+    "key": "incomplete/person/apollo_contacts_export_5_catch_all_and_unknown_millionverifier_com_all_deliverable_emails_20250728_c_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 227101,
+    "remote": 227101
+  },
+  {
+    "key": "incomplete/person/apollo_contacts_export_5_catch_all_and_unknown_millionverifier_com_categorized_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 299870,
+    "remote": 299870
+  },
+  {
+    "key": "incomplete/person/apollo_contacts_export_6_ok_only_millionverifier_com_1_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 2947819,
+    "remote": 2947819
+  },
+  {
+    "key": "incomplete/person/apollo_contacts_export_ok_only_millionverifier_com_1_categorized_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 3858309,
+    "remote": 3858309
+  },
+  {
+    "key": "incomplete/person/asia_region_v2_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 93941,
+    "remote": 93941
+  },
+  {
+    "key": "incomplete/person/asia_region_v3_part1_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 59995,
+    "remote": 59995
+  },
+  {
+    "key": "incomplete/person/asia_region_v3_part2_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 160362,
+    "remote": 160362
+  },
+  {
+    "key": "incomplete/person/asia_region_v4_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 155628,
+    "remote": 155628
+  },
+  {
+    "key": "incomplete/person/asia_region_v5_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 45771,
+    "remote": 45771
+  },
+  {
+    "key": "incomplete/person/asia_region_v6_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 98400,
+    "remote": 98400
+  },
+  {
+    "key": "incomplete/person/cleaned_1_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 466844,
+    "remote": 466844
+  },
+  {
+    "key": "incomplete/person/cleaned_2_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 450031,
+    "remote": 450031
+  },
+  {
+    "key": "incomplete/person/cleaned_3_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 636014,
+    "remote": 636014
+  },
+  {
+    "key": "incomplete/person/cleaned_4_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 385169,
+    "remote": 385169
+  },
+  {
+    "key": "incomplete/person/cleaned_5_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 323344,
+    "remote": 323344
+  },
+  {
+    "key": "incomplete/person/cleaned_6_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 613979,
+    "remote": 613979
+  },
+  {
+    "key": "incomplete/person/coaches_1_6k_categorized_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 304140,
+    "remote": 304140
+  },
+  {
+    "key": "incomplete/person/contractors_data111112_categorized_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 16596847,
+    "remote": 16596847
+  },
+  {
+    "key": "incomplete/company/crunchbase_0_100k_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 22246479,
+    "remote": 22246479
+  },
+  {
+    "key": "incomplete/company/crunchbase_100k_200k_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 23252589,
+    "remote": 23252589
+  },
+  {
+    "key": "incomplete/company/crunchbase_1_1m_1_2m_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 23278262,
+    "remote": 23278262
+  },
+  {
+    "key": "incomplete/company/crunchbase_1_2m_1_3m_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 23650199,
+    "remote": 23650199
+  },
+  {
+    "key": "incomplete/company/crunchbase_1_3m_1_4m_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 23463737,
+    "remote": 23463737
+  },
+  {
+    "key": "incomplete/company/crunchbase_1_4m_1_5m_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 23293206,
+    "remote": 23293206
+  },
+  {
+    "key": "incomplete/company/crunchbase_1_5m_1_6m_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 23084684,
+    "remote": 23084684
+  },
+  {
+    "key": "incomplete/company/crunchbase_1_6m_1_7m_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 24471647,
+    "remote": 24471647
+  },
+  {
+    "key": "incomplete/company/crunchbase_1_7_1_8m_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 24614387,
+    "remote": 24614387
+  },
+  {
+    "key": "incomplete/company/crunchbase_1_8m_1_9m_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 23346929,
+    "remote": 23346929
+  },
+  {
+    "key": "incomplete/company/crunchbase_1_9m_2_0m_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 23475870,
+    "remote": 23475870
+  },
+  {
+    "key": "incomplete/company/crunchbase_1m_1_1m_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 23472332,
+    "remote": 23472332
+  },
+  {
+    "key": "incomplete/company/crunchbase_200k_300k_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 23106968,
+    "remote": 23106968
+  },
+  {
+    "key": "incomplete/company/crunchbase_2_0m_2_1m_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 23585105,
+    "remote": 23585105
+  },
+  {
+    "key": "incomplete/company/crunchbase_2_1m_2_2m_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 23222929,
+    "remote": 23222929
+  },
+  {
+    "key": "incomplete/company/crunchbase_2_2m_2_3m_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 24229850,
+    "remote": 24229850
+  },
+  {
+    "key": "incomplete/company/crunchbase_2_3m_2_4m_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 24130281,
+    "remote": 24130281
+  },
+  {
+    "key": "incomplete/company/crunchbase_2_4m_2_5m_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 23846734,
+    "remote": 23846734
+  },
+  {
+    "key": "incomplete/company/crunchbase_2_5m_2_6m_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 24144151,
+    "remote": 24144151
+  },
+  {
+    "key": "incomplete/company/crunchbase_2_6m_2_7m_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 23873549,
+    "remote": 23873549
+  },
+  {
+    "key": "incomplete/company/crunchbase_2_7_2_8m_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 24966700,
+    "remote": 24966700
+  },
+  {
+    "key": "incomplete/company/crunchbase_2_8m_2_87m_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 1867091,
+    "remote": 1867091
+  },
+  {
+    "key": "incomplete/company/crunchbase_300k_400k_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 23210776,
+    "remote": 23210776
+  },
+  {
+    "key": "incomplete/company/crunchbase_400k_500k_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 24228365,
+    "remote": 24228365
+  },
+  {
+    "key": "incomplete/company/crunchbase_500k_600k_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 23323428,
+    "remote": 23323428
+  },
+  {
+    "key": "incomplete/company/crunchbase_600k_700k_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 23205827,
+    "remote": 23205827
+  },
+  {
+    "key": "incomplete/company/crunchbase_700k_800k_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 22340193,
+    "remote": 22340193
+  },
+  {
+    "key": "incomplete/company/crunchbase_800k_900k_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 23598123,
+    "remote": 23598123
+  },
+  {
+    "key": "incomplete/company/crunchbase_900k_1m_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 24015805,
+    "remote": 24015805
+  },
+  {
+    "key": "incomplete/person/europe_region_v2_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 112994,
+    "remote": 112994
+  },
+  {
+    "key": "incomplete/person/europe_region_v3_part1_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 85484,
+    "remote": 85484
+  },
+  {
+    "key": "incomplete/person/europe_region_v3_part2_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 367551,
+    "remote": 367551
+  },
+  {
+    "key": "incomplete/person/europe_region_v4_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 423799,
+    "remote": 423799
+  },
+  {
+    "key": "incomplete/person/europe_region_v5_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 132946,
+    "remote": 132946
+  },
+  {
+    "key": "incomplete/person/europe_region_v6_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 191378,
+    "remote": 191378
+  },
+  {
+    "key": "incomplete/person/healthcare_wellness_2_1k_categorized_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 3029886,
+    "remote": 3029886
+  },
+  {
+    "key": "incomplete/company/lakta_saas_database_47_493_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 20616494,
+    "remote": 20616494
+  },
+  {
+    "key": "incomplete/person/lending_list_filesaver_all_sep_03_25_2_49_pm_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 3326233,
+    "remote": 3326233
+  },
+  {
+    "key": "incomplete/person/other_region_v2_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 122425,
+    "remote": 122425
+  },
+  {
+    "key": "incomplete/person/other_region_v3_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 122224,
+    "remote": 122224
+  },
+  {
+    "key": "incomplete/person/other_region_v4_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 73290,
+    "remote": 73290
+  },
+  {
+    "key": "incomplete/person/other_region_v5_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 72017,
+    "remote": 72017
+  },
+  {
+    "key": "incomplete/person/other_region_v6_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 100004,
+    "remote": 100004
+  },
+  {
+    "key": "incomplete/person/professional_services_47_5k_categorized_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 1242571,
+    "remote": 1242571
+  },
+  {
+    "key": "incomplete/person/staffing_recruiting_20_3k_csv_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 485055,
+    "remote": 485055
+  },
+  {
+    "key": "incomplete/person/trucking_15_6k_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 358055,
+    "remote": 358055
+  },
+  {
+    "key": "incomplete/person/vanda_105k_apollo_leads_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 1311801,
+    "remote": 1311801
+  },
+  {
+    "key": "incomplete/person/vanda_closer_data_master_list_of_cxo_112924_csv_incomplete.csv",
+    "status": "uploaded-verified",
+    "local": 36881114,
+    "remote": 36881114
+  }
+]

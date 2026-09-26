@@ -1,0 +1,92 @@
+{
+  "key": "Vanda 105k Apollo leads.csv",
+  "entity": "person",
+  "rows": 104564,
+  "required_fields": [
+    "Name",
+    "Company",
+    "Title",
+    "Email",
+    "Phone",
+    "Website",
+    "Social(any)",
+    "Location"
+  ],
+  "absent_columns": [],
+  "complete": 102152,
+  "incomplete": 2412,
+  "complete_pct": 97.7,
+  "missing_counts": {
+    "Phone": 2210,
+    "Company": 115,
+    "Email": 351,
+    "Website": 194
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Phone"
+      ],
+      "rows": 2012
+    },
+    {
+      "missing": [
+        "Email"
+      ],
+      "rows": 200
+    },
+    {
+      "missing": [
+        "Company",
+        "Email",
+        "Phone",
+        "Website"
+      ],
+      "rows": 103
+    },
+    {
+      "missing": [
+        "Email",
+        "Phone",
+        "Website"
+      ],
+      "rows": 41
+    },
+    {
+      "missing": [
+        "Phone",
+        "Website"
+      ],
+      "rows": 36
+    },
+    {
+      "missing": [
+        "Company",
+        "Phone",
+        "Website"
+      ],
+      "rows": 12
+    },
+    {
+      "missing": [
+        "Email",
+        "Phone"
+      ],
+      "rows": 6
+    },
+    {
+      "missing": [
+        "Email",
+        "Website"
+      ],
+      "rows": 1
+    },
+    {
+      "missing": [
+        "Website"
+      ],
+      "rows": 1
+    }
+  ],
+  "people_bonus_rows": 0
+}

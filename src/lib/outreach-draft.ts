@@ -9,16 +9,27 @@
  *   - job:      candidate intro — relevance + proof, ask for a conversation
  * Every sentence is assembled ONLY from real row data, the user's Memory, and
  * the sender inputs in the modal. No LLM, no invented facts, instant, $0.
+ *
+ * Phase E: append jurisdiction-aware compliance footers from lead geo.
  */
+import {
+  jurisdictionDraftHints,
+  resolveJurisdiction,
+  type OutreachJurisdiction,
+} from "@/lib/outreach/jurisdiction";
 
 export type DraftVertical = "investor" | "company" | "local" | "job";
+/** Alias some callers use for the local-business vertical. */
+export type DraftLeadVertical = DraftVertical | "business";
 
 export type DraftLead = {
-  vertical?: DraftVertical;
+  vertical?: DraftLeadVertical;
   name: string;
   firm?: string;
   role?: string;
   location?: string;
+  /** ISO country when known (drives jurisdiction). */
+  country?: string;
   sector?: string;
   /** Matched-thesis sentence from the pipeline ("Investor at X — backs Y rounds."). */
   whyMatch?: string;
@@ -315,28 +326,51 @@ function fn0(name: string): string {
 
 // ── Dispatch ────────────────────────────────────────────────────────────────
 
+function withJurisdictionFooter(
+  draft: { subject: string; body: string },
+  lead: DraftLead,
+): { subject: string; body: string; jurisdiction: OutreachJurisdiction } {
+  const j = resolveJurisdiction({ country: lead.country, location: lead.location });
+  const hints = jurisdictionDraftHints(j);
+  const footer = ["", "—", ...hints.footerLines].join("\n");
+  return {
+    subject: draft.subject,
+    body: `${draft.body.trimEnd()}\n${footer}`,
+    jurisdiction: j,
+  };
+}
+
 export function buildEmailDraft(
   lead: DraftLead,
   sender: DraftSender,
-): { subject: string; body: string } {
+): { subject: string; body: string; jurisdiction?: OutreachJurisdiction } {
+  let draft: { subject: string; body: string };
   switch (lead.vertical) {
     case "local":
-      return localEmail(lead, sender);
+    case "business":
+      draft = localEmail(lead, sender);
+      break;
     case "company":
+      draft = companyEmail(lead, sender);
+      break;
     case "job":
-      return companyEmail(lead, sender);
+      draft = jobEmail(lead, sender);
+      break;
     default:
-      return investorEmail(lead, sender);
+      draft = investorEmail(lead, sender);
   }
+  return withJurisdictionFooter(draft, lead);
 }
 
 export function buildMessageDraft(lead: DraftLead, sender: DraftSender): string {
   switch (lead.vertical) {
     case "local":
+    case "business":
       return localMessage(lead, sender);
     case "company":
-    case "job":
       return companyMessage(lead, sender);
+    case "job":
+      return jobMessage(lead, sender);
     default:
       return investorMessage(lead, sender);
   }

@@ -1,0 +1,11 @@
+import duckdb,boto3,json
+cr=boto3.Session(profile_name='scrapivo').get_credentials().get_frozen_credentials(); c=duckdb.connect(); c.execute('LOAD httpfs'); c.execute("SET s3_region='us-east-2'"); c.execute("SET s3_access_key_id=?",[cr.access_key]); c.execute("SET s3_secret_access_key=?",[cr.secret_key]);
+if cr.token:c.execute("SET s3_session_token=?",[cr.token])
+c.execute("create view d as select * from read_parquet('s3://scrapivo-raw-data-2026-523220341033-us-east-2-an/processed/local-businesses/by_country/*.parquet',union_by_name=true)")
+q="""select count(*) total,count(distinct country) countries,count(distinct locality) cities,count(distinct category) categories,sum((website is not null and trim(website)<>'')::int) website,sum((website is null or trim(website)='')::int) no_website,sum((phone is not null and trim(phone)<>'')::int) phone,sum((email is not null)::int) email,sum((social_presence is not null and trim(social_presence)<>'')::int) socials,sum(((website is not null and trim(website)<>'') or (phone is not null and trim(phone)<>'') or email is not null or (social_presence is not null and trim(social_presence)<>''))::int) any_contact,sum((junk_flag<>0)::int) junk,count(*)-count(distinct registry_id) duplicate_registry_rows,count(*)-count(distinct case when domain is not null and trim(domain)<>'' then domain end) domain_nonunique_upper_bound from d"""
+cols=[x[0] for x in c.description] if False else []
+r=c.execute(q); out=dict(zip([x[0] for x in r.description],r.fetchone()))
+out['top_countries']=c.execute("select country,count(*) n from d group by country order by n desc limit 25").fetchall()
+out['top_categories']=c.execute("select category,count(*) n from d group by category order by n desc limit 30").fetchall()
+out['top_cities']=c.execute("select country,locality,count(*) n from d where locality is not null group by country,locality order by n desc limit 50").fetchall()
+open('reports/gate2/_business-profile.json','w').write(json.dumps(out,indent=2,default=str)); print(json.dumps(out,default=str))

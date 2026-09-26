@@ -1,0 +1,2838 @@
+{
+ "bucket": "scrapivo-raw-data-2026-523220341033-us-east-2-an",
+ "builtAt": "2026-09-11T17:39:08.163906+00:00",
+ "entities": {
+  "businesses": {
+   "byGeo": {
+    "AE": {
+     "footerMeasured": true,
+     "s3Bytes": 9949818,
+     "s3Files": 1,
+     "s3Rows": 86070
+    },
+    "AM": {
+     "footerMeasured": true,
+     "s3Bytes": 1507335,
+     "s3Files": 1,
+     "s3Rows": 13468
+    },
+    "AR": {
+     "footerMeasured": false,
+     "s3Bytes": 40891546,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "AT": {
+     "footerMeasured": true,
+     "s3Bytes": 14614506,
+     "s3Files": 1,
+     "s3Rows": 130000
+    },
+    "AU": {
+     "footerMeasured": false,
+     "s3Bytes": 43002425,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "AUSTIN": {
+     "footerMeasured": true,
+     "s3Bytes": 10797915,
+     "s3Files": 1,
+     "s3Rows": 93734
+    },
+    "AZ": {
+     "footerMeasured": true,
+     "s3Bytes": 1868220,
+     "s3Files": 1,
+     "s3Rows": 17466
+    },
+    "BD": {
+     "footerMeasured": true,
+     "s3Bytes": 14701701,
+     "s3Files": 1,
+     "s3Rows": 124482
+    },
+    "BE": {
+     "footerMeasured": true,
+     "s3Bytes": 14028643,
+     "s3Files": 1,
+     "s3Rows": 130000
+    },
+    "BG": {
+     "footerMeasured": true,
+     "s3Bytes": 5016377,
+     "s3Files": 1,
+     "s3Rows": 45000
+    },
+    "BH": {
+     "footerMeasured": true,
+     "s3Bytes": 985496,
+     "s3Files": 1,
+     "s3Rows": 8773
+    },
+    "BO": {
+     "footerMeasured": true,
+     "s3Bytes": 4889262,
+     "s3Files": 1,
+     "s3Rows": 45000
+    },
+    "BR": {
+     "footerMeasured": false,
+     "s3Bytes": 208935622,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "CA": {
+     "footerMeasured": false,
+     "s3Bytes": 43742923,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "CH": {
+     "footerMeasured": true,
+     "s3Bytes": 13870021,
+     "s3Files": 1,
+     "s3Rows": 130000
+    },
+    "CL": {
+     "footerMeasured": true,
+     "s3Bytes": 13175787,
+     "s3Files": 1,
+     "s3Rows": 130000
+    },
+    "CO": {
+     "footerMeasured": true,
+     "s3Bytes": 13933507,
+     "s3Files": 1,
+     "s3Rows": 130000
+    },
+    "CR": {
+     "footerMeasured": true,
+     "s3Bytes": 4972788,
+     "s3Files": 1,
+     "s3Rows": 45000
+    },
+    "CY": {
+     "footerMeasured": true,
+     "s3Bytes": 4255793,
+     "s3Files": 1,
+     "s3Rows": 37943
+    },
+    "CZ": {
+     "footerMeasured": true,
+     "s3Bytes": 14294939,
+     "s3Files": 1,
+     "s3Rows": 130000
+    },
+    "DE": {
+     "footerMeasured": false,
+     "s3Bytes": 45792881,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "DK": {
+     "footerMeasured": true,
+     "s3Bytes": 14162032,
+     "s3Files": 1,
+     "s3Rows": 130000
+    },
+    "DO": {
+     "footerMeasured": true,
+     "s3Bytes": 4854116,
+     "s3Files": 1,
+     "s3Rows": 43591
+    },
+    "EC": {
+     "footerMeasured": true,
+     "s3Bytes": 5035008,
+     "s3Files": 1,
+     "s3Rows": 45000
+    },
+    "EE": {
+     "footerMeasured": true,
+     "s3Bytes": 3360638,
+     "s3Files": 1,
+     "s3Rows": 31621
+    },
+    "EG": {
+     "footerMeasured": true,
+     "s3Bytes": 15916551,
+     "s3Files": 1,
+     "s3Rows": 130000
+    },
+    "ES": {
+     "footerMeasured": false,
+     "s3Bytes": 43453758,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "FI": {
+     "footerMeasured": true,
+     "s3Bytes": 13848502,
+     "s3Files": 1,
+     "s3Rows": 130000
+    },
+    "FR": {
+     "footerMeasured": false,
+     "s3Bytes": 46179132,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "GB": {
+     "footerMeasured": false,
+     "s3Bytes": 45752581,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "GE": {
+     "footerMeasured": true,
+     "s3Bytes": 2772528,
+     "s3Files": 1,
+     "s3Rows": 23967
+    },
+    "GH": {
+     "footerMeasured": true,
+     "s3Bytes": 2064272,
+     "s3Files": 1,
+     "s3Rows": 17434
+    },
+    "GR": {
+     "footerMeasured": true,
+     "s3Bytes": 14445082,
+     "s3Files": 1,
+     "s3Rows": 130000
+    },
+    "GT": {
+     "footerMeasured": true,
+     "s3Bytes": 4964482,
+     "s3Files": 1,
+     "s3Rows": 45000
+    },
+    "HK": {
+     "footerMeasured": true,
+     "s3Bytes": 4797581,
+     "s3Files": 1,
+     "s3Rows": 45000
+    },
+    "HR": {
+     "footerMeasured": true,
+     "s3Bytes": 4761021,
+     "s3Files": 1,
+     "s3Rows": 45000
+    },
+    "HU": {
+     "footerMeasured": true,
+     "s3Bytes": 13952699,
+     "s3Files": 1,
+     "s3Rows": 130000
+    },
+    "ID": {
+     "footerMeasured": false,
+     "s3Bytes": 40806589,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "IE": {
+     "footerMeasured": true,
+     "s3Bytes": 12783193,
+     "s3Files": 1,
+     "s3Rows": 112677
+    },
+    "IL": {
+     "footerMeasured": true,
+     "s3Bytes": 9894048,
+     "s3Files": 1,
+     "s3Rows": 86459
+    },
+    "IN": {
+     "footerMeasured": false,
+     "s3Bytes": 245745448,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "IS": {
+     "footerMeasured": true,
+     "s3Bytes": 1177841,
+     "s3Files": 1,
+     "s3Rows": 11395
+    },
+    "IT": {
+     "footerMeasured": false,
+     "s3Bytes": 43842234,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "JO": {
+     "footerMeasured": true,
+     "s3Bytes": 4133698,
+     "s3Files": 1,
+     "s3Rows": 33862
+    },
+    "JP": {
+     "footerMeasured": false,
+     "s3Bytes": 40444376,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "KE": {
+     "footerMeasured": true,
+     "s3Bytes": 5181848,
+     "s3Files": 1,
+     "s3Rows": 45000
+    },
+    "KR": {
+     "footerMeasured": true,
+     "s3Bytes": 14348415,
+     "s3Files": 1,
+     "s3Rows": 130000
+    },
+    "KW": {
+     "footerMeasured": true,
+     "s3Bytes": 1610068,
+     "s3Files": 1,
+     "s3Rows": 15736
+    },
+    "KZ": {
+     "footerMeasured": true,
+     "s3Bytes": 2567652,
+     "s3Files": 1,
+     "s3Rows": 22810
+    },
+    "LB": {
+     "footerMeasured": false,
+     "s3Bytes": 3163654,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "LK": {
+     "footerMeasured": false,
+     "s3Bytes": 5151523,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "LT": {
+     "footerMeasured": false,
+     "s3Bytes": 4649541,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "LU": {
+     "footerMeasured": false,
+     "s3Bytes": 2133023,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "LV": {
+     "footerMeasured": false,
+     "s3Bytes": 4065688,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "MA": {
+     "footerMeasured": false,
+     "s3Bytes": 5068388,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "MT": {
+     "footerMeasured": false,
+     "s3Bytes": 1537005,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "MX": {
+     "footerMeasured": false,
+     "s3Bytes": 40163476,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "MY": {
+     "footerMeasured": false,
+     "s3Bytes": 13171496,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "NG": {
+     "footerMeasured": false,
+     "s3Bytes": 8569286,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "NL": {
+     "footerMeasured": false,
+     "s3Bytes": 14828981,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "NO": {
+     "footerMeasured": false,
+     "s3Bytes": 13530326,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "NP": {
+     "footerMeasured": false,
+     "s3Bytes": 4964413,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "NZ": {
+     "footerMeasured": false,
+     "s3Bytes": 14320239,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "OM": {
+     "footerMeasured": false,
+     "s3Bytes": 1056013,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "PA": {
+     "footerMeasured": false,
+     "s3Bytes": 2035869,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "PE": {
+     "footerMeasured": false,
+     "s3Bytes": 14027278,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "PH": {
+     "footerMeasured": false,
+     "s3Bytes": 12672330,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "PK": {
+     "footerMeasured": false,
+     "s3Bytes": 14618742,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "PL": {
+     "footerMeasured": false,
+     "s3Bytes": 14203344,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "PR": {
+     "footerMeasured": false,
+     "s3Bytes": 4700039,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "PT": {
+     "footerMeasured": false,
+     "s3Bytes": 14738117,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "PY": {
+     "footerMeasured": false,
+     "s3Bytes": 4663025,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "QA": {
+     "footerMeasured": false,
+     "s3Bytes": 1617662,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "RO": {
+     "footerMeasured": false,
+     "s3Bytes": 13921215,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "RS": {
+     "footerMeasured": false,
+     "s3Bytes": 4932977,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "SA": {
+     "footerMeasured": false,
+     "s3Bytes": 8048071,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "SE": {
+     "footerMeasured": false,
+     "s3Bytes": 13261502,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "SG": {
+     "footerMeasured": false,
+     "s3Bytes": 7581561,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "SI": {
+     "footerMeasured": false,
+     "s3Bytes": 3885928,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "SK": {
+     "footerMeasured": false,
+     "s3Bytes": 4987028,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "TH": {
+     "footerMeasured": false,
+     "s3Bytes": 14174585,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "TN": {
+     "footerMeasured": false,
+     "s3Bytes": 4172952,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "TR": {
+     "footerMeasured": false,
+     "s3Bytes": 39688915,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "TW": {
+     "footerMeasured": false,
+     "s3Bytes": 4585068,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "TZ": {
+     "footerMeasured": false,
+     "s3Bytes": 1497476,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "UA": {
+     "footerMeasured": false,
+     "s3Bytes": 14907682,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "US": {
+     "footerMeasured": false,
+     "s3Bytes": 217742847,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "UY": {
+     "footerMeasured": false,
+     "s3Bytes": 3464080,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "UZ": {
+     "footerMeasured": false,
+     "s3Bytes": 1267206,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "VN": {
+     "footerMeasured": false,
+     "s3Bytes": 13837111,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "ZA": {
+     "footerMeasured": false,
+     "s3Bytes": 13958903,
+     "s3Files": 1,
+     "s3Rows": null
+    }
+   },
+   "declaredProviders": [
+    "osm-nominatim",
+    "osm-overpass"
+   ],
+   "geoKind": "iso2",
+   "hotIndexByIso": {
+    "AE": 0,
+    "AM": 0,
+    "AR": 0,
+    "AT": 0,
+    "AU": 0,
+    "AZ": 0,
+    "BD": 0,
+    "BE": 0,
+    "BG": 0,
+    "BH": 0,
+    "BO": 0,
+    "BR": 0,
+    "CA": 26,
+    "CH": 0,
+    "CL": 2141,
+    "CO": 0,
+    "CR": 0,
+    "CY": 0,
+    "CZ": 0,
+    "DE": 0,
+    "DK": 0,
+    "DO": 0,
+    "EC": 1,
+    "EE": 0,
+    "EG": 1,
+    "ES": 3,
+    "FI": 0,
+    "FR": 1,
+    "GB": 18,
+    "GE": 0,
+    "GH": 0,
+    "GR": 0,
+    "GT": 1,
+    "HK": 0,
+    "HR": 0,
+    "HU": 0,
+    "ID": 1,
+    "IE": 0,
+    "IL": 0,
+    "IN": 436088,
+    "IS": 1,
+    "IT": 0,
+    "JO": 0,
+    "JP": 0,
+    "KE": 0,
+    "KR": 0,
+    "KW": 0,
+    "KZ": 1,
+    "LB": 0,
+    "LK": 0,
+    "LT": 0,
+    "LU": 0,
+    "LV": 0,
+    "MA": 1,
+    "MT": 0,
+    "MX": 4,
+    "MY": 0,
+    "NG": 0,
+    "NL": 0,
+    "NO": 0,
+    "NP": 0,
+    "NZ": 52,
+    "OM": 0,
+    "PA": 0,
+    "PE": 0,
+    "PH": 0,
+    "PK": 1078,
+    "PL": 0,
+    "PR": 0,
+    "PT": 0,
+    "PY": 0,
+    "QA": 0,
+    "RO": 1,
+    "RS": 0,
+    "SA": 0,
+    "SE": 0,
+    "SG": 0,
+    "SI": 0,
+    "SK": 0,
+    "TH": 0,
+    "TN": 0,
+    "TR": 0,
+    "TW": 0,
+    "TZ": 0,
+    "UA": 0,
+    "US": 169967,
+    "UY": 0,
+    "UZ": 0,
+    "VN": 0,
+    "ZA": 1
+   },
+   "s3Files": 91,
+   "s3Prefix": "processed/local-businesses/by_country/"
+  },
+  "companies": {
+   "byGeo": {
+    "!": {
+     "footerMeasured": true,
+     "s3Bytes": 9881,
+     "s3Files": 1,
+     "s3Rows": 8
+    },
+    "\"": {
+     "footerMeasured": true,
+     "s3Bytes": 10235,
+     "s3Files": 1,
+     "s3Rows": 8
+    },
+    "#": {
+     "footerMeasured": true,
+     "s3Bytes": 15885,
+     "s3Files": 1,
+     "s3Rows": 26
+    },
+    "$": {
+     "footerMeasured": true,
+     "s3Bytes": 7120,
+     "s3Files": 1,
+     "s3Rows": 2
+    },
+    "&": {
+     "footerMeasured": true,
+     "s3Bytes": 19011,
+     "s3Files": 1,
+     "s3Rows": 40
+    },
+    "'": {
+     "footerMeasured": true,
+     "s3Bytes": 11244,
+     "s3Files": 1,
+     "s3Rows": 13
+    },
+    "(": {
+     "footerMeasured": true,
+     "s3Bytes": 16021,
+     "s3Files": 1,
+     "s3Rows": 24
+    },
+    "*": {
+     "footerMeasured": true,
+     "s3Bytes": 9050,
+     "s3Files": 1,
+     "s3Rows": 6
+    },
+    "+": {
+     "footerMeasured": true,
+     "s3Bytes": 16002,
+     "s3Files": 1,
+     "s3Rows": 26
+    },
+    ",": {
+     "footerMeasured": true,
+     "s3Bytes": 6467,
+     "s3Files": 1,
+     "s3Rows": 2
+    },
+    "-": {
+     "footerMeasured": false,
+     "s3Bytes": 8876,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "/": {
+     "footerMeasured": true,
+     "s3Bytes": 8794,
+     "s3Files": 1,
+     "s3Rows": 5
+    },
+    "0": {
+     "footerMeasured": false,
+     "s3Bytes": 39575,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "1": {
+     "footerMeasured": false,
+     "s3Bytes": 616260,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "2": {
+     "footerMeasured": false,
+     "s3Bytes": 500680,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "3": {
+     "footerMeasured": false,
+     "s3Bytes": 729089,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "4": {
+     "footerMeasured": false,
+     "s3Bytes": 387762,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "5": {
+     "footerMeasured": false,
+     "s3Bytes": 183480,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "6": {
+     "footerMeasured": false,
+     "s3Bytes": 89458,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "7": {
+     "footerMeasured": false,
+     "s3Bytes": 150224,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "8": {
+     "footerMeasured": false,
+     "s3Bytes": 117174,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "9": {
+     "footerMeasured": false,
+     "s3Bytes": 142285,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    ":": {
+     "footerMeasured": true,
+     "s3Bytes": 10590,
+     "s3Files": 1,
+     "s3Rows": 10
+    },
+    "<": {
+     "footerMeasured": true,
+     "s3Bytes": 6322,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "=": {
+     "footerMeasured": true,
+     "s3Bytes": 6371,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    ">": {
+     "footerMeasured": true,
+     "s3Bytes": 5884,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "?": {
+     "footerMeasured": true,
+     "s3Bytes": 6231,
+     "s3Files": 1,
+     "s3Rows": 2
+    },
+    "@": {
+     "footerMeasured": true,
+     "s3Bytes": 16522,
+     "s3Files": 1,
+     "s3Rows": 29
+    },
+    "[": {
+     "footerMeasured": true,
+     "s3Bytes": 16442,
+     "s3Files": 1,
+     "s3Rows": 28
+    },
+    "\\": {
+     "footerMeasured": true,
+     "s3Bytes": 6395,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "_": {
+     "footerMeasured": false,
+     "s3Bytes": 7407,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "`": {
+     "footerMeasured": true,
+     "s3Bytes": 5873,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "a": {
+     "footerMeasured": false,
+     "s3Bytes": 26274286,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "b": {
+     "footerMeasured": false,
+     "s3Bytes": 12259954,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "c": {
+     "footerMeasured": false,
+     "s3Bytes": 32802450,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "d": {
+     "footerMeasured": false,
+     "s3Bytes": 16731714,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "data_0": {
+     "footerMeasured": false,
+     "s3Bytes": 18654,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "e": {
+     "footerMeasured": false,
+     "s3Bytes": 17378259,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "f": {
+     "footerMeasured": false,
+     "s3Bytes": 14343718,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "g": {
+     "footerMeasured": false,
+     "s3Bytes": 15694715,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "h": {
+     "footerMeasured": false,
+     "s3Bytes": 12618321,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "i": {
+     "footerMeasured": false,
+     "s3Bytes": 9268982,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "j": {
+     "footerMeasured": false,
+     "s3Bytes": 6252540,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "k": {
+     "footerMeasured": false,
+     "s3Bytes": 9394851,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "l": {
+     "footerMeasured": false,
+     "s3Bytes": 14077901,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "m": {
+     "footerMeasured": false,
+     "s3Bytes": 25742267,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "n": {
+     "footerMeasured": false,
+     "s3Bytes": 12213939,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "o": {
+     "footerMeasured": false,
+     "s3Bytes": 8626089,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "p": {
+     "footerMeasured": false,
+     "s3Bytes": 17576736,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "q": {
+     "footerMeasured": false,
+     "s3Bytes": 2206965,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "r": {
+     "footerMeasured": false,
+     "s3Bytes": 15233017,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "s": {
+     "footerMeasured": false,
+     "s3Bytes": 33381423,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "t": {
+     "footerMeasured": false,
+     "s3Bytes": 22921471,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "u": {
+     "footerMeasured": false,
+     "s3Bytes": 5029810,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "v": {
+     "footerMeasured": false,
+     "s3Bytes": 8873780,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "w": {
+     "footerMeasured": false,
+     "s3Bytes": 10648926,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "x": {
+     "footerMeasured": false,
+     "s3Bytes": 899869,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "y": {
+     "footerMeasured": false,
+     "s3Bytes": 667260,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "z": {
+     "footerMeasured": false,
+     "s3Bytes": 165865,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "{": {
+     "footerMeasured": true,
+     "s3Bytes": 8952,
+     "s3Files": 1,
+     "s3Rows": 5
+    },
+    "}": {
+     "footerMeasured": true,
+     "s3Bytes": 6594,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "\u00b0": {
+     "footerMeasured": true,
+     "s3Bytes": 6954,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "\u00b4": {
+     "footerMeasured": true,
+     "s3Bytes": 5676,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "\u00bf": {
+     "footerMeasured": true,
+     "s3Bytes": 6483,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "\u00e0": {
+     "footerMeasured": true,
+     "s3Bytes": 11253,
+     "s3Files": 1,
+     "s3Rows": 12
+    },
+    "\u00e1": {
+     "footerMeasured": true,
+     "s3Bytes": 39369,
+     "s3Files": 1,
+     "s3Rows": 118
+    },
+    "\u00e2": {
+     "footerMeasured": true,
+     "s3Bytes": 9652,
+     "s3Files": 1,
+     "s3Rows": 7
+    },
+    "\u00e4": {
+     "footerMeasured": true,
+     "s3Bytes": 10640,
+     "s3Files": 1,
+     "s3Rows": 10
+    },
+    "\u00e5": {
+     "footerMeasured": true,
+     "s3Bytes": 19603,
+     "s3Files": 1,
+     "s3Rows": 42
+    },
+    "\u00e7": {
+     "footerMeasured": true,
+     "s3Bytes": 38271,
+     "s3Files": 1,
+     "s3Rows": 113
+    },
+    "\u00e8": {
+     "footerMeasured": true,
+     "s3Bytes": 7545,
+     "s3Files": 1,
+     "s3Rows": 4
+    },
+    "\u00e9": {
+     "footerMeasured": true,
+     "s3Bytes": 33811,
+     "s3Files": 1,
+     "s3Rows": 88
+    },
+    "\u00ea": {
+     "footerMeasured": true,
+     "s3Bytes": 8566,
+     "s3Files": 1,
+     "s3Rows": 5
+    },
+    "\u00eb": {
+     "footerMeasured": true,
+     "s3Bytes": 6384,
+     "s3Files": 1,
+     "s3Rows": 2
+    },
+    "\u00ed": {
+     "footerMeasured": true,
+     "s3Bytes": 9125,
+     "s3Files": 1,
+     "s3Rows": 5
+    },
+    "\u00f1": {
+     "footerMeasured": true,
+     "s3Bytes": 5616,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "\u00f2": {
+     "footerMeasured": true,
+     "s3Bytes": 6267,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "\u00f3": {
+     "footerMeasured": true,
+     "s3Bytes": 20764,
+     "s3Files": 1,
+     "s3Rows": 45
+    },
+    "\u00f4": {
+     "footerMeasured": true,
+     "s3Bytes": 10565,
+     "s3Files": 1,
+     "s3Rows": 12
+    },
+    "\u00f5": {
+     "footerMeasured": true,
+     "s3Bytes": 6535,
+     "s3Files": 1,
+     "s3Rows": 2
+    },
+    "\u00f6": {
+     "footerMeasured": false,
+     "s3Bytes": 62445,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u00f8": {
+     "footerMeasured": true,
+     "s3Bytes": 13095,
+     "s3Files": 1,
+     "s3Rows": 17
+    },
+    "\u00fa": {
+     "footerMeasured": false,
+     "s3Bytes": 11425,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u00fc": {
+     "footerMeasured": false,
+     "s3Bytes": 29737,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u0101": {
+     "footerMeasured": false,
+     "s3Bytes": 6315,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u010d": {
+     "footerMeasured": false,
+     "s3Bytes": 14028,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u0111": {
+     "footerMeasured": false,
+     "s3Bytes": 11567,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u0113": {
+     "footerMeasured": false,
+     "s3Bytes": 6467,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u0131": {
+     "footerMeasured": false,
+     "s3Bytes": 5955,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u0142": {
+     "footerMeasured": false,
+     "s3Bytes": 9371,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u0151": {
+     "footerMeasured": false,
+     "s3Bytes": 6094,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u0159": {
+     "footerMeasured": false,
+     "s3Bytes": 5634,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u015b": {
+     "footerMeasured": false,
+     "s3Bytes": 6705,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u015f": {
+     "footerMeasured": false,
+     "s3Bytes": 25087,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u0161": {
+     "footerMeasured": false,
+     "s3Bytes": 11840,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u017c": {
+     "footerMeasured": false,
+     "s3Bytes": 5904,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u0219": {
+     "footerMeasured": false,
+     "s3Bytes": 6261,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u200b": {
+     "footerMeasured": false,
+     "s3Bytes": 48666,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u200d": {
+     "footerMeasured": false,
+     "s3Bytes": 9493,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u200e": {
+     "footerMeasured": false,
+     "s3Bytes": 7406,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u2018": {
+     "footerMeasured": false,
+     "s3Bytes": 7403,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u2019": {
+     "footerMeasured": false,
+     "s3Bytes": 6788,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u201a": {
+     "footerMeasured": false,
+     "s3Bytes": 5928,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u201c": {
+     "footerMeasured": false,
+     "s3Bytes": 5568,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\u2026": {
+     "footerMeasured": false,
+     "s3Bytes": 6300,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\ud50c": {
+     "footerMeasured": false,
+     "s3Bytes": 5828,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\ufe0f": {
+     "footerMeasured": false,
+     "s3Bytes": 6191,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\uff13": {
+     "footerMeasured": false,
+     "s3Bytes": 5418,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\uff44": {
+     "footerMeasured": false,
+     "s3Bytes": 5736,
+     "s3Files": 1,
+     "s3Rows": null
+    },
+    "\ud835\uddd9": {
+     "footerMeasured": false,
+     "s3Bytes": 6119,
+     "s3Files": 1,
+     "s3Rows": null
+    }
+   },
+   "declaredProviders": [],
+   "geoKind": "initial",
+   "hotIndexByIso": {
+    "AE": 0,
+    "AM": 0,
+    "AR": 0,
+    "AT": 0,
+    "AU": 0,
+    "AZ": 0,
+    "BD": 0,
+    "BE": 0,
+    "BG": 0,
+    "BH": 0,
+    "BO": 0,
+    "BR": 0,
+    "CA": 0,
+    "CH": 0,
+    "CL": 0,
+    "CO": 0,
+    "CR": 0,
+    "CY": 0,
+    "CZ": 0,
+    "DE": 0,
+    "DK": 0,
+    "DO": 0,
+    "EC": 0,
+    "EE": 0,
+    "EG": 0,
+    "ES": 0,
+    "FI": 0,
+    "FR": 0,
+    "GB": 66230,
+    "GE": 0,
+    "GH": 0,
+    "GR": 0,
+    "GT": 0,
+    "HK": 0,
+    "HR": 0,
+    "HU": 0,
+    "ID": 0,
+    "IE": 0,
+    "IL": 0,
+    "IN": 27,
+    "IS": 0,
+    "IT": 0,
+    "JO": 0,
+    "JP": 0,
+    "KE": 0,
+    "KR": 0,
+    "KW": 0,
+    "KZ": 0,
+    "LB": 0,
+    "LK": 0,
+    "LT": 0,
+    "LU": 0,
+    "LV": 0,
+    "MA": 0,
+    "MT": 0,
+    "MX": 0,
+    "MY": 0,
+    "NG": 0,
+    "NL": 0,
+    "NO": 0,
+    "NP": 0,
+    "NZ": 0,
+    "OM": 0,
+    "PA": 0,
+    "PE": 0,
+    "PH": 0,
+    "PK": 0,
+    "PL": 0,
+    "PR": 0,
+    "PT": 0,
+    "PY": 0,
+    "QA": 0,
+    "RO": 0,
+    "RS": 0,
+    "SA": 0,
+    "SE": 0,
+    "SG": 0,
+    "SI": 0,
+    "SK": 0,
+    "TH": 0,
+    "TN": 0,
+    "TR": 0,
+    "TW": 0,
+    "TZ": 0,
+    "UA": 0,
+    "US": 12737,
+    "UY": 0,
+    "UZ": 0,
+    "VN": 0,
+    "ZA": 0
+   },
+   "s3Files": 110,
+   "s3Pool": {
+    "files": 110,
+    "layout": "by_initial_mixed_country"
+   },
+   "s3Prefix": "processed/companies_by_initial/"
+  },
+  "people": {
+   "byGeo": {
+    "afghanistan": {
+     "footerMeasured": true,
+     "s3Bytes": 17737,
+     "s3Files": 2,
+     "s3Rows": 36
+    },
+    "albania": {
+     "footerMeasured": true,
+     "s3Bytes": 19881,
+     "s3Files": 2,
+     "s3Rows": 24
+    },
+    "algeria": {
+     "footerMeasured": true,
+     "s3Bytes": 24176,
+     "s3Files": 2,
+     "s3Rows": 41
+    },
+    "american-samoa": {
+     "footerMeasured": true,
+     "s3Bytes": 6426,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "andorra": {
+     "footerMeasured": true,
+     "s3Bytes": 6939,
+     "s3Files": 1,
+     "s3Rows": 3
+    },
+    "angola": {
+     "footerMeasured": true,
+     "s3Bytes": 8083,
+     "s3Files": 1,
+     "s3Rows": 4
+    },
+    "argentina": {
+     "footerMeasured": true,
+     "s3Bytes": 110816,
+     "s3Files": 2,
+     "s3Rows": 1056
+    },
+    "arizona": {
+     "footerMeasured": true,
+     "s3Bytes": 6085,
+     "s3Files": 1,
+     "s3Rows": 3
+    },
+    "armenia": {
+     "footerMeasured": true,
+     "s3Bytes": 19691,
+     "s3Files": 2,
+     "s3Rows": 21
+    },
+    "australia": {
+     "footerMeasured": true,
+     "s3Bytes": 919538,
+     "s3Files": 2,
+     "s3Rows": 13734
+    },
+    "austria": {
+     "footerMeasured": true,
+     "s3Bytes": 53989,
+     "s3Files": 2,
+     "s3Rows": 349
+    },
+    "azerbaijan": {
+     "footerMeasured": true,
+     "s3Bytes": 18307,
+     "s3Files": 2,
+     "s3Rows": 20
+    },
+    "bahrain": {
+     "footerMeasured": true,
+     "s3Bytes": 30993,
+     "s3Files": 2,
+     "s3Rows": 207
+    },
+    "bangladesh": {
+     "footerMeasured": true,
+     "s3Bytes": 53786,
+     "s3Files": 2,
+     "s3Rows": 359
+    },
+    "barbados": {
+     "footerMeasured": true,
+     "s3Bytes": 9926,
+     "s3Files": 2,
+     "s3Rows": 2
+    },
+    "beijing": {
+     "footerMeasured": true,
+     "s3Bytes": 6896,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "belarus": {
+     "footerMeasured": true,
+     "s3Bytes": 20057,
+     "s3Files": 2,
+     "s3Rows": 29
+    },
+    "belgium": {
+     "footerMeasured": true,
+     "s3Bytes": 141661,
+     "s3Files": 1,
+     "s3Rows": 2408
+    },
+    "belize": {
+     "footerMeasured": true,
+     "s3Bytes": 5061,
+     "s3Files": 1,
+     "s3Rows": 2
+    },
+    "benin": {
+     "footerMeasured": true,
+     "s3Bytes": 13489,
+     "s3Files": 2,
+     "s3Rows": 11
+    },
+    "berlin": {
+     "footerMeasured": true,
+     "s3Bytes": 6961,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "bogota": {
+     "footerMeasured": true,
+     "s3Bytes": 6577,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "bolivia": {
+     "footerMeasured": true,
+     "s3Bytes": 18042,
+     "s3Files": 2,
+     "s3Rows": 11
+    },
+    "bosnia-and-herzegovina": {
+     "footerMeasured": true,
+     "s3Bytes": 19263,
+     "s3Files": 2,
+     "s3Rows": 29
+    },
+    "boston": {
+     "footerMeasured": true,
+     "s3Bytes": 5508,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "botswana": {
+     "footerMeasured": true,
+     "s3Bytes": 15873,
+     "s3Files": 2,
+     "s3Rows": 16
+    },
+    "brazil": {
+     "footerMeasured": true,
+     "s3Bytes": 462035,
+     "s3Files": 2,
+     "s3Rows": 6160
+    },
+    "bulgaria": {
+     "footerMeasured": true,
+     "s3Bytes": 31252,
+     "s3Files": 2,
+     "s3Rows": 114
+    },
+    "burkina-faso": {
+     "footerMeasured": true,
+     "s3Bytes": 16192,
+     "s3Files": 2,
+     "s3Rows": 10
+    },
+    "burundi": {
+     "footerMeasured": true,
+     "s3Bytes": 7909,
+     "s3Files": 1,
+     "s3Rows": 4
+    },
+    "california": {
+     "footerMeasured": true,
+     "s3Bytes": 11846,
+     "s3Files": 2,
+     "s3Rows": 4
+    },
+    "cambodia": {
+     "footerMeasured": true,
+     "s3Bytes": 23003,
+     "s3Files": 2,
+     "s3Rows": 32
+    },
+    "cameroon": {
+     "footerMeasured": true,
+     "s3Bytes": 22375,
+     "s3Files": 2,
+     "s3Rows": 49
+    },
+    "canada": {
+     "footerMeasured": true,
+     "s3Bytes": 1635571,
+     "s3Files": 2,
+     "s3Rows": 16904
+    },
+    "catalonia": {
+     "footerMeasured": true,
+     "s3Bytes": 6700,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "central-african-republic": {
+     "footerMeasured": true,
+     "s3Bytes": 12158,
+     "s3Files": 2,
+     "s3Rows": 2
+    },
+    "chad": {
+     "footerMeasured": true,
+     "s3Bytes": 12783,
+     "s3Files": 2,
+     "s3Rows": 7
+    },
+    "chile": {
+     "footerMeasured": true,
+     "s3Bytes": 60790,
+     "s3Files": 2,
+     "s3Rows": 340
+    },
+    "china": {
+     "footerMeasured": true,
+     "s3Bytes": 185809,
+     "s3Files": 2,
+     "s3Rows": 2789
+    },
+    "colombia": {
+     "footerMeasured": true,
+     "s3Bytes": 64638,
+     "s3Files": 2,
+     "s3Rows": 299
+    },
+    "colorado": {
+     "footerMeasured": true,
+     "s3Bytes": 6959,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "costa-rica": {
+     "footerMeasured": true,
+     "s3Bytes": 31289,
+     "s3Files": 2,
+     "s3Rows": 76
+    },
+    "cote-d-ivoire": {
+     "footerMeasured": true,
+     "s3Bytes": 30296,
+     "s3Files": 2,
+     "s3Rows": 110
+    },
+    "croatia": {
+     "footerMeasured": true,
+     "s3Bytes": 29709,
+     "s3Files": 2,
+     "s3Rows": 104
+    },
+    "cuba": {
+     "footerMeasured": true,
+     "s3Bytes": 4658,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "curacao": {
+     "footerMeasured": true,
+     "s3Bytes": 6785,
+     "s3Files": 1,
+     "s3Rows": 2
+    },
+    "cyprus": {
+     "footerMeasured": true,
+     "s3Bytes": 7523,
+     "s3Files": 1,
+     "s3Rows": 4
+    },
+    "czech-republic": {
+     "footerMeasured": true,
+     "s3Bytes": 30984,
+     "s3Files": 2,
+     "s3Rows": 77
+    },
+    "czechia": {
+     "footerMeasured": true,
+     "s3Bytes": 36827,
+     "s3Files": 2,
+     "s3Rows": 103
+    },
+    "democratic-republic-of-the-congo": {
+     "footerMeasured": true,
+     "s3Bytes": 10282,
+     "s3Files": 1,
+     "s3Rows": 14
+    },
+    "denmark": {
+     "footerMeasured": true,
+     "s3Bytes": 78157,
+     "s3Files": 2,
+     "s3Rows": 728
+    },
+    "djibouti": {
+     "footerMeasured": true,
+     "s3Bytes": 15745,
+     "s3Files": 2,
+     "s3Rows": 8
+    },
+    "dominican-republic": {
+     "footerMeasured": true,
+     "s3Bytes": 7663,
+     "s3Files": 1,
+     "s3Rows": 3
+    },
+    "dubois": {
+     "footerMeasured": true,
+     "s3Bytes": 5158,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "ecuador": {
+     "footerMeasured": true,
+     "s3Bytes": 22309,
+     "s3Files": 2,
+     "s3Rows": 25
+    },
+    "egypt": {
+     "footerMeasured": true,
+     "s3Bytes": 59002,
+     "s3Files": 2,
+     "s3Rows": 505
+    },
+    "el-salvador": {
+     "footerMeasured": true,
+     "s3Bytes": 15529,
+     "s3Files": 2,
+     "s3Rows": 13
+    },
+    "eritrea": {
+     "footerMeasured": true,
+     "s3Bytes": 6921,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "estonia": {
+     "footerMeasured": true,
+     "s3Bytes": 28501,
+     "s3Files": 2,
+     "s3Rows": 71
+    },
+    "ethiopia": {
+     "footerMeasured": true,
+     "s3Bytes": 32780,
+     "s3Files": 2,
+     "s3Rows": 123
+    },
+    "federal-territory-of-kuala-lumpur": {
+     "footerMeasured": true,
+     "s3Bytes": 6873,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "fiji": {
+     "footerMeasured": true,
+     "s3Bytes": 9309,
+     "s3Files": 1,
+     "s3Rows": 6
+    },
+    "finland": {
+     "footerMeasured": true,
+     "s3Bytes": 72445,
+     "s3Files": 2,
+     "s3Rows": 687
+    },
+    "flanders": {
+     "footerMeasured": true,
+     "s3Bytes": 6752,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "france": {
+     "footerMeasured": true,
+     "s3Bytes": 235846,
+     "s3Files": 2,
+     "s3Rows": 3089
+    },
+    "gabon": {
+     "footerMeasured": true,
+     "s3Bytes": 7854,
+     "s3Files": 1,
+     "s3Rows": 2
+    },
+    "gauteng": {
+     "footerMeasured": true,
+     "s3Bytes": 6315,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "georgia": {
+     "footerMeasured": true,
+     "s3Bytes": 26425,
+     "s3Files": 2,
+     "s3Rows": 53
+    },
+    "germany": {
+     "footerMeasured": true,
+     "s3Bytes": 836117,
+     "s3Files": 2,
+     "s3Rows": 11950
+    },
+    "ghana": {
+     "footerMeasured": true,
+     "s3Bytes": 40919,
+     "s3Files": 2,
+     "s3Rows": 238
+    },
+    "greece": {
+     "footerMeasured": true,
+     "s3Bytes": 28774,
+     "s3Files": 2,
+     "s3Rows": 174
+    },
+    "guadeloupe": {
+     "footerMeasured": true,
+     "s3Bytes": 7377,
+     "s3Files": 1,
+     "s3Rows": 2
+    },
+    "guam": {
+     "footerMeasured": true,
+     "s3Bytes": 8565,
+     "s3Files": 1,
+     "s3Rows": 5
+    },
+    "guatemala": {
+     "footerMeasured": true,
+     "s3Bytes": 23590,
+     "s3Files": 2,
+     "s3Rows": 64
+    },
+    "guinea": {
+     "footerMeasured": true,
+     "s3Bytes": 6898,
+     "s3Files": 1,
+     "s3Rows": 2
+    },
+    "haiti": {
+     "footerMeasured": true,
+     "s3Bytes": 15959,
+     "s3Files": 2,
+     "s3Rows": 8
+    },
+    "hamburg": {
+     "footerMeasured": true,
+     "s3Bytes": 6139,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "haryana": {
+     "footerMeasured": true,
+     "s3Bytes": 6237,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "hawaii": {
+     "footerMeasured": true,
+     "s3Bytes": 5090,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "honduras": {
+     "footerMeasured": true,
+     "s3Bytes": 9102,
+     "s3Files": 1,
+     "s3Rows": 5
+    },
+    "hong-kong": {
+     "footerMeasured": true,
+     "s3Bytes": 63412,
+     "s3Files": 2,
+     "s3Rows": 723
+    },
+    "https-www-facebook-com-cbc-": {
+     "footerMeasured": true,
+     "s3Bytes": 5101,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "hungary": {
+     "footerMeasured": true,
+     "s3Bytes": 61176,
+     "s3Files": 2,
+     "s3Rows": 515
+    },
+    "iceland": {
+     "footerMeasured": true,
+     "s3Bytes": 14719,
+     "s3Files": 2,
+     "s3Rows": 19
+    },
+    "illinois": {
+     "footerMeasured": true,
+     "s3Bytes": 7181,
+     "s3Files": 1,
+     "s3Rows": 2
+    },
+    "india": {
+     "footerMeasured": true,
+     "s3Bytes": 1598837,
+     "s3Files": 2,
+     "s3Rows": 25048
+    },
+    "indonesia": {
+     "footerMeasured": true,
+     "s3Bytes": 136464,
+     "s3Files": 2,
+     "s3Rows": 1757
+    },
+    "iowa": {
+     "footerMeasured": true,
+     "s3Bytes": 5984,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "iran": {
+     "footerMeasured": true,
+     "s3Bytes": 26542,
+     "s3Files": 2,
+     "s3Rows": 54
+    },
+    "iraq": {
+     "footerMeasured": true,
+     "s3Bytes": 19365,
+     "s3Files": 2,
+     "s3Rows": 34
+    },
+    "ireland": {
+     "footerMeasured": true,
+     "s3Bytes": 48083,
+     "s3Files": 2,
+     "s3Rows": 453
+    },
+    "isle-of-man": {
+     "footerMeasured": true,
+     "s3Bytes": 5976,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "israel": {
+     "footerMeasured": true,
+     "s3Bytes": 132843,
+     "s3Files": 2,
+     "s3Rows": 1466
+    },
+    "italy": {
+     "footerMeasured": true,
+     "s3Bytes": 210354,
+     "s3Files": 2,
+     "s3Rows": 3104
+    },
+    "ithaca": {
+     "footerMeasured": true,
+     "s3Bytes": 5265,
+     "s3Files": 1,
+     "s3Rows": 2
+    },
+    "jamaica": {
+     "footerMeasured": true,
+     "s3Bytes": 9634,
+     "s3Files": 1,
+     "s3Rows": 8
+    },
+    "japan": {
+     "footerMeasured": true,
+     "s3Bytes": 125921,
+     "s3Files": 2,
+     "s3Rows": 1521
+    },
+    "jordan": {
+     "footerMeasured": true,
+     "s3Bytes": 26369,
+     "s3Files": 2,
+     "s3Rows": 73
+    },
+    "kazakhstan": {
+     "footerMeasured": true,
+     "s3Bytes": 26703,
+     "s3Files": 2,
+     "s3Rows": 74
+    },
+    "kenya": {
+     "footerMeasured": true,
+     "s3Bytes": 66945,
+     "s3Files": 2,
+     "s3Rows": 522
+    },
+    "kosovo": {
+     "footerMeasured": true,
+     "s3Bytes": 15526,
+     "s3Files": 2,
+     "s3Rows": 15
+    },
+    "kuwait": {
+     "footerMeasured": true,
+     "s3Bytes": 22203,
+     "s3Files": 3,
+     "s3Rows": 10
+    },
+    "kyrgyzstan": {
+     "footerMeasured": true,
+     "s3Bytes": 9515,
+     "s3Files": 1,
+     "s3Rows": 16
+    },
+    "laos": {
+     "footerMeasured": true,
+     "s3Bytes": 14419,
+     "s3Files": 2,
+     "s3Rows": 11
+    },
+    "latvia": {
+     "footerMeasured": true,
+     "s3Bytes": 23059,
+     "s3Files": 2,
+     "s3Rows": 31
+    },
+    "lebanon": {
+     "footerMeasured": true,
+     "s3Bytes": 25989,
+     "s3Files": 2,
+     "s3Rows": 58
+    },
+    "lesotho": {
+     "footerMeasured": true,
+     "s3Bytes": 9322,
+     "s3Files": 1,
+     "s3Rows": 6
+    },
+    "liberia": {
+     "footerMeasured": true,
+     "s3Bytes": 15396,
+     "s3Files": 2,
+     "s3Rows": 10
+    },
+    "libya": {
+     "footerMeasured": true,
+     "s3Bytes": 6725,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "lithuania": {
+     "footerMeasured": true,
+     "s3Bytes": 42994,
+     "s3Files": 2,
+     "s3Rows": 266
+    },
+    "lombardy": {
+     "footerMeasured": true,
+     "s3Bytes": 6506,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "luxembourg": {
+     "footerMeasured": true,
+     "s3Bytes": 25817,
+     "s3Files": 2,
+     "s3Rows": 60
+    },
+    "madagascar": {
+     "footerMeasured": true,
+     "s3Bytes": 8726,
+     "s3Files": 1,
+     "s3Rows": 5
+    },
+    "maharashtra": {
+     "footerMeasured": true,
+     "s3Bytes": 6730,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "malawi": {
+     "footerMeasured": true,
+     "s3Bytes": 21865,
+     "s3Files": 2,
+     "s3Rows": 35
+    },
+    "malaysia": {
+     "footerMeasured": true,
+     "s3Bytes": 86874,
+     "s3Files": 2,
+     "s3Rows": 897
+    },
+    "mali": {
+     "footerMeasured": true,
+     "s3Bytes": 16831,
+     "s3Files": 2,
+     "s3Rows": 12
+    },
+    "malta": {
+     "footerMeasured": true,
+     "s3Bytes": 13764,
+     "s3Files": 2,
+     "s3Rows": 3
+    },
+    "marshall-islands": {
+     "footerMeasured": true,
+     "s3Bytes": 12108,
+     "s3Files": 2,
+     "s3Rows": 5
+    },
+    "masovian-voivodeship": {
+     "footerMeasured": true,
+     "s3Bytes": 6059,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "mauritania": {
+     "footerMeasured": true,
+     "s3Bytes": 7907,
+     "s3Files": 1,
+     "s3Rows": 3
+    },
+    "mauritius": {
+     "footerMeasured": true,
+     "s3Bytes": 8704,
+     "s3Files": 1,
+     "s3Rows": 7
+    },
+    "melbourne": {
+     "footerMeasured": true,
+     "s3Bytes": 6378,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "mexico": {
+     "footerMeasured": true,
+     "s3Bytes": 165660,
+     "s3Files": 2,
+     "s3Rows": 1753
+    },
+    "mexico-city": {
+     "footerMeasured": true,
+     "s3Bytes": 5417,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "missouri": {
+     "footerMeasured": true,
+     "s3Bytes": 4889,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "moldova": {
+     "footerMeasured": true,
+     "s3Bytes": 16142,
+     "s3Files": 2,
+     "s3Rows": 17
+    },
+    "mongolia": {
+     "footerMeasured": true,
+     "s3Bytes": 13302,
+     "s3Files": 2,
+     "s3Rows": 8
+    },
+    "montenegro": {
+     "footerMeasured": true,
+     "s3Bytes": 15072,
+     "s3Files": 2,
+     "s3Rows": 9
+    },
+    "morocco": {
+     "footerMeasured": true,
+     "s3Bytes": 36374,
+     "s3Files": 2,
+     "s3Rows": 171
+    },
+    "mozambique": {
+     "footerMeasured": true,
+     "s3Bytes": 18714,
+     "s3Files": 2,
+     "s3Rows": 25
+    },
+    "myanmar-burma-": {
+     "footerMeasured": true,
+     "s3Bytes": 7802,
+     "s3Files": 1,
+     "s3Rows": 3
+    },
+    "nairobi": {
+     "footerMeasured": true,
+     "s3Bytes": 6239,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "namibia": {
+     "footerMeasured": true,
+     "s3Bytes": 14113,
+     "s3Files": 2,
+     "s3Rows": 11
+    },
+    "nepal": {
+     "footerMeasured": true,
+     "s3Bytes": 20829,
+     "s3Files": 2,
+     "s3Rows": 32
+    },
+    "netherlands": {
+     "footerMeasured": true,
+     "s3Bytes": 312490,
+     "s3Files": 2,
+     "s3Rows": 4412
+    },
+    "new-south-wales": {
+     "footerMeasured": true,
+     "s3Bytes": 7196,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "new-york": {
+     "footerMeasured": true,
+     "s3Bytes": 6831,
+     "s3Files": 1,
+     "s3Rows": 2
+    },
+    "new-zealand": {
+     "footerMeasured": true,
+     "s3Bytes": 67356,
+     "s3Files": 2,
+     "s3Rows": 601
+    },
+    "nicaragua": {
+     "footerMeasured": true,
+     "s3Bytes": 12894,
+     "s3Files": 2,
+     "s3Rows": 5
+    },
+    "niger": {
+     "footerMeasured": true,
+     "s3Bytes": 15422,
+     "s3Files": 2,
+     "s3Rows": 7
+    },
+    "nigeria": {
+     "footerMeasured": true,
+     "s3Bytes": 67065,
+     "s3Files": 2,
+     "s3Rows": 622
+    },
+    "north-brabant": {
+     "footerMeasured": true,
+     "s3Bytes": 6068,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "north-carolina": {
+     "footerMeasured": true,
+     "s3Bytes": 6296,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "north-korea": {
+     "footerMeasured": true,
+     "s3Bytes": 5949,
+     "s3Files": 1,
+     "s3Rows": 3
+    },
+    "north-macedonia": {
+     "footerMeasured": true,
+     "s3Bytes": 13577,
+     "s3Files": 2,
+     "s3Rows": 6
+    },
+    "north-rhine-westphalia": {
+     "footerMeasured": true,
+     "s3Bytes": 6890,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "norway": {
+     "footerMeasured": true,
+     "s3Bytes": 60774,
+     "s3Files": 2,
+     "s3Rows": 1058
+    },
+    "oman": {
+     "footerMeasured": true,
+     "s3Bytes": 8861,
+     "s3Files": 1,
+     "s3Rows": 9
+    },
+    "ontario": {
+     "footerMeasured": true,
+     "s3Bytes": 6746,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "oregon": {
+     "footerMeasured": true,
+     "s3Bytes": 7011,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "pakistan": {
+     "footerMeasured": true,
+     "s3Bytes": 74693,
+     "s3Files": 2,
+     "s3Rows": 780
+    },
+    "panama": {
+     "footerMeasured": true,
+     "s3Bytes": 26450,
+     "s3Files": 2,
+     "s3Rows": 70
+    },
+    "paraguay": {
+     "footerMeasured": true,
+     "s3Bytes": 25926,
+     "s3Files": 2,
+     "s3Rows": 46
+    },
+    "pennsylvania": {
+     "footerMeasured": true,
+     "s3Bytes": 7529,
+     "s3Files": 1,
+     "s3Rows": 5
+    },
+    "peru": {
+     "footerMeasured": true,
+     "s3Bytes": 41884,
+     "s3Files": 2,
+     "s3Rows": 157
+    },
+    "philippines": {
+     "footerMeasured": true,
+     "s3Bytes": 89182,
+     "s3Files": 2,
+     "s3Rows": 1034
+    },
+    "poland": {
+     "footerMeasured": true,
+     "s3Bytes": 140678,
+     "s3Files": 2,
+     "s3Rows": 1727
+    },
+    "portugal": {
+     "footerMeasured": true,
+     "s3Bytes": 57572,
+     "s3Files": 2,
+     "s3Rows": 419
+    },
+    "provence-alpes-cote-d-azur": {
+     "footerMeasured": true,
+     "s3Bytes": 6274,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "puerto-rico": {
+     "footerMeasured": true,
+     "s3Bytes": 30273,
+     "s3Files": 2,
+     "s3Rows": 102
+    },
+    "qatar": {
+     "footerMeasured": true,
+     "s3Bytes": 23017,
+     "s3Files": 2,
+     "s3Rows": 29
+    },
+    "republic-of-indonesia": {
+     "footerMeasured": true,
+     "s3Bytes": 59300,
+     "s3Files": 2,
+     "s3Rows": 456
+    },
+    "republic-of-the-congo": {
+     "footerMeasured": true,
+     "s3Bytes": 6507,
+     "s3Files": 1,
+     "s3Rows": 4
+    },
+    "republic-of-the-union-of-myanmar": {
+     "footerMeasured": true,
+     "s3Bytes": 19021,
+     "s3Files": 2,
+     "s3Rows": 22
+    },
+    "reunion": {
+     "footerMeasured": true,
+     "s3Bytes": 13558,
+     "s3Files": 2,
+     "s3Rows": 6
+    },
+    "romania": {
+     "footerMeasured": true,
+     "s3Bytes": 47619,
+     "s3Files": 2,
+     "s3Rows": 552
+    },
+    "russia": {
+     "footerMeasured": true,
+     "s3Bytes": 60605,
+     "s3Files": 2,
+     "s3Rows": 367
+    },
+    "rwanda": {
+     "footerMeasured": true,
+     "s3Bytes": 25465,
+     "s3Files": 2,
+     "s3Rows": 60
+    },
+    "saint-lucia": {
+     "footerMeasured": true,
+     "s3Bytes": 5079,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "saudi-arabia": {
+     "footerMeasured": true,
+     "s3Bytes": 40929,
+     "s3Files": 2,
+     "s3Rows": 176
+    },
+    "senegal": {
+     "footerMeasured": true,
+     "s3Bytes": 26918,
+     "s3Files": 2,
+     "s3Rows": 41
+    },
+    "serbia": {
+     "footerMeasured": true,
+     "s3Bytes": 34395,
+     "s3Files": 2,
+     "s3Rows": 143
+    },
+    "sierra-leone": {
+     "footerMeasured": true,
+     "s3Bytes": 9011,
+     "s3Files": 1,
+     "s3Rows": 5
+    },
+    "singapore": {
+     "footerMeasured": true,
+     "s3Bytes": 130597,
+     "s3Files": 2,
+     "s3Rows": 1440
+    },
+    "slovakia": {
+     "footerMeasured": true,
+     "s3Bytes": 31737,
+     "s3Files": 2,
+     "s3Rows": 101
+    },
+    "slovenia": {
+     "footerMeasured": true,
+     "s3Bytes": 23038,
+     "s3Files": 2,
+     "s3Rows": 38
+    },
+    "somalia": {
+     "footerMeasured": true,
+     "s3Bytes": 16813,
+     "s3Files": 2,
+     "s3Rows": 19
+    },
+    "south-africa": {
+     "footerMeasured": true,
+     "s3Bytes": 102800,
+     "s3Files": 2,
+     "s3Rows": 972
+    },
+    "south-korea": {
+     "footerMeasured": true,
+     "s3Bytes": 54715,
+     "s3Files": 2,
+     "s3Rows": 381
+    },
+    "south-sudan": {
+     "footerMeasured": true,
+     "s3Bytes": 14601,
+     "s3Files": 2,
+     "s3Rows": 11
+    },
+    "spain": {
+     "footerMeasured": true,
+     "s3Bytes": 162184,
+     "s3Files": 2,
+     "s3Rows": 2136
+    },
+    "sri-lanka": {
+     "footerMeasured": true,
+     "s3Bytes": 27751,
+     "s3Files": 2,
+     "s3Rows": 62
+    },
+    "state-of-goias": {
+     "footerMeasured": true,
+     "s3Bytes": 5825,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "sudan": {
+     "footerMeasured": true,
+     "s3Bytes": 21778,
+     "s3Files": 2,
+     "s3Rows": 106
+    },
+    "swaziland": {
+     "footerMeasured": true,
+     "s3Bytes": 11733,
+     "s3Files": 2,
+     "s3Rows": 4
+    },
+    "sweden": {
+     "footerMeasured": true,
+     "s3Bytes": 65910,
+     "s3Files": 2,
+     "s3Rows": 496
+    },
+    "switzerland": {
+     "footerMeasured": true,
+     "s3Bytes": 150700,
+     "s3Files": 2,
+     "s3Rows": 1644
+    },
+    "syria": {
+     "footerMeasured": true,
+     "s3Bytes": 9012,
+     "s3Files": 1,
+     "s3Rows": 5
+    },
+    "taiwan": {
+     "footerMeasured": true,
+     "s3Bytes": 44170,
+     "s3Files": 2,
+     "s3Rows": 368
+    },
+    "tajikistan": {
+     "footerMeasured": true,
+     "s3Bytes": 8825,
+     "s3Files": 1,
+     "s3Rows": 7
+    },
+    "tanzania": {
+     "footerMeasured": true,
+     "s3Bytes": 28495,
+     "s3Files": 2,
+     "s3Rows": 62
+    },
+    "thailand": {
+     "footerMeasured": true,
+     "s3Bytes": 68586,
+     "s3Files": 2,
+     "s3Rows": 726
+    },
+    "the-bahamas": {
+     "footerMeasured": true,
+     "s3Bytes": 8068,
+     "s3Files": 1,
+     "s3Rows": 3
+    },
+    "the-gambia": {
+     "footerMeasured": true,
+     "s3Bytes": 6797,
+     "s3Files": 1,
+     "s3Rows": 2
+    },
+    "timor-leste": {
+     "footerMeasured": true,
+     "s3Bytes": 11993,
+     "s3Files": 2,
+     "s3Rows": 2
+    },
+    "togo": {
+     "footerMeasured": true,
+     "s3Bytes": 15161,
+     "s3Files": 2,
+     "s3Rows": 14
+    },
+    "trinidad-and-tobago": {
+     "footerMeasured": true,
+     "s3Bytes": 18875,
+     "s3Files": 2,
+     "s3Rows": 14
+    },
+    "tucson": {
+     "footerMeasured": true,
+     "s3Bytes": 5217,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "tuerkiye": {
+     "footerMeasured": true,
+     "s3Bytes": 15920,
+     "s3Files": 2,
+     "s3Rows": 7
+    },
+    "tunisia": {
+     "footerMeasured": true,
+     "s3Bytes": 27390,
+     "s3Files": 2,
+     "s3Rows": 62
+    },
+    "turkey": {
+     "footerMeasured": true,
+     "s3Bytes": 88525,
+     "s3Files": 2,
+     "s3Rows": 860
+    },
+    "turkmenistan": {
+     "footerMeasured": true,
+     "s3Bytes": 6467,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "u-s-virgin-islands": {
+     "footerMeasured": true,
+     "s3Bytes": 11916,
+     "s3Files": 2,
+     "s3Rows": 3
+    },
+    "uganda": {
+     "footerMeasured": true,
+     "s3Bytes": 27761,
+     "s3Files": 2,
+     "s3Rows": 78
+    },
+    "ukraine": {
+     "footerMeasured": true,
+     "s3Bytes": 75772,
+     "s3Files": 2,
+     "s3Rows": 646
+    },
+    "united-arab-emirates": {
+     "footerMeasured": true,
+     "s3Bytes": 82336,
+     "s3Files": 2,
+     "s3Rows": 598
+    },
+    "united-kingdom": {
+     "footerMeasured": true,
+     "s3Bytes": 494068,
+     "s3Files": 2,
+     "s3Rows": 6392
+    },
+    "united-states": {
+     "footerMeasured": true,
+     "s3Bytes": 49187699,
+     "s3Files": 1,
+     "s3Rows": 351216
+    },
+    "uruguay": {
+     "footerMeasured": true,
+     "s3Bytes": 36572,
+     "s3Files": 2,
+     "s3Rows": 241
+    },
+    "uttar-pradesh": {
+     "footerMeasured": true,
+     "s3Bytes": 5839,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "uzbekistan": {
+     "footerMeasured": true,
+     "s3Bytes": 24574,
+     "s3Files": 2,
+     "s3Rows": 46
+    },
+    "vanuatu": {
+     "footerMeasured": true,
+     "s3Bytes": 7021,
+     "s3Files": 1,
+     "s3Rows": 1
+    },
+    "venezuela": {
+     "footerMeasured": true,
+     "s3Bytes": 14524,
+     "s3Files": 2,
+     "s3Rows": 10
+    },
+    "vietnam": {
+     "footerMeasured": true,
+     "s3Bytes": 47635,
+     "s3Files": 2,
+     "s3Rows": 274
+    },
+    "yemen": {
+     "footerMeasured": true,
+     "s3Bytes": 13979,
+     "s3Files": 2,
+     "s3Rows": 10
+    },
+    "zambia": {
+     "footerMeasured": true,
+     "s3Bytes": 29086,
+     "s3Files": 2,
+     "s3Rows": 96
+    },
+    "zimbabwe": {
+     "footerMeasured": true,
+     "s3Bytes": 18496,
+     "s3Files": 2,
+     "s3Rows": 22
+    },
+    "zurich": {
+     "footerMeasured": true,
+     "s3Bytes": 7767,
+     "s3Files": 1,
+     "s3Rows": 1
+    }
+   },
+   "declaredProviders": [],
+   "geoKind": "slug",
+   "hotIndexByIso": {
+    "AE": 0,
+    "AM": 0,
+    "AR": 0,
+    "AT": 0,
+    "AU": 0,
+    "AZ": 0,
+    "BD": 0,
+    "BE": 0,
+    "BG": 0,
+    "BH": 0,
+    "BO": 0,
+    "BR": 0,
+    "CA": 16900,
+    "CH": 0,
+    "CL": 0,
+    "CO": 0,
+    "CR": 0,
+    "CY": 0,
+    "CZ": 0,
+    "DE": 0,
+    "DK": 0,
+    "DO": 0,
+    "EC": 0,
+    "EE": 0,
+    "EG": 0,
+    "ES": 0,
+    "FI": 0,
+    "FR": 0,
+    "GB": 6391,
+    "GE": 0,
+    "GH": 0,
+    "GR": 0,
+    "GT": 0,
+    "HK": 0,
+    "HR": 0,
+    "HU": 0,
+    "ID": 0,
+    "IE": 0,
+    "IL": 0,
+    "IN": 25031,
+    "IS": 0,
+    "IT": 0,
+    "JO": 0,
+    "JP": 0,
+    "KE": 0,
+    "KR": 0,
+    "KW": 0,
+    "KZ": 0,
+    "LB": 0,
+    "LK": 0,
+    "LT": 0,
+    "LU": 0,
+    "LV": 0,
+    "MA": 0,
+    "MT": 0,
+    "MX": 0,
+    "MY": 0,
+    "NG": 0,
+    "NL": 0,
+    "NO": 0,
+    "NP": 0,
+    "NZ": 0,
+    "OM": 0,
+    "PA": 0,
+    "PE": 0,
+    "PH": 0,
+    "PK": 0,
+    "PL": 0,
+    "PR": 0,
+    "PT": 0,
+    "PY": 0,
+    "QA": 0,
+    "RO": 0,
+    "RS": 0,
+    "SA": 0,
+    "SE": 0,
+    "SG": 0,
+    "SI": 0,
+    "SK": 0,
+    "TH": 0,
+    "TN": 0,
+    "TR": 0,
+    "TW": 0,
+    "TZ": 0,
+    "UA": 0,
+    "US": 351072,
+    "UY": 0,
+    "UZ": 0,
+    "VN": 0,
+    "ZA": 0
+   },
+   "measuredAt": "s3-footer-scan",
+   "s3Files": 362,
+   "s3Prefix": "processed/people_by_country/"
+  }
+ },
+ "hotIndex": {
+  "measured": true,
+  "via": "supabase-postgrest-count-exact"
+ }
+}

@@ -1,0 +1,440 @@
+{
+  "key": "cleaned-6.csv",
+  "size": 8902272,
+  "last_modified": "2026-09-08 00:15:51+00:00",
+  "columns": [
+    "First Name",
+    "Last Name",
+    "Title",
+    "Company",
+    "Company Name for Emails",
+    "Email",
+    "Email Status",
+    "Seniority",
+    "Departments",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Stage",
+    "# Employees",
+    "Industry",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "City",
+    "State",
+    "Country",
+    "Company City",
+    "Company State",
+    "Company Country",
+    "Company Phone",
+    "SEO Description",
+    "email",
+    "username",
+    "domain",
+    "status",
+    "overall_score",
+    "is_safe_to_send",
+    "is_valid_syntax",
+    "is_disposable",
+    "is_role_account",
+    "mx_accepts_mail",
+    "mx_records",
+    "can_connect_smtp",
+    "has_inbox_full",
+    "is_catch_all",
+    "is_deliverable",
+    "is_disabled",
+    "is_spamtrap",
+    "is_free_email"
+  ],
+  "row_count": 11479,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "First Name": "first_name",
+    "Last Name": "last_name",
+    "Title": "title",
+    "Company": "company",
+    "Company Name for Emails": "email",
+    "Email": "email",
+    "Email Status": "email",
+    "Seniority": "other",
+    "Departments": "other",
+    "First Phone": "phone",
+    "Work Direct Phone": "phone",
+    "Home Phone": "phone",
+    "Mobile Phone": "phone",
+    "Corporate Phone": "phone",
+    "Other Phone": "phone",
+    "Stage": "other",
+    "# Employees": "employees",
+    "Industry": "industry",
+    "Website": "website",
+    "Company Linkedin Url": "linkedin",
+    "Facebook Url": "social",
+    "Twitter Url": "social",
+    "City": "other",
+    "State": "other",
+    "Country": "country",
+    "Company City": "company",
+    "Company State": "company",
+    "Company Country": "company",
+    "Company Phone": "phone",
+    "SEO Description": "descriptive",
+    "email": "email",
+    "username": "other",
+    "domain": "website",
+    "status": "other",
+    "overall_score": "other",
+    "is_safe_to_send": "other",
+    "is_valid_syntax": "other",
+    "is_disposable": "other",
+    "is_role_account": "company",
+    "mx_accepts_mail": "email",
+    "mx_records": "other",
+    "can_connect_smtp": "other",
+    "has_inbox_full": "other",
+    "is_catch_all": "other",
+    "is_deliverable": "other",
+    "is_disabled": "other",
+    "is_spamtrap": "other",
+    "is_free_email": "email"
+  },
+  "missing_pct": {
+    "First Name": 0.1,
+    "Last Name": 0.3,
+    "Title": 0.0,
+    "Company": 0.0,
+    "Company Name for Emails": 0.0,
+    "Email": 0.0,
+    "Email Status": 0.0,
+    "Seniority": 0.0,
+    "Departments": 22.7,
+    "First Phone": 6.1,
+    "Work Direct Phone": 100.0,
+    "Home Phone": 100.0,
+    "Mobile Phone": 98.8,
+    "Corporate Phone": 6.3,
+    "Other Phone": 99.4,
+    "Stage": 0.0,
+    "# Employees": 0.1,
+    "Industry": 0.9,
+    "Website": 0.1,
+    "Company Linkedin Url": 0.3,
+    "Facebook Url": 9.3,
+    "Twitter Url": 10.4,
+    "City": 15.5,
+    "State": 12.4,
+    "Country": 0.3,
+    "Company City": 5.0,
+    "Company State": 3.2,
+    "Company Country": 0.3,
+    "Company Phone": 5.0,
+    "SEO Description": 15.6,
+    "email": 0.0,
+    "username": 0.0,
+    "domain": 0.0,
+    "status": 0.0,
+    "overall_score": 0.0,
+    "is_safe_to_send": 0.0,
+    "is_valid_syntax": 0.0,
+    "is_disposable": 0.0,
+    "is_role_account": 0.0,
+    "mx_accepts_mail": 0.0,
+    "mx_records": 0.0,
+    "can_connect_smtp": 0.0,
+    "has_inbox_full": 0.0,
+    "is_catch_all": 0.0,
+    "is_deliverable": 0.0,
+    "is_disabled": 0.0,
+    "is_spamtrap": 0.0,
+    "is_free_email": 0.0
+  },
+  "samples": {
+    "First Name": [
+      "Christina",
+      "Arthur",
+      "Gul"
+    ],
+    "Last Name": [
+      "Dovi",
+      "Coykendall",
+      "Yesilova"
+    ],
+    "Title": [
+      "Director of Finance and Budget",
+      "Site Supervisor",
+      "Key Account Manager OEM"
+    ],
+    "Company": [
+      "www.law.cornell.edu",
+      "Havecon Horticultural Projects",
+      "Signify"
+    ],
+    "Company Name for Emails": [
+      "law.cornell.edu",
+      "Havecon Horticultural Projects",
+      "Signify"
+    ],
+    "Email": [
+      "cjd88@cornell.edu",
+      "arthur@havecon.com",
+      "gul.yesilova@signify.com"
+    ],
+    "Email Status": [
+      "Verified",
+      "Verified",
+      "Verified"
+    ],
+    "Seniority": [
+      "Director",
+      "Manager",
+      "Manager"
+    ],
+    "Departments": [
+      "Finance",
+      "Sales",
+      "Engineering & Technical"
+    ],
+    "First Phone": [
+      "'+1 607-254-4636",
+      "'+31 10 266 3270",
+      "'+31 40 275 0000"
+    ],
+    "Corporate Phone": [
+      "'+1 607-254-4636",
+      "'+31 10 266 3270",
+      "'+31 40 275 0000"
+    ],
+    "Stage": [
+      "Cold",
+      "Cold",
+      "Cold"
+    ],
+    "# Employees": [
+      "19000",
+      "52",
+      "34000"
+    ],
+    "Industry": [
+      "higher education",
+      "construction",
+      "electrical/electronic manufacturing"
+    ],
+    "Website": [
+      "http://www.cornell.edu",
+      "http://www.havecon.com",
+      "http://www.signify.com"
+    ],
+    "Company Linkedin Url": [
+      "http://www.linkedin.com/school/cornell-university",
+      "http://www.linkedin.com/company/havecon-bv",
+      "http://www.linkedin.com/company/signifycompany"
+    ],
+    "Facebook Url": [
+      "https://www.facebook.com/Cornell",
+      "https://facebook.com/signify/",
+      "https://facebook.com/basf.apac/"
+    ],
+    "Twitter Url": [
+      "https://twitter.com/Cornell",
+      "https://twitter.com/havecon",
+      "https://twitter.com/signifycompany?lang=en"
+    ],
+    "City": [
+      "Cortland",
+      "Woodgate",
+      "Ankara"
+    ],
+    "State": [
+      "New York",
+      "New York",
+      "Ankara Province"
+    ],
+    "Country": [
+      "United States",
+      "United States",
+      "Turkey"
+    ],
+    "Company City": [
+      "Ithaca",
+      "Bleiswijk",
+      "Bridgewater"
+    ],
+    "Company State": [
+      "New York",
+      "South Holland",
+      "New Jersey"
+    ],
+    "Company Country": [
+      "United States",
+      "Netherlands",
+      "United States"
+    ],
+    "Company Phone": [
+      "'+1 607-254-4636",
+      "'+31 10 266 3270",
+      "'+31 40 275 0000"
+    ],
+    "SEO Description": [
+      "Get free shipping on qualified Millstead products or Buy Online Pick Up in Store today.",
+      "Poultry lighting and poultry sensors for precision livestock farming, scheme compliance and animal welfare",
+      "We use aeroponics to design & build sustainable farming systems for indoor \nfarms, greenhouses & vertical farms."
+    ],
+    "email": [
+      "cjd88@cornell.edu",
+      "arthur@havecon.com",
+      "gul.yesilova@signify.com"
+    ],
+    "username": [
+      "cjd88",
+      "arthur",
+      "gul.yesilova"
+    ],
+    "domain": [
+      "cornell.edu",
+      "havecon.com",
+      "signify.com"
+    ],
+    "status": [
+      "safe",
+      "safe",
+      "safe"
+    ],
+    "overall_score": [
+      "98",
+      "98",
+      "98"
+    ],
+    "is_safe_to_send": [
+      "true",
+      "true",
+      "true"
+    ],
+    "is_valid_syntax": [
+      "true",
+      "true",
+      "true"
+    ],
+    "is_disposable": [
+      "false",
+      "false",
+      "false"
+    ],
+    "is_role_account": [
+      "false",
+      "false",
+      "false"
+    ],
+    "mx_accepts_mail": [
+      "true",
+      "true",
+      "true"
+    ],
+    "mx_records": [
+      "cornell-edu.mail.protection.outlook.com",
+      "mx4.mtaroutes.com; mx1.mtaroutes.com; mx2.mtaroutes.com; mx3.mtaroutes.com",
+      "signify-com.mail.protection.outlook.com"
+    ],
+    "can_connect_smtp": [
+      "true",
+      "true",
+      "true"
+    ],
+    "has_inbox_full": [
+      "false",
+      "false",
+      "false"
+    ],
+    "is_catch_all": [
+      "false",
+      "false",
+      "false"
+    ],
+    "is_deliverable": [
+      "true",
+      "true",
+      "true"
+    ],
+    "is_disabled": [
+      "false",
+      "false",
+      "false"
+    ],
+    "is_spamtrap": [
+      "false",
+      "false",
+      "false"
+    ],
+    "is_free_email": [
+      "false",
+      "false",
+      "false"
+    ],
+    "Other Phone": [
+      "'+44 797 990 0893",
+      "'+1 607-254-4636",
+      "'+1 669-251-5937"
+    ],
+    "Mobile Phone": [
+      "'+1 813-629-1124",
+      "'+1 474-523-3799",
+      "'+52 656 146 9029"
+    ]
+  },
+  "validity": {
+    "Company Name for Emails": "0/3 valid-shape",
+    "Email": "3/3 valid-shape",
+    "Email Status": "0/3 valid-shape",
+    "First Phone": "3/3 valid-shape",
+    "Mobile Phone": "3/3 valid-shape",
+    "Corporate Phone": "3/3 valid-shape",
+    "Other Phone": "3/3 valid-shape",
+    "Company Phone": "3/3 valid-shape",
+    "email": "3/3 valid-shape",
+    "mx_accepts_mail": "0/3 valid-shape",
+    "is_free_email": "0/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "domain"
+  ],
+  "activity_match_keys": [
+    "First Name",
+    "Last Name",
+    "Company",
+    "Company Name for Emails",
+    "Email",
+    "Email Status",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "Company City",
+    "Company State",
+    "Company Country",
+    "Company Phone",
+    "email",
+    "domain",
+    "is_role_account",
+    "mx_accepts_mail",
+    "is_free_email"
+  ]
+}

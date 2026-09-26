@@ -1,0 +1,70 @@
+{
+  "audit": {
+    "name": "Gate 2A Full Data Coverage & Inventory Audit",
+    "date": "2026-09-18",
+    "mode": "read-only",
+    "s3_access": "success: LIST, HEAD, RANGE GET",
+    "postgres_index_access": "success: read-only counts for idx_businesses, idx_companies, idx_people; idx_investors and idx_jobs are 404",
+    "secrets_included": false
+  },
+  "physical_s3": {
+    "local_businesses": {"rows": 16338186, "metric": "EXACT", "objects": 91, "bytes": 1793647463},
+    "companies": {"rows": 1602141, "metric": "EXACT", "objects": 110, "bytes": 355129771, "single_file_duplicate_rows": 1602141},
+    "people": {"rows": 484325, "metric": "EXACT", "objects": 362, "bytes": 62039368, "single_file_duplicate_rows": 484325},
+    "investors": {"rows": 8076, "metric": "EXACT", "objects": 1, "bytes": 1844423},
+    "gazetteer": {"locality_keys": 199113, "country_keys": 90, "metric": "EXACT"},
+    "jobs": {"stored": false, "metric": "EXACT", "status": "live-only / no stored corpus"}
+  },
+  "local_businesses": {
+    "rows": 16338186, "countries": 90, "cities": 248031, "categories": 1939, "metric": "EXACT",
+    "contact": {"website": 10086954, "no_website": 6251232, "phone": 12139621, "email": 0, "any_contact": 14171719, "metric": "EXACT"},
+    "quality": {"junk_flagged": 650371, "duplicate_registry_rows": 302, "domain_nonunique_upper_bound": 10491009},
+    "routability": {"matched_unique_localities": 228206, "unmatched_unique_localities": 19824, "unmatched_rows": 1590564, "metric": "EXACT"}
+  },
+  "companies": {
+    "rows": 1602141, "metric": "EXACT", "locations": 69, "distinct_category_strings": 515607,
+    "country_city_coverage": "UNKNOWN: locations are coarse strings, not normalized country/city fields",
+    "contact": {"website": 1602141, "email": 1602141, "phone": 1602141, "linkedin": 1446814, "other_social": 1302165, "any_contact": 1602141, "metric": "EXACT"},
+    "funding_rows": 93670, "stages_technologies": "UNKNOWN", "duplicate_external_ids": 1, "duplicate_website_extra_rows": 551
+  },
+  "people": {
+    "rows": 484325, "metric": "EXACT", "countries": 219, "cities": 10144, "titles": 110732, "industries": 168,
+    "employer_rows": 484325, "role_niche_category": "title available; separate normalized fields UNKNOWN",
+    "contact": {"website": 484325, "email": 484325, "phone": 484325, "linkedin_any": 484307, "other_social": 415967, "any_contact": 484325, "metric": "EXACT"},
+    "duplicates": {"personal_linkedin_extra_rows": 84969, "website_extra_rows": 369272, "metric": "EXACT; not a person-duplicate count"}
+  },
+  "investors": {
+    "rows": 8076, "metric": "EXACT", "countries_raw": 240, "cities": 560, "kinds": {"individual": 7439, "firm": 637},
+    "contact": {"website": 7485, "email": 2458, "linkedin": 7438, "any_contact_profiled": 7564, "metric": "EXACT"},
+    "focus": {"sector_rows": 5262, "stage_rows": 5334, "check_size_rows": 4002, "metric": "EXACT"},
+    "retrieval": "no idx_investors table; current indexed coverage 0"
+  },
+  "postgres_index": {
+    "idx_businesses": {"rows": 609387, "metric": "EXACT", "s3_share_pct": 3.73},
+    "idx_companies": {"rows": 79014, "metric": "EXACT", "s3_share_pct": 4.93},
+    "idx_people": {"rows": 399397, "metric": "EXACT", "s3_share_pct": 82.46},
+    "idx_investors": {"status": "absent (404)"},
+    "idx_jobs": {"status": "absent (404)"}
+  },
+  "retrieval_probe": {
+    "metric": "SAMPLED; 18 queries, direct S3-Parquet path forced, no live gapfill implementation",
+    "business": {"queries": 6, "queries_with_db_hit": 3, "stored_candidates": 12, "complete_usable": 10, "final_returned": 10},
+    "person": {"queries": 6, "queries_with_db_hit": 0, "stored_candidates": 0, "complete_usable": 0, "final_returned": 0},
+    "company": {"queries": 6, "queries_with_db_hit": 2, "stored_candidates": 12, "complete_usable": 0, "final_returned": 0}
+  },
+  "coverage_gaps": [
+    "No stored jobs corpus or jobs index",
+    "Investor corpus has no retrieval index",
+    "Company normalized geography, stages, and technologies are not established",
+    "Local businesses have zero email and 19,824 non-routable locality values",
+    "Contact field presence is not unique/deliverable contact quality"
+  ],
+  "retrieval_bottlenecks": [
+    "Thin business/company index coverage",
+    "No investor/jobs indexes",
+    "Direct S3 person probes return no candidates",
+    "Company candidates fail complete/usable output",
+    "Location normalization and broad S3 scans limit routability/performance"
+  ],
+  "supporting_artifacts": ["_s3-metadata.json", "_profiles.json", "_business-profile.json", "_company-profile.json", "_people-profile.json", "_investor-profile.json", "_gazetteer-profile.json", "_postgres-counts.json", "_postgres-profile.json", "_retrieval-probes.json"]
+}

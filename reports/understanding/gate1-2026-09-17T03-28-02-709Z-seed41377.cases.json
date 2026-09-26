@@ -1,0 +1,265 @@
+{
+  "seed": 41377,
+  "holdout": [
+    {
+      "id": "h000a",
+      "prompt": "harbour pilots looking for clients",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_client"
+      },
+      "pairWith": "h000b"
+    },
+    {
+      "id": "h000b",
+      "prompt": "businesses looking for harbour pilots",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "business",
+          "company"
+        ],
+        "relation": "needs_service",
+        "object": "harbour pilot"
+      },
+      "pairWith": "h000a"
+    },
+    {
+      "id": "h002a",
+      "prompt": "brand strategists who serve seed libraries in Salta",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "location": "salta"
+      },
+      "pairWith": "h002b"
+    },
+    {
+      "id": "h002b",
+      "prompt": "seed libraries in Salta who need a brand strategist",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "needs_service",
+        "object": "brand strategist",
+        "location": "salta"
+      },
+      "pairWith": "h002a"
+    }
+  ],
+  "chaos": [
+    {
+      "id": "c000a",
+      "prompt": "companies in Kelowna hiring AI sfaety researchers today",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "hiring",
+        "location": "kelowna",
+        "intent_signal_required": true
+      },
+      "pairWith": "c000b"
+    },
+    {
+      "id": "c000b",
+      "prompt": "AI sfety researchers in Kelowna looking for work",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_job",
+        "location": "kelowna"
+      },
+      "pairWith": "c000a"
+    },
+    {
+      "id": "c002a",
+      "prompt": "companies in Surabaya hiring wind turbine technicians when u can",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "hiring",
+        "location": "surabaya",
+        "intent_signal_required": true
+      },
+      "pairWith": "c002b"
+    },
+    {
+      "id": "c002b",
+      "prompt": "wind turbine technicians in Surabaya looking for work",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_job",
+        "location": "surabaya"
+      },
+      "pairWith": "c002a"
+    },
+    {
+      "id": "c004",
+      "prompt": "find  me 40  cobblers ouside  turku not  chains insta  if possible",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "quantity": 40,
+        "location": "turku",
+        "min_constraints": 1,
+        "negated": [
+          "category"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ]
+      },
+      "note": "chaos_quantity_constraints"
+    },
+    {
+      "id": "c005",
+      "prompt": "optometrists chattanooga pls",
+      "set": "chaos",
+      "size": "tiny",
+      "expect": {
+        "relation": "none",
+        "location": "chattanooga"
+      },
+      "note": "chaos_plain"
+    },
+    {
+      "id": "c006",
+      "prompt": "find me 20 optometrists outside trois-rivières, not chains, insta if possible",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "quantity": 20,
+        "location": "trois-rivières",
+        "min_constraints": 1,
+        "negated": [
+          "category"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ]
+      },
+      "note": "chaos_quantity_constraints"
+    },
+    {
+      "id": "c007",
+      "prompt": "any prosthetics labs near cebu no prpoer website n got phone?",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "cebu",
+        "location_scope": "near"
+      },
+      "note": "chaos_lacks_asset"
+    },
+    {
+      "id": "c008",
+      "prompt": "need musictech startups chattanooga funded this yr + founders names if u can",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "received_funding",
+        "location": "chattanooga",
+        "temporal": true
+      },
+      "note": "chaos_funding"
+    },
+    {
+      "id": "c009",
+      "prompt": "need some fuonders round swansea tryna bring on ai safety researcher ppl rn",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "swansea"
+      },
+      "note": "chaos_hiring"
+    },
+    {
+      "id": "c010",
+      "prompt": "looking for bell foundries in pereira and also seed libraries in arequipa",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "compound": true,
+        "min_subgoals": 2
+      },
+      "note": "chaos_compound"
+    },
+    {
+      "id": "c011",
+      "prompt": "orthotics clinics daugavpils pls",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "daugavpils"
+      },
+      "note": "chaos_plain"
+    },
+    {
+      "id": "c012",
+      "prompt": "any roasteries near kelowna no prpoer website n got phone? pls?",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "kelowna",
+        "location_scope": "near"
+      },
+      "note": "chaos_lacks_asset"
+    },
+    {
+      "id": "c013",
+      "prompt": "bell foundries fayetteville pls",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "fayetteville"
+      },
+      "note": "chaos_plain"
+    },
+    {
+      "id": "c014",
+      "prompt": "bell foundries mombbasa pls as many as u can",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "none",
+        "location": "mombasa"
+      },
+      "note": "chaos_plain"
+    },
+    {
+      "id": "c015",
+      "prompt": "need satellite imaging startups ann arbor funded this yr + founders names if u can",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "received_funding",
+        "location": "ann arbor",
+        "temporal": true
+      },
+      "note": "chaos_funding"
+    }
+  ]
+}

@@ -1,0 +1,443 @@
+{
+  "people": 484325,
+  "companies": 1602141,
+  "total": 2086466,
+  "per_file": [
+    {
+      "key": "1- europe_region.csv",
+      "entity": "person",
+      "rows": 2346
+    },
+    {
+      "key": "1-americas_region.csv",
+      "entity": "person",
+      "rows": 4018
+    },
+    {
+      "key": "1-asia_region.csv",
+      "entity": "person",
+      "rows": 2007
+    },
+    {
+      "key": "1-other_region.csv",
+      "entity": "person",
+      "rows": 1094
+    },
+    {
+      "key": "1.csv",
+      "entity": "person",
+      "rows": 24188
+    },
+    {
+      "key": "2.csv",
+      "entity": "person",
+      "rows": 24205
+    },
+    {
+      "key": "3.csv",
+      "entity": "person",
+      "rows": 16878
+    },
+    {
+      "key": "4.csv",
+      "entity": "person",
+      "rows": 15233
+    },
+    {
+      "key": "5.csv",
+      "entity": "person",
+      "rows": 13564
+    },
+    {
+      "key": "6.csv",
+      "entity": "person",
+      "rows": 27375
+    },
+    {
+      "key": "Coaches 1.6K_CATEGORIZED.csv",
+      "entity": "person",
+      "rows": 0
+    },
+    {
+      "key": "Contractors - data111112_CATEGORIZED.csv",
+      "entity": "person",
+      "rows": 0
+    },
+    {
+      "key": "Healthcare & Wellness 2.1k_CATEGORIZED.csv",
+      "entity": "person",
+      "rows": 0
+    },
+    {
+      "key": "Lakta SaaS Database 47,493.csv",
+      "entity": "company",
+      "rows": 0
+    },
+    {
+      "key": "Lending List filesaver-All_Sep 03 25 2_49 pm.csv",
+      "entity": "person",
+      "rows": 0
+    },
+    {
+      "key": "Professional Services 47.5k_CATEGORIZED.csv",
+      "entity": "person",
+      "rows": 44214
+    },
+    {
+      "key": "Vanda 105k Apollo leads.csv",
+      "entity": "person",
+      "rows": 102152
+    },
+    {
+      "key": "Vanda Closer Data Master List of CXO 112924.csv",
+      "entity": "person",
+      "rows": 0
+    },
+    {
+      "key": "americas_region_v2.csv",
+      "entity": "person",
+      "rows": 3894
+    },
+    {
+      "key": "americas_region_v3_part1.csv",
+      "entity": "person",
+      "rows": 1717
+    },
+    {
+      "key": "americas_region_v3_part2.csv",
+      "entity": "person",
+      "rows": 0
+    },
+    {
+      "key": "americas_region_v4.csv",
+      "entity": "person",
+      "rows": 0
+    },
+    {
+      "key": "americas_region_v5.csv",
+      "entity": "person",
+      "rows": 1792
+    },
+    {
+      "key": "americas_region_v6.csv",
+      "entity": "person",
+      "rows": 5108
+    },
+    {
+      "key": "apollo-contacts-export (1) (1)_OK_ONLY_MILLIONVERIFIER.COM (3)_CATEGORIZED.csv",
+      "entity": "person",
+      "rows": 37051
+    },
+    {
+      "key": "apollo-contacts-export (1) (2)_CATCH_ALL_AND_UNKNOWN_MILLIONVERIFIER.COM-All deliverable emails-20250728_CATEGORIZED.csv",
+      "entity": "person",
+      "rows": 2043
+    },
+    {
+      "key": "apollo-contacts-export (1) (2)_CATCH_ALL_AND_UNKNOWN_MILLIONVERIFIER.COM_CATEGORIZED.csv",
+      "entity": "person",
+      "rows": 3780
+    },
+    {
+      "key": "apollo-contacts-export (1) (2)_OK_ONLY_MILLIONVERIFIER.COM_CATEGORIZED.csv",
+      "entity": "person",
+      "rows": 3439
+    },
+    {
+      "key": "apollo-contacts-export (1)_OK_ONLY_MILLIONVERIFIER.COM (1)_CATEGORIZED.csv",
+      "entity": "person",
+      "rows": 11084
+    },
+    {
+      "key": "apollo-contacts-export (5)_CATCH_ALL_AND_UNKNOWN_MILLIONVERIFIER.COM-All deliverable emails-20250728_CATEGORIZED.csv",
+      "entity": "person",
+      "rows": 4569
+    },
+    {
+      "key": "apollo-contacts-export (5)_CATCH_ALL_AND_UNKNOWN_MILLIONVERIFIER.COM_CATEGORIZED.csv",
+      "entity": "person",
+      "rows": 7052
+    },
+    {
+      "key": "apollo-contacts-export (6)_OK_ONLY_MILLIONVERIFIER.COM (1).csv",
+      "entity": "person",
+      "rows": 7532
+    },
+    {
+      "key": "apollo-contacts-export_OK_ONLY_MILLIONVERIFIER.COM (1)_CATEGORIZED.csv",
+      "entity": "person",
+      "rows": 23512
+    },
+    {
+      "key": "asia_region_v2.csv",
+      "entity": "person",
+      "rows": 1999
+    },
+    {
+      "key": "asia_region_v3_part1.csv",
+      "entity": "person",
+      "rows": 808
+    },
+    {
+      "key": "asia_region_v3_part2.csv",
+      "entity": "person",
+      "rows": 0
+    },
+    {
+      "key": "asia_region_v4.csv",
+      "entity": "person",
+      "rows": 0
+    },
+    {
+      "key": "asia_region_v5.csv",
+      "entity": "person",
+      "rows": 595
+    },
+    {
+      "key": "asia_region_v6.csv",
+      "entity": "person",
+      "rows": 1928
+    },
+    {
+      "key": "cleaned-1.csv",
+      "entity": "person",
+      "rows": 9468
+    },
+    {
+      "key": "cleaned-2.csv",
+      "entity": "person",
+      "rows": 9226
+    },
+    {
+      "key": "cleaned-3.csv",
+      "entity": "person",
+      "rows": 7058
+    },
+    {
+      "key": "cleaned-4.csv",
+      "entity": "person",
+      "rows": 4921
+    },
+    {
+      "key": "cleaned-5.csv",
+      "entity": "person",
+      "rows": 3760
+    },
+    {
+      "key": "cleaned-6.csv",
+      "entity": "person",
+      "rows": 10493
+    },
+    {
+      "key": "crunchbase_0-100k.csv",
+      "entity": "company",
+      "rows": 59213
+    },
+    {
+      "key": "crunchbase_1.1m-1.2m.csv",
+      "entity": "company",
+      "rows": 57589
+    },
+    {
+      "key": "crunchbase_1.2m-1.3m.csv",
+      "entity": "company",
+      "rows": 56442
+    },
+    {
+      "key": "crunchbase_1.3m-1.4m.csv",
+      "entity": "company",
+      "rows": 57122
+    },
+    {
+      "key": "crunchbase_1.4m-1.5m.csv",
+      "entity": "company",
+      "rows": 57289
+    },
+    {
+      "key": "crunchbase_1.5m-1.6m.csv",
+      "entity": "company",
+      "rows": 58187
+    },
+    {
+      "key": "crunchbase_1.6m-1.7m.csv",
+      "entity": "company",
+      "rows": 55595
+    },
+    {
+      "key": "crunchbase_1.7-1.8m.csv",
+      "entity": "company",
+      "rows": 55543
+    },
+    {
+      "key": "crunchbase_1.8m-1.9m.csv",
+      "entity": "company",
+      "rows": 57640
+    },
+    {
+      "key": "crunchbase_1.9m-2.0m.csv",
+      "entity": "company",
+      "rows": 57019
+    },
+    {
+      "key": "crunchbase_100k-200k.csv",
+      "entity": "company",
+      "rows": 58607
+    },
+    {
+      "key": "crunchbase_1m-1.1m.csv",
+      "entity": "company",
+      "rows": 57595
+    },
+    {
+      "key": "crunchbase_2.0m-2.1m.csv",
+      "entity": "company",
+      "rows": 57384
+    },
+    {
+      "key": "crunchbase_2.1m-2.2m.csv",
+      "entity": "company",
+      "rows": 57672
+    },
+    {
+      "key": "crunchbase_2.2m-2.3m.csv",
+      "entity": "company",
+      "rows": 56082
+    },
+    {
+      "key": "crunchbase_2.3m-2.4m.csv",
+      "entity": "company",
+      "rows": 56173
+    },
+    {
+      "key": "crunchbase_2.4m-2.5m.csv",
+      "entity": "company",
+      "rows": 56886
+    },
+    {
+      "key": "crunchbase_2.5m-2.6m.csv",
+      "entity": "company",
+      "rows": 56130
+    },
+    {
+      "key": "crunchbase_2.6m-2.7m.csv",
+      "entity": "company",
+      "rows": 56615
+    },
+    {
+      "key": "crunchbase_2.7-2.8m.csv",
+      "entity": "company",
+      "rows": 52612
+    },
+    {
+      "key": "crunchbase_2.8m-2.87m.csv",
+      "entity": "company",
+      "rows": 3860
+    },
+    {
+      "key": "crunchbase_200k-300k.csv",
+      "entity": "company",
+      "rows": 58385
+    },
+    {
+      "key": "crunchbase_300k-400k.csv",
+      "entity": "company",
+      "rows": 57791
+    },
+    {
+      "key": "crunchbase_400k-500k.csv",
+      "entity": "company",
+      "rows": 56743
+    },
+    {
+      "key": "crunchbase_500k-600k.csv",
+      "entity": "company",
+      "rows": 57707
+    },
+    {
+      "key": "crunchbase_600k-700k.csv",
+      "entity": "company",
+      "rows": 57431
+    },
+    {
+      "key": "crunchbase_700k-800k.csv",
+      "entity": "company",
+      "rows": 59302
+    },
+    {
+      "key": "crunchbase_800k-900k.csv",
+      "entity": "company",
+      "rows": 57088
+    },
+    {
+      "key": "crunchbase_900k-1m.csv",
+      "entity": "company",
+      "rows": 56439
+    },
+    {
+      "key": "europe_region_v2.csv",
+      "entity": "person",
+      "rows": 2283
+    },
+    {
+      "key": "europe_region_v3_part1.csv",
+      "entity": "person",
+      "rows": 710
+    },
+    {
+      "key": "europe_region_v3_part2.csv",
+      "entity": "person",
+      "rows": 0
+    },
+    {
+      "key": "europe_region_v4.csv",
+      "entity": "person",
+      "rows": 0
+    },
+    {
+      "key": "europe_region_v5.csv",
+      "entity": "person",
+      "rows": 1127
+    },
+    {
+      "key": "europe_region_v6.csv",
+      "entity": "person",
+      "rows": 2394
+    },
+    {
+      "key": "other_region_v2.csv",
+      "entity": "person",
+      "rows": 1050
+    },
+    {
+      "key": "other_region_v3.csv",
+      "entity": "person",
+      "rows": 604
+    },
+    {
+      "key": "other_region_v4.csv",
+      "entity": "person",
+      "rows": 304
+    },
+    {
+      "key": "other_region_v5.csv",
+      "entity": "person",
+      "rows": 246
+    },
+    {
+      "key": "other_region_v6.csv",
+      "entity": "person",
+      "rows": 1063
+    },
+    {
+      "key": "staffing & recruiting- 20.3k CSV.csv",
+      "entity": "person",
+      "rows": 19525
+    },
+    {
+      "key": "trucking- 15.6k.csv",
+      "entity": "person",
+      "rows": 14916
+    }
+  ],
+  "processed_at": "2026-09-08T15:02:42+00:00"
+}

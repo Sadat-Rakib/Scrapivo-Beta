@@ -36,7 +36,7 @@ export function isRealBusinessWebsite(url: string | undefined | null): boolean {
   try {
     const u = new URL(url);
     const host = u.hostname.replace(/^www\./, "").toLowerCase();
-    if (/^(geoapify\.com|foursquare\.com|openstreetmap\.org|osm\.org)$/i.test(host)) {
+    if (/^(geoapify\.com|foursquare\.com|openstreetmap\.org|osm\.org|yelp\.com|facebook\.com|instagram\.com|linkedin\.com)$/i.test(host)) {
       return false;
     }
     if (/geoapify\.com\/place/i.test(url)) return false;

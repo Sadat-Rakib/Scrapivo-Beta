@@ -38,12 +38,8 @@ function craftTags(skill: string): string[] {
   if (/\bhvac|heating|cooling|air.?cond/.test(s)) {
     return [
       '"craft"="hvac"',
-      '"craft"="plumber"',
       '"craft"="heating_engineer"',
       '"shop"="air_conditioning"',
-      '"shop"="hardware"',
-      '"craft"="electrician"',
-      '"office"="company"',
     ];
   }
   if (/law|attorney|legal/.test(s)) return ['"office"="lawyer"', '"office"="company"'];
@@ -71,6 +67,15 @@ function nameNeedleFor(skill: string): string {
   if (/gym|fitness/.test(s)) return "gym|fitness";
   if (/market|agency/.test(s)) return "market|agency";
   return "";
+}
+
+/** Broad fallback tags must not turn an arbitrary POI into a plumber. */
+export function osmTradeCategory(skill: string, tag: string, name: string): string | null {
+  if (!/\bplumb/.test(skill.toLowerCase())) return tag;
+  if (tag.toLowerCase() === "plumber") return "plumber";
+  if (/\bplumb(?:er|ers|ing)?\b/i.test(name) &&
+      !/\b(supply|supplies|wholesale|parts|showroom)\b/i.test(name)) return "plumber";
+  return null;
 }
 
 type GeoHit = {
@@ -205,7 +210,9 @@ async function overpass(query: string): Promise<any[]> {
       }
     }
   }
-  return [];
+  // A provider outage is different from a valid empty OSM response. Let the
+  // caller record SOURCE_ERROR instead of reporting zero local businesses.
+  throw new Error("Overpass mirrors unavailable");
 }
 
 /** Tag-only query — fast and reliable. NEVER mix name-regex statements into
@@ -236,7 +243,7 @@ out center 60;
 `;
 }
 
-function elementsToLeads(elements: any[], loc: string, skill: string, cap: number): SourceLead[] {
+export function elementsToLeads(elements: any[], loc: string, skill: string, cap: number): SourceLead[] {
   const out: SourceLead[] = [];
   const seen = new Set<string>();
   for (const el of elements) {
@@ -244,10 +251,6 @@ function elementsToLeads(elements: any[], loc: string, skill: string, cap: numbe
     const name = (tagsMap.name || "").trim();
     if (!name || name.length < 2) continue;
     if (isClosedOsmTags(tagsMap)) continue;
-    const key = name.toLowerCase();
-    if (seen.has(key)) continue;
-    seen.add(key);
-
     const websiteRaw = (tagsMap.website || tagsMap["contact:website"] || "").trim();
     const website = isRealBusinessWebsite(
       websiteRaw ? (websiteRaw.startsWith("http") ? websiteRaw : `https://${websiteRaw}`) : "",
@@ -258,13 +261,18 @@ function elementsToLeads(elements: any[], loc: string, skill: string, cap: numbe
       : undefined;
     const phone = (tagsMap.phone || tagsMap["contact:phone"] || "").trim();
     const email = (tagsMap.email || tagsMap["contact:email"] || "").trim();
-    const category =
+    const rawCategory =
       tagsMap.craft ||
       tagsMap.office ||
       tagsMap.amenity ||
       tagsMap.shop ||
       tagsMap.leisure ||
       skill;
+    const category = osmTradeCategory(skill, rawCategory, name);
+    if (!category) continue;
+    const key = name.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
     const address = formatOsmAddress(tagsMap);
 
     out.push({
@@ -274,6 +282,10 @@ function elementsToLeads(elements: any[], loc: string, skill: string, cap: numbe
       title: name,
       snippet: [address || loc, phone ? `Phone: ${phone}` : null].filter(Boolean).join(" · "),
       full_post_url: website,
+      // A directory/social URL in OSM is not an official business website.
+      // This is only a research seed; exact-name checks still decide absence.
+      structured_website_absent: !website,
+      source_record_url: el.type && el.id ? `https://www.openstreetmap.org/${el.type}/${el.id}` : undefined,
       author: name,
       company: name,
       company_domain: website

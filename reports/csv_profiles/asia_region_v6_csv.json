@@ -1,0 +1,446 @@
+{
+  "key": "asia_region_v6.csv",
+  "size": 1709899,
+  "last_modified": "2026-09-08 00:14:11+00:00",
+  "columns": [
+    "First Name",
+    "Last Name",
+    "Title",
+    "Company",
+    "Company Name for Emails",
+    "Email",
+    "Email Status",
+    "Seniority",
+    "Departments",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Stage",
+    "# Employees",
+    "Industry",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "City",
+    "State",
+    "Country",
+    "Company City",
+    "Company State",
+    "Company Country",
+    "Company Phone",
+    "SEO Description",
+    "email",
+    "username",
+    "domain",
+    "status",
+    "overall_score",
+    "is_safe_to_send",
+    "is_valid_syntax",
+    "is_disposable",
+    "is_role_account",
+    "mx_accepts_mail",
+    "mx_records",
+    "can_connect_smtp",
+    "has_inbox_full",
+    "is_catch_all",
+    "is_deliverable",
+    "is_disabled",
+    "is_spamtrap",
+    "is_free_email",
+    "Region"
+  ],
+  "row_count": 2087,
+  "sampled_rows": 2087,
+  "delimiter": ",",
+  "roles": {
+    "First Name": "first_name",
+    "Last Name": "last_name",
+    "Title": "title",
+    "Company": "company",
+    "Company Name for Emails": "email",
+    "Email": "email",
+    "Email Status": "email",
+    "Seniority": "other",
+    "Departments": "other",
+    "First Phone": "phone",
+    "Work Direct Phone": "phone",
+    "Home Phone": "phone",
+    "Mobile Phone": "phone",
+    "Corporate Phone": "phone",
+    "Other Phone": "phone",
+    "Stage": "other",
+    "# Employees": "employees",
+    "Industry": "industry",
+    "Website": "website",
+    "Company Linkedin Url": "linkedin",
+    "Facebook Url": "social",
+    "Twitter Url": "social",
+    "City": "other",
+    "State": "other",
+    "Country": "country",
+    "Company City": "company",
+    "Company State": "company",
+    "Company Country": "company",
+    "Company Phone": "phone",
+    "SEO Description": "descriptive",
+    "email": "email",
+    "username": "other",
+    "domain": "website",
+    "status": "other",
+    "overall_score": "other",
+    "is_safe_to_send": "other",
+    "is_valid_syntax": "other",
+    "is_disposable": "other",
+    "is_role_account": "company",
+    "mx_accepts_mail": "email",
+    "mx_records": "other",
+    "can_connect_smtp": "other",
+    "has_inbox_full": "other",
+    "is_catch_all": "other",
+    "is_deliverable": "other",
+    "is_disabled": "other",
+    "is_spamtrap": "other",
+    "is_free_email": "email",
+    "Region": "other"
+  },
+  "missing_pct": {
+    "First Name": 0.0,
+    "Last Name": 0.4,
+    "Title": 0.1,
+    "Company": 0.1,
+    "Company Name for Emails": 0.1,
+    "Email": 0.0,
+    "Email Status": 0.0,
+    "Seniority": 0.1,
+    "Departments": 42.8,
+    "First Phone": 5.7,
+    "Work Direct Phone": 100.0,
+    "Home Phone": 100.0,
+    "Mobile Phone": 99.4,
+    "Corporate Phone": 5.7,
+    "Other Phone": 100.0,
+    "Stage": 0.0,
+    "# Employees": 0.2,
+    "Industry": 2.2,
+    "Website": 0.0,
+    "Company Linkedin Url": 0.4,
+    "Facebook Url": 6.3,
+    "Twitter Url": 10.1,
+    "City": 22.6,
+    "State": 14.9,
+    "Country": 0.0,
+    "Company City": 5.0,
+    "Company State": 6.2,
+    "Company Country": 0.9,
+    "Company Phone": 5.6,
+    "SEO Description": 13.5,
+    "email": 0.0,
+    "username": 0.0,
+    "domain": 0.0,
+    "status": 0.0,
+    "overall_score": 0.0,
+    "is_safe_to_send": 0.0,
+    "is_valid_syntax": 0.0,
+    "is_disposable": 0.0,
+    "is_role_account": 0.0,
+    "mx_accepts_mail": 0.0,
+    "mx_records": 0.0,
+    "can_connect_smtp": 0.0,
+    "has_inbox_full": 0.0,
+    "is_catch_all": 0.0,
+    "is_deliverable": 0.0,
+    "is_disabled": 0.0,
+    "is_spamtrap": 0.0,
+    "is_free_email": 0.0,
+    "Region": 0.0
+  },
+  "samples": {
+    "First Name": [
+      "Abhishek",
+      "Anat",
+      "Ahmed"
+    ],
+    "Last Name": [
+      "Borole",
+      "Assa",
+      "Ibrahim"
+    ],
+    "Title": [
+      "Corporate Manager",
+      "VP Human Resources",
+      "Head of Engineering"
+    ],
+    "Company": [
+      "Jai Kisan",
+      "Cropx TechnologiesCropx Technologies",
+      "Signify"
+    ],
+    "Company Name for Emails": [
+      "Jai Kisan",
+      "Cropx TechnologiesCropx",
+      "Signify"
+    ],
+    "Email": [
+      "abhishek.borole@jai-kisan.com",
+      "anat@cropx.com",
+      "ahmed.ibrahim@signify.com"
+    ],
+    "Email Status": [
+      "Verified",
+      "Verified",
+      "Verified"
+    ],
+    "Seniority": [
+      "Manager",
+      "Vp",
+      "Head"
+    ],
+    "First Phone": [
+      "'+91 99725 88700",
+      "'+972 73-240-0426",
+      "'+31 40 275 0000"
+    ],
+    "Corporate Phone": [
+      "'+91 99725 88700",
+      "'+972 73-240-0426",
+      "'+31 40 275 0000"
+    ],
+    "Stage": [
+      "Cold",
+      "Cold",
+      "Cold"
+    ],
+    "# Employees": [
+      "550.0",
+      "92.0",
+      "34000.0"
+    ],
+    "Industry": [
+      "financial services",
+      "farming",
+      "electrical/electronic manufacturing"
+    ],
+    "Website": [
+      "http://www.jai-kisan.com",
+      "http://www.cropx.com",
+      "http://www.signify.com"
+    ],
+    "Company Linkedin Url": [
+      "http://www.linkedin.com/company/jai-kisan",
+      "http://www.linkedin.com/company/cropx-ltd",
+      "http://www.linkedin.com/company/signifycompany"
+    ],
+    "Facebook Url": [
+      "https://www.facebook.com/jaikisanfin/",
+      "https://www.facebook.com/CropXGlobal",
+      "https://facebook.com/signify/"
+    ],
+    "Twitter Url": [
+      "https://twitter.com/jaikisanindia?lang=en",
+      "https://twitter.com/crop_x",
+      "https://twitter.com/signifycompany?lang=en"
+    ],
+    "City": [
+      "Mumbai",
+      "Bharuch",
+      "Lucknow"
+    ],
+    "State": [
+      "Maharashtra",
+      "Gujarat",
+      "Uttar Pradesh"
+    ],
+    "Country": [
+      "India",
+      "Israel",
+      "United Arab Emirates"
+    ],
+    "Company City": [
+      "Mumbai",
+      "Ein Ayala",
+      "Bridgewater"
+    ],
+    "Company State": [
+      "Maharashtra",
+      "Haifa District",
+      "New Jersey"
+    ],
+    "Company Country": [
+      "India",
+      "Israel",
+      "United States"
+    ],
+    "Company Phone": [
+      "'+91 99725 88700",
+      "'+972 73-240-0426",
+      "'+31 40 275 0000"
+    ],
+    "SEO Description": [
+      "Omnivore funds entrepreneurs building the future ofagriculture and food systems.",
+      "Building the most trusted platform matchmaking fruits globally",
+      "JALA helps shrimp farmers increase cultivation production and efficiency in the shrimp industry."
+    ],
+    "email": [
+      "abhishek.borole@jai-kisan.com",
+      "anat@cropx.com",
+      "ahmed.ibrahim@signify.com"
+    ],
+    "username": [
+      "abhishek.borole",
+      "anat",
+      "ahmed.ibrahim"
+    ],
+    "domain": [
+      "jai-kisan.com",
+      "cropx.com",
+      "signify.com"
+    ],
+    "status": [
+      "safe",
+      "safe",
+      "safe"
+    ],
+    "overall_score": [
+      "98",
+      "98",
+      "98"
+    ],
+    "is_safe_to_send": [
+      "True",
+      "True",
+      "True"
+    ],
+    "is_valid_syntax": [
+      "True",
+      "True",
+      "True"
+    ],
+    "is_disposable": [
+      "False",
+      "False",
+      "False"
+    ],
+    "is_role_account": [
+      "False",
+      "False",
+      "False"
+    ],
+    "mx_accepts_mail": [
+      "True",
+      "True",
+      "True"
+    ],
+    "mx_records": [
+      "aspmx.l.google.com; aspmx2.googlemail.com; aspmx3.googlemail.com; alt1.aspmx.l.google.com; alt2.aspmx.l.google.com",
+      "cropx-com.mail.protection.outlook.com",
+      "signify-com.mail.protection.outlook.com"
+    ],
+    "can_connect_smtp": [
+      "True",
+      "True",
+      "True"
+    ],
+    "has_inbox_full": [
+      "False",
+      "False",
+      "False"
+    ],
+    "is_catch_all": [
+      "False",
+      "False",
+      "False"
+    ],
+    "is_deliverable": [
+      "True",
+      "True",
+      "True"
+    ],
+    "is_disabled": [
+      "False",
+      "False",
+      "False"
+    ],
+    "is_spamtrap": [
+      "False",
+      "False",
+      "False"
+    ],
+    "is_free_email": [
+      "False",
+      "False",
+      "False"
+    ],
+    "Region": [
+      "Asia",
+      "Asia",
+      "Asia"
+    ],
+    "Departments": [
+      "Human Resources",
+      "Engineering & Technical, Information Technology",
+      "C-Suite, Finance"
+    ],
+    "Mobile Phone": [
+      "'+65 9047 0387",
+      "'+65 9875 3383",
+      "'+95 9 793 124387"
+    ],
+    "Other Phone": [
+      "'+63 2 818 9911"
+    ]
+  },
+  "validity": {
+    "Company Name for Emails": "0/3 valid-shape",
+    "Email": "3/3 valid-shape",
+    "Email Status": "0/3 valid-shape",
+    "First Phone": "3/3 valid-shape",
+    "Mobile Phone": "3/3 valid-shape",
+    "Corporate Phone": "3/3 valid-shape",
+    "Other Phone": "1/1 valid-shape",
+    "Company Phone": "3/3 valid-shape",
+    "email": "3/3 valid-shape",
+    "mx_accepts_mail": "0/3 valid-shape",
+    "is_free_email": "0/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "domain"
+  ],
+  "activity_match_keys": [
+    "First Name",
+    "Last Name",
+    "Company",
+    "Company Name for Emails",
+    "Email",
+    "Email Status",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "Company City",
+    "Company State",
+    "Company Country",
+    "Company Phone",
+    "email",
+    "domain",
+    "is_role_account",
+    "mx_accepts_mail",
+    "is_free_email"
+  ]
+}

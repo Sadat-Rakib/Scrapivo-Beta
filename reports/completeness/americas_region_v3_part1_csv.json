@@ -1,0 +1,43 @@
+{
+  "key": "americas_region_v3_part1.csv",
+  "entity": "person",
+  "rows": 1804,
+  "required_fields": [
+    "Name",
+    "Company",
+    "Title",
+    "Email",
+    "Phone",
+    "Website",
+    "Social(any)",
+    "Location"
+  ],
+  "absent_columns": [],
+  "complete": 1717,
+  "incomplete": 87,
+  "complete_pct": 95.2,
+  "missing_counts": {
+    "Phone": 87,
+    "Company": 1,
+    "Title": 1,
+    "Website": 1
+  },
+  "top_patterns": [
+    {
+      "missing": [
+        "Phone"
+      ],
+      "rows": 86
+    },
+    {
+      "missing": [
+        "Company",
+        "Phone",
+        "Title",
+        "Website"
+      ],
+      "rows": 1
+    }
+  ],
+  "people_bonus_rows": 0
+}

@@ -1,0 +1,365 @@
+{
+  "key": "crunchbase_900k-1m.csv",
+  "size": 59116324,
+  "last_modified": "2026-09-08 00:12:15+00:00",
+  "columns": [
+    "id",
+    "created_at",
+    "name",
+    "short_description",
+    "semrush_global_rank",
+    "semrush_visits_latest_month",
+    "num_investors",
+    "funding_total",
+    "num_exits",
+    "num_funding_rounds",
+    "last_funding_type",
+    "last_funding_at",
+    "num_acquisitions",
+    "apptopia_total_apps",
+    "apptopia_total_downloads",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "num_investments",
+    "num_lead_investments",
+    "num_lead_investors",
+    "listed_stock_symbol",
+    "company_type",
+    "hub_tags",
+    "operating_status",
+    "founded_on",
+    "categories",
+    "founders",
+    "website",
+    "ipo_status",
+    "num_employees_enum",
+    "locations",
+    "growth_insight_description",
+    "growth_insight_indicator",
+    "growth_insight_direction",
+    "growth_insight_confidence",
+    "investor_insight_description",
+    "permalink",
+    "url"
+  ],
+  "row_count": 100000,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "id": "other",
+    "created_at": "other",
+    "name": "full_name",
+    "short_description": "descriptive",
+    "semrush_global_rank": "other",
+    "semrush_visits_latest_month": "other",
+    "num_investors": "other",
+    "funding_total": "other",
+    "num_exits": "other",
+    "num_funding_rounds": "other",
+    "last_funding_type": "other",
+    "last_funding_at": "other",
+    "num_acquisitions": "other",
+    "apptopia_total_apps": "other",
+    "apptopia_total_downloads": "other",
+    "contact_email": "email",
+    "phone_number": "phone",
+    "facebook": "social",
+    "linkedin": "linkedin",
+    "twitter": "social",
+    "num_investments": "other",
+    "num_lead_investments": "other",
+    "num_lead_investors": "other",
+    "listed_stock_symbol": "other",
+    "company_type": "company",
+    "hub_tags": "other",
+    "operating_status": "other",
+    "founded_on": "other",
+    "categories": "other",
+    "founders": "other",
+    "website": "website",
+    "ipo_status": "other",
+    "num_employees_enum": "employees",
+    "locations": "other",
+    "growth_insight_description": "descriptive",
+    "growth_insight_indicator": "other",
+    "growth_insight_direction": "other",
+    "growth_insight_confidence": "other",
+    "investor_insight_description": "descriptive",
+    "permalink": "other",
+    "url": "website"
+  },
+  "missing_pct": {
+    "id": 0.0,
+    "created_at": 0.0,
+    "name": 0.0,
+    "short_description": 0.0,
+    "semrush_global_rank": 58.5,
+    "semrush_visits_latest_month": 58.5,
+    "num_investors": 88.5,
+    "funding_total": 89.1,
+    "num_exits": 99.8,
+    "num_funding_rounds": 85.7,
+    "last_funding_type": 85.7,
+    "last_funding_at": 85.5,
+    "num_acquisitions": 98.5,
+    "apptopia_total_apps": 89.8,
+    "apptopia_total_downloads": 97.0,
+    "contact_email": 26.4,
+    "phone_number": 28.2,
+    "facebook": 35.4,
+    "linkedin": 24.2,
+    "twitter": 51.0,
+    "num_investments": 99.4,
+    "num_lead_investments": 99.7,
+    "num_lead_investors": 93.0,
+    "listed_stock_symbol": 99.7,
+    "company_type": 3.8,
+    "hub_tags": 99.8,
+    "operating_status": 0.0,
+    "founded_on": 16.6,
+    "categories": 5.2,
+    "founders": 72.7,
+    "website": 4.9,
+    "ipo_status": 2.9,
+    "num_employees_enum": 16.7,
+    "locations": 8.3,
+    "growth_insight_description": 97.2,
+    "growth_insight_indicator": 97.2,
+    "growth_insight_direction": 98.5,
+    "growth_insight_confidence": 98.5,
+    "investor_insight_description": 98.8,
+    "permalink": 0.0,
+    "url": 0.0
+  },
+  "samples": {
+    "id": [
+      "d99cbba7-00f1-468e-a720-f234c5381664",
+      "3d2e2f73-ff3d-42ff-a08a-c2671aecede4",
+      "b9cba4a9-5873-4343-86e1-2068860e656f"
+    ],
+    "created_at": [
+      "2024-08-18 05:41:18.28122+00",
+      "2024-08-18 05:41:18.28122+00",
+      "2024-08-18 05:41:18.28122+00"
+    ],
+    "name": [
+      "Fondazione Opera San Camillo",
+      "Fondazione Ospedale Alba-Bra Onlus",
+      "Fondazione PTV"
+    ],
+    "short_description": [
+      "Fondazione Ospedale Alba-Bra Onlus is a nonprofit foundation that develops and supports hospital care and hospitality.",
+      "Fondazione PTV is a healthcare management association that provides patient services, research, and training.",
+      "Fondazione Penta Onlus is a nonprofit research organization that conducts HIV clinical trials and observational studies."
+    ],
+    "semrush_global_rank": [
+      "2722782",
+      "197761",
+      "9129332"
+    ],
+    "semrush_visits_latest_month": [
+      "6449",
+      "222880",
+      "3"
+    ],
+    "contact_email": [
+      "segreteria.fondazione@camilliani.net",
+      "info@fondazionesanitarialbabra.it",
+      "info@ptvonline.it"
+    ],
+    "phone_number": [
+      "+39 0267502700",
+      "+39.0172.1404444",
+      "+39 06.2090.1"
+    ],
+    "facebook": [
+      "https://www.facebook.com/profile.php?id=100062919865387&fref=ts",
+      "https://www.facebook.com/fondazioneospedalealbabra.onlus",
+      "https://www.facebook.com/policlinicotorvergata"
+    ],
+    "linkedin": [
+      "https://www.linkedin.com/company/fondazione-san-camillo",
+      "https://www.linkedin.com/company/ptv-policlinico-tor-vergata/",
+      "https://www.linkedin.com/company/fondazione-paideia-onlus"
+    ],
+    "twitter": [
+      "https://twitter.com/OperaSanCamillo",
+      "https://twitter.com/ptvonline2001",
+      "http://twitter.com/fondpaideia"
+    ],
+    "company_type": [
+      "non_profit",
+      "non_profit",
+      "for_profit"
+    ],
+    "operating_status": [
+      "active",
+      "active",
+      "active"
+    ],
+    "founded_on": [
+      "2008-12-23",
+      "2008-03-28",
+      "1972-01-01"
+    ],
+    "categories": [
+      "Elder Care, Hospital, Non Profit, Nursing and Residential Care, Psychology",
+      "Association, Charity, Health Care, Non Profit",
+      "Health Care, Medical, Training"
+    ],
+    "website": [
+      "https://www.operasancamillo.net/",
+      "https://www.fondazioneospedalealbabra.it",
+      "https://www.ptvonline.it/"
+    ],
+    "ipo_status": [
+      "private",
+      "private",
+      "private"
+    ],
+    "num_employees_enum": [
+      "c_01001_05000",
+      "c_00051_00100",
+      "c_01001_05000"
+    ],
+    "locations": [
+      "European Union (EU), Europe, Middle East, and Africa (EMEA)",
+      "European Union (EU), Europe, Middle East, and Africa (EMEA)",
+      "European Union (EU), Europe, Middle East, and Africa (EMEA)"
+    ],
+    "permalink": [
+      "fondazione-opera-san-camillo",
+      "fondazione-ospedale-alba-bra-onlus",
+      "fondazione-ptv"
+    ],
+    "url": [
+      "https://www.crunchbase.com/organization/fondazione-opera-san-camillo",
+      "https://www.crunchbase.com/organization/fondazione-ospedale-alba-bra-onlus",
+      "https://www.crunchbase.com/organization/fondazione-ptv"
+    ],
+    "founders": [
+      "Alberto Burri",
+      "Gianni Mastella",
+      "Salvatore Maugeri"
+    ],
+    "apptopia_total_apps": [
+      "3",
+      "1",
+      "1"
+    ],
+    "apptopia_total_downloads": [
+      "161",
+      "4133",
+      "443"
+    ],
+    "num_investors": [
+      "1",
+      "16",
+      "3"
+    ],
+    "funding_total": [
+      "66000000",
+      "32150000",
+      "2756701"
+    ],
+    "num_funding_rounds": [
+      "1",
+      "5",
+      "3"
+    ],
+    "last_funding_type": [
+      "private_equity",
+      "series_a",
+      "seed"
+    ],
+    "last_funding_at": [
+      "2016-02-24",
+      "2021-03-16",
+      "2021-08-26"
+    ],
+    "num_lead_investors": [
+      "1",
+      "3",
+      "3"
+    ],
+    "growth_insight_description": [
+      "Fonterra Co-operative Group (NZSE:FCG) shareholders have earned a 2.4% CAGR over the last five years.",
+      "Food Allergy Science Initiative announced that it received a transformative $5 million gift.",
+      "Food Depot Alimentaire received $2M from the province to help feed students."
+    ],
+    "growth_insight_indicator": [
+      "growing",
+      "growing",
+      "growing"
+    ],
+    "num_exits": [
+      "1",
+      "1",
+      "2"
+    ],
+    "num_investments": [
+      "2",
+      "3",
+      "6"
+    ],
+    "investor_insight_description": [],
+    "num_acquisitions": [
+      "1",
+      "1",
+      "2"
+    ],
+    "num_lead_investments": [
+      "6",
+      "5",
+      "1"
+    ],
+    "growth_insight_direction": [
+      "c400_growing",
+      "c400_growing",
+      "c400_growing"
+    ],
+    "growth_insight_confidence": [
+      "c300_medium",
+      "c300_medium",
+      "c300_medium"
+    ],
+    "listed_stock_symbol": [
+      "NSE:FONEBOX",
+      "LSE:FNX",
+      "NYSE:FL"
+    ],
+    "hub_tags": [
+      "cbvp",
+      "cbvp",
+      "cbvp"
+    ]
+  },
+  "validity": {
+    "contact_email": "3/3 valid-shape",
+    "phone_number": "3/3 valid-shape"
+  },
+  "entity": "company",
+  "entity_confidence": 0.85,
+  "entity_why": "value-checked override: name=organization name; founders/company_type/num_employees_enum/funding/ipo_status present; no person first/last-name columns",
+  "social_cols": [
+    "facebook",
+    "linkedin",
+    "twitter",
+    "website",
+    "url"
+  ],
+  "activity_match_keys": [
+    "name",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "company_type",
+    "website",
+    "url"
+  ]
+}

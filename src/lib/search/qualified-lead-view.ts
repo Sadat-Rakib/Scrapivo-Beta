@@ -1,0 +1,356 @@
+/**
+ * M11 — UI view contract over QualifiedLead (not lossy SpecRow→Lead mapping).
+ *
+ * Rendering derives from QualifiedLead + SearchSpec + entity_type.
+ * ClaimEvidence[] remains inspectable — why_match is presentation only.
+ */
+import type { SearchSpec, SpecEntity } from "@/lib/search/search-spec";
+import type { SpecRow } from "@/lib/spec-search.functions";
+import type { ClaimEvidence } from "@/lib/search/claim-binding";
+import type { SearchRunIds } from "@/lib/search/search-run";
+import {
+  projectQualifiedLead,
+  type QualifiedLead,
+} from "@/lib/search/qualified-lead";
+import type { SearchOutcomeCode } from "@/lib/search/canonical-contract";
+import { fixMojibake } from "@/lib/encoding";
+
+/** Generic table columns — M12/M13 specialize further; M11 establishes the contract. */
+export type QualifiedLeadColumnId =
+  | "name"
+  | "location"
+  | "website"
+  | "contact"
+  | "evidence"
+  | "current_role"
+  | "company"
+  | "title"
+  | "employer"
+  | "salary"
+  | "apply";
+
+export type QualifiedLeadColumn = {
+  id: QualifiedLeadColumnId;
+  label: string;
+};
+
+const BUSINESS_COLS: QualifiedLeadColumn[] = [
+  { id: "name", label: "Name" },
+  { id: "location", label: "Location" },
+  { id: "website", label: "Website" },
+  { id: "contact", label: "Contact" },
+  { id: "evidence", label: "Evidence" },
+];
+
+const COMPANY_COLS: QualifiedLeadColumn[] = [
+  { id: "name", label: "Name" },
+  { id: "location", label: "Location" },
+  { id: "website", label: "Website" },
+  { id: "contact", label: "Contact" },
+  { id: "evidence", label: "Evidence" },
+];
+
+const PERSON_COLS: QualifiedLeadColumn[] = [
+  { id: "name", label: "Name" },
+  { id: "current_role", label: "Current role" },
+  { id: "company", label: "Company" },
+  { id: "location", label: "Location" },
+  { id: "contact", label: "Contact" },
+  { id: "evidence", label: "Evidence" },
+];
+
+const JOB_COLS: QualifiedLeadColumn[] = [
+  { id: "title", label: "Title" },
+  { id: "employer", label: "Employer" },
+  { id: "location", label: "Location" },
+  { id: "salary", label: "Salary" },
+  { id: "apply", label: "Apply" },
+  { id: "evidence", label: "Evidence" },
+];
+
+/** Columns for the Spec entity — generic table contract. */
+export function columnsForEntity(
+  entity: SpecEntity | string | null | undefined,
+): QualifiedLeadColumn[] {
+  switch (entity) {
+    case "person":
+    case "investor":
+      return PERSON_COLS;
+    case "job":
+      return JOB_COLS;
+    case "business":
+      return BUSINESS_COLS;
+    case "company":
+    default:
+      return COMPANY_COLS;
+  }
+}
+
+/**
+ * UI row: canonical QualifiedLead plus display cells.
+ * Evidence is never reduced to why_match alone.
+ */
+export type QualifiedLeadViewRow = {
+  key: string;
+  entity_type: string;
+  lead: QualifiedLead;
+  cells: Partial<Record<QualifiedLeadColumnId, string | null>>;
+  /** Full claim proof — inspectable in detail panels. */
+  evidence: ClaimEvidence[];
+  why_match: string | null;
+};
+
+function contactCell(lead: QualifiedLead): string | null {
+  const email = lead.fields.email;
+  const phone = lead.fields.phone;
+  const parts = [email, phone].filter(
+    (v): v is string => typeof v === "string" && !!v.trim(),
+  );
+  return parts.length ? parts.join(" · ") : null;
+}
+
+function evidenceSummary(evidence: ClaimEvidence[]): string | null {
+  if (!evidence.length) return null;
+  const e = evidence[0];
+  const bits = [
+    e.claim_type,
+    e.freshness && e.freshness !== "unknown" ? e.freshness : null,
+    e.evidence_source ?? null,
+  ].filter(Boolean);
+  return bits.join(" · ") || e.claim || null;
+}
+
+function cellValue(
+  col: QualifiedLeadColumnId,
+  lead: QualifiedLead,
+): string | null {
+  switch (col) {
+    case "name":
+      return lead.name ? fixMojibake(lead.name) : null;
+    case "title":
+      return lead.name ? fixMojibake(lead.name) : null;
+    case "location":
+      return lead.location ? fixMojibake(lead.location) : null;
+    case "website":
+      return typeof lead.fields.website_url === "string" ? lead.fields.website_url : null;
+    case "apply":
+      return typeof lead.fields.apply_url === "string" ? lead.fields.apply_url : null;
+    case "contact":
+      return contactCell(lead);
+    case "evidence":
+      return evidenceSummary(lead.evidence);
+    case "current_role": {
+      const role = lead.fields.category ?? lead.evidence[0]?.claim_parameters?.role;
+      return role != null ? String(role) : null;
+    }
+    case "company":
+    case "employer": {
+      const co = lead.fields.employer ?? lead.fields.industry;
+      return co != null ? String(co) : null;
+    }
+    case "salary": {
+      const s = lead.fields.salary;
+      return s != null && s !== "" ? String(s) : null;
+    }
+    default:
+      return null;
+  }
+}
+
+/** Build a view row from a QualifiedLead (no re-qualification). */
+export function viewRowFromQualifiedLead(
+  lead: QualifiedLead,
+  entity: SpecEntity | string,
+): QualifiedLeadViewRow {
+  const cols = columnsForEntity(entity);
+  const cells: QualifiedLeadViewRow["cells"] = {};
+  for (const c of cols) {
+    cells[c.id] = cellValue(c.id, lead);
+  }
+  return {
+    key: `${lead.entity_id}::${lead.claim_type}`,
+    entity_type: lead.entity_type,
+    lead,
+    cells,
+    evidence: lead.evidence,
+    why_match: lead.why_match ? fixMojibake(lead.why_match) : null,
+  };
+}
+
+/**
+ * Project SpecRows into QualifiedLead view rows.
+ * Rows that fail the persistence/theorem gate are omitted — never rendered as leads.
+ */
+export function projectSpecRowsToQualifiedViews(args: {
+  rows: SpecRow[];
+  spec: SearchSpec;
+  run?: Partial<SearchRunIds> | null;
+  nowMs?: number;
+}): {
+  views: QualifiedLeadViewRow[];
+  rejected: Array<{ title: string; reject_code: string; reason: string }>;
+  qualified_count: number;
+} {
+  const views: QualifiedLeadViewRow[] = [];
+  const rejected: Array<{ title: string; reject_code: string; reason: string }> =
+    [];
+
+  for (const row of args.rows) {
+    const projected = projectQualifiedLead({
+      row,
+      spec: args.spec,
+      run: args.run,
+      nowMs: args.nowMs,
+    });
+    if (!projected.ok) {
+      rejected.push({
+        title: row.title ?? "",
+        reject_code: projected.reject_code,
+        reason: projected.reason,
+      });
+      continue;
+    }
+    views.push(viewRowFromQualifiedLead(projected.lead, args.spec.entity));
+  }
+
+  return {
+    views,
+    rejected,
+    qualified_count: views.length,
+  };
+}
+
+/**
+ * Count only QualifiedLead views — never raw SpecRow length.
+ */
+export function qualifiedViewCount(views: QualifiedLeadViewRow[]): number {
+  return views.filter((v) => v.lead.disposition === "qualified").length;
+}
+
+/** Evidence still inspectable after view projection. */
+export function evidenceAccessible(view: QualifiedLeadViewRow): boolean {
+  return Array.isArray(view.evidence) && view.evidence === view.lead.evidence;
+}
+
+/**
+ * Bridge to legacy LocalBusinessRow shape WITHOUT dropping evidence.
+ * Prefer rendering from QualifiedLeadViewRow; this exists for existing tables.
+ */
+export function viewToLocalBusinessRow(
+  view: QualifiedLeadViewRow,
+  idx: number,
+): {
+  key: string;
+  name: string;
+  category?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  description?: string;
+  source: string;
+  sample_url: string;
+  score: number;
+  opportunity_tags: string[];
+  website_status: "listed" | "unknown";
+  why_match?: string;
+  /** M11: canonical proof retained beside legacy fields. */
+  qualified: QualifiedLead;
+  claim_evidence: ClaimEvidence[];
+} {
+  const lead = view.lead;
+  const slug =
+    lead.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .slice(0, 40) || "biz";
+  return {
+    key: view.key || `ql-biz-${idx}-${slug}`,
+    name: fixMojibake(lead.name),
+    category: (lead.fields.category as string | null) ?? undefined,
+    address: lead.location ? fixMojibake(lead.location) : undefined,
+    phone: (lead.fields.phone as string | null) ?? undefined,
+    email: (lead.fields.email as string | null) ?? undefined,
+    website: typeof lead.fields.website_url === "string" ? lead.fields.website_url : undefined,
+    description: lead.location_country
+      ? fixMojibake(
+          [lead.location, lead.location_country].filter(Boolean).join(", "),
+        )
+      : undefined,
+    source: `qualified-${lead.entity_type}`,
+    sample_url: lead.source_url || "",
+    score: Math.round((lead.relevance_score ?? 0.5) * 100),
+    opportunity_tags: typeof lead.fields.website_url === "string" ? ["has_website"] : lead.evidence.some((e) => e.claim_type === "no_website") ? ["no_website"] : [],
+    website_status: typeof lead.fields.website_url === "string" ? "listed" : "unknown",
+    why_match: view.why_match ?? undefined,
+    qualified: lead,
+    claim_evidence: view.evidence,
+  };
+}
+
+/**
+ * Bridge to legacy Lead shape WITHOUT dropping evidence.
+ */
+export function viewToLegacyLead(
+  view: QualifiedLeadViewRow,
+  idx: number,
+): {
+  source: string;
+  platform: string;
+  platform_label: string;
+  title: string;
+  snippet: string;
+  full_post_url: string;
+  why_match?: string;
+  inline_contacts?: { emails: string[]; phones: string[]; links: string[] };
+  /** M11: canonical proof retained. */
+  qualified: QualifiedLead;
+  claim_evidence: ClaimEvidence[];
+} {
+  const lead = view.lead;
+  const email = typeof lead.fields.email === "string" ? lead.fields.email : null;
+  const phone = typeof lead.fields.phone === "string" ? lead.fields.phone : null;
+  return {
+    source: `qualified-${lead.entity_type}`,
+    platform: "qualified-lead",
+    platform_label:
+      lead.entity_type.charAt(0).toUpperCase() + lead.entity_type.slice(1),
+    title: fixMojibake(lead.name),
+    snippet: fixMojibake(
+      [view.why_match, email, phone].filter(Boolean).join(" · "),
+    ),
+    full_post_url:
+      lead.source_url || `qualified-${lead.entity_type}-${idx}-${lead.entity_id}`,
+    why_match: view.why_match ?? undefined,
+    inline_contacts:
+      email || phone
+        ? {
+            emails: email ? [email] : [],
+            phones: phone ? [phone] : [],
+            links: lead.source_url ? [lead.source_url] : [],
+          }
+        : undefined,
+    qualified: lead,
+    claim_evidence: view.evidence,
+  };
+}
+
+export type UiSearchState = {
+  outcome: SearchOutcomeCode | null;
+  views: QualifiedLeadViewRow[];
+  qualified_count: number;
+  loading: boolean;
+  error: string | null;
+  diagnostics: Array<{ code: SearchOutcomeCode; source?: string; detail?: string }>;
+};
+
+export function emptyUiSearchState(): UiSearchState {
+  return {
+    outcome: null,
+    views: [],
+    qualified_count: 0,
+    loading: false,
+    error: null,
+    diagnostics: [],
+  };
+}

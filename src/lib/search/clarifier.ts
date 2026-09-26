@@ -9,7 +9,7 @@
 //  5. Product pitches get product questions; crafts get skill questions.
 // =====================================================================
 import type { ClassifiedQuery } from "./query-classifier";
-import { isProductPitchQuery } from "./query-classifier";
+import { isProductPitchQuery, isDirectoryQuery } from "./query-classifier";
 import { tokenizeInput } from "./tokenize-input";
 
 export type ClarifyOptionId = string;
@@ -32,7 +32,19 @@ export type ClarifyQuestionId =
   | "local_opportunity"
   | "investor_stage"
   | "investor_check"
-  | "investor_sector";
+  | "investor_sector"
+  | "entity_role"
+  | "entity"
+  | "entity_category"
+  | "entity_industry"
+  | "entity_business_model"
+  | "entity_seniority"
+  | "entity_employment"
+  | "entity_location"
+  | "entity_mode"
+  | "entity_offer"
+  | "entity_site"
+  | "entity_channel";
 
 export type ClarifyQuestion = {
   id: ClarifyQuestionId;
@@ -60,6 +72,15 @@ export type ClarifyAnswers = {
   investor_check?: "angel" | "seed" | "growth" | "any";
   /** Investor hunt: sector focus (free text or canonical label). */
   investor_sector?: string;
+  /** Entity-slot answers (spec-first flow): free text folded into refinement. */
+  entity_role?: string;
+  entity_category?: string;
+  entity_industry?: string;
+  entity_location?: string;
+  /** Mode: just browsing vs selling (Step 2.4). Never blocks; skippable. */
+  entity_mode?: "looking" | "selling" | string;
+  /** What the user is selling them (only meaningful when mode is selling). */
+  entity_offer?: string;
   /** Free-text the user typed instead of picking. */
   other?: Partial<Record<ClarifyQuestionId, string>>;
 };
@@ -330,7 +351,7 @@ function productBuyerQuestion(): ClarifyQuestion {
   };
 }
 
-function geographyQuestion(): ClarifyQuestion {
+export function geographyQuestion(): ClarifyQuestion {
   return {
     id: "geography",
     question: "Anywhere in particular?",
@@ -490,7 +511,7 @@ function localOpportunityQuestion(): ClarifyQuestion {
   };
 }
 
-function investorStageQuestion(): ClarifyQuestion {
+export function investorStageQuestion(): ClarifyQuestion {
   return {
     id: "investor_stage",
     question: "Which stage should the investor cover?",
@@ -505,7 +526,7 @@ function investorStageQuestion(): ClarifyQuestion {
   };
 }
 
-function investorCheckQuestion(): ClarifyQuestion {
+export function investorCheckQuestion(): ClarifyQuestion {
   return {
     id: "investor_check",
     question: "Rough check size?",
@@ -519,7 +540,7 @@ function investorCheckQuestion(): ClarifyQuestion {
   };
 }
 
-function investorSectorQuestion(preferred?: string | null): ClarifyQuestion {
+export function investorSectorQuestion(preferred?: string | null): ClarifyQuestion {
   const base: ClarifyOption[] = [
     { id: "AI", label: "AI / ML", hint: "Model, applied AI, infra", recommended: true },
     { id: "Fintech", label: "Fintech", hint: "Payments, lending, infra" },
@@ -543,7 +564,7 @@ function investorSectorQuestion(preferred?: string | null): ClarifyQuestion {
   }
   return {
     id: "investor_sector",
-    question: "What sector is your startup in?",
+    question: "Which sector should the investors cover?",
     allowOther: true,
     options: base,
   };
@@ -589,8 +610,10 @@ export function buildClarifyingQuestions(
     return out.slice(0, 4);
   }
 
-  // Local business hunt — opportunity + place.
-  if (isLocalBusinessHunt(classified)) {
+  // Local business hunt — opportunity + place. Directory-intent queries
+  // ("find me businesses in Pune without websites") take the same path: an
+  // entity noun with no demand verb is a catalogue ask, whatever the wording.
+  if (isLocalBusinessHunt(classified) || isDirectoryQuery(classified.raw || "")) {
     out.push(localOpportunityQuestion());
     if (!hasLocation) out.push(geographyQuestion());
     if (craftLooksUncertain(classified.coreSkill)) {
@@ -666,6 +689,8 @@ export type SearchRefinement = {
   investorSector?: string;
   /** True when query is find-investors outreach, not startups-raising. */
   findInvestors?: boolean;
+  /** Entity-slot category/industry answer (spec-first flow) for DB routing. */
+  entityCategory?: string;
   /** Human-readable summary, shown back so the user can see what we assumed. */
   summary: string;
 };
@@ -778,7 +803,8 @@ export function applyClarifyAnswers(
   answers: ClarifyAnswers = {},
 ): SearchRefinement {
   const product = isProductClarifyPath(classified);
-  const craftRaw = (answers.other?.craft || answers.craft || "").trim() || undefined;
+  const craftRaw =
+    (answers.other?.craft || answers.craft || answers.entity_role || "").trim() || undefined;
   const craft = craftRaw ? PRODUCT_CRAFT_LABELS[craftRaw] || craftRaw : undefined;
   // Honor audience already typed in the query when the user skips the form.
   const inferredAudience = extractStatedAudience(classified.raw || "");
@@ -799,7 +825,11 @@ export function applyClarifyAnswers(
       ? (answers.experience ?? inferredExp ?? undefined)
       : (answers.experience ?? inferredExp ?? "0-1");
 
-  const location = answers.other?.geography?.trim() || classified.location || GEO_LOCATIONS[geo];
+  const location =
+    answers.other?.geography?.trim() ||
+    answers.entity_location?.trim() ||
+    classified.location ||
+    GEO_LOCATIONS[geo];
   const localOpportunity =
     answers.local_opportunity ||
     (answers.other?.local_opportunity as ClarifyAnswers["local_opportunity"]) ||
@@ -816,6 +846,12 @@ export function applyClarifyAnswers(
     (answers.investor_sector as string | undefined) ||
     (answers.other?.investor_sector as string | undefined) ||
     undefined;
+  const entityCategory =
+    answers.entity_category?.trim() ||
+    answers.entity_industry?.trim() ||
+    (answers.other?.entity_category as string | undefined) ||
+    (answers.other?.entity_industry as string | undefined) ||
+    undefined;
 
   const noun = craft || classified.coreSkill || (product ? "your product" : "work");
   const parts: string[] = [];
@@ -828,6 +864,7 @@ export function applyClarifyAnswers(
     parts.push(product ? `Looking for customers for ${noun}` : `Looking for ${noun}`);
   }
   if (audience !== "all") parts.push(`${audience} only`);
+  if (entityCategory) parts.push(entityCategory);
   if (buyerKey !== "any") {
     parts.push(product ? `customers: ${profile.label}` : `targeting ${profile.label}`);
   }
@@ -855,22 +892,363 @@ export function applyClarifyAnswers(
     investorCheck,
     investorSector,
     findInvestors,
+    entityCategory,
     summary: parts.join(" · "),
   };
 }
 
 export { isFindInvestorHunt, isLocalBusinessHunt };
 
+/** Short subject phrase from the user's ask — never invents slots. */
+export function subjectFromQuery(raw: string, entity: string): string {
+  const t = (raw || "").trim().replace(/\s+/g, " ");
+  if (!t) {
+    if (entity === "person") return "people";
+    if (entity === "company") return "companies";
+    if (entity === "business") return "local businesses";
+    if (entity === "investor") return "investors";
+    if (entity === "job") return "jobs";
+    return "leads";
+  }
+  // Prefer a compact noun phrase when the query is long.
+  const clipped = t.length > 72 ? `${t.slice(0, 69)}…` : t;
+  return clipped;
+}
+
+/**
+ * Entity-slot questions from a SearchSpec (spec-first flow, Phase 4).
+ * One question per actually-missing field, ordered role → category →
+ * industry → location. Free text always allowed; options are suggestions.
+ * Copy quotes the user's ask when raw_query is present.
+ */
+export function entityQuestionsForSpec(spec: {
+  entity: string;
+  missing: string[];
+  raw_query?: string;
+  locationSuggestion?: { typed: string; suggestion: string } | null;
+}): ClarifyQuestion[] {
+  const subject = subjectFromQuery(spec.raw_query ?? "", spec.entity);
+  const opt = (label: string, hint: string) => ({
+    id: label.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+    label,
+    hint,
+  });
+  const builders: Record<string, () => ClarifyQuestion> = {
+    entity_entity: () => ({
+      id: "entity",
+      question: "What are you looking for — people, companies, local businesses, or investors?",
+      options: [
+        opt("People", "Founders, execs, professionals"),
+        opt("Companies", "SaaS, startups, firms"),
+        opt("Local businesses", "Plumbers, dentists, cafes"),
+        opt("Investors", "VCs and angels"),
+      ],
+      allowOther: true,
+    }),
+    entity_role: () => ({
+      id: "entity_role",
+      question: `Got it — you're looking for ${subject}. What role or title (e.g. founder, CTO, owner)?`,
+      options: [
+        opt("Founder", "Startup founders"),
+        opt("CEO", "Chief executives"),
+        opt("CTO", "Tech leaders"),
+      ],
+      allowOther: true,
+    }),
+    entity_category: () => ({
+      id: "entity_category",
+      question:
+        spec.entity === "business"
+          ? `You're looking for businesses. What type of businesses (e.g. cafes, plumbers, dentists)?`
+          : `Which category should I focus on for “${subject}”?`,
+      options: [
+        opt("Plumbers", "Plumbing contractors"),
+        opt("Dentists", "Dental practices"),
+        opt("Cafes", "Coffee shops & cafes"),
+        opt("Restaurants", "Restaurants & cafes"),
+      ],
+      allowOther: true,
+    }),
+    entity_industry: () => ({
+      id: "entity_industry",
+      question: `Understood — ${subject}. Any particular industry (e.g. SaaS, Fintech), or all?`,
+      options: [
+        opt("SaaS", "Software companies"),
+        opt("Fintech", "Financial tech"),
+        opt("Healthcare", "Health companies"),
+      ],
+      allowOther: true,
+    }),
+    entity_business_model: () => ({
+      id: "entity_business_model",
+      question: `For “${subject}”, any business model (agency, brand, D2C, B2B, B2C), or all?`,
+      options: [
+        opt("Agency", "Service agencies"),
+        opt("Brand", "Product brands"),
+        opt("D2C", "Direct-to-consumer"),
+        opt("B2B", "Selling to businesses"),
+        opt("B2C", "Selling to consumers"),
+      ],
+      allowOther: true,
+    }),
+    entity_seniority: () => ({
+      id: "entity_seniority",
+      question: `For “${subject}”, what seniority (junior, senior, lead, principal)?`,
+      options: [
+        opt("Junior", "Entry-level roles"),
+        opt("Senior", "Experienced roles"),
+        opt("Lead", "Team leads"),
+        opt("Principal", "Staff/principal roles"),
+      ],
+      allowOther: true,
+    }),
+    entity_employment: () => ({
+      id: "entity_employment",
+      question: `For “${subject}”, what employment type (full-time, part-time, contract, remote)?`,
+      options: [
+        opt("Full-time", "Full-time roles"),
+        opt("Part-time", "Part-time roles"),
+        opt("Contract", "Contract roles"),
+        opt("Remote", "Remote-friendly roles"),
+      ],
+      allowOther: true,
+    }),
+    entity_location: () => {
+      const s = spec.locationSuggestion;
+      if (s) {
+        // Fuzzy guess: confirm, never assume. The option id IS the canonical
+        // value so picking it answers the location slot directly.
+        return {
+          id: "entity_location",
+          question: `Did you mean ${s.suggestion}?`,
+          options: [
+            {
+              id: s.suggestion,
+              label: `Yes, ${s.suggestion}`,
+              hint: `You typed "${s.typed}"`,
+              recommended: true,
+            },
+          ],
+          allowOther: true,
+        };
+      }
+      return {
+        id: "entity_location",
+        question: `You're looking for ${subject}. Which location (city, region, or country)?`,
+        options: [
+          { id: "global", label: "Worldwide", hint: "Search globally" },
+        ],
+        allowOther: true,
+      };
+    },
+  };
+  const order = ["entity", "role", "category", "industry", "business_model", "location"];
+  const idFor = (f: string) => (f === "entity" ? null : `entity_${f}`);
+  const out: ClarifyQuestion[] = [];
+  // Investor slots reuse the neutral investor question builders (stage /
+  // check / sector / location), asked only when actually missing.
+  if (spec.entity === "investor") {
+    const invOrder: Record<string, () => ClarifyQuestion> = {
+      investor_stage: () => investorStageQuestion(),
+      investor_sector: () => investorSectorQuestion(null),
+      investor_check: () => investorCheckQuestion(),
+      location: () => geographyQuestion(),
+    };
+    for (const f of ["investor_stage", "investor_sector", "investor_check", "location"]) {
+      if (spec.missing.includes(f)) out.push(invOrder[f]());
+    }
+    return out;
+  }
+  // Job slots (Phase 3): seniority/employment are optional refinements, never
+  // in `missing` — but a job spec missing its role still asks it here.
+  if (spec.entity === "job") {
+    for (const f of ["role", "location", "seniority", "employment"]) {
+      if (!spec.missing.includes(f)) continue;
+      const build = builders[`entity_${f}`];
+      if (build) out.push(build());
+    }
+    return out;
+  }
+  for (const f of order) {
+    if (!spec.missing.includes(f)) continue;
+    if (f === "entity") {
+      // Entity unknown → ask the entity question. Without it the unknown slot
+      // produced zero questions and the UI fell through to a misleading
+      // "0 results" screen for unparseable input.
+      out.push(builders.entity_entity());
+      continue;
+    }
+    const build = builders[`entity_${f}`];
+    if (build) out.push(build());
+  }
+  // Mode + offer (Phase 1.3): owned by the mode gate (mode-gate.ts), asked
+  // BEFORE retrieval — never appended blindly here. The offer question only
+  // ever follows a selling answer, so "just looking" never sees it.
+  // Investors are exempt (their flow captures intent via stage/sector).
+  return out;
+}
+
+/**
+ * Job refinement follow-ups (Phase 3, thin-ask): optional location /
+ * seniority / employment questions for an already-ready job spec whose
+ * retrieval came back thin. Never blocks — the caller attaches these to a
+ * ready result's `clarify` so the UI can offer refinement instead of a dead
+ * empty state. Stated slots are skipped 1:1.
+ */
+export function jobRefinementQuestions(spec: {
+  entity: string;
+  criteria: Array<{ field: string; value: string }>;
+}): ClarifyQuestion[] {
+  if (spec.entity !== "job") return [];
+  const has = (f: string) => spec.criteria.some((c) => c.field === f && c.value.trim().length > 0);
+  const out: ClarifyQuestion[] = [];
+  if (!has("location")) {
+    out.push({
+      id: "entity_location",
+      question: "Which location should I focus on (city, region, or remote)?",
+      options: [],
+      allowOther: true,
+    });
+  }
+  if (!has("seniority")) {
+    out.push({
+      id: "entity_seniority",
+      question: "What seniority level (e.g. junior, senior, lead, principal)?",
+      options: [
+        { id: "junior", label: "Junior", hint: "Entry-level roles" },
+        { id: "senior", label: "Senior", hint: "Experienced roles" },
+        { id: "lead", label: "Lead", hint: "Team leads" },
+      ],
+      allowOther: true,
+    });
+  }
+  if (!has("employment")) {
+    out.push({
+      id: "entity_employment",
+      question: "What employment type (e.g. full-time, part-time, contract, remote)?",
+      options: [
+        { id: "full-time", label: "Full-time", hint: "Full-time roles" },
+        { id: "part-time", label: "Part-time", hint: "Part-time roles" },
+        { id: "contract", label: "Contract", hint: "Contract roles" },
+        { id: "remote", label: "Remote", hint: "Remote-friendly roles" },
+      ],
+      allowOther: true,
+    });
+  }
+  return out;
+}
+
+/**
+ * Thin-ask follow-ups (Phase 5, always-ask on thin): optional refinement
+ * questions for an already-ready spec whose retrieval came back empty.
+ * Never blocks — the caller attaches these to a ready result's `clarify`
+ * so the UI offers refinement instead of a dead empty state. Only unstated
+ * optional slots are asked (required slots are stated by definition of
+ * ready); entities with no optional slots (investor) get nothing.
+ */
+export function thinClarifyForSpec(spec: {
+  entity: string;
+  criteria: Array<{ field: string; value: string }>;
+}): ClarifyQuestion[] {
+  if (spec.entity === "job") return jobRefinementQuestions(spec);
+  if (spec.entity === "investor" || spec.entity === "unknown") return [];
+  const has = (f: string) => spec.criteria.some((c) => c.field === f && c.value.trim().length > 0);
+  const hasLocation = has("location") || has("geo_scope");
+  const out: ClarifyQuestion[] = [];
+  // Order: highest retrieval leverage first (location narrows most).
+  if (
+    !hasLocation &&
+    (spec.entity === "company" || spec.entity === "person" || spec.entity === "business")
+  ) {
+    out.push({
+      id: "entity_location",
+      question: "Which location should I focus on (city, region, or country)?",
+      options: [],
+      allowOther: true,
+    });
+  }
+  if (!has("industry") && (spec.entity === "company" || spec.entity === "person")) {
+    out.push({
+      id: "entity_industry",
+      question: "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?",
+      options: [
+        { id: "saas", label: "SaaS", hint: "Software companies" },
+        { id: "fintech", label: "Fintech", hint: "Financial tech" },
+        { id: "healthcare", label: "Healthcare", hint: "Health companies" },
+      ],
+      allowOther: true,
+    });
+  }
+  if (!has("business_model") && (spec.entity === "company" || spec.entity === "business")) {
+    out.push({
+      id: "entity_business_model",
+      question: "Any particular business model (agency, brand, D2C, B2B, B2C), or all?",
+      options: [
+        { id: "agency", label: "Agency", hint: "Service agencies" },
+        { id: "brand", label: "Brand", hint: "Product brands" },
+        { id: "d2c", label: "D2C", hint: "Direct-to-consumer" },
+        { id: "b2b", label: "B2B", hint: "Selling to businesses" },
+        { id: "b2c", label: "B2C", hint: "Selling to consumers" },
+      ],
+      allowOther: true,
+    });
+  }
+  return out;
+}
+
+/** Browsing-vs-selling question copy (single owner; gate decides when).
+ *  Optional subjectHint quotes the user's ask ("startup founders", "cafes"). */
+export function entityModeQuestion(
+  entity: "person" | "company" | "business",
+  subjectHint?: string | null,
+): ClarifyQuestion {
+  const fallback =
+    entity === "person" ? "them" : entity === "company" ? "these companies" : "these businesses";
+  const subject = (subjectHint ?? "").trim() || fallback;
+  return {
+    id: "entity_mode",
+    question: `Got it — looking for ${subject}. Just browsing, selling something, or something else?`,
+    options: [
+      {
+        id: "looking",
+        label: "Just looking",
+        hint: "Browse and compare, no pitch",
+        recommended: true,
+      },
+      { id: "selling", label: "Selling something", hint: "Find buyers for an offer" },
+      { id: "hiring", label: "Hiring / recruiting", hint: "Talent or roles" },
+    ],
+    allowOther: true,
+  };
+}
+
+/** Offer question copy: gate emits it only when mode == selling. */
+export function entityOfferQuestion(subjectHint?: string | null): ClarifyQuestion {
+  const subject = (subjectHint ?? "").trim();
+  return {
+    id: "entity_offer",
+    question: subject
+      ? `What are you offering ${subject}? (Skip if you're just looking)`
+      : "What are you offering them? (Skip if you're just looking)",
+    options: [],
+    allowOther: true,
+  };
+}
+
 export function mentionsPlace(raw: string): boolean {
   const t = (raw || "").trim();
+  // Stated worldwide / global / anywhere counts as geography resolved —
+  // never re-ask "Anywhere in particular?".
+  if (/\b(worldwide|globally|global|anywhere|world[\s-]?wide)\b/i.test(t)) return true;
   const m =
-    /\b(?:in|near|around|across|based\s+in|located\s+in)\s+(?:the\s+)?([A-Za-z][A-Za-z.'-]+(?:\s+[A-Za-z][A-Za-z.'-]+)?)/.exec(
+    /\b(?:in|near|around|across|based\s+in|located\s+in)\s+(?:the\s+)?([\p{L}][\p{L}.'-]+(?:\s+[\p{L}][\p{L}.'-]+)?)/u.exec(
       t,
     );
   if (!m) return false;
   // Accept lowercase places ("in camrose") — real users type lowercase. Reject
   // prepositional/idiomatic phrases ("in the morning", "in particular", …).
   const candidate = m[1].toLowerCase();
+  if (/^(worldwide|globally|global|anywhere)$/i.test(candidate)) return true;
   return !/^(the|a|an|my|our|their|his|her|its|this|that|these|those|order|advance|general|particular|detail|depth|terms|case|addition|short|total|between|contrast|front|middle|place|return|response|regard|relation|spite|time|view|fact|other|words|summary|conclusion|process|way|hands|doubt|light|event|face|future|past|present|end|start|beginning|progress|demand|market|industry|niche|field|business|businesses|companies|company|firms?|agenc\w*|location|locations|advance)$/.test(
     candidate,
   );

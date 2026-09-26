@@ -1,0 +1,264 @@
+﻿
+=== companies that provide recruiting
+  mode=fit_based entity=company cat=companies role=- ind=- biz=-
+  relation=offers_service obj=- raw="that provide"
+  loc=- raw="-" scope=- radius=-
+  temporal=-
+  qty=-
+  constraints=-
+  req=- pref=- verify=- out=-
+  user=- evidence=claim:true intent:false
+  compound=false subgoals=0 clar=no
+
+=== agencies that are not hiring
+  mode=hiring_based entity=company cat=agencies role=- ind=- biz=-
+  relation=hiring obj=- raw="hiring"
+  loc=- raw="-" scope=- radius=-
+  temporal=-
+  qty=-
+  constraints=-
+  req=- pref=- verify=- out=-
+  user=- evidence=claim:true intent:true
+  compound=false subgoals=0 clar=no
+
+=== engineers not looking for work
+  mode=job_based entity=person cat=- role=engineers ind=- biz=-
+  relation=seeking_job obj=work raw="looking for"
+  loc=- raw="-" scope=- radius=-
+  temporal=-
+  qty=-
+  constraints=-
+  req=- pref=- verify=- out=-
+  user=- evidence=claim:true intent:true
+  compound=false subgoals=0 clar=no
+
+=== companies that offer no marketing services
+  mode=fit_based entity=company cat=companies role=- ind=- biz=-
+  relation=offers_service obj=- raw="that offer"
+  loc=- raw="-" scope=- radius=-
+  temporal=-
+  qty=-
+  constraints=!categoryneq"marketing services"
+  req=- pref=- verify=- out=-
+  user=- evidence=claim:true intent:false
+  compound=false subgoals=0 clar=no
+
+=== software companies with at least 100 employees, not agencies
+  mode=fit_based entity=company cat=software companies role=- ind=- biz=-
+  relation=none obj=- raw="-"
+  loc=- raw="-" scope=- radius=-
+  temporal=-
+  qty=-
+  constraints=employee_countgte100 ; !categoryneq"agencies"
+  req=- pref=- verify=- out=-
+  user=- evidence=claim:true intent:false
+  compound=false subgoals=0 clar=no
+
+=== plumbers within 30 miles of Manchester with more than 4 stars
+  mode=fit_based entity=business cat=plumbers role=- ind=- biz=-
+  relation=none obj=- raw="-"
+  loc=Manchester raw="within 30 miles of Manchester" scope=within_radius radius=-
+  temporal=-
+  qty=-
+  constraints=ratinggt4stars ; distancewithin_radius30miles
+  req=- pref=- verify=- out=-
+  user=- evidence=claim:true intent:false
+  compound=false subgoals=0 clar=no
+
+=== freelance agronomists under $90/hour, excluding Waterford
+  mode=fit_based entity=person cat=- role=freelance agronomists ind=- biz=-
+  relation=none obj=- raw="-"
+  loc=- raw="-" scope=- radius=-
+  temporal=-
+  qty=-
+  constraints=hourly_ratelt90hour ; !categoryneq"waterford"
+  req=- pref=- verify=- out=-
+  user=- evidence=claim:true intent:false
+  compound=false subgoals=0 clar=no
+
+=== mushroom farms within 30 miles of Arequipa
+  mode=fit_based entity=business cat=mushroom farms role=- ind=- biz=-
+  relation=none obj=- raw="-"
+  loc=Arequipa raw="within 30 miles of Arequipa" scope=within_radius radius=-
+  temporal=-
+  qty=-
+  constraints=distancewithin_radius30miles
+  req=- pref=- verify=- out=-
+  user=- evidence=claim:true intent:false
+  compound=false subgoals=0 clar=no
+
+=== remote rust job postings from the last 30 days
+  mode=job_based entity=job cat=remote rust job postings role=- ind=- biz=-
+  relation=none obj=- raw="-"
+  loc=- raw="-" scope=- radius=-
+  temporal={"relation":"within_last","window":"30d","year":null,"raw":"from the last 30 days","confidence":0.85}
+  qty=-
+  constraints=-
+  req=- pref=- verify=- out=-
+  user=- evidence=claim:true intent:false
+  compound=false subgoals=0 clar=no
+
+=== companies that posted a arborist role in the last 2 months
+  mode=hiring_based entity=company cat=companies role=- ind=- biz=-
+  relation=hiring(posted_job) obj=arborist role raw="posted a"
+  loc=- raw="-" scope=- radius=-
+  temporal={"relation":"within_last","window":"2m","year":null,"raw":"in the last 2 months","confidence":0.85}
+  qty=-
+  constraints=-
+  req=- pref=- verify=- out=-
+  user=- evidence=claim:true intent:true
+  compound=false subgoals=0 clar=no
+
+=== people in london
+  mode=fit_based entity=person cat=- role=people ind=- biz=-
+  relation=none obj=- raw="-"
+  loc=London raw="in london" scope=in radius=-
+  temporal=-
+  qty=-
+  constraints=-
+  req=- pref=- verify=- out=-
+  user=- evidence=claim:true intent:false
+  compound=false subgoals=0 clar=no
+
+=== heads of talent at fintech companies
+  mode=fit_based entity=person cat=- role=heads of talent ind=fintech biz=-
+  relation=none obj=- raw="-"
+  loc=- raw="-" scope=- radius=-
+  temporal=-
+  qty=-
+  constraints=-
+  req=- pref=- verify=- out=-
+  user=- evidence=claim:true intent:false
+  compound=false subgoals=0 clar=no
+
+=== brand strategists in Enschede looking for work
+  mode=job_based entity=company cat=brand role=- ind=- biz=-
+  relation=seeking_job obj=work raw="looking for"
+  loc=Enschede raw="in Enschede" scope=in radius=-
+  temporal=-
+  qty=-
+  constraints=-
+  req=- pref=- verify=- out=-
+  user=- evidence=claim:true intent:true
+  compound=false subgoals=0 clar=no
+
+=== Give me 50 restaurants in Lisbon, phone number required, Instagram if possible, verified as currently open, as a CSV
+  mode=fit_based entity=business cat=restaurants role=- ind=- biz=-
+  relation=none obj=- raw="-"
+  loc=Lisbon raw="in Lisbon" scope=in radius=-
+  temporal=-
+  qty={"requested":50,"minimum":null,"maximum":null,"unlimited":false,"approximate":false,"raw":"Give me 50"}
+  constraints=-
+  req=name,phone,evidence pref=instagram verify=phone_is_public,business_exists out=csv
+  user=- evidence=claim:true intent:false
+  compound=false subgoals=0 clar=no
+
+=== companies in mombasa hirng orthodontists today
+  mode=fit_based entity=company cat=companies role=- ind=- biz=-
+  relation=none obj=- raw="-"
+  loc=mombasa raw="in mombasa" scope=in radius=-
+  temporal={"relation":"current","window":null,"year":null,"raw":"today","confidence":0.8}
+  qty=-
+  constraints=-
+  req=- pref=- verify=- out=-
+  user=- evidence=claim:true intent:false
+  compound=false subgoals=0 clar=no
+
+=== who around tromso needs someone for grant writinng asap
+  mode=intent_based entity=business cat=- role=- ind=- biz=-
+  relation=needs_service obj=grant writinng raw="needs someone for"
+  loc=tromso raw="around tromso" scope=near radius=-
+  temporal={"relation":"current","window":null,"year":null,"raw":"as soon as possible","confidence":0.8}
+  qty=-
+  constraints=-
+  req=- pref=- verify=- out=-
+  user=- evidence=claim:true intent:true
+  compound=false subgoals=0 clar=missing_target [target]
+
+=== any quilt shops near swansea no prroper website n got phone?
+  mode=fit_based entity=business cat=quilt shops role=- ind=- biz=-
+  relation=none obj=- raw="-"
+  loc=swansea raw="near swansea" scope=near radius=-
+  temporal=-
+  qty=-
+  constraints=!categoryneq"prroper website"
+  req=- pref=- verify=- out=-
+  user=- evidence=claim:true intent:false
+  compound=false subgoals=0 clar=no
+
+=== find me 20 saunas outside aarhus, not chains, insta if possible rn
+  mode=fit_based entity=unknown cat=- role=- ind=- biz=-
+  relation=none obj=- raw="-"
+  loc=aarhus raw="outside aarhus" scope=near radius=-
+  temporal=-
+  qty={"requested":20,"minimum":null,"maximum":null,"unlimited":false,"approximate":false,"raw":"find me 20"}
+  constraints=!categoryneq"chains"
+  req=name pref=instagram verify=- out=-
+  user=- evidence=claim:true intent:false
+  compound=false subgoals=0 clar=no
+
+=== need some foundders round wtaerford tryna bring on tax barrister ppl rn
+  mode=hiring_based entity=person cat=- role=foundders ind=- biz=-
+  relation=hiring obj=tax barrister people raw="bring on"
+  loc=wtaerford raw="round wtaerford" scope=near radius=-
+  temporal={"relation":"current","window":null,"year":null,"raw":"right now","confidence":0.8}
+  qty=-
+  constraints=-
+  req=- pref=- verify=- out=-
+  user=- evidence=claim:true intent:true
+  compound=false subgoals=0 clar=no
+
+=== ok so i do iso certificaiton n im tryna find like sailmakers aound kosice that dont got a site, phone would b great, thx
+  mode=opportunity_based entity=unknown cat=- role=- ind=- biz=-
+  relation=lacks_asset obj=website raw="dont got"
+  loc=- raw="-" scope=- radius=-
+  temporal=-
+  qty=-
+  constraints=-
+  req=name,phone pref=- verify=- out=-
+  user=iso certificaiton and im evidence=claim:true intent:false
+  compound=false subgoals=0 clar=no
+
+=== gimme bell foundries kumasi pls ??
+  mode=fit_based entity=business cat=bell foundries role=- ind=- biz=-
+  relation=none obj=- raw="-"
+  loc=kumasi raw="kumasi" scope=in radius=-
+  temporal=-
+  qty=-
+  constraints=-
+  req=- pref=- verify=- out=-
+  user=- evidence=claim:true intent:false
+  compound=false subgoals=0 clar=no
+
+=== hydroponic farms in Split who need a localisation manager as many as u can
+  mode=intent_based entity=business cat=hydroponic farms role=- ind=- biz=-
+  relation=needs_service obj=localisation manager raw="who need a"
+  loc=Split raw="in Split" scope=in radius=-
+  temporal=-
+  qty=-
+  constraints=-
+  req=- pref=- verify=- out=-
+  user=- evidence=claim:true intent:true
+  compound=false subgoals=0 clar=no
+
+=== investosr fnuding space startups in saskatoon
+  mode=fit_based entity=company cat=investosr fnuding space startups role=- ind=- biz=-
+  relation=none obj=- raw="-"
+  loc=saskatoon raw="in saskatoon" scope=in radius=-
+  temporal=-
+  qty=-
+  constraints=-
+  req=- pref=- verify=- out=-
+  user=- evidence=claim:true intent:false
+  compound=false subgoals=0 clar=no
+
+=== find me B2B SaaS founders on LinkedIn who mentioned hiring this month
+  mode=hiring_based entity=person cat=- role=b2b saas founders ind=saas biz=-
+  relation=hiring obj=- raw="hiring"
+  loc=- raw="-" scope=- radius=-
+  temporal={"relation":"within_last","window":"1m","year":null,"raw":"this month","confidence":0.8}
+  qty=-
+  constraints=-
+  req=- pref=- verify=- out=-
+  user=- evidence=claim:true intent:true
+  compound=false subgoals=0 clar=no

@@ -1,0 +1,625 @@
+{
+  "key": "cleaned-2.csv",
+  "size": 19247748,
+  "last_modified": "2026-09-08 00:12:14+00:00",
+  "columns": [
+    "First Name",
+    "Last Name",
+    "Title",
+    "Company",
+    "Company Name for Emails",
+    "Email",
+    "Email Status",
+    "Seniority",
+    "Departments",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Stage",
+    "# Employees",
+    "Industry",
+    "Keywords",
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "City",
+    "State",
+    "Country",
+    "Company Address",
+    "Company City",
+    "Company State",
+    "Company Country",
+    "Company Phone",
+    "SEO Description",
+    "Technologies",
+    "Annual Revenue",
+    "Total Funding",
+    "Latest Funding",
+    "Latest Funding Amount",
+    "Last Raised At",
+    "Email Sent",
+    "Email Open",
+    "Email Bounced",
+    "Replied",
+    "Demoed",
+    "Number of Retail Locations",
+    "Apollo Contact Id",
+    "Apollo Account Id",
+    "Primary Email Source",
+    "Secondary Email",
+    "Secondary Email Source",
+    "Tertiary Email",
+    "Tertiary Email Source",
+    "Primary Intent Topic",
+    "Primary Intent Score",
+    "Secondary Intent Topic",
+    "Secondary Intent Score",
+    "Contact at Client That Moved Jobs",
+    "Head of Partnerships?",
+    "Client Facing Team?",
+    "Head Of CS 50+ Reps",
+    "in TAM?",
+    "CXplained - Head of CX",
+    "Years In Current Position?",
+    "CXplained - Owner",
+    "Deal Stage",
+    "Simplified Job Title",
+    "email",
+    "username",
+    "domain",
+    "status",
+    "overall_score",
+    "is_safe_to_send",
+    "is_valid_syntax",
+    "is_disposable",
+    "is_role_account",
+    "mx_accepts_mail",
+    "mx_records",
+    "can_connect_smtp",
+    "has_inbox_full",
+    "is_catch_all"
+  ],
+  "row_count": 9600,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "First Name": "first_name",
+    "Last Name": "last_name",
+    "Title": "title",
+    "Company": "company",
+    "Company Name for Emails": "email",
+    "Email": "email",
+    "Email Status": "email",
+    "Seniority": "other",
+    "Departments": "other",
+    "First Phone": "phone",
+    "Work Direct Phone": "phone",
+    "Home Phone": "phone",
+    "Mobile Phone": "phone",
+    "Corporate Phone": "phone",
+    "Other Phone": "phone",
+    "Stage": "other",
+    "# Employees": "employees",
+    "Industry": "industry",
+    "Keywords": "descriptive",
+    "Person Linkedin Url": "linkedin",
+    "Website": "website",
+    "Company Linkedin Url": "linkedin",
+    "Facebook Url": "social",
+    "Twitter Url": "social",
+    "City": "other",
+    "State": "other",
+    "Country": "country",
+    "Company Address": "company",
+    "Company City": "company",
+    "Company State": "company",
+    "Company Country": "company",
+    "Company Phone": "phone",
+    "SEO Description": "descriptive",
+    "Technologies": "tech",
+    "Annual Revenue": "other",
+    "Total Funding": "other",
+    "Latest Funding": "other",
+    "Latest Funding Amount": "other",
+    "Last Raised At": "other",
+    "Email Sent": "email",
+    "Email Open": "email",
+    "Email Bounced": "email",
+    "Replied": "other",
+    "Demoed": "other",
+    "Number of Retail Locations": "other",
+    "Apollo Contact Id": "other",
+    "Apollo Account Id": "company",
+    "Primary Email Source": "email",
+    "Secondary Email": "email",
+    "Secondary Email Source": "email",
+    "Tertiary Email": "email",
+    "Tertiary Email Source": "email",
+    "Primary Intent Topic": "other",
+    "Primary Intent Score": "other",
+    "Secondary Intent Topic": "other",
+    "Secondary Intent Score": "other",
+    "Contact at Client That Moved Jobs": "other",
+    "Head of Partnerships?": "other",
+    "Client Facing Team?": "other",
+    "Head Of CS 50+ Reps": "other",
+    "in TAM?": "other",
+    "CXplained - Head of CX": "other",
+    "Years In Current Position?": "title",
+    "CXplained - Owner": "other",
+    "Deal Stage": "other",
+    "Simplified Job Title": "title",
+    "email": "email",
+    "username": "other",
+    "domain": "website",
+    "status": "other",
+    "overall_score": "other",
+    "is_safe_to_send": "other",
+    "is_valid_syntax": "other",
+    "is_disposable": "other",
+    "is_role_account": "company",
+    "mx_accepts_mail": "email",
+    "mx_records": "other",
+    "can_connect_smtp": "other",
+    "has_inbox_full": "other",
+    "is_catch_all": "other"
+  },
+  "missing_pct": {
+    "First Name": 0.0,
+    "Last Name": 0.2,
+    "Title": 0.1,
+    "Company": 0.2,
+    "Company Name for Emails": 0.2,
+    "Email": 0.0,
+    "Email Status": 0.0,
+    "Seniority": 0.1,
+    "Departments": 40.2,
+    "First Phone": 3.5,
+    "Work Direct Phone": 100.0,
+    "Home Phone": 100.0,
+    "Mobile Phone": 99.9,
+    "Corporate Phone": 3.5,
+    "Other Phone": 100.0,
+    "Stage": 0.0,
+    "# Employees": 0.2,
+    "Industry": 0.8,
+    "Keywords": 12.0,
+    "Person Linkedin Url": 0.0,
+    "Website": 0.0,
+    "Company Linkedin Url": 0.2,
+    "Facebook Url": 6.4,
+    "Twitter Url": 7.2,
+    "City": 14.5,
+    "State": 10.7,
+    "Country": 0.5,
+    "Company Address": 0.6,
+    "Company City": 4.9,
+    "Company State": 4.8,
+    "Company Country": 0.6,
+    "Company Phone": 3.3,
+    "SEO Description": 14.1,
+    "Technologies": 0.2,
+    "Annual Revenue": 8.0,
+    "Total Funding": 51.0,
+    "Latest Funding": 50.4,
+    "Latest Funding Amount": 52.4,
+    "Last Raised At": 50.4,
+    "Email Sent": 100.0,
+    "Email Open": 0.0,
+    "Email Bounced": 0.0,
+    "Replied": 0.0,
+    "Demoed": 0.0,
+    "Number of Retail Locations": 80.2,
+    "Apollo Contact Id": 0.0,
+    "Apollo Account Id": 0.2,
+    "Primary Email Source": 0.0,
+    "Secondary Email": 99.1,
+    "Secondary Email Source": 99.1,
+    "Tertiary Email": 100.0,
+    "Tertiary Email Source": 100.0,
+    "Primary Intent Topic": 100.0,
+    "Primary Intent Score": 100.0,
+    "Secondary Intent Topic": 100.0,
+    "Secondary Intent Score": 100.0,
+    "Contact at Client That Moved Jobs": 100.0,
+    "Head of Partnerships?": 100.0,
+    "Client Facing Team?": 100.0,
+    "Head Of CS 50+ Reps": 100.0,
+    "in TAM?": 100.0,
+    "CXplained - Head of CX": 100.0,
+    "Years In Current Position?": 100.0,
+    "CXplained - Owner": 100.0,
+    "Deal Stage": 100.0,
+    "Simplified Job Title": 100.0,
+    "email": 0.0,
+    "username": 0.0,
+    "domain": 0.0,
+    "status": 0.0,
+    "overall_score": 0.0,
+    "is_safe_to_send": 0.0,
+    "is_valid_syntax": 0.0,
+    "is_disposable": 0.0,
+    "is_role_account": 0.0,
+    "mx_accepts_mail": 0.0,
+    "mx_records": 0.0,
+    "can_connect_smtp": 0.0,
+    "has_inbox_full": 0.0,
+    "is_catch_all": 0.0
+  },
+  "samples": {
+    "First Name": [
+      "Juan",
+      "Jim",
+      "Jing"
+    ],
+    "Last Name": [
+      "Cruz",
+      "Kruger",
+      "Wu"
+    ],
+    "Title": [
+      "Chief Technology Officer",
+      "MW/NE Sales Manager",
+      "Lab Manager"
+    ],
+    "Company": [
+      "Osalim Agribusiness",
+      "Fine Americas",
+      "www.law.cornell.edu"
+    ],
+    "Company Name for Emails": [
+      "Osalim Agribusiness",
+      "Fine Americas",
+      "law.cornell.edu"
+    ],
+    "Email": [
+      "juanpfcruz@osalim.com.br",
+      "jimk@fine-americas.com",
+      "jw377@cornell.edu"
+    ],
+    "Email Status": [
+      "Verified",
+      "Verified",
+      "Verified"
+    ],
+    "Seniority": [
+      "C suite",
+      "Manager",
+      "Manager"
+    ],
+    "Departments": [
+      "C-Suite, Engineering & Technical",
+      "Sales",
+      "Legal"
+    ],
+    "Stage": [
+      "Cold",
+      "Cold",
+      "Cold"
+    ],
+    "# Employees": [
+      "6",
+      "6",
+      "19000"
+    ],
+    "Industry": [
+      "information technology & services",
+      "chemicals",
+      "higher education"
+    ],
+    "Person Linkedin Url": [
+      "http://www.linkedin.com/in/juan-cruz-3a529831",
+      "http://www.linkedin.com/in/jim-kruger-163b16158",
+      "http://www.linkedin.com/in/jing-wu-1828232b"
+    ],
+    "Website": [
+      "http://www.osalim.com.br",
+      "http://www.fine-americas.com",
+      "http://www.cornell.edu"
+    ],
+    "Company Linkedin Url": [
+      "http://www.linkedin.com/company/osalim-agribusiness",
+      "http://www.linkedin.com/company/fine-americas",
+      "http://www.linkedin.com/school/cornell-university"
+    ],
+    "Facebook Url": [
+      "https://www.facebook.com/cdpn.osalim01/",
+      "https://facebook.com/fine-americas-inc-latin-am�rica-494170034687050",
+      "https://www.facebook.com/Cornell"
+    ],
+    "City": [
+      "Curitiba",
+      "Delhi charter Township",
+      "Ann Arbor"
+    ],
+    "State": [
+      "State of Parana",
+      "Michigan",
+      "Michigan"
+    ],
+    "Country": [
+      "Brazil",
+      "United States",
+      "United States"
+    ],
+    "Company Address": [
+      "Curitiba, State of Parana, Brazil",
+      "1850 Mt Diablo Blvd, Walnut Creek, California, United States, 94596-4407",
+      "616 Thurston Ave, Ithaca, New York, United States, 14850"
+    ],
+    "Company City": [
+      "Curitiba",
+      "Walnut Creek",
+      "Ithaca"
+    ],
+    "Company State": [
+      "State of Parana",
+      "California",
+      "New York"
+    ],
+    "Company Country": [
+      "Brazil",
+      "United States",
+      "United States"
+    ],
+    "Technologies": [
+      "Microsoft Office 365, WordPress.org, Workday Recruit, Google Font API, Mobile Friendly, Remote",
+      "Gmail, Google Apps, Google Tag Manager, Vimeo, Typekit, IoT, SAP, Remote, , Circle, Render, Basis",
+      "Cloudflare DNS, Outlook, Microsoft Office 365, CloudFlare Hosting, Mobile Friendly"
+    ],
+    "Email Open": [
+      "FALSE",
+      "FALSE",
+      "FALSE"
+    ],
+    "Email Bounced": [
+      "FALSE",
+      "FALSE",
+      "FALSE"
+    ],
+    "Replied": [
+      "FALSE",
+      "FALSE",
+      "FALSE"
+    ],
+    "Demoed": [
+      "FALSE",
+      "FALSE",
+      "FALSE"
+    ],
+    "Apollo Contact Id": [
+      "66dec1d2bc50b30001e24a5a",
+      "66dec1d2bc50b30001e24a63",
+      "66dec1e5bc50b30001e24b1c"
+    ],
+    "Apollo Account Id": [
+      "66dd242feae75500012c593d",
+      "66d56b5ad4687b0001e1daba",
+      "6186dce742dace0001d9c752"
+    ],
+    "Primary Email Source": [
+      "Fulfilled by Apollo",
+      "Fulfilled by Apollo",
+      "Fulfilled by Apollo"
+    ],
+    "email": [
+      "juanpfcruz@osalim.com.br",
+      "jimk@fine-americas.com",
+      "jw377@cornell.edu"
+    ],
+    "username": [
+      "juanpfcruz",
+      "jimk",
+      "jw377"
+    ],
+    "domain": [
+      "osalim.com.br",
+      "fine-americas.com",
+      "cornell.edu"
+    ],
+    "status": [
+      "safe",
+      "safe",
+      "safe"
+    ],
+    "overall_score": [
+      "98",
+      "98",
+      "98"
+    ],
+    "is_safe_to_send": [
+      "true",
+      "true",
+      "true"
+    ],
+    "is_valid_syntax": [
+      "true",
+      "true",
+      "true"
+    ],
+    "is_disposable": [
+      "false",
+      "false",
+      "false"
+    ],
+    "is_role_account": [
+      "false",
+      "false",
+      "false"
+    ],
+    "mx_accepts_mail": [
+      "true",
+      "true",
+      "true"
+    ],
+    "mx_records": [
+      "fineamericas-com01b.mail.protection.outlook.com",
+      "cornell-edu.mail.protection.outlook.com",
+      "basf.mail.protection.outlook.com"
+    ],
+    "can_connect_smtp": [
+      "true",
+      "true",
+      "true"
+    ],
+    "has_inbox_full": [
+      "false",
+      "false",
+      "false"
+    ],
+    "is_catch_all": [
+      "false",
+      "false",
+      "false"
+    ],
+    "First Phone": [
+      "'+1 925-932-8800",
+      "'+1 607-254-4636",
+      "'+49 621 600"
+    ],
+    "Corporate Phone": [
+      "'+1 925-932-8800",
+      "'+1 607-254-4636",
+      "'+49 621 600"
+    ],
+    "Company Phone": [
+      "'+1 925-932-8800",
+      "'+1 607-254-4636",
+      "'+49 621 600"
+    ],
+    "Keywords": [
+      "education & research",
+      "chemicals, performance products, functional materials, solutions, agricultural solutions, oil, gas",
+      "retail, home improvement, customer service, appliances, hardware stores, home & garden, nurseries & gardening, shopping"
+    ],
+    "Twitter Url": [
+      "https://twitter.com/Cornell",
+      "https://twitter.com/BASFCanada",
+      "https://www.twitter.com/homedepot"
+    ],
+    "SEO Description": [
+      "We help farmers and companies establish and achieve sustainable goals in a safe, transparent and accurate way",
+      "Smart transitioning coating technology - A bright idea for shade.",
+      "Bosch Power Tools | Boschtools"
+    ],
+    "Annual Revenue": [
+      "5110000000",
+      "12200000",
+      "157000000000"
+    ],
+    "Total Funding": [
+      "22271422",
+      "14500000000",
+      "22271422"
+    ],
+    "Latest Funding": [
+      "Other",
+      "Debt Financing",
+      "Other"
+    ],
+    "Latest Funding Amount": [
+      "6800000",
+      "14500000000",
+      "6800000"
+    ],
+    "Last Raised At": [
+      "1/1/2024",
+      "5/1/2024",
+      "1/1/2024"
+    ],
+    "Number of Retail Locations": [
+      "1767",
+      "14",
+      "14"
+    ],
+    "Secondary Email": [
+      "diana_mejia2204@hotmail.com",
+      "Fulfilled by Apollo",
+      "puttasuresh@johndeere.com"
+    ],
+    "Secondary Email Source": [
+      "Fulfilled by Apollo",
+      "Fulfilled by Apollo",
+      "Fulfilled by Apollo"
+    ],
+    "Mobile Phone": [
+      "'+1 515-535-5827",
+      "'+65 9011 5852",
+      "'+1 812-241-0987"
+    ],
+    "Other Phone": [
+      "'+1 515-321-3958",
+      "'+1 484-433-3386"
+    ]
+  },
+  "validity": {
+    "Company Name for Emails": "0/3 valid-shape",
+    "Email": "3/3 valid-shape",
+    "Email Status": "0/3 valid-shape",
+    "First Phone": "3/3 valid-shape",
+    "Mobile Phone": "3/3 valid-shape",
+    "Corporate Phone": "3/3 valid-shape",
+    "Other Phone": "2/2 valid-shape",
+    "Company Phone": "3/3 valid-shape",
+    "Email Open": "0/3 valid-shape",
+    "Email Bounced": "0/3 valid-shape",
+    "Primary Email Source": "0/3 valid-shape",
+    "Secondary Email": "2/3 valid-shape",
+    "Secondary Email Source": "0/3 valid-shape",
+    "email": "3/3 valid-shape",
+    "mx_accepts_mail": "0/3 valid-shape"
+  },
+  "entity": "person",
+  "entity_confidence": 0.9,
+  "entity_why": "name columns + company/title with name-like values",
+  "social_cols": [
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "domain"
+  ],
+  "activity_match_keys": [
+    "First Name",
+    "Last Name",
+    "Company",
+    "Company Name for Emails",
+    "Email",
+    "Email Status",
+    "First Phone",
+    "Work Direct Phone",
+    "Home Phone",
+    "Mobile Phone",
+    "Corporate Phone",
+    "Other Phone",
+    "Person Linkedin Url",
+    "Website",
+    "Company Linkedin Url",
+    "Facebook Url",
+    "Twitter Url",
+    "Company Address",
+    "Company City",
+    "Company State",
+    "Company Country",
+    "Company Phone",
+    "Email Sent",
+    "Email Open",
+    "Email Bounced",
+    "Apollo Account Id",
+    "Primary Email Source",
+    "Secondary Email",
+    "Secondary Email Source",
+    "Tertiary Email",
+    "Tertiary Email Source",
+    "email",
+    "domain",
+    "is_role_account",
+    "mx_accepts_mail"
+  ]
+}

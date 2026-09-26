@@ -1,0 +1,365 @@
+{
+  "key": "crunchbase_800k-900k.csv",
+  "size": 59108585,
+  "last_modified": "2026-09-08 00:12:15+00:00",
+  "columns": [
+    "id",
+    "created_at",
+    "name",
+    "short_description",
+    "semrush_global_rank",
+    "semrush_visits_latest_month",
+    "num_investors",
+    "funding_total",
+    "num_exits",
+    "num_funding_rounds",
+    "last_funding_type",
+    "last_funding_at",
+    "num_acquisitions",
+    "apptopia_total_apps",
+    "apptopia_total_downloads",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "num_investments",
+    "num_lead_investments",
+    "num_lead_investors",
+    "listed_stock_symbol",
+    "company_type",
+    "hub_tags",
+    "operating_status",
+    "founded_on",
+    "categories",
+    "founders",
+    "website",
+    "ipo_status",
+    "num_employees_enum",
+    "locations",
+    "growth_insight_description",
+    "growth_insight_indicator",
+    "growth_insight_direction",
+    "growth_insight_confidence",
+    "investor_insight_description",
+    "permalink",
+    "url"
+  ],
+  "row_count": 100000,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "id": "other",
+    "created_at": "other",
+    "name": "full_name",
+    "short_description": "descriptive",
+    "semrush_global_rank": "other",
+    "semrush_visits_latest_month": "other",
+    "num_investors": "other",
+    "funding_total": "other",
+    "num_exits": "other",
+    "num_funding_rounds": "other",
+    "last_funding_type": "other",
+    "last_funding_at": "other",
+    "num_acquisitions": "other",
+    "apptopia_total_apps": "other",
+    "apptopia_total_downloads": "other",
+    "contact_email": "email",
+    "phone_number": "phone",
+    "facebook": "social",
+    "linkedin": "linkedin",
+    "twitter": "social",
+    "num_investments": "other",
+    "num_lead_investments": "other",
+    "num_lead_investors": "other",
+    "listed_stock_symbol": "other",
+    "company_type": "company",
+    "hub_tags": "other",
+    "operating_status": "other",
+    "founded_on": "other",
+    "categories": "other",
+    "founders": "other",
+    "website": "website",
+    "ipo_status": "other",
+    "num_employees_enum": "employees",
+    "locations": "other",
+    "growth_insight_description": "descriptive",
+    "growth_insight_indicator": "other",
+    "growth_insight_direction": "other",
+    "growth_insight_confidence": "other",
+    "investor_insight_description": "descriptive",
+    "permalink": "other",
+    "url": "website"
+  },
+  "missing_pct": {
+    "id": 0.0,
+    "created_at": 0.0,
+    "name": 0.0,
+    "short_description": 0.0,
+    "semrush_global_rank": 57.3,
+    "semrush_visits_latest_month": 57.3,
+    "num_investors": 94.0,
+    "funding_total": 95.0,
+    "num_exits": 99.8,
+    "num_funding_rounds": 92.8,
+    "last_funding_type": 92.8,
+    "last_funding_at": 92.5,
+    "num_acquisitions": 98.0,
+    "apptopia_total_apps": 94.6,
+    "apptopia_total_downloads": 98.3,
+    "contact_email": 22.3,
+    "phone_number": 15.2,
+    "facebook": 43.6,
+    "linkedin": 19.9,
+    "twitter": 61.4,
+    "num_investments": 99.5,
+    "num_lead_investments": 99.8,
+    "num_lead_investors": 96.2,
+    "listed_stock_symbol": 99.4,
+    "company_type": 2.8,
+    "hub_tags": 99.9,
+    "operating_status": 0.0,
+    "founded_on": 15.1,
+    "categories": 3.2,
+    "founders": 83.8,
+    "website": 5.0,
+    "ipo_status": 2.9,
+    "num_employees_enum": 14.2,
+    "locations": 4.3,
+    "growth_insight_description": 98.2,
+    "growth_insight_indicator": 98.2,
+    "growth_insight_direction": 99.1,
+    "growth_insight_confidence": 99.1,
+    "investor_insight_description": 98.8,
+    "permalink": 0.0,
+    "url": 0.0
+  },
+  "samples": {
+    "id": [
+      "870cdbd6-acaf-4b15-b603-37b915ffff07",
+      "bacb2dc2-1131-d679-7dc2-b0e9660180c5",
+      "965e4a45-19cc-3d77-712f-9002fe17590f"
+    ],
+    "created_at": [
+      "2024-08-18 00:39:28.194214+00",
+      "2024-08-18 00:39:28.194214+00",
+      "2024-08-18 00:39:28.194214+00"
+    ],
+    "name": [
+      "EthnicBuzz",
+      "EthnicCode",
+      "EthnicGrocer.com"
+    ],
+    "short_description": [
+      "EthnicBuzz is a professional manufacturer and exporter of bearing units.",
+      "Exclusive women’s ethnic clothing from India’s best online store.",
+      "EthnicGrocer.com"
+    ],
+    "contact_email": [
+      "niall@tht-bearing.com",
+      "care@ethniccode.com",
+      "sharewithus@ethnicity.in"
+    ],
+    "phone_number": [
+      "+00852 - 30691155",
+      "919962742204",
+      "+91 226 275 5821"
+    ],
+    "facebook": [
+      "https://www.facebook.com/ethnicbuzzonline/",
+      "https://www.facebook.com/EthnicCodeOnline",
+      "https://www.facebook.com/Ethnicitystore/"
+    ],
+    "twitter": [
+      "https://www.twitter.com/ethnicbuzz1",
+      "https://www.twitter.com/ethniccode",
+      "https://twitter.com/ethnicthread"
+    ],
+    "company_type": [
+      "for_profit",
+      "for_profit",
+      "for_profit"
+    ],
+    "operating_status": [
+      "active",
+      "closed",
+      "active"
+    ],
+    "categories": [
+      "Fashion, Manufacturing, Sales",
+      "E-Commerce, Fashion",
+      "Grocery, Internet"
+    ],
+    "website": [
+      "http://ethnicbuzz.com/",
+      "http://www.ethniccode.com/",
+      "http://www.ethnicgrocer.com"
+    ],
+    "ipo_status": [
+      "private",
+      "private",
+      "private"
+    ],
+    "num_employees_enum": [
+      "c_00011_00050",
+      "c_00001_00010",
+      "c_00001_00010"
+    ],
+    "locations": [
+      "Asia-Pacific (APAC)",
+      "Asia-Pacific (APAC)",
+      "Greater Chicago Area, Great Lakes, Midwestern US"
+    ],
+    "permalink": [
+      "ethnicbuzz",
+      "ethniccode",
+      "ethnicgrocer-com"
+    ],
+    "url": [
+      "https://www.crunchbase.com/organization/ethnicbuzz",
+      "https://www.crunchbase.com/organization/ethniccode",
+      "https://www.crunchbase.com/organization/ethnicgrocer-com"
+    ],
+    "linkedin": [
+      "https://www.linkedin.com/company/ethnic-code",
+      "https://www.linkedin.com/company/ethnic-thread",
+      "https://www.linkedin.com/company/nexonomniverselimited/"
+    ],
+    "founded_on": [
+      "2014-01-01",
+      "1998-01-01",
+      "2015-06-01"
+    ],
+    "num_investors": [
+      "6",
+      "12",
+      "7"
+    ],
+    "funding_total": [
+      "46000000",
+      "3435000",
+      "850000"
+    ],
+    "num_funding_rounds": [
+      "2",
+      "3",
+      "3"
+    ],
+    "last_funding_type": [
+      "series_c",
+      "seed",
+      "convertible_note"
+    ],
+    "last_funding_at": [
+      "2000-08-03",
+      "2022-06-01",
+      "2018-11-22"
+    ],
+    "num_lead_investors": [
+      "2",
+      "3",
+      "2"
+    ],
+    "founders": [
+      "Sailee Raje",
+      "Abhishek Jain",
+      "Benoit Loos, Philippe Delaisse"
+    ],
+    "semrush_global_rank": [
+      "2240457",
+      "6244135",
+      "14844274"
+    ],
+    "semrush_visits_latest_month": [
+      "9012",
+      "1070",
+      "36"
+    ],
+    "apptopia_total_apps": [
+      "1",
+      "12",
+      "2"
+    ],
+    "num_acquisitions": [
+      "1",
+      "1",
+      "1"
+    ],
+    "growth_insight_description": [
+      "EthonAI raised $16.5 million in funding.",
+      "EthosEnergy won an O&M contract to manage six power assets in Mexico.",
+      "Etrav Tech Private Limited secured a deal with EaseMyTrip and raised USD 3.9 million for its expansion."
+    ],
+    "growth_insight_indicator": [
+      "growing",
+      "growing",
+      "growing"
+    ],
+    "growth_insight_direction": [
+      "c400_growing",
+      "c400_growing",
+      "c400_growing"
+    ],
+    "growth_insight_confidence": [
+      "c400_high",
+      "c400_high",
+      "c300_medium"
+    ],
+    "investor_insight_description": [],
+    "hub_tags": [
+      "unicorn",
+      "cbvp",
+      "cbvp"
+    ],
+    "num_exits": [
+      "1",
+      "1",
+      "1"
+    ],
+    "num_investments": [
+      "3",
+      "1",
+      "1"
+    ],
+    "num_lead_investments": [
+      "2",
+      "2",
+      "2"
+    ],
+    "apptopia_total_downloads": [
+      "125",
+      "1865",
+      "1335"
+    ],
+    "listed_stock_symbol": [
+      "IST:ETILR",
+      "NASDAQ:ETON",
+      "TSX:ETX"
+    ]
+  },
+  "validity": {
+    "contact_email": "3/3 valid-shape",
+    "phone_number": "3/3 valid-shape"
+  },
+  "entity": "company",
+  "entity_confidence": 0.85,
+  "entity_why": "value-checked override: name=organization name; founders/company_type/num_employees_enum/funding/ipo_status present; no person first/last-name columns",
+  "social_cols": [
+    "facebook",
+    "linkedin",
+    "twitter",
+    "website",
+    "url"
+  ],
+  "activity_match_keys": [
+    "name",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "company_type",
+    "website",
+    "url"
+  ]
+}

@@ -5,9 +5,16 @@ import { useEffect, useRef, useState } from "react";
 import { buildProjectQuery } from "@/lib/project-query";
 import { displaySearchLabel, scrapyAckReply, toPlainSearchQuery } from "@/lib/display-query";
 import { runSearch, getRemainingSearches } from "@/lib/search.functions";
+import { runSpecSearch, getSpecFlag, getSearchBrowserProgress } from "@/lib/spec-search.functions";
 import { aiChat } from "@/lib/ai-chat.functions";
 import { prepareDynamicQuestions } from "@/lib/search/clarify-ai.functions";
 import { saveLead, listSavedLeads } from "@/lib/leads.functions";
+import { saveTranscript, getTranscript } from "@/lib/transcript.functions";
+import { getIntentStrategy, discoverCandidateIntent } from "@/lib/intent/intent.functions";
+import type { IntentStrategy } from "@/lib/intent/strategy";
+import type { EvidenceObject } from "@/lib/intent/evidence";
+import type { IntentCandidate } from "@/lib/intent/discover.server";
+import { rankEvidence } from "@/lib/intent/rank";
 import { createSignalWatch } from "@/lib/campaigns.functions";
 import { resolveLeadContact, verificationLabel } from "@/lib/contact.functions";
 import {
@@ -21,8 +28,18 @@ import { OnboardingWizard, type OnboardingAnswers } from "@/components/discover/
 import { GuidedTour } from "@/components/discover/guided-tour";
 import type { Lead } from "@/lib/scoring";
 import type { CompanyRow, PersonRow, LocalBusinessRow } from "@/lib/search/lead-segments";
+import { filterBarModel, relevanceChips, type TurnFilter } from "@/lib/search/relevance";
+import { specRowsToCandidates } from "@/lib/intent/spec-candidates";
 import { LeadDetailPanel } from "@/components/lead-detail-panel";
 import { DiscoverWelcomeHero } from "@/components/discover/discover-welcome-hero";
+import { ActiveSearchSession, isSearchAbortError } from "@/lib/search/search-run-client";
+import { cancelSearchRun } from "@/lib/search/search-run.functions";
+import {
+  projectSpecRowsToQualifiedViews,
+  viewToLegacyLead,
+  viewToLocalBusinessRow,
+} from "@/lib/search/qualified-lead-view";
+import { outcomeUi, shouldSurfaceOutcome } from "@/lib/search/outcome-ui";
 
 import {
   UnifiedComposer,
@@ -40,15 +57,16 @@ import {
   PersonTable,
   ViewToggle,
   LocalBusinessesGrid,
-  LocalListRows,
+  BusinessTable,
   type ResolvedContactInfo,
+  type IntentBadgeInput,
 } from "@/components/discover/result-tabs";
 import { EntityDetailPanel, type SelectedEntity } from "@/components/discover/entity-detail-panel";
 import { GenerateModal } from "@/components/discover/generate-modal";
-import { Bell, Plus, X } from "lucide-react";
-import { SearchingSteps } from "@/components/discover/searching-steps";
-import { SearchingPlan } from "@/components/discover/searching-plan";
+import { Bell, Plus, X, ChevronDown, ChevronUp } from "lucide-react";
+import { ThinkingSteps } from "@/components/discover/thinking-steps";
 import { ClarifyPanel } from "@/components/discover/clarify-panel";
+import { UnderstandingInspector } from "@/components/discover/understanding-inspector";
 import type { ClarifyQuestion, ClarifyAnswers } from "@/lib/search/clarifier";
 import { resolveSearchVertical } from "@/lib/search/vertical";
 import { friendlyErrorText } from "@/lib/friendly-error";
@@ -60,15 +78,43 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { mySupabase } from "@/integrations/my-supabase/client";
 
 export const Route = createFileRoute("/_authenticated/discover")({
-  validateSearch: (search: Record<string, unknown>): { q?: string; fresh?: number } => ({
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { q?: string; fresh?: number; conversation?: string; inspect?: number } => ({
     q: typeof search.q === "string" ? search.q : undefined,
-    fresh: typeof search.fresh === "number" ? search.fresh : undefined,
+    // URL params arrive as strings (?fresh=1); accept numeric strings too.
+    fresh:
+      typeof search.fresh === "number"
+        ? search.fresh
+        : typeof search.fresh === "string" && /^\d+$/.test(search.fresh)
+          ? Number(search.fresh)
+          : undefined,
+    conversation: typeof search.conversation === "string" ? search.conversation : undefined,
+    // ?inspect=1 replaces the page with the Gate 1 Understanding Inspector.
+    inspect:
+      typeof search.inspect === "number"
+        ? search.inspect
+        : typeof search.inspect === "string" && /^\d+$/.test(search.inspect)
+          ? Number(search.inspect)
+          : undefined,
   }),
   head: () => ({
     meta: [{ title: "Scrapivo — Discover" }],
   }),
-  component: DiscoverPage,
+  component: DiscoverRoute,
 });
+
+/**
+ * ?inspect=1 short-circuits the whole page. The inspector must not be a panel
+ * inside Discover: mounted there it would sit beside search state, effects and
+ * queries, and Gate 1's guarantee is that understanding runs with none of that
+ * attached.
+ */
+function DiscoverRoute() {
+  const { inspect, q } = Route.useSearch();
+  if (inspect) return <UnderstandingInspector initialQuery={q ?? ""} />;
+  return <DiscoverPage />;
+}
 
 function DiscoverPage() {
   const { userId } = AuthRoute.useRouteContext();
@@ -88,6 +134,50 @@ function DiscoverPage() {
   const patchProfile = useServerFn(updateMyProfile);
   const getUsage = useServerFn(getRemainingSearches);
   const askDynamicQuestions = useServerFn(prepareDynamicQuestions);
+  const runSpec = useServerFn(runSpecSearch);
+  const cancelRun = useServerFn(cancelSearchRun);
+  const getBrowserProgress = useServerFn(getSearchBrowserProgress);
+  const readSpecFlag = useServerFn(getSpecFlag);
+  const getStrategy = useServerFn(getIntentStrategy);
+  const discoverIntent = useServerFn(discoverCandidateIntent);
+  // Step 4: verified intent per row-key + run progress. Entries are scoped
+  // by offer: a new search with a different offer hides old badges instead
+  // of showing stale evidence. Rows without evidence have no entry (hidden).
+  type IntentEntry = { offer: string; evidence: EvidenceObject[] };
+  const [intentByKey, setIntentByKey] = useState<Record<string, IntentEntry>>({});
+  const [intentProgress, setIntentProgress] = useState<{ done: number; total: number } | null>(
+    null,
+  );
+  const intentRunRef = useRef(0);
+  const intentAbortRef = useRef<AbortController | null>(null);
+  const activeOfferRef = useRef("");
+  // Badge/evidence lookups honor the active offer (T4 stale-state fix).
+  const intentBadgeFor = (key: string) => {
+    const e = intentByKey[key];
+    return e && e.offer === activeOfferRef.current ? (e.evidence[0] ?? null) : null;
+  };
+  const intentEvidenceFor = (key: string | null): EvidenceObject[] => {
+    if (!key) return [];
+    const e = intentByKey[key];
+    return e && e.offer === activeOfferRef.current ? e.evidence : [];
+  };
+  // Grid input derived with the same offer gate (single progress line and
+  // badges stay consistent between cards, grids, and drawers).
+  const badgeMapForGrid = (): Record<string, IntentBadgeInput> => {
+    const out: Record<string, IntentBadgeInput> = {};
+    for (const [k, e] of Object.entries(intentByKey)) {
+      if (e.offer === activeOfferRef.current && e.evidence[0]) out[k] = e.evidence[0];
+    }
+    return out;
+  };
+  // Build stamp (freshness proof): console only. The footer tag was removed
+  // per UX review; the stamp still logs once for debugging which code serves.
+  useEffect(() => {
+    readSpecFlag()
+      .then((r) => console.info(`[build] ${r.stamp.hash} (${r.stamp.builtAt ?? "unknown time"})`))
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const savedQuery = useQuery({ queryKey: ["saved-leads"], queryFn: () => getSaved() });
   const savedLeads = savedQuery.data ?? [];
@@ -273,6 +363,12 @@ function DiscoverPage() {
   // alongside results, which meant the first search was always the unrefined
   // one; the comment outlived the behaviour.)
   const [clarifyQs, setClarifyQs] = useState<ClarifyQuestion[]>([]);
+  // Phase B dropdown: questions collapse above the input; reopened
+  // automatically for each new question round.
+  const [questionsOpen, setQuestionsOpen] = useState(true);
+  useEffect(() => {
+    if (clarifyQs.length > 0) setQuestionsOpen(true);
+  }, [clarifyQs]);
   const [refinement, setRefinement] = useState<string>("");
   const [clarifyAnswers, setClarifyAnswers] = useState<ClarifyAnswers | null>(null);
   // Query waiting on clarification. The search does NOT run until the user
@@ -383,6 +479,20 @@ function DiscoverPage() {
       email: contactByKey[`co:${row.key}`]?.email,
     });
   };
+  // Grid-view person cards share the table's outreach target (single owner).
+  const openGenerateForPerson = (row: PersonRow, kind: "email" | "message") =>
+    setGenTarget({
+      kind,
+      vertical: "investor",
+      name: row.name,
+      firm: row.company_hint,
+      role: row.title_hint ?? row.role_hint ?? undefined,
+      location: row.location_hint ?? undefined,
+      email: row.inline_contacts?.emails?.[0],
+      whyMatch: row.why_match ?? undefined,
+      investorStage: raiseStage,
+      investorSector: raiseSector,
+    });
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
   // ChatGPT-style conversation: every submitted query persists as a user
   // bubble WITH its results frozen into the turn, so previous inputs keep
@@ -398,15 +508,496 @@ function DiscoverPage() {
     text: string;
     results?: TurnResults;
     counts?: { posts: number; companies: number; people: number; local: number };
+    // Phase A3: stated selling context frozen with the turn so relevance
+    // chips + filter state survive refresh/history. Optional: old turns omit.
+    filter?: TurnFilter;
   };
-  /** Turns older than this collapse to bubble + counts (memory/DOM cost). */
-  const KEEP_FULL_TURNS = 4;
+  // Step 3: transcripts persist whole turns (results included) — nothing is
+  // ever collapsed into counts. Older turns render folded (header only, one
+  // click to expand) so DOM stays cheap; the data stays in memory + server.
   const [turns, setTurns] = useState<ConversationTurn[]>([]);
+  // Per-turn fold state. Default: only the latest turn is open.
+  const [expandedTurns, setExpandedTurns] = useState<Record<string, boolean>>({});
+  // Conversation identity: per-user namespaced (`userId:uuid`) so two users
+  // can never collide on the globally-unique server column. Minted lazily
+  // inside effects/handlers only (never during render), persisted to
+  // localStorage, replaced only by New chat / Clear.
+  const conversationIdRef = useRef<string | null>(null);
+  const getConversationId = () => {
+    if (!conversationIdRef.current) {
+      let stored: string | null = null;
+      try {
+        stored = window.localStorage.getItem(`scrapivo:conversation-id:${userId}`);
+      } catch {
+        // Private mode: memory-only identity, server save still attempted.
+      }
+      conversationIdRef.current =
+        stored ||
+        `${userId}:${typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`}`;
+      try {
+        window.localStorage.setItem(
+          `scrapivo:conversation-id:${userId}`,
+          conversationIdRef.current,
+        );
+      } catch {
+        // ignore
+      }
+    }
+    return conversationIdRef.current;
+  };
+  const rotateConversationId = () => {
+    const next = `${userId}:${typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`}`;
+    conversationIdRef.current = next;
+    try {
+      window.localStorage.setItem(`scrapivo:conversation-id:${userId}`, next);
+    } catch {
+      // ignore
+    }
+    // M11: new chat aborts in-flight work and rotates conversation identity.
+    searchSessionRef.current?.rotateConversation(next);
+    searchSessionRef.current = new ActiveSearchSession(next);
+  };
+  // Owning turn for the in-flight hunt (ref: onSuccess closures go stale).
+  const pendingTurnIdRef = useRef<string | null>(null);
+  // Accumulated panel answers for the active turn: partial answers persist
+  // across clarify rounds so answering Q1 then Search on Q2 never loses Q1.
+  const pendingTurnAnswersRef = useRef<Record<string, string>>({});
+  // Spec-first cutover (SPEC_SEARCH_ENABLED): when true the turn is served by
+  // the canonical spec path; legacy flow below runs untouched otherwise.
+  const specModeRef = useRef(false);
+  // Spec loading state: runSpec is a plain server-fn await (not a mutation),
+  // so runSearchMut.isPending never fires on this path. Without this the UI
+  // looks dead during the S3 scan then pops results "out of blue".
+  const [specPending, setSpecPending] = useState(false);
+  const [browserProgressRun, setBrowserProgressRun] = useState<string | null>(null);
+  const [browserProgressEvents, setBrowserProgressEvents] = useState<Array<{ id: number; action: string; source?: string; detail?: string }>>([]);
+  // M11: only the active search_run_id may mutate results/loading/outcome UI.
+  const searchSessionRef = useRef<ActiveSearchSession | null>(null);
+  useEffect(() => {
+    if (!browserProgressRun) return;
+    let active = true;
+    let cursor = 0;
+    let timer: number | undefined;
+    const poll = async () => {
+      try {
+        const result = await getBrowserProgress({ data: { search_run_id: browserProgressRun, after: cursor } });
+        if (!active || !searchSessionRef.current?.accept({ search_run_id: browserProgressRun }).ok) return;
+        if (result.events.length) {
+          cursor = result.events[result.events.length - 1].id;
+          setBrowserProgressEvents((events) => [...events, ...result.events].slice(-12));
+        }
+        if (!result.done) timer = window.setTimeout(poll, 450);
+      } catch {
+        if (active) timer = window.setTimeout(poll, 1000);
+      }
+    };
+    void poll();
+    return () => { active = false; if (timer) window.clearTimeout(timer); };
+  }, [browserProgressRun, getBrowserProgress]);
+  const getSearchSession = () => {
+    if (!searchSessionRef.current) {
+      searchSessionRef.current = new ActiveSearchSession(getConversationId());
+    }
+    return searchSessionRef.current;
+  };
+  useEffect(() => {
+    return () => {
+      searchSessionRef.current?.dispose();
+      searchSessionRef.current = null;
+      intentAbortRef.current?.abort();
+      intentRunRef.current += 1;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Phase 1.8 pagination: page size only (never a result ceiling) + per-turn
+  // next-offset cursor + hasMore for the active turn's Show more button.
+  const SPEC_PAGE_SIZE = 50;
+  const specOffsetRef = useRef<Record<string, number>>({});
+  const [specHasMore, setSpecHasMore] = useState(false);
+  // Phase A3: active turn's stated selling context (drives filter bar +
+  // relevance chips). Mirrored onto the frozen turn for persistence.
+  const [specFilter, setSpecFilter] = useState<TurnFilter | null>(null);
+  const filterFromAnswers = (m: Record<string, string>): TurnFilter | null => {
+    const f: TurnFilter = {};
+    if (typeof m.mode === "string" && m.mode.trim()) f.mode = m.mode.trim();
+    if (typeof m.offer === "string" && m.offer.trim()) f.offer = m.offer.trim();
+    if (typeof m.opportunity === "string" && m.opportunity.trim())
+      f.opportunity = m.opportunity.trim();
+    if (typeof m.site === "string" && m.site.trim()) f.site = m.site.trim();
+    if (typeof m.channel === "string" && m.channel.trim()) f.channel = m.channel.trim();
+    return f.mode ? f : null;
+  };
+  // One-tap site-filter toggle: flips opportunity and re-runs this turn
+  // (force keeps stated answers; offset resets to the first page).
+  const toggleSiteFilter = () => {
+    const tid = pendingTurnIdRef.current;
+    if (!tid || !activeQuery) return;
+    const m = { ...pendingTurnAnswersRef.current };
+    if (m.opportunity === "no_website") delete m.opportunity;
+    else {
+      m.opportunity = "no_website";
+      delete m.site;
+    }
+    pendingTurnAnswersRef.current = m;
+    void runSpecBranch(activeQuery, tid, {}, true, 0).catch((e: Error) =>
+      toast.error(friendlyErrorText(e, "Could not reload")),
+    );
+  };
+  const runSpecBranch = async (
+    query: string,
+    turnId: string,
+    answers: Record<string, string>,
+    force = false,
+    offset = 0,
+  ): Promise<void> => {
+    if (pendingTurnIdRef.current !== turnId) return;
+    // Merge with answers given in earlier rounds of this turn.
+    const merged = { ...pendingTurnAnswersRef.current, ...answers };
+    pendingTurnAnswersRef.current = merged;
+    // M11: abort prior run + mint identity before any UI mutation.
+    const session = getSearchSession();
+    const { run, signal } = session.begin({
+      conversation_id: getConversationId(),
+      turn_id: turnId,
+    });
+    // Request disconnects are not propagated by every hosting adapter.
+    // Notify the authenticated server registry as well as aborting fetch.
+    const cancelOnServer = () => {
+      void cancelRun({ data: { search_run_id: run.search_run_id } }).catch(() => {});
+    };
+    signal.addEventListener("abort", cancelOnServer, { once: true });
+    intentAbortRef.current?.abort();
+    intentRunRef.current += 1;
+    setIntentProgress(null);
+    setBrowserProgressRun(run.search_run_id);
+    setBrowserProgressEvents([]);
+    // Loading spinner only for the active run (stale cannot flip chrome).
+    session.applyIfActive({ search_run_id: run.search_run_id }, () => {
+      setSpecPending(true);
+      setActiveQuery(query);
+    });
+    try {
+      // Phase 1.8: limit is PAGE SIZE (default 50), never a result ceiling.
+      // offset>0 appends the next verified page to this turn's results.
+      const res = await runSpec({
+        data: {
+          query,
+          limit: SPEC_PAGE_SIZE,
+          offset,
+          answers: merged,
+          force,
+          search_run_id: run.search_run_id,
+          conversation_id: run.conversation_id,
+          turn_id: run.turn_id,
+          request_id: run.request_id,
+        },
+        signal,
+      });
+      // Discard late responses — zero state mutation (results/loading/empty/error).
+      if (!session.accept(res).ok || pendingTurnIdRef.current !== turnId) return;
+
+      setSpecEntity(res.spec.entity ?? null);
+      if (res.clarify.length > 0) {
+        setClarifyQs(res.clarify);
+        setPendingQuery(query);
+        setActiveQuery(query);
+        session.settle(res);
+        return;
+      }
+
+      // M11: render from QualifiedLead projection — unresolved never becomes a lead.
+      const projected = projectSpecRowsToQualifiedViews({
+        rows: res.rows,
+        spec: res.spec,
+        run,
+      });
+      if (import.meta.env.DEV) {
+        // Server→UI loss visibility: qualification ran twice (server + here);
+        // when the screen shows zero but the server returned rows, this says
+        // whether UI projection killed them and under which reject codes.
+        const codes: Record<string, number> = {};
+        for (const r of projected.rejected) codes[r.reject_code] = (codes[r.reject_code] ?? 0) + 1;
+        console.info(
+          `[ui-projection] server=${res.rows.length} projected=${projected.views.length} ` +
+            `rejected=${projected.rejected.length} codes=${JSON.stringify(codes)}`,
+        );
+      }
+      const isBusiness =
+        res.spec.entity === "business" ||
+        (projected.views.length > 0 && projected.views[0].lead.entity_type === "business");
+      const leads: Lead[] = isBusiness
+        ? []
+        : projected.views.map((v, i) => viewToLegacyLead(v, i) as Lead);
+      const local: LocalBusinessRow[] = isBusiness
+        ? projected.views.map((v, i) => viewToLocalBusinessRow(v, i) as unknown as LocalBusinessRow)
+        : [];
+      const qualifiedCount = projected.qualified_count;
+
+      const turnFilter = filterFromAnswers(merged);
+      const append = offset > 0;
+      setSpecFilter(turnFilter);
+      if (append) {
+        setLeads((prev) => [...prev, ...leads]);
+        setLocalRows((prev) => [...prev, ...local]);
+        setTurns((prev) =>
+          prev.map((t) =>
+            t.id === turnId
+              ? {
+                  ...t,
+                  filter: turnFilter ?? undefined,
+                  results: {
+                    leads: [...(t.results?.leads ?? []), ...leads],
+                    companies: [],
+                    people: [],
+                    local: [...(t.results?.local ?? []), ...local],
+                  },
+                }
+              : t,
+          ),
+        );
+      } else {
+        setLeads(leads);
+        setCompanies([]);
+        setPeople([]);
+        setLocalRows(local);
+        setTurns((prev) =>
+          prev.map((t) =>
+            t.id === turnId
+              ? {
+                  ...t,
+                  filter: turnFilter ?? undefined,
+                  results: { leads, companies: [], people: [], local },
+                }
+              : t,
+          ),
+        );
+      }
+      specOffsetRef.current[turnId] = offset + res.rows.length;
+      setSpecHasMore(res.hasMore);
+      setActiveQuery(query);
+      setSuggestions([]);
+      session.settle(res);
+
+      if (
+        typeof merged.offer === "string" &&
+        merged.offer.trim() &&
+        projected.views.length &&
+        res.spec.entity !== "job"
+      ) {
+        void runIntentEnrichment(
+          merged.offer,
+          res.spec.entity,
+          { people: [], companies: [], local: [] },
+          specRowsToCandidates(res.rows.filter((r) => r.disposition === "qualified")),
+        );
+      }
+
+      // Typed outcomes — never bare "No results found"; superseded cancel is silent.
+      const uiOutcome = outcomeUi(res.outcome, {
+        superseded: session.wasSuperseded(res.search_run_id),
+        detail: res.diagnostics?.[0]?.detail,
+      });
+      if (
+        !append &&
+        turnId === pendingTurnIdRef.current &&
+        shouldSurfaceOutcome(uiOutcome) &&
+        qualifiedCount === 0
+      ) {
+        toast.info(uiOutcome.message!);
+      } else if (
+        !append &&
+        res.moreAvailableMessage &&
+        turnId === pendingTurnIdRef.current &&
+        qualifiedCount > 0
+      ) {
+        toast.message(res.moreAvailableMessage);
+      }
+    } catch (e: unknown) {
+      // Aborted because a newer search started — no failure chrome.
+      if (isSearchAbortError(e) || session.wasSuperseded(run.search_run_id)) {
+        return;
+      }
+      if (!session.accept({ search_run_id: run.search_run_id }).ok) return;
+      throw e;
+    } finally {
+      signal.removeEventListener("abort", cancelOnServer);
+      // Only the still-active run may clear loading — a superseded finally
+      // must not hide the newer search's spinner.
+      if (session.activeRunId === run.search_run_id) {
+        setSpecPending(false);
+        setBrowserProgressRun(null);
+      }
+    }
+  };
+
+  // Step 4: offer-gated intent enrichment. Runs ONLY with a stated offer,
+  // over structured rows (people/companies/local, top 20), sequentially so
+  // progress ("Checking evidence 7/20") is real and the run is cancellable
+  // by any new search. Evidence merges into intentByKey; rows without
+  // evidence keep no entry and no badge.
+  const runIntentEnrichment = async (
+    offer: string,
+    entity: string,
+    rows: { people: PersonRow[]; companies: CompanyRow[]; local: LocalBusinessRow[] },
+    prebuilt?: IntentCandidate[],
+  ): Promise<void> => {
+    const trimmedOffer = offer.trim().slice(0, 120);
+    if (!trimmedOffer) return;
+    // Round-robin across row types so 20 people can't starve every
+    // company/local out of the top-20 budget (T4 fix). Prebuilt spec
+    // candidates arrive already interleaved — same cap applies.
+    const pools: IntentCandidate[][] = [
+      rows.people.map((p) => ({
+        key: p.key,
+        name: p.name,
+        company: p.company_hint ?? p.company_domain ?? null,
+        city: p.location_hint ?? null,
+        country: null as string | null,
+      })),
+      rows.companies.map((c) => ({
+        key: c.key,
+        name: c.name,
+        // Domain anchors company queries (bare names return nothing);
+        // matcher still requires a real token hit, so no false positives.
+        company: c.domain ?? c.website ?? c.name,
+        city: null as string | null,
+        country: null as string | null,
+      })),
+      rows.local.map((b) => ({
+        key: b.key,
+        name: b.name,
+        company: b.name,
+        city: null as string | null,
+        country: null as string | null,
+      })),
+    ];
+    const candidates: IntentCandidate[] =
+      prebuilt?.slice(0, 20) ??
+      (() => {
+        const out: IntentCandidate[] = [];
+        for (let i = 0; out.length < 20; i++) {
+          let added = false;
+          for (const pool of pools) {
+            if (pool[i]) {
+              out.push(pool[i]);
+              added = true;
+              if (out.length >= 20) break;
+            }
+          }
+          if (!added) break;
+        }
+        return out;
+      })();
+    if (!candidates.length) return;
+    const runId = ++intentRunRef.current;
+    intentAbortRef.current?.abort();
+    const controller = new AbortController();
+    intentAbortRef.current = controller;
+    activeOfferRef.current = trimmedOffer;
+    setIntentProgress({ done: 0, total: candidates.length });
+    let strategy: IntentStrategy;
+    try {
+      strategy = await getStrategy({ data: { offer: trimmedOffer, entity }, signal: controller.signal });
+    } catch {
+      if (intentRunRef.current === runId) setIntentProgress(null);
+      return; // Strategy failed: base results stand, no intent layer.
+    }
+    const rowByKey = new Map<string, PersonRow | CompanyRow | LocalBusinessRow>();
+    for (const r of [...rows.people, ...rows.companies, ...rows.local]) rowByKey.set(r.key, r);
+    let done = 0;
+    for (const c of candidates) {
+      if (intentRunRef.current !== runId) return; // superseded
+      try {
+        const res = await discoverIntent({ data: { candidate: c, strategy, offer: trimmedOffer }, signal: controller.signal });
+        done += 1;
+        if (intentRunRef.current !== runId) return;
+        setIntentProgress({ done, total: candidates.length });
+        if (res.evidence.length) {
+          const row = rowByKey.get(c.key);
+          const ranked = [...res.evidence].sort(
+            (a, b) =>
+              rankEvidence(row, b.leadKey, b).quality - rankEvidence(row, a.leadKey, a).quality,
+          );
+          setIntentByKey((m) => ({ ...m, [c.key]: { offer: trimmedOffer, evidence: ranked } }));
+        }
+      } catch {
+        done += 1;
+        if (intentRunRef.current !== runId) return;
+        setIntentProgress({ done, total: candidates.length });
+      }
+    }
+    if (intentRunRef.current === runId) setIntentProgress(null);
+  };
+
+  const specAnswersFromPanel = (a: ClarifyAnswers | null | undefined): Record<string, string> => {
+    const out: Record<string, string> = {};
+    if (!a) return out;
+    // Free-text "Something else…" answers land under `other`.
+    const other = (a.other ?? {}) as Record<string, unknown>;
+    const pick = (...keys: string[]): string => {
+      for (const k of keys) {
+        const v = (a as Record<string, unknown>)[k] ?? other[k];
+        if (typeof v === "string" && v.trim()) return v.trim();
+      }
+      return "";
+    };
+    const role = pick("entity_role", "craft");
+    const entity = pick("entity");
+    const category = pick("entity_category");
+    const industry = pick("entity_industry");
+    const location = pick("entity_location", "geography");
+    const mode = pick("entity_mode");
+    const offer = pick("entity_offer");
+    // Investor slots survive the panel (previously dropped: answers existed
+    // but never reached retrieval). "any" means no filter — skip it.
+    const invStage = pick("investor_stage");
+    const invCheck = pick("investor_check");
+    const invSector = pick("investor_sector");
+    // Geography ids (global/us/na/eu/uk/local) map to the country names the
+    // readers understand; unresolvable ones stay missing (re-asked).
+    const GEO_ID_MAP: Record<string, string> = {
+      us: "USA",
+      na: "North America",
+      eu: "Europe",
+      uk: "UK",
+    };
+    const mappedLocation = GEO_ID_MAP[location] ?? location;
+    if (role) out.role = role;
+    if (entity) out.entity = entity;
+    if (category) out.category = category;
+    if (industry) out.industry = industry;
+    if (mappedLocation && mappedLocation !== "global" && mappedLocation !== "local") {
+      out.location = mappedLocation;
+    }
+    if (location === "global") out.geo_scope = "worldwide";
+    if (invStage && invStage !== "any") out.investor_stage = invStage;
+    if (invCheck && invCheck !== "any") out.investor_check = invCheck;
+    if (invSector && invSector !== "any") out.investor_sector = invSector;
+    // Mode/offer ride along as stated criteria (ignored by retrieval and
+    // validation; consumed by Intent in Batch 4). Phase 1.3: the server mode
+    // gate blocks retrieval until mode is stated (one question), and asks the
+    // offer question only after a selling answer — just-looking never sees it.
+    // Explicit "Search" (force) bypasses the gate.
+    if (mode) out.mode = mode;
+    if (offer) out.offer = offer;
+    // ICP follow-up answers (Phase 1.4): site preference drives the
+    // no_website retrieval filter; channel tailors the pitch (no row filter).
+    const site = pick("entity_site");
+    if (site === "without" || site === "no_website") out.opportunity = "no_website";
+    else if (site === "with" || site === "has_website") out.site = "with";
+    const channel = pick("entity_channel");
+    if (channel && channel !== "any") out.channel = channel;
+    return out;
+  };
   const [planTokens, setPlanTokens] = useState<
     import("@/lib/search/tokenize-input").InputTokens | null
   >(null);
   // Questions mount only after the plan has revealed (min 2 lines) — never beside it.
   const [planDone, setPlanDone] = useState(false);
+  // Latest spec entity from runSpec responses: steers the plan narration
+  // (business/company/person lines) once known; legacy vertical covers pre-spec.
+  const [specEntity, setSpecEntity] = useState<string | null>(null);
   // Raise facts: clarifier answers win, tokenizer slots from the query fill gaps.
   const raiseStage =
     (clarifyAnswers?.investor_stage && clarifyAnswers.investor_stage !== "any"
@@ -424,6 +1015,16 @@ function DiscoverPage() {
   const resetConversation = () => {
     clearWorkspace();
     setTurns([]);
+    setExpandedTurns({});
+    setContactByKey({});
+    setIntentByKey({});
+    setIntentProgress(null);
+    intentRunRef.current += 1;
+    // New chat owns a new identity: the old server row stays intact under
+    // its own id (history keeps working); only the view resets.
+    rotateConversationId();
+    pendingTurnIdRef.current = null;
+    pendingTurnAnswersRef.current = {};
     setPlanTokens(null);
     setActiveQuery(null);
     setClarifyAnswers(null);
@@ -432,6 +1033,8 @@ function DiscoverPage() {
     setDefaultSummary("");
     composerRef.current?.focus();
   };
+  const saveTranscriptFn = useServerFn(saveTranscript);
+  const getTranscriptFn = useServerFn(getTranscript);
 
   // Shared contact resolution (cards, tables, and the detail drawer all use it).
   const resolveContactFor = async (
@@ -549,6 +1152,14 @@ function DiscoverPage() {
         ? `co:${selectedEntity.company.key}`
         : selectedEntity.person.key
       : null;
+  // Raw row key for intent-evidence lookup (contact map uses co: prefix).
+  const selectedEntityKey = !selectedEntity
+    ? null
+    : selectedEntity.type === "company"
+      ? selectedEntity.company.key
+      : selectedEntity.type === "person"
+        ? selectedEntity.person.key
+        : selectedEntity.local.key;
   const resolveSelectedEntityContact = () => {
     if (!selectedEntity) return;
     if (selectedEntity.type === "company") void resolveCompanyContact(selectedEntity.company);
@@ -574,7 +1185,9 @@ function DiscoverPage() {
   const shownPeople = people;
 
   const runSearchMut = useMutation({
-    mutationFn: async (vars: string | { query: string; clarify?: ClarifyAnswers | null }) => {
+    mutationFn: async (
+      vars: string | { query: string; clarify?: ClarifyAnswers | null; turnId?: string },
+    ) => {
       const q = typeof vars === "string" ? vars : vars.query;
       const clarify = typeof vars === "string" ? clarifyAnswers : (vars.clarify ?? clarifyAnswers);
       const plain = toPlainSearchQuery(q) || q.trim();
@@ -602,10 +1215,33 @@ function DiscoverPage() {
       const cos = (res.companies as CompanyRow[]) ?? [];
       const ppl = (res.people as PersonRow[]) ?? [];
       const locs = (res.local as LocalBusinessRow[] | undefined) ?? [];
+      // Turn-owned results (Phase 6): the owning turn keeps its output forever,
+      // so earlier inputs never lose their outputs when new searches append.
+      const ownerId =
+        (typeof vars === "string" ? undefined : vars.turnId) ?? pendingTurnIdRef.current;
+      if (ownerId) {
+        const frozen: TurnResults = { leads: posts, companies: cos, people: ppl, local: locs };
+        setTurns((prev) => prev.map((t) => (t.id === ownerId ? { ...t, results: frozen } : t)));
+      }
       setLeads(posts);
       setCompanies(cos);
       setPeople(ppl);
       setLocalRows(locs);
+      // Intent follows selling offers only (offer rides in clarify answers).
+      {
+        const vClarify = typeof vars === "string" ? null : vars.clarify;
+        const other = (vClarify?.other ?? clarifyAnswers?.other ?? {}) as Record<string, unknown>;
+        const offer =
+          (typeof vClarify?.entity_offer === "string" && vClarify.entity_offer.trim()) ||
+          (typeof other.entity_offer === "string" && other.entity_offer.trim()) ||
+          (typeof clarifyAnswers?.entity_offer === "string" &&
+            clarifyAnswers.entity_offer.trim()) ||
+          "";
+        if (offer && (ppl.length || cos.length || locs.length)) {
+          const entity = ppl.length ? "person" : cos.length ? "company" : "business";
+          void runIntentEnrichment(offer, entity, { people: ppl, companies: cos, local: locs });
+        }
+      }
       // Seed known contacts so Show contact isn't needed to see them. Honest
       // provenance only — no "in database" framing, just the state of the
       // email/phone we already hold.
@@ -702,7 +1338,7 @@ function DiscoverPage() {
     setPendingAutoSearch(false);
     setAutoRanForProject(activeProject.id);
     setInput(q);
-    runSearchMut.mutate(q);
+    void beginSearch(q);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingAutoSearch, activeProject?.id]);
 
@@ -710,7 +1346,7 @@ function DiscoverPage() {
   // (own crawler + public registries), sequential so the server isn't hammered.
   const autoResolvedFor = useRef<string | null>(null);
   useEffect(() => {
-    if (!activeQuery || runSearchMut.isPending) return;
+    if (!activeQuery || runSearchMut.isPending || specPending) return;
     if (autoResolvedFor.current === activeQuery) return;
     if (!companies.length && !people.length) return;
     autoResolvedFor.current = activeQuery;
@@ -734,7 +1370,7 @@ function DiscoverPage() {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeQuery, companies, people, runSearchMut.isPending]);
+  }, [activeQuery, companies, people, runSearchMut.isPending, specPending]);
 
   /**
    * Wipe the previous answer before starting a new one.
@@ -746,11 +1382,22 @@ function DiscoverPage() {
    * the only thing on screen; previous results belong in History, not behind
    * the new research.
    */
+  const stopSearch = () => {
+    searchSessionRef.current?.cancel({ clearActive: true });
+    intentAbortRef.current?.abort();
+    intentRunRef.current += 1;
+    setIntentProgress(null);
+    setBrowserProgressRun(null);
+    setBrowserProgressEvents([]);
+    setSpecPending(false);
+  };
   const clearWorkspace = () => {
+    stopSearch();
     setLeads([]);
     setCompanies([]);
     setPeople([]);
     setLocalRows([]);
+    setSpecFilter(null);
     // contactByKey is GLOBAL: frozen turns still render their seeded
     // contacts, so it's only wiped on a full conversation reset.
     setSelected(null);
@@ -758,6 +1405,7 @@ function DiscoverPage() {
     setSuggestions([]);
     setQueryType(null);
     setRefinement("");
+    setSpecHasMore(false);
   };
 
   /**
@@ -768,67 +1416,136 @@ function DiscoverPage() {
    * Asking after results was the wrong order: the first search is then the
    * wrong one and the user watches it run before being asked to fix it.
    */
-  // Deep-link + new-chat params: ?q= re-runs a history search, ?fresh=
+  // Deep-link + new-chat params: ?conversation= rehydrates an exact saved
+  // transcript (history reopen), ?q= re-runs a history search, ?fresh=
   // resets to a clean conversation (fixes same-route navigate no-ops).
   const seenParamsRef = useRef("");
   useEffect(() => {
-    const key = `${routeSearch.q ?? ""}|${routeSearch.fresh ?? ""}`;
+    const key = `${routeSearch.q ?? ""}|${routeSearch.fresh ?? ""}|${routeSearch.conversation ?? ""}`;
     if (!key || seenParamsRef.current === key) return;
     seenParamsRef.current = key;
     if (routeSearch.fresh) {
       resetConversation();
+    } else if (routeSearch.conversation) {
+      const cid = routeSearch.conversation;
+      conversationIdRef.current = cid;
+      searchSessionRef.current?.rotateConversation(cid);
+      try {
+        window.localStorage.setItem(`scrapivo:conversation-id:${userId}`, cid);
+      } catch {
+        // ignore
+      }
+      // Full hygiene: a reopened conversation must not inherit live
+      // workspace rows, contacts, intent, or turn ownership.
+      clearWorkspace();
+      setContactByKey({});
+      setIntentByKey({});
+      setIntentProgress(null);
+      intentRunRef.current += 1;
+      pendingTurnIdRef.current = null;
+      pendingTurnAnswersRef.current = {};
+      setPlanTokens(null);
+      setClarifyQs([]);
+      setPendingQuery(null);
+      void getTranscriptFn({ data: { conversationId: cid } })
+        .then((r) => {
+          setTurns((r.turns as unknown as ConversationTurn[]) ?? []);
+          setExpandedTurns({});
+          setActiveQuery(null);
+        })
+        .catch((e: unknown) => {
+          toast.error(friendlyErrorText(e, "Could not reopen conversation"));
+        });
     } else if (routeSearch.q && routeSearch.q.trim() && routeSearch.q.trim() !== activeQuery) {
+      // Legacy history entries re-run in an ISOLATED conversation so the
+      // search never pollutes (or gets polluted by) the current transcript.
+      resetConversation();
+      // Drop the ?q param after consuming so refresh replays the saved
+      // transcript instead of re-running the search.
+      navigate({ to: "/discover", search: {}, replace: true });
       void beginSearch(routeSearch.q);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- param-driven entry only
-  }, [routeSearch.q, routeSearch.fresh]);
+  }, [routeSearch.q, routeSearch.fresh, routeSearch.conversation]);
+
+  // Transcript persistence: debounced save of whole turns whenever they
+  // settle (never mid-search). The conversation id is captured up front so
+  // an id rotation mid-debounce can never misattribute the snapshot.
+  // Unmount flush covers fast-close (<1500ms) loss. Failures stay silent:
+  // transcript is best-effort; in-memory truth stays intact.
+  useEffect(() => {
+    if (!turns.length || runSearchMut.isPending || specPending) return;
+    const cid = getConversationId();
+    const snapshot = turns;
+    let flushed = false;
+    const flush = () => {
+      if (flushed) return;
+      flushed = true;
+      void saveTranscriptFn({
+        data: { conversationId: cid, turns: snapshot as unknown as never },
+      }).catch(() => {});
+    };
+    const t = setTimeout(flush, 1500);
+    return () => {
+      clearTimeout(t);
+      // Unmount-only flush (fast-close protection): deps-change cleanups
+      // must NOT save, or every keystroke-turn would write immediately.
+      if (unmountedRef.current) flush();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [turns, runSearchMut.isPending, specPending]);
+
+  const unmountedRef = useRef(false);
+  useEffect(
+    () => () => {
+      unmountedRef.current = true;
+    },
+    [],
+  );
+
+  // Refresh replay: plain reload (no params) restores the stored
+  // conversation's exact transcript instead of starting blank.
+  const replayedRef = useRef(false);
+  useEffect(() => {
+    if (replayedRef.current) return;
+    if (routeSearch.q || routeSearch.fresh || routeSearch.conversation) return;
+    if (turns.length) return;
+    replayedRef.current = true;
+    const cid = getConversationId();
+    void getTranscriptFn({ data: { conversationId: cid } })
+      .then((r) => {
+        const saved = (r.turns as unknown as ConversationTurn[]) ?? [];
+        if (saved.length) {
+          setTurns(saved);
+          setExpandedTurns({});
+        }
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Auto-scroll: the echoed user bubble and new panels come into view the
   // frame they appear, matching ChatGPT-style conversation behavior.
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTo({ top: el.scrollHeight });
-  }, [turns.length, clarifyQs.length, runSearchMut.isPending]);
+  }, [turns.length, clarifyQs.length, runSearchMut.isPending, specPending]);
 
   const beginSearch = async (q: string) => {
     const trimmed = q.trim();
     if (!trimmed) return;
     // User bubble first: the submitted text lives in the conversation from
-    // this instant, independent of whatever happens downstream. The PREVIOUS
-    // turn's workspace is frozen into its own record first — that's what
-    // keeps earlier inputs showing their outputs (ChatGPT-style transcript).
-    setTurns((prev) => {
-      const withSnapshot = prev.map((t, i) => {
-        if (i !== prev.length - 1 || t.results) return t;
-        const hasRows = leads.length > 0 || companies.length > 0 || people.length > 0 || localRows.length > 0;
-        if (!hasRows) return t;
-        return {
-          ...t,
-          results: {
-            leads: [...leads],
-            companies: [...companies],
-            people: [...people],
-            local: [...localRows],
-          },
-        };
-      });
-      // Collapse: keep the last KEEP_FULL_TURNS turns' results in memory.
-      const appended = [...withSnapshot, { id: turnId(), text: trimmed }];
-      const keepFrom = appended.length - KEEP_FULL_TURNS;
-      return appended.map((t, i) => {
-        if (i >= keepFrom || !t.results) return t;
-        return {
-          ...t,
-          results: undefined,
-          counts: {
-            posts: t.results.leads.length,
-            companies: t.results.companies.length,
-            people: t.results.people.length,
-            local: t.results.local.length,
-          },
-        };
-      });
-    });
+    // this instant, independent of whatever happens downstream. Results are
+    // attached to the owning turn by onSuccess (turn-owned transcript) — no
+    // deferred snapshotting, so outputs can never vanish or duplicate.
+    const newTurnId = turnId();
+    pendingTurnIdRef.current = newTurnId;
+    pendingTurnAnswersRef.current = {};
+    intentRunRef.current += 1; // cancel any in-flight intent enrichment
+    setIntentProgress(null);
+    setTurns((prev) => [...prev, { id: newTurnId, text: trimmed, ts: Date.now() }]);
+    // Fold state derives at render (open = explicitly opened, else the
+    // latest turn), so no sync needed here; manual toggles persist.
     // New research starts with a clean screen — never leave the previous
     // answer underneath the clarifier or the hunting steps.
     clearWorkspace();
@@ -839,6 +1556,25 @@ function DiscoverPage() {
     // hunting while the old sales cards were still on screen.
     setClarifyAnswers(null);
     setDefaultSummary("");
+    // Spec-first cutover (SPEC_SEARCH_ENABLED=true): canonical DB-first path.
+    // Legacy flow below runs byte-identical when the flag is off.
+    try {
+      const flag = await readSpecFlag();
+      if (pendingTurnIdRef.current !== newTurnId) return;
+      if (flag.enabled) {
+        specModeRef.current = true;
+        try {
+          await runSpecBranch(trimmed, newTurnId, {});
+        } catch (e) {
+          toast.error(friendlyErrorText(e as Error, "Spec search failed"));
+        }
+        return;
+      }
+    } catch {
+      // Flag unreadable → fall through to legacy path (safe default).
+    }
+    if (pendingTurnIdRef.current !== newTurnId) return;
+    specModeRef.current = false;
     try {
       const plain = toPlainSearchQuery(trimmed) || trimmed;
       const [{ classifyQuery }, clarifier, { tokenizeInput }, { resolveSearchVertical }] =
@@ -861,6 +1597,7 @@ function DiscoverPage() {
         // component (their node builtins break the browser bundle / Vercel build).
         // Deterministic tokens travel along as un-overridable facts.
         let questions: ClarifyQuestion[] = [];
+        let specReady = false;
         try {
           const res = await askDynamicQuestions({
             data: {
@@ -881,10 +1618,23 @@ function DiscoverPage() {
             },
           });
           questions = (res.questions ?? []) as ClarifyQuestion[];
+          // Spec-complete verdict from the server wins over EVERYTHING below:
+          // a ready spec searches instantly with zero questions (locked).
+          specReady =
+            (res as { specStatus?: string }).specStatus === "ready_to_search" &&
+            ["person", "company", "business"].includes(
+              (res as { specEntity?: string }).specEntity ?? "",
+            );
+          if (specReady) {
+            questions = [];
+          }
         } catch (e) {
           console.warn("[discover] dynamic questions failed, using fallback", e);
         }
-        if (!questions.length) {
+        // Legacy fallback ONLY when the spec did not already decide. A ready
+        // spec must never be re-questioned by seller defaults (the bug where
+        // "founders" got "What do you do?").
+        if (!questions.length && !specReady) {
           questions = clarifier.buildClarifyingQuestions(classified, {
             hasLocation: !!classified.location || !!searchContext?.location,
             known: {
@@ -910,7 +1660,7 @@ function DiscoverPage() {
       console.error("[discover] clarifier failed; searching without it", err);
     }
     setActiveQuery(trimmed);
-    runSearchMut.mutate(trimmed);
+    runSearchMut.mutate({ query: trimmed, turnId: newTurnId });
   };
 
   const onSubmit = () => {
@@ -940,22 +1690,25 @@ function DiscoverPage() {
     chatMut.mutate(next);
   };
 
-  const pending = runSearchMut.isPending || chatMut.isPending;
-  const hasResults = leads.length > 0 || activeQuery !== null;
+  const pending = runSearchMut.isPending || chatMut.isPending || specPending;
+  const hasResults = leads.length > 0 || localRows.length > 0 || activeQuery !== null;
   // A submitted turn starts the conversation instantly: the echoed user
   // bubble renders on the next frame, never held until the clarifier
   // round-trip finishes (ChatGPT-style echo).
-  const idle = !hasResults && !runSearchMut.isPending && turns.length === 0;
+  const idle = !hasResults && !runSearchMut.isPending && !specPending && turns.length === 0;
   const showHero = idle;
 
   /** One full result feed (People → Companies → Posts → Local) — rendered for
    *  the active workspace AND for frozen transcript turns. */
-  const renderResultSections = (rows: {
-    leads: Lead[];
-    companies: CompanyRow[];
-    people: PersonRow[];
-    local: LocalBusinessRow[];
-  }) => (
+  const renderResultSections = (
+    rows: {
+      leads: Lead[];
+      companies: CompanyRow[];
+      people: PersonRow[];
+      local: LocalBusinessRow[];
+    },
+    filter?: TurnFilter | null,
+  ) => (
     <>
       {rows.people.length > 0 && (
         <div className="space-y-3 pb-4">
@@ -966,20 +1719,7 @@ function DiscoverPage() {
                 setSelected(null);
                 setSelectedEntity({ type: "person", person: row });
               }}
-              onGenerate={(row, kind) =>
-                setGenTarget({
-                  kind,
-                  vertical: "investor",
-                  name: row.name,
-                  firm: row.company_hint,
-                  role: row.title_hint ?? row.role_hint ?? undefined,
-                  location: row.location_hint ?? undefined,
-                  email: row.inline_contacts?.emails?.[0],
-                  whyMatch: row.why_match ?? undefined,
-                  investorStage: raiseStage,
-                  investorSector: raiseSector,
-                })
-              }
+              onGenerate={openGenerateForPerson}
             />
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -992,6 +1732,8 @@ function DiscoverPage() {
                     setSelectedEntity({ type: "person", person: row });
                   }}
                   contact={contactByKey[p.key]}
+                  intent={intentBadgeFor(p.key)}
+                  onGenerate={openGenerateForPerson}
                 />
               ))}
             </div>
@@ -1008,6 +1750,12 @@ function DiscoverPage() {
                 setSelectedEntity({ type: "company", company: row });
               }}
               onGenerate={openGenerateForCompany}
+              relevanceByKey={Object.fromEntries(
+                rows.companies.map((c) => [
+                  c.key,
+                  relevanceChips({ website: c.website ?? null }, filter ?? null, false),
+                ]),
+              )}
             />
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -1021,6 +1769,8 @@ function DiscoverPage() {
                   }}
                   contact={contactByKey[`co:${c.key}`]}
                   onGenerate={openGenerateForCompany}
+                  intent={intentBadgeFor(c.key)}
+                  relevance={relevanceChips({ website: c.website ?? null }, filter ?? null, false)}
                 />
               ))}
             </div>
@@ -1044,13 +1794,16 @@ function DiscoverPage() {
       {rows.local.length > 0 && (
         <div className="space-y-3 pb-4">
           {viewMode === "table" ? (
-            <LocalListRows
+            <BusinessTable
               rows={rows.local}
               onOpen={(row) => {
                 setSelected(null);
                 setSelectedEntity({ type: "local", local: row });
               }}
               onGenerate={openGenerateForLocal}
+              relevanceByKey={Object.fromEntries(
+                rows.local.map((r) => [r.key, relevanceChips(r, filter ?? null)]),
+              )}
             />
           ) : (
             <LocalBusinessesGrid
@@ -1060,6 +1813,10 @@ function DiscoverPage() {
                 setSelectedEntity({ type: "local", local: row });
               }}
               onGenerate={openGenerateForLocal}
+              intentByKey={badgeMapForGrid()}
+              relevanceByKey={Object.fromEntries(
+                rows.local.map((r) => [r.key, relevanceChips(r, filter ?? null)]),
+              )}
             />
           )}
         </div>
@@ -1140,10 +1897,21 @@ function DiscoverPage() {
           ) : (
             <div className="max-w-4xl mx-auto py-4 md:py-6 space-y-5 md:space-y-6">
               {/* Conversation transcript: each turn = user bubble + its own
-                  frozen results (or a collapsed count line for old turns).
-                  The ACTIVE turn's live workspace renders below the map. */}
+                  frozen results, folded except the latest (one click reopens).
+                  Nothing is ever discarded — Step 3 keeps every turn's data
+                  in memory and on the server. */}
               {turns.map((t, i) => {
                 const isLast = i === turns.length - 1;
+                const open = expandedTurns[t.id] ?? isLast;
+                const totals = t.results
+                  ? t.results.leads.length +
+                    t.results.companies.length +
+                    t.results.people.length +
+                    t.results.local.length
+                  : (t.counts?.posts ?? 0) +
+                    (t.counts?.companies ?? 0) +
+                    (t.counts?.people ?? 0) +
+                    (t.counts?.local ?? 0);
                 return (
                   <div key={t.id} className="space-y-4">
                     <div className="flex justify-end">
@@ -1151,7 +1919,142 @@ function DiscoverPage() {
                         {t.text}
                       </div>
                     </div>
-                    {t.results && renderResultSections(t.results)}
+                    {t.results ? (
+                      open ? (
+                        <>
+                          {/* Phase C: per-turn header at the TOP of its
+                              results. Frozen turns: read-only label + counts.
+                              Last turn: full control cluster. */}
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="text-sm min-w-0">
+                              <span className="text-muted-foreground">Results for </span>
+                              <span className="font-medium">"{t.text}"</span>
+                              <span className="text-muted-foreground"> · {totals} results</span>
+                            </div>
+                            {isLast && (
+                              <div className="flex flex-wrap items-center gap-2 shrink-0">
+                                {specHasMore && (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-7 text-xs"
+                                    disabled={specPending}
+                                    onClick={() => {
+                                      const tid = pendingTurnIdRef.current ?? "";
+                                      const off = specOffsetRef.current[tid] ?? 0;
+                                      void runSpecBranch(activeQuery ?? "", tid, {}, true, off).catch((e: Error) =>
+                                        toast.error(friendlyErrorText(e, "Could not load more")),
+                                      );
+                                    }}
+                                  >
+                                    Show more
+                                  </Button>
+                                )}
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-7 text-xs"
+                                  disabled={watchMut.isPending || !activeQuery}
+                                  onClick={() => activeQuery && watchMut.mutate(activeQuery)}
+                                >
+                                  <Bell className="size-3 mr-1" /> Watch signal
+                                </Button>
+                                <ViewToggle view={viewMode} onChange={setViewMode} />
+                                <button
+                                  onClick={() => {
+                                    // Clear resets the VIEW and rotates identity so the
+                                    // cleared transcript can never overwrite history.
+                                    // (Same as New chat minus the composer focus.)
+                                    clearWorkspace();
+                                    setTurns([]);
+                                    setExpandedTurns({});
+                                    setContactByKey({});
+                                    setIntentByKey({});
+                                    setIntentProgress(null);
+                                    intentRunRef.current += 1;
+                                    pendingTurnIdRef.current = null;
+                                    rotateConversationId();
+                                    setPlanTokens(null);
+                                    setActiveQuery(null);
+                                    setClarifyAnswers(null);
+                                    setClarifyQs([]);
+                                    setPendingQuery(null);
+                                    setDefaultSummary("");
+                                    setSpecHasMore(false);
+                                  }}
+                                  className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+                                >
+                                  <X className="size-3" /> Clear
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                          {isLast &&
+                            (() => {
+                              const bar = filterBarModel(specFilter);
+                              if (!bar.visible) return null;
+                              return (
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                  {bar.modeLabel && (
+                                    <span className="text-[10px] px-1.5 py-0.5 rounded-full border border-border text-muted-foreground">
+                                      {bar.modeLabel}
+                                    </span>
+                                  )}
+                                  {bar.offerLabel && (
+                                    <span className="text-[10px] px-1.5 py-0.5 rounded-full border border-border text-muted-foreground">
+                                      Offer: {bar.offerLabel}
+                                    </span>
+                                  )}
+                                  {bar.filterState === "no-website-on" && (
+                                    <span className="text-[10px] px-1.5 py-0.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300">
+                                      No-website filter: ON
+                                    </span>
+                                  )}
+                                  {bar.filterState === "stale-site-on" && (
+                                    <span className="text-[10px] px-1.5 py-0.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300">
+                                      Redesign targets: ON
+                                    </span>
+                                  )}
+                                  {bar.filterState === "unset" && (
+                                    <span className="text-[10px] px-1.5 py-0.5 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-300">
+                                      Showing all — set site preference
+                                    </span>
+                                  )}
+                                  {(bar.showSiteToggle || bar.filterState === "no-website-on") && (
+                                    <button
+                                      type="button"
+                                      onClick={toggleSiteFilter}
+                                      className="text-[10px] px-1.5 py-0.5 rounded-full border border-border text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                                    >
+                                      {bar.filterState === "no-website-on"
+                                        ? "Show all"
+                                        : "No-website only"}
+                                    </button>
+                                  )}
+                                </div>
+                              );
+                            })()}
+                          <div>
+                            <button
+                              type="button"
+                              onClick={() => setExpandedTurns((m) => ({ ...m, [t.id]: false }))}
+                              className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+                            >
+                              <ChevronUp className="size-3" /> Fold ({totals} results)
+                            </button>
+                          </div>
+                          {renderResultSections(t.results, t.filter ?? null)}
+                        </>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setExpandedTurns((m) => ({ ...m, [t.id]: true }))}
+                          className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+                        >
+                          <ChevronDown className="size-3" /> Expand ({totals} results)
+                        </button>
+                      )
+                    ) : null}
                     {t.counts && !t.results && (
                       <div className="text-xs text-muted-foreground">
                         {[
@@ -1165,127 +2068,50 @@ function DiscoverPage() {
                         — run the search again to reload.
                       </div>
                     )}
-                    {isLast && clarifyQs.length > 0 && !runSearchMut.isPending && (
-                      <SearchingPlan
-                        key={`plan-${pendingQuery ?? activeQuery ?? "idle"}`}
-                        tokens={planTokens}
-                        vertical={activeVertical ?? "general"}
-                        onDone={() => setPlanDone(true)}
-                      />
-                    )}
-                    {isLast &&
-                      clarifyQs.length > 0 &&
-                      planDone &&
-                      !runSearchMut.isPending && (
-                        <ClarifyPanel
-                          questions={clarifyQs}
-                          refinement={defaultSummary || refinement}
-                          disabled={runSearchMut.isPending}
-                          onDismiss={() => {
-                            setClarifyQs([]);
-                            const q = pendingQuery;
-                            setPendingQuery(null);
-                            if (q) runSearchMut.mutate({ query: q, clarify: null });
-                          }}
-                          onApply={(answers) => {
-                            setClarifyAnswers(answers);
-                            setClarifyQs([]);
-                            const q = pendingQuery ?? activeQuery;
-                            setPendingQuery(null);
-                            // Pass clarify into mutate vars — do not rely on setState timing.
-                            if (q) runSearchMut.mutate({ query: q, clarify: answers });
-                          }}
-                        />
-                      )}
-                    {isLast && runSearchMut.isPending && (
-                      <SearchingSteps
-                        query={displaySearchLabel(
-                          (typeof runSearchMut.variables === "string"
-                            ? runSearchMut.variables
-                            : runSearchMut.variables?.query) ??
-                            activeQuery ??
-                            "",
-                        )}
-                        goal={searchContext?.goal}
-                        audience={searchContext?.audience}
-                        vertical={activeVertical}
-                      />
-                    )}
+                    {/* Phase B: thinking lives at the composer (single
+                        unified sequence). Nothing narrates inside turns. */}
                   </div>
                 );
               })}
 
-              {/* Active-turn header: watch/clear + Cards|Lists for the live
-                  workspace (frozen turns render read-only above). */}
-              {activeQuery &&
-                clarifyQs.length === 0 &&
-                !runSearchMut.isPending &&
-                (leads.length > 0 || companies.length > 0 || people.length > 0) && (
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="text-sm min-w-0">
-                      <span className="text-muted-foreground">Results for </span>
-                      <span className="font-medium">"{displaySearchLabel(activeQuery)}"</span>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-7 text-xs"
-                        disabled={watchMut.isPending}
-                        onClick={() => watchMut.mutate(activeQuery)}
-                      >
-                        <Bell className="size-3 mr-1" /> Watch signal
-                      </Button>
-                      <button
-                        onClick={() => {
-                          clearWorkspace();
-                          setTurns([]);
-                          setPlanTokens(null);
-                          setActiveQuery(null);
-                          setClarifyAnswers(null);
-                          setClarifyQs([]);
-                          setPendingQuery(null);
-                          setDefaultSummary("");
-                        }}
-                        className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
-                      >
-                        <X className="size-3" /> Clear
-                      </button>
-                    </div>
-                  </div>
-                )}
+              {/* Phase C: header + controls live per-turn above (controls move
+                  with each turn). No standalone bottom header. */}
 
-              {activeQuery &&
-                clarifyQs.length === 0 &&
-                !runSearchMut.isPending &&
-                (leads.length > 0 ||
-                  companies.length > 0 ||
-                  people.length > 0 ||
-                  localRows.length > 0) && (
-                  <div className="flex flex-wrap items-center gap-2">
-                    <div className="ml-auto">
-                      <ViewToggle view={viewMode} onChange={setViewMode} />
-                    </div>
-                  </div>
-                )}
+              {/* Phase C: filter bar lives per-turn above (with each turn's
+                  controls). No standalone bottom bar. */}
 
               {/* Previous results must not sit under the clarifier or the
                   hunting steps — that was the reported bug. */}
-              {/* Single unified feed: every non-empty section stacks, no tabs. */}
-              {clarifyQs.length === 0 && !runSearchMut.isPending &&
-                renderResultSections({
-                  people: shownPeople,
-                  companies: shownCompanies,
-                  leads: shownLeads,
-                  local: localRows,
-                })}
+              {/* Single unified feed: every non-empty section stacks, no tabs.
+                  Once the owning turn has its results, the turn render above
+                  shows them — the live feed hides to avoid duplicate groups. */}
+              {intentProgress && (
+                <div className="text-xs text-muted-foreground pb-1">
+                  Checking evidence {intentProgress.done}/{intentProgress.total}…
+                </div>
+              )}
+              {clarifyQs.length === 0 &&
+                !runSearchMut.isPending &&
+                !specPending &&
+                !turns[turns.length - 1]?.results &&
+                renderResultSections(
+                  {
+                    people: shownPeople,
+                    companies: shownCompanies,
+                    leads: shownLeads,
+                    local: localRows,
+                  },
+                  specFilter,
+                )}
 
-                          {/* `activeQuery` is set the moment the clarifier opens (so the
+              {/* `activeQuery` is set the moment the clarifier opens (so the
                   header reads correctly), which made this empty-state render
                   UNDER the questions — telling the user nothing was found before
                   the search had even run. No results box while clarifying. */}
               {!runSearchMut.isPending &&
+                !specPending &&
                 clarifyQs.length === 0 &&
+                !turns[turns.length - 1]?.results &&
                 activeQuery &&
                 leads.length === 0 &&
                 companies.length === 0 &&
@@ -1301,8 +2127,8 @@ function DiscoverPage() {
                     </div>
                     {activeVertical === "local" && (
                       <div>
-                        We scanned the local business database and live directories for that
-                        place. Try a nearby larger city, or check the spelling of the town.
+                        We scanned the local business database and live directories for that place.
+                        Try a nearby larger city, or check the spelling of the town.
                       </div>
                     )}
                     {activeVertical !== "local" && (
@@ -1354,6 +2180,133 @@ function DiscoverPage() {
 
         <div className="px-4 md:px-6 pb-4 md:pb-6 pt-2">
           <div className="max-w-3xl mx-auto" data-tour="composer">
+            {/* Phase B: unified thinking sequence (replaces SearchingPlan +
+                SearchingSteps). One composer-attached narration derived from
+                live query/tokens/entity — never fixed ladders. */}
+            {(clarifyQs.length > 0 || runSearchMut.isPending || specPending) && (
+              <div className="mb-2 rounded-2xl border border-border bg-card p-4 space-y-1.5">
+                <ThinkingSteps
+                  inputKey={pendingQuery ?? activeQuery ?? "idle"}
+                  input={{
+                    query: pendingQuery ?? activeQuery ?? "",
+                    tokens: planTokens,
+                    // While a search runs, specEntity is the PREVIOUS turn's
+                    // entity — narrating it mislabels the running query (a
+                    // jobs hunt would say "businesses"). Pending narration
+                    // uses the live tokenizer slots only; the confirmed
+                    // entity label appears once the turn settles.
+                    entityLabel:
+                      runSearchMut.isPending || specPending
+                        ? null
+                        : specEntity === "business"
+                          ? "businesses"
+                          : specEntity === "company"
+                            ? "companies"
+                            : specEntity === "person"
+                              ? "people"
+                              : activeVertical === "local"
+                                ? "local businesses"
+                                : (activeVertical ?? null),
+                  }}
+                  pending={runSearchMut.isPending || specPending}
+                  compact={planDone}
+                  onDone={() => setPlanDone(true)}
+                />
+                {specPending && (
+                  <button type="button" onClick={stopSearch} className="text-xs font-medium text-muted-foreground hover:text-foreground">
+                    Stop search
+                  </button>
+                )}
+                {browserProgressEvents.length > 0 && (
+                  <div className="mt-2 border-t border-border pt-2 space-y-1" aria-live="polite" aria-label="Live browser activity">
+                    {browserProgressEvents.map((event) => (
+                      <div key={event.id} className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <span className="size-1.5 rounded-full bg-primary shrink-0" />
+                        <span>{event.action}{event.source ? ` · ${event.source}` : ""}{event.detail ? ` · ${event.detail}` : ""}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            {/* Clarifying questions as an attached dropdown above the input —
+                never inside the results flow. Collapsible; reopens per round. */}
+            {clarifyQs.length > 0 && planDone && !runSearchMut.isPending && !specPending && (
+              <div className="mb-2 rounded-2xl border border-primary/25 bg-card shadow-xl">
+                <button
+                  type="button"
+                  onClick={() => setQuestionsOpen((o) => !o)}
+                  className="flex w-full items-center justify-between gap-2 px-4 pt-3 pb-2 text-left"
+                  aria-expanded={questionsOpen}
+                >
+                  <span className="text-xs font-medium text-primary">
+                    Narrow this down
+                    <span className="ml-1 text-muted-foreground">
+                      {clarifyQs.length} question{clarifyQs.length === 1 ? "" : "s"}
+                    </span>
+                  </span>
+                  {questionsOpen ? (
+                    <ChevronUp className="size-3.5 text-muted-foreground" />
+                  ) : (
+                    <ChevronDown className="size-3.5 text-muted-foreground" />
+                  )}
+                </button>
+                {questionsOpen && (
+                  <div className="px-4 pb-4">
+                    <ClarifyPanel
+                      questions={clarifyQs}
+                      refinement={defaultSummary || refinement}
+                      disabled={runSearchMut.isPending || specPending}
+                      onDismiss={() => {
+                        setClarifyQs([]);
+                        const q = pendingQuery;
+                        setPendingQuery(null);
+                        if (!q) return;
+                        if (specModeRef.current) {
+                          void runSpecBranch(q, pendingTurnIdRef.current ?? "", {}).catch(
+                            (e: Error) =>
+                              toast.error(friendlyErrorText(e, "Search failed to start")),
+                          );
+                          return;
+                        }
+                        runSearchMut.mutate({
+                          query: q,
+                          clarify: null,
+                          turnId: pendingTurnIdRef.current ?? undefined,
+                        });
+                      }}
+                      onApply={(answers, opts) => {
+                        setClarifyAnswers(answers);
+                        setClarifyQs([]);
+                        const q = pendingQuery ?? activeQuery;
+                        setPendingQuery(null);
+                        if (!q) return;
+                        if (specModeRef.current) {
+                          // Spec path: answers merge as stated criteria.
+                          // Search/Search-with-defaults buttons force the
+                          // hunt with stated answers; option picks flow on.
+                          void runSpecBranch(
+                            q,
+                            pendingTurnIdRef.current ?? "",
+                            specAnswersFromPanel(answers),
+                            opts?.force ?? false,
+                          ).catch((e: Error) =>
+                            toast.error(friendlyErrorText(e, "Search failed to start")),
+                          );
+                          return;
+                        }
+                        // Pass clarify into mutate vars — do not rely on setState timing.
+                        runSearchMut.mutate({
+                          query: q,
+                          clarify: answers,
+                          turnId: pendingTurnIdRef.current ?? undefined,
+                        });
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
             <UnifiedComposer
               ref={composerRef}
               value={input}
@@ -1370,12 +2323,13 @@ function DiscoverPage() {
               thinker={thinker}
               onThinkerChange={setThinker}
             />
+            {/* Build footer tag removed (Phase B) — stamp logs to console. */}
           </div>
         </div>
       </div>
 
       {selected && (
-        <div className="hidden lg:block w-[420px] border-l border-border shrink-0 bg-card overflow-y-auto">
+        <div className="hidden md:block w-[420px] border-l border-border shrink-0 bg-card overflow-y-auto">
           <LeadDetailPanel
             lead={selected}
             saved={savedByUrl.get(selected.full_post_url)}
@@ -1384,7 +2338,7 @@ function DiscoverPage() {
         </div>
       )}
       {selectedEntity && !selected && (
-        <div className="hidden lg:block w-[420px] border-l border-border shrink-0 bg-card overflow-y-auto">
+        <div className="hidden md:block w-[420px] border-l border-border shrink-0 bg-card overflow-y-auto">
           <EntityDetailPanel
             entity={selectedEntity}
             onClose={() => setSelectedEntity(null)}
@@ -1392,6 +2346,7 @@ function DiscoverPage() {
             contactBusy={!!entityContactKey && contactBusyKey === entityContactKey}
             onResolveContact={resolveSelectedEntityContact}
             onGenerate={(kind) => openGenerateForEntity(kind)}
+            evidence={intentEvidenceFor(selectedEntityKey)}
           />
         </div>
       )}
@@ -1419,6 +2374,7 @@ function DiscoverPage() {
               contactBusy={!!entityContactKey && contactBusyKey === entityContactKey}
               onResolveContact={resolveSelectedEntityContact}
               onGenerate={(kind) => openGenerateForEntity(kind)}
+              evidence={intentEvidenceFor(selectedEntityKey)}
             />
           ) : null}
         </SheetContent>

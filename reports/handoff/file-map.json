@@ -8,3 +8,4 @@
   {"path":"src/lib/canonical/persist-live.server.ts","subsystem":"persistence","purpose":"verified live upsert","entry_points":["persistVerifiedLiveRows"],"depends_on":["Supabase","optional pg"],"used_by":["spec core"],"tests":["src/lib/search/__tests__/m10-persistence.test.ts"],"risk":"high"},
   {"path":"scripts/pipeline/build_search_index.py","subsystem":"storage","purpose":"resumable derived-index build","entry_points":["CLI"],"depends_on":["S3"],"used_by":["watchdog"],"tests":["search index certification"],"risk":"high"}
 ]
+ 

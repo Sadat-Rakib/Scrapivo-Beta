@@ -1,0 +1,365 @@
+{
+  "key": "crunchbase_400k-500k.csv",
+  "size": 60111568,
+  "last_modified": "2026-09-08 00:12:14+00:00",
+  "columns": [
+    "id",
+    "created_at",
+    "name",
+    "short_description",
+    "semrush_global_rank",
+    "semrush_visits_latest_month",
+    "num_investors",
+    "funding_total",
+    "num_exits",
+    "num_funding_rounds",
+    "last_funding_type",
+    "last_funding_at",
+    "num_acquisitions",
+    "apptopia_total_apps",
+    "apptopia_total_downloads",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "num_investments",
+    "num_lead_investments",
+    "num_lead_investors",
+    "listed_stock_symbol",
+    "company_type",
+    "hub_tags",
+    "operating_status",
+    "founded_on",
+    "categories",
+    "founders",
+    "website",
+    "ipo_status",
+    "num_employees_enum",
+    "locations",
+    "growth_insight_description",
+    "growth_insight_indicator",
+    "growth_insight_direction",
+    "growth_insight_confidence",
+    "investor_insight_description",
+    "permalink",
+    "url"
+  ],
+  "row_count": 100000,
+  "sampled_rows": 4000,
+  "delimiter": ",",
+  "roles": {
+    "id": "other",
+    "created_at": "other",
+    "name": "full_name",
+    "short_description": "descriptive",
+    "semrush_global_rank": "other",
+    "semrush_visits_latest_month": "other",
+    "num_investors": "other",
+    "funding_total": "other",
+    "num_exits": "other",
+    "num_funding_rounds": "other",
+    "last_funding_type": "other",
+    "last_funding_at": "other",
+    "num_acquisitions": "other",
+    "apptopia_total_apps": "other",
+    "apptopia_total_downloads": "other",
+    "contact_email": "email",
+    "phone_number": "phone",
+    "facebook": "social",
+    "linkedin": "linkedin",
+    "twitter": "social",
+    "num_investments": "other",
+    "num_lead_investments": "other",
+    "num_lead_investors": "other",
+    "listed_stock_symbol": "other",
+    "company_type": "company",
+    "hub_tags": "other",
+    "operating_status": "other",
+    "founded_on": "other",
+    "categories": "other",
+    "founders": "other",
+    "website": "website",
+    "ipo_status": "other",
+    "num_employees_enum": "employees",
+    "locations": "other",
+    "growth_insight_description": "descriptive",
+    "growth_insight_indicator": "other",
+    "growth_insight_direction": "other",
+    "growth_insight_confidence": "other",
+    "investor_insight_description": "descriptive",
+    "permalink": "other",
+    "url": "website"
+  },
+  "missing_pct": {
+    "id": 0.0,
+    "created_at": 0.0,
+    "name": 0.0,
+    "short_description": 0.0,
+    "semrush_global_rank": 57.2,
+    "semrush_visits_latest_month": 57.2,
+    "num_investors": 91.9,
+    "funding_total": 92.5,
+    "num_exits": 99.7,
+    "num_funding_rounds": 90.4,
+    "last_funding_type": 90.4,
+    "last_funding_at": 90.0,
+    "num_acquisitions": 97.7,
+    "apptopia_total_apps": 94.5,
+    "apptopia_total_downloads": 98.7,
+    "contact_email": 27.5,
+    "phone_number": 15.9,
+    "facebook": 39.6,
+    "linkedin": 18.8,
+    "twitter": 56.6,
+    "num_investments": 99.4,
+    "num_lead_investments": 99.6,
+    "num_lead_investors": 94.1,
+    "listed_stock_symbol": 99.3,
+    "company_type": 3.7,
+    "hub_tags": 99.8,
+    "operating_status": 0.0,
+    "founded_on": 17.9,
+    "categories": 3.5,
+    "founders": 82.0,
+    "website": 5.3,
+    "ipo_status": 3.1,
+    "num_employees_enum": 14.8,
+    "locations": 4.8,
+    "growth_insight_description": 96.8,
+    "growth_insight_indicator": 96.8,
+    "growth_insight_direction": 98.4,
+    "growth_insight_confidence": 98.4,
+    "investor_insight_description": 98.8,
+    "permalink": 0.0,
+    "url": 0.0
+  },
+  "samples": {
+    "id": [
+      "fe3dd33e-125c-400a-ae9a-526f6f4a396c",
+      "d3f8453e-705f-ad28-0142-52a269e7e7ce",
+      "ef812751-f074-4082-bb08-c3ec2b53a47a"
+    ],
+    "created_at": [
+      "2024-08-15 14:58:13.225159+00",
+      "2024-08-15 14:58:13.225159+00",
+      "2024-08-15 14:58:13.225159+00"
+    ],
+    "name": [
+      "Cellnex Telecom Sau",
+      "Cellnext Solutions",
+      "Cellnique Corporation (USA)"
+    ],
+    "short_description": [
+      "Cellnex Telecom Sau is an infrastructure operating company that has expertise in wireless telecommunication business.",
+      "Cellnique Corporation is a women deserve the best beauty solutions Company.",
+      "Cellntell Distrubution is a business development enterprise applications company."
+    ],
+    "semrush_global_rank": [
+      "1604391",
+      "14304810",
+      "4970778"
+    ],
+    "semrush_visits_latest_month": [
+      "14650",
+      "52",
+      "1233"
+    ],
+    "num_investors": [
+      "2",
+      "2",
+      "9"
+    ],
+    "funding_total": [
+      "1068000000",
+      "7375000",
+      "9270000000"
+    ],
+    "num_funding_rounds": [
+      "2",
+      "1",
+      "2"
+    ],
+    "last_funding_type": [
+      "post_ipo_debt",
+      "series_a",
+      "seed"
+    ],
+    "last_funding_at": [
+      "2023-07-24",
+      "2020-01-31",
+      "2023-07-20"
+    ],
+    "num_acquisitions": [
+      "9",
+      "18",
+      "1"
+    ],
+    "apptopia_total_apps": [
+      "1",
+      "2",
+      "2"
+    ],
+    "contact_email": [
+      "abertistlc@abertistelecom.com",
+      "info@cello-zorg.nl",
+      "info@cello.so"
+    ],
+    "phone_number": [
+      "+34 935 678 910",
+      "1-635-123-4200",
+      "+31-88-345-1000"
+    ],
+    "linkedin": [
+      "https://www.linkedin.com/company/cellnextelecom/",
+      "https://www.linkedin.com/company-beta/34242/?pathWildcard=34242",
+      "https://www.linkedin.com/company/cellnique-corporation"
+    ],
+    "twitter": [
+      "https://twitter.com/cellnextelecom",
+      "http://twitter.com/Cellnique",
+      "https://twitter.com/cellozorg"
+    ],
+    "num_investments": [
+      "3",
+      "1",
+      "1"
+    ],
+    "num_lead_investments": [
+      "2",
+      "1",
+      "1"
+    ],
+    "num_lead_investors": [
+      "2",
+      "2",
+      "1"
+    ],
+    "company_type": [
+      "for_profit",
+      "for_profit",
+      "for_profit"
+    ],
+    "operating_status": [
+      "active",
+      "active",
+      "active"
+    ],
+    "founded_on": [
+      "2008-01-01",
+      "2000-01-01",
+      "2014-01-01"
+    ],
+    "categories": [
+      "Broadcasting, Enterprise Software, Satellite Communication, Telecommunications",
+      "Content, Mobile, Telecommunications",
+      "Beauty, Cosmetics, Lifestyle"
+    ],
+    "website": [
+      "https://www.cellnex.com",
+      "https://www.cellnext.com/",
+      "http://cellnique.com/"
+    ],
+    "ipo_status": [
+      "public",
+      "private",
+      "private"
+    ],
+    "num_employees_enum": [
+      "c_01001_05000",
+      "c_00051_00100",
+      "c_00051_00100"
+    ],
+    "locations": [
+      "European Union (EU), Europe, Middle East, and Africa (EMEA)",
+      "Asia-Pacific (APAC)",
+      "Southern US"
+    ],
+    "investor_insight_description": [],
+    "permalink": [
+      "cellnex-telecom-sau",
+      "cellnext-solutions",
+      "cellnique-corporation-usa"
+    ],
+    "url": [
+      "https://www.crunchbase.com/organization/cellnex-telecom-sau",
+      "https://www.crunchbase.com/organization/cellnext-solutions",
+      "https://www.crunchbase.com/organization/cellnique-corporation-usa"
+    ],
+    "facebook": [
+      "http://www.facebook.com/cellnique",
+      "https://www.facebook.com/Cellozorg/",
+      "https://www.facebook.com/cellotel/"
+    ],
+    "founders": [
+      "Robert Coletti, Stefan Bader",
+      "Loïc Texier",
+      "Falko Weber, Mark Jurgeleit"
+    ],
+    "apptopia_total_downloads": [
+      "14",
+      "62189",
+      "10"
+    ],
+    "growth_insight_description": [
+      "Cellva Ingredients raised R$6.5 million to develop cultivated pork fat.",
+      "Celonis entered the Korean market by appointing a new Country Manager.",
+      "CemVision raised €10 million in a seed funding round."
+    ],
+    "growth_insight_indicator": [
+      "growing",
+      "growing",
+      "growing"
+    ],
+    "growth_insight_direction": [
+      "c400_growing",
+      "c400_growing",
+      "c400_growing"
+    ],
+    "growth_insight_confidence": [
+      "c400_high",
+      "c400_high",
+      "c300_medium"
+    ],
+    "listed_stock_symbol": [
+      "LSE:CBX",
+      "NASDAQ:CELH",
+      "LSE:CLA"
+    ],
+    "hub_tags": [
+      "unicorn",
+      "cbvp",
+      "cbvp"
+    ],
+    "num_exits": [
+      "1",
+      "1",
+      "1"
+    ]
+  },
+  "validity": {
+    "contact_email": "3/3 valid-shape",
+    "phone_number": "3/3 valid-shape"
+  },
+  "entity": "company",
+  "entity_confidence": 0.85,
+  "entity_why": "value-checked override: name=organization name; founders/company_type/num_employees_enum/funding/ipo_status present; no person first/last-name columns",
+  "social_cols": [
+    "facebook",
+    "linkedin",
+    "twitter",
+    "website",
+    "url"
+  ],
+  "activity_match_keys": [
+    "name",
+    "contact_email",
+    "phone_number",
+    "facebook",
+    "linkedin",
+    "twitter",
+    "company_type",
+    "website",
+    "url"
+  ]
+}
