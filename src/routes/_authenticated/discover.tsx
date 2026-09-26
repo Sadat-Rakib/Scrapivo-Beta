@@ -39,7 +39,7 @@ import {
   viewToLegacyLead,
   viewToLocalBusinessRow,
 } from "@/lib/search/qualified-lead-view";
-import { outcomeUi, shouldSurfaceOutcome } from "@/lib/search/outcome-ui";
+import { outcomeUi, shouldSurfaceOutcome, zeroResultsNarrative } from "@/lib/search/outcome-ui";
 
 import {
   UnifiedComposer,
@@ -570,7 +570,7 @@ function DiscoverPage() {
   // looks dead during the S3 scan then pops results "out of blue".
   const [specPending, setSpecPending] = useState(false);
   const [browserProgressRun, setBrowserProgressRun] = useState<string | null>(null);
-  const [browserProgressEvents, setBrowserProgressEvents] = useState<Array<{ id: number; action: string; source?: string; detail?: string }>>([]);
+  const [browserProgressEvents, setBrowserProgressEvents] = useState<Array<{ id: number; action: string; source?: string; detail?: string; count?: number | string }>>([]);
   // M11: only the active search_run_id may mutate results/loading/outcome UI.
   const searchSessionRef = useRef<ActiveSearchSession | null>(null);
   useEffect(() => {
@@ -796,7 +796,7 @@ function DiscoverPage() {
       // Typed outcomes — never bare "No results found"; superseded cancel is silent.
       const uiOutcome = outcomeUi(res.outcome, {
         superseded: session.wasSuperseded(res.search_run_id),
-        detail: res.diagnostics?.[0]?.detail,
+        detail: zeroResultsNarrative(res.retrievalTrace) ?? res.diagnostics?.[0]?.detail,
       });
       if (
         !append &&
@@ -2222,7 +2222,10 @@ function DiscoverPage() {
                     {browserProgressEvents.map((event) => (
                       <div key={event.id} className="flex items-center gap-2 text-xs text-muted-foreground">
                         <span className="size-1.5 rounded-full bg-primary shrink-0" />
-                        <span>{event.action}{event.source ? ` · ${event.source}` : ""}{event.detail ? ` · ${event.detail}` : ""}</span>
+                        <span>
+                          {event.action}{event.source ? ` · ${event.source}` : ""}
+                          {event.count != null ? ` · ${event.count}` : event.detail ? ` · ${event.detail}` : ""}
+                        </span>
                       </div>
                     ))}
                   </div>

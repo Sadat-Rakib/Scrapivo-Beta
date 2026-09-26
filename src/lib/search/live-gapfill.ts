@@ -45,7 +45,7 @@ export type LiveGapfillDeps = {
   /** Injectable browser discovery; production always uses the browser adapter. */
   browser?: ((spec: SearchSpec, options: { searchRunId?: string; signal?: AbortSignal | null; onProgress?: (event: { action: string; source?: string; detail?: string }) => void; researchPlan?: ReturnType<typeof buildResearchPlan>; initialCandidates?: SpecRow[]; desiredCount?: number; isVerified?: (row: SpecRow) => boolean; timeoutMs?: number }) => Promise<SpecRow[]>) | null;
   searchRunId?: string;
-  onBrowserProgress?: (event: { action: string; source?: string; detail?: string }) => void;
+  onBrowserProgress?: (event: { action: string; source?: string; detail?: string; count?: number | string }) => void;
   desiredCount?: number;
   initialCandidates?: SpecRow[];
   isVerified?: (row: SpecRow) => boolean;
@@ -504,7 +504,9 @@ async function runSourceGapfill(
           role: "primary",
           costTier: 1,
         });
+        deps.onBrowserProgress?.({ action: "Searching OpenStreetMap", source: "osm", detail: osmLocation });
         if (rows.length) {
+          deps.onBrowserProgress?.({ action: "Found local businesses", source: "osm", count: rows.length });
           return {
             rows,
             engine: "live-osm",
@@ -551,6 +553,7 @@ async function runSourceGapfill(
           role: "primary",
           costTier: 1,
         });
+        deps.onBrowserProgress?.({ action: "Found job postings", source: "jobs", count: rows.length });
         return {
           rows,
           engine: "live-jobs",
@@ -608,6 +611,7 @@ async function runSourceGapfill(
           role: "primary",
           costTier: step.costTier,
         });
+        deps.onBrowserProgress?.({ action: "Found web candidates", source: "web", count: rows.length });
         if (rows.length) {
           return {
             rows,

@@ -78,7 +78,7 @@ export interface SpecSearchDeps {
   >;
   /** M3: abort in-flight work when signalled. */
   signal?: AbortSignal | null;
-  browserProgress?: (event: { action: string; source?: string; detail?: string }) => void;
+  browserProgress?: (event: { action: string; source?: string; detail?: string; count?: number | string }) => void;
 }
 
 export interface SpecRow {
@@ -553,9 +553,10 @@ export function rowCouldSatisfySpec(spec: SearchSpec, row: SpecRow): boolean {
 }
 
 /**
- * Shared location gate: ISO-aware for known countries ("Canada" matches
- * "CA"), substring otherwise. Used by person/company/investor validation
- * so every entity enforces location the same way.
+ * Shared location gate: metro-aware (GTA rows may say "Toronto"), ISO-aware
+ * for known countries ("Canada" matches "CA"), substring otherwise. Used by
+ * person/company/investor validation so every entity enforces location the
+ * same way.
  */
 function locationOk(
   country: string | null | undefined,
@@ -563,6 +564,13 @@ function locationOk(
   detail: string,
   want: string,
 ): boolean {
+  // Metro asks (GTA, Bay Area, …): member-city rows satisfy even though the
+  // literal metro name never appears on the row. Mirrors the business
+  // branch's metro-aware locationSatisfies check.
+  const wantGeo = resolveCanonicalLocation(want);
+  if (wantGeo?.kind === "metro") {
+    return locationSatisfies(location ?? detail ?? "", wantGeo) || locationSatisfies(detail ?? "", wantGeo);
+  }
   const isoList = COUNTRY_ISO[want.toLowerCase().trim()];
   if (isoList) {
     const rowIso = (country ?? "").toLowerCase().trim();
@@ -1777,7 +1785,7 @@ export async function runSpecSearchCore(
     const known = mergeDuplicateCandidates([...completeRows, ...incompleteRows]);
     const enriched = await enrichCandidatesForSpec(known, spec, {
       signal: deps.signal,
-      maxContactCandidates: process.env.VITEST ? 0 : 8,
+      maxContactCandidates: process.env.VITEST ? 0 : 12,
       maxPaidCalls: 0,
       adapters: deps.enrichmentAdapters,
     });
@@ -1793,6 +1801,10 @@ export async function runSpecSearchCore(
   const { applyWhyMatchGate } = await import("@/lib/search/live-gapfill");
   const qualifiedDbCount = applyWhyMatchGate(completeRows, spec, !!spec.signal_required).kept.length;
   const requestedTarget = pageBaseOffset + limit;
+  // Volume engine (Phase 1): discovery should BROADLY oversample the request.
+  // The user's N is the delivery bar, not the discovery bar — research/enrich
+  // sits between broad discovery and strict qualification.
+  const candidatePoolTarget = Math.min(150, Math.max(requestedTarget * 3, 20));
   const { buildSourcePlan } = await import("@/lib/search/source-plan");
   let executionPlan = buildSourcePlan(spec, undefined, { desiredCount: requestedTarget });
   let providerAttempts: import("@/lib/search/source-plan").ProviderDiagnostic[] = [];
@@ -1802,6 +1814,9 @@ export async function runSpecSearchCore(
   // erase them. Only user cancellation / stale runs discard work.
   let deadlineHit = false;
   const deadlineNow = () => deps.signal?.aborted === true && searchAbortCode(deps.signal) === "SEARCH_DEADLINE";
+  // User-visible activity events (no reasoning — actions and counts only).
+  const emitProgress = (action: string, source?: string, detail?: string, count?: number | string) =>
+    deps.browserProgress?.({ action, source, detail, count });
   if (forceLiveDiscovery) {
     console.info("[spec-run] forced live discovery", { search_run_id: runIds.search_run_id });
   }
@@ -1812,6 +1827,7 @@ export async function runSpecSearchCore(
         ? null
         : {};
   if (liveOpt !== null && (forceLiveDiscovery || spec.signal_required || fieldOf(spec, "needs_live") === "true" || qualifiedDbCount < requestedTarget)) {
+    emitProgress("Stored search complete", "database", undefined, kept.length);
     try {
       const { runLiveGapfill } = await import("@/lib/search/live-gapfill");
       const live = await runLiveGapfill(spec, {
@@ -1819,7 +1835,7 @@ export async function runSpecSearchCore(
         searchRunId: runIds.search_run_id,
         signal: deps.signal,
         onBrowserProgress: deps.browserProgress,
-        desiredCount: Math.min(requestedTarget, 5),
+        desiredCount: Math.min(candidatePoolTarget, 30),
         initialCandidates: [...completeRows, ...incompleteRows],
         // Verification order fix: stamp the Spec opportunity BEFORE judging
         // completeness, so a no-site candidate with structured absence + two
@@ -1848,6 +1864,7 @@ export async function runSpecSearchCore(
       }
       if (live.rows.length) {
         liveCandidateCount = live.rows.length;
+        emitProgress("Live discovery complete", live.engine, undefined, live.rows.length);
         dbMeta.push({
           dbHit: true,
           engine: live.engine,
@@ -1979,11 +1996,12 @@ export async function runSpecSearchCore(
       researchableCount = researchable.length;
       const enriched = await enrichCandidatesForSpec(researchable, spec, {
         signal: deps.signal,
-        maxContactCandidates: process.env.VITEST ? 0 : 8,
+        maxContactCandidates: process.env.VITEST ? 0 : Math.min(14, Math.max(8, Math.ceil(candidatePoolTarget / 4))),
         maxPaidCalls: 0,
         adapters: deps.enrichmentAdapters,
       });
       researchedCount = enriched.rows.length;
+      emitProgress("Enrichment pass complete", "enrich", undefined, `${researchedCount} candidates`);
       const checked = [...knownRows, ...enriched.rows].map((r) => sanitizeSpecRow(r, spec));
       completeRows = checked.filter((r) => r.complete);
       incompleteRows = checked.filter((r) => !r.complete);
@@ -2055,6 +2073,9 @@ export async function runSpecSearchCore(
     completeRows = applyWhyMatchGate(completeRows, spec, !!spec.signal_required).kept;
     // Belt-and-suspenders: only theorem-qualified rows may be delivered.
     completeRows = completeRows.filter((r) => r.disposition === "qualified");
+    if (completeRows.length) {
+      emitProgress("Leads qualified", "verification", undefined, completeRows.length);
+    }
   } catch (e) {
     if (!deadlineNow()) {
       if (e instanceof Error && e.message === "SEARCH_CANCELLED") {

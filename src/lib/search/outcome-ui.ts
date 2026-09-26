@@ -25,6 +25,38 @@ export type OutcomeUiModel = {
 };
 
 /**
+ * Human explanation for an honest zero, derived from the retrieval funnel.
+ * "N candidates were checked but …" instead of a bare zero — the work was
+ * real, the answer should say where it stopped.
+ */
+export function zeroResultsNarrative(
+  trace?: {
+    rawCandidates?: number;
+    postSpecFilter?: number;
+    complete?: number;
+    pendingEnrichment?: number;
+    qualificationRejected?: number;
+    reason?: string;
+  } | null,
+): string | null {
+  if (!trace) return null;
+  const discovered = trace.rawCandidates ?? 0;
+  if (discovered === 0) {
+    return "No public sources returned candidates for this query yet. Try broadening the location or removing a constraint.";
+  }
+  if (trace.reason === "INCOMPLETE" && (trace.pendingEnrichment ?? 0) > 0) {
+    return `${trace.pendingEnrichment} candidates were found, but their public details could not be verified in the time available.`;
+  }
+  if ((trace.qualificationRejected ?? 0) > 0 && (trace.complete ?? 0) > 0) {
+    return `${trace.complete} candidates were checked, but none passed verification. Try broadening criteria or removing a constraint.`;
+  }
+  if ((trace.postSpecFilter ?? 0) === 0) {
+    return `${discovered} candidates were found, but none matched the requested criteria.`;
+  }
+  return null;
+}
+
+/**
  * @param superseded — cancel happened because the user launched another search.
  */
 export function outcomeUi(

@@ -5,6 +5,7 @@ import { AgentBrowserCliAdapter } from "@/lib/research-agent/agent-browser-cli.s
 import type { SearchSpec } from "./search-spec";
 import { makeEvidence } from "./evidence";
 import { classifyPage } from "./page-classify";
+import { extractStructuredFacts, factsFromJsonLdText, type StructuredPageFacts } from "./page-structured";
 import { normalizeDomain, normalizeEntityName, isFirstPartyEntityHost } from "./entity-resolve";
 import { buildResearchPlan, buildCandidateResearchQueries } from "./source-plan";
 import { qualifyLead } from "./qualify";
@@ -21,7 +22,7 @@ export type BrowserExtractedEntity = {
   claims?: Array<{ type: "hiring" | "service_request" | "funding" | "social_ask"; quote: string; eventDate?: string }>;
   fields?: Partial<Record<"role" | "company" | "category" | "industry" | "location" | "country" | "sector" | "stage" | "email" | "phone" | "salary" | "employer" | "opportunity" | "content_topic", QuotedField>>;
 };
-export type BrowserObservedPage = { url: string; title: string; text: string };
+export type BrowserObservedPage = { url: string; title: string; text: string; structured?: StructuredPageFacts };
 export type BrowserDiscoveryOptions = {
   searchRunId?: string;
   signal?: AbortSignal | null;
@@ -35,7 +36,7 @@ export type BrowserDiscoveryOptions = {
   desiredCount?: number;
   isVerified?: (row: SpecRow) => boolean;
   onCandidateMemory?: (candidates: BrowserCandidateMemory[]) => void;
-  onProgress?: (event: { action: string; source?: string; detail?: string }) => void;
+  onProgress?: (event: { action: string; source?: string; detail?: string; count?: number | string }) => void;
   extractEntities?: (pages: BrowserObservedPage[], spec: SearchSpec) => Promise<BrowserExtractedEntity[]>;
 };
 
@@ -438,7 +439,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       })]);
     } finally { if (cancel) controller.signal.removeEventListener("abort", cancel); }
   };
-  const progress = (action: string, source?: string, detail?: string) => options.onProgress?.({ action, source, detail });
+  const progress = (action: string, source?: string, detail?: string, count?: number | string) => options.onProgress?.({ action, source, detail, count });
   const log = (fields: Record<string, unknown>) => console.log(`[browser-live] ${JSON.stringify({ run, ...fields })}`);
   const isVerified = options.isVerified ?? ((row: SpecRow) => qualifyLead(row, spec, row.evidence).disposition === "qualified");
   const refresh = (candidate: BrowserCandidateMemory) => {
@@ -542,11 +543,14 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
         const response = await resilientFetch(link.url, { retries: 0, signal: AbortSignal.timeout(5_000) });
         const finalUrl = publicUrl(response.url || link.url);
         if (!response.ok || !finalUrl || !/html/i.test(response.headers.get("content-type") ?? "")) return null;
-        const $ = load((await response.text()).slice(0, 250_000));
+        const html = (await response.text()).slice(0, 250_000);
+        // Structured facts must come from the raw HTML — cheerio strips scripts.
+        const structured = extractStructuredFacts(html);
+        const $ = load(html);
         $("script,style,noscript,svg").remove();
         const text = $("body").text().replace(/\s+/g, " ").trim().slice(0, 18_000);
         if (text.length < 100 || /(?:captcha|verify you are human|access denied)/i.test(text.slice(0, 500))) return null;
-        const value = { page: { url: finalUrl, title: $("title").text().trim(), text }, links: [] };
+        const value = { page: { url: finalUrl, title: $("title").text().trim(), text, structured }, links: [] };
         pageCache.set(link.url, value);
         progress("Read page", new URL(finalUrl).hostname, `${text.length} characters`);
         return value;
@@ -572,24 +576,99 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       }
       progress("Opened result", domain);
       if (blocked(snapshot) || !publicUrl(snapshot.url)) return await httpFallback();
-      let extracted = await bounded(browser.extract(session!, { fields: { body: { selector: "body" } } }));
+      let extracted = await bounded(browser.extract(session!, { fields: { body: { selector: "body" }, jsonld: { selector: 'script[type="application/ld+json"]' } } }));
       check();
       let text = (extracted.values.body || snapshot.visibleRelevantText).slice(0, 18_000);
+      const structured = extracted.values.jsonld ? factsFromJsonLdText(String(extracted.values.jsonld)) : undefined;
       const thin = () => text.replace(/\s+/g, " ").trim().length < 100;
       if (thin()) {
         try {
           snapshot = (await bounded(browser.scroll(session!, null, "down"))).snapshot;
           if (blocked(snapshot)) return null;
-          extracted = await bounded(browser.extract(session!, { fields: { body: { selector: "body" } } }));
+          extracted = await bounded(browser.extract(session!, { fields: { body: { selector: "body" }, jsonld: { selector: 'script[type="application/ld+json"]' } } }));
           text = (extracted.values.body || snapshot.visibleRelevantText).slice(0, 18_000);
         } catch { check(); }
       }
       if (thin() || /(?:sign in|log in) to (?:continue|view)|enable javascript|verify you are human/i.test(text.slice(0, 500)) && text.length < 500) return await httpFallback();
-      const value = { page: { url: snapshot.url, title: snapshot.title, text }, links: snapshot.links };
+      const structuredFacts = structured ?? (extracted.values.jsonld ? factsFromJsonLdText(String(extracted.values.jsonld)) : undefined);
+      const value = { page: { url: snapshot.url, title: snapshot.title, text, structured: structuredFacts }, links: snapshot.links };
       pageCache.set(link.url, value);
       progress("Read page", domain, `${text.length} characters`);
       return value;
     } catch { check(); log({ source: domain, action: "navigate", status: "failed" }); return await httpFallback(); }
+  };
+  // JSON-LD JobPosting rows: deterministic, quote-able, no model needed.
+  const structuredJobRows = (pages: BrowserObservedPage[]): SpecRow[] => {
+    const rows: SpecRow[] = [];
+    for (const page of pages) {
+      for (const job of page.structured?.jobs ?? []) {
+        if (!job.title?.trim()) continue;
+        const id = `job:jsonld:${createHash("sha256").update(`${page.url}|${job.title}|${job.employer ?? ""}`).digest("hex").slice(0, 24)}`;
+        const applyUrl = job.url && /^https?:\/\//.test(job.url) ? job.url : page.url;
+        rows.push({
+          key: id,
+          entity_id: id,
+          entity_resolved: true,
+          identity_confidence: 0.9,
+          kind: "job",
+          title: job.employer ? `${job.title} @ ${job.employer}` : job.title,
+          detail: [job.employer, job.location, job.employmentType].filter(Boolean).join(" | "),
+          employer: job.employer ?? null,
+          salary: job.salary ?? null,
+          location: job.location ?? null,
+          source_url: page.url,
+          apply_url: applyUrl,
+          url: applyUrl,
+          page_type: "job_posting",
+          source_page_type: "job_posting",
+          evidence: [
+            makeEvidence({
+              source_url: page.url,
+              source_type: "web",
+              evidence_type: "identity",
+              supports: "identity",
+              subject: id,
+              excerpt: `${job.title}${job.employer ? ` at ${job.employer}` : ""} (structured job posting)`,
+              confidence: 0.85,
+              extraction_method: "json_ld_job_posting",
+              observed_at: new Date().toISOString(),
+              event_at: job.datePosted ? `${job.datePosted}T00:00:00.000Z` : null,
+              claim_parameters: job.employer ? { role: job.title, organization_name: job.employer } : { role: job.title },
+            }),
+          ],
+          verification_status: "discovered",
+        } as SpecRow);
+      }
+    }
+    return rows;
+  };
+  // First-party contacts from structured facts: only when the page IS the
+  // candidate's own site (host match) — never from a third-party page.
+  const mergeStructuredContacts = (candidate: BrowserCandidateMemory, page?: BrowserObservedPage) => {
+    const facts = page?.structured;
+    if (!facts || (!facts.emails.length && !facts.phones.length)) return;
+    const hostOf = (url?: string | null) => {
+      try {
+        return url ? new URL(url).hostname.replace(/^www\./, "") : "";
+      } catch {
+        return "";
+      }
+    };
+    const siteHost = hostOf(candidate.row.website_url);
+    if (!siteHost || hostOf(page.url) !== siteHost) return;
+    let merged = false;
+    if (!candidate.row.email && facts.emails[0]) {
+      candidate.row = { ...candidate.row, email: facts.emails[0] };
+      merged = true;
+    }
+    if (!candidate.row.phone && facts.phones[0]) {
+      candidate.row = { ...candidate.row, phone: facts.phones[0] };
+      merged = true;
+    }
+    if (merged) {
+      refresh(candidate);
+      progress("Found public contact", hostOf(page.url), candidate.row.title);
+    }
   };
   const extract = async (pages: BrowserObservedPage[], query?: string, candidate?: BrowserCandidateMemory) => {
     if (!pages.length) return;
@@ -597,6 +676,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       const entities = await bounded((options.extractEntities ?? extractEntities)(pages, spec));
       check();
       remember(browserEntitiesToRows(entities, pages), query, candidate);
+      if (spec.entity === "job") remember(structuredJobRows(pages), query, candidate);
       progress("Extracted candidates", undefined, `${memory.length} candidates; ${verifiedCount()} verified`);
     } catch (error) { check(); extractionError = error; log({ action: "extract", status: "failed" }); }
   };
@@ -604,7 +684,9 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
     refresh(candidate);
     const done = () => candidate.status === "verified" || candidate.status === "rejected";
     if (done() || limitReached()) return;
-    progress("Researching", undefined, candidate.row.title);
+    const researchedSoFar = memory.filter((item) => item.attempts > 0).length;
+    progress("Researching", undefined, candidate.row.title, `${Math.min(researchedSoFar + 1, memory.length)}/${memory.length}`);
+    const verifiedBefore = verifiedCount();
     let secondary = 0;
     const probeFirstPartyDomains = async () => {
       if (candidate.row.website_url || candidate.row.profile_url ||
@@ -712,6 +794,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
         if (candidate.visitedUrls.length >= 4 || limitReached()) break;
         const value = await readPage(link, candidate);
         if (!value) continue;
+        mergeStructuredContacts(candidate, value.page);
         inspectedThisCheck++;
         const observedName = candidate.row.kind === "person" ? candidate.row.company ?? candidate.row.title : candidate.row.title;
         const synthetic: BrowserExtractedEntity = { page: 0, kind: candidate.row.kind, name: candidate.row.title, identityQuote: candidate.row.title };
@@ -799,6 +882,9 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       if (done()) break;
     }
     refresh(candidate);
+    if (verifiedCount() > verifiedBefore) {
+      progress("Leads verified", undefined, undefined, verifiedCount());
+    }
     if (!done()) {
       candidate.status = "exhausted";
       candidate.verificationStatus = "unresolved";
@@ -826,10 +912,22 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
     const initiallyResearched = new Set<BrowserCandidateMemory>();
     let sourcePagesResearched = 0;
     const hasDiscoveryQueries = (options.discoveryQueries ?? plan.discoveryQueries).length > 0;
+    // Cheap pre-ranking (research PRIORITIZATION, not qualification): fewest
+    // unmet needs first, then stronger identity, then contact-ready rows.
+    const researchRank = (item: BrowserCandidateMemory) => ({
+      needs: item.needs.length,
+      identity: -(item.row.identity_confidence ?? 0),
+      contact: item.row.email || item.row.phone ? 0 : 1,
+    });
+    const byResearchRank = (a: BrowserCandidateMemory, b: BrowserCandidateMemory) => {
+      const x = researchRank(a);
+      const y = researchRank(b);
+      return x.needs - y.needs || x.identity - y.identity || x.contact - y.contact;
+    };
     while (initiallyResearched.size < 12 && !limitReached()) {
       const candidate = memory
         .filter((item) => item.row.entity_resolved && !initiallyResearched.has(item))
-        .sort((a, b) => a.needs.length - b.needs.length)[0] ??
+        .sort(byResearchRank)[0] ??
         (!hasDiscoveryQueries && sourcePagesResearched < 3 ? memory.find((item) => !initiallyResearched.has(item)) : undefined);
       if (!candidate) break;
       initiallyResearched.add(candidate);
@@ -854,7 +952,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       }
       await extract(pages, query);
       // PASS B: revisit each newly discovered plausible entity intentionally.
-      for (const candidate of memory.slice(before).sort((a, b) => a.needs.length - b.needs.length)) {
+      for (const candidate of memory.slice(before).sort(byResearchRank)) {
         if (limitReached()) break;
         await research(candidate);
         if (verifiedCount() >= plan.desiredCount) break;

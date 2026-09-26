@@ -3,6 +3,8 @@ export type SearchBrowserProgressEvent = {
   action: string;
   source?: string;
   detail?: string;
+  /** Optional quantitative payload: "Found N candidates", "4/15 researched". */
+  count?: number | string;
   at: string;
 };
 
@@ -15,7 +17,7 @@ type ProgressRun = {
 
 const runs = new Map<string, ProgressRun>();
 const TTL_MS = 10 * 60_000;
-const MAX_EVENTS = 40;
+const MAX_EVENTS = 80;
 
 export function beginSearchBrowserProgress(runId: string, ownerId: string) {
   const now = Date.now();

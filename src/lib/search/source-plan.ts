@@ -359,8 +359,8 @@ export function buildResearchPlan(
     desiredCount,
     stoppingRules: {
       maxQueries: Math.min(6, Math.max(3, discoveryQueries.length)),
-      maxPages: Math.max(12, Math.min(40, desiredCount * 4)),
-      maxCandidates: Math.min(30, Math.max(desiredCount * 3, 12)),
+      maxPages: Math.max(12, Math.min(60, desiredCount * 4)),
+      maxCandidates: Math.min(60, Math.max(desiredCount * 2, 20)),
       maxNoProgressQueries: 2,
     },
   };

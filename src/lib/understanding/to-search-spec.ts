@@ -59,6 +59,29 @@ export function frameToSearchSpec(input: UnderstandingFrame): SearchSpec {
     const next = { field, value, stated, confidence };
     if (index < 0) criteria.push(next); else criteria[index] = next;
   };
+  // Last-chance geography: the deterministic segmenter can miss multi-word
+  // canonical places ("HVAC companies in the Greater Toronto Area") when a
+  // strict place-span rule rejects the leading modifier. Bounded n-gram scan
+  // against the curated geo index — a canonical hit becomes the location.
+  // Runs only when the frame produced NO location at all.
+  if (!criteria.some((c) => c.field === 'location')) {
+    const words = raw.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean);
+    outer: for (let n = Math.min(4, words.length); n >= 2; n--) {
+      for (let i = 0; i + n <= words.length; i++) {
+        const phrase = words.slice(i, i + n).join(' ');
+        const geo = resolveCanonicalLocation(phrase);
+        if (geo && ['metro', 'city', 'country', 'admin'].includes(geo.kind)) {
+          put('location', geo.name, 0.6);
+          put('location_id', geo.id);
+          put('location_kind', geo.kind);
+          if (geo.country_code) put('location_country', geo.country_code);
+          if (geo.scope) put('location_scope', geo.scope);
+          if (geo.parent_ids.length) put('location_parents', geo.parent_ids.join(','));
+          break outer;
+        }
+      }
+    }
+  }
   const descriptor = (field: string, value: OpenValue | null | undefined, transform = (s: string) => s) => {
     if (value) put(field, transform(valueOf(value)), value.confidence, !!value.raw);
   };
