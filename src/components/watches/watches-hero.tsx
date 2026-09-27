@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { HeroVideo } from "@/components/hero-video";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { listProjects } from "@/lib/projects.functions";
+import { getSearchJob } from "@/lib/search-jobs.functions";
 import {
   createSignalWatch,
   deleteSignalWatch,
@@ -18,6 +20,16 @@ type Step = "idle" | "q1" | "q2" | "confirm";
 
 const Q1_PLACEHOLDER = "e.g. Watch for SaaS founders hiring engineers rn";
 
+const TERMINAL_JOB_STATUSES = ["completed", "failed", "stopped"];
+
+interface RunProgress {
+  watchId: string;
+  jobId: string;
+  status: string;
+  qualified: number;
+  discovered: number;
+}
+
 /**
  * Saved-watches drawer — same list data and actions as the legacy panel
  * (run / delete), presented in a drawer so the hero viewport stays clean.
@@ -27,18 +39,59 @@ function SavedWatchesDrawer({ open, onOpenChange }: { open: boolean; onOpenChang
   const list = useServerFn(listSignalWatches);
   const remove = useServerFn(deleteSignalWatch);
   const runOne = useServerFn(runSignalWatch);
+  const getJob = useServerFn(getSearchJob);
+  const projectsQ = useQuery({ queryKey: ["projects-list"], queryFn: () => listProjects() });
+  const projectName = (id: string | null | undefined) =>
+    id ? (projectsQ.data?.projects ?? []).find((p) => p.id === id)?.name ?? null : null;
   const q = useQuery({ queryKey: ["signal-watches"], queryFn: () => list() });
+
+  // Run-now progress: runSignalWatch enqueues a durable job; this poller rides
+  // getSearchJob until a terminal status, then reflects the outcome.
+  const [runState, setRunState] = useState<RunProgress | null>(null);
+
+  useEffect(() => {
+    if (!runState) return;
+    if (TERMINAL_JOB_STATUSES.includes(runState.status)) {
+      if (runState.status === "completed") {
+        toast.success(`${runState.qualified} matches found — new signals will be delivered`);
+        qc.invalidateQueries({ queryKey: ["signal-watches"] });
+      } else {
+        toast.error("Watch run failed — check back later");
+      }
+      const t = window.setTimeout(() => setRunState(null), 4000);
+      return () => window.clearTimeout(t);
+    }
+    const id = window.setInterval(() => {
+      void (async () => {
+        try {
+          const job = await getJob({ data: { id: runState.jobId } });
+          if (job) {
+            setRunState((s) =>
+              s && s.jobId === job.id
+                ? { ...s, status: job.status, qualified: job.qualified_count, discovered: job.discovered_count }
+                : s,
+            );
+          }
+        } catch {
+          // transient — the next tick retries
+        }
+      })();
+    }, 3000);
+    return () => window.clearInterval(id);
+  }, [runState, getJob, qc]);
 
   const runMut = useMutation({
     mutationFn: (id: string) => runOne({ data: { id } }),
     onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ["signal-watches"] });
-      qc.invalidateQueries({ queryKey: ["usage"] });
       if (res.error === "limit") {
         toast.error(res.message ?? "Search limit reached");
         return;
       }
-      toast.success(`${res.results_count} leads for this signal`);
+      if (res.jobId) {
+        setRunState({ watchId: res.id, jobId: res.jobId, status: res.status ?? "queued", qualified: 0, discovered: 0 });
+        toast("Watch run queued");
+      }
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -64,6 +117,9 @@ function SavedWatchesDrawer({ open, onOpenChange }: { open: boolean; onOpenChang
           )}
           {q.data?.map((w: any) => {
             const icp = (w.icp || {}) as CampaignIcp;
+            const changeMode = (w.change_mode || "new_entity") as "new_entity" | "new_signal";
+            const channels: string[] = w.delivery?.channels ?? ["in_app"];
+            const running = runState?.watchId === w.id;
             return (
               <div
                 key={w.id}
@@ -71,19 +127,49 @@ function SavedWatchesDrawer({ open, onOpenChange }: { open: boolean; onOpenChang
               >
                 <div className="min-w-0">
                   <div className="text-sm font-semibold text-white truncate">{w.name || w.query}</div>
-                  <div className="text-xs text-white/50 mt-0.5">
-                    {icp.schedule || "daily"}
-                    {icp.signal_family ? ` · ${icp.signal_family}` : ""}
+                  <div className="text-xs text-white/50 mt-0.5 flex flex-wrap items-center gap-1.5">
+                    <span>{icp.schedule || "daily"}</span>
+                    {w.project_id && projectName(w.project_id) && (
+                      <span>· {projectName(w.project_id)}</span>
+                    )}
                     {typeof icp.last_results_count === "number"
-                      ? ` · last ${icp.last_results_count} leads`
+                      ? ` · last ${icp.last_results_count} new`
                       : ""}
                     {w.last_run_at ? ` · ran ${new Date(w.last_run_at).toLocaleString()}` : " · never run"}
+                  </div>
+                  <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[10px] font-medium">
+                    <span
+                      className={`rounded-full px-2 py-0.5 border ${
+                        changeMode === "new_signal"
+                          ? "border-amber-400/30 text-amber-300 bg-amber-400/10"
+                          : "border-emerald-400/30 text-emerald-300 bg-emerald-400/10"
+                      }`}
+                    >
+                      {changeMode === "new_signal" ? "new signal" : "new entity"}
+                    </span>
+                    {channels.map((c) => (
+                      <span
+                        key={c}
+                        className="rounded-full px-2 py-0.5 border border-white/15 text-white/60 bg-white/[0.04]"
+                      >
+                        {c}
+                      </span>
+                    ))}
+                    {running && (
+                      <span className="rounded-full px-2 py-0.5 border border-sky-400/30 text-sky-300 bg-sky-400/10">
+                        {runState!.status === "completed"
+                          ? `done · ${runState!.qualified} matches`
+                          : runState!.status === "queued"
+                            ? "job queued"
+                            : `running · found ${runState!.discovered}`}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     type="button"
-                    disabled={runMut.isPending}
+                    disabled={runMut.isPending || running}
                     onClick={() => runMut.mutate(w.id)}
                     className="glass-pill px-3 py-1.5 text-xs font-medium text-white/80 hover:text-white flex items-center gap-1.5"
                   >

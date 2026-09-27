@@ -28,6 +28,7 @@ import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProjectsIndexRouteImport } from './routes/_authenticated/projects.index'
 import { Route as ApiWebhooksResendRouteImport } from './routes/api/webhooks/resend'
 import { Route as ApiCronEmailSequencesRouteImport } from './routes/api/cron/email-sequences'
+import { Route as ApiCronSignalWatchesRouteImport } from './routes/api/cron/signal-watches'
 import { Route as AuthenticatedSettingsProfileRouteImport } from './routes/_authenticated/settings/profile'
 import { Route as AuthenticatedProjectsProjectIdRouteImport } from './routes/_authenticated/projects.$projectId'
 import { Route as ApiResearchSessionIdEventsRouteImport } from './routes/api/research/$sessionId/events'
@@ -129,6 +130,11 @@ const ApiCronEmailSequencesRoute = ApiCronEmailSequencesRouteImport.update({
   path: '/api/cron/email-sequences',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCronSignalWatchesRoute = ApiCronSignalWatchesRouteImport.update({
+  id: '/api/cron/signal-watches',
+  path: '/api/cron/signal-watches',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedSettingsProfileRoute =
   AuthenticatedSettingsProfileRouteImport.update({
     id: '/settings/profile',
@@ -173,6 +179,9 @@ export interface FileRoutesByFullPath {
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRouteWithChildren
   '/settings/profile': typeof AuthenticatedSettingsProfileRoute
   '/api/cron/email-sequences': typeof ApiCronEmailSequencesRoute
+  '/api/cron/signal-watches': typeof ApiCronSignalWatchesRoute
+  '/api/cron/signal-watches': typeof ApiCronSignalWatchesRoute
+  '/api/cron/signal-watches': typeof ApiCronSignalWatchesRoute
   '/api/webhooks/resend': typeof ApiWebhooksResendRoute
   '/projects/': typeof AuthenticatedProjectsIndexRoute
   '/api/research/$sessionId/events': typeof ApiResearchSessionIdEventsRoute
@@ -249,6 +258,7 @@ export interface FileRouteTypes {
     | '/projects/$projectId'
     | '/settings/profile'
     | '/api/cron/email-sequences'
+    | '/api/cron/signal-watches'
     | '/api/webhooks/resend'
     | '/projects/'
     | '/api/research/$sessionId/events'
@@ -310,6 +320,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   ApiCronEmailSequencesRoute: typeof ApiCronEmailSequencesRoute
+  ApiCronSignalWatchesRoute: typeof ApiCronSignalWatchesRoute
   ApiWebhooksResendRoute: typeof ApiWebhooksResendRoute
   ApiResearchSessionIdEventsRoute: typeof ApiResearchSessionIdEventsRoute
 }
@@ -449,6 +460,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCronEmailSequencesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/cron/signal-watches': {
+      id: '/api/cron/signal-watches'
+      path: '/api/cron/signal-watches'
+      fullPath: '/api/cron/signal-watches'
+      preLoaderRoute: typeof ApiCronSignalWatchesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/settings/profile': {
       id: '/_authenticated/settings/profile'
       path: '/settings/profile'
@@ -541,6 +559,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   ApiCronEmailSequencesRoute: ApiCronEmailSequencesRoute,
+  ApiCronSignalWatchesRoute: ApiCronSignalWatchesRoute,
   ApiWebhooksResendRoute: ApiWebhooksResendRoute,
   ApiResearchSessionIdEventsRoute: ApiResearchSessionIdEventsRoute,
 }

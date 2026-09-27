@@ -1,0 +1,327 @@
+/**
+ * WS7A deep-signal pass — offline unit battery (injected hunters).
+ *
+ * Core invariant: a base-eligible candidate that lacks a signal gets signal
+ * research BEFORE final rejection (kills the circular drop), and the final
+ * gate stays exactly as strict as today (no weakening, no fabricated signals).
+ */
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { applyWhyMatchGate } from "@/lib/search/live-gapfill";
+import { buildSpec, stated } from "@/lib/search/search-spec";
+import type { SearchSpec } from "@/lib/search/search-spec";
+import type { Evidence } from "@/lib/search/evidence";
+import type { SpecRow } from "@/lib/spec-search.functions";
+import {
+  createDefaultSignalHunter,
+  finalQualify,
+  rowHasVerifiedSignal,
+  runDeepSignalPass,
+  splitBaseEligibility,
+  verifiedSignalEvidence,
+} from "../deep-pass.server";
+
+afterEach(() => {
+  vi.useRealTimers();
+});
+
+const spec: SearchSpec = buildSpec({
+  entity: "company",
+  criteria: [stated("requested_service", "website redesign")],
+  signal_required: true,
+  signal_types: ["service_request"],
+  raw_query: "software companies that need a website redesign",
+});
+
+const optionalSpec: SearchSpec = buildSpec({
+  entity: "company",
+  criteria: [stated("industry", "software")],
+  signal_required: false,
+  raw_query: "software companies",
+});
+
+const row = (over: Partial<SpecRow> = {}): SpecRow => ({
+  kind: "company",
+  title: "Acme Dynamics",
+  detail: "Software company",
+  entity_id: "company:acme",
+  entity_resolved: true,
+  page_type: "company_page",
+  complete: true,
+  ...over,
+});
+
+const ev = (over: Partial<Evidence> = {}): Evidence => ({
+  source_url: "https://news.example/acme-needs-website",
+  source_type: "web",
+  excerpt: "Acme Dynamics says it needs a website redesign",
+  observed_at: new Date().toISOString(),
+  event_at: new Date(Date.now() - 2 * 86_400_000).toISOString(),
+  evidence_type: "service_request",
+  supports: "requested_service",
+  confidence: 0.7,
+  extraction_method: "searxng_snippet",
+  subject: "company:acme",
+  claim_parameters: { service: "website redesign" },
+  ...over,
+});
+
+describe("splitBaseEligibility", () => {
+  it("is spec minus the signal dimension: fit failures split off, signalless rows stay eligible", () => {
+    const fits = row();
+    const contradicted = row({ title: "Acme Dynamics", detail: "retail shop", category: "retail", industry: "retail" });
+    // company + industry criterion: a "retail" row must fail the fit gate
+    const s = buildSpec({
+      entity: "company",
+      criteria: [stated("industry", "software")],
+      signal_required: true,
+      raw_query: "software companies needing redesigns",
+    });
+    const { baseEligible, baseRejected } = splitBaseEligibility([fits, contradicted], s);
+    expect(baseEligible.map((r) => r.entity_id)).toEqual(["company:acme"]);
+    expect(baseRejected).toHaveLength(1);
+  });
+});
+
+describe("runDeepSignalPass + finalQualify (circular-bug scenario)", () => {
+  it("today's gate rejects a signalless candidate BEFORE any research; the new pipeline qualifies it after the hunt", async () => {
+    const r = row();
+    // Sanity: the circular bug is real — requireSignal gate drops it pre-hunt.
+    expect(applyWhyMatchGate([r], spec, true).kept).toHaveLength(0);
+
+    const events: string[] = [];
+    const deep = await runDeepSignalPass([r], spec, {
+      hunter: async (candidate, s, ctx) => {
+        expect(candidate.entity_id).toBe("company:acme");
+        expect(s.signal_required).toBe(true);
+        expect(ctx.probesLeft).toBeGreaterThan(0);
+        return [ev()];
+      },
+      onProgress: (e) => events.push(e.action),
+    });
+
+    expect(deep.probes).toBe(1);
+    expect(deep.signalReady).toHaveLength(1);
+    expect(deep.signalReady[0]!.evidence).toHaveLength(1);
+    expect(events).toContain("Signal research started");
+    expect(events).toContain("Signal research finished");
+
+    const final = finalQualify({
+      signalReady: deep.signalReady,
+      alreadySignalRows: [...deep.alreadyVerified, ...deep.stillUnsignaled, ...deep.notResearched],
+      spec,
+    });
+    expect(final.qualified).toHaveLength(1);
+    expect(final.qualified[0]!.entity_id).toBe("company:acme");
+    expect(final.qualified[0]!.why_match).toContain("website redesign");
+  });
+
+  it("hunter finds nothing → row stays rejected with an honest reason", async () => {
+    const r = row();
+    const deep = await runDeepSignalPass([r], spec, { hunter: async () => null });
+    expect(deep.stillUnsignaled).toHaveLength(1);
+    expect(deep.signalReady).toHaveLength(0);
+
+    const final = finalQualify({
+      signalReady: deep.signalReady,
+      alreadySignalRows: [...deep.alreadyVerified, ...deep.stillUnsignaled],
+      spec,
+    });
+    expect(final.qualified).toHaveLength(0);
+    expect(final.rejected).toHaveLength(1);
+    expect(final.rejected[0]!.code).toBe("NO_CLAIM_EVIDENCE");
+  });
+});
+
+describe("budget discipline", () => {
+  it("pass deadline mid-hunt: processed rows finalize, the rest are honestly notResearched", async () => {
+    const first = row({ title: "First Corp", entity_id: "company:first" });
+    const second = row({ title: "Second Corp", entity_id: "company:second" });
+    const third = row({ title: "Third Corp", entity_id: "company:third" });
+
+    const deep = await runDeepSignalPass([first, second, third], spec, {
+      budgetMs: 20,
+      concurrency: 1,
+      hunter: async (candidate) => {
+        if (candidate.entity_id === "company:first") {
+          await new Promise((res) => setTimeout(res, 40));
+          return [ev({ subject: "company:first", source_url: "https://news.example/first" })];
+        }
+        return null;
+      },
+    });
+
+    expect(deep.deadlineHit).toBe(true);
+    // In-flight work finished and finalized (researched-so-far → signalReady).
+    expect(deep.signalReady.map((r) => r.entity_id)).toEqual(["company:first"]);
+    // Rows never probed are reported honestly, not silently dropped.
+    expect(deep.notResearched.map((r) => r.entity_id)).toEqual(["company:second", "company:third"]);
+    expect(deep.stillUnsignaled).toHaveLength(0);
+    expect(deep.probes).toBe(1);
+  });
+
+  it("per-candidate probe cap is respected", async () => {
+    const calls = new Map<string, number>();
+    const a = row({ title: "Alpha Corp", entity_id: "company:alpha" });
+    const b = row({ title: "Beta Corp", entity_id: "company:beta" });
+    const deep = await runDeepSignalPass([a, b], spec, {
+      probesPerCandidate: 2,
+      concurrency: 2,
+      hunter: async (candidate) => {
+        calls.set(candidate.entity_id!, (calls.get(candidate.entity_id!) ?? 0) + 1);
+        return null;
+      },
+    });
+    expect(deep.probes).toBe(4);
+    expect([...calls.values()].sort()).toEqual([2, 2]);
+  });
+
+  it("stuck probe cannot stall the pass: per-probe timeout finalizes the row (fake timers)", async () => {
+    vi.useFakeTimers();
+    const r = row({ title: "Stuck Corp", entity_id: "company:stuck" });
+    const pass = runDeepSignalPass([r], spec, {
+      probeTimeoutMs: 500,
+      hunter: async () => new Promise<Evidence[]>(() => undefined), // never resolves
+    });
+    // Default cap = 2 probes: each burns its own 500ms timeout, then the row
+    // finalizes honestly instead of stalling the pass.
+    await vi.advanceTimersByTimeAsync(1_600);
+    const deep = await pass;
+    expect(deep.probes).toBe(2);
+    expect(deep.stillUnsignaled).toHaveLength(1);
+    expect(deep.signalReady).toHaveLength(0);
+  });
+});
+
+describe("signal-optional specs keep today's behavior", () => {
+  it("the pass is never invoked: hunter zero calls, rows pass through untouched", async () => {
+    const hunter = vi.fn(async () => [ev()]);
+    const r = row();
+    const deep = await runDeepSignalPass([r], optionalSpec, { hunter });
+    expect(hunter).not.toHaveBeenCalled();
+    expect(deep.probes).toBe(0);
+    expect(deep.alreadyVerified).toHaveLength(1);
+    expect(deep.signalReady).toHaveLength(0);
+    expect(deep.alreadyVerified[0]).toBe(r);
+  });
+});
+
+describe("no fabricated signals", () => {
+  it.each([
+    ["no subject binding", { subject: undefined }],
+    ["subject bound to another entity", { subject: "company:someone-else" }],
+    ["no source_url", { source_url: "" }],
+    ["non-http source", { source_url: "ftp://files.example/x" }],
+    ["no observed_at", { observed_at: "" }],
+    ["unparseable observed_at", { observed_at: "not-a-date" }],
+    ["no excerpt", { excerpt: "" }],
+    ["not a demand signal (identity)", { evidence_type: "identity" as const }],
+    ["absurd confidence", { confidence: 5 }],
+  ])("evidence with %s is never counted verified", async (_name, over) => {
+    const r = row();
+    expect(rowHasVerifiedSignal(r)).toBe(false);
+    expect(verifiedSignalEvidence(r, [ev(over)])).toHaveLength(0);
+
+    const deep = await runDeepSignalPass([r], spec, { hunter: async () => [ev(over)] });
+    expect(deep.signalReady).toHaveLength(0);
+    expect(deep.stillUnsignaled).toHaveLength(1);
+    expect(deep.stillUnsignaled[0]!.evidence).toBeUndefined();
+  });
+
+  it("rows with no stable entity id cannot receive verified evidence at all", () => {
+    const provisional = row({ entity_id: "provisional:acme", key: undefined });
+    expect(verifiedSignalEvidence(provisional, [ev()])).toHaveLength(0);
+    const noId = row({ entity_id: undefined, key: undefined });
+    expect(verifiedSignalEvidence(noId, [ev({ subject: "company:acme" })])).toHaveLength(0);
+  });
+
+  it("duplicate evidence (same source + excerpt + type) is not double-attached", () => {
+    const r = row({ evidence: [ev()] });
+    expect(verifiedSignalEvidence(r, [ev()])).toHaveLength(0);
+    expect(verifiedSignalEvidence(r, [ev({ source_url: "https://other.example/post" })])).toHaveLength(1);
+  });
+});
+
+describe("no gate weakening in finalQualify", () => {
+  it("already-verified rows skip research but still face the full theorem gate", async () => {
+    // Spec WITH a recency constraint — event 200d old is stale, 2d is fresh.
+    const recencySpec: SearchSpec = buildSpec({
+      entity: "company",
+      criteria: [stated("requested_service", "website redesign")],
+      signal_required: true,
+      signal_types: ["service_request"],
+      signal_recency: "30d",
+      raw_query: "software companies that need a website redesign",
+    });
+    // Structurally verified evidence, but the event is stale (200d > 30d window).
+    const stale = row({ evidence: [ev({ event_at: new Date(Date.now() - 200 * 86_400_000).toISOString() })] });
+    expect(rowHasVerifiedSignal(stale)).toBe(true);
+    const fresh = row({ title: "Fresh Corp", entity_id: "company:fresh" });
+
+    const deep = await runDeepSignalPass([stale, fresh], recencySpec, {
+      hunter: async (candidate) => [
+        ev({ subject: candidate.entity_id!, source_url: "https://news.example/fresh-lead" }),
+      ],
+    });
+    // Stale row was never probed (already verified)…
+    expect(deep.alreadyVerified.map((r) => r.entity_id)).toEqual(["company:acme"]);
+    expect(deep.signalReady.map((r) => r.entity_id)).toEqual(["company:fresh"]);
+
+    const final = finalQualify({
+      signalReady: deep.signalReady,
+      alreadySignalRows: deep.alreadyVerified,
+      spec: recencySpec,
+    });
+    // …and the gate still rejects it on temporal grounds — strictness kept.
+    expect(final.qualified.map((r) => r.entity_id)).toEqual(["company:fresh"]);
+    const staleRejection = final.rejected.find((r) => r.row.entity_id === "company:acme");
+    expect(staleRejection?.code).toBe("TEMPORAL_STALE");
+  });
+
+  it("base-rejected rows (fit failure) also face the full gate in the union", async () => {
+    const soft = buildSpec({
+      entity: "company",
+      criteria: [stated("industry", "software"), stated("requested_service", "website redesign")],
+      signal_required: true,
+      raw_query: "software companies needing redesigns",
+    });
+    const retail = row({ category: "retail", industry: "retail" });
+    const deep = await runDeepSignalPass([retail], soft, { hunter: null });
+    expect(deep.stillUnsignaled).toHaveLength(1);
+    const final = finalQualify({
+      signalReady: [],
+      alreadySignalRows: deep.stillUnsignaled,
+      spec: soft,
+    });
+    expect(final.qualified).toHaveLength(0);
+    expect(final.rejected).toHaveLength(1);
+  });
+});
+
+describe("production hunter wiring (structure, not network)", () => {
+  it("binds evidence from existing extraction paths only when the hit names the candidate", async () => {
+    const hunter = createDefaultSignalHunter({
+      webSearch: async ({ queries }) => {
+        expect(queries[0]).toContain("Acme Dynamics");
+        return [
+          {
+            title: "Acme Dynamics redesign",
+            snippet: "Acme Dynamics is looking for a website redesign",
+            url: "https://news.example/acme",
+          },
+          {
+            title: "Unrelated shop",
+            snippet: "Totally unrelated content about baking",
+            url: "https://other.example/baking",
+          },
+        ];
+      },
+      socialSearch: async () => [],
+    });
+    const r = row();
+    const deep = await runDeepSignalPass([r], spec, { hunter });
+    expect(deep.signalReady).toHaveLength(1);
+    const attached = deep.signalReady[0]!.evidence ?? [];
+    expect(attached.length).toBeGreaterThanOrEqual(1);
+    expect(attached.every((e) => e.subject === "company:acme")).toBe(true);
+  });
+});

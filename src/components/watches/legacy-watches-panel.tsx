@@ -1,4 +1,3 @@
-import { useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -27,7 +26,6 @@ const WATCH_EXAMPLES = [
  * `/watches?legacy=1` or the HERO_TAKEOVER_ENABLED kill-switch.
  */
 export function LegacyWatchesPanel() {
-  const navigate = useNavigate();
   const qc = useQueryClient();
   const list = useServerFn(listSignalWatches);
   const create = useServerFn(createSignalWatch);
@@ -65,15 +63,12 @@ export function LegacyWatchesPanel() {
     mutationFn: (id: string) => runOne({ data: { id } }),
     onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ["signal-watches"] });
-      qc.invalidateQueries({ queryKey: ["usage"] });
       if (res.error === "limit") {
         toast.error(res.message ?? "Search limit reached");
         return;
       }
-      toast.success(`${res.results_count} leads for this signal`);
-      if (res.leads?.length) {
-        navigate({ to: "/discover" });
-      }
+      // Watch v2: the run is a durable job — results land after it completes.
+      toast.success("Watch run queued — fresh matches land in Discover");
     },
     onError: (e: Error) => toast.error(e.message),
   });

@@ -15,6 +15,10 @@
     {
       "path": "/api/cron/email-sequences",
       "schedule": "0 14 * * *"
+    },
+    {
+      "path": "/api/cron/signal-watches",
+      "schedule": "0 * * * *"
     }
   ]
 }

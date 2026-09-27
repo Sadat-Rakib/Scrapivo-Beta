@@ -2220,7 +2220,37 @@ export async function runSpecSearchCore(
   }
   try {
     const { applyWhyMatchGate } = await import("@/lib/search/live-gapfill");
-    completeRows = applyWhyMatchGate(completeRows, spec, !!spec.signal_required).kept;
+    if (spec.signal_required && !deadlineNow() && !process.env.VITEST) {
+      // Deep-signal split (WS7A): base eligibility → budgeted signal research
+      // → FINAL qualification. Kills the circular bug where a signalless
+      // candidate is rejected before it ever receives signal research.
+      // Gates are unchanged — finalQualify runs the exact production gate.
+      const { splitBaseEligibility, runDeepSignalPass, finalQualify } = await import(
+        "@/lib/signals/deep-pass.server"
+      );
+      const split = splitBaseEligibility(completeRows, spec);
+      emitProgress("Researching signals", "signals", undefined, split.baseEligible.length);
+      const deep = await runDeepSignalPass(split.baseEligible, spec, {
+        signal: deps.signal ?? undefined,
+        onProgress: (e) => emitProgress(e.action, e.source, e.detail, e.count),
+      });
+      if (deep.verifiedRows > 0) {
+        emitProgress("Signals verified", "signals", undefined, deep.verifiedRows);
+      }
+      const fq = finalQualify({
+        signalReady: deep.signalReady,
+        alreadySignalRows: [
+          ...split.baseRejected,
+          ...deep.alreadyVerified,
+          ...deep.stillUnsignaled,
+          ...deep.notResearched,
+        ],
+        spec,
+      });
+      completeRows = fq.qualified;
+    } else {
+      completeRows = applyWhyMatchGate(completeRows, spec, !!spec.signal_required).kept;
+    }
     // Belt-and-suspenders: only theorem-qualified rows may be delivered.
     completeRows = completeRows.filter((r) => r.disposition === "qualified");
     if (completeRows.length) {
