@@ -17,6 +17,22 @@ import {
   type StaticPageRead,
 } from "./candidate-acquisition.server";
 import { detectOperationalStatus, operationalStatusAccepted, statusEvidence } from "./operational-status";
+import {
+  classifyPageRelevance,
+  PAGE_LEVEL_STOP_VERDICTS,
+} from "@/lib/search/page-relevance";
+import {
+  acquireHostSlot,
+  hostBlockedUntil,
+  HostPaceError,
+  isLoopbackHost,
+  noteBrowserAction,
+  noteHostResponse,
+  releaseHostSlot,
+} from "@/lib/search/domain-pacer.server";
+import { canonicalJobUrl, recognizeUrl } from "@/lib/sources/recognize";
+import { isNeverContactHost } from "@/lib/sources/registry";
+import { resilientFetch } from "@/lib/search/http-fetch.server";
 import { researchEvent } from "./events";
 import type {
   FieldEvidence,
@@ -130,6 +146,69 @@ function withRowContact(row: SpecRow, email: string | null, phone: string | null
 function pageReadFailed(snapshot: PageSnapshot): boolean {
   return snapshot.loadingState === "error" ||
     (!snapshot.title.trim() && !snapshot.visibleRelevantText.trim() && snapshot.links.length === 0);
+}
+
+/** Rejection reasons that mean the whole host is degraded (never re-attempted). */
+const HOST_LEVEL_REJECTIONS = /^(captcha|access_restricted|page_login_required|page_challenge|page_rate_limited|page_blocked)$/;
+
+/** Outcome of one contact with a host, recorded against its pacing state. */
+type HostOutcome = "ok" | "blocked" | "rate_limited" | "challenge" | "error";
+
+/** Host-level outcomes map onto browser friction markers the pacer understands. */
+const OUTCOME_FRICTION: Record<Exclude<HostOutcome, "ok" | "error">, string[]> = {
+  blocked: ["ACCESS_BLOCK"],
+  challenge: ["CAPTCHA"],
+  rate_limited: ["RATE_LIMIT"],
+};
+
+/** Record a response/verdict against the host's pacing state (no-op for loopback). */
+function noteHostOutcome(
+  host: string | null,
+  outcome: HostOutcome,
+  extra: { status?: number; retryAfterHeader?: string | null } = {},
+): void {
+  if (!host || isLoopbackHost(host)) return;
+  if (outcome === "error") {
+    noteHostResponse(host, { networkError: true });
+    return;
+  }
+  noteHostResponse(host, {
+    status: outcome === "ok" ? (extra.status ?? 200) : undefined,
+    friction: outcome === "ok" ? [] : OUTCOME_FRICTION[outcome],
+    retryAfterHeader: extra.retryAfterHeader ?? null,
+  });
+}
+
+/** True when the host asked us to wait (Retry-After) or blocked/challenged us. */
+function hostCoolingDown(url: string): boolean {
+  const host = safeHost(url);
+  return !!host && !isLoopbackHost(host) && hostBlockedUntil(host) > Date.now();
+}
+
+/**
+ * Paced HTTP fetch for candidate pages: one request in flight per host with
+ * polite spacing; 429/503 responses (and their Retry-After) plus network
+ * failures are recorded so the rest of the run backs the host off. Throws
+ * HostPaceError when the host must not be contacted right now — callers
+ * degrade the source and move on instead of retrying it.
+ */
+function pacedStaticFetch(inner?: StaticFetch): StaticFetch {
+  return async (url, init) => {
+    const doFetch = inner ?? ((u, i) => resilientFetch(u, { signal: i?.signal ?? undefined, retries: 1, retryDelayMs: 250 }));
+    const host = safeHost(url);
+    if (!host || isLoopbackHost(host)) return doFetch(url, init);
+    await acquireHostSlot(host, { maxConcurrent: 1 });
+    try {
+      const res = await doFetch(url, init);
+      noteHostResponse(host, { status: res.status, retryAfterHeader: res.headers.get("retry-after") });
+      return res;
+    } catch (error) {
+      if (!(error instanceof HostPaceError)) noteHostResponse(host, { networkError: true });
+      throw error;
+    } finally {
+      releaseHostSlot(host);
+    }
+  };
 }
 
 function structuredAbsenceEvidence(candidate: ResearchCandidate): Evidence[] {
@@ -280,6 +359,30 @@ function verifyCandidateFromSnapshot(args: {
     return { ...current, state: "UNRESOLVED", rejectionReason: "access_restricted" };
   }
 
+  // Goal-conditioned relevance gate (§23-32): before extracting anything,
+  // refuse pages that are legal/boilerplate furniture, a login/challenge
+  // shell, or otherwise un-usable. THIN is left to the read ladders (short
+  // contact pages can legitimately carry an email/phone); entity-name
+  // matching stays with the qualification layer. Friction verdicts
+  // (challenge/login/rate-limit/blocked) are NOT stopped here — the
+  // pre-existing friction handling above owns them and their Take-Control
+  // handoff (captcha reason + CAPTCHA_DETECTED / HUMAN_ACTION_REQUIRED).
+  const relevance = classifyPageRelevance({
+    url: snapshot.url,
+    title: snapshot.title,
+    text: snapshot.visibleRelevantText,
+    friction: snapshot.friction,
+  });
+  const frictionDriven = relevance.reason.startsWith("friction:");
+  if (!relevance.keepExtracting && !frictionDriven && PAGE_LEVEL_STOP_VERDICTS.has(relevance.verdict)) {
+    emit(researchEvent({
+      sessionId, type: "SOURCE_FAILED", phase: "BROWSER",
+      internal: { candidateId: current.id, verdict: relevance.verdict, reason: relevance.reason, url: snapshot.url },
+      domain: safeHost(snapshot.url),
+    }));
+    return { ...current, state: "UNRESOLVED", rejectionReason: `page_${relevance.verdict.toLowerCase()}` };
+  }
+
   emit(researchEvent({ sessionId, type: "INSPECTING_PAGE", phase: "BROWSER", internal: { candidateId: current.id } }));
   const screenshotRef = args.screenshotRef ?? null;
   const email = firstEmail(snapshot.visibleRelevantText);
@@ -414,15 +517,40 @@ async function readWithLadder(args: {
 }): Promise<{ observation: BrowserObservation } | "degraded"> {
   const { browser, session, url, candidateId, emit, sessionId } = args;
   const attempt = async (): Promise<BrowserObservation> => {
-    const observation = await browser.navigate(session, url);
-    if (pageReadFailed(observation.snapshot)) throw new Error(`Read page:${candidateId}`);
-    return observation;
+    const host = safeHost(url);
+    const paced = !!host && !isLoopbackHost(host);
+    if (paced) await acquireHostSlot(host!, { maxConcurrent: 1 });
+    try {
+      const observation = await browser.navigate(session, url);
+      if (pageReadFailed(observation.snapshot)) {
+        if (paced) noteBrowserAction(host!, { networkError: true });
+        throw new Error(`Read page:${candidateId}`);
+      }
+      // Friction markers (captcha / access block / rate limit) recorded here
+      // back the whole host off for later candidates too.
+      if (paced) noteBrowserAction(host!, { status: 200, friction: observation.snapshot.friction });
+      return observation;
+    } finally {
+      if (paced) releaseHostSlot(host!);
+    }
   };
   let firstError: unknown = null;
   try {
     return { observation: await attempt() };
   } catch (error) {
     if (args.signal?.aborted) throw error;
+    // The host refused contact outright (Retry-After beyond the wait cap, or
+    // an active block/challenge): degrade immediately — no retry, no HTTP
+    // fallback, no repeated attempts against the same host.
+    if (error instanceof HostPaceError) {
+      emit(researchEvent({
+        sessionId, type: "SOURCE_DEGRADED", phase: "BROWSER",
+        internal: { code: "SOURCE_DEGRADED", candidateId, url, reason: error.code },
+        domain: safeHost(url),
+        message: "This site is asking us to wait before visiting again; research continued without it.",
+      }));
+      return "degraded";
+    }
     firstError = error;
   }
   emit(researchEvent({
@@ -481,6 +609,8 @@ export async function researchCandidatesWithBrowser(args: {
   };
   const degradedSources = new Set<string>();
   const degradedKey = (url: string): string => registrableDomainOf(url) ?? url;
+  // Every HTTP fetch of a candidate page goes through the host pacer.
+  const pacedFetch = pacedStaticFetch(args.fetchPage);
   const counters = { pages: 0, actions: 0, screenshots: 0 };
   let sessionCounter = 0;
 
@@ -517,14 +647,72 @@ export async function researchCandidatesWithBrowser(args: {
         return { ...candidate, state: "UNRESOLVED", rejectionReason: "no_public_page_for_browser_verification" };
       }
       const url = candidate.row.url;
+      // Source recognition first: never contact hosts known to block
+      // automated access, and route recognized structured job boards to the
+      // structured feed instead of browsing the human careers site.
+      const recognized = recognizeUrl(url);
+      const host = safeHost(url);
+      if (recognized.kind === "blocked" || (host !== null && isNeverContactHost(host))) {
+        emit(researchEvent({
+          sessionId: args.sessionId, type: "SOURCE_FAILED", phase: "BROWSER",
+          internal: { code: "SOURCE_BLOCKS_AUTOMATED_ACCESS", candidateId: candidate.id, url, recognition: recognized.kind },
+          domain: recognized.host || host,
+          message: "This site blocks automated access, so research moved on to another source.",
+        }));
+        return { ...candidate, state: "UNRESOLVED", rejectionReason: "source_blocks_automated_access" };
+      }
+      if (recognized.kind === "ats" && recognized.ats && recognized.board) {
+        // Structured job data exists for this employer — do not browse the
+        // human site. The hint rides on the candidate's evidence so the jobs
+        // pipeline can fetch the structured feed instead.
+        emit(researchEvent({
+          sessionId: args.sessionId, type: "ACQUISITION_DECIDED", phase: "BROWSER",
+          internal: { candidateId: candidate.id, decision: "structured_source_used", url },
+          domain: recognized.host,
+          message: "This employer's openings are published as structured job data; using that instead of opening the site.",
+        }));
+        return {
+          ...candidate,
+          evidence: [...candidate.evidence, makeEvidence({
+            source_url: url,
+            source_type: "other",
+            excerpt: `Employer openings are published through a recognized structured job board (${recognized.ats}/${recognized.board}).`,
+            evidence_type: "other",
+            supports: "other",
+            subject: candidate.id,
+            extraction_method: "structured_job_source_recognition",
+            claim_parameters: {
+              ats: recognized.ats,
+              board: recognized.board,
+              ...(recognized.jobId ? { job_id: recognized.jobId } : {}),
+              ...(recognized.sourceId ? { source_id: recognized.sourceId } : {}),
+              canonical_job_key: canonicalJobUrl(url),
+            },
+            confidence: 0.9,
+          })],
+          rejectionReason: null,
+        };
+      }
       if (degradedSources.has(degradedKey(url))) {
         return { ...candidate, state: "UNRESOLVED", rejectionReason: "source_degraded" };
       }
+      // The host asked us to wait (Retry-After) or blocked/challenged us
+      // earlier in this run or a recent one: skip it without any contact.
+      if (hostCoolingDown(url)) {
+        degradedSources.add(degradedKey(url));
+        emit(researchEvent({
+          sessionId: args.sessionId, type: "SOURCE_DEGRADED", phase: "BROWSER",
+          internal: { code: "SOURCE_DEGRADED", candidateId: candidate.id, url, reason: "host_asked_to_wait" },
+          domain: host,
+          message: "Waiting before revisiting this site; research continued without it.",
+        }));
+        return { ...candidate, state: "UNRESOLVED", rejectionReason: "source_degraded" };
+      }
 
-      // HTTP-first acquisition policy.
+      // HTTP-first acquisition policy (paced per host).
       let working = candidate;
       const acquired = await acquireStatically(working, {
-        signal: args.signal, fetchPage: args.fetchPage, emit, sessionId: args.sessionId, plan: args.plan,
+        signal: args.signal, fetchPage: pacedFetch, emit, sessionId: args.sessionId, plan: args.plan,
       });
       working = acquired.candidate;
       if (acquired.read) {
@@ -542,7 +730,7 @@ export async function researchCandidatesWithBrowser(args: {
         }));
         const result = await readWithLadder({
           browser: args.browser, session, url, candidateId: working.id,
-          signal: args.signal, fetchPage: args.fetchPage, emit, sessionId: args.sessionId,
+          signal: args.signal, fetchPage: pacedFetch, emit, sessionId: args.sessionId,
         });
         if (result === "degraded") {
           degradedSources.add(degradedKey(url));
@@ -559,6 +747,23 @@ export async function researchCandidatesWithBrowser(args: {
           candidate: working, snapshot: observation.snapshot, plan: args.plan, now: new Date(),
           screenshotRef, emit, sessionId: args.sessionId,
         });
+        // Host-level failures (captcha / access restricted / blocked or
+        // challenge verdicts) degrade the whole registrable domain for the
+        // rest of the run — never re-attempted — and are recorded against the
+        // host's pacing state so later candidates skip it while it blocks or
+        // asks us to wait. LOGIN_WALL is page-level: run-local degradation
+        // only, never a cross-run host block.
+        if (verified.rejectionReason && HOST_LEVEL_REJECTIONS.test(verified.rejectionReason)) {
+          degradedSources.add(degradedKey(url));
+          if (verified.rejectionReason !== "page_login_required") {
+            noteHostOutcome(
+              safeHost(observation.snapshot.url),
+              verified.rejectionReason === "captcha" ? "challenge"
+                : verified.rejectionReason === "page_rate_limited" ? "rate_limited"
+                : "blocked",
+            );
+          }
+        }
         return verified;
       } finally {
         counters.pages += session.counters.pages;

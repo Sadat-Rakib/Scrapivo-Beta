@@ -7,7 +7,7 @@ export default defineConfig({
     globals: true,
     environment: "node",
     include: ["**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
-    exclude: ["node_modules", "dist", ".vercel", ".tanstack", "freehire/**", "e2e/**", "reports/**"],
+    exclude: ["**/node_modules/**", "node_modules", "dist", ".vercel", ".tanstack", "freehire/**", "e2e/**", "reports/**", "local-business-finder/**", ".agents/**"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],

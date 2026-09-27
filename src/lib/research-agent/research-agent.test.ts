@@ -463,7 +463,7 @@ describe("deterministic browser research", () => {
     };
     const result = await researchCandidatesWithBrowser({
       browser: fakeBrowser([page("We are hiring now. Apply today. Contact careers@candidate.example.com. Currently operating.")]),
-      sessionId: "fixture", plan, candidates: [base], visible: false,
+      sessionId: "fixture", plan, candidates: [base], visible: false, fetchPage: async () => new Response("", { status: 404 }),
     });
     expect(result.candidates[0]?.row.email).toBe("careers@candidate.example.com");
     expect(result.candidates[0]?.signals[0]?.type).toBe("HIRING");
@@ -480,7 +480,7 @@ describe("deterministic browser research", () => {
       id: candidate.entity_id!, row: candidate, state: "READY_FOR_VERIFICATION", origin: "stored", evidence: [],
       fieldEvidence: [], signals: [], operationalStatus: "UNKNOWN", operationalStatusEvidence: [], missingFields: [], rejectionReason: null, whyMatch: null,
     };
-    const result = await researchCandidatesWithBrowser({ browser: fakeBrowser([page(text)]), sessionId: "fixture", plan, candidates: [base], visible: false });
+    const result = await researchCandidatesWithBrowser({ browser: fakeBrowser([page(text)]), sessionId: "fixture", plan, candidates: [base], visible: false, fetchPage: async () => new Response("", { status: 404 }) });
     expect(result.candidates[0]).toMatchObject({ state: "REJECTED", operationalStatus: status });
   });
 
@@ -491,7 +491,7 @@ describe("deterministic browser research", () => {
       id: candidate.entity_id!, row: candidate, state: "READY_FOR_VERIFICATION", origin: "stored", evidence: [],
       fieldEvidence: [], signals: [], operationalStatus: "UNKNOWN", operationalStatusEvidence: [], missingFields: [], rejectionReason: null, whyMatch: null,
     };
-    const result = await researchCandidatesWithBrowser({ browser: fakeBrowser([page("Verify you are human", ["CAPTCHA"])]), sessionId: "fixture", plan, candidates: [base], visible: false });
+    const result = await researchCandidatesWithBrowser({ browser: fakeBrowser([page("Verify you are human", ["CAPTCHA"])]), sessionId: "fixture", plan, candidates: [base], visible: false, fetchPage: async () => new Response("", { status: 404 }) });
     expect(result.candidates[0]).toMatchObject({ state: "UNRESOLVED", rejectionReason: "captcha" });
     expect(result.events.map((event) => event.type)).toEqual(expect.arrayContaining(["CAPTCHA_DETECTED", "HUMAN_ACTION_REQUIRED"]));
   });

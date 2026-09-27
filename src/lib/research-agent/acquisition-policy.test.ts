@@ -167,7 +167,10 @@ describe("HTTP-first acquisition policy", () => {
     const navigate = vi.spyOn(browser, "navigate");
     const result = await run({
       browser, fetchPage,
-      candidates: [candidate(row(1, { url: "https://www.linkedin.com/company/acme-1" }))],
+      // crunchbase requires rendering but is not a never-contact host;
+      // never-contact hosts (e.g. linkedin) are skipped before any contact —
+      // covered in browser-research.pacing.test.ts.
+      candidates: [candidate(row(1, { url: "https://www.crunchbase.com/organization/acme-1" }))],
     });
     expect(fetchPage).not.toHaveBeenCalled();
     expect(navigate).toHaveBeenCalledTimes(1);

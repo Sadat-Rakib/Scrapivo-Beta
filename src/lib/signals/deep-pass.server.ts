@@ -16,6 +16,16 @@
  * Signal-optional specs keep today's behavior: the pass is a no-op and
  * signals stay post-qualification enrichment.
  *
+ * WS7B — custom signals: runDeepSignalPass accepts an optional
+ * `customSignal` (compiled by src/lib/signals/custom-compiler.ts from the
+ * user's verbatim text, carried on spec.custom_signal_text). When set, the
+ * pass researches with createCustomSignalHunter — compiled searchQueries on
+ * the same web ladder, indicator-aware scoring, negativeIndicator veto —
+ * under the SAME budget/concurrency/timeout and the SAME
+ * isVerifiedSignalEvidence floor. Absent the option, behavior is unchanged.
+ * Compiled output is SEARCH HYPOTHESES; nothing about verification is
+ * loosened and the final gate stays the full production gate.
+ *
  * Anti-fabrication: a signal counts only as Evidence with source_url +
  * observed_at + extractive excerpt, subject-bound to the candidate, and a
  * demand-signal type — mirroring the existing social/web evidence path
@@ -66,6 +76,7 @@ import { rowSatisfiesSpec, type SpecRow } from "@/lib/spec-search.functions";
 import { applyWhyMatchGate } from "@/lib/search/live-gapfill";
 import { makeEvidence, type Evidence } from "@/lib/search/evidence";
 import { qualifyLead } from "@/lib/search/qualify";
+import type { CompiledCustomSignal } from "@/lib/signals/custom-compiler";
 
 // ---------------------------------------------------------------------------
 // Base eligibility (identity/fit, spec MINUS the signal constraint)
@@ -249,6 +260,21 @@ export interface DeepSignalPassOptions {
   probeTimeoutMs?: number;
   /** Injected hunter (tests/adapters). undefined → production hunter; null → dry split. */
   hunter?: SignalHunter | null;
+  /**
+   * WS7B: compiled custom signal (src/lib/signals/custom-compiler). When set
+   * and no explicit `hunter` is injected, the pass researches with the
+   * custom-signal hunter — the compiled searchQueries on the SAME web ladder
+   * as the default hunter, indicator-aware evidence scoring, negative
+   * indicators vetoing hits. Budget/concurrency/timeouts are unchanged and
+   * evidence still passes isVerifiedSignalEvidence — this option never
+   * loosens verification, it only changes WHERE the pass looks.
+   */
+  customSignal?: CompiledCustomSignal;
+  /**
+   * WS7B: override factory for the custom hunter (tests/adapters). Only
+   * consulted when `customSignal` is set and `hunter` is not.
+   */
+  customHunterFactory?: (customSignal: CompiledCustomSignal) => SignalHunter;
   /** User/deadline abort for the owning search run. */
   signal?: AbortSignal | null;
   /** browserProgress-compatible sink. */
@@ -272,6 +298,12 @@ export interface DeepSignalPassResult {
   deadlineHit: boolean;
   /** User/deadline abort observed. */
   aborted: boolean;
+  /**
+   * Which hunter the pass researched with: "custom" when the WS7B
+   * custom-signal hunter ran (customSignal set, no explicit hunter), else
+   * "default". Diagnostics only.
+   */
+  hunterKind: "default" | "custom";
 }
 
 export async function runDeepSignalPass(
@@ -288,6 +320,7 @@ export async function runDeepSignalPass(
     verifiedRows: 0,
     deadlineHit: false,
     aborted: false,
+    hunterKind: "default",
   };
 
   // Signal-optional specs: the pass is never invoked (enrichment path
@@ -323,8 +356,15 @@ export async function runDeepSignalPass(
     result.stillUnsignaled = toResearch;
     return result;
   }
-  const hunter: SignalHunter =
-    opts.hunter ?? createDefaultSignalHunter();
+  // Hunter selection (WS7B): explicit injection wins; then the custom-signal
+  // hunter when a compiled customSignal is present; otherwise the unchanged
+  // default. Absent options ⇒ byte-for-byte today's behavior.
+  const hunter: SignalHunter = opts.hunter
+    ? opts.hunter
+    : opts.customSignal
+      ? (opts.customHunterFactory ?? createCustomSignalHunter)(opts.customSignal)
+      : createDefaultSignalHunter();
+  if (!opts.hunter && opts.customSignal) result.hunterKind = "custom";
 
   const queue = toResearch.slice();
   let inFlight = 0;
@@ -541,6 +581,28 @@ export interface DefaultHunterDeps {
 }
 
 /**
+ * The free-first discovery ladder both production hunters share (default AND
+ * WS7B custom). Same sourceKey/operation so provider telemetry is unchanged.
+ */
+function defaultWebSearch(): NonNullable<DefaultHunterDeps["webSearch"]> {
+  return async (args) => {
+    const { discoverWebFreeFirst } = await import("@/lib/search/provider-ladder");
+    const r = await discoverWebFreeFirst({
+      queries: args.queries,
+      maxQueries: args.maxQueries,
+      signal: args.signal ?? null,
+      sourceKey: "deep-signal-pass",
+      operation: "deep-signal-pass",
+    });
+    return r.results.map((h) => ({
+      title: h.title,
+      snippet: h.content,
+      url: h.url,
+    }));
+  };
+}
+
+/**
  * Distinctive identity token of a candidate: a host (website/first-party url)
  * when known, else the longest distinctive word of the title. Short/generic
  * words never bind a hit to a candidate.
@@ -616,23 +678,7 @@ export function createDefaultSignalHunter(deps: DefaultHunterDeps = {}): SignalH
     const need = needTermsFromSpec(spec);
 
     if (ctx.probeIndex === 0) {
-      const webSearch =
-        deps.webSearch ??
-        (async (args) => {
-          const { discoverWebFreeFirst } = await import("@/lib/search/provider-ladder");
-          const r = await discoverWebFreeFirst({
-            queries: args.queries,
-            maxQueries: args.maxQueries,
-            signal: args.signal ?? null,
-            sourceKey: "deep-signal-pass",
-            operation: "deep-signal-pass",
-          });
-          return r.results.map((h) => ({
-            title: h.title,
-            snippet: h.content,
-            url: h.url,
-          }));
-        });
+      const webSearch = deps.webSearch ?? defaultWebSearch();
       const query = [row.title, need, "(need OR looking for OR hiring)"]
         .filter(Boolean)
         .join(" ");
@@ -662,6 +708,122 @@ export function createDefaultSignalHunter(deps: DefaultHunterDeps = {}): SignalH
       for (const ev of srow.evidence ?? []) {
         if (!hitNamesCandidate(`${ev.excerpt ?? ""} ${srow.title}`, row)) continue;
         out.push(makeEvidence({ ...ev, subject: subjectId }));
+      }
+    }
+    return out.length ? out : null;
+  };
+}
+
+// ---------------------------------------------------------------------------
+// WS7B — custom-signal hunter: compiled hypotheses, same verification floor
+// ---------------------------------------------------------------------------
+
+/** Max compiled queries per web probe (mirrors the default hunter's ladder cap). */
+const CUSTOM_PROBE_MAX_QUERIES = 4;
+
+/**
+ * Deterministic demand-type for indicator-only evidence: the compiled
+ * indicator matched, so the hit OBSERVES the hypothesis — but the excerpt is
+ * extractive and the type must still be one the theorem gate accepts.
+ * Hiring/funding cues keep their honest type; everything else is a service
+ * need observed on the public web.
+ */
+function customIndicatorEvidenceType(text: string): Evidence["evidence_type"] {
+  if (/\b(hiring|we're hiring|we are hiring|join our team|open role|job opening|now hiring)\b/i.test(text))
+    return "hiring";
+  if (/\b(funded|raises|raised|series\s+[a-d]|seed round)\b/i.test(text))
+    return "funding";
+  return "service_request";
+}
+
+/**
+ * Evidence from ONE hit that matched an observableIndicator but not the
+ * default verification: still fully structural (extractive excerpt, http
+ * source, observed_at, subject-bound), just lower confidence and a distinct
+ * extraction_method. isVerifiedSignalEvidence keeps the final say.
+ */
+function customIndicatorEvidence(hit: WebHitLike, subjectId: string): Evidence {
+  return makeEvidence({
+    source_url: hit.url,
+    source_type: "web",
+    excerpt: (hit.snippet || hit.title).slice(0, 180),
+    evidence_type: customIndicatorEvidenceType(`${hit.title} ${hit.snippet}`),
+    supports: "intent",
+    extraction_method: "custom_signal_indicator",
+    confidence: 0.55,
+    subject: subjectId,
+  });
+}
+
+/**
+ * WS7B custom-signal hunter — mirrors createDefaultSignalHunter's probe 0 on
+ * the SAME web ladder, but fires the COMPILED searchQueries (probe 0: first
+ * four, probe 1: the next four; an exhausted probe returns null without
+ * touching the network) and scores evidence indicator-aware:
+ *
+ *   - a hit is bound to the candidate by the SAME naming rule as the default
+ *     hunter (hitNamesCandidate);
+ *   - negativeIndicators VETO the hit outright (disconfirming context);
+ *   - the hit counts when it passes the DEFAULT verification
+ *     (evidenceFromWebHit) OR its text contains at least one
+ *     observableIndicator (case-insensitive) — in the latter case an
+ *     indicator evidence item is built, never a fabricated one;
+ *   - everything still flows through verifiedSignalEvidence /
+ *     isVerifiedSignalEvidence in runDeepSignalPass: compilation NEVER
+ *     loosens the verification floor, it only changes WHERE the pass looks.
+ *
+ * These compiled artifacts are SEARCH HYPOTHESES (see custom-compiler.ts);
+ * the final gate stays the full, unweakened production gate.
+ */
+export function createCustomSignalHunter(
+  customSignal: CompiledCustomSignal,
+  deps: DefaultHunterDeps = {},
+): SignalHunter {
+  const indicators = customSignal.observableIndicators
+    .map((s) => s.toLowerCase().trim())
+    .filter((s) => s.length > 0);
+  const negatives = customSignal.negativeIndicators
+    .map((s) => s.toLowerCase().trim())
+    .filter((s) => s.length > 0);
+
+  const queriesForProbe = (probeIndex: number): string[] =>
+    customSignal.searchQueries.slice(
+      probeIndex * CUSTOM_PROBE_MAX_QUERIES,
+      (probeIndex + 1) * CUSTOM_PROBE_MAX_QUERIES,
+    );
+
+  return async (row, spec, ctx) => {
+    const subjectId = deepPassEntityIdOf(row);
+    if (!subjectId) return null;
+    const queries = queriesForProbe(ctx.probeIndex);
+    if (!queries.length) return null;
+
+    const webSearch = deps.webSearch ?? defaultWebSearch();
+    const hits = await webSearch({
+      queries,
+      maxQueries: CUSTOM_PROBE_MAX_QUERIES,
+      signal: ctx.signal ?? null,
+    });
+
+    const { evidenceFromWebHit } = await import("@/lib/search/live-gapfill");
+    const out: Evidence[] = [];
+    for (const hit of hits) {
+      const text = `${hit.title} ${hit.snippet}`;
+      const lower = text.toLowerCase();
+      if (!hitNamesCandidate(text, row)) continue;
+      if (negatives.some((n) => lower.includes(n))) continue;
+      const verified = evidenceFromWebHit({
+        title: hit.title,
+        snippet: hit.snippet,
+        url: hit.url,
+        spec,
+      });
+      if (verified.length) {
+        for (const ev of verified) out.push(makeEvidence({ ...ev, subject: subjectId }));
+        continue;
+      }
+      if (indicators.some((ind) => lower.includes(ind))) {
+        out.push(customIndicatorEvidence(hit, subjectId));
       }
     }
     return out.length ? out : null;

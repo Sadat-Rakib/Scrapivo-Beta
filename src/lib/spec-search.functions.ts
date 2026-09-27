@@ -2230,8 +2230,22 @@ export async function runSpecSearchCore(
       );
       const split = splitBaseEligibility(completeRows, spec);
       emitProgress("Researching signals", "signals", undefined, split.baseEligible.length);
+      // WS7B V1: compile a user-supplied custom signal into observable search
+      // hypotheses. Compile failure degrades to the default signal hunter —
+      // it must never kill the search.
+      let customSignal: import("@/lib/signals/custom-compiler").CompiledCustomSignal | undefined;
+      if (typeof spec.custom_signal_text === "string" && spec.custom_signal_text.trim()) {
+        try {
+          const { compileCustomSignal } = await import("@/lib/signals/custom-compiler");
+          emitProgress("Understanding your custom signal", "signals");
+          customSignal = await compileCustomSignal(spec.custom_signal_text);
+        } catch (e) {
+          console.warn("[custom-signal] compile failed, using default signal hunter", e instanceof Error ? e.message : e);
+        }
+      }
       const deep = await runDeepSignalPass(split.baseEligible, spec, {
         signal: deps.signal ?? undefined,
+        customSignal,
         onProgress: (e) => emitProgress(e.action, e.source, e.detail, e.count),
       });
       if (deep.verifiedRows > 0) {

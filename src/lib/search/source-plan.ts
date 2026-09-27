@@ -16,6 +16,7 @@ import {
   type SourceProviderId,
 } from "@/lib/search/source-capabilities";
 import { applyStableYieldOrder } from "./source-yield";
+import { SOURCE_REGISTRY, type SourceDefinition } from "@/lib/sources/registry";
 
 function fieldOf(spec: SearchSpec, f: string): string | null {
   const c = spec.criteria.find((x) => x.field === f);
@@ -104,6 +105,37 @@ export function deriveCoverageRequirements(spec: SearchSpec): CoverageRequiremen
   };
 }
 
+/**
+ * Registry (source intelligence) → plan provider mapping. Only confident
+ * 1:1 pairs; job feed/ATS gating lives in the jobs pipeline itself.
+ */
+const REGISTRY_TO_PLAN_PROVIDER: Record<string, string> = {
+  "db-indexed": "indexed-db",
+  "db-osm": "osm-local",
+  "db-company-registry": "company-registry",
+  "search-searxng": "searxng",
+  "search-browser": "browser-automation",
+  "web-official-sites": "direct-http",
+};
+
+/**
+ * Source registry policy enforcement: a registry decision of `disabled` or
+ * `needs_review` blocks the mapped plan provider so a disabled source can
+ * never be planned (beta spec §64). Allowed/needs_key sources stay plannable.
+ */
+export function registryBlockedProviderIds(
+  defs: readonly SourceDefinition[] = SOURCE_REGISTRY,
+): Map<string, string> {
+  const blocked = new Map<string, string>();
+  for (const def of defs) {
+    const planId = REGISTRY_TO_PLAN_PROVIDER[def.id];
+    if (!planId) continue;
+    if (def.decision === "disabled") blocked.set(planId, "registry_disabled");
+    else if (def.decision === "needs_review") blocked.set(planId, "registry_needs_review");
+  }
+  return blocked;
+}
+
 function entityMatch(cap: SourceCapability, entityTypes: SpecEntity[]): boolean {
   if (!entityTypes.length) return true;
   return entityTypes.some((e) => cap.entityTypes.includes(e));
@@ -183,7 +215,13 @@ export function buildSourcePlan(
   const skipped: SourcePlanSkip[] = [];
   const fitted: SourceCapability[] = [];
 
+  const registryBlocked = registryBlockedProviderIds();
   for (const cap of catalog) {
+    const blockedReason = registryBlocked.get(cap.id);
+    if (blockedReason) {
+      skipped.push({ providerId: cap.id, reason: blockedReason });
+      continue;
+    }
     if (unavailable.has(cap.id)) {
       skipped.push({ providerId: cap.id, reason: "provider_unavailable" });
       continue;

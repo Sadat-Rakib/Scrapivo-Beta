@@ -6,6 +6,9 @@ export type JobSourceKind =
   | "source-ats-smartrecruiters"
   | "source-ats-workable"
   | "source-ats-recruitee"
+  | "source-ats-personio"
+  | "source-ats-teamtailor"
+  | "source-ats-gem"
   | "source-ats-workday"
   | "source-remoteok"
   | "source-remotive"
@@ -33,6 +36,9 @@ export type JobSourceId =
   | "smartrecruiters"
   | "workable"
   | "recruitee"
+  | "personio"
+  | "teamtailor"
+  | "gem"
   | "workday"
   | "remoteok"
   | "remotive"
@@ -58,6 +64,9 @@ export const ALL_JOB_SOURCE_IDS: JobSourceId[] = [
   "smartrecruiters",
   "workable",
   "recruitee",
+  "personio",
+  "teamtailor",
+  "gem",
   "workday",
   "remoteok",
   "remotive",

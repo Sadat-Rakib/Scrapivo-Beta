@@ -60,6 +60,14 @@ export interface SearchSpec {
   understanding?: UnderstandingFrame;
   /** Fuzzy location guess (location stays missing until confirmed). */
   locationSuggestion?: LocationSuggestion | null;
+  /**
+   * WS7B: verbatim custom-signal text from the user ("companies with manual
+   * onboarding"). Optional — absent on every pre-WS7B spec. Compiled by
+   * src/lib/signals/custom-compiler.ts into SEARCH HYPOTHESES for the
+   * deep-signal pass (runDeepSignalPass `customSignal` option); it is never
+   * a fact, never a criterion, and never affects computeMissing.
+   */
+  custom_signal_text?: string;
 }
 
 const stated = (field: string, value: string): SpecField => ({
@@ -196,6 +204,8 @@ export function buildSpec(args: {
   signal_recency?: string | null;
   raw_query: string;
   locationSuggestion?: LocationSuggestion | null;
+  /** WS7B: verbatim custom-signal text (see SearchSpec.custom_signal_text). */
+  custom_signal_text?: string | null;
 }): SearchSpec {
   const spec: SearchSpec = {
     entity: args.entity,
@@ -207,6 +217,7 @@ export function buildSpec(args: {
     status: "ready_to_search",
     raw_query: args.raw_query,
     locationSuggestion: args.locationSuggestion ?? null,
+    custom_signal_text: args.custom_signal_text || undefined,
   };
   spec.missing = computeMissing(spec);
   spec.status = spec.missing.length ? "needs_clarification" : "ready_to_search";
