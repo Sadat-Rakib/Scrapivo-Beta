@@ -82,6 +82,8 @@ export interface SpecSearchDeps {
   browserProgress?: (event: { action: string; source?: string; detail?: string; count?: number | string; row?: import("@/lib/search/search-browser-progress.server").StreamedLead }) => void;
   /** Authenticated owner — binds the Scrapy browser session to the run. */
   ownerId?: string;
+  /** Data-asset reuse accumulator; records canonical cache hits vs live calls. */
+  reuse?: import("@/lib/canonical/reuse-metrics.server").ReuseRun;
 }
 
 export interface SpecRow {
@@ -1016,6 +1018,13 @@ export async function runSpecSearchCore(
     conversation_id?: string;
     turn_id?: string;
     request_id?: string;
+    /** Pre-compiled spec (job passes reuse the compiled thesis; skips understanding). */
+    spec?: SearchSpec;
+    /** Data-asset pass: engine-driven widening + candidate dedupe for job modes. */
+    jobContext?: {
+      poolTargetOverride?: number;
+      excludeCandidateKeys?: string[];
+    };
   } = {},
 ): Promise<SpecSearchResult> {
   const { createSearchRun, finalizeSearchOutcome, throwIfAborted, searchAbortCode } = await import(
@@ -1098,7 +1107,7 @@ export async function runSpecSearchCore(
     totalAvailable: null as number | null,
   };
   const { understandSearchSpec, isActionableFrame } = await import("@/lib/understanding/to-search-spec");
-  const base = await understandSearchSpec(query, answers, deps.signal);
+  const base = opts.spec ?? (await understandSearchSpec(query, answers, deps.signal));
   understandingDoneAt = Date.now();
   if (deps.signal?.aborted) return withRun({ spec: base, ...pageInfo }, 0, true);
   // Merge prior answers as stated criteria (multi-turn without session store).
@@ -1617,7 +1626,7 @@ export async function runSpecSearchCore(
             continue;
           }
           const r = await withTierTimeout(
-            indexer(spec, fetchWindow, 0),
+            (indexer as typeof queryIndexForSpec)(spec, fetchWindow, 0, deps.reuse),
             step.timeoutMs,
             "hot-index",
           );
@@ -1695,7 +1704,7 @@ export async function runSpecSearchCore(
     // +1 probe row makes hasMore exact without a count scan.
     if (indexer && useIndexedSearch()) {
       try {
-        const r = await indexer(spec, limit + 1, effOffset);
+        const r = await (indexer as typeof queryIndexForSpec)(spec, limit + 1, effOffset, deps.reuse);
         if (r) {
           dbMeta.push(r.meta);
           rows = r.rows;
@@ -1902,10 +1911,37 @@ export async function runSpecSearchCore(
     unknown: { mult: 3, min: 20 },
   };
   const poolFor = POOL_OVERFETCH[spec.entity] ?? { mult: 3, min: 20 };
-  const candidatePoolTarget = Math.min(250, Math.max(requestedTarget * poolFor.mult, poolFor.min));
+  const basePoolTarget = Math.min(250, Math.max(requestedTarget * poolFor.mult, poolFor.min));
+  // Job passes widen explicitly: the engine's pool target overrides the
+  // per-request cap; interactive requests keep the 250 interactive ceiling.
+  const candidatePoolTarget = opts.jobContext?.poolTargetOverride
+    ? Math.min(2000, Math.max(basePoolTarget, opts.jobContext.poolTargetOverride))
+    : basePoolTarget;
   const storedSearchDoneAt = Date.now();
   const { buildSourcePlan } = await import("@/lib/search/source-plan");
   let executionPlan = buildSourcePlan(spec, undefined, { desiredCount: requestedTarget });
+  // Yield-aware ordering (data-asset): decayed historical yield reorders the
+  // plan when enough evidence exists; no data keeps the plan unchanged.
+  if (!process.env.VITEST && executionPlan.steps.length > 1) {
+    try {
+      const { reorderByYield } = await import("@/lib/search/source-yield.server");
+      const ordered = await reorderByYield(
+        executionPlan.steps.map((s) => s.providerId),
+        spec.signal_required ? "signal" : "general",
+        spec.entity,
+      );
+      const rank = new Map(ordered.map((id, i) => [id, i]));
+      const ranked = executionPlan.steps.map((s, i) => ({
+        step: s,
+        origIndex: i,
+        r: rank.get(s.providerId) ?? i,
+      }));
+      ranked.sort((a, b) => a.r - b.r || a.origIndex - b.origIndex);
+      executionPlan = { ...executionPlan, steps: ranked.map((x) => x.step) };
+    } catch {
+      // learning reorder is best-effort; never blocks the plan
+    }
+  }
   let providerAttempts: import("@/lib/search/source-plan").ProviderDiagnostic[] = [];
   const forceLiveDiscovery = process.env.NODE_ENV !== "production" && process.env.FORCE_LIVE_DISCOVERY === "true";
   let liveIncompleteRows: SpecRow[] = [];
@@ -1950,6 +1986,18 @@ export async function runSpecSearchCore(
       });
       executionPlan = live.plan ?? executionPlan;
       providerAttempts = live.diagnostics ?? [];
+      // Source learning (data-asset): drain provider outcomes into daily
+      // yield windows; fire-and-forget, never blocks the run.
+      if (!process.env.VITEST && providerAttempts.length) {
+        void import("@/lib/search/source-yield.server")
+          .then(({ drainProviderDiagnostics }) =>
+            drainProviderDiagnostics(providerAttempts, {
+              queryFamily: spec.signal_required ? "signal" : "general",
+              entityType: spec.entity,
+            }),
+          )
+          .catch(() => {});
+      }
       liveDiscovery = "completed";
       if (live.diagnostics?.length) {
         for (const d of live.diagnostics) {
@@ -2252,6 +2300,13 @@ export async function runSpecSearchCore(
   }
 
   completeRows = markSoftDuplicates(completeRows);
+
+  // Job passes: never re-deliver candidates the job already holds (WS1
+  // upsert-dedupe is the source of truth; this keeps pass results disjoint).
+  if (opts.jobContext?.excludeCandidateKeys?.length) {
+    const exclude = new Set(opts.jobContext.excludeCandidateKeys);
+    completeRows = completeRows.filter((r) => !exclude.has(r.entity_id ?? r.key ?? ""));
+  }
 
   // Paging (Phase 1.8): the window above fetched offset+limit+1 matches;
   // slice the page here, after validation + opportunity + key filters, so

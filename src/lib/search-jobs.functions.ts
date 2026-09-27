@@ -61,6 +61,39 @@ export const createSearchJob = createServerFn({ method: "POST" })
     const target = data.target ?? 10;
     // Frozen mode inference: ≤25 interactive, ≤200 batch, else job.
     const mode = target <= 25 ? "interactive" : target <= 200 ? "batch" : "job";
+    // Context snapshot (frozen): the job executes against the project context
+    // it started with, even if the project changes mid-run. Best-effort —
+    // ownership checked on the projects row before its context is read.
+    let contextVersion: number | null = null;
+    let contextSnapshot: Record<string, unknown> | null = null;
+    if (data.projectId) {
+      try {
+        const { getAdmin } = await import("@/integrations/my-supabase/admin.server");
+        const { data: proj } = await getAdmin()
+          .from("projects")
+          .select("id")
+          .eq("id", data.projectId)
+          .eq("user_id", context.userId)
+          .maybeSingle();
+        if (proj) {
+          const { data: ctxRow } = await getAdmin()
+            .from("project_context")
+            .select(
+              "context_version, default_icp_id, offer_profile, preferred_geographies, exclusions, preferred_signals, messaging_preferences, custom_context",
+            )
+            .eq("project_id", data.projectId)
+            .maybeSingle();
+          if (ctxRow) {
+            contextVersion =
+              typeof ctxRow.context_version === "number" ? ctxRow.context_version : null;
+            const { context_version: _v, ...snap } = ctxRow;
+            contextSnapshot = snap;
+          }
+        }
+      } catch {
+        // snapshot is best-effort; the job still runs on the explicit spec
+      }
+    }
     const job = await store.create({
       user_id: context.userId,
       project_id: data.projectId ?? null,
@@ -70,6 +103,18 @@ export const createSearchJob = createServerFn({ method: "POST" })
       target,
       mode,
     });
+    if (contextVersion !== null || contextSnapshot !== null) {
+      await store.update(job.id, {
+        project_context_version: contextVersion,
+        context_snapshot: contextSnapshot,
+      });
+    }
+    // Batch/job modes continue in the background worker; interactive stays
+    // on the existing inline path.
+    if (mode !== "interactive") {
+      const { ensureJobWorkerStarted } = await import("@/lib/jobs/worker.server");
+      ensureJobWorkerStarted();
+    }
     return toWireJob(job);
   });
 
