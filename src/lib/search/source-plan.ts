@@ -6,6 +6,7 @@
  */
 import type { SearchSpec, SpecEntity } from "@/lib/search/search-spec";
 import type { EvidenceType } from "@/lib/search/evidence";
+import { planDiscoveryVariants } from "./search-query-planner";
 import { requestedClaimTypes } from "@/lib/search/canonical-contract";
 import type { SearchOutcomeCode } from "@/lib/search/canonical-contract";
 import {
@@ -339,6 +340,11 @@ export function buildResearchPlan(
       [...terms, location].filter(Boolean).join(" "),
     ]);
   }
+
+  // Query planner (Part 7): Boolean/site: discovery variants as ADDITIONS —
+  // exact phrases, publicly indexed signal hunts, role aliases. Capped by the
+  // existing maxQueries rule.
+  discoveryQueries = uniq([...discoveryQueries, ...planDiscoveryVariants(spec)]);
 
   const requiredFields = uniq([
     "name",

@@ -1,4 +1,6 @@
 /** Minimal serializable lead for progressive result streaming. */
+import { presentActivityEvent } from "@/lib/search/activity-presenter";
+
 export type StreamedLead = {
   key: string;
   entity_id: string;
@@ -49,8 +51,10 @@ function prune(now: number) {
 export function publishSearchBrowserProgress(
   runId: string,
   ownerId: string,
-  event: Omit<SearchBrowserProgressEvent, "id" | "at">,
+  rawEvent: Omit<SearchBrowserProgressEvent, "id" | "at">,
 ) {
+  // Privacy boundary: internal infra never reaches stored/user events.
+  const event = presentActivityEvent(rawEvent);
   const now = Date.now();
   prune(now);
   const run = runs.get(runId) ?? { ownerId, events: [], updatedAt: now, done: false };

@@ -706,6 +706,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       progress("Extracted candidates", undefined, `${memory.length} candidates; ${verifiedCount()} verified`);
     } catch (error) { check(); extractionError = error; log({ action: "extract", status: "failed" }); }
   };
+  const verifiedSeen = new Set<string>();
   const research = async (candidate: BrowserCandidateMemory) => {
     refresh(candidate);
     const done = () => candidate.status === "verified" || candidate.status === "rejected";
@@ -915,6 +916,10 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       candidate.status = "exhausted";
       candidate.verificationStatus = "unresolved";
     } else if (candidate.status === "verified") {
+      // One verified event per distinct candidate identity.
+      const verifiedKey = `${candidate.row.entity_id ?? ""}|${(candidate.row.title ?? "").toLowerCase()}`;
+      if (verifiedSeen.has(verifiedKey)) return;
+      verifiedSeen.add(verifiedKey);
       progress("Candidate verified", undefined, candidate.row.title);
       // Progressive results: stream the verified lead immediately so the UI
       // shows it while research continues on remaining candidates.

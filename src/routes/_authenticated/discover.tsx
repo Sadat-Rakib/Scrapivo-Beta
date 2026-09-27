@@ -358,6 +358,9 @@ function DiscoverPage() {
     "investors" | "local" | "jobs" | "general" | undefined
   >(undefined);
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  // Honest terminal-zero copy from the retrieval funnel (never invented fiction).
+  const [zeroNarrative, setZeroNarrative] = useState<string | null>(null);
+  const [activityExpanded, setActivityExpanded] = useState(false);
   const [queryType, setQueryType] = useState<string | null>(null);
   // Clarifying-question flow. Questions are computed BEFORE the search runs and
   // hold it until answered or skipped — see beginSearch. (They used to arrive
@@ -674,6 +677,8 @@ function DiscoverPage() {
     setIntentProgress(null);
     setBrowserProgressRun(run.search_run_id);
     setBrowserProgressEvents([]);
+    setZeroNarrative(null);
+    setActivityExpanded(false);
     // Loading spinner only for the active run (stale cannot flip chrome).
     session.applyIfActive({ search_run_id: run.search_run_id }, () => {
       setSpecPending(true);
@@ -800,6 +805,11 @@ function DiscoverPage() {
         superseded: session.wasSuperseded(res.search_run_id),
         detail: res.boundary_message ?? zeroResultsNarrative(res.retrievalTrace) ?? res.diagnostics?.[0]?.detail,
       });
+      setZeroNarrative(
+        !append && qualifiedCount === 0 && res.outcome === "NO_QUALIFIED_RESULTS"
+          ? zeroResultsNarrative(res.retrievalTrace)
+          : null,
+      );
       if (
         !append &&
         turnId === pendingTurnIdRef.current &&
@@ -949,6 +959,7 @@ function DiscoverPage() {
     const category = pick("entity_category");
     const industry = pick("entity_industry");
     const location = pick("entity_location", "geography");
+    const investorSector = pick("investor_sector");
     const mode = pick("entity_mode");
     const offer = pick("entity_offer");
     // Investor slots survive the panel (previously dropped: answers existed
@@ -976,6 +987,7 @@ function DiscoverPage() {
     if (invStage && invStage !== "any") out.investor_stage = invStage;
     if (invCheck && invCheck !== "any") out.investor_check = invCheck;
     if (invSector && invSector !== "any") out.investor_sector = invSector;
+    if (investorSector && investorSector.toLowerCase() !== "any") out.investor_sector = investorSector;
     // Mode/offer ride along as stated criteria (ignored by retrieval and
     // validation; consumed by Intent in Batch 4). Phase 1.3: the server mode
     // gate blocks retrieval until mode is stated (one question), and asks the
@@ -1894,7 +1906,19 @@ function DiscoverPage() {
             </div>
           ) : showHero ? (
             <div className="min-h-full flex flex-col items-center justify-center py-6 md:py-10">
-              <DiscoverWelcomeHero greetingName={greetingName || undefined} />
+              <DiscoverWelcomeHero
+                greetingName={greetingName || undefined}
+                onQuickSearch={(q) => {
+                  setInput(q);
+                  const text = q.trim();
+                  setInput("");
+                  void beginSearch(text).catch((e: unknown) => {
+                    console.error("[discover] quick search failed", e);
+                    toast.error(friendlyErrorText(e, "Search failed to start"));
+                    setInput(text);
+                  });
+                }}
+              />
             </div>
           ) : (
             <div className="max-w-4xl mx-auto py-4 md:py-6 space-y-5 md:space-y-6">
@@ -2123,9 +2147,9 @@ function DiscoverPage() {
                     <div className="text-foreground font-medium">
                       {activeVertical === "local"
                         ? `No local businesses found for "${displaySearchLabel(activeQuery)}".`
-                        : queryType === "product"
-                          ? `No fresh public asks for a tool like "${displaySearchLabel(activeQuery)}" in the last day or two.`
-                          : `No fresh buyer-intent posts for "${displaySearchLabel(activeQuery)}" in the last day or two.`}
+                        : zeroNarrative
+                          ? zeroNarrative
+                          : `No verified matches found for "${displaySearchLabel(activeQuery)}" yet.`}
                     </div>
                     {activeVertical === "local" && (
                       <div>
@@ -2134,20 +2158,7 @@ function DiscoverPage() {
                       </div>
                     )}
                     {activeVertical !== "local" && (
-                      <div>
-                        {queryType === "product"
-                          ? "We look for posts where people recommend, compare, or ask for tools like yours."
-                          : "This means:"}
-                      </div>
-                    )}
-                    {activeVertical !== "local" && queryType !== "product" && (
-                      <ul className="list-disc pl-5 space-y-1">
-                        <li>
-                          No one posted publicly asking for this in the last few hours to two days.
-                        </li>
-                        <li>Try again shortly — new posts appear constantly.</li>
-                        <li>Try broader terms (e.g. "developer" instead of "React developer").</li>
-                      </ul>
+                      <div>Try broadening the search — remove a constraint, add a location, or search without a filter.</div>
                     )}
                     {suggestions.length > 0 && (
                       <div className="space-y-2">
@@ -2220,8 +2231,11 @@ function DiscoverPage() {
                   </button>
                 )}
                 {browserProgressEvents.length > 0 && (
-                  <div className="mt-2 border-t border-border pt-2 space-y-1" aria-live="polite" aria-label="Live browser activity">
-                    {browserProgressEvents.map((event) => (
+                  <div className={`mt-2 border-t border-border pt-2 space-y-1 ${activityExpanded ? "max-h-44 overflow-y-auto" : ""}`} aria-live="polite" aria-label="Live research activity">
+                    {(activityExpanded
+                      ? browserProgressEvents
+                      : browserProgressEvents.slice(-3)
+                    ).map((event) => (
                       <div key={event.id} className="flex items-center gap-2 text-xs text-muted-foreground">
                         <span className="size-1.5 rounded-full bg-primary shrink-0" />
                         <span>
@@ -2230,6 +2244,17 @@ function DiscoverPage() {
                         </span>
                       </div>
                     ))}
+                    {browserProgressEvents.length > 3 && (
+                      <button
+                        type="button"
+                        onClick={() => setActivityExpanded((v) => !v)}
+                        className="text-left text-[11px] text-primary/80 hover:text-primary"
+                      >
+                        {activityExpanded
+                          ? "Show less"
+                          : `Show all activity (${browserProgressEvents.length})`}
+                      </button>
+                    )}
                     {browserProgressEvents.filter((event) => event.row).length > 0 && (
                       <div className="space-y-0.5 pt-1" aria-live="polite" aria-label="Verified while researching">
                         {browserProgressEvents.filter((event) => event.row).slice(-4).map((event) => (

@@ -1143,6 +1143,23 @@ export async function runSpecSearchCore(
   // when optional fields are still missing. Unknown entity still clarifies.
   const forcedReady = !!opts.force && spec.entity !== "unknown";
   if (forcedReady) spec.status = "ready_to_search";
+  // Universal query readiness: a BARE ask ("find me investors") asks the one
+  // highest-information question instead of searching with arbitrary
+  // assumptions. "Search with defaults" in the panel bypasses; an explicit
+  // count in the query signals the user knows what they want.
+  if (spec.status === "ready_to_search") {
+    const { evaluateQueryReadiness } = await import("@/lib/search/query-readiness");
+    const readiness = evaluateQueryReadiness({ spec, query, force: opts.force });
+    if (!readiness.ready && readiness.question) {
+      return withRun({
+        spec,
+        questions: [],
+        clarify: [readiness.question],
+        rows: [],
+        ...pageInfo,
+      } as unknown as Record<string, unknown>, 0, false);
+    }
+  }
   // Mode gate (Phase 1.3): directory hunts state browsing-vs-selling BEFORE
   // retrieval — never results first. Missing-field specs keep their panel;
   // once ready, an unstated mode blocks with exactly one question. The offer
