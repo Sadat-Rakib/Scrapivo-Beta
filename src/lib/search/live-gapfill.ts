@@ -45,7 +45,8 @@ export type LiveGapfillDeps = {
   /** Injectable browser discovery; production always uses the browser adapter. */
   browser?: ((spec: SearchSpec, options: { searchRunId?: string; signal?: AbortSignal | null; onProgress?: (event: { action: string; source?: string; detail?: string }) => void; researchPlan?: ReturnType<typeof buildResearchPlan>; initialCandidates?: SpecRow[]; desiredCount?: number; isVerified?: (row: SpecRow) => boolean; timeoutMs?: number }) => Promise<SpecRow[]>) | null;
   searchRunId?: string;
-  onBrowserProgress?: (event: { action: string; source?: string; detail?: string; count?: number | string }) => void;
+  ownerId?: string;
+  onBrowserProgress?: (event: { action: string; source?: string; detail?: string; count?: number | string; row?: import("@/lib/search/search-browser-progress.server").StreamedLead }) => void;
   desiredCount?: number;
   initialCandidates?: SpecRow[];
   isVerified?: (row: SpecRow) => boolean;
@@ -718,6 +719,7 @@ export async function runLiveGapfill(
   const researchPlan = buildResearchPlan(spec, { desiredCount });
   const browserOptions = {
     ...(deps.searchRunId ? { searchRunId: deps.searchRunId } : {}),
+    ...(deps.ownerId ? { ownerId: deps.ownerId } : {}),
     ...(deps.signal ? { signal: deps.signal } : {}),
     ...(deps.onBrowserProgress ? { onProgress: deps.onBrowserProgress } : {}),
     researchPlan,

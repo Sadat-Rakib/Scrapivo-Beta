@@ -65,6 +65,7 @@ import { EntityDetailPanel, type SelectedEntity } from "@/components/discover/en
 import { GenerateModal } from "@/components/discover/generate-modal";
 import { Bell, Plus, X, ChevronDown, ChevronUp } from "lucide-react";
 import { ThinkingSteps } from "@/components/discover/thinking-steps";
+import { ScrapyBrowser } from "@/components/discover/scrapy-browser";
 import { ClarifyPanel } from "@/components/discover/clarify-panel";
 import { UnderstandingInspector } from "@/components/discover/understanding-inspector";
 import type { ClarifyQuestion, ClarifyAnswers } from "@/lib/search/clarifier";
@@ -570,7 +571,8 @@ function DiscoverPage() {
   // looks dead during the S3 scan then pops results "out of blue".
   const [specPending, setSpecPending] = useState(false);
   const [browserProgressRun, setBrowserProgressRun] = useState<string | null>(null);
-  const [browserProgressEvents, setBrowserProgressEvents] = useState<Array<{ id: number; action: string; source?: string; detail?: string; count?: number | string }>>([]);
+  type StreamedLead = import("@/lib/search/search-browser-progress.server").StreamedLead;
+  const [browserProgressEvents, setBrowserProgressEvents] = useState<Array<{ id: number; action: string; source?: string; detail?: string; count?: number | string; row?: StreamedLead }>>([]);
   // M11: only the active search_run_id may mutate results/loading/outcome UI.
   const searchSessionRef = useRef<ActiveSearchSession | null>(null);
   useEffect(() => {
@@ -2228,6 +2230,25 @@ function DiscoverPage() {
                         </span>
                       </div>
                     ))}
+                    {browserProgressEvents.filter((event) => event.row).length > 0 && (
+                      <div className="space-y-0.5 pt-1" aria-live="polite" aria-label="Verified while researching">
+                        {browserProgressEvents.filter((event) => event.row).slice(-4).map((event) => (
+                          <div key={`v${event.id}`} className="flex items-center gap-2 text-xs text-emerald-400/90">
+                            <span>✓</span>
+                            <span className="truncate">
+                              {event.row?.title}
+                              {event.row?.email || event.row?.phone
+                                ? ` · ${event.row.email ?? event.row.phone}`
+                                : ""}
+                            </span>
+                          </div>
+                        ))}
+                        <div className="text-[11px] text-muted-foreground">
+                          {browserProgressEvents.filter((event) => event.row).length} verified while researching…
+                        </div>
+                      </div>
+                    )}
+                    <ScrapyBrowser runId={browserProgressRun} />
                   </div>
                 )}
               </div>

@@ -79,7 +79,9 @@ export interface SpecSearchDeps {
   >;
   /** M3: abort in-flight work when signalled. */
   signal?: AbortSignal | null;
-  browserProgress?: (event: { action: string; source?: string; detail?: string; count?: number | string }) => void;
+  browserProgress?: (event: { action: string; source?: string; detail?: string; count?: number | string; row?: import("@/lib/search/search-browser-progress.server").StreamedLead }) => void;
+  /** Authenticated owner — binds the Scrapy browser session to the run. */
+  ownerId?: string;
 }
 
 export interface SpecRow {
@@ -1132,7 +1134,7 @@ export async function runSpecSearchCore(
       ...pageInfo,
       boundary_message:
         "Scrapivo is built for finding and researching people, companies, local businesses, jobs, and investors. Try one of those instead.",
-    } as SpecSearchResult, 0, false);
+    } as unknown as Record<string, unknown>, 0, false);
   }
   const { computeMissing } = await import("@/lib/search/search-spec");
   spec.missing = computeMissing(spec);
@@ -1892,6 +1894,7 @@ export async function runSpecSearchCore(
         searchRunId: runIds.search_run_id,
         signal: deps.signal,
         onBrowserProgress: deps.browserProgress,
+        ownerId: deps.ownerId,
         desiredCount: Math.min(candidatePoolTarget, 30),
         initialCandidates: [...completeRows, ...incompleteRows],
         // Verification order fix: stamp the Spec opportunity BEFORE judging
@@ -2359,6 +2362,55 @@ export async function runSpecSearchCore(
   );
 }
 
+export const getScrapyBrowserState = createServerFn({ method: "POST" })
+  .middleware([requireMyAuth])
+  .inputValidator(
+    z.object({
+      search_run_id: z.string().min(1).max(80),
+    }),
+  )
+  .handler(async ({ data, context }): Promise<{
+    active: boolean;
+    status: string | null;
+    currentUrl: string | null;
+    currentTitle: string | null;
+    currentAction: string | null;
+    pagesVisited: number;
+    actionCount: number;
+    elapsedMs: number | null;
+    screenshotDataUrl: string | null;
+  }> => {
+    const { readScrapyBrowserState } = await import("@/lib/search/scrapy-browser.server");
+    const state = readScrapyBrowserState(data.search_run_id, String(context?.userId ?? ""));
+    if (!state) {
+      return { active: false, status: null, currentUrl: null, currentTitle: null, currentAction: null, pagesVisited: 0, actionCount: 0, elapsedMs: null, screenshotDataUrl: null };
+    }
+    let screenshotDataUrl: string | null = null;
+    if (state.lastScreenshotPath) {
+      try {
+        const fs = await import("node:fs/promises");
+        const stat = await fs.stat(state.lastScreenshotPath).catch(() => null);
+        if (stat && stat.size < 300_000) {
+          const buf = await fs.readFile(state.lastScreenshotPath);
+          screenshotDataUrl = `data:image/jpeg;base64,${buf.toString("base64")}`;
+        }
+      } catch {
+        screenshotDataUrl = null;
+      }
+    }
+    return {
+      active: state.status === "active" || state.status === "starting" || state.status === "user_control",
+      status: state.status,
+      currentUrl: state.currentUrl || null,
+      currentTitle: state.currentTitle || null,
+      currentAction: state.currentAction || null,
+      pagesVisited: state.pagesVisited,
+      actionCount: state.actionCount,
+      elapsedMs: Date.now() - state.startedAt,
+      screenshotDataUrl,
+    };
+  });
+
 export const getSpecFlag = createServerFn({ method: "GET" })
   .middleware([requireMyAuth])
   .handler(
@@ -2401,6 +2453,7 @@ export const runSpecSearch = createServerFn({ method: "POST" })
       return await runSpecSearchCore(data.query, {
         signal: registered?.signal ?? getRequest().signal,
         browserProgress: runId ? (event) => publishSearchBrowserProgress(runId, ownerId, event) : undefined,
+        ownerId,
       }, data.limit, data.answers, {
         force: data.force,
         offset: data.offset,

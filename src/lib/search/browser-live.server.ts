@@ -2,6 +2,19 @@ import { createHash, randomUUID } from "node:crypto";
 import type { SpecRow } from "@/lib/spec-search.functions";
 import type { AgentBrowser, BrowserSession, PageSnapshot } from "@/lib/research-agent/browser";
 import { AgentBrowserCliAdapter } from "@/lib/research-agent/agent-browser-cli.server";
+import { PlaywrightBrowserAdapter } from "@/lib/research-agent/playwright-browser.server";
+
+/** Browser worker selection: persistent Playwright primary, CLI fallback. */
+export function buildDefaultAgentBrowser(
+  signal: AbortSignal | null,
+  meta: { runId?: string; ownerId?: string; visible?: boolean } = {},
+): AgentBrowser {
+  const adapter = (process.env.SCRAPIVO_BROWSER_ADAPTER ?? "playwright").toLowerCase();
+  if (adapter === "playwright") {
+    return new PlaywrightBrowserAdapter(signal, meta);
+  }
+  return new AgentBrowserCliAdapter(undefined, signal);
+}
 import type { SearchSpec } from "./search-spec";
 import { makeEvidence } from "./evidence";
 import { classifyPage } from "./page-classify";
@@ -25,6 +38,7 @@ export type BrowserExtractedEntity = {
 export type BrowserObservedPage = { url: string; title: string; text: string; structured?: StructuredPageFacts };
 export type BrowserDiscoveryOptions = {
   searchRunId?: string;
+  ownerId?: string;
   signal?: AbortSignal | null;
   browser?: AgentBrowser;
   maxPages?: number;
@@ -36,7 +50,7 @@ export type BrowserDiscoveryOptions = {
   desiredCount?: number;
   isVerified?: (row: SpecRow) => boolean;
   onCandidateMemory?: (candidates: BrowserCandidateMemory[]) => void;
-  onProgress?: (event: { action: string; source?: string; detail?: string; count?: number | string }) => void;
+  onProgress?: (event: { action: string; source?: string; detail?: string; count?: number | string; row?: import("@/lib/search/search-browser-progress.server").StreamedLead }) => void;
   extractEntities?: (pages: BrowserObservedPage[], spec: SearchSpec) => Promise<BrowserExtractedEntity[]>;
 };
 
@@ -413,7 +427,15 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
   options.signal?.addEventListener("abort", abort, { once: true });
   if (options.signal?.aborted) abort();
   const timer = setTimeout(abort, Math.max(1_000, options.timeoutMs ?? 120_000));
-  const browser = options.browser ?? new AgentBrowserCliAdapter(undefined, controller.signal);
+  // Browser worker selection (Phase 8): the persistent Playwright adapter is
+  // primary — one browser process for the whole run (≈50-150ms per action vs
+  // a CLI process spawn per action) and screenshots for the Scrapy viewer.
+  // SCRAPIVO_BROWSER_ADAPTER=cli forces the legacy per-command adapter.
+  const browser = options.browser ?? buildDefaultAgentBrowser(controller.signal, {
+    runId: options.searchRunId,
+    ownerId: options.ownerId,
+    visible: options.visible,
+  });
   let session: BrowserSession | null = null;
   const memory: BrowserCandidateMemory[] = [];
   const visited = new Set<string>();
@@ -888,7 +910,29 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
     if (!done()) {
       candidate.status = "exhausted";
       candidate.verificationStatus = "unresolved";
-    } else if (candidate.status === "verified") progress("Candidate verified", undefined, candidate.row.title);
+    } else if (candidate.status === "verified") {
+      progress("Candidate verified", undefined, candidate.row.title);
+      // Progressive results: stream the verified lead immediately so the UI
+      // shows it while research continues on remaining candidates.
+      const row = candidate.row;
+      options.onProgress?.({
+        action: "Candidate verified",
+        detail: candidate.row.title,
+        row: {
+          key: row.key ?? row.entity_id ?? "",
+          entity_id: row.entity_id ?? "",
+          kind: row.kind,
+          title: row.title ?? "",
+          url: row.url ?? null,
+          website_url: row.website_url ?? null,
+          profile_url: row.profile_url ?? null,
+          email: row.email ?? null,
+          phone: row.phone ?? null,
+          location: row.location ?? null,
+          why_match: row.why_match ?? null,
+        },
+      });
+    }
   };
   try {
     check();

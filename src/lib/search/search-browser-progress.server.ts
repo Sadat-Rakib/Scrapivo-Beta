@@ -1,3 +1,18 @@
+/** Minimal serializable lead for progressive result streaming. */
+export type StreamedLead = {
+  key: string;
+  entity_id: string;
+  kind: string;
+  title: string;
+  url: string | null;
+  website_url: string | null;
+  profile_url: string | null;
+  email: string | null;
+  phone: string | null;
+  location: string | null;
+  why_match: string | null;
+};
+
 export type SearchBrowserProgressEvent = {
   id: number;
   action: string;
@@ -5,6 +20,8 @@ export type SearchBrowserProgressEvent = {
   detail?: string;
   /** Optional quantitative payload: "Found N candidates", "4/15 researched". */
   count?: number | string;
+  /** Progressive results: a lead that just verified mid-run. */
+  row?: StreamedLead;
   at: string;
 };
 
