@@ -792,6 +792,14 @@ export function resolveCanonicalLocation(raw: string): GeoEntity | null {
  * Pass when equal, or candidate is nested inside required (more specific OK).
  * Fail when sibling / unrelated / candidate is strictly broader than Spec.
  */
+/** Macro-region → country codes (rows carry cities/countries, users say regions). */
+export const REGION_COUNTRY: Record<string, string[]> = {
+  "north america": ["us", "usa", "united states", "ca", "can", "canada", "mx", "mexico"],
+  europe: ["gb", "uk", "united kingdom", "ie", "fr", "de", "nl", "be", "es", "it", "pt", "se", "no", "dk", "fi", "ch", "at", "pl", "cz", "gr"],
+  "latin america": ["mx", "br", "ar", "cl", "co"],
+  asia: ["in", "cn", "jp", "kr", "sg", "ph", "vn", "id", "my", "th"],
+};
+
 export function locationSatisfies(
   candidateRaw: string | null | undefined,
   required: GeoEntity | string | null | undefined,
@@ -806,6 +814,18 @@ export function locationSatisfies(
 
   const cand = resolveCanonicalLocation(candRaw);
   if (!cand) return false;
+
+  // Macro-region asks ("North America"): a row satisfies it when the row's
+  // own canonical country is in the region — city/country text never contains
+  // the region name, so substring logic would reject every member.
+  if (req.kind === "stated") {
+    const region = REGION_COUNTRY[req.name.toLowerCase()] ?? REGION_COUNTRY[req.id.replace(/^geo:stated:/, "").replace(/-/g, " ")];
+    const rowCountry = cand.country_code?.toLowerCase() ?? null;
+    const rowName = (cand.name ?? "").toLowerCase();
+    if (region && ((rowCountry && region.includes(rowCountry)) || region.includes(rowName))) {
+      return true;
+    }
+  }
 
   if (
     req.country_code &&

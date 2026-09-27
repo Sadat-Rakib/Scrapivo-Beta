@@ -475,10 +475,15 @@ export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
     const location = fieldOf(spec, "location");
     const seniority = fieldOf(spec, "seniority");
     const employment = fieldOf(spec, "employment");
-    if (role && !role.toLowerCase().split(/\s+/).every((term) => term && new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(row.title))) return false;
-    if (location && !locationOk(row.country, row.location, row.detail, location)) return false;
+    // Hyphen/space normalization: "front-end developer" titles must satisfy
+    // a "frontend" role ask and vice versa.
+    const jobTitleNorm = row.title.replace(/[-–—]/g, " ");
+    if (role && !role.toLowerCase().split(/\s+/).every((term) => term && new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(jobTitleNorm))) return false;
+    // "remote" as a location is a work MODE, not a geo gate — rows may carry
+    // a city alongside remote employment.
+    if (location && location.toLowerCase() !== "remote" && !locationOk(row.country, row.location, row.detail, location)) return false;
     if (seniority && !like(row.title, seniority) && !like(row.detail, seniority)) return false;
-    if (employment && !like(row.title, employment) && !like(row.detail, employment)) {
+    if (employment && !like(row.title, employment) && !like(row.detail, employment) && !like(row.location ?? "", employment)) {
       // "remote" also matches an explicit Remote marker in the detail line.
       if (!(employment.toLowerCase() === "remote" && /\bremote\b/i.test(row.detail))) return false;
     }
@@ -576,10 +581,28 @@ function locationOk(
   if (wantGeo?.kind === "metro") {
     return locationSatisfies(location ?? detail ?? "", wantGeo) || locationSatisfies(detail ?? "", wantGeo);
   }
-  const isoList = COUNTRY_ISO[want.toLowerCase().trim()];
+  // Macro-regions: "North America" names a country SET, not a substring —
+  // rows carry "US"/"CA"/"MX", never the region name.
+  const REGION_ISO: Record<string, string[]> = {
+    "north america": ["us", "ca", "mx"],
+    europe: ["gb", "ie", "fr", "de", "nl", "be", "es", "it", "pt", "se", "no", "dk", "fi", "ch", "at", "pl", "cz", "gr"],
+    "latin america": ["mx", "br", "ar", "cl", "co"],
+    asia: ["in", "cn", "jp", "kr", "sg", "ph", "vn", "id", "my", "th"],
+  };
+  const isoList = COUNTRY_ISO[want.toLowerCase().trim()] ?? REGION_ISO[want.toLowerCase().trim()];
   if (isoList) {
     const rowIso = (country ?? "").toLowerCase().trim();
-    const isoOk = isoList.some((s) => rowIso === s || (rowIso && rowIso.includes(s)));
+    // Rows store full country names as often as ISO codes — accept both.
+    const COUNTRY_NAME_ISO: Record<string, string> = {
+      "united states": "us", usa: "us", canada: "ca", mexico: "mx",
+      "united kingdom": "gb", ireland: "ie", germany: "de", france: "fr",
+      netherlands: "nl", spain: "es", italy: "it", portugal: "pt",
+      sweden: "se", norway: "no", denmark: "dk", finland: "fi",
+      switzerland: "ch", austria: "at", poland: "pl", india: "in",
+      brazil: "br", israel: "il", australia: "au", japan: "jp",
+    };
+    const rowIsoNorm = COUNTRY_NAME_ISO[rowIso] ?? rowIso;
+    const isoOk = isoList.some((s) => rowIsoNorm === s || (rowIsoNorm && rowIsoNorm.includes(s)));
     const nameOk = like(location ?? "", want) || like(detail, want);
     return isoOk || nameOk;
   }

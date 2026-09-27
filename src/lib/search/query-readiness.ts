@@ -59,6 +59,10 @@ export function evaluateQueryReadiness(args: {
     spec.entity === "person" &&
     /\bfounder\b/i.test(fieldOf("role") ?? "") &&
     !fieldOf("industry") &&
+    // A stated location already narrows the hunt ("founders in Toronto") —
+    // asking for industry too would be interrogation, not clarification.
+    !fieldOf("location") &&
+    !fieldOf("geo_scope") &&
     !hasCount
   ) {
     return {

@@ -35,7 +35,7 @@ export function DiscoverWelcomeHero({
         {firstName ? `Hey ${firstName} 👋 I'm Scrapy. What are you looking for today?` : "Hey 👋 I'm Scrapy. What are you looking for today?"}
         <span className="absolute -bottom-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-b border-r border-white/10 bg-white/[0.06]" />
       </div>
-      <div className="mb-2 flex justify-center">
+      <div className="mt-4 flex justify-center">
         <Mascot
           directions="/mascots/cat-directions.webp"
           reactions="/mascots/cat-reactions.webp"
@@ -44,16 +44,8 @@ export function DiscoverWelcomeHero({
         />
       </div>
 
-      {/* Personalized greeting — no fabricated names. */}
-      <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-white text-balance">
-        {firstName ? `Hey ${firstName}, I'm Scrapy.` : "Hey, I'm Scrapy."}
-      </h1>
-      <p className="mt-3 text-sm sm:text-base text-white/60 max-w-lg mx-auto leading-relaxed">
-        Welcome to Scrapivo. What are you looking for?
-      </p>
-
       {/* Quick paths — same pipeline as typing; power users keep the composer. */}
-      <div className="mt-6 flex flex-wrap justify-center gap-2">
+      <div className="mt-5 flex flex-wrap justify-center gap-2">
         {QUICK_CHIPS.map((chip) => (
           <button
             key={chip.label}

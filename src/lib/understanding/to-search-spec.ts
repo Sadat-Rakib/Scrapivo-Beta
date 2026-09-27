@@ -46,11 +46,16 @@ export function frameToSearchSpec(input: UnderstandingFrame): SearchSpec {
   const supported = ['person', 'company', 'business', 'investor', 'job'];
   // An explicit SaaS company request is an organization search even when the
   // understanding provider labels the city-scoped target as a local business.
-  const entity: SpecEntity = /\bSaaS\s+compan(?:y|ies)\b/i.test(raw)
+  const legacyEntity: SpecEntity = /\bSaaS\s+compan(?:y|ies)\b/i.test(raw)
     ? 'company'
     : supported.includes(frame.target.entity_type.value)
       ? frame.target.entity_type.value as SpecEntity
       : frame.target.entity_type.value === 'organization' ? 'company' : legacy.entity;
+  // Investor nouns beat the frame's target: "investors backing pre-seed AI
+  // STARTUPS" describes the PORTFOLIO, not the entity being searched.
+  const entity: SpecEntity = /\b(investors?|vcs?|angels?|funds?)\b/i.test(raw)
+    ? 'investor'
+    : legacyEntity;
   const semanticFields = new Set(['role', 'industry', 'category', 'requested_service', 'requested_role', 'requested_product']);
   const criteria: SpecField[] = legacy.criteria.filter((c) => !semanticFields.has(c.field));
   const put = (field: string, value: string, confidence = 1, stated = true) => {
@@ -157,6 +162,17 @@ export function frameToSearchSpec(input: UnderstandingFrame): SearchSpec {
     }
   }
   if (frame.temporal?.relation === 'within_last' && frame.temporal.window) put('needs_live', 'true');
+  // "Remote" is a work MODE, not geography: worldwide scope replaces any
+  // location criterion so downstream gates never geo-gate remote hunts.
+  const remoteMode = criteria.some((c) => c.field === 'employment' && /remote/i.test(c.value)) ||
+    /remote/i.test(raw);
+  if (remoteMode && entity !== 'unknown') {
+    for (let i = criteria.length - 1; i >= 0; i--) {
+      if (criteria[i].field === 'location') criteria.splice(i, 1);
+    }
+    put('geo_scope', 'worldwide');
+  }
+
   const eventSignal = ['hiring', 'received_funding', 'seeking_funding'].includes(frame.relation.type.value);
   const signalRequired = !tentativeHelp && (frame.evidence.intent_signal_required || eventSignal);
   const signalTypes = signalRequired ? legacy.signal_types.length ? legacy.signal_types : [frame.relation.type.value === 'hiring' ? 'hiring' : frame.relation.type.value === 'received_funding' ? 'funding' : 'service_request'] : [];

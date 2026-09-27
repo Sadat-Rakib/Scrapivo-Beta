@@ -5,6 +5,14 @@
 import { readFiltered, type DbHitMeta } from "./read-parquet.server";
 import { investorSectorMatches } from "@/lib/search/search-spec";
 
+/** Macro-region → country codes (rows store countries, users say regions). */
+const REGION_COUNTRY: Record<string, string[]> = {
+  "north america": ["us", "usa", "united states", "ca", "can", "canada", "mx", "mexico"],
+  europe: ["gb", "uk", "united kingdom", "ie", "fr", "de", "nl", "be", "es", "it", "pt", "se", "no", "dk", "fi", "ch", "at", "pl", "cz", "gr"],
+  "latin america": ["mx", "br", "ar", "cl", "co"],
+  asia: ["in", "cn", "jp", "kr", "sg", "ph", "vn", "id", "my", "th"],
+};
+
 export interface CanonicalInvestor {
   id: string | null;
   name: string | null;
@@ -70,7 +78,8 @@ export async function searchInvestorsDB(q: {
       (!q.check || checkValue == null ||
         ((typeof r.check_min_usd !== "number" || r.check_min_usd <= checkValue) &&
          (typeof r.check_max_usd !== "number" || r.check_max_usd >= checkValue))) &&
-      (!q.location || like(r.location_raw, q.location) || like(r.location_country, q.location)) &&
+      (!q.location || like(r.location_raw, q.location) || like(r.location_country, q.location) ||
+        REGION_COUNTRY[q.location.toLowerCase()]?.includes(String((r as unknown as Record<string, unknown>).location_country ?? "").toLowerCase())) &&
       (!q.kind || r.kind === q.kind),
   });
 }
