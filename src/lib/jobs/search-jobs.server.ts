@@ -73,14 +73,19 @@ export function createSearchJobsStore(client: SupabaseClient): SearchJobsStore {
       return data ? parseSearchJobRow(data) : null;
     },
 
-    async list(userId, opts): Promise<{ rows: SearchJobRow[]; total: number }> {
+    async list(
+      userId,
+      opts: { page: number; pageSize: number; projectId?: string | null },
+    ): Promise<{ rows: SearchJobRow[]; total: number }> {
       const page = Math.max(0, opts.page);
       const pageSize = Math.min(50, Math.max(1, opts.pageSize));
       const from = page * pageSize;
-      const { data, error, count } = await client
+      let query = client
         .from(JOBS)
         .select("*", { count: "exact" })
-        .eq("user_id", userId)
+        .eq("user_id", userId);
+      if (opts.projectId) query = query.eq("project_id", opts.projectId);
+      const { data, error, count } = await query
         .order("created_at", { ascending: false })
         .range(from, from + pageSize - 1);
       if (error) mapDbError(error);

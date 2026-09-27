@@ -143,6 +143,7 @@ export const listSearchJobs = createServerFn({ method: "GET" })
       .object({
         page: z.number().int().min(0).optional().default(0),
         pageSize: z.number().int().min(1).max(50).optional().default(20),
+        projectId: z.string().uuid().nullable().optional(),
       })
       .parse(d),
   )
@@ -153,6 +154,7 @@ export const listSearchJobs = createServerFn({ method: "GET" })
     const { rows, total } = await store.list(context.userId, {
       page: data.page,
       pageSize: data.pageSize,
+      projectId: data.projectId ?? undefined,
     });
     return { rows: rows.map(toWireJob), total };
   });

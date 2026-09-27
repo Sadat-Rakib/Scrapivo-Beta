@@ -246,7 +246,7 @@ export interface SearchJobsStore {
   get(jobId: string): Promise<SearchJobRow | null>;
   list(
     userId: string,
-    opts: { page: number; pageSize: number },
+    opts: { page: number; pageSize: number; projectId?: string | null },
   ): Promise<{ rows: SearchJobRow[]; total: number }>;
   /** Validated partial update; stamps updated_at. */
   update(jobId: string, patch: SearchJobPatch): Promise<SearchJobRow | null>;

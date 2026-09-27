@@ -26,3 +26,17 @@
 - This work is deferred until discovery → enrichment → qualification → output
   reliably returns results. Do not implement stealth, fingerprint evasion,
   CAPTCHA bypass, or login-control bypass.
+
+## Data-asset pass — deferred follow-ups (2026-09-27)
+
+- Real-Postgres replay of the frozen search-job sequence: the acceptance asserts
+  the fake store's lease/claim semantics plus the migration SQL textually
+  (FOR UPDATE SKIP LOCKED, unique upserts); a live Supabase harness is deferred.
+- Wire `createSearchJob` (TanStack server fn, auth-gated) into an offline
+  harness — the acceptance replicates its frozen context-pinning block through
+  the same `store.update` call instead of calling the fn.
+- Thread `createReuseRun()` into the real passRunner (parent workstream's
+  documented wiring point); the acceptance drives reuse invariants via a
+  scripted indexer double over the real freshness TTLs.
+- Add a live-fire check of the outbox's ambiguous-delivery path against real
+  provider adapters (Resend/Slack); covered offline by adapter overrides.
