@@ -40,3 +40,11 @@
   scripted indexer double over the real freshness TTLs.
 - Add a live-fire check of the outbox's ambiguous-delivery path against real
   provider adapters (Resend/Slack); covered offline by adapter overrides.
+
+## Data-asset pass cuts (frozen cut order, 2026-09-27)
+- WS7B custom-signal compiler — CUT under budget strategy. Architecture ready:
+  signal slots on SearchSpec + deep-pass hunter injection point (WS7A) remain;
+  build observableIndicators/searchQueries/evidenceRules on top.
+- Telegram notification adapter — CUT. NotificationChannel interface + 
+  notification_connections rows already accept type 'telegram'; official-bot
+  one-time linking-code flow is the agreed onboarding when built.
