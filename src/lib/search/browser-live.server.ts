@@ -679,6 +679,10 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
     const siteHost = hostOf(candidate.row.website_url);
     if (!siteHost || hostOf(page.url) !== siteHost) return;
     let merged = false;
+    if (!candidate.row.location && facts.organizationLocation) {
+      candidate.row = { ...candidate.row, location: facts.organizationLocation };
+      merged = true;
+    }
     if (!candidate.row.email && facts.emails[0]) {
       candidate.row = { ...candidate.row, email: facts.emails[0] };
       merged = true;

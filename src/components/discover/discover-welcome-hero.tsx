@@ -1,8 +1,13 @@
 import { FindCard } from "./find-card";
 import { Mascot } from "page-mascot";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export function DiscoverWelcomeHero({ greetingName }: { greetingName?: string }) {
   const firstName = greetingName?.trim() ? greetingName.trim().split(" ")[0] : null;
+  // Single instance: page-mascot mounts a fixed-position canvas, so CSS
+  // show/hide duals would render twice. Size switches on the breakpoint.
+  const isMobile = useIsMobile();
+  const mascotSize = isMobile ? 112 : 152;
 
   return (
     <div className="max-w-4xl mx-auto w-full text-center px-4 sm:px-6 py-8 sm:py-12">
@@ -13,15 +18,7 @@ export function DiscoverWelcomeHero({ greetingName }: { greetingName?: string })
         <Mascot
           directions="/mascots/cat-directions.webp"
           reactions="/mascots/cat-reactions.webp"
-          size={112}
-          className="sm:hidden"
-          label="Scrapy"
-        />
-        <Mascot
-          directions="/mascots/cat-directions.webp"
-          reactions="/mascots/cat-reactions.webp"
-          size={152}
-          className="hidden sm:block"
+          size={mascotSize}
           label="Scrapy"
         />
       </div>

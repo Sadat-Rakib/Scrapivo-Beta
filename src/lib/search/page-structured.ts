@@ -20,9 +20,19 @@ export type StructuredJobPosting = {
 export type StructuredPageFacts = {
   jobs: StructuredJobPosting[];
   organizationName: string | null;
+  /** Canonical postal place of the organization ("City, Region"/country). */
+  organizationLocation: string | null;
   emails: string[];
   phones: string[];
 };
+
+function orgAddressText(address: unknown): string | null {
+  if (!address || typeof address !== "object") return asText(address);
+  const a = address as Record<string, unknown>;
+  return [asText(a.addressLocality), asText(a.addressRegion), asText(a.addressCountry)]
+    .filter(Boolean)
+    .join(", ") || null;
+}
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -113,6 +123,9 @@ function interpretNode(node: Record<string, unknown>, facts: StructuredPageFacts
   if (type === "organization" || type === "localbusiness" || type === "store" || type === "professionalservice") {
     const name = asText(node.name);
     if (name && !facts.organizationName) facts.organizationName = name.slice(0, 160);
+    if (!facts.organizationLocation) {
+      facts.organizationLocation = orgAddressText(node.address) ?? null;
+    }
     const email = asText(node.email);
     if (email && EMAIL_RE.test(email) && !facts.emails.includes(email.toLowerCase())) facts.emails.push(email.toLowerCase());
     const phone = asText(node.telephone);
@@ -130,7 +143,7 @@ function interpretNode(node: Record<string, unknown>, facts: StructuredPageFacts
 
 /** Parse every JSON-LD block + contact links out of raw HTML. Bounded + safe. */
 export function extractStructuredFacts(html: string): StructuredPageFacts {
-  const facts: StructuredPageFacts = { jobs: [], organizationName: null, emails: [], phones: [] };
+  const facts: StructuredPageFacts = { jobs: [], organizationName: null, organizationLocation: null, emails: [], phones: [] };
   if (!html) return facts;
   const scriptRe = /<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
   for (const match of html.matchAll(scriptRe)) {
@@ -162,7 +175,7 @@ export function extractStructuredFacts(html: string): StructuredPageFacts {
 
 /** Parse a bare JSON-LD payload (e.g. a browser extract field) — no HTML. */
 export function factsFromJsonLdText(text: string): StructuredPageFacts {
-  const facts: StructuredPageFacts = { jobs: [], organizationName: null, emails: [], phones: [] };
+  const facts: StructuredPageFacts = { jobs: [], organizationName: null, organizationLocation: null, emails: [], phones: [] };
   const raw = text?.trim();
   if (!raw) return facts;
   try {

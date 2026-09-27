@@ -26,3 +26,29 @@
 - This work is deferred until discovery → enrichment → qualification → output
   reliably returns results. Do not implement stealth, fingerprint evasion,
   CAPTCHA bypass, or login-control bypass.
+
+
+## PRODUCT-COMPLETION PASS — COMPLETED (2026-09-26)
+
+Moved OUT of deferred (implemented, verified in battery):
+- ~~Persistent browser worker~~ → PlaywrightBrowserAdapter behind AgentBrowser
+  (SCRAPIVO_BROWSER_ADAPTER=cli forces legacy). One browser/run, ~50-150ms per
+  action; C founders yield 3→9 verified.
+- ~~Browser viewer (Scrapy mini browser)~~ → screenshot-based in-product
+  viewer (scrapy-browser.tsx) + session registry + owner-scoped state endpoint.
+- ~~Row-level progress streaming~~ → verified leads stream as typed events
+  with payload; UI shows "✓ verified while researching" lines.
+- ~~Investor retrieval~~ → broad-then-enrich; REQUIRED.investor=[]; token
+  sector matching; I1 20/20 in 12s, I2 real AI-infra investors.
+- ~~Off-topic routing~~ → deterministic domain boundary (weather etc.) at ~0.3s.
+- ~~Home mascot hero~~ → page-mascot cat (local assets), personalized greeting.
+- ~~Stage timings~~ → retrievalTrace.timings + [spec-run] log.
+
+STILL DEFERRED (real future work):
+- Browser candidate research concurrency >1 (multi-page per run).
+- Pause/resume + Take Control UI (session status protocol already typed).
+- Dynamic widening rounds (discovery → re-discovery on low yield).
+- TTL cache layer + staleness-aware read-back of write-back rows.
+- Deep signal research phase for D-type queries.
+- Generic entity-driven result table columns (current tables are per-entity).
+- Right-dock desktop Scrapy panel (inline card ships today).
