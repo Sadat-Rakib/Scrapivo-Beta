@@ -3,6 +3,7 @@
  * Replaces the JSONL file-source path for spec-first search.
  */
 import { readFiltered, type DbHitMeta } from "./read-parquet.server";
+import { investorSectorMatches } from "@/lib/search/search-spec";
 
 export interface CanonicalInvestor {
   id: string | null;
@@ -64,7 +65,7 @@ export async function searchInvestorsDB(q: {
     meta: { dbHit: false, engine: "s3-parquet", partitionsRead: [KEY] },
     where: (r) =>
       (!needle || like(r.name, needle) || like(r.firm, needle)) &&
-      (!q.sector || like((r as unknown as Record<string, unknown>).sectors, q.sector)) &&
+      (!q.sector || investorSectorMatches(textOf((r as unknown as Record<string, unknown>).sectors), q.sector)) &&
       (!stageNeedle || like((r as unknown as Record<string, unknown>).stages, stageNeedle)) &&
       (!q.check || checkValue == null ||
         ((typeof r.check_min_usd !== "number" || r.check_min_usd <= checkValue) &&

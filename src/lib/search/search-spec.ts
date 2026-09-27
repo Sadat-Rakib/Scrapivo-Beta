@@ -69,17 +69,48 @@ const stated = (field: string, value: string): SpecField => ({
   confidence: 1,
 });
 
-/** Required-field matrices per entity (Phase 1; thresholds stay configurable). */
+/** Required-field matrices per entity (Phase 1; thresholds stay configurable).
+ *  Investors: broad-then-enrich — a sector/stage/check/location-only request
+ *  searches immediately and the clarifier refines thin result sets. Blocking
+ *  all four slots made every investor query a question, never a search. */
 const REQUIRED: Record<Exclude<SpecEntity, "unknown">, string[]> = {
   person: ["role"],
   company: [],
   business: ["location"],
-  investor: ["investor_stage", "investor_sector", "investor_check", "location"],
+  investor: [],
   job: ["role"],
 };
 
 export function getField(spec: SearchSpec, field: string): SpecField | undefined {
   return spec.criteria.find((c) => c.field === field);
+}
+
+/** Words in a requested focus phrase that describe the ASK, not the sector. */
+const INVESTOR_SECTOR_STOPWORDS = new Set([
+  "startups", "startup", "companies", "company", "investors", "investor",
+  "vc", "vcs", "funds", "fund", "focus", "focuses", "focused", "focusing",
+  "the", "a", "an", "on", "in", "who", "that", "and", "or",
+]);
+
+/**
+ * Broad-then-enrich sector matching for investors: stored sector strings are
+ * curated mega-tokens ("Agentic AI AI Infrastructure …") and the user may say
+ * "AI infrastructure startups" — an exact substring match against that phrase
+ * finds nobody. Split the ask into content tokens and match ANY token against
+ * the row's sector text. Generic words never match on their own.
+ */
+export function investorSectorTokens(wanted: string | null | undefined): string[] {
+  const raw = (wanted ?? "").toLowerCase().replace(/[^a-z0-9+#\s]/g, " ");
+  const tokens = raw.split(/\s+/).filter((t) => t.length >= 2 && !INVESTOR_SECTOR_STOPWORDS.has(t));
+  return [...new Set(tokens)];
+}
+
+export function investorSectorMatches(rowSectorText: string | null | undefined, wanted: string | null | undefined): boolean {
+  if (!wanted || !wanted.trim()) return true;
+  const row = (rowSectorText ?? "").toLowerCase();
+  const tokens = investorSectorTokens(wanted);
+  if (!tokens.length) return row.includes(wanted.toLowerCase());
+  return tokens.some((t) => row.includes(t));
 }
 
 export function hasField(spec: SearchSpec, field: string): boolean {

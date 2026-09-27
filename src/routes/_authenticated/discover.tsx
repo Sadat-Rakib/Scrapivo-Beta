@@ -796,7 +796,7 @@ function DiscoverPage() {
       // Typed outcomes — never bare "No results found"; superseded cancel is silent.
       const uiOutcome = outcomeUi(res.outcome, {
         superseded: session.wasSuperseded(res.search_run_id),
-        detail: zeroResultsNarrative(res.retrievalTrace) ?? res.diagnostics?.[0]?.detail,
+        detail: res.boundary_message ?? zeroResultsNarrative(res.retrievalTrace) ?? res.diagnostics?.[0]?.detail,
       });
       if (
         !append &&

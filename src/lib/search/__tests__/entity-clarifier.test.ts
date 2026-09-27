@@ -23,25 +23,24 @@ describe("entity-slot clarifier (Phase 4)", () => {
     expect(entityQuestionsForSpec(spec)).toEqual([]);
   });
 
-  it("investors get neutral input-dependent questions", () => {
+  it("investors search immediately — slots are non-blocking (broad-then-enrich)", () => {
     const spec = extractSearchSpec("I need investors");
     expect(spec.entity).toBe("investor");
-    expect(spec.missing).toEqual(["investor_stage", "investor_sector", "investor_check", "location"]);
-    expect(spec.status).toBe("needs_clarification");
-    const qs = entityQuestionsForSpec(spec);
-    expect(qs.map((q) => q.id)).toEqual([
-      "investor_stage",
-      "investor_sector",
-      "investor_check",
-      "geography",
-    ]);
-    expect(qs.join(" ")).not.toMatch(/your startup/i);
+    // Investor slots are refinement-only: no investor query may be blocked by
+    // a question before retrieval (broad-then-enrich contract).
+    expect(spec.missing).toEqual([]);
+    expect(spec.status).toBe("ready_to_search");
+    expect(entityQuestionsForSpec(spec)).toEqual([]);
   });
 
-  it("investors with sector+location stated skip those questions", () => {
+  it("investor slot questions build only when explicitly missing", () => {
     const spec = extractSearchSpec("investors in SaaS in New York");
-    expect(spec.missing).toEqual(["investor_stage", "investor_check"]);
-    const qs = entityQuestionsForSpec(spec);
+    expect(spec.missing).toEqual([]);
+    const qs = entityQuestionsForSpec({
+      entity: "investor",
+      missing: ["investor_stage", "investor_check"],
+      raw_query: "investors in SaaS in New York",
+    });
     expect(qs.map((q) => q.id)).toEqual(["investor_stage", "investor_check"]);
   });
 

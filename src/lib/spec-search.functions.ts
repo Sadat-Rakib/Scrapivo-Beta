@@ -12,6 +12,7 @@ import { z } from "zod";
 import { requireMyAuth } from "@/integrations/my-supabase/auth-middleware";
 import { extractSearchSpec } from "@/lib/search/search-spec-extract";
 import type { SearchSpec } from "@/lib/search/search-spec";
+import { investorSectorMatches } from "@/lib/search/search-spec";
 import type { DbHitMeta } from "@/lib/canonical/read-parquet.server";
 import { searchPeopleDB, personRoleMatches } from "@/lib/canonical/people.server";
 import { searchCompaniesDB, companyCategoryMatches } from "@/lib/canonical/companies.server";
@@ -456,7 +457,9 @@ export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
     const stage = fieldOf(spec, "investor_stage");
     const check = fieldOf(spec, "investor_check");
     const location = fieldOf(spec, "location");
-    if (sector && !like(row.sector ?? row.detail, sector) && !like(row.title, sector)) return false;
+    // Broad-then-enrich: stored sector strings are curated mega-tokens; match
+    // ANY content token of the requested focus ("AI infrastructure startups").
+    if (sector && !investorSectorMatches(row.sector ?? row.detail, sector) && !like(row.title, sector)) return false;
     if (stage && !like(row.stage ?? row.detail, stage)) return false;
     if (check && !like(row.check ?? row.detail, check)) return false;
     if (location && !locationOk(row.country, row.location, row.detail, location)) return false;
@@ -630,9 +633,20 @@ export interface SpecSearchResult {
   }>;
   /** Qualified count after theorem (delivery/counting denominator). */
   qualified_count: number;
+  /** Off-topic domain boundary copy when the request is out of scope. */
+  boundary_message?: string;
   /** Internal stage accounting so an empty response has a factual cause. */
   retrievalTrace?: {
     sources: Array<{ source: string; partitions: string[]; scanned: number; matched: number }>;
+    /** Stage timings (performance observability, DEV). */
+    timings?: {
+      understanding_ms: number;
+      stored_search_ms: number;
+      research_ms: number;
+      enrichment_ms: number;
+      qualification_ms: number;
+      total_ms: number;
+    };
     rawCandidates: number;
     postSpecFilter: number;
     /** Candidates that entered query-aware enrichment (complete + researchable). */
@@ -988,6 +1002,10 @@ export async function runSpecSearchCore(
     turn_id: opts.turn_id,
     request_id: opts.request_id,
   });
+  const runStartedAt = Date.now();
+  let understandingDoneAt = runStartedAt;
+  let liveDoneAt = runStartedAt;
+  let enrichDoneAt = runStartedAt;
   const routeDiagnostics: Array<{
     code: import("@/lib/search/canonical-contract").SearchOutcomeCode;
     source?: string;
@@ -1056,6 +1074,7 @@ export async function runSpecSearchCore(
   };
   const { understandSearchSpec, isActionableFrame } = await import("@/lib/understanding/to-search-spec");
   const base = await understandSearchSpec(query, answers, deps.signal);
+  understandingDoneAt = Date.now();
   if (deps.signal?.aborted) return withRun({ spec: base, ...pageInfo }, 0, true);
   // Merge prior answers as stated criteria (multi-turn without session store).
   const criteria = [...base.criteria];
@@ -1091,6 +1110,30 @@ export async function runSpecSearchCore(
     criteria,
     ...(entityPick && base.entity === "unknown" ? { entity: entityPick } : {}),
   };
+  // Off-topic boundary: a clearly out-of-domain request ("what's the weather
+  // in Paris") gets a one-line product boundary — never retrieval, never
+  // Scrapy, never a clarification round about people vs companies.
+  const OFF_TOPIC_RE =
+    /\b(weather|forecast|temperature|recipe|recipes|horoscope|lyrics|translate|translation|showtimes?|stock (?:price|quote)|sports scores?)\b/i;
+  const DOMAIN_NOUN_RE =
+    /\b(investors?|founders?|startups?|companies|company|businesses|business|jobs?|leads?|hire|hiring|clients?|customers?|prospects?|vcs?|angels?|funds?)\b/i;
+  if (OFF_TOPIC_RE.test(query) && !DOMAIN_NOUN_RE.test(query)) {
+    routeDiagnostics.push({
+      code: "UNSUPPORTED_CAPABILITY",
+      source: "domain-router",
+      detail:
+        "Scrapivo is built for finding and researching people, companies, local businesses, jobs, and investors. Try one of those instead.",
+    });
+    return withRun({
+      spec,
+      questions: [],
+      clarify: [],
+      rows: [],
+      ...pageInfo,
+      boundary_message:
+        "Scrapivo is built for finding and researching people, companies, local businesses, jobs, and investors. Try one of those instead.",
+    } as SpecSearchResult, 0, false);
+  }
   const { computeMissing } = await import("@/lib/search/search-spec");
   spec.missing = computeMissing(spec);
   spec.status = spec.missing.length ? "needs_clarification" : "ready_to_search";
@@ -1804,7 +1847,21 @@ export async function runSpecSearchCore(
   // Volume engine (Phase 1): discovery should BROADLY oversample the request.
   // The user's N is the delivery bar, not the discovery bar — research/enrich
   // sits between broad discovery and strict qualification.
-  const candidatePoolTarget = Math.min(150, Math.max(requestedTarget * 3, 20));
+  // Volume engine: discovery BROADLY oversamples the request, per entity —
+  // people/investors need deep identity research (higher oversample), local
+  // businesses qualify cheaply from structured sources (lower). Hard cap keeps
+  // cheap candidate collection bounded; deep research stays prioritized.
+  const POOL_OVERFETCH: Record<SearchSpec["entity"], { mult: number; min: number }> = {
+    business: { mult: 3, min: 30 },
+    company: { mult: 5, min: 40 },
+    person: { mult: 7, min: 50 },
+    job: { mult: 6, min: 50 },
+    investor: { mult: 6, min: 50 },
+    unknown: { mult: 3, min: 20 },
+  };
+  const poolFor = POOL_OVERFETCH[spec.entity] ?? { mult: 3, min: 20 };
+  const candidatePoolTarget = Math.min(250, Math.max(requestedTarget * poolFor.mult, poolFor.min));
+  const storedSearchDoneAt = Date.now();
   const { buildSourcePlan } = await import("@/lib/search/source-plan");
   let executionPlan = buildSourcePlan(spec, undefined, { desiredCount: requestedTarget });
   let providerAttempts: import("@/lib/search/source-plan").ProviderDiagnostic[] = [];
@@ -1955,6 +2012,7 @@ export async function runSpecSearchCore(
     }
   }
 
+  liveDoneAt = Date.now();
   // Browser candidates may need the same completeness enrichment as DB rows.
   // A deadline that fired mid-browser (which returned its rows anyway) must
   // not re-enter research phases here.
@@ -2041,6 +2099,7 @@ export async function runSpecSearchCore(
     }
   }
 
+  enrichDoneAt = Date.now();
   const qualificationInputCount = completeRows.length;
   const { qualifyLead } = await import("@/lib/search/qualify");
   const rejectionSummary = completeRows.map((row) => ({ row, decision: qualifyLead(row, spec, row.evidence) }))
@@ -2231,6 +2290,14 @@ export async function runSpecSearchCore(
     })),
     rawCandidates: rawCandidateCount,
     postSpecFilter: postSpecFilterCount,
+    timings: {
+      understanding_ms: understandingDoneAt - runStartedAt,
+      stored_search_ms: storedSearchDoneAt - understandingDoneAt,
+      research_ms: liveDoneAt - storedSearchDoneAt,
+      enrichment_ms: enrichDoneAt - liveDoneAt,
+      qualification_ms: Date.now() - enrichDoneAt,
+      total_ms: Date.now() - runStartedAt,
+    },
     researchable: researchableCount || qualificationInputCount,
     researched: researchedCount || undefined,
     complete: qualificationInputCount,
