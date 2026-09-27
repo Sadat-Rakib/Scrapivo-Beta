@@ -25,9 +25,13 @@ import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedHelpRouteImport } from './routes/_authenticated/help'
 import { Route as AuthenticatedGuidesRouteImport } from './routes/_authenticated/guides'
 import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticated/discover'
+import { Route as AuthenticatedProjectsIndexRouteImport } from './routes/_authenticated/projects.index'
 import { Route as ApiWebhooksResendRouteImport } from './routes/api/webhooks/resend'
 import { Route as ApiCronEmailSequencesRouteImport } from './routes/api/cron/email-sequences'
+import { Route as AuthenticatedSettingsProfileRouteImport } from './routes/_authenticated/settings/profile'
+import { Route as AuthenticatedProjectsProjectIdRouteImport } from './routes/_authenticated/projects.$projectId'
 import { Route as ApiResearchSessionIdEventsRouteImport } from './routes/api/research/$sessionId/events'
+import { Route as AuthenticatedProjectsProjectIdListsListIdRouteImport } from './routes/_authenticated/projects.$projectId.lists.$listId'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -109,6 +113,12 @@ const AuthenticatedDiscoverRoute = AuthenticatedDiscoverRouteImport.update({
   path: '/discover',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedProjectsIndexRoute =
+  AuthenticatedProjectsIndexRouteImport.update({
+    id: '/projects/',
+    path: '/projects/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiWebhooksResendRoute = ApiWebhooksResendRouteImport.update({
   id: '/api/webhooks/resend',
   path: '/api/webhooks/resend',
@@ -119,11 +129,29 @@ const ApiCronEmailSequencesRoute = ApiCronEmailSequencesRouteImport.update({
   path: '/api/cron/email-sequences',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedSettingsProfileRoute =
+  AuthenticatedSettingsProfileRouteImport.update({
+    id: '/settings/profile',
+    path: '/settings/profile',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProjectsProjectIdRoute =
+  AuthenticatedProjectsProjectIdRouteImport.update({
+    id: '/projects/$projectId',
+    path: '/projects/$projectId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiResearchSessionIdEventsRoute =
   ApiResearchSessionIdEventsRouteImport.update({
     id: '/api/research/$sessionId/events',
     path: '/api/research/$sessionId/events',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedProjectsProjectIdListsListIdRoute =
+  AuthenticatedProjectsProjectIdListsListIdRouteImport.update({
+    id: '/lists/$listId',
+    path: '/lists/$listId',
+    getParentRoute: () => AuthenticatedProjectsProjectIdRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -142,9 +170,13 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/watches': typeof AuthenticatedWatchesRoute
+  '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRouteWithChildren
+  '/settings/profile': typeof AuthenticatedSettingsProfileRoute
   '/api/cron/email-sequences': typeof ApiCronEmailSequencesRoute
   '/api/webhooks/resend': typeof ApiWebhooksResendRoute
+  '/projects/': typeof AuthenticatedProjectsIndexRoute
   '/api/research/$sessionId/events': typeof ApiResearchSessionIdEventsRoute
+  '/projects/$projectId/lists/$listId': typeof AuthenticatedProjectsProjectIdListsListIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -162,9 +194,13 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/watches': typeof AuthenticatedWatchesRoute
+  '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRouteWithChildren
+  '/settings/profile': typeof AuthenticatedSettingsProfileRoute
   '/api/cron/email-sequences': typeof ApiCronEmailSequencesRoute
   '/api/webhooks/resend': typeof ApiWebhooksResendRoute
+  '/projects': typeof AuthenticatedProjectsIndexRoute
   '/api/research/$sessionId/events': typeof ApiResearchSessionIdEventsRoute
+  '/projects/$projectId/lists/$listId': typeof AuthenticatedProjectsProjectIdListsListIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -184,9 +220,13 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/_authenticated/watches': typeof AuthenticatedWatchesRoute
+  '/_authenticated/projects/$projectId': typeof AuthenticatedProjectsProjectIdRouteWithChildren
+  '/_authenticated/settings/profile': typeof AuthenticatedSettingsProfileRoute
   '/api/cron/email-sequences': typeof ApiCronEmailSequencesRoute
   '/api/webhooks/resend': typeof ApiWebhooksResendRoute
+  '/_authenticated/projects/': typeof AuthenticatedProjectsIndexRoute
   '/api/research/$sessionId/events': typeof ApiResearchSessionIdEventsRoute
+  '/_authenticated/projects/$projectId/lists/$listId': typeof AuthenticatedProjectsProjectIdListsListIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -206,9 +246,13 @@ export interface FileRouteTypes {
     | '/profile'
     | '/saved'
     | '/watches'
+    | '/projects/$projectId'
+    | '/settings/profile'
     | '/api/cron/email-sequences'
     | '/api/webhooks/resend'
+    | '/projects/'
     | '/api/research/$sessionId/events'
+    | '/projects/$projectId/lists/$listId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -226,9 +270,13 @@ export interface FileRouteTypes {
     | '/profile'
     | '/saved'
     | '/watches'
+    | '/projects/$projectId'
+    | '/settings/profile'
     | '/api/cron/email-sequences'
     | '/api/webhooks/resend'
+    | '/projects'
     | '/api/research/$sessionId/events'
+    | '/projects/$projectId/lists/$listId'
   id:
     | '__root__'
     | '/'
@@ -247,9 +295,13 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/saved'
     | '/_authenticated/watches'
+    | '/_authenticated/projects/$projectId'
+    | '/_authenticated/settings/profile'
     | '/api/cron/email-sequences'
     | '/api/webhooks/resend'
+    | '/_authenticated/projects/'
     | '/api/research/$sessionId/events'
+    | '/_authenticated/projects/$projectId/lists/$listId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -376,6 +428,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDiscoverRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/projects/': {
+      id: '/_authenticated/projects/'
+      path: '/projects'
+      fullPath: '/projects/'
+      preLoaderRoute: typeof AuthenticatedProjectsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/webhooks/resend': {
       id: '/api/webhooks/resend'
       path: '/api/webhooks/resend'
@@ -390,6 +449,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCronEmailSequencesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/settings/profile': {
+      id: '/_authenticated/settings/profile'
+      path: '/settings/profile'
+      fullPath: '/settings/profile'
+      preLoaderRoute: typeof AuthenticatedSettingsProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/projects/$projectId': {
+      id: '/_authenticated/projects/$projectId'
+      path: '/projects/$projectId'
+      fullPath: '/projects/$projectId'
+      preLoaderRoute: typeof AuthenticatedProjectsProjectIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/research/$sessionId/events': {
       id: '/api/research/$sessionId/events'
       path: '/api/research/$sessionId/events'
@@ -397,8 +470,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiResearchSessionIdEventsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/projects/$projectId/lists/$listId': {
+      id: '/_authenticated/projects/$projectId/lists/$listId'
+      path: '/lists/$listId'
+      fullPath: '/projects/$projectId/lists/$listId'
+      preLoaderRoute: typeof AuthenticatedProjectsProjectIdListsListIdRouteImport
+      parentRoute: typeof AuthenticatedProjectsProjectIdRoute
+    }
   }
 }
+
+interface AuthenticatedProjectsProjectIdRouteChildren {
+  AuthenticatedProjectsProjectIdListsListIdRoute: typeof AuthenticatedProjectsProjectIdListsListIdRoute
+}
+
+const AuthenticatedProjectsProjectIdRouteChildren: AuthenticatedProjectsProjectIdRouteChildren =
+  {
+    AuthenticatedProjectsProjectIdListsListIdRoute:
+      AuthenticatedProjectsProjectIdListsListIdRoute,
+  }
+
+const AuthenticatedProjectsProjectIdRouteWithChildren =
+  AuthenticatedProjectsProjectIdRoute._addFileChildren(
+    AuthenticatedProjectsProjectIdRouteChildren,
+  )
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDiscoverRoute: typeof AuthenticatedDiscoverRoute
@@ -413,6 +508,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
   AuthenticatedWatchesRoute: typeof AuthenticatedWatchesRoute
+  AuthenticatedProjectsProjectIdRoute: typeof AuthenticatedProjectsProjectIdRouteWithChildren
+  AuthenticatedSettingsProfileRoute: typeof AuthenticatedSettingsProfileRoute
+  AuthenticatedProjectsIndexRoute: typeof AuthenticatedProjectsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -428,6 +526,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSavedRoute: AuthenticatedSavedRoute,
   AuthenticatedWatchesRoute: AuthenticatedWatchesRoute,
+  AuthenticatedProjectsProjectIdRoute:
+    AuthenticatedProjectsProjectIdRouteWithChildren,
+  AuthenticatedSettingsProfileRoute: AuthenticatedSettingsProfileRoute,
+  AuthenticatedProjectsIndexRoute: AuthenticatedProjectsIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

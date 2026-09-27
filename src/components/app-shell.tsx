@@ -15,7 +15,7 @@ import {
   PanelRightOpen,
   Bell,
   BookOpen,
-  Brain,
+  FolderKanban,
   Plus,
   ChevronLeft,
   ChevronRight,
@@ -33,9 +33,11 @@ const LOGO_SRC =
 
 // §5: Renamed nav items — "Discover" → "Home", "Local businesses" → "Businesses"
 // §4.1: Removed "History" and "Pipeline" from the left sidebar nav
+// WS3: "Memory" → "Projects" (research context); old Memory content moved
+// under Settings → Profile & Defaults (/settings/profile).
 const navItems = [
   { to: "/discover", label: "Home", icon: Search },
-  { to: "/memory", label: "Memory", icon: Brain },
+  { to: "/projects", label: "Projects", icon: FolderKanban },
   { to: "/watches", label: "Watches", icon: Bell },
   { to: "/saved", label: "Saved", icon: Bookmark },
   { to: "/guides", label: "Guides", icon: BookOpen },
@@ -115,6 +117,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     if (location.pathname === "/jobs") return "Jobs";
     if (location.pathname === "/guides") return "Guides";
     if (location.pathname === "/memory") return "Memory";
+    if (location.pathname.startsWith("/projects")) return "Projects";
     return location.pathname.slice(1).replace(/-/g, " ");
   };
 

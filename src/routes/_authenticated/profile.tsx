@@ -27,7 +27,7 @@ type ProfileForm = {
   slack_webhook?: string | null;
 };
 
-function ProfilePage() {
+function ProfilePage({ heading = "Settings" }: { heading?: string }) {
   const qc = useQueryClient();
   const get = useServerFn(getMyProfile);
   const upd = useServerFn(updateMyProfile);
@@ -84,7 +84,7 @@ function ProfilePage() {
           <SettingsIcon className="size-3.5" />
           <span>Account Preferences</span>
         </div>
-        <h1 className="text-2xl font-semibold tracking-tight text-white">Settings</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-white">{heading}</h1>
         <p className="text-xs text-white/60 mt-1">
           Personalize outreach, report delivery, and how Scrapivo understands you.
         </p>
@@ -251,3 +251,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     </div>
   );
 }
+
+// WS3: re-exported for the Settings → Profile & Defaults page
+// (/settings/profile) so the editor exists in exactly one place.
+export { ProfilePage };

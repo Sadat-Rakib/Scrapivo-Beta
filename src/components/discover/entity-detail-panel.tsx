@@ -8,6 +8,7 @@ import { TIER_LABEL, type EvidenceObject } from "@/lib/intent/evidence";
 import { ensureHttpUrl } from "@/lib/search/site-url";
 import { fixMojibake } from "@/lib/encoding";
 import { getWebsiteBio, type WebsiteBio } from "@/lib/search/website-bio.server";
+import { AddToListMenu } from "@/components/discover/add-to-list-menu";
 import { Button } from "@/components/ui/button";
 import {
   Building2,
@@ -219,9 +220,13 @@ export function EntityDetailPanel({
             </div>
           </div>
         </div>
-        <button onClick={onClose} className="p-1 rounded hover:bg-accent text-muted-foreground">
-          <X className="size-4" />
-        </button>
+        {/* WS3: "Add to list…" — dedupe-on-add via project_list_items. */}
+        <div className="flex items-center gap-1 shrink-0">
+          <AddToListMenu entity={entity} />
+          <button onClick={onClose} className="p-1 rounded hover:bg-accent text-muted-foreground">
+            <X className="size-4" />
+          </button>
+        </div>
       </div>
 
       <div className="space-y-2.5">

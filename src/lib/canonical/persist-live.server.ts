@@ -8,6 +8,34 @@
 import type { SpecRow } from "@/lib/spec-search.functions";
 import type { Evidence } from "@/lib/search/evidence";
 import { createHash } from "node:crypto";
+import {
+  canonicalFactProjection,
+  rejectJudgmentFields,
+} from "@/lib/canonical/fact-projection";
+
+/**
+ * Canonical-facts-only gate (Workstream 4): rows reach idx_* storage through
+ * canonicalFactProjection, so thesis-specific judgment fields (why_match,
+ * fit/intent scores, disposition, outreach angles, ...) can never leak into
+ * canonical storage even if a future payload builder spreads row fields.
+ * Dev-warns once per run when judgments were detected and stripped.
+ */
+let judgmentWarnedOnce = false;
+
+export function prepareVerifiedRowForPersist(row: SpecRow): {
+  row: SpecRow;
+  rejected: string[];
+} {
+  const rejected = rejectJudgmentFields(row);
+  if (rejected.length && !judgmentWarnedOnce && process.env.NODE_ENV !== "production") {
+    judgmentWarnedOnce = true;
+    console.warn(
+      "[persist-live] judgment fields blocked from canonical storage:",
+      rejected.join(", "),
+    );
+  }
+  return { row: canonicalFactProjection(row), rejected };
+}
 
 function registryKey(row: SpecRow): string | null {
   if (row.key && !row.key.startsWith("live-web:") && !row.key.startsWith("live-social:")) {
@@ -344,7 +372,11 @@ async function persistViaPg(candidates: SpecRow[], url: string): Promise<Persist
 }
 
 export async function persistVerifiedLiveRows(rows: SpecRow[]): Promise<PersistResult> {
-  const candidates = rows.filter(isVerifiedForPersist);
+  // Verification gate runs on the RAW row (it needs disposition/evidence);
+  // only the storage payload is projected down to canonical facts.
+  const candidates = rows
+    .filter(isVerifiedForPersist)
+    .map((r) => prepareVerifiedRowForPersist(r).row);
   const result: PersistResult = {
     attempted: candidates.length,
     persisted: 0,

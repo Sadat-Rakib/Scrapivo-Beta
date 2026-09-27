@@ -15,6 +15,7 @@ import {
   type SourceCapability,
   type SourceProviderId,
 } from "@/lib/search/source-capabilities";
+import { applyStableYieldOrder } from "./source-yield";
 
 function fieldOf(spec: SearchSpec, f: string): string | null {
   const c = spec.criteria.find((x) => x.field === f);
@@ -149,6 +150,14 @@ export type BuildSourcePlanOptions = {
    */
   unavailable?: ReadonlySet<string> | readonly string[];
   desiredCount?: number;
+  /**
+   * Workstream 4: precomputed smoothed qualification yield per provider id
+   * (prefetch with smoothedYieldsBySource() from source-yield.server.ts).
+   * When present, capable providers WITH yield data are stable-reordered by
+   * yield desc after the tier sort; providers without data keep their tier
+   * position and are never dropped. Optional — buildSourcePlan stays sync.
+   */
+  yieldOrder?: Readonly<Record<string, number>>;
 };
 
 /**
@@ -218,6 +227,27 @@ export function buildSourcePlan(
     if (a.role !== b.role) return a.role === "primary" ? -1 : 1;
     return a.costTier - b.costTier || a.providerId.localeCompare(b.providerId);
   });
+
+  // Workstream 4 post-step: yield reorder. Applied ONLY when smoothed data
+  // was prefetched; applyStableYieldOrder keeps no-data providers in place.
+  if (opts?.yieldOrder && Object.keys(opts.yieldOrder).length > 0) {
+    const yields = new Map<string, number | null>(
+      Object.entries(opts.yieldOrder).map(([k, v]) => [
+        k,
+        typeof v === "number" && Number.isFinite(v) ? v : null,
+      ]),
+    );
+    const ordered = applyStableYieldOrder(
+      steps.map((s) => s.providerId),
+      yields,
+    );
+    const byId = new Map<string, SourcePlanStep>(steps.map((s) => [s.providerId, s]));
+    steps.length = 0;
+    for (const id of ordered) {
+      const step = byId.get(id);
+      if (step) steps.push(step);
+    }
+  }
 
   return {
     requirements: req,

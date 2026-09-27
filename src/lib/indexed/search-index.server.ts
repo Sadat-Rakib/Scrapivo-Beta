@@ -18,6 +18,9 @@
  */
 import { getAdmin } from "@/integrations/my-supabase/admin.server";
 import type { DbHitMeta } from "@/lib/canonical/read-parquet.server";
+import { stampFreshness, type FreshnessStamp, STALE_SKIP_FIELDS } from "@/lib/canonical/freshness";
+import { CANONICAL_FACT_FIELDS } from "@/lib/canonical/fact-projection";
+import type { ReuseRun } from "@/lib/canonical/reuse-metrics.server";
 import { COUNTRY_ISO, normCityLookup, normalizeRole } from "@/lib/search/search-spec-extract";
 import { countryHintForCity } from "@/lib/search/location-resolver";
 import { canonCraft, expandCategory } from "@/lib/canonical/businesses.server";
@@ -31,6 +34,30 @@ import { queryRequiredFields } from "@/lib/search/canonical-contract";
 export interface IndexQueryResult {
   rows: SpecRow[];
   meta: DbHitMeta;
+}
+
+const FACT_FIELD_SET: ReadonlySet<string> = new Set(CANONICAL_FACT_FIELDS);
+
+/**
+ * Workstream 4 reuse accounting (optional ReuseRun thread): every indexed
+ * record is a canonical cache hit; its fresh fact fields are reused without
+ * re-research, its staleFields are marked for target re-research.
+ */
+function recordIndexReuse(rows: SpecRow[], reuse?: ReuseRun): void {
+  if (!reuse) return;
+  for (const row of rows) {
+    reuse.recordCacheHit();
+    const stamped = row as SpecRow & FreshnessStamp;
+    const stale = new Set(stamped.staleFields ?? []);
+    const rec = stamped as unknown as Record<string, unknown>;
+    for (const field of Object.keys(rec)) {
+      if (!FACT_FIELD_SET.has(field) || STALE_SKIP_FIELDS.has(field)) continue;
+      const v = rec[field];
+      if (v === null || v === undefined || v === "") continue;
+      if (stale.has(field)) reuse.recordStaleResearched(field);
+      else reuse.recordFreshReused(field);
+    }
+  }
 }
 
 function fieldOf(spec: SearchSpec, f: string): string | null {
@@ -71,7 +98,7 @@ async function queryBusinesses(
   let q = getAdmin()
     .from("idx_businesses")
     .select(
-      "registry_key,name,category,address,city,region,country,phone,email,website,quality_score",
+      "registry_key,name,category,address,city,region,country,phone,email,website,quality_score,last_seen",
     )
     .eq("junk_flag", 0)
     .order("quality_score", { ascending: false })
@@ -87,33 +114,38 @@ async function queryBusinesses(
   if (requirePhone) q = q.not("phone", "is", null);
   const { data, error } = await q;
   if (error) throw new Error(`[pg-index businesses] ${error.message}`);
-  const rows: SpecRow[] = (data ?? []).map((b) => ({
-    kind: "business" as const,
-    key: b.registry_key ?? null,
-    entity_id: b.registry_key ?? null,
-    entity_resolved: !!b.registry_key,
-    page_type: "entity_page" as const,
-    identity_confidence: 0.9,
-    title: b.name ?? "?",
-    detail: [b.address, b.city, b.region, b.country].filter(has).join(", "),
-    email: b.email ?? null,
-    // Phase 1.5: wrong-country dial codes are source-data hallucinations —
-    // hide + flag, never display (e.g. +1 numbers on IN rows).
-    phone: checkPhone(b.phone, b.country ?? "").phone,
-    phoneStatus: checkPhone(b.phone, b.country ?? "").status,
-    url: b.website ?? null,
-    website_url: b.website ?? null,
-    // The indexed Overture record explicitly stores a null website field.
-    // Keep that structured fact as an unverified research seed only.
-    no_website_verification: opportunity === "no_website" && !b.website &&
-      typeof b.registry_key === "string" && b.registry_key.startsWith("overture:")
-      ? { structured_source_url: b.registry_key, structured_absence: true, exact_queries: [] }
-      : undefined,
-    category: b.category ?? null,
-    location: [b.city, b.region].filter(has).join(", ") || null,
-    country: b.country ?? null,
-    opportunity,
-  }));
+  const rows: (SpecRow & FreshnessStamp)[] = (data ?? []).map((b) =>
+    stampFreshness<SpecRow>(
+      {
+        kind: "business" as const,
+        key: b.registry_key ?? null,
+        entity_id: b.registry_key ?? null,
+        entity_resolved: !!b.registry_key,
+        page_type: "entity_page" as const,
+        identity_confidence: 0.9,
+        title: b.name ?? "?",
+        detail: [b.address, b.city, b.region, b.country].filter(has).join(", "),
+        email: b.email ?? null,
+        // Phase 1.5: wrong-country dial codes are source-data hallucinations —
+        // hide + flag, never display (e.g. +1 numbers on IN rows).
+        phone: checkPhone(b.phone, b.country ?? "").phone,
+        phoneStatus: checkPhone(b.phone, b.country ?? "").status,
+        url: b.website ?? null,
+        website_url: b.website ?? null,
+        // The indexed Overture record explicitly stores a null website field.
+        // Keep that structured fact as an unverified research seed only.
+        no_website_verification: opportunity === "no_website" && !b.website &&
+          typeof b.registry_key === "string" && b.registry_key.startsWith("overture:")
+          ? { structured_source_url: b.registry_key, structured_absence: true, exact_queries: [] }
+          : undefined,
+        category: b.category ?? null,
+        location: [b.city, b.region].filter(has).join(", ") || null,
+        country: b.country ?? null,
+        opportunity,
+      },
+      { observedAtFallback: b.last_seen },
+    ),
+  );
   return {
     rows,
     meta: {
@@ -142,7 +174,7 @@ async function queryCompanies(
   const cc = countryEq(location);
   let q = getAdmin()
     .from("idx_companies")
-    .select("registry_key,name,country,city,region,category,website,email,phone,quality_score")
+    .select("registry_key,name,country,city,region,category,website,email,phone,quality_score,last_seen")
     .order("quality_score", { ascending: false })
     .range(offset, offset + limit - 1);
   if (cc) q = q.eq("country", cc);
@@ -159,7 +191,9 @@ async function queryCompanies(
   if (requirePhone) q = q.not("phone", "is", null);
   const { data, error } = await q;
   if (error) throw new Error(`[pg-index companies] ${error.message}`);
-  const rows: SpecRow[] = (data ?? []).map((c) => ({
+  const rows: (SpecRow & FreshnessStamp)[] = (data ?? []).map((c) =>
+    stampFreshness<SpecRow>(
+      {
     kind: "company" as const,
     key: c.registry_key ?? null,
     entity_id: c.registry_key ?? null,
@@ -178,7 +212,10 @@ async function queryCompanies(
     location: [c.city, c.region].filter(has).join(", ") || null,
     country: c.country ?? null,
     opportunity,
-  }));
+      },
+      { observedAtFallback: c.last_seen },
+    ),
+  );
   return {
     rows,
     meta: {
@@ -206,7 +243,7 @@ async function queryPeople(
   const cc = countryEq(location);
   let q = getAdmin()
     .from("idx_people")
-    .select("registry_key,name,role,company,city,country,industry,email,phone,linkedin,quality_score")
+    .select("registry_key,name,role,company,city,country,industry,email,phone,linkedin,quality_score,last_seen")
     .order("quality_score", { ascending: false })
     .range(offset, offset + limit - 1);
   if (role) {
@@ -234,7 +271,7 @@ async function queryPeople(
   if (requirePhone) q = q.not("phone", "is", null);
   const { data, error } = await q;
   if (error) throw new Error(`[pg-index people] ${error.message}`);
-  const rows: SpecRow[] = (data ?? []).map((p) => {
+  const rows: (SpecRow & FreshnessStamp)[] = (data ?? []).map((p) => {
     const entityId = p.registry_key ?? null;
     const company = (p.company ?? "").trim();
     const roleName = (p.role ?? "").trim();
@@ -255,7 +292,8 @@ async function queryPeople(
           },
         } as unknown as Evidence & { claim_parameters: Record<string, string> })]
       : [];
-    return {
+    return stampFreshness<SpecRow>(
+      {
       kind: "person" as const,
       key: entityId,
       entity_id: entityId,
@@ -272,7 +310,9 @@ async function queryPeople(
       location: p.city ?? p.country ?? null,
       country: p.country ?? null,
       evidence,
-    };
+      },
+      { observedAtFallback: p.last_seen },
+    );
   });
   return {
     rows,
@@ -313,6 +353,7 @@ export async function queryIndexForSpec(
   spec: SearchSpec,
   limit: number,
   offset = 0,
+  reuse?: ReuseRun,
 ): Promise<IndexQueryResult | null> {
   const location = fieldOf(spec, "location");
   const required = new Set(queryRequiredFields(spec));
@@ -328,7 +369,7 @@ export async function queryIndexForSpec(
     return null;
   }
   if (spec.entity === "business") {
-    return queryBusinesses(
+    const res = await queryBusinesses(
       fieldOf(spec, "category"),
       location,
       limit,
@@ -337,10 +378,12 @@ export async function queryIndexForSpec(
       requireEmail,
       requirePhone,
     );
+    recordIndexReuse(res.rows, reuse);
+    return res;
   }
   if (spec.entity === "company") {
     const cat = fieldOf(spec, "category") ?? fieldOf(spec, "industry");
-    return queryCompanies(
+    const res = await queryCompanies(
       cat,
       location,
       limit,
@@ -349,9 +392,11 @@ export async function queryIndexForSpec(
       requirePhone,
       fieldOf(spec, "opportunity"),
     );
+    recordIndexReuse(res.rows, reuse);
+    return res;
   }
   if (spec.entity === "person") {
-    return queryPeople(
+    const res = await queryPeople(
       fieldOf(spec, "role"),
       fieldOf(spec, "industry"),
       location,
@@ -360,6 +405,8 @@ export async function queryIndexForSpec(
       requireEmail,
       requirePhone,
     );
+    recordIndexReuse(res.rows, reuse);
+    return res;
   }
   return null;
 }

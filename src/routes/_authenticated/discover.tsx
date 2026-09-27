@@ -62,6 +62,7 @@ import {
   type IntentBadgeInput,
 } from "@/components/discover/result-tabs";
 import { EntityDetailPanel, type SelectedEntity } from "@/components/discover/entity-detail-panel";
+import { ProjectChipsRow } from "@/components/discover/project-chips-row";
 import { GenerateModal } from "@/components/discover/generate-modal";
 import { Bell, Plus, X, ChevronDown, ChevronUp } from "lucide-react";
 import { ThinkingSteps } from "@/components/discover/thinking-steps";
@@ -2193,6 +2194,9 @@ function DiscoverPage() {
 
         <div className="px-4 md:px-6 pb-4 md:pb-6 pt-2">
           <div className="max-w-3xl mx-auto" data-tour="composer">
+            {/* WS3: project chips above the composer — hidden when the user
+                has no projects; clicking opens the project page. */}
+            <ProjectChipsRow />
             {/* Phase B: unified thinking sequence (replaces SearchingPlan +
                 SearchingSteps). One composer-attached narration derived from
                 live query/tokens/entity — never fixed ladders. */}
