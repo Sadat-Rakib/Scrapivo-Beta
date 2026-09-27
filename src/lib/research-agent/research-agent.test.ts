@@ -1,6 +1,6 @@
 import os from "node:os";
 import path from "node:path";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { buildSpec } from "@/lib/search/search-spec";
 import type { SpecEntity } from "@/lib/search/search-spec";
 import type { SpecRow } from "@/lib/spec-search.functions";
@@ -12,6 +12,15 @@ import { ResearchOrchestrator, assertStoredPathUsesNoAI } from "./orchestrator.s
 import { retrievalPlanFromInputs } from "./plan";
 import { ResearchSessionRegistry } from "./session.server";
 import type { ResearchCandidate, RetrievalPlan, SignalEvidence } from "./types";
+
+// Keep every browser-research test offline: HTTP-first acquisition must fail
+// fast and fall back to the (faked) browser ladder.
+beforeEach(() => {
+  vi.stubGlobal("fetch", vi.fn(async () => new Response("offline", { status: 503 })));
+});
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 function spec(args: {
   entity?: SpecEntity;
@@ -67,13 +76,15 @@ function row(id: number, kind: SpecRow["kind"] = "person", over: Partial<SpecRow
 }
 
 function currentSignal(type: SignalEvidence["type"]): SignalEvidence {
+  // Relative to now: fixed dates rot out of the 7d recency window.
+  const dayAgo = new Date(Date.now() - 86_400_000).toISOString();
   return {
     type,
     claim: `${type} verified`,
     sourceUrl: "https://evidence.example.com/current",
     sourceType: "fixture",
-    observedAt: "2026-09-20T12:00:00.000Z",
-    eventAt: "2026-09-19T12:00:00.000Z",
+    observedAt: dayAgo,
+    eventAt: dayAgo,
     freshness: "CURRENT",
     confidence: 0.9,
     evidenceGrade: "A",
@@ -485,7 +496,29 @@ describe("deterministic browser research", () => {
     expect(result.events.map((event) => event.type)).toEqual(expect.arrayContaining(["CAPTCHA_DETECTED", "HUMAN_ACTION_REQUIRED"]));
   });
 
-  it("verifies no-website only after two exact-name searches", async () => {
+  it("verifies no-website only after structured absence plus exact-name searches (H14)", async () => {
+    const plan = retrievalPlanFromInputs({ spec: spec({ entity: "business", signal: "no_website" }) });
+    // H14: structured listing lacking a website field must be on file.
+    const candidate = row(1, "business", {
+      url: null,
+      no_website_verification: {
+        structured_source_url: "osm:live-osm:1",
+        structured_absence: true,
+        exact_queries: [],
+        official_site_found: null,
+      },
+    });
+    const base: ResearchCandidate = {
+      id: candidate.entity_id!, row: candidate, state: "READY_FOR_VERIFICATION", origin: "stored", evidence: [],
+      fieldEvidence: [], signals: [], operationalStatus: "ACTIVE", operationalStatusEvidence: [], missingFields: [], rejectionReason: null, whyMatch: null,
+    };
+    const searchPage = page("Directory result", [], [{ ref: "@e1", name: "Directory", url: "https://yelp.example/listing" }]);
+    const result = await researchCandidatesWithBrowser({ browser: fakeBrowser([searchPage, searchPage]), sessionId: "fixture", plan, candidates: [base], visible: false });
+    expect(result.candidates[0]?.signals[0]).toMatchObject({ type: "NO_WEBSITE", evidenceGrade: "B", freshness: "CURRENT", claim: "website not found after verification" });
+    expect(result.candidates[0]?.evidence.some((e) => e.evidence_type === "no_website" && e.subject === "business:1")).toBe(true);
+  });
+
+  it("refuses no-website without a structured listing (H14)", async () => {
     const plan = retrievalPlanFromInputs({ spec: spec({ entity: "business", signal: "no_website" }) });
     const candidate = row(1, "business", { url: null });
     const base: ResearchCandidate = {
@@ -494,6 +527,6 @@ describe("deterministic browser research", () => {
     };
     const searchPage = page("Directory result", [], [{ ref: "@e1", name: "Directory", url: "https://yelp.example/listing" }]);
     const result = await researchCandidatesWithBrowser({ browser: fakeBrowser([searchPage, searchPage]), sessionId: "fixture", plan, candidates: [base], visible: false });
-    expect(result.candidates[0]?.signals[0]).toMatchObject({ type: "NO_WEBSITE", evidenceGrade: "B", freshness: "CURRENT" });
+    expect(result.candidates[0]?.signals.some((s) => s.type === "NO_WEBSITE")).toBe(false);
   });
 });

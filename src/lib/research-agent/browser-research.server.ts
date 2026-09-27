@@ -1,6 +1,21 @@
 import type { Evidence } from "@/lib/search/evidence";
+import { makeEvidence } from "@/lib/search/evidence";
+import {
+  verifyWebsiteAbsence,
+  WEBSITE_NOT_FOUND_AFTER_VERIFICATION,
+} from "@/lib/search/absence-verification";
 import type { SpecRow } from "@/lib/spec-search.functions";
-import type { AgentBrowser, BrowserSession, PageSnapshot } from "./browser";
+import type { AgentBrowser, BrowserObservation, BrowserSession, PageSnapshot } from "./browser";
+import {
+  fetchStaticPage,
+  registrableDomainOf,
+  researchConcurrency,
+  requiresRendering,
+  runCandidateTasks,
+  staticPageToSnapshot,
+  type StaticFetch,
+  type StaticPageRead,
+} from "./candidate-acquisition.server";
 import { detectOperationalStatus, operationalStatusAccepted, statusEvidence } from "./operational-status";
 import { researchEvent } from "./events";
 import type {
@@ -107,43 +122,347 @@ function withRowContact(row: SpecRow, email: string | null, phone: string | null
   return { ...row, email: row.email ?? email, phone: row.phone ?? phone };
 }
 
+/**
+ * A browser page read failed when the navigation threw, the snapshot reports
+ * an error loading state, or the page is completely empty (no title, no text,
+ * no links) — the zero-result failure mode behind past "Read page" failures.
+ */
+function pageReadFailed(snapshot: PageSnapshot): boolean {
+  return snapshot.loadingState === "error" ||
+    (!snapshot.title.trim() && !snapshot.visibleRelevantText.trim() && snapshot.links.length === 0);
+}
+
+function structuredAbsenceEvidence(candidate: ResearchCandidate): Evidence[] {
+  const verification = candidate.row.no_website_verification;
+  const fromVerification = verification?.structured_absence === true
+    ? [makeEvidence({
+        source_url: verification.structured_source_url || `entity:${candidate.id}`,
+        source_type: verification.structured_source_url?.startsWith("overture:") ? "db" : "osm",
+        excerpt: "Structured listing has no website field.",
+        evidence_type: "no_website",
+        supports: "opportunity",
+        subject: candidate.id,
+        confidence: 0.8,
+        extraction_method: "structured_listing_website_absent",
+        observed_at: new Date().toISOString(),
+      })]
+    : [];
+  const fromEvidence = candidate.evidence.filter((e) =>
+    e.evidence_type === "no_website" &&
+    e.subject === candidate.id &&
+    ["osm_absence_plus_exact_web_check", "structured_absence_plus_exact_web_check", "structured_listing_website_absent"].includes(e.extraction_method ?? ""));
+  return [...fromVerification, ...fromEvidence];
+}
+
+function searchCheckEvidence(args: {
+  query: string;
+  snapshot: PageSnapshot;
+  kind: "exact_identity_search_check" | "official_domain_search_check";
+  subject: string;
+}): Evidence {
+  return makeEvidence({
+    source_url: args.snapshot.url,
+    source_type: "web",
+    excerpt: `${args.kind === "exact_identity_search_check" ? "Exact identity search" : "Official-domain search"} performed: ${args.query}`,
+    evidence_type: "no_website",
+    supports: "opportunity",
+    subject: args.subject,
+    confidence: 0.7,
+    extraction_method: args.kind,
+    observed_at: new Date().toISOString(),
+  });
+}
+
+/**
+ * H14 absence verification for no_website candidates: the NO_WEBSITE signal is
+ * minted ONLY when all four components hold — structured listing(s) without a
+ * website field, exact identity search, official-domain search, and no
+ * credible first-party site discovered. Exact claim wording is preserved by
+ * verifyWebsiteAbsence (never simplified).
+ */
 async function verifyNoWebsite(
   browser: AgentBrowser,
   session: BrowserSession,
   candidate: ResearchCandidate,
   plan: RetrievalPlan,
-): Promise<{ signal: SignalEvidence | null; snapshot: PageSnapshot }> {
+  args: { emit: (event: ResearchEvent) => void; sessionId: string },
+): Promise<{ signal: SignalEvidence | null; snapshot: PageSnapshot; claimEvidence: Evidence | null }> {
   const name = candidate.row.title;
   const location = candidate.row.location ?? plan.location ?? "";
-  const first = await browser.search(session, `"${name}" "${location}" official website`);
-  const second = await browser.search(session, `"${name}" "${location}" contact`);
+  const officialQuery = `"${name}" "${location}" official website`;
+  const contactQuery = `"${name}" "${location}" contact`;
+  const first = await browser.search(session, officialQuery);
+  const second = await browser.search(session, contactQuery);
   if ([...first.snapshot.friction, ...second.snapshot.friction]
     .some((item) => item === "CAPTCHA" || item === "ACCESS_BLOCK" || item === "RATE_LIMIT")) {
-    return { signal: null, snapshot: second.snapshot };
+    return { signal: null, snapshot: second.snapshot, claimEvidence: null };
   }
   const ignored = /facebook|instagram|linkedin|yelp|yellowpages|map|directory|tripadvisor/i;
   const links = [...first.snapshot.links, ...second.snapshot.links];
-  const hasOwned = links
-    .some((link) => link.url && !ignored.test(link.url));
-  if (hasOwned || links.length === 0) return { signal: null, snapshot: second.snapshot };
+  const hasOwned = links.some((link) => link.url && !ignored.test(link.url));
+
+  const subject = candidate.id;
+  const components = {
+    structured_listing_absence: structuredAbsenceEvidence(candidate),
+    exact_identity_search: [
+      searchCheckEvidence({ query: officialQuery, snapshot: first.snapshot, kind: "exact_identity_search_check", subject }),
+      searchCheckEvidence({ query: contactQuery, snapshot: second.snapshot, kind: "exact_identity_search_check", subject }),
+    ],
+    official_domain_search: [
+      searchCheckEvidence({ query: officialQuery, snapshot: first.snapshot, kind: "official_domain_search_check", subject }),
+    ],
+    no_first_party_site: hasOwned || links.length === 0 ? [] : [makeEvidence({
+      source_url: second.snapshot.url,
+      source_type: "web",
+      excerpt: "Exact-name searches returned only directory/social results; no credible first-party site discovered.",
+      evidence_type: "no_website",
+      supports: "opportunity",
+      subject,
+      confidence: 0.7,
+      extraction_method: "no_first_party_site_check",
+      observed_at: new Date().toISOString(),
+    })],
+  };
+
+  const verdict = verifyWebsiteAbsence(components, { subject, observedAt: new Date().toISOString() });
+  args.emit(researchEvent({
+    sessionId: args.sessionId,
+    type: "ACQUISITION_DECIDED",
+    phase: "BROWSER",
+    internal: {
+      candidateId: candidate.id,
+      decision: verdict.ok ? "absence_verified" : "absence_unverified",
+      missing: verdict.missing,
+    },
+  }));
+  if (!verdict.ok || !verdict.claim) return { signal: null, snapshot: second.snapshot, claimEvidence: null };
   const observedAt = new Date().toISOString();
   return {
     signal: {
       type: "NO_WEBSITE",
-      claim: `No owned website found as of ${observedAt.slice(0, 10)}`,
-      sourceUrl: second.snapshot.url,
+      claim: WEBSITE_NOT_FOUND_AFTER_VERIFICATION,
+      sourceUrl: verdict.claim.source_url,
       sourceType: "search-presence-check",
       observedAt,
       eventAt: null,
       freshness: "CURRENT",
       confidence: 0.76,
       evidenceGrade: "B",
-      snippetOrObservation: "Two exact-name search variants found no likely owned domain.",
+      snippetOrObservation: "website not found after verification: structured listing lacks a website field; exact identity and official-domain searches performed; no first-party site found.",
     },
     snapshot: second.snapshot,
+    claimEvidence: verdict.claim,
   };
 }
 
+/**
+ * Shared evidence pipeline for one successfully read page (browser snapshot or
+ * HTTP static snapshot) — contacts, operational status, required signals.
+ */
+function verifyCandidateFromSnapshot(args: {
+  candidate: ResearchCandidate;
+  snapshot: PageSnapshot;
+  plan: RetrievalPlan;
+  now: Date;
+  screenshotRef?: string | null;
+  emit: (event: ResearchEvent) => void;
+  sessionId: string;
+}): ResearchCandidate {
+  const { candidate: current, snapshot, plan, now, emit, sessionId } = args;
+  const friction = snapshot.friction;
+  if (friction.includes("CAPTCHA")) {
+    emit(researchEvent({ sessionId, type: "CAPTCHA_DETECTED", phase: "BROWSER", internal: { candidateId: current.id } }));
+    emit(researchEvent({ sessionId, type: "HUMAN_ACTION_REQUIRED", phase: "BROWSER", internal: { candidateId: current.id } }));
+    return { ...current, state: "UNRESOLVED", rejectionReason: "captcha" };
+  }
+  if (friction.includes("LOGIN_WALL") || friction.includes("ACCESS_BLOCK") || friction.includes("RATE_LIMIT")) {
+    emit(researchEvent({ sessionId, type: "ACCESS_RESTRICTED", phase: "BROWSER", internal: { candidateId: current.id, friction } }));
+    return { ...current, state: "UNRESOLVED", rejectionReason: "access_restricted" };
+  }
+
+  emit(researchEvent({ sessionId, type: "INSPECTING_PAGE", phase: "BROWSER", internal: { candidateId: current.id } }));
+  const screenshotRef = args.screenshotRef ?? null;
+  const email = firstEmail(snapshot.visibleRelevantText);
+  const phone = firstPhone(snapshot.visibleRelevantText);
+  const fields = [
+    ...(email && !current.row.email ? [contactEvidence("email", email, snapshot, now)] : []),
+    ...(phone && !current.row.phone ? [contactEvidence("phone", phone, snapshot, now)] : []),
+  ];
+  if (fields.length) emit(researchEvent({ sessionId, type: "CONTACT_FOUND", phase: "BROWSER", internal: { candidateId: current.id, fields: fields.map((item) => item.field) }, screenshotRef }));
+
+  emit(researchEvent({ sessionId, type: "CHECKING_STATUS", phase: "BROWSER", internal: { candidateId: current.id } }));
+  const operationalStatus = detectOperationalStatus([snapshot.visibleRelevantText]);
+  const statusProof = statusEvidence({
+    status: operationalStatus,
+    sourceUrl: snapshot.url,
+    observation: operationalStatus === "UNKNOWN" ? "No explicit operational status found." : `Page states ${operationalStatus}.`,
+    observedAt: now.toISOString(),
+  });
+  if (!operationalStatusAccepted(operationalStatus)) {
+    emit(researchEvent({ sessionId, type: "CANDIDATE_REJECTED", phase: "VERIFICATION", internal: { candidateId: current.id, reason: `operational_status:${operationalStatus}` } }));
+    return {
+      ...current,
+      state: "REJECTED",
+      operationalStatus,
+      operationalStatusEvidence: [...current.operationalStatusEvidence, statusProof],
+      rejectionReason: `operational_status:${operationalStatus}`,
+    };
+  }
+
+  const signals = plan.signalRequired || plan.freshnessRequired
+    ? signalsFromSnapshot(snapshot, plan.signalTypes, now)
+    : [];
+  if (signals.length) emit(researchEvent({ sessionId, type: "SIGNAL_FOUND", phase: "BROWSER", internal: { candidateId: current.id, signalTypes: signals.map((item) => item.type) }, screenshotRef }));
+  const legacyEvidence = signals.map((signal) => signalAsLegacyEvidence(signal, current.id));
+  return {
+    ...current,
+    row: withRowContact(current.row, email, phone),
+    state: "VERIFIED",
+    fieldEvidence: [...current.fieldEvidence, ...fields],
+    signals: [...current.signals, ...signals],
+    evidence: [...current.evidence, ...legacyEvidence],
+    operationalStatus,
+    operationalStatusEvidence: [...current.operationalStatusEvidence, statusProof],
+    rejectionReason: null,
+  };
+}
+
+/**
+ * HTTP-first sufficiency: mirror of the orchestrator's needsBrowser() triggers.
+ * Static acquisition is sufficient only when every trigger that sent this
+ * candidate to browser research is resolved by the fetched page.
+ */
+function staticResolvesTriggers(read: StaticPageRead, candidate: ResearchCandidate, plan: RetrievalPlan): boolean {
+  if (plan.signalRequired || plan.freshnessRequired) {
+    if (!signalsFromSnapshot(staticPageToSnapshot(read), plan.signalTypes, new Date()).length) return false;
+  }
+  if (candidate.row.kind === "business" && candidate.operationalStatus === "UNKNOWN") {
+    if (detectOperationalStatus([read.text]) === "UNKNOWN") return false;
+  }
+  const contactFields = new Set(["email", "phone", "phone_number", "contact", "public_contact", "contact_channel"]);
+  if (candidate.missingFields.some((field) => !contactFields.has(field))) return false;
+  const needsContact = candidate.missingFields.filter((field) => contactFields.has(field));
+  if (needsContact.length) {
+    const needEmail = needsContact.some((f) => f === "email" || f.includes("contact"));
+    const needPhone = needsContact.some((f) => f.startsWith("phone") || f.includes("contact"));
+    if ((needEmail && !read.emails.length) || (needPhone && !read.phones.length)) return false;
+  }
+  return true;
+}
+
+/**
+ * HTTP-first acquisition policy: candidate research pages (official sites,
+ * team pages, contact pages) are fetched + extracted over HTTP first; the
+ * browser is used only when HTTP is insufficient or the page class requires
+ * rendering. needsBrowser() routing in the orchestrator is unchanged.
+ */
+async function acquireStatically(
+  candidate: ResearchCandidate,
+  args: { plan: RetrievalPlan; signal?: AbortSignal | null; fetchPage?: StaticFetch; emit: (event: ResearchEvent) => void; sessionId: string },
+): Promise<{ candidate: ResearchCandidate; read: StaticPageRead | null }> {
+  const url = candidate.row.url!;
+  if (requiresRendering(url)) {
+    args.emit(researchEvent({
+      sessionId: args.sessionId, type: "ACQUISITION_DECIDED", phase: "BROWSER",
+      internal: { candidateId: candidate.id, decision: "rendering_required" },
+    }));
+    return { candidate, read: null };
+  }
+  const read = await fetchStaticPage(url, { signal: args.signal, fetchPage: args.fetchPage });
+  args.emit(researchEvent({
+    sessionId: args.sessionId, type: "ACQUISITION_DECIDED", phase: "BROWSER",
+    internal: { candidateId: candidate.id, decision: read.decision, staticUsable: read.staticUsable, status: read.status },
+  }));
+  if (!read.staticUsable) return { candidate, read: null };
+  if (staticResolvesTriggers(read, candidate, args.plan)) {
+    const now = new Date();
+    const verified = verifyCandidateFromSnapshot({
+      candidate, snapshot: staticPageToSnapshot(read), plan: args.plan!, now,
+      screenshotRef: null, emit: args.emit, sessionId: args.sessionId,
+    });
+    return { candidate: verified, read };
+  }
+  // Not sufficient — harvest whatever contacts HTTP did find, then escalate.
+  const harvested = {
+    ...candidate,
+    row: withRowContact(candidate.row, read.emails[0] ?? null, read.phones[0] ?? null),
+    fieldEvidence: [
+      ...candidate.fieldEvidence,
+      ...(read.emails[0] && !candidate.row.email
+        ? [contactEvidence("email", read.emails[0], staticPageToSnapshot(read), new Date())] : []),
+      ...(read.phones[0] && !candidate.row.phone
+        ? [contactEvidence("phone", read.phones[0], staticPageToSnapshot(read), new Date())] : []),
+    ],
+  };
+  return { candidate: harvested, read: null };
+}
+
+/**
+ * Read-failure ladder for browser page reads:
+ *   browser fail → exactly one browser retry → HTTP fallback → SOURCE_DEGRADED.
+ * No infinite retries; abort signals respected throughout.
+ */
+async function readWithLadder(args: {
+  browser: AgentBrowser;
+  session: BrowserSession;
+  url: string;
+  candidateId: string;
+  signal?: AbortSignal | null;
+  fetchPage?: StaticFetch;
+  emit: (event: ResearchEvent) => void;
+  sessionId: string;
+}): Promise<{ observation: BrowserObservation } | "degraded"> {
+  const { browser, session, url, candidateId, emit, sessionId } = args;
+  const attempt = async (): Promise<BrowserObservation> => {
+    const observation = await browser.navigate(session, url);
+    if (pageReadFailed(observation.snapshot)) throw new Error(`Read page:${candidateId}`);
+    return observation;
+  };
+  let firstError: unknown = null;
+  try {
+    return { observation: await attempt() };
+  } catch (error) {
+    if (args.signal?.aborted) throw error;
+    firstError = error;
+  }
+  emit(researchEvent({
+    sessionId, type: "READ_RETRY", phase: "BROWSER",
+    internal: { candidateId, attempt: 2, error: firstError instanceof Error ? firstError.message : String(firstError) },
+  }));
+  try {
+    return { observation: await attempt() };
+  } catch (retryError) {
+    if (args.signal?.aborted) throw retryError;
+  }
+  // HTTP fallback after exactly one browser retry.
+  const read = await fetchStaticPage(url, { signal: args.signal, fetchPage: args.fetchPage });
+  if (read.staticUsable) {
+    emit(researchEvent({
+      sessionId, type: "ACQUISITION_DECIDED", phase: "BROWSER",
+      internal: { candidateId, decision: "static_used", mode: "http_fallback", status: read.status },
+    }));
+    return { observation: { snapshot: staticPageToSnapshot(read), action: "http_fallback", expectedState: null, verified: true } };
+  }
+  emit(researchEvent({
+    sessionId, type: "SOURCE_DEGRADED", phase: "BROWSER",
+    internal: {
+      code: "SOURCE_DEGRADED",
+      candidateId,
+      url,
+      browserError: firstError instanceof Error ? firstError.message : String(firstError),
+      httpStatus: read.status,
+      httpError: read.error ?? null,
+    },
+  }));
+  return "degraded";
+}
+
+/**
+ * Parallel candidate research: up to `concurrency` candidates in flight
+ * (SCRAPIVO_RESEARCH_CONCURRENCY, default 3, clamped 1–6), strict
+ * per-registrable-domain serialization. Results keep input order so dedupe,
+ * merge, and evidence attachment stay candidate-correct.
+ */
 export async function researchCandidatesWithBrowser(args: {
   browser: AgentBrowser;
   sessionId: string;
@@ -151,107 +470,135 @@ export async function researchCandidatesWithBrowser(args: {
   candidates: ResearchCandidate[];
   visible?: boolean;
   onEvent?: (event: ResearchEvent) => void;
+  signal?: AbortSignal | null;
+  fetchPage?: StaticFetch;
+  concurrency?: number;
 }): Promise<BrowserResearchResult> {
   const events: ResearchEvent[] = [];
   const emit = (event: ResearchEvent) => {
     events.push(event);
     args.onEvent?.(event);
   };
-  const session = await args.browser.createSession({ id: args.sessionId, visible: args.visible ?? true });
-  emit(researchEvent({ sessionId: args.sessionId, type: "BROWSER_SESSION_STARTED", phase: "BROWSER" }));
-  const output: ResearchCandidate[] = [];
-  try {
-    for (const candidate of args.candidates) {
-      let current = { ...candidate };
-      if (args.plan.signalTypes.includes("NO_WEBSITE") && !current.row.url) {
-        emit(researchEvent({ sessionId: args.sessionId, type: "CHECKING_SIGNAL", phase: "BROWSER", internal: { candidateId: current.id, signal: "NO_WEBSITE" } }));
-        const checked = await verifyNoWebsite(args.browser, session, current, args.plan);
-        if (checked.signal) {
-          current = { ...current, signals: [...current.signals, checked.signal] };
-          emit(researchEvent({ sessionId: args.sessionId, type: "SIGNAL_FOUND", phase: "BROWSER", internal: { candidateId: current.id, signal: "NO_WEBSITE" }, domain: new URL(checked.snapshot.url).hostname }));
+  const degradedSources = new Set<string>();
+  const degradedKey = (url: string): string => registrableDomainOf(url) ?? url;
+  const counters = { pages: 0, actions: 0, screenshots: 0 };
+  let sessionCounter = 0;
+
+  const workOne = async (candidate: ResearchCandidate): Promise<ResearchCandidate> => {
+    try {
+      // NO_WEBSITE candidates: absence rule (H14) over browser searches.
+      if (args.plan.signalTypes.includes("NO_WEBSITE") && !candidate.row.url) {
+        emit(researchEvent({ sessionId: args.sessionId, type: "CHECKING_SIGNAL", phase: "BROWSER", internal: { candidateId: candidate.id, signal: "NO_WEBSITE" } }));
+        const session = await args.browser.createSession({ id: `${args.sessionId}-${++sessionCounter}`, visible: args.visible ?? true });
+        try {
+          const checked = await verifyNoWebsite(args.browser, session, candidate, args.plan, { emit, sessionId: args.sessionId });
+          if (checked.signal) {
+            const claimEvidence = checked.claimEvidence ? [checked.claimEvidence] : [];
+            emit(researchEvent({
+              sessionId: args.sessionId, type: "SIGNAL_FOUND", phase: "BROWSER",
+              internal: { candidateId: candidate.id, signal: "NO_WEBSITE" },
+              domain: safeHost(checked.snapshot.url),
+            }));
+            return {
+              ...candidate,
+              signals: [...candidate.signals, checked.signal],
+              evidence: [...candidate.evidence, ...claimEvidence],
+            };
+          }
+          return candidate;
+        } finally {
+          counters.pages += session.counters.pages;
+          counters.actions += session.counters.actions;
+          counters.screenshots += session.counters.screenshots;
+          await args.browser.close(session);
         }
-        output.push(current);
-        continue;
       }
-      if (!current.row.url) {
-        output.push({ ...current, state: "UNRESOLVED", rejectionReason: "no_public_page_for_browser_verification" });
-        continue;
+      if (!candidate.row.url) {
+        return { ...candidate, state: "UNRESOLVED", rejectionReason: "no_public_page_for_browser_verification" };
       }
-
-      emit(researchEvent({ sessionId: args.sessionId, type: "NAVIGATING", phase: "BROWSER", internal: { candidateId: current.id, url: current.row.url }, domain: new URL(current.row.url).hostname }));
-      const observation = await args.browser.navigate(session, current.row.url);
-      emit(researchEvent({ sessionId: args.sessionId, type: "PAGE_LOADED", phase: "BROWSER", internal: { candidateId: current.id, pageType: observation.snapshot.pageType }, domain: new URL(observation.snapshot.url).hostname }));
-      const friction = observation.snapshot.friction;
-      if (friction.includes("CAPTCHA")) {
-        emit(researchEvent({ sessionId: args.sessionId, type: "CAPTCHA_DETECTED", phase: "BROWSER", internal: { candidateId: current.id } }));
-        emit(researchEvent({ sessionId: args.sessionId, type: "HUMAN_ACTION_REQUIRED", phase: "BROWSER", internal: { candidateId: current.id } }));
-        output.push({ ...current, state: "UNRESOLVED", rejectionReason: "captcha" });
-        continue;
-      }
-      if (friction.includes("LOGIN_WALL") || friction.includes("ACCESS_BLOCK") || friction.includes("RATE_LIMIT")) {
-        emit(researchEvent({ sessionId: args.sessionId, type: "ACCESS_RESTRICTED", phase: "BROWSER", internal: { candidateId: current.id, friction } }));
-        output.push({ ...current, state: "UNRESOLVED", rejectionReason: "access_restricted" });
-        continue;
+      const url = candidate.row.url;
+      if (degradedSources.has(degradedKey(url))) {
+        return { ...candidate, state: "UNRESOLVED", rejectionReason: "source_degraded" };
       }
 
-      emit(researchEvent({ sessionId: args.sessionId, type: "INSPECTING_PAGE", phase: "BROWSER", internal: { candidateId: current.id } }));
-      const screenshotRef = await args.browser.screenshot(session);
-      const now = new Date();
-      const email = firstEmail(observation.snapshot.visibleRelevantText);
-      const phone = firstPhone(observation.snapshot.visibleRelevantText);
-      const fields = [
-        ...(email && !current.row.email ? [contactEvidence("email", email, observation.snapshot, now)] : []),
-        ...(phone && !current.row.phone ? [contactEvidence("phone", phone, observation.snapshot, now)] : []),
-      ];
-      if (fields.length) emit(researchEvent({ sessionId: args.sessionId, type: "CONTACT_FOUND", phase: "BROWSER", internal: { candidateId: current.id, fields: fields.map((item) => item.field) }, screenshotRef }));
-
-      emit(researchEvent({ sessionId: args.sessionId, type: "CHECKING_STATUS", phase: "BROWSER", internal: { candidateId: current.id } }));
-      const operationalStatus = detectOperationalStatus([observation.snapshot.visibleRelevantText]);
-      const statusProof = statusEvidence({
-        status: operationalStatus,
-        sourceUrl: observation.snapshot.url,
-        observation: operationalStatus === "UNKNOWN" ? "No explicit operational status found." : `Page states ${operationalStatus}.`,
-        observedAt: now.toISOString(),
+      // HTTP-first acquisition policy.
+      let working = candidate;
+      const acquired = await acquireStatically(working, {
+        signal: args.signal, fetchPage: args.fetchPage, emit, sessionId: args.sessionId, plan: args.plan,
       });
-      if (!operationalStatusAccepted(operationalStatus)) {
-        output.push({
-          ...current,
-          state: "REJECTED",
-          operationalStatus,
-          operationalStatusEvidence: [...current.operationalStatusEvidence, statusProof],
-          rejectionReason: `operational_status:${operationalStatus}`,
-        });
-        emit(researchEvent({ sessionId: args.sessionId, type: "CANDIDATE_REJECTED", phase: "VERIFICATION", internal: { candidateId: current.id, reason: `operational_status:${operationalStatus}` } }));
-        continue;
+      working = acquired.candidate;
+      if (acquired.read) {
+        // Static page carried sufficient evidence — browser never called.
+        counters.pages += 1;
+        return working;
       }
 
-      const signals = args.plan.signalRequired || args.plan.freshnessRequired
-        ? signalsFromSnapshot(observation.snapshot, args.plan.signalTypes, now)
-        : [];
-      if (signals.length) emit(researchEvent({ sessionId: args.sessionId, type: "SIGNAL_FOUND", phase: "BROWSER", internal: { candidateId: current.id, signalTypes: signals.map((item) => item.type) }, screenshotRef }));
-      const legacyEvidence = signals.map((signal) => signalAsLegacyEvidence(signal, current.id));
-      current = {
-        ...current,
-        row: withRowContact(current.row, email, phone),
-        state: "VERIFIED",
-        fieldEvidence: [...current.fieldEvidence, ...fields],
-        signals: [...current.signals, ...signals],
-        evidence: [...current.evidence, ...legacyEvidence],
-        operationalStatus,
-        operationalStatusEvidence: [...current.operationalStatusEvidence, statusProof],
-        rejectionReason: null,
-      };
-      output.push(current);
+      // Browser phase with read-failure ladder.
+      const session = await args.browser.createSession({ id: `${args.sessionId}-${++sessionCounter}`, visible: args.visible ?? true });
+      try {
+        emit(researchEvent({
+          sessionId: args.sessionId, type: "NAVIGATING", phase: "BROWSER",
+          internal: { candidateId: working.id, url }, domain: safeHost(url),
+        }));
+        const result = await readWithLadder({
+          browser: args.browser, session, url, candidateId: working.id,
+          signal: args.signal, fetchPage: args.fetchPage, emit, sessionId: args.sessionId,
+        });
+        if (result === "degraded") {
+          degradedSources.add(degradedKey(url));
+          return { ...working, state: "UNRESOLVED", rejectionReason: "source_degraded" };
+        }
+        const observation = result.observation;
+        emit(researchEvent({
+          sessionId: args.sessionId, type: "PAGE_LOADED", phase: "BROWSER",
+          internal: { candidateId: working.id, pageType: observation.snapshot.pageType },
+          domain: safeHost(observation.snapshot.url),
+        }));
+        const screenshotRef = await args.browser.screenshot(session).catch(() => null);
+        const verified = verifyCandidateFromSnapshot({
+          candidate: working, snapshot: observation.snapshot, plan: args.plan, now: new Date(),
+          screenshotRef, emit, sessionId: args.sessionId,
+        });
+        return verified;
+      } finally {
+        counters.pages += session.counters.pages;
+        counters.actions += session.counters.actions;
+        counters.screenshots += session.counters.screenshots;
+        await args.browser.close(session);
+      }
+    } catch (error) {
+      if (args.signal?.aborted) throw error;
+      // Unexpected per-candidate failure must never sink the run.
+      emit(researchEvent({
+        sessionId: args.sessionId, type: "SOURCE_DEGRADED", phase: "BROWSER",
+        internal: {
+          code: "SOURCE_DEGRADED", candidateId: candidate.id,
+          error: error instanceof Error ? error.message : String(error),
+        },
+      }));
+      return { ...candidate, state: "UNRESOLVED", rejectionReason: "source_degraded" };
     }
-  } finally {
-    await args.browser.close(session);
-  }
+  };
+
+  const tasks = args.candidates.map((candidate) => ({
+    domain: candidate.row.url ? registrableDomainOf(candidate.row.url) : "search",
+    work: () => workOne(candidate),
+  }));
+  const pool = await runCandidateTasks(tasks, args.concurrency ?? researchConcurrency(), args.signal);
+  const firstError = pool.errors[0]?.error;
+  if (firstError) throw firstError;
+  // Session counters accumulate in `counters` after each session closes; one
+  // final read for any session still open is not needed (all closed above).
   return {
-    candidates: output,
+    candidates: args.candidates.map((candidate, index) => pool.results[index] ?? candidate),
     events,
-    pages: session.counters.pages,
-    actions: session.counters.actions,
-    screenshots: session.counters.screenshots,
+    pages: counters.pages,
+    actions: counters.actions,
+    screenshots: counters.screenshots,
     reasoningCalls: 0,
   };
+}
+
+function safeHost(url: string): string | null {
+  try { return new URL(url).hostname; } catch { return null; }
 }

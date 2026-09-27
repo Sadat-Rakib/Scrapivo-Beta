@@ -1025,8 +1025,41 @@ export function expandFromClassified(cq: ClassifiedQuery): ExpandedQueries {
 }
 
 /**
+ * H7 — US-restricted founder discovery expansion. Startup-directory, ATS, and
+ * people-source dorks (scopes already supported by the source modules) so a
+ * US-locked founder hunt reaches founders directly, not only via intent posts.
+ * Site-scoped on purpose: every variant names its source so results are
+ * attributable and the source modules can route them.
+ */
+export function usFounderDiscoveryVariants(skill: string): string[] {
+  const s = (skill || "").replace(/["']/g, " ").trim();
+  if (!s) return [];
+  const founder = `("founder" OR "co-founder")`;
+  return [
+    // Startup directories
+    `${founder} "${s}" (site:crunchbase.com OR site:ycombinator.com OR site:producthunt.com OR site:wellfound.com)`,
+    `"${s}" ("founded by" OR "founders") (site:techcrunch.com OR site:inc.com OR site:fastcompany.com)`,
+    // ATS-hosted company job boards (founder-led hiring pages)
+    `${founder} "${s}" (site:jobs.lever.co OR site:boards.greenhouse.io OR site:jobs.ashbyhq.com OR site:apply.workable.com)`,
+    `${founder} "${s}" ("we're hiring" OR "join us") (site:jobs.lever.co OR site:boards.greenhouse.io)`,
+    // People sources
+    `${founder} "${s}" (site:linkedin.com/in OR site:medium.com OR site:substack.com OR site:x.com)`,
+  ];
+}
+
+function isUsLocation(loc: string): boolean {
+  return /^(united states|united states of america|usa|us|u\.s\.|u\.s\.a\.?|america)$/.test(loc.trim().toLowerCase());
+}
+
+function isFounderQuery(qx: ExpandedQueries): boolean {
+  return /\bfounder|co-?founder\b/i.test(`${qx.raw ?? ""} ${qx.role ?? ""} ${qx.skill ?? ""}`);
+}
+
+/**
  * Inject clarifier / classified geography into dorks so US/UK/EU selections
  * actually change what sources fetch — not only soft post-filters.
+ * H7: US-restricted founder queries additionally get startup-directory / ATS /
+ * people-source discovery variants (site-scoped, source-module supported).
  */
 export function injectLocationBias(
   qx: ExpandedQueries,
@@ -1046,9 +1079,14 @@ export function injectLocationBias(
     `("${qx.skill}") "${loc}" ("who can" OR "willing to pay" OR budget)`,
   ];
 
+  const founderVariants = isUsLocation(loc) && isFounderQuery(qx)
+    ? usFounderDiscoveryVariants(qx.skill)
+    : [];
+
   return {
     ...qx,
-    booleanWebQueries: [...geoWeb, ...biasFirst(qx.booleanWebQueries, 6)].slice(0, 16),
+    booleanWebQueries: [...geoWeb, ...founderVariants, ...biasFirst(qx.booleanWebQueries, 6)]
+      .slice(0, 16 + founderVariants.length),
     socialQueries: biasFirst(qx.socialQueries, 5),
     redditBuyerQueries: biasFirst(qx.redditBuyerQueries, 6),
     buyerIntentQueries: biasFirst(qx.buyerIntentQueries, 5),

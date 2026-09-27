@@ -338,6 +338,7 @@ async function defaultBrowserResearch(
     candidates,
     visible: process.env.RESEARCH_BROWSER_VISIBLE?.toLowerCase() !== "false",
     onEvent: args.onEvent,
+    signal: args.signal,
   });
 }
 
