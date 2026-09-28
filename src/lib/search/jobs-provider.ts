@@ -9,9 +9,6 @@
  * are untouched; the TS adapters already registered in the catalog are
  * what runs here.
  */
-import { ensureJobCatalogRegistered } from "@/lib/jobs/source-catalog";
-import { ensureFreehireSourceRegistered } from "@/lib/jobs/freehire-source";
-import { dedupeJobs, fetchAllJobSourcesWithMeta } from "@/lib/jobs/registry";
 import type { JobPosting, JobSourceId } from "@/lib/jobs/types";
 import { makeEvidence } from "@/lib/search/evidence";
 import { isSeekerPhrasing } from "@/lib/search/lead-segments";
@@ -130,8 +127,16 @@ export async function fetchSpecJobs(args: {
   seniority?: string;
   employment?: string;
 }): Promise<SpecJobsResult> {
+  // The catalog + registry pull the ATS adapter chain -> http-fetch.server ->
+  // node:child_process and registry -> node:crypto. Load them dynamically so a
+  // client-reachable importer never drags those into the browser bundle.
+  const [{ ensureJobCatalogRegistered }, { ensureFreehireSourceRegistered }, registry] = await Promise.all([
+    import("@/lib/jobs/source-catalog"),
+    import("@/lib/jobs/freehire-source"),
+    import("@/lib/jobs/registry"),
+  ]);
+  const { dedupeJobs, fetchAllJobSourcesWithMeta } = registry;
   ensureJobCatalogRegistered();
-  ensureFreehireSourceRegistered();
   const statuses: SpecJobsResult["sourceStatuses"] = [];
   let fetched = 0;
   const phase1 = await fetchAllJobSourcesWithMeta({

@@ -14,15 +14,18 @@ import { extractSearchSpec } from "@/lib/search/search-spec-extract";
 import type { SearchSpec } from "@/lib/search/search-spec";
 import { investorSectorMatches } from "@/lib/search/search-spec";
 import type { DbHitMeta } from "@/lib/canonical/read-parquet.server";
-import { searchPeopleDB, personRoleMatches } from "@/lib/canonical/people.server";
-import { searchCompaniesDB, companyCategoryMatches } from "@/lib/canonical/companies.server";
-import { searchBusinessesDB, craftMatches } from "@/lib/canonical/businesses.server";
-import { searchInvestorsDB } from "@/lib/canonical/investors.server";
+import { personRoleMatches } from "@/lib/canonical/people.server";
+import { companyCategoryMatches } from "@/lib/canonical/companies.server";
+import { craftMatches } from "@/lib/canonical/businesses.server";
+import type { searchPeopleDB } from "@/lib/canonical/people.server";
+import type { searchCompaniesDB } from "@/lib/canonical/companies.server";
+import type { searchBusinessesDB } from "@/lib/canonical/businesses.server";
+import type { searchInvestorsDB } from "@/lib/canonical/investors.server";
 import { COUNTRY_ISO } from "@/lib/search/search-spec-extract";
 import { countryHintForCity, locationSatisfies, resolveCanonicalLocation } from "@/lib/search/location-resolver";
 import { useIndexedSearch, useObjectSearchIndex } from "@/lib/search/flag";
-import { queryIndexForSpec } from "@/lib/indexed/search-index.server";
-import { queryObjectIndexForSpec } from "@/lib/object-index/search.server";
+import type { queryIndexForSpec } from "@/lib/indexed/search-index.server";
+import type { queryObjectIndexForSpec } from "@/lib/object-index/search.server";
 import { useCoverageSelector } from "@/lib/search/flag";
 import { selectCoverageSources, type CoverageMatrix } from "@/lib/search/coverage-selector";
 import { normCityLookup } from "@/lib/search/search-spec-extract";
@@ -1362,13 +1365,27 @@ export async function runSpecSearchCore(
       outcome: "NO_QUALIFIED_RESULTS",
     });
   }
-  const people = deps.people ?? searchPeopleDB;
-  const companies = deps.companies ?? searchCompaniesDB;
-  const businesses = deps.businesses ?? searchBusinessesDB;
-  const investors = deps.investors ?? searchInvestorsDB;
-  const indexer = deps.index === null
-    ? null
-    : (deps.index ?? (useObjectSearchIndex() ? queryObjectIndexForSpec : queryIndexForSpec));
+  // S3 + index readers reach node builtins (AWS SDK -> node:os/crypto), so they
+  // load dynamically — a static import would pull them into the client bundle.
+  const [peopleMod, companiesMod, businessesMod, investorsMod] = await Promise.all([
+    import("@/lib/canonical/people.server"),
+    import("@/lib/canonical/companies.server"),
+    import("@/lib/canonical/businesses.server"),
+    import("@/lib/canonical/investors.server"),
+  ]);
+  const people = deps.people ?? peopleMod.searchPeopleDB;
+  const companies = deps.companies ?? companiesMod.searchCompaniesDB;
+  const businesses = deps.businesses ?? businessesMod.searchBusinessesDB;
+  const investors = deps.investors ?? investorsMod.searchInvestorsDB;
+  // The two indexers are structurally compatible at their call sites but have
+  // different declared return types (IndexQueryResult vs ObjectIndexQueryResult),
+  // so the union is asserted here — same relationship the previous ternary had.
+  let indexer: typeof queryIndexForSpec | null = deps.index ?? null;
+  if (deps.index === undefined) {
+    indexer = (useObjectSearchIndex()
+      ? (await import("@/lib/object-index/search.server")).queryObjectIndexForSpec
+      : (await import("@/lib/indexed/search-index.server")).queryIndexForSpec) as typeof queryIndexForSpec;
+  }
   const dbMeta: DbHitMeta[] = [];
   let rows: SpecRow[] = [];
   let liveCandidateCount = 0;

@@ -1,6 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
 import { createFileRoute } from "@tanstack/react-router";
-import { researchSessions } from "@/lib/research-agent/session.server";
 
 async function userIdForRequest(request: Request): Promise<string | null> {
   const auth = request.headers.get("authorization");
@@ -21,6 +20,9 @@ export const Route = createFileRoute("/api/research/$sessionId/events")({
   server: {
     handlers: {
       GET: async ({ request, params }) => {
+        // `.server` modules load dynamically — a top-level import leaks server-only
+        // deps into the client route graph and breaks the vite client build.
+        const { researchSessions } = await import("@/lib/research-agent/session.server");
         const userId = await userIdForRequest(request);
         if (!userId) return new Response("Unauthorized", { status: 401 });
         try {

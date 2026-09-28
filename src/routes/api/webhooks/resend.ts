@@ -1,6 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getAdmin } from "@/integrations/my-supabase/admin.server";
-import { verifyResendWebhook } from "@/lib/outreach/webhook-verify.server";
 
 type ResendEvent = {
   type?: string;
@@ -15,6 +13,12 @@ export const Route = createFileRoute("/api/webhooks/resend")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        // `.server` modules must be imported dynamically inside the handler —
+        // a top-level import leaks node:crypto into the client route graph and
+        // breaks the vite client build.
+        const { getAdmin } = await import("@/integrations/my-supabase/admin.server");
+        const { verifyResendWebhook } = await import("@/lib/outreach/webhook-verify.server");
+
         const payload = await request.text();
         const secret = process.env.RESEND_WEBHOOK_SECRET || "";
 

@@ -4,7 +4,7 @@
  * caller. No new index service — correctness first (locked).
  */
 import { GetObjectCommand, ListObjectsV2Command, S3Client } from "@aws-sdk/client-s3";
-import { fromIni } from "@aws-sdk/credential-provider-ini";
+import type { AwsCredentialIdentity } from "@smithy/types";
 import { parquetReadObjects } from "hyparquet";
 
 const BUCKET = process.env.S3_BUCKET ?? "scrapivo-raw-data-2026-523220341033-us-east-2-an";
@@ -14,10 +14,25 @@ let s3: S3Client | null = null;
 const LIST_CACHE_MS = 5 * 60_000;
 const NETWORK_TIMEOUT_MS = 15_000;
 const listCache = new Map<string, { at: number; files: { key: string; size: number }[] }>();
+/** Shared-config credentials, resolved on first use.
+ *
+ * `@aws-sdk/credential-provider-ini` reaches node:os / node:fs / node:child_process.
+ * These readers stay transitively reachable from client routes (discover ->
+ * spec-search.functions -> indexed/search-index.server), so importing it at module
+ * scope drags those builtins into the browser bundle and fails the vite client
+ * build. The S3 client accepts an async credentials provider, so the import
+ * happens on the server at first use instead. */
+export function iniCredentialProvider(profile: string) {
+  return async (): Promise<AwsCredentialIdentity> => {
+    const { fromIni } = await import("@aws-sdk/credential-provider-ini");
+    return fromIni({ profile })();
+  };
+}
+
 function client(): S3Client {
   if (!s3) {
     const profile = process.env.AWS_PROFILE?.trim();
-    s3 = new S3Client({ region: REGION, ...(profile ? { credentials: fromIni({ profile }) } : {}) });
+    s3 = new S3Client({ region: REGION, ...(profile ? { credentials: iniCredentialProvider(profile) } : {}) });
   }
   return s3;
 }

@@ -1,6 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getAdmin } from "@/integrations/my-supabase/admin.server";
-import { runDueWatchesForAllUsers } from "@/lib/watch/watch-scheduler.server";
 
 /**
  * Cron: enqueue due signal watches for ALL users (service role). The route
@@ -11,6 +9,10 @@ export const Route = createFileRoute("/api/cron/signal-watches")({
   server: {
     handlers: {
       GET: async ({ request }) => {
+        // `.server` modules load dynamically — a top-level import leaks server-only
+        // deps into the client route graph and breaks the vite client build.
+        const { getAdmin } = await import("@/integrations/my-supabase/admin.server");
+        const { runDueWatchesForAllUsers } = await import("@/lib/watch/watch-scheduler.server");
         const auth = request.headers.get("authorization") || "";
         const cronSecret = process.env.CRON_SECRET;
         const url = new URL(request.url);
@@ -28,6 +30,10 @@ export const Route = createFileRoute("/api/cron/signal-watches")({
         return Response.json(result);
       },
       POST: async ({ request }) => {
+        // `.server` modules load dynamically — a top-level import leaks server-only
+        // deps into the client route graph and breaks the vite client build.
+        const { getAdmin } = await import("@/integrations/my-supabase/admin.server");
+        const { runDueWatchesForAllUsers } = await import("@/lib/watch/watch-scheduler.server");
         const auth = request.headers.get("authorization") || "";
         const cronSecret = process.env.CRON_SECRET;
         if (cronSecret && auth !== `Bearer ${cronSecret}`) {

@@ -27,8 +27,8 @@ import { Route as AuthenticatedGuidesRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticated/discover'
 import { Route as AuthenticatedProjectsIndexRouteImport } from './routes/_authenticated/projects.index'
 import { Route as ApiWebhooksResendRouteImport } from './routes/api/webhooks/resend'
-import { Route as ApiCronEmailSequencesRouteImport } from './routes/api/cron/email-sequences'
 import { Route as ApiCronSignalWatchesRouteImport } from './routes/api/cron/signal-watches'
+import { Route as ApiCronEmailSequencesRouteImport } from './routes/api/cron/email-sequences'
 import { Route as AuthenticatedSettingsProfileRouteImport } from './routes/_authenticated/settings/profile'
 import { Route as AuthenticatedProjectsProjectIdRouteImport } from './routes/_authenticated/projects.$projectId'
 import { Route as ApiResearchSessionIdEventsRouteImport } from './routes/api/research/$sessionId/events'
@@ -125,14 +125,14 @@ const ApiWebhooksResendRoute = ApiWebhooksResendRouteImport.update({
   path: '/api/webhooks/resend',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiCronEmailSequencesRoute = ApiCronEmailSequencesRouteImport.update({
-  id: '/api/cron/email-sequences',
-  path: '/api/cron/email-sequences',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiCronSignalWatchesRoute = ApiCronSignalWatchesRouteImport.update({
   id: '/api/cron/signal-watches',
   path: '/api/cron/signal-watches',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCronEmailSequencesRoute = ApiCronEmailSequencesRouteImport.update({
+  id: '/api/cron/email-sequences',
+  path: '/api/cron/email-sequences',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedSettingsProfileRoute =
@@ -180,8 +180,6 @@ export interface FileRoutesByFullPath {
   '/settings/profile': typeof AuthenticatedSettingsProfileRoute
   '/api/cron/email-sequences': typeof ApiCronEmailSequencesRoute
   '/api/cron/signal-watches': typeof ApiCronSignalWatchesRoute
-  '/api/cron/signal-watches': typeof ApiCronSignalWatchesRoute
-  '/api/cron/signal-watches': typeof ApiCronSignalWatchesRoute
   '/api/webhooks/resend': typeof ApiWebhooksResendRoute
   '/projects/': typeof AuthenticatedProjectsIndexRoute
   '/api/research/$sessionId/events': typeof ApiResearchSessionIdEventsRoute
@@ -206,6 +204,7 @@ export interface FileRoutesByTo {
   '/projects/$projectId': typeof AuthenticatedProjectsProjectIdRouteWithChildren
   '/settings/profile': typeof AuthenticatedSettingsProfileRoute
   '/api/cron/email-sequences': typeof ApiCronEmailSequencesRoute
+  '/api/cron/signal-watches': typeof ApiCronSignalWatchesRoute
   '/api/webhooks/resend': typeof ApiWebhooksResendRoute
   '/projects': typeof AuthenticatedProjectsIndexRoute
   '/api/research/$sessionId/events': typeof ApiResearchSessionIdEventsRoute
@@ -232,6 +231,7 @@ export interface FileRoutesById {
   '/_authenticated/projects/$projectId': typeof AuthenticatedProjectsProjectIdRouteWithChildren
   '/_authenticated/settings/profile': typeof AuthenticatedSettingsProfileRoute
   '/api/cron/email-sequences': typeof ApiCronEmailSequencesRoute
+  '/api/cron/signal-watches': typeof ApiCronSignalWatchesRoute
   '/api/webhooks/resend': typeof ApiWebhooksResendRoute
   '/_authenticated/projects/': typeof AuthenticatedProjectsIndexRoute
   '/api/research/$sessionId/events': typeof ApiResearchSessionIdEventsRoute
@@ -283,6 +283,7 @@ export interface FileRouteTypes {
     | '/projects/$projectId'
     | '/settings/profile'
     | '/api/cron/email-sequences'
+    | '/api/cron/signal-watches'
     | '/api/webhooks/resend'
     | '/projects'
     | '/api/research/$sessionId/events'
@@ -308,6 +309,7 @@ export interface FileRouteTypes {
     | '/_authenticated/projects/$projectId'
     | '/_authenticated/settings/profile'
     | '/api/cron/email-sequences'
+    | '/api/cron/signal-watches'
     | '/api/webhooks/resend'
     | '/_authenticated/projects/'
     | '/api/research/$sessionId/events'
@@ -453,18 +455,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiWebhooksResendRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/cron/email-sequences': {
-      id: '/api/cron/email-sequences'
-      path: '/api/cron/email-sequences'
-      fullPath: '/api/cron/email-sequences'
-      preLoaderRoute: typeof ApiCronEmailSequencesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/cron/signal-watches': {
       id: '/api/cron/signal-watches'
       path: '/api/cron/signal-watches'
       fullPath: '/api/cron/signal-watches'
       preLoaderRoute: typeof ApiCronSignalWatchesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cron/email-sequences': {
+      id: '/api/cron/email-sequences'
+      path: '/api/cron/email-sequences'
+      fullPath: '/api/cron/email-sequences'
+      preLoaderRoute: typeof ApiCronEmailSequencesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/settings/profile': {

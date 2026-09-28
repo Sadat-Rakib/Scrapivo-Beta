@@ -7,6 +7,8 @@ import type { ResolvedContactInfo } from "@/components/discover/result-tabs";
 import { TIER_LABEL, type EvidenceObject } from "@/lib/intent/evidence";
 import { ensureHttpUrl } from "@/lib/search/site-url";
 import { fixMojibake } from "@/lib/encoding";
+// getWebsiteBio is a serverFn — TanStack Start replaces the import with a
+// client stub, so this value import is safe. The type import is the same module.
 import { getWebsiteBio, type WebsiteBio } from "@/lib/search/website-bio.server";
 import { AddToListMenu } from "@/components/discover/add-to-list-menu";
 import { Button } from "@/components/ui/button";

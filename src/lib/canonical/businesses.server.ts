@@ -2,9 +2,8 @@
  * Canonical business reader — S3 Parquet by_country (full 16.3M corpus).
  * Country-stem pruning via location text; bounded fallback scan otherwise.
  */
-import { listPartitionFilesBySize, readFiltered, type DbHitMeta } from "./read-parquet.server";
+import { listPartitionFilesBySize, readFiltered, type DbHitMeta, iniCredentialProvider } from "./read-parquet.server";
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { fromIni } from "@aws-sdk/credential-provider-ini";
 import { countryHintForCity } from "@/lib/search/location-resolver";
 
 const BUCKET = process.env.S3_BUCKET ?? "scrapivo-raw-data-2026-523220341033-us-east-2-an";
@@ -58,7 +57,7 @@ async function gazetteer(): Promise<Gazetteer> {
     const profile = process.env.AWS_PROFILE?.trim();
     const s3 = new S3Client({
       region: REGION,
-      ...(profile ? { credentials: fromIni({ profile }) } : {}),
+      ...(profile ? { credentials: iniCredentialProvider(profile) } : {}),
     });
     const res = await s3.send(
       new GetObjectCommand({ Bucket: BUCKET, Key: "processed/gazetteer/gazetteer.json" }),

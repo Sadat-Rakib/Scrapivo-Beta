@@ -5,7 +5,7 @@ import {
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
-import { fromIni } from "@aws-sdk/credential-provider-ini";
+import { iniCredentialProvider } from "@/lib/canonical/read-parquet.server";
 
 export interface SearchIndexObjectStore {
   getObject(key: string, range?: { start: number; end?: number }): Promise<Uint8Array>;
@@ -55,7 +55,7 @@ export class S3SearchIndexObjectStore implements SearchIndexObjectStore {
       ...(config.accessKeyId && config.secretAccessKey
         ? { credentials: { accessKeyId: config.accessKeyId, secretAccessKey: config.secretAccessKey } }
         : config.profile
-          ? { credentials: fromIni({ profile: config.profile }) }
+          ? { credentials: iniCredentialProvider(config.profile) }
           : {}),
     });
   }
