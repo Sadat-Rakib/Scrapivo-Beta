@@ -17,6 +17,9 @@ type RegisteredRun = {
 const runs = new Map<string, RegisteredRun>();
 const TTL_MS = 10 * 60_000;
 const MAX_RUN_MS = 120_000;
+/** Upper bound for adaptive budgets (beta-reality: live research for
+ * people/companies cannot finish inside the flat 120s budget). */
+const MAX_ADAPTIVE_RUN_MS = 10 * 60_000;
 const keyFor = (ownerId: string, runId: string) => JSON.stringify([ownerId, runId]);
 
 function abort(controller: AbortController, reason: SearchAbortReason): void {
@@ -53,6 +56,9 @@ export function beginRegisteredSearchRun(args: {
   runId: string;
   conversationId?: string;
   signal?: AbortSignal;
+  /** Optional run budget. Defaults to the flat MAX_RUN_MS; callers with a
+   * requested target scale it (120s base + 20s per requested candidate). */
+  maxRunMs?: number;
 }): { signal: AbortSignal; finish: () => void } {
   prune();
   const key = keyFor(args.ownerId, args.runId);
@@ -78,7 +84,11 @@ export function beginRegisteredSearchRun(args: {
   if (args.signal?.aborted) abortExternal();
   else args.signal?.addEventListener("abort", abortExternal, { once: true });
   // Hard deadline: stop research but keep already-qualified rows downstream.
-  const timeout = setTimeout(() => abort(controller, SEARCH_DEADLINE_REASON), MAX_RUN_MS);
+  const budgetMs = Math.min(
+    Math.max(5_000, args.maxRunMs ?? MAX_RUN_MS),
+    MAX_ADAPTIVE_RUN_MS,
+  );
+  const timeout = setTimeout(() => abort(controller, SEARCH_DEADLINE_REASON), budgetMs);
   timeout.unref?.();
   const run: RegisteredRun = {
     controller,

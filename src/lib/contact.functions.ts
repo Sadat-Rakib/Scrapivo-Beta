@@ -405,21 +405,26 @@ export const resolveLeadContact = createServerFn({ method: "POST" })
       }
     }
 
-    // People path: post email already in knownEmail/signals; else first.last@domain guess.
+    // People path: post email already in knownEmail/signals; else first.last@domain
+    // pattern check. Beta-reality rule (§46/§72): a pattern address that is not
+    // SMTP-verified is a GUESS and must never be surfaced as a contact — guesses
+    // presented as verified emails were shown to beta users (Canva CEO). Only a
+    // deep-verified address may be pushed; probable/possible stay out.
     if (data.personName && domain?.domain && !hasOutreachEmail(signals, discovery)) {
       const guesses = guessEmailPatterns(data.personName, domain.domain);
       for (const g of guesses.slice(0, 3)) {
         const v = await verifyEmailDeep(g, { freeOnly: data.freeOnly });
         if (v.tier === "invalid" || v.disposable) continue;
+        if (v.tier !== "verified") continue;
         signals.push({
           kind: "pattern_guess",
           email: g,
           name: data.personName,
           domain: domain.domain,
-          confidence: v.tier === "verified" ? 0.55 : v.tier === "probable" ? 0.4 : 0.28,
-          note: `Pattern guess from ${data.personName} (${v.method})`,
+          confidence: 0.55,
+          note: `Pattern guess from ${data.personName}, SMTP-verified (${v.method})`,
         });
-        if (v.tier === "verified" || v.tier === "probable") break;
+        break;
       }
     }
 

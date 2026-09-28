@@ -372,6 +372,7 @@ function verifyCandidateFromSnapshot(args: {
     title: snapshot.title,
     text: snapshot.visibleRelevantText,
     friction: snapshot.friction,
+    entityName: current.row.title ?? undefined,
   });
   const frictionDriven = relevance.reason.startsWith("friction:");
   if (!relevance.keepExtracting && !frictionDriven && PAGE_LEVEL_STOP_VERDICTS.has(relevance.verdict)) {
@@ -516,6 +517,19 @@ async function readWithLadder(args: {
   sessionId: string;
 }): Promise<{ observation: BrowserObservation } | "degraded"> {
   const { browser, session, url, candidateId, emit, sessionId } = args;
+  // Beta-reality fix (§15/§16): search-result pages (Bing/Google/SearXNG SERPs)
+  // must never consume browser budget — live runs burned 8 pages/10 actions
+  // paginating a Bing SERP instead of reading candidate pages. Recognized SERP
+  // URLs are skipped before any navigation.
+  if (recognizeUrl(url).kind === "search") {
+    emit(researchEvent({
+      sessionId, type: "SOURCE_FAILED", phase: "BROWSER",
+      internal: { code: "SEARCH_RESULTS_PAGE_SKIPPED", candidateId, url },
+      domain: safeHost(url),
+      message: "That's a search results page, not a source — reading the actual results instead.",
+    }));
+    return "degraded";
+  }
   const attempt = async (): Promise<BrowserObservation> => {
     const host = safeHost(url);
     const paced = !!host && !isLoopbackHost(host);

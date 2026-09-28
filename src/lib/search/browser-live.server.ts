@@ -18,6 +18,7 @@ export function buildDefaultAgentBrowser(
 import type { SearchSpec } from "./search-spec";
 import { makeEvidence } from "./evidence";
 import { classifyPage } from "./page-classify";
+import { classifyPageRelevance } from "./page-relevance";
 import { extractStructuredFacts, factsFromJsonLdText, type StructuredPageFacts } from "./page-structured";
 import { normalizeDomain, normalizeEntityName, isFirstPartyEntityHost } from "./entity-resolve";
 import { buildResearchPlan, buildCandidateResearchQueries } from "./source-plan";
@@ -598,6 +599,22 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       }
       progress("Opened result", domain);
       if (blocked(snapshot) || !publicUrl(snapshot.url)) return await httpFallback();
+      // Beta-reality fix (§15): live runs spent 8-10 browser pages on
+      // microsoft.com/support furniture while researching unrelated entities.
+      // Boilerplate/legal/support/consent pages are skipped before any
+      // extraction or scrolling. WRONG_ENTITY is deliberately not checked here:
+      // directory/listing pages legitimately cover many entities.
+      {
+        const relevance = classifyPageRelevance({
+          url: snapshot.url,
+          title: snapshot.title,
+          text: snapshot.visibleRelevantText,
+        });
+        if (relevance.verdict === "IRRELEVANT" || relevance.verdict === "ERROR") {
+          progress("This page isn't useful for the search — moving on", domain, relevance.reason);
+          return null;
+        }
+      }
       let extracted = await bounded(browser.extract(session!, { fields: { body: { selector: "body" }, jsonld: { selector: 'script[type="application/ld+json"]' } } }));
       check();
       let text = (extracted.values.body || snapshot.visibleRelevantText).slice(0, 18_000);

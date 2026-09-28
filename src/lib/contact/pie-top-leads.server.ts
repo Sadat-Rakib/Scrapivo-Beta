@@ -287,12 +287,12 @@ async function enrichOneLead(lead: Lead, paidBudget: { used: number }): Promise<
     }
   }
 
-  // 5) LLM last resort
-  if (!hasContact()) {
-    const pageText = (await fetchPublicPageText(lead.full_post_url || "")) || stripHtmlNoise(blob);
-    const llm = await llmPieExtract(pageText || blob);
-    current = mergeInline(current, llm.emails, llm.phones);
-  }
+  // 5) LLM last resort — DISABLED. Contacts read out of a page by an LLM are
+  // not verbatim evidence; the model invents first.last@domain addresses
+  // (beta-reality: fabricated CEO emails reached users). Only regex extraction
+  // from real page text (steps 1-4) may contribute inline contacts.
+  // llmPieExtract is retained for a future flow that verifies its output
+  // against the fetched page text before merging.
 
   return current;
 }

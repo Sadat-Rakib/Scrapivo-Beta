@@ -2585,7 +2585,11 @@ export const runSpecSearch = createServerFn({ method: "POST" })
     const runId = data.search_run_id;
     const ownerId = context.userId;
     const { beginRegisteredSearchRun } = await import("@/lib/search/search-run.server");
-    const registered = runId ? beginRegisteredSearchRun({ ownerId, runId, conversationId: data.conversation_id, signal: getRequest().signal }) : undefined;
+    // Beta-reality fix: a flat 120s deadline killed live people/company research
+    // mid-flight (premature honest-looking zeros). Scale the budget with the
+    // requested target; the absolute cap lives in search-run.server.
+    const requested = Number.isFinite(data.limit) ? Math.max(1, Math.min(100, Number(data.limit))) : 10;
+    const registered = runId ? beginRegisteredSearchRun({ ownerId, runId, conversationId: data.conversation_id, signal: getRequest().signal, maxRunMs: 120_000 + requested * 20_000 }) : undefined;
     const { beginSearchBrowserProgress, publishSearchBrowserProgress, finishSearchBrowserProgress } = await import("@/lib/search/search-browser-progress.server");
     if (runId) beginSearchBrowserProgress(runId, ownerId);
     try {

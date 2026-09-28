@@ -27,7 +27,7 @@ type ProfileForm = {
   slack_webhook?: string | null;
 };
 
-function ProfilePage({ heading = "Settings" }: { heading?: string }) {
+export function ProfilePage({ heading = "Settings" }: { heading?: string }) {
   const qc = useQueryClient();
   const get = useServerFn(getMyProfile);
   const upd = useServerFn(updateMyProfile);
@@ -252,6 +252,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-// WS3: re-exported for the Settings → Profile & Defaults page
-// (/settings/profile) so the editor exists in exactly one place.
-export { ProfilePage };
+// WS3 note: the Settings → Profile & Defaults route (/settings/profile)
+// imports ProfilePage from here. Route files must not use a trailing
+// `export { ... }` re-export — the TanStack/vite route transform fails it
+// with "Export 'ProfilePage' is not defined" and the whole dev app 500s.
