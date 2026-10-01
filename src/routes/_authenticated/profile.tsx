@@ -52,6 +52,10 @@ export function ProfilePage({ heading = "Settings" }: { heading?: string }) {
       upd({
         data: {
           full_name: form.full_name ?? "",
+          // The form edits one display name; write it to sender_name too so the
+          // load-side "prefer the longer sender_name" rule can't resurrect a
+          // stale value and silently drop the user's edit on the next load.
+          sender_name: form.full_name ?? "",
           job_title: form.job_title ?? "",
           years_experience: form.years_experience ? Number(form.years_experience) : null,
           work_preference: form.work_preference ?? "",
@@ -61,7 +65,12 @@ export function ProfilePage({ heading = "Settings" }: { heading?: string }) {
           slack_webhook: form.slack_webhook ?? "",
         },
       }),
-    onSuccess: () => {
+    onSuccess: (res) => {
+      // The server returns the persisted row; only toast on a real write.
+      if (!res?.profile) {
+        toast.error("Settings were not saved. Please try again.");
+        return;
+      }
       toast.success("Settings saved");
       qc.invalidateQueries({ queryKey: ["profile"] });
       qc.invalidateQueries({ queryKey: ["my-profile"] });

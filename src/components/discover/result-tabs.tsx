@@ -145,8 +145,8 @@ function InPostContacts({ ic }: { ic?: InlineContacts }) {
   if (!ic) return null;
   return (
     <div className="rounded-lg border border-primary/20 bg-primary/5 px-2.5 py-1.5 space-y-0.5">
-      {ic.emails.map((e) => (
-        <div key={e} className="flex items-center gap-1.5 text-xs">
+      {ic.emails.map((e, i) => (
+        <div key={`${e}-${i}`} className="flex items-center gap-1.5 text-xs">
           <Mail className="size-3 text-primary shrink-0" />
           <a
             href={`mailto:${e}`}
@@ -157,14 +157,14 @@ function InPostContacts({ ic }: { ic?: InlineContacts }) {
           </a>
         </div>
       ))}
-      {ic.phones.map((p) => (
-        <div key={p} className="flex items-center gap-1.5 text-xs">
+      {ic.phones.map((p, i) => (
+        <div key={`${p}-${i}`} className="flex items-center gap-1.5 text-xs">
           <Phone className="size-3 text-primary shrink-0" />
           <span className="truncate">{p}</span>
         </div>
       ))}
-      {ic.links.map((l) => (
-        <div key={l} className="flex items-center gap-1.5 text-xs">
+      {ic.links.map((l, i) => (
+        <div key={`${l}-${i}`} className="flex items-center gap-1.5 text-xs">
           <ExternalLink className="size-3 text-primary shrink-0" />
           <a
             href={l}
@@ -248,9 +248,9 @@ export function CompanyCard({
         <p className="mt-2 text-xs text-foreground/80 line-clamp-2">{row.why_now}</p>
         {relevance && relevance.length > 0 && (
           <div className="mt-1.5 flex flex-wrap gap-1">
-            {relevance.map((chip) => (
+            {relevance.map((chip, i) => (
               <span
-                key={chip}
+                key={`${chip}-${i}`}
                 className="text-[10px] px-1.5 py-0.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
               >
                 {chip}
@@ -504,7 +504,7 @@ export function ViewToggle({
     <div className="inline-flex rounded-full border border-border p-0.5 bg-muted/40">
       {(["cards", "table"] as const).map((v) => (
         <button
-          key={v}
+          key={`view-${v}`}
           type="button"
           onClick={() => onChange(v)}
           className={`px-2.5 py-1 rounded-full text-[11px] transition-colors ${
@@ -815,7 +815,7 @@ export function PostsGrid({
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 pb-4">
       {leads.map((l, idx) => (
         <LeadCard
-          key={l.full_post_url || `${l.title}-${idx}`}
+          key={`${l.full_post_url || l.title}-${idx}`}
           lead={l}
           saved={savedByUrl.has(l.full_post_url)}
           onOpen={() => onOpen(l)}
@@ -860,9 +860,9 @@ export function LocalBusinessCard({
         {row.address && <p className="text-xs text-muted-foreground truncate">{row.address}</p>}
         {relevance && relevance.length > 0 && (
           <div className="flex flex-wrap gap-1 pt-0.5">
-            {relevance.map((chip) => (
+            {relevance.map((chip, i) => (
               <span
-                key={chip}
+                key={`${chip}-${i}`}
                 className="text-[10px] px-1.5 py-0.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
               >
                 {chip}

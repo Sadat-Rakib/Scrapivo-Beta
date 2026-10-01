@@ -268,9 +268,9 @@ export function EntityDetailPanel({
             {!!b.opportunity_tags?.length && (
               <Row label="Opportunity">
                 <div className="flex flex-wrap gap-1.5 pt-0.5">
-                  {b.opportunity_tags.slice(0, 6).map((t) => (
+                  {b.opportunity_tags.slice(0, 6).map((t, i) => (
                     <span
-                      key={t}
+                      key={`${t}-${i}`}
                       className="text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/25 bg-emerald-500/[0.07] text-emerald-200/90"
                     >
                       {t.replace(/_/g, " ")}
@@ -361,17 +361,17 @@ export function EntityDetailPanel({
             {(p.inline_contacts?.emails?.length || p.inline_contacts?.phones?.length) && (
               <Row label="In post">
                 <div className="space-y-0.5">
-                  {p.inline_contacts.emails.slice(0, 3).map((e) => (
+                  {p.inline_contacts.emails.slice(0, 3).map((e, i) => (
                     <a
-                      key={e}
+                      key={`${e}-${i}`}
                       href={`mailto:${e}`}
                       className="block text-sm text-emerald-400 hover:underline break-all"
                     >
                       {e}
                     </a>
                   ))}
-                  {p.inline_contacts.phones.slice(0, 3).map((ph) => (
-                    <span key={ph} className="block text-sm">
+                  {p.inline_contacts.phones.slice(0, 3).map((ph, i) => (
+                    <span key={`${ph}-${i}`} className="block text-sm">
                       {ph}
                     </span>
                   ))}

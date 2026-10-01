@@ -99,9 +99,19 @@ export function LeadCard({
   const sourceLabel = displaySource(lead);
   const isDirectory = lead.source === "investors";
   return (
-    <button
+    // role="button" div, not a <button>: the card contains a real save
+    // <button>, and nested interactive elements are invalid HTML.
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onOpen}
-      className="lead-card-hover text-left w-full p-4 rounded-xl border border-border bg-card transition-all"
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onOpen();
+        }
+      }}
+      className="lead-card-hover text-left w-full p-4 rounded-xl border border-border bg-card transition-all cursor-pointer"
     >
       <div className="flex items-start justify-between gap-3 mb-2">
         <div className="flex items-center gap-1.5 text-xs flex-wrap">
@@ -167,14 +177,14 @@ export function LeadCard({
       {lead.inline_contacts &&
         (lead.inline_contacts.emails.length > 0 || lead.inline_contacts.phones.length > 0) && (
           <div className="mt-2 rounded-lg border border-primary/20 bg-primary/5 px-2.5 py-1.5 space-y-0.5">
-            {lead.inline_contacts.emails.slice(0, 2).map((e) => (
-              <div key={e} className="flex items-center gap-1.5 text-xs text-foreground/90">
+            {lead.inline_contacts.emails.slice(0, 2).map((e, i) => (
+              <div key={`${e}-${i}`} className="flex items-center gap-1.5 text-xs text-foreground/90">
                 <Mail className="size-3 text-primary shrink-0" />
                 <span className="truncate">{e}</span>
               </div>
             ))}
-            {lead.inline_contacts.phones.slice(0, 1).map((p) => (
-              <div key={p} className="flex items-center gap-1.5 text-xs text-foreground/90">
+            {lead.inline_contacts.phones.slice(0, 1).map((p, i) => (
+              <div key={`${p}-${i}`} className="flex items-center gap-1.5 text-xs text-foreground/90">
                 <Phone className="size-3 text-primary shrink-0" />
                 <span className="truncate">{p}</span>
               </div>
@@ -198,6 +208,6 @@ export function LeadCard({
           <ExternalLink className="size-3" />
         </span>
       </div>
-    </button>
+    </div>
   );
 }

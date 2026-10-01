@@ -76,6 +76,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailTouched, setEmailTouched] = useState(false);
+  const [signinError, setSigninError] = useState<string | null>(null);
   const [tab, setTab] = useState<"signin" | "signup">(mode === "signup" ? "signup" : "signin");
 
   const normalizedEmail = email.trim().toLowerCase();
@@ -96,12 +97,14 @@ function AuthPage() {
 
   const setMode = (next: "signin" | "signup") => {
     setTab(next);
+    setSigninError(null);
     void navigate({ to: "/auth", search: { mode: next }, replace: true });
   };
 
   const goDiscover = () => navigate({ to: "/discover" });
 
   const signIn = async () => {
+    setSigninError(null);
     setEmailTouched(true);
     if (!emailOk) {
       toast.error(emailError || "Enter a valid email address (you@domain.com).");
@@ -113,43 +116,56 @@ function AuthPage() {
     }
 
     setLoading(true);
-    let { data, error } = await mySupabase.auth.signInWithPassword({
-      email: normalizedEmail,
-      password,
-    });
+    // finally guarantees loading ends and the form is retryable on every path,
+    // including the swallowed repair() failure below.
+    try {
+      let { data, error } = await mySupabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password,
+      });
 
-    // Confirm email if needed, then retry once.
-    if (error && /invalid login credentials/i.test(error.message)) {
-      try {
-        const fixed = await repair({ data: { email: normalizedEmail } });
-        if (fixed.exists) {
-          ({ data, error } = await mySupabase.auth.signInWithPassword({
-            email: normalizedEmail,
-            password,
-          }));
-        }
-        if (error) {
-          const check = await checkEmail({ data: { email: normalizedEmail } });
-          setLoading(false);
-          if (check.exists) {
-            toast.error("Wrong password. Try again, or use Sign up to set a new password.");
+      // Confirm email if needed, then retry once.
+      if (error && /invalid login credentials/i.test(error.message)) {
+        try {
+          const fixed = await repair({ data: { email: normalizedEmail } });
+          if (fixed.exists) {
+            ({ data, error } = await mySupabase.auth.signInWithPassword({
+              email: normalizedEmail,
+              password,
+            }));
+          }
+          if (error) {
+            const check = await checkEmail({ data: { email: normalizedEmail } });
+            if (check.exists) {
+              toast.error("Wrong password. Try again, or use Sign up to set a new password.");
+              setSigninError("Email or password is incorrect.");
+              return;
+            }
+            toast.error("No account for that email yet. Create one on Sign up.");
+            setSigninError("No account for that email yet. Create one on Sign up.");
+            setMode("signup");
             return;
           }
-          toast.error("No account for that email yet. Create one on Sign up.");
-          setMode("signup");
-          return;
+        } catch {
+          // Repair is best-effort; fall through and surface the original error.
         }
-      } catch {
-        // fall through
       }
-    }
 
-    setLoading(false);
-    if (error) return toast.error(friendlyAuthError(error.message));
-    if (!data.session) {
-      return toast.error("Sign in did not create a session. Try again.");
+      if (error) {
+        const msg = friendlyAuthError(error.message);
+        toast.error(msg);
+        setSigninError(msg);
+        return;
+      }
+      if (!data.session) {
+        toast.error("Sign in did not create a session. Try again.");
+        setSigninError("Sign in did not create a session. Try again.");
+        return;
+      }
+      goDiscover();
+    } finally {
+      setLoading(false);
     }
-    goDiscover();
   };
 
   const signUp = async () => {
@@ -325,6 +341,13 @@ function AuthPage() {
                 )}
 
                 <div className="pt-4 mt-auto">
+                  {/* Inline (not toast-only) so a failed sign-in stays visible
+                      until the next attempt — accessible via role="alert". */}
+                  {tab === "signin" && signinError && (
+                    <p role="alert" className="text-xs text-red-400 mb-2 text-center">
+                      {signinError}
+                    </p>
+                  )}
                   <Button
                     onClick={tab === "signin" ? () => void signIn() : () => void signUp()}
                     disabled={loading || (tab === "signup" ? (!name.trim() || !leadIssue.trim() || !emailOk || password.length < 6) : (!emailOk || password.length < 6))}

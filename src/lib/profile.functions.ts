@@ -33,7 +33,17 @@ export const updateMyProfile = createServerFn({ method: "POST" })
   .middleware([requireMyAuth])
   .inputValidator((d: unknown) => PatchSchema.parse(d))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("profiles").update(data).eq("id", context.userId);
+    // Upsert, not update: users without an existing profiles row got a silent
+    // 0-row UPDATE (client toasted success, nothing persisted). onConflict on
+    // id merges into an existing row so columns omitted from the payload
+    // (plan, usage counters, outreach settings) are preserved, and .select()
+    // returns the row so the client can verify the write actually landed.
+    const { data: row, error } = await context.supabase
+      .from("profiles")
+      .upsert({ id: context.userId, ...data }, { onConflict: "id" })
+      .select()
+      .maybeSingle();
     if (error) throw new Error(error.message);
-    return { ok: true };
+    if (!row) throw new Error("Profile save did not persist. Please try again.");
+    return { ok: true as const, profile: row };
   });
