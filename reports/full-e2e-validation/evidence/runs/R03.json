@@ -1,0 +1,165 @@
+{
+  "id": "R03",
+  "query": "Web designers in New York",
+  "category": "role",
+  "viewport": "m360",
+  "startedAt": "2026-10-01T12:47:13.799Z",
+  "main": {
+    "query": "Web designers in New York",
+    "clarify": [
+      {
+        "question": "What are you trying to do with these results?",
+        "chosen": "Find prospects",
+        "t": 2
+      },
+      {
+        "question": "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?",
+        "chosen": "Search with defaults",
+        "t": 64
+      }
+    ],
+    "streamed": [],
+    "activity": [
+      "Checked available records · Available records · 0"
+    ],
+    "bubbleVerbatim": true,
+    "clarifyAt": 2,
+    "runningAt": 16,
+    "pill": "Scrapy browser kept open · webdesignnyc.co · 8 pages · 00:41",
+    "miniBrowserAt": 61,
+    "viewingOnly": false,
+    "clarifyStuck": true,
+    "durationS": 122,
+    "firstStreamS": null,
+    "timedOut": true,
+    "header": null,
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nB2B SaaS founders in Canada with public email or phone\nExpand (0 results)\nHVAC companies in Toronto with phone numbers\nHVAC companies in Toronto with phone numbers\nPeople looking for a web designer\nPeople looking for a web designer\nFintech companies in Toronto with 50 to 200 employees\nPeople looking for a web designer\nPeople looking for a web designer\nFintech founders in London\nExpand (0 results)\nAI founders globally hiring their first sales rep\nExpand (0 results)\nFounders talking about needing SEO\nFintech companies in Toronto with 50 to 200 employees\nPlumbers in Edmonton with public contact details\nExpand (50 results)\nDentists in Calgary with websites\nExpand (50 results)\nMarketing agencies in Vancouver\nRoofers in Mississauga with phone numbers\nExpand (1 results)\nCopywriters in Toronto\nExpand (1 results)\nFractional CMOs in Canada\nExpand (1 results)\nWeb designers in New York\nUnderstanding your request…\nStop search\nMode\nThinker"
+  },
+  "server": {
+    "runId": "run_338ff61a",
+    "specRuns": 2,
+    "spec": {
+      "query": "Web designers in New York",
+      "entity": "person",
+      "status": "ready_to_search",
+      "outcome": "NO_QUALIFIED_RESULTS",
+      "criteria": [
+        "role=web designer",
+        "location=New York",
+        "location_id=geo:city:new-york",
+        "location_kind=city",
+        "location_country=US",
+        "location_parents=geo:country:us",
+        "purpose=prospecting"
+      ],
+      "retrieved": 0,
+      "returned": 0,
+      "qualified": 0,
+      "rejected": 0,
+      "pendingEnrichment": 0,
+      "liveDiscovery": "completed",
+      "signalRequired": false,
+      "reason": "SOURCE_UNAVAILABLE",
+      "timings": {
+        "understanding_ms": 0,
+        "stored_search_ms": 10134,
+        "research_ms": 40007,
+        "enrichment_ms": 1,
+        "qualification_ms": 0,
+        "total_ms": 50142
+      },
+      "sources": [
+        "pg-index:0/0",
+        "s3-parquet:351216/0"
+      ],
+      "funnel": {
+        "raw": 0,
+        "postSpec": 0,
+        "complete": 0,
+        "qualRejected": 0,
+        "qualified": 0
+      },
+      "sourceHealth": {
+        "summary": null,
+        "sources": [
+          "Public websites:unavailable",
+          "The web:unavailable",
+          "Public websites:empty"
+        ]
+      }
+    },
+    "ledger": null,
+    "runtime": [
+      {
+        "requested": "worker",
+        "used": "worker",
+        "reason": null
+      }
+    ],
+    "browserDone": [
+      {
+        "status": "completed",
+        "reason": "diminishing_returns",
+        "candidates": 0,
+        "researched": 0,
+        "verified": 0,
+        "visited": 4,
+        "elapsedMs": 39865
+      }
+    ],
+    "searches": 4,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": []
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "error: In HTML, %s cannot be a descendant of <%s>.\nThis will cause a hydration error.%s <button> button \n\n  ...\n    <Lazy>\n      <DiscoverRoute>\n        <DiscoverPage>\n          <div className=\"h-full fle...\">\n            <div className=\"flex-1 min...\">\n              <div ref={{...}} className=\"flex-1 min.",
+    "error: <%s> cannot contain a nested %s.\nSee this log for the ancestor stack trace. button <button>",
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 4,
+      "event": "a: submitted"
+    },
+    {
+      "t": 6,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 19,
+      "event": "a: running"
+    },
+    {
+      "t": 66,
+      "event": "a: mini-browser (Scrapy browser kept open · webdesignnyc.co · 8 pages · 00:41)"
+    },
+    {
+      "t": 68,
+      "event": "a: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
+    },
+    {
+      "t": 126,
+      "event": "a: clarify dead-loop (same question repeated)"
+    },
+    {
+      "t": 126,
+      "event": "a: TIMEOUT"
+    }
+  ],
+  "screenshots": [
+    "ui/R03-a-1-clarify.jpg",
+    "ui/R03-a-3-mini-browser.jpg",
+    "ui/R03-a-6-final.jpg"
+  ],
+  "durationS": 132,
+  "responseBytes": 18862
+}

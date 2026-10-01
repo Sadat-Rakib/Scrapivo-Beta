@@ -1,0 +1,202 @@
+{
+  "id": "P03",
+  "query": "AI founders globally hiring their first sales rep",
+  "category": "founder",
+  "viewport": "desktop",
+  "startedAt": "2026-10-01T11:59:47.436Z",
+  "main": {
+    "query": "AI founders globally hiring their first sales rep",
+    "clarify": [
+      {
+        "question": "What are you trying to do with these results?",
+        "chosen": "Find prospects",
+        "t": 2
+      }
+    ],
+    "streamed": [],
+    "activity": [
+      "Checked available records · Available records · 51"
+    ],
+    "bubbleVerbatim": true,
+    "clarifyAt": 2,
+    "runningAt": 8,
+    "pill": "Scrapy is browsing · Public source · 18 pages · 00:42",
+    "miniBrowserAt": 53,
+    "viewingOnly": false,
+    "takeover": {
+      "attempted": true,
+      "tookControl": true,
+      "pausedNotice": true,
+      "scrolled": true,
+      "errorAfterInput": null,
+      "gaveBack": true,
+      "pagesBefore": 18,
+      "pagesAfter": 19,
+      "stillRunningAfterGiveBack": false
+    },
+    "settled": true,
+    "durationS": 313,
+    "firstStreamS": null,
+    "header": {
+      "query": "AI founders globally hiring their first sales rep",
+      "count": 0
+    },
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nB2B SaaS founders in Canada with public email or phone\nExpand (0 results)\nHVAC companies in Toronto with phone numbers\nHVAC companies in Toronto with phone numbers\nPeople looking for a web designer\nPeople looking for a web designer\nFintech companies in Toronto with 50 to 200 employees\nPeople looking for a web designer\nPeople looking for a web designer\nFintech founders in London\nExpand (0 results)\nAI founders globally hiring their first sales rep\nResults for \"AI founders globally hiring their first sales rep\" · 0 results\nShow more\nWatch signal\nCards\nLists\nClear\nFold (0 results)\nScrapy\nKEPT OPEN\nbing.com\nSession kept open\n· \"Mark Miller — Manager of General Partner, Founder @ Border International\" founder ai - Search\n19 pages\n22 actions\n05:04\nOpen original\nTake control\nClose browser\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind H"
+  },
+  "closeBrowser": true,
+  "server": {
+    "runId": "run_3af45a85",
+    "specRuns": 1,
+    "spec": {
+      "query": "AI founders globally hiring their first sales rep",
+      "entity": "person",
+      "status": "ready_to_search",
+      "outcome": "NO_QUALIFIED_RESULTS",
+      "criteria": [
+        "role=founder",
+        "industry=ai",
+        "requested_role=their first sales rep",
+        "geo_scope=worldwide",
+        "purpose=prospecting"
+      ],
+      "retrieved": 57,
+      "returned": 0,
+      "qualified": 0,
+      "rejected": 0,
+      "pendingEnrichment": 0,
+      "liveDiscovery": "completed",
+      "signalRequired": true,
+      "reason": "FAILED_QUALIFICATION",
+      "timings": {
+        "understanding_ms": 0,
+        "stored_search_ms": 4934,
+        "research_ms": 94696,
+        "enrichment_ms": 3,
+        "qualification_ms": 323,
+        "total_ms": 99956
+      },
+      "sources": [
+        "pg-index:51/51",
+        "live-browser:6/6",
+        "live-social:reddit-arctic-shift:1/1"
+      ],
+      "funnel": {
+        "raw": 57,
+        "postSpec": 57,
+        "researched": 1,
+        "complete": 51,
+        "qualRejected": 51,
+        "qualified": 0
+      },
+      "sourceHealth": {
+        "summary": null,
+        "sources": [
+          "Public websites:unavailable",
+          "The web:unavailable",
+          "Public websites:healthy"
+        ]
+      }
+    },
+    "ledger": {
+      "search_run_id": "run_3af45a85",
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 51,
+        "gated": 0,
+        "filtered": 1,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {
+        "CLAIM_TYPE_MISMATCH": 51
+      },
+      "streamed": 0,
+      "streamedNotReturned": []
+    },
+    "runtime": [
+      {
+        "requested": "worker",
+        "used": "worker",
+        "reason": null
+      }
+    ],
+    "browserDone": [
+      {
+        "status": "partial",
+        "reason": "timeout",
+        "candidates": 6,
+        "researched": 6,
+        "verified": 0,
+        "elapsedMs": 90014
+      }
+    ],
+    "searches": 8,
+    "qualRejected": [
+      "Bakit Baydaliev — CEO / Co-Founder @ DOF Robotics: CLAIM_TYPE_MISMATCH",
+      "Blake Eastman — Founder @ The Nonverbal Group: CLAIM_TYPE_MISMATCH",
+      "Jason Cowles — Founder @ Nitrogen Express: CLAIM_TYPE_MISMATCH",
+      "Ria Harjani — Co-Founder @ Dedola Global Logistics: CLAIM_TYPE_MISMATCH",
+      "Marc Fussell — Founder of Take2Minutes.org / CIO @ The Armstrong Company: CLAIM_TYPE_MISMATCH",
+      "Erwin Ponce — Founder, President, Head of New Product Development @ ELP Aviation, Inc.: CLAIM_TYPE_MISMATCH",
+      "Brendan King — CEO And Founder @ Crisis Consultant Group, Inc: CLAIM_TYPE_MISMATCH",
+      "Roman Olievsky — Founder & President @ Romex Transport: CLAIM_TYPE_MISMATCH"
+    ],
+    "errors": [],
+    "aiRouter": [
+      "[ai-router] groq:openai/gpt-oss-120b daily quota exhausted; held"
+    ]
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps",
+    "info: [ui-projection] server=0 projected=0 rejected=0 codes={}"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 4,
+      "event": "a: submitted"
+    },
+    {
+      "t": 6,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 11,
+      "event": "a: running"
+    },
+    {
+      "t": 58,
+      "event": "a: mini-browser (Scrapy is browsing · Public source · 18 pages · 00:42)"
+    },
+    {
+      "t": 132,
+      "event": "a: takeover took=true gaveBack=true"
+    },
+    {
+      "t": 316,
+      "event": "a: settled"
+    },
+    {
+      "t": 320,
+      "event": "close browser: true"
+    }
+  ],
+  "screenshots": [
+    "ui/P03-a-1-clarify.jpg",
+    "ui/P03-a-3-mini-browser.jpg",
+    "ui/P03-a-4-takeover.jpg",
+    "ui/P03-a-6-final.jpg",
+    "ui/P03-a-8-closed.jpg"
+  ],
+  "durationS": 324,
+  "responseBytes": 19396
+}

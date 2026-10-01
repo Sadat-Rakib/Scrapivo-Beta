@@ -1,0 +1,144 @@
+{
+  "id": "L02",
+  "query": "Dentists in Calgary with websites",
+  "category": "local",
+  "viewport": "mobile",
+  "startedAt": "2026-10-01T12:22:44.258Z",
+  "main": {
+    "query": "Dentists in Calgary with websites",
+    "clarify": [
+      {
+        "question": "What are you trying to do with these results?",
+        "chosen": "Find prospects",
+        "t": 2
+      }
+    ],
+    "streamed": [],
+    "activity": [],
+    "bubbleVerbatim": true,
+    "clarifyAt": 2,
+    "runningAt": 49,
+    "settled": true,
+    "durationS": 278,
+    "firstStreamS": null,
+    "header": {
+      "query": "Dentists in Calgary with websites",
+      "count": 50
+    },
+    "leadCards": [],
+    "businessCards": [
+      "Fresh Smile Spa | dentist | Local | Calgary, AB | Email | Message | Website | +14034553326 | maranda@freshdentalhygiene.com",
+      "Discovery Dental Centre | dentist | Local | Calgary, AB | Email | Message | Website | +14032347400 | admin@discoverydental.ca",
+      "Richmond Dental Clinic | dentist | Local | Calgary, AB | Email | Message | Website | +15873192367",
+      "Westhills Dental Centre | dentist | Local | Calgary, AB | Email | Message | Website | +14032461129",
+      "Sierra Dental | dentist | Local | Calgary, AB | Email | Message | Website | +14032979600 | info@sierradental.ca",
+      "Signal Hill Dental Centre | dentist | Local | Calgary, AB | Email | Message | Website | +14032463663",
+      "MyBite Denture & Implants Solutions - Richmond | dentist | Local | Calgary, AB | Email | Message | Website | +14032175666 | southport@mybite.ca",
+      "Glenbrook Dental Centre | dentist | Local | Calgary, AB | Email | Message | Website | +15874839900",
+      "Harmony Ceramic Dental Lab | dentist | Local | Calgary, AB | Email | Message | Website | +14032403919",
+      "Peter J Vettori & Timothy Harnett | dentist | Local | Calgary, AB | Email | Message | Website | +14032252991",
+      "Glenbrook Calgary Lab Services | dentist | Local | Calgary, AB | Email | Message | Website | +14037775119",
+      "South Calgary Orthodontics & Pediatric Dentistry | dentist | Local | Calgary, AB | Email | Message | Website | +15878851811",
+      "J S Denture Clinic | dentist | Local | Calgary, AB | Email | Message | Website | +14032495957",
+      "Sierra Dental Studio | dentist | Local | Calgary, AB | Email | Message | Website | +14032979606",
+      "Springbank Hill Dental | dentist | Local | Calgary, AB | Email | Message | Website | +14034544757"
+    ],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nB2B SaaS founders in Canada with public email or phone\nExpand (0 results)\nHVAC companies in Toronto with phone numbers\nHVAC companies in Toronto with phone numbers\nPeople looking for a web designer\nPeople looking for a web designer\nFintech companies in Toronto with 50 to 200 employees\nPeople looking for a web designer\nPeople looking for a web designer\nFintech founders in London\nExpand (0 results)\nAI founders globally hiring their first sales rep\nExpand (0 results)\nFounders talking about needing SEO\nFintech companies in Toronto with 50 to 200 employees\nPlumbers in Edmonton with public contact details\nExpand (50 results)\nDentists in Calgary with websites\nResults for \"Dentists in Calgary with websites\" · 50 results\nShow more\nWatch signal\nCards\nLists\nClear\nFold (50 results)\nFresh Smile Spa\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14034553326\nmaranda@freshdentalhygiene.com\nDiscovery Dental Centre\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14032347400\nadmin@discoverydental.ca\nRichmond Dental Clinic\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+15873192367\nWesthills Dental Centre\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14032461129\nSierra Dental\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14032979600\ninfo@sierradental.ca\nSignal Hill Dental Centre\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14032463663\nMyBite Denture & Implants Solutions - Richmond\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14032175666\nsouthport@mybite.ca\nGlenbrook Dental Centre\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+15874839900\nHarmony Ceramic Dental Lab\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14032403919\nPeter J Vettori & Timothy Harnett\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14032252991\nGlenbrook Calgary Lab Services\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14037775119\nSouth Calgary Orthodontics & Pediatric Dentistry\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+15878851811\nJ S Denture Clinic\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14032495957\nSierra Dental Studio\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14032979606\nSpringbank Hill Dental\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14034544757\nImpressions Orthodontics\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14034577700\nSpringbank Dental Centre\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14032777464\nSpringborough Endodontics\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14032623636\nMontreux Dental Clinic Aspen\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14034549100\nAntosz Vincelli Orthodontics - Aspen Landing\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+15873558772\nByte Dental Technologies\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14037642983\nWest 85th Dental\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14032465545\nTrue North Orthodontics\ndentist\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14037200044\nKherani Dental at Aspen\ndentist\nLocal\n\nCalgary"
+  },
+  "detail": "Close | Fresh Smile Spa | dentist · Calgary | Category | dentist | Location | Calgary, AB | Opportunity | has website | Social | Website | Email | maranda@freshdentalhygiene.com | Number | +14034553326 | Generate email | Generate message",
+  "server": {
+    "runId": "run_f9fd2e09",
+    "specRuns": 1,
+    "spec": {
+      "query": "Dentists in Calgary with websites",
+      "entity": "business",
+      "status": "ready_to_search",
+      "outcome": "QUALIFIED_RESULTS",
+      "criteria": [
+        "category=dentist",
+        "location=Calgary",
+        "location_id=geo:city:calgary",
+        "location_kind=city",
+        "location_country=CA",
+        "location_parents=geo:country:ca",
+        "website=true",
+        "purpose=prospecting"
+      ],
+      "retrieved": 51,
+      "returned": 50,
+      "qualified": 50,
+      "rejected": 0,
+      "pendingEnrichment": 0,
+      "liveDiscovery": "not_required",
+      "signalRequired": false,
+      "reason": "RESULTS",
+      "timings": {
+        "understanding_ms": 1,
+        "stored_search_ms": 36108,
+        "research_ms": 102,
+        "enrichment_ms": 2,
+        "qualification_ms": 7,
+        "total_ms": 36220
+      },
+      "sources": [
+        "pg-index:0/0",
+        "s3-parquet:217409/51"
+      ],
+      "funnel": {
+        "raw": 51,
+        "postSpec": 51,
+        "complete": 50,
+        "qualRejected": 0,
+        "qualified": 50
+      },
+      "sourceHealth": {
+        "summary": null,
+        "sources": []
+      }
+    },
+    "ledger": null,
+    "runtime": [],
+    "browserDone": [],
+    "searches": 0,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": []
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps",
+    "info: [ui-projection] server=50 projected=50 rejected=0 codes={}",
+    "error: `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.\n\nIf you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.\n\nFor more information, see https://radix-ui.com/primitives/docs/components/dialog",
+    "error: `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.\n\nIf you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.\n\nFor more information, see https://radix-ui.com/primitives/docs/components/dialog"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 4,
+      "event": "a: submitted"
+    },
+    {
+      "t": 6,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 53,
+      "event": "a: running"
+    },
+    {
+      "t": 282,
+      "event": "a: settled"
+    }
+  ],
+  "screenshots": [
+    "ui/L02-a-1-clarify.jpg",
+    "ui/L02-a-6-final.jpg",
+    "ui/L02-a-7-detail.jpg"
+  ],
+  "durationS": 292,
+  "responseBytes": 115214
+}

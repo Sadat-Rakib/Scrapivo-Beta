@@ -1,0 +1,192 @@
+{
+  "id": "R02",
+  "query": "Fractional CMOs in Canada",
+  "category": "role",
+  "viewport": "desktop",
+  "startedAt": "2026-10-01T12:42:54.239Z",
+  "main": {
+    "query": "Fractional CMOs in Canada",
+    "clarify": [
+      {
+        "question": "What are you trying to do with these results?",
+        "chosen": "Find prospects",
+        "t": 2
+      }
+    ],
+    "streamed": [
+      "Alexandra Sifton — CEO & Fractional CMO @ Futureproof Inc. · alexandra@meetfutureproof.com"
+    ],
+    "activity": [
+      "Checked available records · Available records · 1",
+      "Searching the web · The web · fractional cmo Canada",
+      "Found possible leads · The web · 10 links",
+      "Opening result · clutch.co",
+      "Show all activity (7)",
+      "✓",
+      "Alexandra Sifton — CEO & Fractional CMO @ Futureproof Inc. · alexandra@meetfutureproof.com",
+      "1 verified while researching…",
+      "Reading page · vertamarketing.com · 14260 characters",
+      "Found possible leads · 1 candidates; 1 verified",
+      "Searching the web · The web · site:linkedin.com/in fractional cmo Canada",
+      "Show all activity (12)"
+    ],
+    "bubbleVerbatim": true,
+    "clarifyAt": 2,
+    "runningAt": 10,
+    "pill": "Scrapy is browsing · Public source · 1 pages · 00:02",
+    "miniBrowserAt": 13,
+    "viewingOnly": false,
+    "settled": true,
+    "durationS": 246,
+    "firstStreamS": 11,
+    "header": {
+      "query": "Fractional CMOs in Canada",
+      "count": 1
+    },
+    "leadCards": [
+      "linkedin.com | Alexandra Sifton — CEO & Fractional CMO @ Futureproof Inc. | Identity · CEO & Fractional CMO at Futureproof Inc. · alexandra@meetfutureproof.com · +1 647-449-1960 | alexandra@meetfutureproof.com | +1 647-449-1960"
+    ],
+    "businessCards": [],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nB2B SaaS founders in Canada with public email or phone\nExpand (0 results)\nHVAC companies in Toronto with phone numbers\nHVAC companies in Toronto with phone numbers\nPeople looking for a web designer\nPeople looking for a web designer\nFintech companies in Toronto with 50 to 200 employees\nPeople looking for a web designer\nPeople looking for a web designer\nFintech founders in London\nExpand (0 results)\nAI founders globally hiring their first sales rep\nExpand (0 results)\nFounders talking about needing SEO\nFintech companies in Toronto with 50 to 200 employees\nPlumbers in Edmonton with public contact details\nExpand (50 results)\nDentists in Calgary with websites\nExpand (50 results)\nMarketing agencies in Vancouver\nRoofers in Mississauga with phone numbers\nExpand (1 results)\nCopywriters in Toronto\nExpand (1 results)\nFractional CMOs in Canada\nResults for \"Fractional CMOs in Canada\" · 1 results\nWatch signal\nCards\nLists\nClear\nFold (1 results)\nlinkedin.com\nAlexandra Sifton — CEO & Fractional CMO @ Futureproof Inc.\nIdentity · CEO & Fractional CMO at Futureproof Inc. · alexandra@meetfutureproof.com · +1 647-449-1960\nalexandra@meetfutureproof.com\n+1 647-449-1960\nScrapy\nKEPT OPEN\nmaplesyrupmarketing.ca\nOpening result\n· Fractional CMO Services in Canada | Maple Syrup Marketing\n9 pages\n9 actions\n03:53\nOpen original\nTake control\nClose browser\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC compani"
+  },
+  "detail": "Person | Alexandra Sifton — CEO & Fractional CMO @ Futureproof Inc. | Open original | Pipeline stage | Saved | Contacted | Replied | Won | Lost | Ignored | Identity · CEO & Fractional CMO at Futureproof Inc. · alexandra@meetfutureproof.com · +1 647-449-1960 | Why this matches | Identity · CEO & Fractional CMO at Futureproof Inc. | Contact published in this post | alexandra@meetfutureproof.com | +1 647-449-1960 | http://www.linkedin.com/in/alexandra-sifton | Published by the author in the post itself — no enrichment needed. | Verify contact | Resolve contact | Deep enrich | AI research brief | Run research | Activity | Save this lead to start an activity log. | Notes | AI outreach | Research & draft",
+  "server": {
+    "runId": "run_33d6ef86",
+    "specRuns": 1,
+    "spec": {
+      "query": "Fractional CMOs in Canada",
+      "entity": "person",
+      "status": "ready_to_search",
+      "outcome": "QUALIFIED_RESULTS",
+      "criteria": [
+        "role=fractional cmo",
+        "location=Canada",
+        "location_id=geo:country:ca",
+        "location_kind=country",
+        "location_country=CA",
+        "purpose=prospecting"
+      ],
+      "retrieved": 2,
+      "returned": 1,
+      "qualified": 1,
+      "rejected": 0,
+      "pendingEnrichment": 0,
+      "liveDiscovery": "completed",
+      "signalRequired": false,
+      "reason": "RESULTS",
+      "timings": {
+        "understanding_ms": 0,
+        "stored_search_ms": 7237,
+        "research_ms": 31980,
+        "enrichment_ms": 0,
+        "qualification_ms": 1,
+        "total_ms": 39218
+      },
+      "sources": [
+        "s3-parquet:16904/1",
+        "live-browser:1/1"
+      ],
+      "funnel": {
+        "raw": 2,
+        "postSpec": 2,
+        "complete": 1,
+        "qualRejected": 0,
+        "qualified": 1
+      },
+      "sourceHealth": {
+        "summary": "Some sources could not be searched this time (Available records), so results may be incomplete.",
+        "sources": [
+          "Public websites:unavailable",
+          "The web:unavailable",
+          "Public websites:healthy",
+          "Available records:degraded"
+        ]
+      }
+    },
+    "ledger": {
+      "search_run_id": "run_33d6ef86",
+      "counts": {
+        "returned": 1,
+        "qualified_more": 0,
+        "rejected": 0,
+        "gated": 0,
+        "filtered": 0,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {},
+      "streamed": 1,
+      "streamedNotReturned": []
+    },
+    "runtime": [
+      {
+        "requested": "worker",
+        "used": "worker",
+        "reason": null
+      }
+    ],
+    "browserDone": [
+      {
+        "status": "completed",
+        "reason": "diminishing_returns",
+        "candidates": 1,
+        "researched": 0,
+        "verified": 1,
+        "visited": 4,
+        "elapsedMs": 31864
+      }
+    ],
+    "searches": 4,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": []
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "error: In HTML, %s cannot be a descendant of <%s>.\nThis will cause a hydration error.%s <button> button \n\n  ...\n    <Lazy>\n      <DiscoverRoute>\n        <DiscoverPage>\n          <div className=\"h-full fle...\">\n            <div className=\"flex-1 min...\">\n              <div ref={{...}} className=\"flex-1 min.",
+    "error: <%s> cannot contain a nested %s.\nSee this log for the ancestor stack trace. button <button>",
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps",
+    "info: [ui-projection] server=1 projected=1 rejected=0 codes={}"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 4,
+      "event": "a: submitted"
+    },
+    {
+      "t": 6,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 14,
+      "event": "a: running"
+    },
+    {
+      "t": 15,
+      "event": "a: streamed rows visible"
+    },
+    {
+      "t": 18,
+      "event": "a: mini-browser (Scrapy is browsing · Public source · 1 pages · 00:02)"
+    },
+    {
+      "t": 249,
+      "event": "a: settled"
+    }
+  ],
+  "screenshots": [
+    "ui/R02-a-1-clarify.jpg",
+    "ui/R02-a-2-streamed.jpg",
+    "ui/R02-a-3-mini-browser.jpg",
+    "ui/R02-a-6-final.jpg",
+    "ui/R02-a-7-detail.jpg"
+  ],
+  "durationS": 259,
+  "responseBytes": 20577
+}

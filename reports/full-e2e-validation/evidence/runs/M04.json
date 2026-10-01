@@ -1,0 +1,188 @@
+{
+  "id": "M04",
+  "query": "copywriters toronto email",
+  "category": "messy",
+  "viewport": "mobile",
+  "startedAt": "2026-10-01T14:17:25.241Z",
+  "main": {
+    "query": "copywriters toronto email",
+    "clarify": [
+      {
+        "question": "What are you trying to do with these results?",
+        "chosen": "Find prospects",
+        "t": 3
+      },
+      {
+        "question": "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?",
+        "chosen": "Search with defaults",
+        "t": 57
+      },
+      {
+        "question": "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?",
+        "chosen": "Search with defaults",
+        "t": 108
+      },
+      {
+        "question": "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?",
+        "chosen": "Search with defaults",
+        "t": 159
+      }
+    ],
+    "streamed": [],
+    "activity": [
+      "Checked available records · Available records · 0",
+      "Reading page · upwork.com · 18000 characters",
+      "Opening result · copywritercollective.com",
+      "Show all activity (12)"
+    ],
+    "bubbleVerbatim": true,
+    "clarifyAt": 3,
+    "clarifyRepeats": 3,
+    "runningAt": 8,
+    "pill": "Scrapy browser kept open · bing.com · 5 pages · 00:42",
+    "miniBrowserAt": 53,
+    "viewingOnly": false,
+    "clarifyStuck": true,
+    "durationS": 256,
+    "firstStreamS": null,
+    "timedOut": true,
+    "header": null,
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nDentists in Calgary with websites\nExpand (50 results)\nMarketing agencies in Vancouver\nRoofers in Mississauga with phone numbers\nExpand (1 results)\nCopywriters in Toronto\nExpand (1 results)\nFractional CMOs in Canada\nExpand (1 results)\nWeb designers in New York\nRecruiters hiring software engineers\nSales consultants in London\nFounders complaining about lead generation\nExpand (50 results)\nBusinesses saying they need a new website\nPeople looking for an SEO agency\nCybersecurity companies in Ottawa with websites\nAI startups in Montreal hiring engineers\nPre-seed investors in Canada investing in SaaS\nExpand (0 results)\nBusinesses saying they need a new website\nAngel investors in Toronto for healthtech startups\nExpand (0 results)\nRemote frontend developer jobs\nExpand (4 results)\nData engineer jobs in Berlin with salary\nyo find me saas founders canada need sales help email if possible\nExpand (0 results)\nneed dentists portland phone number\nExpand (41 results)\nfind startup founders worldwide building fintech\ncopywriters toronto email\nUnderstanding: people\nReading page · copywritercollective.com · 5882 characters\nFound possible leads · 0 candidates; 0 verified\nChecked contact details · Public contact details · 0 candidates\nShow all activity (12)\nScrapy\nKEPT OPEN\ncopywritercollective.com\nOpening result\n· Hire Freelance Copywriters in Toronto, Canada | Copywriter Collective\n8 pages\n8 actions\n01:34\nOpen original\nTake control\nClose browser\nNarrow this down1 question\nNarrow this down\nQuestion 1 of 1\n\nAny particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?\n\nSaaS\nSoftware companies\nFintech\nFinancial tech\nHealthcare\nHealth companies\nUse\nSearch with defaults\nSearch\nMode\nThinker"
+  },
+  "server": {
+    "runId": "run_2c633f70",
+    "specRuns": 4,
+    "spec": {
+      "query": "copywriters toronto email",
+      "entity": "person",
+      "status": "ready_to_search",
+      "outcome": "NO_QUALIFIED_RESULTS",
+      "criteria": [
+        "role=copywriter",
+        "location=Toronto",
+        "location_id=geo:city:toronto",
+        "location_kind=city",
+        "location_country=CA",
+        "location_parents=geo:admin:ontario,geo:country:ca,geo:metro:gta",
+        "purpose=prospecting"
+      ],
+      "retrieved": 0,
+      "returned": 0,
+      "qualified": 0,
+      "rejected": 0,
+      "pendingEnrichment": 0,
+      "liveDiscovery": "completed",
+      "signalRequired": false,
+      "reason": "SOURCE_UNAVAILABLE",
+      "timings": {
+        "understanding_ms": 1,
+        "stored_search_ms": 2808,
+        "research_ms": 48017,
+        "enrichment_ms": 0,
+        "qualification_ms": 0,
+        "total_ms": 50826
+      },
+      "sources": [
+        "pg-index:0/0",
+        "s3-parquet:16904/0"
+      ],
+      "funnel": {
+        "raw": 0,
+        "postSpec": 0,
+        "complete": 0,
+        "qualRejected": 0,
+        "qualified": 0
+      },
+      "sourceHealth": {
+        "summary": null,
+        "sources": [
+          "Public websites:unavailable",
+          "The web:unavailable",
+          "Public websites:empty"
+        ]
+      }
+    },
+    "ledger": null,
+    "runtime": [
+      {
+        "requested": "worker",
+        "used": "worker",
+        "reason": null
+      }
+    ],
+    "browserDone": [
+      {
+        "status": "completed",
+        "reason": "diminishing_returns",
+        "candidates": 0,
+        "researched": 0,
+        "verified": 0,
+        "visited": 4,
+        "elapsedMs": 47864
+      }
+    ],
+    "searches": 4,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": [
+      "[ai-router] groq:openai/gpt-oss-20b daily quota exhausted; held"
+    ]
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "error: Can't perform a React state update on a component that hasn't mounted yet. This indicates that you have a side-effect in your render function that asynchronously tries to update the component. Move this work to useEffect instead.",
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 5,
+      "event": "a: submitted"
+    },
+    {
+      "t": 7,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 13,
+      "event": "a: running"
+    },
+    {
+      "t": 60,
+      "event": "a: mini-browser (Scrapy browser kept open · bing.com · 5 pages · 00:42)"
+    },
+    {
+      "t": 62,
+      "event": "a: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
+    },
+    {
+      "t": 113,
+      "event": "a: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
+    },
+    {
+      "t": 164,
+      "event": "a: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
+    },
+    {
+      "t": 261,
+      "event": "a: clarify dead-loop (same question re-asked 3x, no search start)"
+    },
+    {
+      "t": 261,
+      "event": "a: TIMEOUT"
+    }
+  ],
+  "screenshots": [
+    "ui/M04-a-1-clarify.jpg",
+    "ui/M04-a-3-mini-browser.jpg",
+    "ui/M04-a-6-final.jpg"
+  ],
+  "durationS": 267,
+  "responseBytes": 19249
+}

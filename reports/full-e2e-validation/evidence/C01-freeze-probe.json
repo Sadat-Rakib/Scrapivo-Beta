@@ -1,0 +1,55 @@
+{
+  "query": "Fintech companies in Toronto with 50 to 200 employees",
+  "label": "C01",
+  "startedAt": "2026-10-01T11:11:42.047Z",
+  "steps": [
+    {
+      "s": "goto",
+      "d": 200,
+      "t": 0
+    },
+    {
+      "s": "textarea",
+      "d": true,
+      "t": 1
+    },
+    {
+      "s": "eval-alive",
+      "d": 2,
+      "t": 1
+    },
+    {
+      "s": "eval-alive",
+      "d": 2,
+      "t": 16
+    },
+    {
+      "s": "eval-alive",
+      "d": 2,
+      "t": 46
+    },
+    {
+      "s": "filled",
+      "d": "Fintech companies in Toronto with 50 to 200 employees",
+      "t": 46
+    },
+    {
+      "s": "clicked-send",
+      "d": true,
+      "t": 46
+    },
+    {
+      "s": "poll",
+      "d": {
+        "evalr": 19,
+        "narrow": true,
+        "pending": false,
+        "clarify": "What are you trying to do with these results?",
+        "thinking": null,
+        "zero": true
+      },
+      "t": 56
+    }
+  ],
+  "finishedAt": "2026-10-01T11:12:38.361Z"
+}

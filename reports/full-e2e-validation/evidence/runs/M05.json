@@ -1,0 +1,93 @@
+{
+  "id": "M05",
+  "query": "hvac gta phone",
+  "category": "messy",
+  "viewport": "desktop",
+  "startedAt": "2026-10-01T14:40:58.431Z",
+  "main": {
+    "query": "hvac gta phone",
+    "clarify": [
+      {
+        "question": "What are you looking for — people, companies, local businesses, or investors?",
+        "chosen": "Search with defaults",
+        "t": 3
+      },
+      {
+        "question": "What are you looking for — people, companies, local businesses, or investors?",
+        "chosen": "Search with defaults",
+        "t": 24
+      },
+      {
+        "question": "What are you looking for — people, companies, local businesses, or investors?",
+        "chosen": "Search with defaults",
+        "t": 44
+      }
+    ],
+    "streamed": [],
+    "activity": [],
+    "bubbleVerbatim": true,
+    "clarifyAt": 3,
+    "clarifyRepeats": 3,
+    "clarifyStuck": true,
+    "durationS": 64,
+    "firstStreamS": null,
+    "timedOut": true,
+    "header": null,
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nDentists in Calgary with websites\nExpand (50 results)\nMarketing agencies in Vancouver\nRoofers in Mississauga with phone numbers\nExpand (1 results)\nCopywriters in Toronto\nExpand (1 results)\nFractional CMOs in Canada\nExpand (1 results)\nWeb designers in New York\nRecruiters hiring software engineers\nSales consultants in London\nFounders complaining about lead generation\nExpand (50 results)\nBusinesses saying they need a new website\nPeople looking for an SEO agency\nCybersecurity companies in Ottawa with websites\nAI startups in Montreal hiring engineers\nPre-seed investors in Canada investing in SaaS\nExpand (0 results)\nBusinesses saying they need a new website\nAngel investors in Toronto for healthtech startups\nExpand (0 results)\nRemote frontend developer jobs\nExpand (4 results)\nData engineer jobs in Berlin with salary\nyo find me saas founders canada need sales help email if possible\nExpand (0 results)\nneed dentists portland phone number\nExpand (41 results)\nfind startup founders worldwide building fintech\ncopywriters toronto email\nhvac gta phone\nsaas founders public contact details\nExpand (4 results)\nWeb designers in Chicago\nSaaS founders in Austin with public emails\nExpand (0 results)\nhvac gta phone\nUnderstanding your request\nNarrow this down1 question\nNarrow this down\nQuestion 1 of 1\n\nWhat are you looking for — people, companies, local businesses, or investors?\n\nPeople\nFounders, execs, professionals\nCompanies\nSaaS, startups, firms\nLocal businesses\nPlumbers, dentists, cafes\nInvestors\nVCs and angels\nUse\nSearch with defaults\nSearch\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area th"
+  },
+  "server": {
+    "runId": null,
+    "specRuns": 0,
+    "spec": null,
+    "ledger": null,
+    "runtime": [],
+    "browserDone": [],
+    "searches": 0,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": []
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 6,
+      "event": "a: submitted"
+    },
+    {
+      "t": 8,
+      "event": "a: clarify \"What are you looking for — people, companies, local business\" -> Search with defaults"
+    },
+    {
+      "t": 29,
+      "event": "a: clarify \"What are you looking for — people, companies, local business\" -> Search with defaults"
+    },
+    {
+      "t": 49,
+      "event": "a: clarify \"What are you looking for — people, companies, local business\" -> Search with defaults"
+    },
+    {
+      "t": 69,
+      "event": "a: clarify dead-loop (same question re-asked 3x, no search start)"
+    },
+    {
+      "t": 69,
+      "event": "a: TIMEOUT"
+    }
+  ],
+  "screenshots": [
+    "ui/M05-a-1-clarify.jpg",
+    "ui/M05-a-6-final.jpg"
+  ],
+  "durationS": 76,
+  "responseBytes": 6029
+}

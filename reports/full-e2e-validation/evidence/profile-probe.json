@@ -1,0 +1,35 @@
+{
+  "usedFallback": true,
+  "targetedLabel": "Job title / craft",
+  "targetedPlaceholder": "e.g. React developer, video editor",
+  "fields": [
+    {
+      "label": "Full name",
+      "state": "empty"
+    },
+    {
+      "label": "Job title / craft",
+      "state": "empty"
+    },
+    {
+      "label": "Years of experience",
+      "state": "empty"
+    },
+    {
+      "label": "Work preference",
+      "state": "empty"
+    },
+    {
+      "label": "Location",
+      "state": "empty"
+    },
+    {
+      "label": "Skills",
+      "state": "empty"
+    },
+    {
+      "label": "Slack Webhook URL",
+      "state": "empty"
+    }
+  ]
+}

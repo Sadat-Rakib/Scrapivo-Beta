@@ -1,0 +1,24 @@
+﻿{
+    "tag":  "start",
+    "started":  "2026-09-30T21:18:55",
+    "branch":  "rc/mvp-local-testing-baseline",
+    "head":  "2fcf028a0f56794080cf61049a35e6bc4320ac2d",
+    "vt":  "total=1568 passed=1498 failed=55 skipped=15 files=160 knownRedHit=55 NEW_FAILURES=0",
+    "vtNewFailures":  [
+
+                      ],
+    "vtSecs":  106,
+    "typecheck":  "{\"errors\":43,\"baseline\":43,\"groupsAboveBaseline\":[]}",
+    "typecheckSecs":  71,
+    "buildExit":  1,
+    "buildSecs":  295,
+    "buildErrors":  [
+                        "runtime: VirtualAlloc of 8192 bytes failed with errno=1455",
+                        "\u001b[31m✗\u001b[39m Build failed in 1m 44s"
+                    ],
+    "bundleScan":  "SKIPPED (build failed)",
+    "stress":  "{\"total\":100,\"mechanicsFixed\":94,\"policyAdjusted\":100}",
+    "adversarial":  "PASSED 40/40",
+    "rcFilesRestored":  true,
+    "finished":  "2026-09-30T21:30:12"
+}

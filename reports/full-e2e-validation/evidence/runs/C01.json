@@ -1,0 +1,175 @@
+{
+  "id": "C01",
+  "query": "Fintech companies in Toronto with 50 to 200 employees",
+  "category": "company",
+  "viewport": "desktop",
+  "startedAt": "2026-10-01T12:12:51.164Z",
+  "main": {
+    "query": "Fintech companies in Toronto with 50 to 200 employees",
+    "clarify": [
+      {
+        "question": "What are you trying to do with these results?",
+        "chosen": "Find prospects",
+        "t": 2
+      },
+      {
+        "question": "Any particular business model (agency, brand, D2C, B2B, B2C), or all?",
+        "chosen": "Search with defaults",
+        "t": 104
+      }
+    ],
+    "streamed": [],
+    "activity": [
+      "Checked available records · Available records · 0",
+      "Found company website · ledn.io",
+      "Found possible leads · 6 candidates; 0 verified",
+      "Opening result · ledn.io",
+      "Show all activity (12)",
+      "Opening result · findglocal.com"
+    ],
+    "bubbleVerbatim": true,
+    "clarifyAt": 2,
+    "runningAt": 8,
+    "pill": "Scrapy is browsing · ledn.io · 17 pages · 00:42",
+    "miniBrowserAt": 53,
+    "viewingOnly": false,
+    "clarifyStuck": true,
+    "durationS": 204,
+    "firstStreamS": null,
+    "timedOut": true,
+    "header": null,
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nB2B SaaS founders in Canada with public email or phone\nExpand (0 results)\nHVAC companies in Toronto with phone numbers\nHVAC companies in Toronto with phone numbers\nPeople looking for a web designer\nPeople looking for a web designer\nFintech companies in Toronto with 50 to 200 employees\nPeople looking for a web designer\nPeople looking for a web designer\nFintech founders in London\nExpand (0 results)\nAI founders globally hiring their first sales rep\nExpand (0 results)\nFounders talking about needing SEO\nFintech companies in Toronto with 50 to 200 employees\nUnderstanding your request…\nStop search\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS foun"
+  },
+  "server": {
+    "runId": "run_a6fad720",
+    "specRuns": 2,
+    "spec": {
+      "query": "Fintech companies in Toronto with 50 to 200 employees",
+      "entity": "company",
+      "status": "ready_to_search",
+      "outcome": "NO_QUALIFIED_RESULTS",
+      "criteria": [
+        "industry=fintech company",
+        "location=Toronto",
+        "location_id=geo:city:toronto",
+        "location_kind=city",
+        "location_country=CA",
+        "location_parents=geo:admin:ontario,geo:country:ca,geo:metro:gta",
+        "employee_count=200",
+        "requested_count=50",
+        "purpose=prospecting"
+      ],
+      "retrieved": 6,
+      "returned": 0,
+      "qualified": 0,
+      "rejected": 0,
+      "pendingEnrichment": 1,
+      "liveDiscovery": "completed",
+      "signalRequired": false,
+      "reason": "INCOMPLETE",
+      "timings": {
+        "understanding_ms": 0,
+        "stored_search_ms": 5230,
+        "research_ms": 59562,
+        "enrichment_ms": 8460,
+        "qualification_ms": 1,
+        "total_ms": 73253
+      },
+      "sources": [
+        "pg-index:0/0",
+        "live-browser:6/6"
+      ],
+      "funnel": {
+        "raw": 6,
+        "postSpec": 6,
+        "researched": 6,
+        "complete": 0,
+        "qualRejected": 0,
+        "qualified": 0
+      },
+      "sourceHealth": {
+        "summary": "Some sources could not be searched this time (Available records, Public source), so results may be incomplete.",
+        "sources": [
+          "Public websites:unavailable",
+          "The web:unavailable",
+          "Public websites:healthy",
+          "Available records:degraded",
+          "Public source:unavailable"
+        ]
+      }
+    },
+    "ledger": null,
+    "runtime": [
+      {
+        "requested": "worker",
+        "used": "worker",
+        "reason": null
+      }
+    ],
+    "browserDone": [
+      {
+        "status": "completed",
+        "reason": "sources_exhausted",
+        "candidates": 6,
+        "researched": 6,
+        "verified": 0,
+        "visited": 25,
+        "elapsedMs": 59408
+      }
+    ],
+    "searches": 6,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": [
+      "[ai-router] groq:openai/gpt-oss-120b daily quota exhausted; held"
+    ]
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 4,
+      "event": "a: submitted"
+    },
+    {
+      "t": 6,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 12,
+      "event": "a: running"
+    },
+    {
+      "t": 58,
+      "event": "a: mini-browser (Scrapy is browsing · ledn.io · 17 pages · 00:42)"
+    },
+    {
+      "t": 107,
+      "event": "a: clarify \"Any particular business model (agency, brand, D2C, B2B, B2C)\" -> Search with defaults"
+    },
+    {
+      "t": 208,
+      "event": "a: clarify dead-loop (same question repeated)"
+    },
+    {
+      "t": 208,
+      "event": "a: TIMEOUT"
+    }
+  ],
+  "screenshots": [
+    "ui/C01-a-1-clarify.jpg",
+    "ui/C01-a-3-mini-browser.jpg",
+    "ui/C01-a-6-final.jpg"
+  ],
+  "durationS": 214,
+  "responseBytes": 22527
+}

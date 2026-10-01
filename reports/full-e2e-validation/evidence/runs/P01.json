@@ -1,0 +1,188 @@
+{
+  "id": "P01",
+  "query": "B2B SaaS founders in Canada with public email or phone",
+  "category": "founder",
+  "viewport": "desktop",
+  "startedAt": "2026-10-01T09:42:55.124Z",
+  "main": {
+    "query": "B2B SaaS founders in Canada with public email or phone",
+    "clarify": [
+      {
+        "question": "What are you trying to do with these results?",
+        "chosen": "Find prospects",
+        "t": 64
+      }
+    ],
+    "streamed": [],
+    "activity": [
+      "Checked available records · Available records · 0"
+    ],
+    "bubbleVerbatim": true,
+    "runningAt": 32,
+    "clarifyAt": 64,
+    "pill": "Scrapy is browsing · saasdirect.ca · 17 pages · 00:26",
+    "miniBrowserAt": 99,
+    "viewingOnly": false,
+    "takeover": {
+      "attempted": true,
+      "tookControl": true,
+      "pausedNotice": true,
+      "scrolled": true,
+      "errorAfterInput": null,
+      "gaveBack": true,
+      "pagesBefore": 17,
+      "pagesAfter": 17,
+      "stillRunningAfterGiveBack": false
+    },
+    "settled": true,
+    "durationS": 284,
+    "firstStreamS": null,
+    "header": {
+      "query": "B2B SaaS founders in Canada with public email or phone",
+      "count": 0
+    },
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nB2B SaaS founders in Canada with public email or phone\nResults for \"B2B SaaS founders in Canada with public email or phone\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\nScrapy\nKEPT OPEN\nca.linkedin.com\nSession kept open\n· Jono Landon - Hubbli Inc. | LinkedIn\n17 pages\n20 actions\n03:31\nOpen original\nTake control\nClose browser\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n5 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n5 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n5 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n10 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFin"
+  },
+  "closeBrowser": true,
+  "server": {
+    "runId": "run_0a2999de",
+    "specRuns": 1,
+    "spec": {
+      "query": "B2B SaaS founders in Canada with public email or phone",
+      "entity": "person",
+      "status": "ready_to_search",
+      "outcome": "NO_QUALIFIED_RESULTS",
+      "criteria": [
+        "role=founder",
+        "industry=saas",
+        "location=Canada",
+        "location_id=geo:country:ca",
+        "location_kind=country",
+        "location_country=CA",
+        "require_phone=true",
+        "required_field=phone",
+        "require_email=true",
+        "required_field=email",
+        "purpose=prospecting"
+      ],
+      "retrieved": 1,
+      "returned": 0,
+      "qualified": 0,
+      "rejected": 0,
+      "pendingEnrichment": 0,
+      "liveDiscovery": "completed",
+      "signalRequired": false,
+      "reason": "FAILED_QUALIFICATION",
+      "timings": {
+        "understanding_ms": 18,
+        "stored_search_ms": 4409,
+        "research_ms": 29850,
+        "enrichment_ms": 1602,
+        "qualification_ms": 29,
+        "total_ms": 35908
+      },
+      "sources": [
+        "pg-index:0/0",
+        "s3-parquet:16904/0",
+        "live-browser:1/1"
+      ],
+      "funnel": {
+        "raw": 1,
+        "postSpec": 1,
+        "researched": 1,
+        "complete": 0,
+        "qualRejected": 0,
+        "qualified": 0
+      },
+      "sourceHealth": {
+        "summary": null,
+        "sources": [
+          "Public websites:unavailable",
+          "The web:unavailable",
+          "Public websites:healthy"
+        ]
+      }
+    },
+    "ledger": null,
+    "runtime": [
+      {
+        "requested": "worker",
+        "used": "worker",
+        "reason": null
+      }
+    ],
+    "browserDone": [
+      {
+        "status": "completed",
+        "reason": "diminishing_returns",
+        "candidates": 1,
+        "researched": 1,
+        "verified": 0,
+        "visited": 10,
+        "elapsedMs": 29524
+      }
+    ],
+    "searches": 6,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": [
+      "[ai-router] groq:openai/gpt-oss-20b daily quota exhausted; held",
+      "[ai-router] groq:openai/gpt-oss-120b daily quota exhausted; held",
+      "[ai-router] openrouter:google/gemma-4-31b-it:free daily quota exhausted; held",
+      "[ai-router] openrouter:nvidia/nemotron-3-super-120b-a12b:free daily quota exhausted; held",
+      "[ai-router] openrouter:nvidia/nemotron-3.5-lightning:free daily quota exhausted; held",
+      "[ai-router] openrouter:nex-agi/nex-n2.5-mini:free unavailable for this run (model_missing)"
+    ]
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps",
+    "info: [ui-projection] server=0 projected=0 rejected=0 codes={}"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 4,
+      "event": "a: submitted"
+    },
+    {
+      "t": 36,
+      "event": "a: running"
+    },
+    {
+      "t": 68,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 104,
+      "event": "a: mini-browser (Scrapy is browsing · saasdirect.ca · 17 pages · 00:26)"
+    },
+    {
+      "t": 163,
+      "event": "a: takeover took=true gaveBack=true"
+    },
+    {
+      "t": 287,
+      "event": "a: settled"
+    },
+    {
+      "t": 292,
+      "event": "close browser: true"
+    }
+  ],
+  "screenshots": [
+    "ui/P01-a-1-clarify.jpg",
+    "ui/P01-a-3-mini-browser.jpg",
+    "ui/P01-a-4-takeover.jpg",
+    "ui/P01-a-6-final.jpg",
+    "ui/P01-a-8-closed.jpg"
+  ],
+  "durationS": 296,
+  "responseBytes": 20001
+}

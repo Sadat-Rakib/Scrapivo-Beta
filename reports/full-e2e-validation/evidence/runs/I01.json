@@ -1,0 +1,164 @@
+{
+  "id": "I01",
+  "query": "People looking for a web designer",
+  "category": "intent",
+  "viewport": "desktop",
+  "startedAt": "2026-10-01T11:25:22.802Z",
+  "fatal": "page.waitForTimeout: Target page, context or browser has been closed",
+  "server": {
+    "runId": "run_8bedc3b7",
+    "specRuns": 4,
+    "spec": {
+      "query": "People looking for a web designer",
+      "entity": "person",
+      "status": "ready_to_search",
+      "outcome": "NO_QUALIFIED_RESULTS",
+      "criteria": [
+        "requested_service=web designer"
+      ],
+      "retrieved": 57,
+      "returned": 0,
+      "qualified": 0,
+      "rejected": 0,
+      "pendingEnrichment": 0,
+      "liveDiscovery": "completed",
+      "signalRequired": true,
+      "reason": "FAILED_QUALIFICATION",
+      "timings": {
+        "understanding_ms": 1,
+        "stored_search_ms": 9605,
+        "research_ms": 25961,
+        "enrichment_ms": 2,
+        "qualification_ms": 216,
+        "total_ms": 35785
+      },
+      "sources": [
+        "s3-parquet:51/51",
+        "live-browser:6/6"
+      ],
+      "funnel": {
+        "raw": 57,
+        "postSpec": 57,
+        "complete": 51,
+        "qualRejected": 51,
+        "qualified": 0
+      },
+      "sourceHealth": {
+        "summary": null,
+        "sources": [
+          "Public websites:unavailable",
+          "The web:unavailable",
+          "Public websites:healthy"
+        ]
+      }
+    },
+    "ledger": {
+      "search_run_id": "run_8bedc3b7",
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 51,
+        "gated": 0,
+        "filtered": 0,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {
+        "CLAIM_TYPE_MISMATCH": 51
+      },
+      "streamed": 0,
+      "streamedNotReturned": []
+    },
+    "runtime": [
+      {
+        "requested": "worker",
+        "used": "worker",
+        "reason": null
+      }
+    ],
+    "browserDone": [
+      {
+        "status": "completed",
+        "reason": "diminishing_returns",
+        "candidates": 6,
+        "researched": 0,
+        "verified": 0,
+        "visited": 4,
+        "elapsedMs": 21616
+      }
+    ],
+    "searches": 3,
+    "qualRejected": [
+      "Linda Simmons — Owner @ PLAYRITE, LLC: CLAIM_TYPE_MISMATCH",
+      "Grant Leishman — CEO and Founder @ GrowUp Greenwalls: CLAIM_TYPE_MISMATCH",
+      "Becky Hobbs — Co-Founder & COO @ OLarry: CLAIM_TYPE_MISMATCH",
+      "Mark Gatz — Owner @ SERVPRO of Gilbert, Chandler South & Ahwatukee/S. Tempe (FirePit Holdings Corp): CLAIM_TYPE_MISMATCH",
+      "Michael Lishewski — VP Business Development and Co-Founder @ Xecutive Recruitment Inc.: CLAIM_TYPE_MISMATCH",
+      "Edward Dooling — CEO and Co-Founder @ Vanguard Healthcare Staffing: CLAIM_TYPE_MISMATCH",
+      "Ashok Seetharaman — CoFounder & CIO / CPO @ Bono Network: CLAIM_TYPE_MISMATCH",
+      "Madhu Nalamothu — CEO @ HL Solutions LLC: CLAIM_TYPE_MISMATCH"
+    ],
+    "errors": [],
+    "aiRouter": []
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 4,
+      "event": "a: submitted"
+    },
+    {
+      "t": 14,
+      "event": "a: running"
+    },
+    {
+      "t": 61,
+      "event": "a: mini-browser (Scrapy browser kept open · reddit.com · 7 pages · 00:40)"
+    },
+    {
+      "t": 63,
+      "event": "a: clarify \"Which location should I focus on (city, region, or country)?\" -> Skip"
+    },
+    {
+      "t": 65,
+      "event": "a: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
+    },
+    {
+      "t": 123,
+      "event": "a: clarify \"Which location should I focus on (city, region, or country)?\" -> Skip"
+    },
+    {
+      "t": 125,
+      "event": "a: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
+    },
+    {
+      "t": 182,
+      "event": "a: clarify \"Which location should I focus on (city, region, or country)?\" -> Skip"
+    },
+    {
+      "t": 184,
+      "event": "a: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
+    },
+    {
+      "t": 1816,
+      "event": "a: TIMEOUT"
+    },
+    {
+      "t": 1816,
+      "event": "fatal: page.waitForTimeout: Target page, context or browser has been closed"
+    }
+  ],
+  "screenshots": [
+    "ui/I01-a-3-mini-browser.jpg",
+    "ui/I01-a-1-clarify.jpg",
+    "ui/I01-fatal.jpg"
+  ],
+  "durationS": 1816,
+  "responseBytes": 17984
+}

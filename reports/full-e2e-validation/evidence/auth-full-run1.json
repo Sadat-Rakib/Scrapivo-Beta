@@ -1,0 +1,92 @@
+{
+  "startedAt": "2026-10-01T05:27:51.049Z",
+  "base": "http://localhost:8080",
+  "otherContextAfterSignOut": "still shows the app (cached session)",
+  "wrongPasswordMessage": "Wrong password. Try again, or use Sign up to set a new password.",
+  "wrongPasswordLeaksInternals": false,
+  "steps": [
+    {
+      "step": "valid demo login reaches /discover",
+      "ok": true,
+      "detail": "/discover",
+      "ms": 3986
+    },
+    {
+      "step": "authenticated shell (composer + nav)",
+      "ok": false,
+      "detail": "{\"Home\":true,\"Projects\":false,\"Watches\":false,\"Saved\":false,\"Guides\":false,\"Help\":false}"
+    },
+    {
+      "step": "profile identity shows the demo account",
+      "ok": false
+    },
+    {
+      "step": "refresh keeps the session",
+      "ok": true
+    },
+    {
+      "step": "navigate /saved while signed in",
+      "ok": true,
+      "detail": "/saved"
+    },
+    {
+      "step": "navigate /projects while signed in",
+      "ok": true,
+      "detail": "/projects"
+    },
+    {
+      "step": "navigate /watches while signed in",
+      "ok": true,
+      "detail": "/watches"
+    },
+    {
+      "step": "navigate /profile while signed in",
+      "ok": true,
+      "detail": "/profile"
+    },
+    {
+      "step": "navigate /discover while signed in",
+      "ok": true,
+      "detail": "/discover"
+    },
+    {
+      "step": "second tab is signed in",
+      "ok": true
+    },
+    {
+      "step": "fresh context restores the session",
+      "ok": true
+    },
+    {
+      "step": "Sign out returns to /auth",
+      "ok": true
+    },
+    {
+      "step": "signed out: /discover redirects to /auth",
+      "ok": true,
+      "detail": "/auth"
+    },
+    {
+      "step": "signed out: /saved redirects to /auth",
+      "ok": true,
+      "detail": "/auth"
+    },
+    {
+      "step": "signed out: /profile redirects to /auth",
+      "ok": true,
+      "detail": "/auth"
+    },
+    {
+      "step": "wrong password stays on /auth with a clear message",
+      "ok": true,
+      "detail": "Wrong password. Try again, or use Sign up to set a new password.",
+      "ms": 1248
+    },
+    {
+      "step": "log in again after logout",
+      "ok": true,
+      "ms": 494
+    }
+  ],
+  "finishedAt": "2026-10-01T05:29:04.756Z"
+}

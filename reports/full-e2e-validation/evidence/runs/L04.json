@@ -1,0 +1,166 @@
+{
+  "id": "L04",
+  "query": "Marketing agencies in Vancouver",
+  "category": "local",
+  "viewport": "desktop",
+  "startedAt": "2026-10-01T12:27:36.514Z",
+  "main": {
+    "query": "Marketing agencies in Vancouver",
+    "clarify": [
+      {
+        "question": "What are you trying to do with these results?",
+        "chosen": "Find prospects",
+        "t": 2
+      },
+      {
+        "question": "Any particular business model (agency, brand, D2C, B2B, B2C), or all?",
+        "chosen": "Search with defaults",
+        "t": 56
+      }
+    ],
+    "streamed": [],
+    "activity": [
+      "Checked available records · Available records · 0"
+    ],
+    "bubbleVerbatim": true,
+    "clarifyAt": 2,
+    "runningAt": 8,
+    "pill": "Scrapy browser kept open · vancouver.marketing · 7 pages · 00:43",
+    "miniBrowserAt": 53,
+    "viewingOnly": false,
+    "clarifyStuck": true,
+    "durationS": 110,
+    "firstStreamS": null,
+    "timedOut": true,
+    "header": null,
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nB2B SaaS founders in Canada with public email or phone\nExpand (0 results)\nHVAC companies in Toronto with phone numbers\nHVAC companies in Toronto with phone numbers\nPeople looking for a web designer\nPeople looking for a web designer\nFintech companies in Toronto with 50 to 200 employees\nPeople looking for a web designer\nPeople looking for a web designer\nFintech founders in London\nExpand (0 results)\nAI founders globally hiring their first sales rep\nExpand (0 results)\nFounders talking about needing SEO\nFintech companies in Toronto with 50 to 200 employees\nPlumbers in Edmonton with public contact details\nExpand (50 results)\nDentists in Calgary with websites\nExpand (50 results)\nMarketing agencies in Vancouver\nUnderstanding your request…\nStop search\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without webs"
+  },
+  "server": {
+    "runId": "run_b4d3c496",
+    "specRuns": 2,
+    "spec": {
+      "query": "Marketing agencies in Vancouver",
+      "entity": "company",
+      "status": "ready_to_search",
+      "outcome": "NO_QUALIFIED_RESULTS",
+      "criteria": [
+        "industry=marketing agency",
+        "location=Vancouver",
+        "location_id=geo:city:vancouver",
+        "location_kind=city",
+        "location_country=CA",
+        "location_parents=geo:country:ca",
+        "purpose=prospecting"
+      ],
+      "retrieved": 0,
+      "returned": 0,
+      "qualified": 0,
+      "rejected": 0,
+      "pendingEnrichment": 0,
+      "liveDiscovery": "completed",
+      "signalRequired": false,
+      "reason": "TIMEOUT",
+      "timings": {
+        "understanding_ms": 2,
+        "stored_search_ms": 5175,
+        "research_ms": 24625,
+        "enrichment_ms": 0,
+        "qualification_ms": 1,
+        "total_ms": 29803
+      },
+      "sources": [
+        "pg-index:0/0"
+      ],
+      "funnel": {
+        "raw": 0,
+        "postSpec": 0,
+        "complete": 0,
+        "qualRejected": 0,
+        "qualified": 0
+      },
+      "sourceHealth": {
+        "summary": "Some sources could not be searched this time (Available records), so results may be incomplete.",
+        "sources": [
+          "Public websites:unavailable",
+          "The web:unavailable",
+          "Public websites:empty",
+          "Available records:degraded"
+        ]
+      }
+    },
+    "ledger": null,
+    "runtime": [
+      {
+        "requested": "worker",
+        "used": "worker",
+        "reason": null
+      }
+    ],
+    "browserDone": [
+      {
+        "status": "completed",
+        "reason": "diminishing_returns",
+        "candidates": 0,
+        "researched": 0,
+        "verified": 0,
+        "visited": 4,
+        "elapsedMs": 24506
+      }
+    ],
+    "searches": 3,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": [
+      "[ai-router] groq:openai/gpt-oss-20b daily quota exhausted; held",
+      "[ai-router] groq:openai/gpt-oss-120b daily quota exhausted; held"
+    ]
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 4,
+      "event": "a: submitted"
+    },
+    {
+      "t": 6,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 11,
+      "event": "a: running"
+    },
+    {
+      "t": 58,
+      "event": "a: mini-browser (Scrapy browser kept open · vancouver.marketing · 7 pages · 00:43)"
+    },
+    {
+      "t": 60,
+      "event": "a: clarify \"Any particular business model (agency, brand, D2C, B2B, B2C)\" -> Search with defaults"
+    },
+    {
+      "t": 113,
+      "event": "a: clarify dead-loop (same question repeated)"
+    },
+    {
+      "t": 113,
+      "event": "a: TIMEOUT"
+    }
+  ],
+  "screenshots": [
+    "ui/L04-a-1-clarify.jpg",
+    "ui/L04-a-3-mini-browser.jpg",
+    "ui/L04-a-6-final.jpg"
+  ],
+  "durationS": 120,
+  "responseBytes": 21061
+}

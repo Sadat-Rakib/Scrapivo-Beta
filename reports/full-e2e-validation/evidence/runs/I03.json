@@ -1,0 +1,174 @@
+{
+  "id": "I03",
+  "query": "Businesses saying they need a new website",
+  "category": "intent",
+  "viewport": "desktop",
+  "startedAt": "2026-10-01T13:31:38.348Z",
+  "main": {
+    "query": "Businesses saying they need a new website",
+    "clarify": [
+      {
+        "question": "Any particular business model (agency, brand, D2C, B2B, B2C), or all?",
+        "chosen": "Search with defaults",
+        "t": 51
+      },
+      {
+        "question": "Any particular business model (agency, brand, D2C, B2B, B2C), or all?",
+        "chosen": "Search with defaults",
+        "t": 100
+      },
+      {
+        "question": "Any particular business model (agency, brand, D2C, B2B, B2C), or all?",
+        "chosen": "Search with defaults",
+        "t": 149
+      }
+    ],
+    "streamed": [],
+    "activity": [
+      "Checked available records · Available records · 0"
+    ],
+    "bubbleVerbatim": true,
+    "runningAt": 2,
+    "pill": "Scrapy browser kept open · dvprinting.com · 7 pages · 00:40",
+    "miniBrowserAt": 47,
+    "viewingOnly": false,
+    "clarifyAt": 51,
+    "clarifyRepeats": 3,
+    "clarifyStuck": true,
+    "durationS": 198,
+    "firstStreamS": null,
+    "timedOut": true,
+    "header": null,
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nB2B SaaS founders in Canada with public email or phone\nExpand (0 results)\nHVAC companies in Toronto with phone numbers\nHVAC companies in Toronto with phone numbers\nPeople looking for a web designer\nPeople looking for a web designer\nFintech companies in Toronto with 50 to 200 employees\nPeople looking for a web designer\nPeople looking for a web designer\nFintech founders in London\nExpand (0 results)\nAI founders globally hiring their first sales rep\nExpand (0 results)\nFounders talking about needing SEO\nFintech companies in Toronto with 50 to 200 employees\nPlumbers in Edmonton with public contact details\nExpand (50 results)\nDentists in Calgary with websites\nExpand (50 results)\nMarketing agencies in Vancouver\nRoofers in Mississauga with phone numbers\nExpand (1 results)\nCopywriters in Toronto\nExpand (1 results)\nFractional CMOs in Canada\nExpand (1 results)\nWeb designers in New York\nRecruiters hiring software engineers\nSales consultants in London\nFounders complaining about lead generation\nExpand (50 results)\nBusinesses saying they need a new website\nPeople looking for an SEO agency\nCybersecurity companies in Ottawa with websites\nAI startups in Montreal hiring engineers\nPre-seed investors in Canada investing in SaaS\nExpand (0 results)\nBusinesses saying they need a new website\nUnderstanding: businesses\nSearching the web · Public source · business saying they\nChecked contact details · Public contact details · 0 candidates\nResearching signals · Public source · 0\nShow all activity (12)\nScrapy\nKEPT OPEN\nbing.com\nOpening result\n· business saying they - Search\n5 pages\n5 actions\n00:45\nOpen original\nTake control\nClose browser\nNarrow this down1 question\nNarrow this down\nQuestion 1 of 1\n\nAny particular business model (agency, brand, D2C, B2B, B2C), or all?\n\nAgency\nService agencies\nBrand\nProduct brands\nD2C\nDirect-to-consumer\nB2B\nSelling to businesses\nB2C\nSelling to consumers\nUse\nSearch with defaults\nSearch\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0"
+  },
+  "server": {
+    "runId": "run_95e6b8d6",
+    "specRuns": 4,
+    "spec": {
+      "query": "Businesses saying they need a new website",
+      "entity": "business",
+      "status": "ready_to_search",
+      "outcome": "NO_QUALIFIED_RESULTS",
+      "criteria": [
+        "location=saying they",
+        "location_id=geo:stated:saying-they",
+        "location_kind=stated",
+        "requested_service=website",
+        "require_name=true",
+        "required_field=name",
+        "require_website=true",
+        "required_field=website"
+      ],
+      "retrieved": 0,
+      "returned": 0,
+      "qualified": 0,
+      "rejected": 0,
+      "pendingEnrichment": 0,
+      "liveDiscovery": "completed",
+      "signalRequired": true,
+      "reason": "NO_LOCATION_ROUTE",
+      "timings": {
+        "understanding_ms": 2,
+        "stored_search_ms": 298,
+        "research_ms": 20165,
+        "enrichment_ms": 0,
+        "qualification_ms": 0,
+        "total_ms": 20465
+      },
+      "sources": [
+        "pg-index:0/0",
+        "s3-parquet:0/0"
+      ],
+      "funnel": {
+        "raw": 0,
+        "postSpec": 0,
+        "complete": 0,
+        "qualRejected": 0,
+        "qualified": 0
+      },
+      "sourceHealth": {
+        "summary": null,
+        "sources": [
+          "Public websites:empty"
+        ]
+      }
+    },
+    "ledger": null,
+    "runtime": [
+      {
+        "requested": "worker",
+        "used": "worker",
+        "reason": null
+      }
+    ],
+    "browserDone": [
+      {
+        "status": "completed",
+        "reason": "diminishing_returns",
+        "candidates": 0,
+        "researched": 0,
+        "verified": 0,
+        "visited": 2,
+        "elapsedMs": 16786
+      }
+    ],
+    "searches": 4,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": [
+      "[ai-router] groq:openai/gpt-oss-120b daily quota exhausted; held"
+    ]
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 4,
+      "event": "a: submitted"
+    },
+    {
+      "t": 6,
+      "event": "a: running"
+    },
+    {
+      "t": 53,
+      "event": "a: mini-browser (Scrapy browser kept open · dvprinting.com · 7 pages · 00:40)"
+    },
+    {
+      "t": 55,
+      "event": "a: clarify \"Any particular business model (agency, brand, D2C, B2B, B2C)\" -> Search with defaults"
+    },
+    {
+      "t": 104,
+      "event": "a: clarify \"Any particular business model (agency, brand, D2C, B2B, B2C)\" -> Search with defaults"
+    },
+    {
+      "t": 153,
+      "event": "a: clarify \"Any particular business model (agency, brand, D2C, B2B, B2C)\" -> Search with defaults"
+    },
+    {
+      "t": 202,
+      "event": "a: clarify dead-loop (same question re-asked 3x, no search start)"
+    },
+    {
+      "t": 202,
+      "event": "a: TIMEOUT"
+    }
+  ],
+  "screenshots": [
+    "ui/I03-a-3-mini-browser.jpg",
+    "ui/I03-a-1-clarify.jpg",
+    "ui/I03-a-6-final.jpg"
+  ],
+  "durationS": 208,
+  "responseBytes": 19693
+}

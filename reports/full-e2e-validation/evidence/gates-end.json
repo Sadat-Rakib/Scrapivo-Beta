@@ -1,0 +1,20 @@
+﻿{
+    "tag":  "end",
+    "started":  "2026-10-01T02:00:53",
+    "branch":  "rc/mvp-local-testing-baseline",
+    "head":  "2fcf028a0f56794080cf61049a35e6bc4320ac2d",
+    "vt":  "total=1568 passed=1498 failed=55 skipped=15 files=160 knownRedHit=55 NEW_FAILURES=0",
+    "vtNewFailures":  [
+
+                      ],
+    "vtSecs":  101,
+    "typecheck":  "{\"errors\":43,\"baseline\":43,\"groupsAboveBaseline\":[]}",
+    "typecheckSecs":  53,
+    "buildExit":  0,
+    "buildSecs":  209,
+    "buildErrors":  [
+
+                    ],
+    "bundleScan":  "{\"files\":69,\"patternHits\":[0,0,0,0,0],\"secretsChecked\":29,\"secretHitKeys\":[]}",
+    "finished":  "2026-10-01T02:06:57"
+}

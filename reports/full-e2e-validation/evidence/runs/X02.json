@@ -1,0 +1,138 @@
+{
+  "id": "X02",
+  "query": "SaaS founders in Austin with public emails",
+  "category": "cancel",
+  "viewport": "desktop",
+  "startedAt": "2026-10-01T14:33:04.680Z",
+  "fatal": "locator.click: Timeout 45000ms exceeded.",
+  "server": {
+    "runId": "run_26a3be73",
+    "specRuns": 1,
+    "spec": {
+      "query": "SaaS founders in Austin with public emails",
+      "entity": "person",
+      "status": "ready_to_search",
+      "outcome": "NO_QUALIFIED_RESULTS",
+      "criteria": [
+        "role=founder",
+        "industry=saas",
+        "location=Austin",
+        "location_id=geo:city:austin",
+        "location_kind=city",
+        "location_country=US",
+        "location_parents=geo:country:us",
+        "require_name=true",
+        "required_field=name",
+        "require_email=true",
+        "required_field=email",
+        "purpose=prospecting"
+      ],
+      "retrieved": 0,
+      "returned": 0,
+      "qualified": 0,
+      "rejected": 0,
+      "pendingEnrichment": 0,
+      "liveDiscovery": "completed",
+      "signalRequired": false,
+      "reason": "SOURCE_UNAVAILABLE",
+      "timings": {
+        "understanding_ms": 1,
+        "stored_search_ms": 12941,
+        "research_ms": 16434,
+        "enrichment_ms": 1,
+        "qualification_ms": 0,
+        "total_ms": 29377
+      },
+      "sources": [
+        "pg-index:0/0",
+        "s3-parquet:351216/0"
+      ],
+      "funnel": {
+        "raw": 0,
+        "postSpec": 0,
+        "complete": 0,
+        "qualRejected": 0,
+        "qualified": 0
+      },
+      "sourceHealth": {
+        "summary": null,
+        "sources": [
+          "Public websites:unavailable",
+          "The web:unavailable",
+          "Public websites:empty"
+        ]
+      }
+    },
+    "ledger": null,
+    "runtime": [
+      {
+        "requested": "worker",
+        "used": "worker",
+        "reason": null
+      }
+    ],
+    "browserDone": [
+      {
+        "status": "completed",
+        "reason": "diminishing_returns",
+        "candidates": 0,
+        "researched": 0,
+        "verified": 0,
+        "visited": 4,
+        "elapsedMs": 16279
+      }
+    ],
+    "searches": 3,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": []
+  },
+  "serverFollowUp": {
+    "runId": null,
+    "specRuns": 1,
+    "spec": null,
+    "ledger": null,
+    "runtime": [],
+    "browserDone": [],
+    "searches": 0,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": []
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps",
+    "info: [ui-projection] server=0 projected=0 rejected=0 codes={}"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 4,
+      "event": "a: submitted"
+    },
+    {
+      "t": 7,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 20,
+      "event": "a: running"
+    },
+    {
+      "t": 67,
+      "event": "a: mini-browser (Scrapy browser kept open · linkedin.com · 8 pages · 00:42)"
+    },
+    {
+      "t": 112,
+      "event": "fatal: locator.click: Timeout 45000ms exceeded."
+    }
+  ],
+  "screenshots": [
+    "ui/X02-a-1-clarify.jpg",
+    "ui/X02-a-3-mini-browser.jpg",
+    "ui/X02-fatal.jpg"
+  ],
+  "durationS": 116,
+  "responseBytes": 19987
+}

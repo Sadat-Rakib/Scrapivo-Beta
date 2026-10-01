@@ -1,0 +1,165 @@
+{
+  "id": "C02",
+  "query": "Cybersecurity companies in Ottawa with websites",
+  "category": "company",
+  "viewport": "desktop",
+  "startedAt": "2026-10-01T13:15:36.422Z",
+  "main": {
+    "query": "Cybersecurity companies in Ottawa with websites",
+    "clarify": [
+      {
+        "question": "What are you trying to do with these results?",
+        "chosen": "Find prospects",
+        "t": 2
+      },
+      {
+        "question": "Any particular business model (agency, brand, D2C, B2B, B2C), or all?",
+        "chosen": "Search with defaults",
+        "t": 237
+      }
+    ],
+    "streamed": [],
+    "activity": [
+      "Reading page · corproster.com · 3618 characters",
+      "Found possible leads · 2 candidates; 0 verified",
+      "Opening result · mspvouch.com",
+      "Show all activity (12)"
+    ],
+    "bubbleVerbatim": true,
+    "clarifyAt": 2,
+    "runningAt": 49,
+    "pill": "Scrapy is browsing · corproster.com · 9 pages · 00:23",
+    "miniBrowserAt": 186,
+    "viewingOnly": false,
+    "durationS": 421,
+    "firstStreamS": null,
+    "timedOut": true,
+    "header": null,
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nB2B SaaS founders in Canada with public email or phone\nExpand (0 results)\nHVAC companies in Toronto with phone numbers\nHVAC companies in Toronto with phone numbers\nPeople looking for a web designer\nPeople looking for a web designer\nFintech companies in Toronto with 50 to 200 employees\nPeople looking for a web designer\nPeople looking for a web designer\nFintech founders in London\nExpand (0 results)\nAI founders globally hiring their first sales rep\nExpand (0 results)\nFounders talking about needing SEO\nFintech companies in Toronto with 50 to 200 employees\nPlumbers in Edmonton with public contact details\nExpand (50 results)\nDentists in Calgary with websites\nExpand (50 results)\nMarketing agencies in Vancouver\nRoofers in Mississauga with phone numbers\nExpand (1 results)\nCopywriters in Toronto\nExpand (1 results)\nFractional CMOs in Canada\nExpand (1 results)\nWeb designers in New York\nRecruiters hiring software engineers\nSales consultants in London\nFounders complaining about lead generation\nExpand (50 results)\nBusinesses saying they need a new website\nPeople looking for an SEO agency\nCybersecurity companies in Ottawa with websites\nUnderstanding your request…\nStop search\nReading page · companylisting.ca · 1759 characters\nFound possible leads · 7 candidates; 0 verified\nChecking company website · ipss.com · Ipss inc.\nShow all activity (12)\nScrapy\nACTIVE\ncompanylisting.ca\nOpening result\n· ipss inc. - Ottawa, ON - CompanyListing.ca\n6 pages\n6 actions\n00:27\nOpen original\nTake control\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n"
+  },
+  "server": {
+    "runId": "run_2e5b3be5",
+    "specRuns": 1,
+    "spec": {
+      "query": "Cybersecurity companies in Ottawa with websites",
+      "entity": "company",
+      "status": "ready_to_search",
+      "outcome": "NO_QUALIFIED_RESULTS",
+      "criteria": [
+        "industry=cybersecurity company",
+        "location=Ottawa",
+        "location_id=geo:stated:ottawa",
+        "location_kind=stated",
+        "website=true",
+        "purpose=prospecting"
+      ],
+      "retrieved": 3,
+      "returned": 0,
+      "qualified": 0,
+      "rejected": 0,
+      "pendingEnrichment": 1,
+      "liveDiscovery": "completed",
+      "signalRequired": false,
+      "reason": "INCOMPLETE",
+      "timings": {
+        "understanding_ms": 1,
+        "stored_search_ms": 158175,
+        "research_ms": 53757,
+        "enrichment_ms": 9356,
+        "qualification_ms": 0,
+        "total_ms": 221289
+      },
+      "sources": [
+        "pg-index:0/0",
+        "s3-parquet:1602141/0",
+        "live-browser:3/3"
+      ],
+      "funnel": {
+        "raw": 3,
+        "postSpec": 3,
+        "researched": 3,
+        "complete": 0,
+        "qualRejected": 0,
+        "qualified": 0
+      },
+      "sourceHealth": {
+        "summary": "Some sources could not be searched this time (Public source), so results may be incomplete.",
+        "sources": [
+          "Public websites:unavailable",
+          "The web:unavailable",
+          "Public websites:healthy",
+          "Public source:unavailable"
+        ]
+      }
+    },
+    "ledger": null,
+    "runtime": [
+      {
+        "requested": "worker",
+        "used": "worker",
+        "reason": null
+      }
+    ],
+    "browserDone": [
+      {
+        "status": "completed",
+        "reason": "sources_exhausted",
+        "candidates": 3,
+        "researched": 3,
+        "verified": 0,
+        "visited": 15,
+        "elapsedMs": 53587
+      }
+    ],
+    "searches": 6,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": [
+      "[ai-router] groq:openai/gpt-oss-120b daily quota exhausted; held"
+    ]
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 4,
+      "event": "a: submitted"
+    },
+    {
+      "t": 6,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 53,
+      "event": "a: running"
+    },
+    {
+      "t": 191,
+      "event": "a: mini-browser (Scrapy is browsing · corproster.com · 9 pages · 00:23)"
+    },
+    {
+      "t": 241,
+      "event": "a: clarify \"Any particular business model (agency, brand, D2C, B2B, B2C)\" -> Search with defaults"
+    },
+    {
+      "t": 425,
+      "event": "a: TIMEOUT"
+    }
+  ],
+  "screenshots": [
+    "ui/C02-a-1-clarify.jpg",
+    "ui/C02-a-3-mini-browser.jpg",
+    "ui/C02-a-6-final.jpg"
+  ],
+  "durationS": 431,
+  "responseBytes": 21850
+}

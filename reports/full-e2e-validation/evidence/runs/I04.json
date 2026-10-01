@@ -1,0 +1,224 @@
+{
+  "id": "I04",
+  "query": "People looking for an SEO agency",
+  "category": "intent",
+  "viewport": "mobile",
+  "startedAt": "2026-10-01T13:08:16.482Z",
+  "main": {
+    "query": "People looking for an SEO agency",
+    "clarify": [
+      {
+        "question": "Which location should I focus on (city, region, or country)?",
+        "chosen": "Skip",
+        "t": 60
+      },
+      {
+        "question": "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?",
+        "chosen": "Search with defaults",
+        "t": 62
+      },
+      {
+        "question": "Which location should I focus on (city, region, or country)?",
+        "chosen": "Skip",
+        "t": 122
+      },
+      {
+        "question": "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?",
+        "chosen": "Search with defaults",
+        "t": 124
+      },
+      {
+        "question": "Which location should I focus on (city, region, or country)?",
+        "chosen": "Skip",
+        "t": 185
+      },
+      {
+        "question": "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?",
+        "chosen": "Search with defaults",
+        "t": 187
+      }
+    ],
+    "streamed": [],
+    "activity": [
+      "Checked available records · Available records · 51",
+      "Researching signals · Public source · 53",
+      "Signal research started · Public source · 53",
+      "Signal research finished · Public source · 0",
+      "Show all activity (12)"
+    ],
+    "bubbleVerbatim": true,
+    "runningAt": 12,
+    "pill": "Scrapy browser kept open · reddit.com · 7 pages · 00:41",
+    "miniBrowserAt": 57,
+    "viewingOnly": false,
+    "clarifyAt": 60,
+    "durationS": 430,
+    "firstStreamS": null,
+    "timedOut": true,
+    "header": null,
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nB2B SaaS founders in Canada with public email or phone\nExpand (0 results)\nHVAC companies in Toronto with phone numbers\nHVAC companies in Toronto with phone numbers\nPeople looking for a web designer\nPeople looking for a web designer\nFintech companies in Toronto with 50 to 200 employees\nPeople looking for a web designer\nPeople looking for a web designer\nFintech founders in London\nExpand (0 results)\nAI founders globally hiring their first sales rep\nExpand (0 results)\nFounders talking about needing SEO\nFintech companies in Toronto with 50 to 200 employees\nPlumbers in Edmonton with public contact details\nExpand (50 results)\nDentists in Calgary with websites\nExpand (50 results)\nMarketing agencies in Vancouver\nRoofers in Mississauga with phone numbers\nExpand (1 results)\nCopywriters in Toronto\nExpand (1 results)\nFractional CMOs in Canada\nExpand (1 results)\nWeb designers in New York\nRecruiters hiring software engineers\nSales consultants in London\nFounders complaining about lead generation\nExpand (50 results)\nBusinesses saying they need a new website\nPeople looking for an SEO agency\nUnderstanding: people\nResearching signals · Public source · 53\nSignal research started · Public source · 53\nSignal research finished · Public source · 0\nShow all activity (12)\nScrapy\nKEPT OPEN\nreddit.com\nOpening result\n· Reddit - The heart of the internet\n7 pages\n7 actions\n03:51\nOpen original\nTake control\nClose browser\nNarrow this down2 questions\nNarrow this down\nQuestion 1 of 2\n\nWhich location should I focus on (city, region, or country)?\n\nUse\nSkip\nNext\nMode\nThinker"
+  },
+  "server": {
+    "runId": "run_02ef7074",
+    "specRuns": 4,
+    "spec": {
+      "query": "People looking for an SEO agency",
+      "entity": "person",
+      "status": "ready_to_search",
+      "outcome": "NO_QUALIFIED_RESULTS",
+      "criteria": [
+        "requested_service=seo agency"
+      ],
+      "retrieved": 57,
+      "returned": 0,
+      "qualified": 0,
+      "rejected": 0,
+      "pendingEnrichment": 0,
+      "liveDiscovery": "completed",
+      "signalRequired": true,
+      "reason": "FAILED_QUALIFICATION",
+      "timings": {
+        "understanding_ms": 0,
+        "stored_search_ms": 9385,
+        "research_ms": 22421,
+        "enrichment_ms": 2,
+        "qualification_ms": 281,
+        "total_ms": 32089
+      },
+      "sources": [
+        "s3-parquet:51/51",
+        "live-browser:6/6",
+        "live-social:reddit-arctic-shift:2/2"
+      ],
+      "funnel": {
+        "raw": 57,
+        "postSpec": 57,
+        "researched": 2,
+        "complete": 53,
+        "qualRejected": 53,
+        "qualified": 0
+      },
+      "sourceHealth": {
+        "summary": null,
+        "sources": [
+          "Public websites:unavailable",
+          "The web:unavailable",
+          "Public websites:healthy"
+        ]
+      }
+    },
+    "ledger": {
+      "search_run_id": "run_02ef7074",
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 53,
+        "gated": 0,
+        "filtered": 0,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {
+        "CLAIM_TYPE_MISMATCH": 51,
+        "PROVISIONAL_ENTITY": 2
+      },
+      "streamed": 0,
+      "streamedNotReturned": []
+    },
+    "runtime": [
+      {
+        "requested": "worker",
+        "used": "worker",
+        "reason": null
+      }
+    ],
+    "browserDone": [
+      {
+        "status": "completed",
+        "reason": "diminishing_returns",
+        "candidates": 6,
+        "researched": 0,
+        "verified": 0,
+        "visited": 4,
+        "elapsedMs": 17714
+      }
+    ],
+    "searches": 3,
+    "qualRejected": [
+      "Linda Simmons — Owner @ PLAYRITE, LLC: CLAIM_TYPE_MISMATCH",
+      "Grant Leishman — CEO and Founder @ GrowUp Greenwalls: CLAIM_TYPE_MISMATCH",
+      "Becky Hobbs — Co-Founder & COO @ OLarry: CLAIM_TYPE_MISMATCH",
+      "Mark Gatz — Owner @ SERVPRO of Gilbert, Chandler South & Ahwatukee/S. Tempe (FirePit Holdings Corp): CLAIM_TYPE_MISMATCH",
+      "Michael Lishewski — VP Business Development and Co-Founder @ Xecutive Recruitment Inc.: CLAIM_TYPE_MISMATCH",
+      "Edward Dooling — CEO and Co-Founder @ Vanguard Healthcare Staffing: CLAIM_TYPE_MISMATCH",
+      "Ashok Seetharaman — CoFounder & CIO / CPO @ Bono Network: CLAIM_TYPE_MISMATCH",
+      "Madhu Nalamothu — CEO @ HL Solutions LLC: CLAIM_TYPE_MISMATCH"
+    ],
+    "errors": [],
+    "aiRouter": [
+      "[ai-router] groq:openai/gpt-oss-20b daily quota exhausted; held",
+      "[ai-router] groq:openai/gpt-oss-120b daily quota exhausted; held"
+    ]
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 4,
+      "event": "a: submitted"
+    },
+    {
+      "t": 15,
+      "event": "a: running"
+    },
+    {
+      "t": 62,
+      "event": "a: mini-browser (Scrapy browser kept open · reddit.com · 7 pages · 00:41)"
+    },
+    {
+      "t": 64,
+      "event": "a: clarify \"Which location should I focus on (city, region, or country)?\" -> Skip"
+    },
+    {
+      "t": 66,
+      "event": "a: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
+    },
+    {
+      "t": 125,
+      "event": "a: clarify \"Which location should I focus on (city, region, or country)?\" -> Skip"
+    },
+    {
+      "t": 128,
+      "event": "a: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
+    },
+    {
+      "t": 189,
+      "event": "a: clarify \"Which location should I focus on (city, region, or country)?\" -> Skip"
+    },
+    {
+      "t": 191,
+      "event": "a: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
+    },
+    {
+      "t": 434,
+      "event": "a: TIMEOUT"
+    }
+  ],
+  "screenshots": [
+    "ui/I04-a-3-mini-browser.jpg",
+    "ui/I04-a-1-clarify.jpg",
+    "ui/I04-a-6-final.jpg"
+  ],
+  "durationS": 440,
+  "responseBytes": 18595
+}

@@ -1,0 +1,46 @@
+{
+  "tag": "E2E_QA_1790866629986",
+  "startedAt": "2026-10-01T14:57:09.987Z",
+  "savedName": "Andrew Breen",
+  "savedCountAtStart": 1,
+  "savedTitlesAtStart": [
+    "capchase.com | Andrew Breen | Identity · Andrew Breen Founder & CEO Outshine | ·"
+  ],
+  "savedCountAfterCleanup": 0,
+  "profileOriginalWasEmpty": true,
+  "projectsDeleteControl": 0,
+  "watchesText": "Close\nSaved watches\nPlumbers in Edmonton with public contact details\ndaily\n· last 0 new · never run\nnew entity\nin_app\nRun",
+  "steps": [
+    {
+      "step": "P04 saved lead is listed on /saved",
+      "ok": true,
+      "detail": "1 saved"
+    },
+    {
+      "step": "notes edit persists across reload",
+      "ok": true
+    },
+    {
+      "step": "QA saved lead deleted (gone after reload)",
+      "ok": true,
+      "detail": "0 saved left"
+    },
+    {
+      "step": "profile form has a Job title field and Save control",
+      "ok": true
+    },
+    {
+      "step": "profile edit persists across reload",
+      "ok": false
+    },
+    {
+      "step": "profile field restored to its original value",
+      "ok": true
+    },
+    {
+      "step": "Projects page loads; New project dialog opens (not submitted)",
+      "ok": true
+    }
+  ],
+  "finishedAt": "2026-10-01T14:58:18.013Z"
+}

@@ -1,0 +1,140 @@
+{
+  "id": "X01",
+  "query": "Web designers in Chicago",
+  "category": "cancel",
+  "viewport": "desktop",
+  "startedAt": "2026-10-01T14:31:05.679Z",
+  "fatal": "locator.click: Timeout 45000ms exceeded.",
+  "server": {
+    "runId": "run_c9d81b2f",
+    "specRuns": 1,
+    "spec": {
+      "query": "Web designers in Chicago",
+      "entity": "person",
+      "status": "ready_to_search",
+      "outcome": "NO_QUALIFIED_RESULTS",
+      "criteria": [
+        "role=web designer",
+        "location=Chicago",
+        "location_id=geo:city:chicago",
+        "location_kind=city",
+        "location_country=US",
+        "location_parents=geo:country:us",
+        "purpose=prospecting"
+      ],
+      "retrieved": 0,
+      "returned": 0,
+      "qualified": 0,
+      "rejected": 0,
+      "pendingEnrichment": 0,
+      "liveDiscovery": "completed",
+      "signalRequired": false,
+      "reason": "SOURCE_UNAVAILABLE",
+      "timings": {
+        "understanding_ms": 1,
+        "stored_search_ms": 15626,
+        "research_ms": 47078,
+        "enrichment_ms": 0,
+        "qualification_ms": 1,
+        "total_ms": 62706
+      },
+      "sources": [
+        "pg-index:0/0",
+        "s3-parquet:351216/0"
+      ],
+      "funnel": {
+        "raw": 0,
+        "postSpec": 0,
+        "complete": 0,
+        "qualRejected": 0,
+        "qualified": 0
+      },
+      "sourceHealth": {
+        "summary": null,
+        "sources": [
+          "Public websites:unavailable",
+          "The web:unavailable",
+          "Public websites:empty"
+        ]
+      }
+    },
+    "ledger": null,
+    "runtime": [
+      {
+        "requested": "worker",
+        "used": "worker",
+        "reason": null
+      }
+    ],
+    "browserDone": [
+      {
+        "status": "completed",
+        "reason": "diminishing_returns",
+        "candidates": 0,
+        "researched": 0,
+        "verified": 0,
+        "visited": 4,
+        "elapsedMs": 46938
+      }
+    ],
+    "searches": 4,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": []
+  },
+  "serverFollowUp": {
+    "runId": null,
+    "specRuns": 1,
+    "spec": null,
+    "ledger": null,
+    "runtime": [],
+    "browserDone": [],
+    "searches": 0,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": []
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "error: Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. https://www.capchase.com/top-25-b2",
+    "error: Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. https://www.capchase.com/top-25-b2",
+    "error: Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. https://www.capchase.com/top-25-b2",
+    "error: In HTML, %s cannot be a descendant of <%s>.\nThis will cause a hydration error.%s <button> button \n\n  ...\n    <Lazy>\n      <DiscoverRoute>\n        <DiscoverPage>\n          <div className=\"h-full fle...\">\n            <div className=\"flex-1 min...\">\n              <div ref={{...}} className=\"flex-1 min.",
+    "error: <%s> cannot contain a nested %s.\nSee this log for the ancestor stack trace. button <button>",
+    "error: Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. https://www.capchase.com/top-25-b2",
+    "error: Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. https://www.capchase.com/top-25-b2",
+    "error: Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. https://www.capchase.com/top-25-b2",
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 4,
+      "event": "a: submitted"
+    },
+    {
+      "t": 7,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 23,
+      "event": "a: running"
+    },
+    {
+      "t": 70,
+      "event": "a: mini-browser (Scrapy is browsing · clutch.co · 7 pages · 00:42)"
+    },
+    {
+      "t": 115,
+      "event": "fatal: locator.click: Timeout 45000ms exceeded."
+    }
+  ],
+  "screenshots": [
+    "ui/X01-a-1-clarify.jpg",
+    "ui/X01-a-3-mini-browser.jpg",
+    "ui/X01-fatal.jpg"
+  ],
+  "durationS": 119,
+  "responseBytes": 18849
+}

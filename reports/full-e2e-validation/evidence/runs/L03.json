@@ -1,0 +1,154 @@
+{
+  "id": "L03",
+  "query": "Plumbers in Edmonton with public contact details",
+  "category": "local",
+  "viewport": "desktop",
+  "startedAt": "2026-10-01T12:17:00.826Z",
+  "main": {
+    "query": "Plumbers in Edmonton with public contact details",
+    "clarify": [
+      {
+        "question": "What are you trying to do with these results?",
+        "chosen": "Find prospects",
+        "t": 2
+      }
+    ],
+    "streamed": [],
+    "activity": [
+      "Checked available records · Available records · 51"
+    ],
+    "bubbleVerbatim": true,
+    "clarifyAt": 2,
+    "runningAt": 49,
+    "settled": true,
+    "durationS": 326,
+    "firstStreamS": null,
+    "header": {
+      "query": "Plumbers in Edmonton with public contact details",
+      "count": 50
+    },
+    "leadCards": [],
+    "businessCards": [
+      "The Rain Man | plumber | Local | Edmonton, AB | Email | Message | Website | +17804473960 | estimates@rainmanirrigation.ca",
+      "Brian Plumbing and Heating | plumber | Local | Edmonton, AB | Email | Message | Website | +17802491496",
+      "Hungry Plumbers, Inc. | plumber | Local | Edmonton, AB | Email | Message | Website | +15874000309",
+      "AIM Plumbing & Heating | plumber | Local | Edmonton, AB | Email | Message | Website | +17802663881",
+      "Tubig CA | plumber | Local | Edmonton, AB | Email | Message | Website | +15873417432",
+      "Bartle & Gibson Co. Ltd - West Side | plumber | Local | Edmonton, AB | Email | Message | Website | +17804831411",
+      "Urban Piping | plumber | Local | Edmonton, AB | Email | Message | Website | +15878536586",
+      "Plumbers Edmonton | plumber | Local | Edmonton, AB | Email | Message | Website | +15874053474",
+      "Plumbing Village Services | plumber | Local | Edmonton, AB | Email | Message | Website | +17804394959",
+      "Jared the Plumber | plumber | Local | Edmonton, AB | Email | Message | Website | +17805540351",
+      "Tristar Services | plumber | Local | Edmonton, AB | Email | Message | Website | +17804821232",
+      "Save-On Mechanical Services | plumber | Local | Edmonton, AB | Email | Message | Website | +17804890127",
+      "Streamline Construction | plumber | Local | Edmonton, AB | Email | Message | Website | +17804474518",
+      "Waterhouse Mechanical | plumber | Local | Edmonton, AB | Email | Message | Website | +17804823800",
+      "Western Pump | plumber | Local | Edmonton, AB | Email | Message | Website | +17804875100"
+    ],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nB2B SaaS founders in Canada with public email or phone\nExpand (0 results)\nHVAC companies in Toronto with phone numbers\nHVAC companies in Toronto with phone numbers\nPeople looking for a web designer\nPeople looking for a web designer\nFintech companies in Toronto with 50 to 200 employees\nPeople looking for a web designer\nPeople looking for a web designer\nFintech founders in London\nExpand (0 results)\nAI founders globally hiring their first sales rep\nExpand (0 results)\nFounders talking about needing SEO\nFintech companies in Toronto with 50 to 200 employees\nPlumbers in Edmonton with public contact details\nResults for \"Plumbers in Edmonton with public contact details\" · 50 results\nShow more\nWatch signal\nCards\nLists\nClear\nFold (50 results)\nThe Rain Man\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+17804473960\nestimates@rainmanirrigation.ca\nBrian Plumbing and Heating\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+17802491496\nHungry Plumbers, Inc.\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+15874000309\nAIM Plumbing & Heating\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+17802663881\nTubig CA\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+15873417432\nBartle & Gibson Co. Ltd - West Side\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+17804831411\nUrban Piping\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+15878536586\nPlumbers Edmonton\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+15874053474\nPlumbing Village Services\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+17804394959\nJared the Plumber\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+17805540351\nTristar Services\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+17804821232\nSave-On Mechanical Services\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+17804890127\nStreamline Construction\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+17804474518\nWaterhouse Mechanical\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+17804823800\nWestern Pump\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+17804875100\nViking Mechanical Contractors\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+17804550181\nHarmcor Plumbing & Heating Ltd\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+17804141040\nBest Plumbing & Lighting\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+17804512432\nStar Plumbing and Heating\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+17804818873\nAqua Plumbing & Heating Ltd\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+17804527610\nTotal Plumbing and Heating\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+17804546337\nplumbers911.ca\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+18663519693\nPLUMBERS & PIPEFITTERS U A LOCAL UNION NO 488\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+17804527080\nPlumbing Edmonton\nplumber\nLocal\n\nEdmonton, AB\n\nEmail\nMessage\nWebsite\n+158"
+  },
+  "detail": "The Rain Man | plumber · Edmonton | Category | plumber | Location | Edmonton, AB | Opportunity | has website | Social | Website | Email | estimates@rainmanirrigation.ca | Number | +17804473960 | Generate email | Generate message",
+  "watchToasts": [],
+  "server": {
+    "runId": "run_c75a6c92",
+    "specRuns": 1,
+    "spec": {
+      "query": "Plumbers in Edmonton with public contact details",
+      "entity": "business",
+      "status": "ready_to_search",
+      "outcome": "QUALIFIED_RESULTS",
+      "criteria": [
+        "category=plumber",
+        "location=Edmonton",
+        "location_id=geo:stated:edmonton",
+        "location_kind=stated",
+        "require_contact=true",
+        "required_field=contact",
+        "purpose=prospecting"
+      ],
+      "retrieved": 60,
+      "returned": 50,
+      "qualified": 50,
+      "rejected": 0,
+      "pendingEnrichment": 7,
+      "liveDiscovery": "completed",
+      "signalRequired": false,
+      "reason": "RESULTS",
+      "timings": {
+        "understanding_ms": 1,
+        "stored_search_ms": 59288,
+        "research_ms": 47319,
+        "enrichment_ms": 2034,
+        "qualification_ms": 103,
+        "total_ms": 108745
+      },
+      "sources": [
+        "pg-index:0/0",
+        "s3-parquet:698309/51",
+        "live-osm:9/9"
+      ],
+      "funnel": {
+        "raw": 60,
+        "postSpec": 60,
+        "researched": 9,
+        "complete": 50,
+        "qualRejected": 0,
+        "qualified": 50
+      },
+      "sourceHealth": {
+        "summary": null,
+        "sources": [
+          "Public source:healthy",
+          "Public source:unavailable"
+        ]
+      }
+    },
+    "ledger": null,
+    "runtime": [],
+    "browserDone": [],
+    "searches": 0,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": []
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps",
+    "info: [ui-projection] server=50 projected=50 rejected=0 codes={}"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 4,
+      "event": "a: submitted"
+    },
+    {
+      "t": 6,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 53,
+      "event": "a: running"
+    },
+    {
+      "t": 329,
+      "event": "a: settled"
+    },
+    {
+      "t": 339,
+      "event": "watch signal clicked"
+    }
+  ],
+  "screenshots": [
+    "ui/L03-a-1-clarify.jpg",
+    "ui/L03-a-6-final.jpg",
+    "ui/L03-a-7-detail.jpg",
+    "ui/L03-a-9-watch.jpg"
+  ],
+  "durationS": 343,
+  "responseBytes": 119074
+}

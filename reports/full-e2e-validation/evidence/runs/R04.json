@@ -1,0 +1,226 @@
+{
+  "id": "R04",
+  "query": "Recruiters hiring software engineers",
+  "category": "role",
+  "viewport": "desktop",
+  "startedAt": "2026-10-01T12:49:25.904Z",
+  "main": {
+    "query": "Recruiters hiring software engineers",
+    "clarify": [
+      {
+        "question": "What are you trying to do with these results?",
+        "chosen": "Find prospects",
+        "t": 2
+      },
+      {
+        "question": "Which location should I focus on (city, region, or country)?",
+        "chosen": "Skip",
+        "t": 69
+      },
+      {
+        "question": "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?",
+        "chosen": "Search with defaults",
+        "t": 71
+      },
+      {
+        "question": "Which location should I focus on (city, region, or country)?",
+        "chosen": "Skip",
+        "t": 171
+      },
+      {
+        "question": "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?",
+        "chosen": "Search with defaults",
+        "t": 173
+      },
+      {
+        "question": "Which location should I focus on (city, region, or country)?",
+        "chosen": "Skip",
+        "t": 272
+      }
+    ],
+    "streamed": [],
+    "activity": [
+      "Checked available records · Available records · 51",
+      "Opening result · linkedin.com",
+      "Researching required detail · \"James Lenhardt — CEO & Executive Recruiter @ Hire Priority Staffing & Executive Search\" recruiter",
+      "Searching the web · The web · \"James Lenhardt — CEO & Executive Recruiter @ Hire Priority Staffing & Executive Search\" recruiter",
+      "Show all activity (12)",
+      "Researching required detail · \"Debra Bennett — Dynamic Business Owner | Senior Executive Recruiter | National Executive Search @ Velocity Search Group\" recruiter",
+      "Searching the web · The web · \"Debra Bennett — Dynamic Business Owner | Senior Executive Recruiter | National Executive Search @ Velocity Search Group\" recruiter",
+      "Searching the web · Public source · \"Debra Bennett — Dynamic Business Owner | Senior Executive Recruiter | National Executive Search @ Velocity Search Group\" recruiter",
+      "Researching signals · Public source · 49",
+      "Signal research started · Public source · 49",
+      "Signal research finished · Public source · 0"
+    ],
+    "bubbleVerbatim": true,
+    "clarifyAt": 2,
+    "runningAt": 20,
+    "pill": "Scrapy browser kept open · ziprecruiter.com · 8 pages · 00:42",
+    "miniBrowserAt": 65,
+    "viewingOnly": false,
+    "durationS": 460,
+    "firstStreamS": null,
+    "timedOut": true,
+    "header": null,
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nB2B SaaS founders in Canada with public email or phone\nExpand (0 results)\nHVAC companies in Toronto with phone numbers\nHVAC companies in Toronto with phone numbers\nPeople looking for a web designer\nPeople looking for a web designer\nFintech companies in Toronto with 50 to 200 employees\nPeople looking for a web designer\nPeople looking for a web designer\nFintech founders in London\nExpand (0 results)\nAI founders globally hiring their first sales rep\nExpand (0 results)\nFounders talking about needing SEO\nFintech companies in Toronto with 50 to 200 employees\nPlumbers in Edmonton with public contact details\nExpand (50 results)\nDentists in Calgary with websites\nExpand (50 results)\nMarketing agencies in Vancouver\nRoofers in Mississauga with phone numbers\nExpand (1 results)\nCopywriters in Toronto\nExpand (1 results)\nFractional CMOs in Canada\nExpand (1 results)\nWeb designers in New York\nRecruiters hiring software engineers\nUnderstanding: people\nResearching signals · Public source · 49\nSignal research started · Public source · 49\nSignal research finished · Public source · 0\nShow all activity (12)\nScrapy\nKEPT OPEN\nbing.com\nOpening result\n· site:linkedin.com/in recruiter - Search\n28 pages\n28 actions\n04:42\nOpen original\nTake control\nClose browser\nNarrow this down2 questions\nNarrow this down\nQuestion 2 of 2\n\nAny particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?\n\nSaaS\nSoftware companies\nFintech\nFinancial tech\nHealthcare\nHealth companies\nUse\nBack\nSearch with defaults\nSearch\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation."
+  },
+  "server": {
+    "runId": "run_bd8bc5a5",
+    "specRuns": 3,
+    "spec": {
+      "query": "Recruiters hiring software engineers",
+      "entity": "person",
+      "status": "ready_to_search",
+      "outcome": "NO_QUALIFIED_RESULTS",
+      "criteria": [
+        "role=recruiter",
+        "requested_role=software engineer",
+        "purpose=prospecting"
+      ],
+      "retrieved": 57,
+      "returned": 0,
+      "qualified": 0,
+      "rejected": 0,
+      "pendingEnrichment": 0,
+      "liveDiscovery": "completed",
+      "signalRequired": true,
+      "reason": "FAILED_QUALIFICATION",
+      "timings": {
+        "understanding_ms": 0,
+        "stored_search_ms": 4291,
+        "research_ms": 78697,
+        "enrichment_ms": 3,
+        "qualification_ms": 271,
+        "total_ms": 83262
+      },
+      "sources": [
+        "pg-index:51/51",
+        "live-browser:6/6"
+      ],
+      "funnel": {
+        "raw": 57,
+        "postSpec": 57,
+        "complete": 49,
+        "qualRejected": 49,
+        "qualified": 0
+      },
+      "sourceHealth": {
+        "summary": null,
+        "sources": [
+          "Public websites:unavailable",
+          "The web:unavailable",
+          "Public websites:healthy"
+        ]
+      }
+    },
+    "ledger": {
+      "search_run_id": "run_bd8bc5a5",
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 49,
+        "gated": 0,
+        "filtered": 0,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {
+        "CLAIM_TYPE_MISMATCH": 49
+      },
+      "streamed": 0,
+      "streamedNotReturned": []
+    },
+    "runtime": [
+      {
+        "requested": "worker",
+        "used": "worker",
+        "reason": null
+      }
+    ],
+    "browserDone": [
+      {
+        "status": "completed",
+        "reason": "diminishing_returns",
+        "candidates": 6,
+        "researched": 6,
+        "verified": 0,
+        "visited": 18,
+        "elapsedMs": 73343
+      }
+    ],
+    "searches": 15,
+    "qualRejected": [
+      "Katherine Mastantuono — CEO, Executive Search Recruiter @ the kpm group: CLAIM_TYPE_MISMATCH",
+      "Kathy Helfand — VP/Executive Recruiter @ Patrice and Associates Franchising: CLAIM_TYPE_MISMATCH",
+      "Michael Aubrecht — President, Senior Recruiter @ Atlanta Executive Search: CLAIM_TYPE_MISMATCH",
+      "Chad Pringle — president and executive recruiter @ principal recruiting group: CLAIM_TYPE_MISMATCH",
+      "Kenny Greer — Partner/Energy Executive Recruiter @ Executive Search: CLAIM_TYPE_MISMATCH",
+      "John Krook — Managing Partner / Executive Recruiter @ gemini solutions: CLAIM_TYPE_MISMATCH",
+      "Veronica Snyder — Executive Recruiter / Owner @ Career Professionals: CLAIM_TYPE_MISMATCH",
+      "Michael Blair — Senior Partner, Executive Recruiter @ abacus search & staffing: CLAIM_TYPE_MISMATCH"
+    ],
+    "errors": [],
+    "aiRouter": []
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 4,
+      "event": "a: submitted"
+    },
+    {
+      "t": 6,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 24,
+      "event": "a: running"
+    },
+    {
+      "t": 70,
+      "event": "a: mini-browser (Scrapy browser kept open · ziprecruiter.com · 8 pages · 00:42)"
+    },
+    {
+      "t": 73,
+      "event": "a: clarify \"Which location should I focus on (city, region, or country)?\" -> Skip"
+    },
+    {
+      "t": 75,
+      "event": "a: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
+    },
+    {
+      "t": 174,
+      "event": "a: clarify \"Which location should I focus on (city, region, or country)?\" -> Skip"
+    },
+    {
+      "t": 176,
+      "event": "a: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
+    },
+    {
+      "t": 275,
+      "event": "a: clarify \"Which location should I focus on (city, region, or country)?\" -> Skip"
+    },
+    {
+      "t": 463,
+      "event": "a: TIMEOUT"
+    }
+  ],
+  "screenshots": [
+    "ui/R04-a-1-clarify.jpg",
+    "ui/R04-a-3-mini-browser.jpg",
+    "ui/R04-a-6-final.jpg"
+  ],
+  "durationS": 469,
+  "responseBytes": 18690
+}

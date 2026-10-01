@@ -1,0 +1,227 @@
+{
+  "id": "R01",
+  "query": "Copywriters in Toronto",
+  "category": "role",
+  "viewport": "desktop",
+  "startedAt": "2026-10-01T12:35:49.062Z",
+  "main": {
+    "query": "Copywriters in Toronto",
+    "clarify": [
+      {
+        "question": "What are you trying to do with these results?",
+        "chosen": "Find prospects",
+        "t": 2
+      },
+      {
+        "question": "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?",
+        "chosen": "Search with defaults",
+        "t": 130
+      }
+    ],
+    "streamed": [
+      "Evan M."
+    ],
+    "activity": [
+      "Checked available records · Available records · 0",
+      "Opening result · upwork.com",
+      "Reading page · upwork.com",
+      "Show all activity (12)",
+      "✓",
+      "Evan M.",
+      "1 verified while researching…",
+      "Checking company website · Joseph C. Toronto official website",
+      "Searching the web · The web · Joseph C. Toronto official website"
+    ],
+    "bubbleVerbatim": true,
+    "clarifyAt": 2,
+    "runningAt": 8,
+    "pill": "Scrapy browser kept open · debrastuart.com · 8 pages · 00:42",
+    "miniBrowserAt": 53,
+    "viewingOnly": false,
+    "takeover": {
+      "attempted": true,
+      "tookControl": true,
+      "pausedNotice": true,
+      "scrolled": true,
+      "errorAfterInput": null,
+      "gaveBack": true,
+      "pagesBefore": 8,
+      "pagesAfter": 8,
+      "stillRunningAfterGiveBack": false
+    },
+    "settled": true,
+    "durationS": 400,
+    "firstStreamS": 161,
+    "header": {
+      "query": "Copywriters in Toronto",
+      "count": 1
+    },
+    "leadCards": [
+      "upwork.com | Evan M. | Identity · Evan M. Expert Editor & Copywriter Toronto, Canada"
+    ],
+    "businessCards": [],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nB2B SaaS founders in Canada with public email or phone\nExpand (0 results)\nHVAC companies in Toronto with phone numbers\nHVAC companies in Toronto with phone numbers\nPeople looking for a web designer\nPeople looking for a web designer\nFintech companies in Toronto with 50 to 200 employees\nPeople looking for a web designer\nPeople looking for a web designer\nFintech founders in London\nExpand (0 results)\nAI founders globally hiring their first sales rep\nExpand (0 results)\nFounders talking about needing SEO\nFintech companies in Toronto with 50 to 200 employees\nPlumbers in Edmonton with public contact details\nExpand (50 results)\nDentists in Calgary with websites\nExpand (50 results)\nMarketing agencies in Vancouver\nRoofers in Mississauga with phone numbers\nExpand (1 results)\nCopywriters in Toronto\nResults for \"Copywriters in Toronto\" · 1 results\nWatch signal\nCards\nLists\nClear\nFold (1 results)\nupwork.com\nEvan M.\nIdentity · Evan M. Expert Editor & Copywriter Toronto, Canada\nScrapy\nKEPT OPEN\ndebrastuart.com\nOpening result\n· Copywriting Services - Toronto Freelance Copywriter Debra Stuart\n23 pages\n23 actions\n04:26\nOpen original\nTake control\nClose browser\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or"
+  },
+  "detail": "Person | Evan M. | Open original | Pipeline stage | Saved | Contacted | Replied | Won | Lost | Ignored | Identity · Evan M. | Expert Editor & Copywriter | Toronto, Canada | Why this matches | Identity · Evan M. Expert Editor & Copywriter Toronto, Canada | Verify contact | Resolve contact | Deep enrich | AI research brief | Run research | Activity | Save this lead to start an activity log. | Notes | AI outreach | Research & draft",
+  "closeBrowser": true,
+  "server": {
+    "runId": "run_ed64dd29",
+    "specRuns": 2,
+    "spec": {
+      "query": "Copywriters in Toronto",
+      "entity": "person",
+      "status": "ready_to_search",
+      "outcome": "QUALIFIED_RESULTS",
+      "criteria": [
+        "role=copywriter",
+        "location=Toronto",
+        "location_id=geo:city:toronto",
+        "location_kind=city",
+        "location_country=CA",
+        "location_parents=geo:admin:ontario,geo:country:ca,geo:metro:gta",
+        "purpose=prospecting"
+      ],
+      "retrieved": 2,
+      "returned": 1,
+      "qualified": 1,
+      "rejected": 0,
+      "pendingEnrichment": 1,
+      "liveDiscovery": "completed",
+      "signalRequired": false,
+      "reason": "RESULTS",
+      "timings": {
+        "understanding_ms": 0,
+        "stored_search_ms": 2491,
+        "research_ms": 82270,
+        "enrichment_ms": 1641,
+        "qualification_ms": 0,
+        "total_ms": 86402
+      },
+      "sources": [
+        "pg-index:0/0",
+        "s3-parquet:16904/0",
+        "live-browser:2/2"
+      ],
+      "funnel": {
+        "raw": 2,
+        "postSpec": 2,
+        "researched": 2,
+        "complete": 1,
+        "qualRejected": 0,
+        "qualified": 1
+      },
+      "sourceHealth": {
+        "summary": "Some sources could not be searched this time (Public source), so results may be incomplete.",
+        "sources": [
+          "Public websites:unavailable",
+          "The web:unavailable",
+          "Public websites:healthy",
+          "Public source:unavailable"
+        ]
+      }
+    },
+    "ledger": {
+      "search_run_id": "run_ed64dd29",
+      "counts": {
+        "returned": 1,
+        "qualified_more": 0,
+        "rejected": 0,
+        "gated": 0,
+        "filtered": 0,
+        "incomplete": 1,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {},
+      "streamed": 1,
+      "streamedNotReturned": []
+    },
+    "runtime": [
+      {
+        "requested": "worker",
+        "used": "worker",
+        "reason": null
+      }
+    ],
+    "browserDone": [
+      {
+        "status": "completed",
+        "reason": "diminishing_returns",
+        "candidates": 2,
+        "researched": 2,
+        "verified": 1,
+        "visited": 10,
+        "elapsedMs": 82136
+      }
+    ],
+    "searches": 7,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": [
+      "[ai-router] groq:openai/gpt-oss-120b daily quota exhausted; held"
+    ]
+  },
+  "worker": [],
+  "toasts": [
+    "There are more verified leads — want to see them?"
+  ],
+  "console": [
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps",
+    "info: [ui-projection] server=1 projected=1 rejected=0 codes={}",
+    "error: In HTML, %s cannot be a descendant of <%s>.\nThis will cause a hydration error.%s <button> button \n\n  ...\n    <Lazy>\n      <DiscoverRoute>\n        <DiscoverPage>\n          <div className=\"h-full fle...\">\n            <div className=\"flex-1 min...\">\n              <div ref={{...}} className=\"flex-1 min.",
+    "error: <%s> cannot contain a nested %s.\nSee this log for the ancestor stack trace. button <button>"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 4,
+      "event": "a: submitted"
+    },
+    {
+      "t": 6,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 12,
+      "event": "a: running"
+    },
+    {
+      "t": 58,
+      "event": "a: mini-browser (Scrapy browser kept open · debrastuart.com · 8 pages · 00:42)"
+    },
+    {
+      "t": 132,
+      "event": "a: takeover took=true gaveBack=true"
+    },
+    {
+      "t": 134,
+      "event": "a: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
+    },
+    {
+      "t": 164,
+      "event": "a: streamed rows visible"
+    },
+    {
+      "t": 403,
+      "event": "a: settled"
+    },
+    {
+      "t": 412,
+      "event": "close browser: true"
+    }
+  ],
+  "screenshots": [
+    "ui/R01-a-1-clarify.jpg",
+    "ui/R01-a-3-mini-browser.jpg",
+    "ui/R01-a-4-takeover.jpg",
+    "ui/R01-a-2-streamed.jpg",
+    "ui/R01-a-6-final.jpg",
+    "ui/R01-a-7-detail.jpg",
+    "ui/R01-a-8-closed.jpg"
+  ],
+  "durationS": 416,
+  "responseBytes": 22425
+}

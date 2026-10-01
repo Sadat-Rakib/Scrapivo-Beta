@@ -1,0 +1,17 @@
+﻿[
+    {
+        "id":  "C01",
+        "category":  "company",
+        "query":  "Fintech companies in Toronto with 50 to 200 employees"
+    },
+    {
+        "id":  "V01",
+        "category":  "investor",
+        "query":  "Pre-seed investors in Canada investing in SaaS"
+    },
+    {
+        "id":  "J01",
+        "category":  "job",
+        "query":  "Remote frontend developer jobs"
+    }
+]

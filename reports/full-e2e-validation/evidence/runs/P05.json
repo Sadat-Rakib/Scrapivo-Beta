@@ -1,0 +1,226 @@
+{
+  "id": "P05",
+  "query": "Founders talking about needing SEO",
+  "category": "intent",
+  "viewport": "desktop",
+  "startedAt": "2026-10-01T12:05:11.997Z",
+  "main": {
+    "query": "Founders talking about needing SEO",
+    "clarify": [
+      {
+        "question": "Which location should I focus on (city, region, or country)?",
+        "chosen": "Skip",
+        "t": 102
+      },
+      {
+        "question": "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?",
+        "chosen": "Search with defaults",
+        "t": 104
+      },
+      {
+        "question": "Which location should I focus on (city, region, or country)?",
+        "chosen": "Skip",
+        "t": 203
+      },
+      {
+        "question": "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?",
+        "chosen": "Search with defaults",
+        "t": 205
+      },
+      {
+        "question": "Which location should I focus on (city, region, or country)?",
+        "chosen": "Skip",
+        "t": 304
+      },
+      {
+        "question": "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?",
+        "chosen": "Search with defaults",
+        "t": 306
+      }
+    ],
+    "streamed": [],
+    "activity": [
+      "Checked available records · Available records · 51",
+      "Researching required detail · \"Connor Wray — Co-Founder: Chief Financial Officer @ JonnyPops\" founder",
+      "Searching the web · The web · \"Connor Wray — Co-Founder: Chief Financial Officer @ JonnyPops\" founder",
+      "Searching the web · Public source · \"Connor Wray — Co-Founder: Chief Financial Officer @ JonnyPops\" founder",
+      "Show all activity (12)",
+      "Researching signals · Public source · 51",
+      "Signal research started · Public source · 51",
+      "Signal research finished · Public source · 0"
+    ],
+    "bubbleVerbatim": true,
+    "runningAt": 6,
+    "pill": "Scrapy is browsing · Public source · 9 pages · 00:43",
+    "miniBrowserAt": 51,
+    "viewingOnly": false,
+    "clarifyAt": 102,
+    "durationS": 449,
+    "firstStreamS": null,
+    "timedOut": true,
+    "header": null,
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nB2B SaaS founders in Canada with public email or phone\nExpand (0 results)\nHVAC companies in Toronto with phone numbers\nHVAC companies in Toronto with phone numbers\nPeople looking for a web designer\nPeople looking for a web designer\nFintech companies in Toronto with 50 to 200 employees\nPeople looking for a web designer\nPeople looking for a web designer\nFintech founders in London\nExpand (0 results)\nAI founders globally hiring their first sales rep\nExpand (0 results)\nFounders talking about needing SEO\nUnderstanding: people\nResearching signals · Public source · 51\nSignal research started · Public source · 51\nSignal research finished · Public source · 0\nShow all activity (12)\nScrapy\nKEPT OPEN\nfacebook.com\nOpening result\n· SmileSuite - Our founder and CEO, Anthony Bonavoglia ,...\n19 pages\n19 actions\n02:17\nOpen original\nTake control\nClose browser\nNarrow this down2 questions\nNarrow this down\nQuestion 1 of 2\n\nWhich location should I focus on (city, region, or country)?\n\nUse\nSkip\nNext\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC co"
+  },
+  "server": {
+    "runId": "run_9892846b",
+    "specRuns": 4,
+    "spec": {
+      "query": "Founders talking about needing SEO",
+      "entity": "person",
+      "status": "ready_to_search",
+      "outcome": "NO_QUALIFIED_RESULTS",
+      "criteria": [
+        "role=founder",
+        "requested_service=seo",
+        "content_topic=needing SEO",
+        "needs_live=true"
+      ],
+      "retrieved": 57,
+      "returned": 0,
+      "qualified": 0,
+      "rejected": 0,
+      "pendingEnrichment": 0,
+      "liveDiscovery": "completed",
+      "signalRequired": true,
+      "reason": "FAILED_QUALIFICATION",
+      "timings": {
+        "understanding_ms": 0,
+        "stored_search_ms": 3604,
+        "research_ms": 73473,
+        "enrichment_ms": 3,
+        "qualification_ms": 188,
+        "total_ms": 77268
+      },
+      "sources": [
+        "pg-index:51/51",
+        "live-browser:6/6"
+      ],
+      "funnel": {
+        "raw": 57,
+        "postSpec": 57,
+        "complete": 51,
+        "qualRejected": 51,
+        "qualified": 0
+      },
+      "sourceHealth": {
+        "summary": null,
+        "sources": [
+          "Public websites:unavailable",
+          "The web:unavailable",
+          "Public websites:healthy"
+        ]
+      }
+    },
+    "ledger": {
+      "search_run_id": "run_9892846b",
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 51,
+        "gated": 0,
+        "filtered": 0,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {
+        "NO_CLAIM_EVIDENCE": 51
+      },
+      "streamed": 0,
+      "streamedNotReturned": []
+    },
+    "runtime": [
+      {
+        "requested": "worker",
+        "used": "worker",
+        "reason": null
+      }
+    ],
+    "browserDone": [
+      {
+        "status": "completed",
+        "reason": "diminishing_returns",
+        "candidates": 6,
+        "researched": 6,
+        "verified": 0,
+        "visited": 14,
+        "elapsedMs": 70641
+      }
+    ],
+    "searches": 13,
+    "qualRejected": [
+      "Steve Wagner — Co-Founder & Managing Partner @ Insurish: NO_CLAIM_EVIDENCE",
+      "Melanie Warrick — Co-Founder @ Fight Health Insurance: NO_CLAIM_EVIDENCE",
+      "Todd Nelson — Founder and Chief Executive Officer @ Telesis Bio: NO_CLAIM_EVIDENCE",
+      "Javier B. — COO & Co-Founder @ MyFloraDNA Inc.: NO_CLAIM_EVIDENCE",
+      "Sanjeev Chaudhry — Founder/CEO @ Gigaforce: NO_CLAIM_EVIDENCE",
+      "Clifton Dennis — Founder & Chief Legal Officer @ MyShyft (formerly RestUp): NO_CLAIM_EVIDENCE",
+      "Elizabeth Middleton — Co-Founder, Business Development @ HireGrowth Executive Search Group: NO_CLAIM_EVIDENCE",
+      "Jerry McDonnell — Managing Partner & Co-Founder @ Keen Capital, LLC: NO_CLAIM_EVIDENCE"
+    ],
+    "errors": [],
+    "aiRouter": [
+      "[ai-router] groq:openai/gpt-oss-20b daily quota exhausted; held"
+    ]
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 4,
+      "event": "a: submitted"
+    },
+    {
+      "t": 9,
+      "event": "a: running"
+    },
+    {
+      "t": 56,
+      "event": "a: mini-browser (Scrapy is browsing · Public source · 9 pages · 00:43)"
+    },
+    {
+      "t": 105,
+      "event": "a: clarify \"Which location should I focus on (city, region, or country)?\" -> Skip"
+    },
+    {
+      "t": 107,
+      "event": "a: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
+    },
+    {
+      "t": 206,
+      "event": "a: clarify \"Which location should I focus on (city, region, or country)?\" -> Skip"
+    },
+    {
+      "t": 208,
+      "event": "a: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
+    },
+    {
+      "t": 307,
+      "event": "a: clarify \"Which location should I focus on (city, region, or country)?\" -> Skip"
+    },
+    {
+      "t": 309,
+      "event": "a: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
+    },
+    {
+      "t": 453,
+      "event": "a: TIMEOUT"
+    }
+  ],
+  "screenshots": [
+    "ui/P05-a-3-mini-browser.jpg",
+    "ui/P05-a-1-clarify.jpg",
+    "ui/P05-a-6-final.jpg"
+  ],
+  "durationS": 459,
+  "responseBytes": 19384
+}

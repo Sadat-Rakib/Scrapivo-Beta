@@ -1,0 +1,146 @@
+{
+  "id": "M01",
+  "query": "yo find me saas founders canada need sales help email if possible",
+  "category": "messy",
+  "viewport": "desktop",
+  "startedAt": "2026-10-01T13:58:58.267Z",
+  "main": {
+    "query": "yo find me saas founders canada need sales help email if possible",
+    "clarify": [],
+    "streamed": [],
+    "activity": [
+      "Checked available records · Available records · 0"
+    ],
+    "bubbleVerbatim": true,
+    "runningAt": 6,
+    "pill": "Scrapy browser kept open · foundersbase.com · 8 pages · 00:41",
+    "miniBrowserAt": 51,
+    "viewingOnly": false,
+    "durationS": 421,
+    "firstStreamS": null,
+    "timedOut": true,
+    "header": {
+      "query": "yo find me saas founders canada need sales help email if possible",
+      "count": 0
+    },
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nB2B SaaS founders in Canada with public email or phone\nExpand (0 results)\nHVAC companies in Toronto with phone numbers\nHVAC companies in Toronto with phone numbers\nPeople looking for a web designer\nPeople looking for a web designer\nFintech companies in Toronto with 50 to 200 employees\nPeople looking for a web designer\nPeople looking for a web designer\nFintech founders in London\nExpand (0 results)\nAI founders globally hiring their first sales rep\nExpand (0 results)\nFounders talking about needing SEO\nFintech companies in Toronto with 50 to 200 employees\nPlumbers in Edmonton with public contact details\nExpand (50 results)\nDentists in Calgary with websites\nExpand (50 results)\nMarketing agencies in Vancouver\nRoofers in Mississauga with phone numbers\nExpand (1 results)\nCopywriters in Toronto\nExpand (1 results)\nFractional CMOs in Canada\nExpand (1 results)\nWeb designers in New York\nRecruiters hiring software engineers\nSales consultants in London\nFounders complaining about lead generation\nExpand (50 results)\nBusinesses saying they need a new website\nPeople looking for an SEO agency\nCybersecurity companies in Ottawa with websites\nAI startups in Montreal hiring engineers\nPre-seed investors in Canada investing in SaaS\nExpand (0 results)\nBusinesses saying they need a new website\nAngel investors in Toronto for healthtech startups\nExpand (0 results)\nRemote frontend developer jobs\nExpand (4 results)\nData engineer jobs in Berlin with salary\nyo find me saas founders canada need sales help email if possible\nResults for \"yo find me saas founders canada need sales help email if possible\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\nScrapy\nKEPT OPEN\nfoundersbase.com\nOpening result\n· Just a moment...\n8 pages\n8 actions\n06:54\nOpen original\nTake control\nClose browser\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in"
+  },
+  "server": {
+    "runId": "run_b2bfde49",
+    "specRuns": 1,
+    "spec": {
+      "query": "yo find me saas founders canada need sales help email if possible",
+      "entity": "person",
+      "status": "ready_to_search",
+      "outcome": "NO_QUALIFIED_RESULTS",
+      "criteria": [
+        "role=founder",
+        "industry=saas",
+        "location=Canada",
+        "location_id=geo:country:ca",
+        "location_kind=country",
+        "location_country=CA",
+        "requested_service=sales help",
+        "require_name=true",
+        "required_field=name",
+        "prefer_email=true"
+      ],
+      "retrieved": 0,
+      "returned": 0,
+      "qualified": 0,
+      "rejected": 0,
+      "pendingEnrichment": 0,
+      "liveDiscovery": "completed",
+      "signalRequired": true,
+      "reason": "SOURCE_UNAVAILABLE",
+      "timings": {
+        "understanding_ms": 140,
+        "stored_search_ms": 4029,
+        "research_ms": 25978,
+        "enrichment_ms": 0,
+        "qualification_ms": 1,
+        "total_ms": 30148
+      },
+      "sources": [
+        "pg-index:0/0",
+        "s3-parquet:16904/0",
+        "live-social:reddit-arctic-shift:1/1"
+      ],
+      "funnel": {
+        "raw": 0,
+        "postSpec": 0,
+        "researched": 1,
+        "complete": 0,
+        "qualRejected": 0,
+        "qualified": 0
+      },
+      "sourceHealth": {
+        "summary": null,
+        "sources": [
+          "Public websites:unavailable",
+          "The web:unavailable",
+          "Public websites:empty"
+        ]
+      }
+    },
+    "ledger": null,
+    "runtime": [
+      {
+        "requested": "worker",
+        "used": "worker",
+        "reason": null
+      }
+    ],
+    "browserDone": [
+      {
+        "status": "completed",
+        "reason": "diminishing_returns",
+        "candidates": 0,
+        "researched": 0,
+        "verified": 0,
+        "visited": 4,
+        "elapsedMs": 21618
+      }
+    ],
+    "searches": 3,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": []
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps",
+    "info: [ui-projection] server=0 projected=0 rejected=0 codes={}"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 5,
+      "event": "a: submitted"
+    },
+    {
+      "t": 10,
+      "event": "a: running"
+    },
+    {
+      "t": 57,
+      "event": "a: mini-browser (Scrapy browser kept open · foundersbase.com · 8 pages · 00:41)"
+    },
+    {
+      "t": 425,
+      "event": "a: TIMEOUT"
+    }
+  ],
+  "screenshots": [
+    "ui/M01-a-3-mini-browser.jpg",
+    "ui/M01-a-6-final.jpg"
+  ],
+  "durationS": 431,
+  "responseBytes": 20428
+}

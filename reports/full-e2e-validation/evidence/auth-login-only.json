@@ -1,0 +1,22 @@
+{
+  "startedAt": "2026-10-01T08:48:30.211Z",
+  "base": "http://localhost:8080",
+  "loginToShellMs": 6908,
+  "steps": [
+    {
+      "step": "valid demo login reaches /discover",
+      "ok": true,
+      "detail": "/discover",
+      "ms": 1350
+    },
+    {
+      "step": "authenticated shell (composer + nav)",
+      "ok": true,
+      "detail": "{\"Home\":true,\"Projects\":true,\"Watches\":true,\"Saved\":true,\"Guides\":true,\"Help\":true}"
+    },
+    {
+      "step": "profile identity shows the demo account",
+      "ok": true
+    }
+  ]
+}

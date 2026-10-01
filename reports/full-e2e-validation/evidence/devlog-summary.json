@@ -1,0 +1,67 @@
+[
+  {
+    "run": "run_7646d4fa",
+    "runtime": "worker",
+    "ledger": {
+      "returned": 2,
+      "qualified_more": 0,
+      "rejected": 2,
+      "gated": 0,
+      "filtered": 0,
+      "incomplete": 6,
+      "excluded": 0,
+      "unaccounted": 0
+    },
+    "rejectReasons": {
+      "MISSING_QUERY_REQUIRED": 2
+    },
+    "streamed": 2,
+    "streamedNotReturned": 0,
+    "query": "SaaS founders with public contact details",
+    "entity": "person",
+    "outcome": "QUALIFIED_RESULTS",
+    "signalRequired": false,
+    "criteria": [
+      "role=founder",
+      "industry=SaaS",
+      "require_contact=true",
+      "required_field=contact",
+      "purpose=prospecting"
+    ],
+    "retrieved": 10,
+    "returned": 2,
+    "reason": "RESULTS",
+    "health": "Some sources could not be searched this time (Public source), so results may be incomplete.",
+    "totalMs": 116394
+  },
+  {
+    "run": "run_fc5ce984",
+    "runtime": "worker",
+    "ledger": {
+      "returned": 0,
+      "qualified_more": 0,
+      "rejected": 56,
+      "gated": 0,
+      "filtered": 0,
+      "incomplete": 0,
+      "excluded": 0,
+      "unaccounted": 0
+    },
+    "rejectReasons": {
+      "CLAIM_TYPE_MISMATCH": 51,
+      "PROVISIONAL_ENTITY": 5
+    },
+    "streamed": 0,
+    "streamedNotReturned": 0,
+    "query": "People looking for a web designer",
+    "entity": "person",
+    "outcome": "NO_QUALIFIED_RESULTS",
+    "signalRequired": true,
+    "criteria": [],
+    "retrieved": 57,
+    "returned": 0,
+    "reason": "FAILED_QUALIFICATION",
+    "health": null,
+    "totalMs": 40799
+  }
+]

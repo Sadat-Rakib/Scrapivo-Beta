@@ -1,0 +1,173 @@
+{
+  "id": "X03",
+  "query": "B2B SaaS founders with public contact details",
+  "category": "cancel",
+  "viewport": "desktop",
+  "startedAt": "2026-10-01T14:42:14.576Z",
+  "main": {
+    "query": "B2B SaaS founders with public contact details",
+    "clarify": [
+      {
+        "question": "What are you trying to do with these results?",
+        "chosen": "Find prospects",
+        "t": 3
+      }
+    ],
+    "streamed": [
+      "Andrew Breen"
+    ],
+    "activity": [
+      "Checked available records · Available records · 0"
+    ],
+    "bubbleVerbatim": true,
+    "clarifyAt": 3,
+    "clarifyRepeats": 0,
+    "runningAt": 9,
+    "pill": "Scrapy is browsing · saasclub.io · 4 pages · 00:08",
+    "miniBrowserAt": 21,
+    "viewingOnly": false,
+    "cancel": {
+      "stage": "streaming",
+      "at": 23,
+      "streamedAtCancel": 1,
+      "stopButtonGoneWithin30s": true,
+      "streamedAfter25s": 0,
+      "bodyAfter": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nDentists in Calgary with websites\nExpand (50 results)\nMarketing agencies in Vancouver\nRoofers in Mississauga with phone numbers\nExpand (1 results)\nCopywriters in Toronto\nExpand (1 results)\nFractional CMOs in Canada\nExpand (1 results)\nWeb designers in New York\nRecruiters hiring software engineers\nSales consultants in London\nFounders complaining about lead generation\nExpand (50 results)\nBusinesses saying they need a new website\nPeople looking for an SEO agency\nCybersecurity companies in Ottawa with websites\nAI startups in Montreal hiring engineers\nPre-seed investors in Canada investing in SaaS\nExpand (0 results)\nBusinesses saying they need a new website\nAngel investors in Toronto for healthtech startups\nExpand (0 results)\nRemote frontend developer jobs\nExpand (4 results)\nData engineer jobs in Berlin with salary\nyo find me saas founders canada need sales help email if possible\nExpand (0 results)\nneed dentists portland phone number\nExpand (41 results)\nfind startup founders worldwide building fintech\ncopywriters toronto email\nhvac gta phone\nsaas founders public contact details\nExpand (4 results)\nWeb designers in Chicago\nSaaS founders in Austin with public emails\nExpand (0 results)\nhvac gta phone\nB2B SaaS founders with public contact details\nNo verified matches found for \"B2B SaaS founders with public contact details\" yet.\nTry broadening t"
+    },
+    "durationS": 93,
+    "firstStreamS": 20,
+    "header": null,
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": "No verified matches found for \"B2B SaaS founders with public contact details\" yet.\nTry broadening the search — remove a constraint, add a location, or search without a filter.",
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nDentists in Calgary with websites\nExpand (50 results)\nMarketing agencies in Vancouver\nRoofers in Mississauga with phone numbers\nExpand (1 results)\nCopywriters in Toronto\nExpand (1 results)\nFractional CMOs in Canada\nExpand (1 results)\nWeb designers in New York\nRecruiters hiring software engineers\nSales consultants in London\nFounders complaining about lead generation\nExpand (50 results)\nBusinesses saying they need a new website\nPeople looking for an SEO agency\nCybersecurity companies in Ottawa with websites\nAI startups in Montreal hiring engineers\nPre-seed investors in Canada investing in SaaS\nExpand (0 results)\nBusinesses saying they need a new website\nAngel investors in Toronto for healthtech startups\nExpand (0 results)\nRemote frontend developer jobs\nExpand (4 results)\nData engineer jobs in Berlin with salary\nyo find me saas founders canada need sales help email if possible\nExpand (0 results)\nneed dentists portland phone number\nExpand (41 results)\nfind startup founders worldwide building fintech\ncopywriters toronto email\nhvac gta phone\nsaas founders public contact details\nExpand (4 results)\nWeb designers in Chicago\nSaaS founders in Austin with public emails\nExpand (0 results)\nhvac gta phone\nB2B SaaS founders with public contact details\nNo verified matches found for \"B2B SaaS founders with public contact details\" yet.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nTry a broader search\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in th"
+  },
+  "followUp": {
+    "query": "Dentists in Boise",
+    "clarify": [
+      {
+        "question": "What are you trying to do with these results?",
+        "chosen": "Find prospects",
+        "t": 3
+      }
+    ],
+    "streamed": [
+      "European Denture Center · +1-208-376-6613"
+    ],
+    "activity": [
+      "Checked available records · Available records · 0"
+    ],
+    "bubbleVerbatim": true,
+    "clarifyAt": 2,
+    "clarifyRepeats": 0,
+    "runningAt": 21,
+    "cancel": {
+      "stage": "early",
+      "at": 40,
+      "streamedAtCancel": 1,
+      "stopButtonGoneWithin30s": true,
+      "streamedAfter25s": 0,
+      "bodyAfter": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nDentists in Calgary with websites\nExpand (50 results)\nMarketing agencies in Vancouver\nRoofers in Mississauga with phone numbers\nExpand (1 results)\nCopywriters in Toronto\nExpand (1 results)\nFractional CMOs in Canada\nExpand (1 results)\nWeb designers in New York\nRecruiters hiring software engineers\nSales consultants in London\nFounders complaining about lead generation\nExpand (50 results)\nBusinesses saying they need a new website\nPeople looking for an SEO agency\nCybersecurity companies in Ottawa with websites\nAI startups in Montreal hiring engineers\nPre-seed investors in Canada investing in SaaS\nExpand (0 results)\nBusinesses saying they need a new website\nAngel investors in Toronto for healthtech startups\nExpand (0 results)\nRemote frontend developer jobs\nExpand (4 results)\nData engineer jobs in Berlin with salary\nyo find me saas founders canada need sales help email if possible\nExpand (0 results)\nneed dentists portland phone number\nExpand (41 results)\nfind startup founders worldwide building fintech\ncopywriters toronto email\nhvac gta phone\nsaas founders public contact details\nExpand (4 results)\nWeb designers in Chicago\nSaaS founders in Austin with public emails\nExpand (0 results)\nhvac gta phone\nB2B SaaS founders with public contact details\nDentists in Boise\nNo verified matches found for \"Dentists in Boise\" yet.\nTry broadening the search "
+    },
+    "durationS": 110,
+    "firstStreamS": 39,
+    "header": null,
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": "No verified matches found for \"Dentists in Boise\" yet.\nTry broadening the search — remove a constraint, add a location, or search without a filter.",
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nDentists in Calgary with websites\nExpand (50 results)\nMarketing agencies in Vancouver\nRoofers in Mississauga with phone numbers\nExpand (1 results)\nCopywriters in Toronto\nExpand (1 results)\nFractional CMOs in Canada\nExpand (1 results)\nWeb designers in New York\nRecruiters hiring software engineers\nSales consultants in London\nFounders complaining about lead generation\nExpand (50 results)\nBusinesses saying they need a new website\nPeople looking for an SEO agency\nCybersecurity companies in Ottawa with websites\nAI startups in Montreal hiring engineers\nPre-seed investors in Canada investing in SaaS\nExpand (0 results)\nBusinesses saying they need a new website\nAngel investors in Toronto for healthtech startups\nExpand (0 results)\nRemote frontend developer jobs\nExpand (4 results)\nData engineer jobs in Berlin with salary\nyo find me saas founders canada need sales help email if possible\nExpand (0 results)\nneed dentists portland phone number\nExpand (41 results)\nfind startup founders worldwide building fintech\ncopywriters toronto email\nhvac gta phone\nsaas founders public contact details\nExpand (4 results)\nWeb designers in Chicago\nSaaS founders in Austin with public emails\nExpand (0 results)\nhvac gta phone\nB2B SaaS founders with public contact details\nDentists in Boise\nNo verified matches found for \"Dentists in Boise\" yet.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nTry a broader search\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater "
+  },
+  "server": {
+    "runId": null,
+    "specRuns": 0,
+    "spec": null,
+    "ledger": null,
+    "runtime": [],
+    "browserDone": [],
+    "searches": 0,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": []
+  },
+  "serverFollowUp": {
+    "runId": null,
+    "specRuns": 0,
+    "spec": null,
+    "ledger": null,
+    "runtime": [],
+    "browserDone": [],
+    "searches": 0,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": []
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 5,
+      "event": "a: submitted"
+    },
+    {
+      "t": 7,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 14,
+      "event": "a: running"
+    },
+    {
+      "t": 25,
+      "event": "a: streamed rows visible"
+    },
+    {
+      "t": 27,
+      "event": "a: mini-browser (Scrapy is browsing · saasclub.io · 4 pages · 00:08)"
+    },
+    {
+      "t": 27,
+      "event": "a: STOP clicked (streaming)"
+    },
+    {
+      "t": 100,
+      "event": "b: submitted"
+    },
+    {
+      "t": 103,
+      "event": "b: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 121,
+      "event": "b: running"
+    },
+    {
+      "t": 139,
+      "event": "b: streamed rows visible"
+    },
+    {
+      "t": 139,
+      "event": "b: STOP clicked (early)"
+    }
+  ],
+  "screenshots": [
+    "ui/X03-a-1-clarify.jpg",
+    "ui/X03-a-2-streamed.jpg",
+    "ui/X03-a-3-mini-browser.jpg",
+    "ui/X03-a-5-after-cancel.jpg",
+    "ui/X03-a-6-final.jpg",
+    "ui/X03-b-1-clarify.jpg",
+    "ui/X03-b-2-streamed.jpg",
+    "ui/X03-b-5-after-cancel.jpg",
+    "ui/X03-b-6-final.jpg"
+  ],
+  "durationS": 216,
+  "responseBytes": 7022
+}

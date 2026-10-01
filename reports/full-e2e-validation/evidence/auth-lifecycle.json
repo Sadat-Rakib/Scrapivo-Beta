@@ -1,0 +1,35 @@
+{
+  "startedAt": "2026-10-01T15:02:12.533Z",
+  "steps": [
+    {
+      "s": "logout_clicked",
+      "ok": false
+    },
+    {
+      "s": "after_logout_url",
+      "ok": "/auth"
+    },
+    {
+      "s": "protected_content_unavailable_after_logout",
+      "ok": true
+    },
+    {
+      "s": "wrong_password_error_useful",
+      "ok": false
+    },
+    {
+      "s": "relogin_reaches_discover",
+      "ok": true
+    },
+    {
+      "s": "storage_state_restored",
+      "ok": true
+    }
+  ],
+  "wrongPassword": {
+    "stillOnAuth": true,
+    "errorVisible": false,
+    "errorText": "",
+    "leakCheck": false
+  }
+}

@@ -1,0 +1,18 @@
+﻿[
+    {
+        "id":  "L01",
+        "category":  "local",
+        "query":  "HVAC companies in Toronto with phone numbers"
+    },
+    {
+        "id":  "L02",
+        "category":  "local",
+        "query":  "Dentists in Calgary with websites",
+        "viewport":  "mobile"
+    },
+    {
+        "id":  "M05",
+        "category":  "messy",
+        "query":  "hvac gta phone"
+    }
+]

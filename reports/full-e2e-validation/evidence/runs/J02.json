@@ -1,0 +1,201 @@
+{
+  "id": "J02",
+  "query": "Data engineer jobs in Berlin with salary",
+  "category": "job",
+  "viewport": "desktop",
+  "startedAt": "2026-10-01T13:46:59.512Z",
+  "main": {
+    "query": "Data engineer jobs in Berlin with salary",
+    "clarify": [
+      {
+        "question": "What seniority level (e.g. junior, senior, lead, principal)?",
+        "chosen": "Skip",
+        "t": 53
+      },
+      {
+        "question": "What employment type (e.g. full-time, part-time, contract, remote)?",
+        "chosen": "Search with defaults",
+        "t": 55
+      },
+      {
+        "question": "What seniority level (e.g. junior, senior, lead, principal)?",
+        "chosen": "Skip",
+        "t": 107
+      },
+      {
+        "question": "What employment type (e.g. full-time, part-time, contract, remote)?",
+        "chosen": "Search with defaults",
+        "t": 109
+      },
+      {
+        "question": "What seniority level (e.g. junior, senior, lead, principal)?",
+        "chosen": "Skip",
+        "t": 159
+      },
+      {
+        "question": "What employment type (e.g. full-time, part-time, contract, remote)?",
+        "chosen": "Search with defaults",
+        "t": 161
+      }
+    ],
+    "streamed": [],
+    "activity": [
+      "Checked available records · Available records · 0",
+      "Found possible leads · 0 candidates; 0 verified",
+      "Checked public sources · Public job listings · 25",
+      "Checked contact details · Public contact details · 0 candidates",
+      "Show all activity (12)"
+    ],
+    "bubbleVerbatim": true,
+    "runningAt": 4,
+    "pill": "Scrapy browser kept open · ca.indeed.com · 6 pages · 00:40",
+    "miniBrowserAt": 50,
+    "viewingOnly": false,
+    "clarifyAt": 53,
+    "clarifyRepeats": 0,
+    "durationS": 445,
+    "firstStreamS": null,
+    "timedOut": true,
+    "header": null,
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nB2B SaaS founders in Canada with public email or phone\nExpand (0 results)\nHVAC companies in Toronto with phone numbers\nHVAC companies in Toronto with phone numbers\nPeople looking for a web designer\nPeople looking for a web designer\nFintech companies in Toronto with 50 to 200 employees\nPeople looking for a web designer\nPeople looking for a web designer\nFintech founders in London\nExpand (0 results)\nAI founders globally hiring their first sales rep\nExpand (0 results)\nFounders talking about needing SEO\nFintech companies in Toronto with 50 to 200 employees\nPlumbers in Edmonton with public contact details\nExpand (50 results)\nDentists in Calgary with websites\nExpand (50 results)\nMarketing agencies in Vancouver\nRoofers in Mississauga with phone numbers\nExpand (1 results)\nCopywriters in Toronto\nExpand (1 results)\nFractional CMOs in Canada\nExpand (1 results)\nWeb designers in New York\nRecruiters hiring software engineers\nSales consultants in London\nFounders complaining about lead generation\nExpand (50 results)\nBusinesses saying they need a new website\nPeople looking for an SEO agency\nCybersecurity companies in Ottawa with websites\nAI startups in Montreal hiring engineers\nPre-seed investors in Canada investing in SaaS\nExpand (0 results)\nBusinesses saying they need a new website\nAngel investors in Toronto for healthtech startups\nExpand (0 results)\nRemote frontend developer jobs\nExpand (4 results)\nData engineer jobs in Berlin with salary\nUnderstanding your request\nFound possible leads · 0 candidates; 0 verified\nChecked public sources · Public job listings · 25\nChecked contact details · Public contact details · 0 candidates\nShow all activity (12)\nScrapy\nKEPT OPEN\nca.indeed.com\nOpening result\n· Flexible Data Engineer Remote Jobs – Apply Today to Work From Home in Canada (1 October 2026) | Indeed\n6 pages\n6 actions\n04:34\nOpen original\nTake control\nClose browser\nNarrow this down2 questions\nNarrow this down\nQuestion 1 of 2\n\nWhat seniority level (e.g. junior, senior, lead, principal)?\n\nJunior\nEntry-level roles\nSenior\nExperienced roles\nLead\nTeam leads\nUse\nSkip\nNext\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote"
+  },
+  "server": {
+    "runId": "run_7027bdd3",
+    "specRuns": 4,
+    "spec": {
+      "query": "Data engineer jobs in Berlin with salary",
+      "entity": "job",
+      "status": "ready_to_search",
+      "outcome": "NO_QUALIFIED_RESULTS",
+      "criteria": [
+        "role=data engineer",
+        "location=Berlin",
+        "location_id=geo:city:berlin",
+        "location_kind=city",
+        "location_country=DE",
+        "location_parents=geo:country:de"
+      ],
+      "retrieved": 125,
+      "returned": 0,
+      "qualified": 0,
+      "rejected": 125,
+      "pendingEnrichment": 0,
+      "liveDiscovery": "completed",
+      "signalRequired": false,
+      "reason": "FILTERED_BY_SPEC",
+      "timings": {
+        "understanding_ms": 7,
+        "stored_search_ms": 2732,
+        "research_ms": 29047,
+        "enrichment_ms": 0,
+        "qualification_ms": 0,
+        "total_ms": 31786
+      },
+      "sources": [
+        "provider-jobs:239/100",
+        "live-jobs:25/25"
+      ],
+      "funnel": {
+        "raw": 125,
+        "postSpec": 0,
+        "complete": 0,
+        "qualRejected": 0,
+        "qualified": 0
+      },
+      "sourceHealth": {
+        "summary": null,
+        "sources": [
+          "Public source:healthy",
+          "Public websites:empty"
+        ]
+      }
+    },
+    "ledger": null,
+    "runtime": [
+      {
+        "requested": "worker",
+        "used": "worker",
+        "reason": null
+      }
+    ],
+    "browserDone": [
+      {
+        "status": "completed",
+        "reason": "diminishing_returns",
+        "candidates": 0,
+        "researched": 0,
+        "verified": 0,
+        "visited": 4,
+        "elapsedMs": 25298
+      }
+    ],
+    "searches": 3,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": [
+      "[ai-router] groq:openai/gpt-oss-20b daily quota exhausted; held"
+    ]
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "error: In HTML, %s cannot be a descendant of <%s>.\nThis will cause a hydration error.%s <button> button \n\n  ...\n    <Lazy>\n      <DiscoverRoute>\n        <DiscoverPage>\n          <div className=\"h-full fle...\">\n            <div className=\"flex-1 min...\">\n              <div ref={{...}} className=\"flex-1 min.",
+    "error: <%s> cannot contain a nested %s.\nSee this log for the ancestor stack trace. button <button>",
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 4,
+      "event": "a: submitted"
+    },
+    {
+      "t": 8,
+      "event": "a: running"
+    },
+    {
+      "t": 55,
+      "event": "a: mini-browser (Scrapy browser kept open · ca.indeed.com · 6 pages · 00:40)"
+    },
+    {
+      "t": 57,
+      "event": "a: clarify \"What seniority level (e.g. junior, senior, lead, principal)?\" -> Skip"
+    },
+    {
+      "t": 59,
+      "event": "a: clarify \"What employment type (e.g. full-time, part-time, contract, r\" -> Search with defaults"
+    },
+    {
+      "t": 110,
+      "event": "a: clarify \"What seniority level (e.g. junior, senior, lead, principal)?\" -> Skip"
+    },
+    {
+      "t": 112,
+      "event": "a: clarify \"What employment type (e.g. full-time, part-time, contract, r\" -> Search with defaults"
+    },
+    {
+      "t": 163,
+      "event": "a: clarify \"What seniority level (e.g. junior, senior, lead, principal)?\" -> Skip"
+    },
+    {
+      "t": 165,
+      "event": "a: clarify \"What employment type (e.g. full-time, part-time, contract, r\" -> Search with defaults"
+    },
+    {
+      "t": 449,
+      "event": "a: TIMEOUT"
+    }
+  ],
+  "screenshots": [
+    "ui/J02-a-3-mini-browser.jpg",
+    "ui/J02-a-1-clarify.jpg",
+    "ui/J02-a-6-final.jpg"
+  ],
+  "durationS": 455,
+  "responseBytes": 17317
+}

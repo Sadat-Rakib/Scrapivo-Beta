@@ -1,0 +1,20 @@
+﻿[
+    {
+        "id":  "I01",
+        "category":  "intent",
+        "query":  "People looking for a web designer"
+    },
+    {
+        "id":  "M06",
+        "category":  "messy",
+        "query":  "saas founders public contact details"
+    },
+    {
+        "id":  "X03",
+        "category":  "cancel",
+        "query":  "B2B SaaS founders with public contact details",
+        "cancel":  "streaming",
+        "followUp":  "Dentists in Boise",
+        "maxMin":  7
+    }
+]

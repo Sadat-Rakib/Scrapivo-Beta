@@ -1,0 +1,14 @@
+﻿[
+    {
+        "id":  "P01",
+        "category":  "founder",
+        "query":  "B2B SaaS founders in Canada with public email or phone",
+        "takeover":  true
+    },
+    {
+        "id":  "R01",
+        "category":  "role",
+        "query":  "Copywriters in Toronto",
+        "takeover":  true
+    }
+]
