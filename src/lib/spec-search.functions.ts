@@ -2029,6 +2029,9 @@ export async function runSpecSearchCore(
     throwIfAborted(deps.signal);
     const { enrichCandidatesForSpec } = await import("@/lib/search/enrichment-run");
     const known = mergeDuplicateCandidates([...completeRows, ...incompleteRows]);
+    // C6 accounting: every row entering the funnel gets booked, so
+    // summary().accounting can prove retrieved === fated (unaccounted: 0).
+    for (const row of known) ledger.retrieved(row);
     const enriched = await enrichCandidatesForSpec(known, spec, {
       signal: deps.signal,
       maxContactCandidates: process.env.VITEST ? 0 : 12,
@@ -2278,7 +2281,10 @@ export async function runSpecSearchCore(
   incompleteRows = [...incompleteRows, ...liveIncompleteRows];
 
   // DB and live providers can discover the same canonical entity.
-  completeRows = mergeDuplicateCandidates(completeRows).map((r) => sanitizeSpecRow(r, spec));
+  completeRows = mergeDuplicateCandidates(completeRows).map((r) => {
+    ledger.retrieved(r);
+    return sanitizeSpecRow(r, spec);
+  });
 
   // M8: query-aware enrichment BEFORE qualification when required fields
   // are missing. Never: qualify → deliver → enrich later for blocking fields.
@@ -2299,6 +2305,7 @@ export async function runSpecSearchCore(
       const researchable = mergeDuplicateCandidates([...completeRows, ...incompleteRows]).filter(
         (row) => !enrichedDbKeys.has(row.entity_id ?? row.key ?? ""),
       );
+      for (const row of researchable) ledger.retrieved(row);
       researchableCount = researchable.length;
       const enriched = await enrichCandidatesForSpec(researchable, spec, {
         signal: deps.signal,
@@ -2562,6 +2569,8 @@ export async function runSpecSearchCore(
     console.info("[candidate-ledger]", JSON.stringify({
       search_run_id: runIds.search_run_id,
       counts: candidateLedger.counts,
+      // C6 invariant: every retrieved candidate must carry exactly one fate.
+      accounting: candidateLedger.accounting,
       rejectReasons: candidateLedger.rejectReasons,
       streamed: candidateLedger.streamed,
       streamedNotReturned: candidateLedger.streamedNotReturned.map((item) => `${item.title}:${item.fate}${item.reason ? `(${item.reason})` : ""}`),

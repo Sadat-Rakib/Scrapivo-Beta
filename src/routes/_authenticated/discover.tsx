@@ -2323,7 +2323,7 @@ function DiscoverPage() {
                   <button
                     type="button"
                     onClick={stopSearch}
-                    className="fixed bottom-4 right-4 z-50 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-lg hover:bg-muted"
+                    className="fixed bottom-24 right-4 z-50 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-lg hover:bg-muted sm:bottom-4"
                   >
                     Stop search
                   </button>
@@ -2353,24 +2353,33 @@ function DiscoverPage() {
                           : `Show all activity (${browserProgressEvents.length})`}
                       </button>
                     )}
-                    {browserProgressEvents.filter((event) => event.row).length > 0 && (
-                      <div className="space-y-0.5 pt-1" aria-live="polite" aria-label="Verified while researching">
-                        {browserProgressEvents.filter((event) => event.row).slice(-4).map((event) => (
-                          <div key={`v${event.id}`} className="flex items-center gap-2 text-xs text-emerald-400/90">
-                            <span>✓</span>
-                            <span className="truncate">
-                              {event.row?.title}
-                              {event.row?.email || event.row?.phone
-                                ? ` · ${event.row.email ?? event.row.phone}`
-                                : ""}
-                            </span>
+                    {(() => {
+                      // C10 honesty: the ✓ section shows only rows that passed
+                      // the strict verification; provisional finds appear as
+                      // plain activity lines above instead of claiming a check.
+                      const verifiedEvents = browserProgressEvents.filter(
+                        (event) => event.row && event.row.rowStatus !== "provisional",
+                      );
+                      if (verifiedEvents.length === 0) return null;
+                      return (
+                        <div className="space-y-0.5 pt-1" aria-live="polite" aria-label="Verified while researching">
+                          {verifiedEvents.slice(-4).map((event) => (
+                            <div key={`v${event.id}`} className="flex items-center gap-2 text-xs text-emerald-400/90">
+                              <span>✓</span>
+                              <span className="truncate">
+                                {event.row?.title}
+                                {event.row?.email || event.row?.phone
+                                  ? ` · ${event.row.email ?? event.row.phone}`
+                                  : ""}
+                              </span>
+                            </div>
+                          ))}
+                          <div className="text-[11px] text-muted-foreground">
+                            {verifiedEvents.length} verified while researching…
                           </div>
-                        ))}
-                        <div className="text-[11px] text-muted-foreground">
-                          {browserProgressEvents.filter((event) => event.row).length} verified while researching…
                         </div>
-                      </div>
-                    )}
+                      );
+                    })()}
                   </div>
                 )}
               </div>

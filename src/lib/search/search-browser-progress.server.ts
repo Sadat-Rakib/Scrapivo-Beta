@@ -13,6 +13,8 @@ export type StreamedLead = {
   phone: string | null;
   location: string | null;
   why_match: string | null;
+  /** C10 honesty: a streamed row is provisional until the strict gate passed. */
+  rowStatus?: "provisional" | "verified";
 };
 
 export type SearchBrowserProgressEvent = {

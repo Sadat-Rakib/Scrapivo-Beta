@@ -176,6 +176,7 @@ export function presentActivityEvent(event: {
     phone: event.row.phone,
     location: leadText(event.row.location, 200),
     why_match: evidenceText(event.row.why_match, 600),
+    rowStatus: event.row.rowStatus,
   };
   return {
     action,
