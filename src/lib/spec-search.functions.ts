@@ -2730,6 +2730,8 @@ export const getScrapyBrowserState = createServerFn({ method: "POST" })
     adapter: "playwright" | "cli" | "worker" | null;
     controller: "agent" | "human";
     retained: boolean;
+    /** Workstream F: live access challenge on the current page. */
+    challenge: "CAPTCHA" | "LOGIN_WALL" | "ACCESS_BLOCK" | "RATE_LIMIT" | null;
     /** Take control is offered only for live or kept-open worker sessions. */
     canControl: boolean;
   }> => {
@@ -2738,7 +2740,7 @@ export const getScrapyBrowserState = createServerFn({ method: "POST" })
     let state = readScrapyBrowserState(data.search_run_id, ownerId);
     if (!state) {
       return { active: false, status: null, currentUrl: null, currentTitle: null, currentAction: null, pagesVisited: 0, actionCount: 0, elapsedMs: null, screenshotDataUrl: null,
-        adapter: null, controller: "agent", retained: false, canControl: false };
+        adapter: null, controller: "agent", retained: false, challenge: null, canControl: false };
     }
     if (state.adapter === "worker") {
       // A person watching a kept-open or human-driven session sees live frames.
@@ -2773,6 +2775,7 @@ export const getScrapyBrowserState = createServerFn({ method: "POST" })
       adapter: state.adapter,
       controller: state.controller,
       retained: state.retained,
+      challenge: state.challenge ?? null,
       canControl: state.adapter === "worker" && (live || state.retained),
     };
   });

@@ -6,7 +6,7 @@ import { ScrapyBrowserView, scrapyPollDelay, type ScrapyState } from "./scrapy-b
 const base: ScrapyState = {
   active: true, status: "active", currentUrl: "https://acme.test/contact", currentTitle: "Contact Acme", currentAction: "Navigating to result",
   pagesVisited: 4, actionCount: 9, elapsedMs: 42_000, screenshotDataUrl: "data:image/jpeg;base64,AAAA",
-  adapter: "worker", controller: "agent", retained: false, canControl: true,
+  adapter: "worker", controller: "agent", retained: false, challenge: null, canControl: true,
 };
 const render = (state: Partial<ScrapyState>, expanded = true) =>
   renderToStaticMarkup(createElement(ScrapyBrowserView, { state: { ...base, ...state }, expanded, onExpand: () => {}, onCollapse: () => {}, onCommand: () => {} }));
@@ -50,6 +50,24 @@ describe("Scrapy mini-browser controls", () => {
   it("announces control errors", () => {
     const html = renderToStaticMarkup(createElement(ScrapyBrowserView, { state: base, expanded: true, error: "Take control of the browser first.", onExpand: () => {}, onCollapse: () => {}, onCommand: () => {} }));
     expect(html).toContain('role="alert"');
+  });
+
+  it("asks for human help on a challenge instead of bypassing it (Workstream F)", () => {
+    const captcha = render({ challenge: "CAPTCHA" });
+    expect(captcha).toContain("Scrapy needs your help");
+    expect(captcha).toContain("Take control");
+    const login = render({ challenge: "LOGIN_WALL" });
+    expect(login).toContain("Login required");
+    const collapsed = render({ challenge: "CAPTCHA" }, false);
+    expect(collapsed).toContain("Verification required — Scrapy needs your help");
+    // No challenge: no banner at all.
+    const clean = render({});
+    expect(clean).not.toContain("Scrapy needs your help");
+  });
+
+  it("says research resumed after the person gave control back", () => {
+    const html = renderToStaticMarkup(createElement(ScrapyBrowserView, { state: base, expanded: true, resumedNote: true, onExpand: () => {}, onCollapse: () => {}, onCommand: () => {} }));
+    expect(html).toContain("Control returned to Scrapy");
   });
 
   it("polls fast while a person drives and stops once the browser is gone", () => {
