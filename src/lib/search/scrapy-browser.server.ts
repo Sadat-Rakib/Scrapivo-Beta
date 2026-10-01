@@ -16,6 +16,11 @@ export type ScrapySessionStatus =
   | "cancelled"
   | "failed";
 
+/** Workstream F: page-level access challenges that require a human. */
+export type ScrapyChallengeKind = "CAPTCHA" | "LOGIN_WALL" | "ACCESS_BLOCK" | "RATE_LIMIT";
+
+const FRICTION_CHALLENGES: readonly ScrapyChallengeKind[] = ["CAPTCHA", "LOGIN_WALL", "ACCESS_BLOCK", "RATE_LIMIT"];
+
 export type ScrapyBrowserState = {
   sessionId: string;
   runId: string;
@@ -26,6 +31,12 @@ export type ScrapyBrowserState = {
   controller: "agent" | "human";
   /** Worker sessions only: kept open after the run for viewing/takeover. */
   retained: boolean;
+  /** Live access challenge seen on the current page (null when none). */
+  challenge: ScrapyChallengeKind | null;
+  challengeAt: number | null;
+  /** When agent-controlled research resumed after a takeover or the challenge
+   *  cleared — the UI shows "Control returned to Scrapy" briefly. */
+  resumedAt: number | null;
   /** Latest frame captured in memory (worker runtime). */
   lastScreenshotData: string | null;
   currentUrl: string;
@@ -101,6 +112,9 @@ export function scrapySessionStarted(args: {
     lastScreenshotAt: null,
     controller: "agent",
     retained: false,
+    challenge: null,
+    challengeAt: null,
+    resumedAt: null,
     lastScreenshotData: null,
   });
   registry.byRun.set(args.runId, args.sessionId);
@@ -119,11 +133,42 @@ export function scrapySessionScreenshotData(sessionId: string, base64Jpeg: strin
 export function scrapySessionControl(sessionId: string, update: { controller?: "agent" | "human"; retained?: boolean }): void {
   const state = registry.states.get(keyFor(sessionId));
   if (!state) return;
+  const wasHuman = state.controller === "human";
   if (update.controller) {
     state.controller = update.controller;
     state.status = update.controller === "human" ? "user_control" : state.retained ? "completed" : "active";
+    if (update.controller === "agent" && wasHuman) {
+      // Give-back: the person finished (login / CAPTCHA / 2FA) and handed the
+      // session back — research resumes in the same session.
+      state.resumedAt = Date.now();
+    }
   }
   if (update.retained !== undefined) state.retained = update.retained;
+  state.lastActivityAt = Date.now();
+}
+
+/**
+ * Workstream F: the session's current page shows an access challenge (from the
+ * page snapshot's friction classification). A challenge REQUIRES HUMAN HELP —
+ * never automated bypass. Cleared automatically when a later observation comes
+ * back clean; a give-back that actually solved the page clears it on the next
+ * agent observation.
+ */
+export function scrapySessionChallenge(sessionId: string, friction: readonly string[] | null | undefined): void {
+  const state = registry.states.get(keyFor(sessionId));
+  if (!state) return;
+  const kind = FRICTION_CHALLENGES.find((k) => !!friction?.includes(k)) ?? null;
+  if (kind) {
+    if (state.challenge !== kind) {
+      state.challenge = kind;
+      state.challengeAt = Date.now();
+      state.resumedAt = null;
+    }
+  } else if (state.challenge) {
+    state.challenge = null;
+    state.challengeAt = null;
+    if (state.controller === "agent" && state.status === "active") state.resumedAt = Date.now();
+  }
   state.lastActivityAt = Date.now();
 }
 

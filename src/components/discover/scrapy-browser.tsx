@@ -50,6 +50,7 @@ export function ScrapyBrowserView({
   expanded,
   busy = false,
   error = null,
+  resumedNote = false,
   onExpand,
   onCollapse,
   onCommand,
@@ -58,6 +59,7 @@ export function ScrapyBrowserView({
   expanded: boolean;
   busy?: boolean;
   error?: string | null;
+  resumedNote?: boolean;
   onExpand: () => void;
   onCollapse: () => void;
   onCommand: (command: ScrapyControlCommand) => void;
@@ -67,6 +69,7 @@ export function ScrapyBrowserView({
   const browsing = state.active && state.controller === "agent";
   const human = state.controller === "human";
   const closed = !state.active && !state.retained;
+  const challenge = state.challenge ?? null;
   const title = state.currentTitle ? presentActivityEvent({ action: state.currentTitle }).action : null;
   const label = human
     ? "You're controlling the browser"
@@ -81,14 +84,20 @@ export function ScrapyBrowserView({
       <button
         type="button"
         onClick={onExpand}
-        className="mt-2 flex w-full items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-left text-xs text-muted-foreground transition-colors hover:border-primary/40"
+        className={`mt-2 flex w-full items-center gap-2 rounded-xl border px-3 py-2 text-left text-xs text-muted-foreground transition-colors hover:bg-card ${challenge ? "border-amber-400/60 bg-amber-400/10 hover:border-amber-400" : "border-border bg-card hover:border-primary/40"}`}
       >
         <span className="relative flex size-2 shrink-0">
           {browsing && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />}
-          <span className={`relative inline-flex size-2 rounded-full ${human ? "bg-amber-400" : "bg-primary"}`} />
+          <span className={`relative inline-flex size-2 rounded-full ${human ? "bg-amber-400" : challenge ? "bg-amber-400" : "bg-primary"}`} />
         </span>
         <span className="min-w-0 flex-1 truncate">
-          {label}
+          {challenge
+            ? challenge === "LOGIN_WALL"
+              ? "Login required — Scrapy needs your help"
+              : challenge === "RATE_LIMIT"
+                ? "Rate limited — Scrapy is waiting"
+                : "Verification required — Scrapy needs your help"
+            : label}
           {domain ? ` · ${domain}` : ""} · {state.pagesVisited} pages · {elapsed(state.elapsedMs)}
         </span>
         <Eye className="size-3.5 shrink-0" aria-hidden="true" />
@@ -113,6 +122,14 @@ export function ScrapyBrowserView({
 
   return (
     <div className="mt-2 overflow-hidden rounded-xl border border-border bg-card">
+      {challenge && !human ? (
+        <div role="alert" className="flex flex-wrap items-center gap-x-2 gap-y-0.5 border-b border-amber-400/40 bg-amber-400/10 px-3 py-2 text-xs text-amber-200">
+          <span className="font-medium">
+            {challenge === "LOGIN_WALL" ? "Login required" : challenge === "RATE_LIMIT" ? "Rate limited" : "Verification required"}
+          </span>
+          <span>Scrapy needs your help. Take control to continue — sign in or solve the check yourself, then give control back.</span>
+        </div>
+      ) : null}
       <div className="flex items-center gap-2 border-b border-border px-3 py-2">
         <span className="relative flex size-2 shrink-0">
           {browsing && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />}
@@ -163,6 +180,9 @@ export function ScrapyBrowserView({
           </span>
           {title && title !== "Working" ? <span className="truncate">· {title}</span> : null}
         </div>
+        {resumedNote && !human && state.active ? (
+          <div className="text-emerald-400/90" aria-live="polite">Control returned to Scrapy — research continuing</div>
+        ) : null}
         <div className="flex items-center gap-3">
           <span>{state.pagesVisited} pages</span>
           <span>{state.actionCount} actions</span>
@@ -211,7 +231,12 @@ export function ScrapyBrowserView({
                 <PlayCircle className="size-3" aria-hidden="true" /> {state.active ? "Give control back" : "Stop controlling"}
               </button>
             ) : (
-              <button type="button" disabled={busy} onClick={() => onCommand({ type: "take" })} className={button}>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => onCommand({ type: "take" })}
+                className={challenge ? "inline-flex items-center gap-1.5 rounded-md border border-amber-400/60 bg-amber-400/15 px-2 py-1 text-[11px] font-medium text-amber-200 hover:bg-amber-400/25" : button}
+              >
                 <Hand className="size-3" aria-hidden="true" /> Take control
               </button>
             )}
@@ -237,7 +262,21 @@ export function ScrapyBrowser({ runId }: { runId: string | null }) {
   const [expanded, setExpanded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Workstream F: brief "Control returned to Scrapy" note after give-back.
+  const [resumedNote, setResumedNote] = useState(false);
   const pollNow = useRef<(() => void) | null>(null);
+  const prevController = useRef<"agent" | "human" | null>(null);
+
+  useEffect(() => {
+    if (!state) return;
+    const prev = prevController.current;
+    prevController.current = state.controller;
+    if (prev === "human" && state.controller === "agent" && state.active) {
+      setResumedNote(true);
+      const t = setTimeout(() => setResumedNote(false), 10_000);
+      return () => clearTimeout(t);
+    }
+  }, [state]);
 
   useEffect(() => {
     setError(null);
@@ -295,6 +334,7 @@ export function ScrapyBrowser({ runId }: { runId: string | null }) {
       expanded={expanded}
       busy={busy}
       error={error}
+      resumedNote={resumedNote}
       onExpand={() => setExpanded(true)}
       onCollapse={() => setExpanded(false)}
       onCommand={(command) => void onCommand(command)}

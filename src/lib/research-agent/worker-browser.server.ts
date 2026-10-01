@@ -26,6 +26,7 @@ import type {
 import { BrowserWorkerError, callBrowserWorker } from "./browser-worker-client.server";
 import {
   scrapySessionAction,
+  scrapySessionChallenge,
   scrapySessionControl,
   scrapySessionFinished,
   scrapySessionScreenshotData,
@@ -107,6 +108,9 @@ export class WorkerBrowserAdapter implements AgentBrowser {
     session.lastSnapshot = snapshot;
     if (action !== "Observing") session.counters.pages += 1;
     scrapySessionAction(session.id, { action, url: view.url, title: view.title, newPage: action !== "Observing" });
+    // Workstream F: a challenge on the current page is surfaced to the UI for
+    // human takeover — never bypassed.
+    scrapySessionChallenge(session.id, view.friction);
     return { snapshot, action, expectedState: null, verified: true };
   }
 

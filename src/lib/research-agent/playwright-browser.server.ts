@@ -21,7 +21,7 @@ import {
   type PageSnapshot,
   type WaitCondition,
 } from "./browser";
-import { scrapySessionAction, scrapySessionFinished, scrapySessionScreenshot, scrapySessionStarted } from "@/lib/search/scrapy-browser.server";
+import { scrapySessionAction, scrapySessionChallenge, scrapySessionFinished, scrapySessionScreenshot, scrapySessionStarted } from "@/lib/search/scrapy-browser.server";
 import { frictionOf } from "./page-friction";
 import { throwIfAborted } from "@/lib/search/search-run";
 
@@ -117,6 +117,9 @@ export class PlaywrightBrowserAdapter implements AgentBrowser {
     session.lastSnapshot = snapshot;
     session.counters.pages += 1;
     scrapySessionAction(session.id, { action, url, title, newPage: action !== "Observing" });
+    // Workstream F: a challenge on the current page is surfaced to the UI for
+    // human takeover — never bypassed.
+    scrapySessionChallenge(session.id, snapshot.friction);
     // Scrapy viewer: capture after every meaningful page change. JPEG q45
     // keeps payloads ~30-80KB; failures never block research.
     if (action !== "Observing" && process.env.SCRAPIVO_BROWSER_SCREENSHOTS !== "false") {
