@@ -14,8 +14,15 @@ const purposeQuestion = (): ClarifyQuestion => ({
   allowOther: true,
 });
 
-/** One decision for the active SPEC path. Optional refinements never block it. */
+/** One decision for the active SPEC path. Optional refinements never block it.
+ *
+ * `force` (Skip / "Search with defaults") always means PROCEED: no question
+ * blocks execution, ever. Criteria left unresolved stay on the spec and fail
+ * qualification honestly — an honest zero, not another round of the same
+ * question. */
 export function decideSpecClarification(spec: SearchSpec, force = false): ClarifyQuestion | null {
+  if (force) return null;
+
   const unresolved = spec.unresolved?.[0];
   if (unresolved) {
     const kinds: Record<string, { id: ClarifyQuestionId; question: string }> = {
@@ -37,7 +44,7 @@ export function decideSpecClarification(spec: SearchSpec, force = false): Clarif
       return entityQuestionsForSpec({ ...spec, missing: ["entity"] })[0] ?? null;
     }
     if (field === "user_context.objective") {
-      if (!force) return purposeQuestion();
+      return purposeQuestion();
     } else if (field === "target.scope") {
       const hasLocation = spec.criteria.some((c) => c.field === "location") || !!spec.locations?.length;
       const missing = hasLocation

@@ -2581,6 +2581,7 @@ export async function runSpecSearchCore(
   if (
     spec.status === "ready_to_search" &&
     completeRows.length === 0 &&
+    !opts.force &&
     (liveDiscovery === "db_thin_gapfill_pending" || liveDiscovery === "completed")
   ) {
     const { thinClarifyForSpec } = await import("@/lib/search/clarifier");

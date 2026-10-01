@@ -284,6 +284,13 @@ export const ClarificationSchema = z.object({
    *  English. */
   reason: z.enum(CLARIFICATION_REASONS).nullable().default(null),
   question: z.string().max(300).nullable().default(null),
+  /** Answers already given this conversation (field id -> answer text). Travels
+   *  inside the frame so the state machine keeps its memory across the HTTP
+   *  boundary instead of re-deriving it (and re-asking) every round. */
+  answered: z.record(z.string().max(300)).optional(),
+  /** Every field ever asked — an asked field is never re-asked, even when the
+   *  answer could not be mapped onto the frame. */
+  asked: z.array(z.string().max(60)).max(20).optional(),
 });
 
 export const RepairMetadataSchema = z.object({

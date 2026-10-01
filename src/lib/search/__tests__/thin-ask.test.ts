@@ -70,7 +70,11 @@ describe("thin-ask end to end (stubs, no network)", () => {
     expect(res.clarify.map((q) => q.id)).toEqual(["entity_location"]);
   });
 
-  it("thin forced business search offers location", async () => {
+  // E2E-C3 contract: force = Skip / "Search with defaults" — the user already
+  // declined refinement, so a forced thin run settles as an honest zero and
+  // never re-attaches the same question. Non-forced thin zeros still offer it
+  // once (the client asks at most once per turn).
+  it("thin forced business search settles as honest zero without re-asking", async () => {
     const res = await runSpecSearchCore(
       "yo find me businesses rn",
       { businesses: emptyBusinesses, index: null },
@@ -79,7 +83,8 @@ describe("thin-ask end to end (stubs, no network)", () => {
       { force: true },
     );
     expect(res.rows).toEqual([]);
-    expect(res.clarify.map((q) => q.id)).toContain("entity_location");
+    expect(res.clarify).toEqual([]);
+    expect(res.questions).toEqual([]);
   });
 
   it("rich search stays quiet (no thin questions when rows found)", async () => {

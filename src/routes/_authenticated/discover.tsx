@@ -39,7 +39,7 @@ import {
   viewToLegacyLead,
   viewToLocalBusinessRow,
 } from "@/lib/search/qualified-lead-view";
-import { outcomeUi, shouldSurfaceOutcome, zeroResultsNarrative } from "@/lib/search/outcome-ui";
+import { enrichZeroNarrative, outcomeUi, shouldSurfaceOutcome, zeroResultsNarrative } from "@/lib/search/outcome-ui";
 
 import {
   UnifiedComposer,
@@ -573,6 +573,9 @@ function DiscoverPage() {
   // across clarify rounds so answering Q1 then Search on Q2 never loses Q1.
   const pendingTurnAnswersRef = useRef<Record<string, string>>({});
   const pendingFrameRef = useRef<import("@/lib/understanding/frame").UnderstandingFrame | null>(null);
+  // Thin-ask (refinement offer on a completed zero run) is offered at most once
+  // per turn — re-offering it on every identical zero is the C3 dead loop.
+  const thinAskedTurnsRef = useRef<Set<string>>(new Set());
   // Spec-first cutover (SPEC_SEARCH_ENABLED): when true the turn is served by
   // the canonical spec path; legacy flow below runs untouched otherwise.
   const specModeRef = useRef(false);
@@ -714,11 +717,28 @@ function DiscoverPage() {
       if (!session.accept(res).ok || pendingTurnIdRef.current !== turnId) return;
 
       setSpecEntity(res.spec.entity ?? null);
-      if (res.clarify.length > 0) {
+      // Two clarify shapes leave the server, and they must not behave the same:
+      // a BLOCKING clarify has no outcome — answering is required to search at
+      // all. Thin-ask rides on a COMPLETED zero-result run; offering it twice
+      // is the dead loop (E2E-C3), so it is offered exactly once per turn and
+      // never after Skip / Search-with-defaults — the zero then settles as an
+      // honest empty state.
+      const thinAsk =
+        res.clarify.length > 0 &&
+        !!res.outcome &&
+        !force &&
+        !thinAskedTurnsRef.current.has(turnId);
+      if (res.clarify.length > 0 && (thinAsk || !res.outcome)) {
+        if (thinAsk) thinAskedTurnsRef.current.add(turnId);
         pendingFrameRef.current = res.spec.understanding ?? null;
         setClarifyQs(res.clarify);
         setPendingQuery(query);
         setActiveQuery(query);
+        setZeroNarrative(
+          thinAsk && res.outcome === "NO_QUALIFIED_RESULTS"
+            ? enrichZeroNarrative(zeroResultsNarrative(res.retrievalTrace), res.candidateLedger)
+            : null,
+        );
         session.settle(res);
         return;
       }
@@ -819,7 +839,7 @@ function DiscoverPage() {
       });
       setZeroNarrative(
         !append && qualifiedCount === 0 && res.outcome === "NO_QUALIFIED_RESULTS"
-          ? zeroResultsNarrative(res.retrievalTrace)
+          ? enrichZeroNarrative(zeroResultsNarrative(res.retrievalTrace), res.candidateLedger)
           : null,
       );
       if (!append) {
@@ -2293,8 +2313,18 @@ function DiscoverPage() {
                   compact={planDone}
                   onDone={() => setPlanDone(true)}
                 />
+                {/* E2E-C14: the stop control is viewport-anchored on purpose.
+                    The old inline button sat under live narration/activity that
+                    re-renders every poll, so it never sat still long enough for
+                    a click to land (45s actionability timeout during browsing).
+                    The floating control holds one position during understanding,
+                    browsing and streaming and is the single stop affordance. */}
                 {specPending && (
-                  <button type="button" onClick={stopSearch} className="text-xs font-medium text-muted-foreground hover:text-foreground">
+                  <button
+                    type="button"
+                    onClick={stopSearch}
+                    className="fixed bottom-4 right-4 z-50 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-lg hover:bg-muted"
+                  >
                     Stop search
                   </button>
                 )}

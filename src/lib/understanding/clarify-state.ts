@@ -73,7 +73,18 @@ export type Question = {
 };
 
 export function initState(frame: UnderstandingFrame): ClarificationState {
-  return { version: "u1", frame, answered: {}, asked: [], turns: 0 };
+  // The frame's clarification block is the durable state: answers and asked
+  // fields recorded there survive the frame crossing an HTTP boundary, so the
+  // monotonicity guarantee holds across rounds, not just within one patchFrame
+  // session.
+  const prev = frame.clarification;
+  return {
+    version: "u1",
+    frame,
+    answered: { ...(prev.answered ?? {}) },
+    asked: [...(prev.asked ?? [])],
+    turns: 0,
+  };
 }
 
 // ── What is actually missing ──────────────────────────────────────────────
@@ -578,13 +589,22 @@ export function patchFrame(
 function clarificationBlock(state: ClarificationState): UnderstandingFrame["clarification"] {
   const list = blockers(state);
   if (list.length === 0) {
-    return { needed: false, fields: [], reason: null, question: null };
+    return {
+      needed: false,
+      fields: [],
+      reason: null,
+      question: null,
+      answered: { ...state.answered },
+      asked: [...state.asked],
+    };
   }
   return {
     needed: true,
     fields: list.map((b) => b.field),
     reason: list[0]!.reason,
     question: nextQuestion(state)?.question ?? null,
+    answered: { ...state.answered },
+    asked: [...state.asked],
   };
 }
 
