@@ -13,13 +13,21 @@ const valueOf = (value: OpenValue | null | undefined) => value ? clean(value.nor
 const MODAL_NEED = /\b(?:may|might|could)\s+(?:potentially\s+)?(?:need|use|benefit from)\b|\b(?:relevant|suitable|a good fit)\s+for\b/i;
 // A discussion clause, not a compound noun: "grant writing agencies" and
 // "actively writing checks" are not topics. Requires `about`/`on`, a relative
-// clause ("who write ..."), or a talking/discussing participle.
+// clause ("who write ..."), a talking/discussing participle — or an expressed
+// complaint/frustration/switch the topic is about. The capture ends where a
+// trailing locative begins ("payroll in Toronto" is not a topic).
 const SOCIAL_TOPIC = new RegExp(
   String.raw`\b(?:` +
     String.raw`(?:talk|post|writ|discuss|blog|tweet)\w*\s+(?:about|on the topic of)\s+` +
     String.raw`|(?:who|that)\s+(?:(?:often|regularly|recently|publicly|actively|frequently|openly)\s+)?(?:talk|post|write|wrote|discuss|blog|tweet)\w*\s+(?:about\s+|on\s+)?` +
     String.raw`|(?:talking|discussing)\s+` +
-  String.raw`)(.+?)(?=[.!?]?$)`,
+    String.raw`|(?:complain|complains|complaining|complained|rant|rants|ranting|ranted)\s+about\s+` +
+    String.raw`|(?:frustrated|stuck)\s+(?:with|by|about|over)\s+` +
+    String.raw`|struggling\s+(?:with|to)\s+` +
+    String.raw`|(?:tired\s+of|sick\s+of|fed\s+up\s+with)\s+` +
+    String.raw`|switching\s+(?:away\s+)?from\s+` +
+    String.raw`|(?:asking\s+for|looking\s+for)\s+recommendations?\s+(?:for|on|about|to)\s+(?:a\s+|an\s+|some\s+)?` +
+  String.raw`)(.+?)(?=\s+(?:in|near|around|across|throughout)\s+\S+[.!?]*\s*$|[.!?]?$)`,
   "i",
 );
 /** A place span that names every place: a worldwide scope, never a location to match. */
@@ -234,6 +242,32 @@ export function normalizeSearchFrame(input: UnderstandingFrame): UnderstandingFr
       frame.meta.notes.push('recovered requested field: contact');
     }
   }
+  // A provider glues the scope word onto the place span ("worldwide building
+  // fintech"): the prefix is a scope, never a location, and the words after it
+  // are activity to re-read — not a town nobody named. The scope lands as
+  // geo_scope; only a word that is structurally a sector becomes the industry.
+  const gluedTail = (place: FrameLocation | null | undefined) => {
+    const m = place ? /^(?:the\s+)?(?:world\s*-?\s*wide|globally|global|globe|world)\s+(?:the\s+)?(.+)$/i.exec(clean(place.value)) : null;
+    return m ? clean(m[1]) : null;
+  };
+  const gluedMain = gluedTail(frame.location);
+  const gluedList = frame.locations.filter((place) => gluedTail(place) !== null);
+  if (gluedMain !== null || gluedList.length) {
+    const tail = gluedMain ?? gluedTail(gluedList[0]!) ?? "";
+    frame.locations = frame.locations.filter((place) => gluedTail(place) === null);
+    if (gluedMain !== null) frame.location = frame.locations[0] ?? null;
+    if (!frame.constraints.some((c) => c.field === 'geo_scope')) {
+      frame.constraints.push({ field: 'geo_scope', operator: 'eq', value: 'worldwide', raw: null, confidence: 1, negated: false, unit: null });
+    }
+    const rest = tail.replace(/^(?:building|working|doing|developing|creating|focusing\s+on|operating|launching)\s+/i, '').trim();
+    if (/^(?:[a-z]+tech|saas|ai|crypto|web3|blockchain|e-?commerce)$/i.test(rest) && !frame.target.industry) {
+      frame.target.industry = openValue(rest.toLowerCase(), rest, null, 0.6);
+      frame.meta.notes.push(`"${tail}" is the activity; the scope is worldwide`);
+    } else if (rest) {
+      frame.meta.notes.push(`"${tail}" follows a worldwide scope — kept as stated context, not a location`);
+    }
+    frame.meta.notes.push('worldwide wording is a search scope, not a place');
+  }
   // "founders globally" / "worldwide" / "anywhere in the world" is a scope.
   // As a stated place it made every candidate fail a location nobody can be
   // in ("globally"), demoting valid leads to potential matches. Runs last so
@@ -357,7 +391,8 @@ export function frameToSearchSpec(input: UnderstandingFrame): SearchSpec {
   if (frame.quantity?.requested) put('requested_count', frame.quantity.requested);
   if (frame.quantity?.minimum) put('minimum_count', frame.quantity.minimum);
 
-  const signalRequired = frame.evidence.intent_signal_required || ['hiring', 'received_funding', 'seeking_funding', 'needs_service', 'asking_for_help'].includes(relation);
+  const signalRequired = frame.evidence.intent_signal_required ||
+    ['hiring', 'received_funding', 'seeking_funding', 'needs_service', 'asking_for_help', 'custom'].includes(relation);
   const signalTypes = signalRequired ? [['received_funding', 'seeking_funding', 'investing_in'].includes(relation) ? 'funding' : relation === 'hiring' ? 'hiring' : 'service_request'] : [];
   const purpose = purposeFromFrame(frame);
   const spec = buildSpec({ entity, criteria, raw_query: frame.input.raw, signal_required: signalRequired, signal_types: signalTypes,

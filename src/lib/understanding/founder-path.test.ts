@@ -143,3 +143,39 @@ describe("founder path understanding", () => {
     expect(fields(spec)).not.toContain("required_field=contact");
   });
 });
+
+describe("a worldwide scope glued to an activity clause", () => {
+  it("reads the scope as scope and the activity as industry", () => {
+    const spec = frameToSearchSpec(applyClarificationToFrame(validateFrame(extractFrameDeterministic("find startup founders worldwide building fintech")).frame, {}));
+    expect(fields(spec)).toContain("geo_scope=worldwide");
+    expect(fields(spec).find((c) => c.startsWith("industry="))?.toLowerCase()).toBe("industry=fintech");
+    expect(fields(spec).find((c) => c.startsWith("role="))).toMatch(/founder/);
+    expect(fields(spec).some((c) => c.startsWith("location=") || c.startsWith("location_id="))).toBe(false);
+  });
+
+  it("keeps the same shape with no target noun at all", () => {
+    const spec = frameToSearchSpec(applyClarificationToFrame(validateFrame(extractFrameDeterministic("globally building AI")).frame, {}));
+    expect(fields(spec)).toContain("geo_scope=worldwide");
+    expect(fields(spec).find((c) => c.startsWith("industry="))?.toLowerCase()).toBe("industry=ai");
+    expect(fields(spec).some((c) => c.startsWith("location="))).toBe(false);
+  });
+
+  it("never swallows an activity clause into a place span", () => {
+    const london = frameToSearchSpec(applyClarificationToFrame(validateFrame(extractFrameDeterministic("founders in London building fintech")).frame, {}));
+    expect(fields(london).find((c) => c.startsWith("location="))).toMatch(/London/);
+    expect(fields(london).find((c) => c.startsWith("industry="))?.toLowerCase()).toBe("industry=fintech");
+    const canada = frameToSearchSpec(applyClarificationToFrame(validateFrame(extractFrameDeterministic("SaaS founders across Canada hiring salespeople")).frame, {}));
+    expect(fields(canada)).toContain("location=Canada");
+    expect(fields(canada)).toContain("industry=saas");
+    expect(canada.understanding?.relation.type.value).toBe("hiring");
+    const toronto = frameToSearchSpec(applyClarificationToFrame(validateFrame(extractFrameDeterministic("companies in Toronto looking for designers")).frame, {}));
+    expect(fields(toronto).find((c) => c.startsWith("location="))).toBe("location=Toronto");
+    expect(toronto.understanding?.location?.value).not.toMatch(/looking/);
+  });
+
+  it("still reads a real place next to the scope wording", () => {
+    const spec = frameToSearchSpec(applyClarificationToFrame(validateFrame(extractFrameDeterministic("SaaS founders in Toronto")).frame, {}));
+    expect(fields(spec)).toContain("location=Toronto");
+    expect(fields(spec).some((c) => c.startsWith("geo_scope="))).toBe(false);
+  });
+});

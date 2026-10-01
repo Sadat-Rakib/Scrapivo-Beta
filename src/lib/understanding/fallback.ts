@@ -60,6 +60,8 @@ import {
   type UserContext,
 } from "./frame";
 import {
+  activityToken,
+  ACTIVITY_VERB_TOKENS,
   canonicalAsset,
   classifyHead,
   CLAUSE_STOP_TOKENS,
@@ -881,6 +883,18 @@ const RECRUITER_SUBJECT =
 const ASKING_HELP_RE =
   /\b(?:asking\s+for|asked\s+for|requesting|posting\s+about\s+needing)\s+(?:some\s+|a\s+|an\s+)?(?:help\s+(?:with\s+)?)?/i;
 
+/** Recommendation-seeking: the topic is what follows "for", not "recommendations". */
+const RECOMMENDATION_CUE_RE =
+  /\b(?:asking\s+for|looking\s+for|requesting|open\s+to)\s+recommendations?\s+(?:for|on|about|to)\s+(?:a\s+|an\s+|some\s+)?/i;
+
+/**
+ * Expressed pain and defection, read with no canonical member of the ontology:
+ * the relation is `custom` and the label carries the wording. The object is the
+ * thing the pain is about, which is what a qualification can check.
+ */
+const FRUSTRATION_CUE_RE =
+  /\b(?:frustrated\s+(?:with|by|about|over)|fed\s+up\s+with|tired\s+of|sick\s+of|stuck\s+with|struggling\s+(?:with|to)|switching\s+(?:away\s+)?from|moving\s+away\s+from)\s+/i;
+
 const SOCIAL_SIGNAL_RE =
   /\b(?:posting|posted|tweeting|tweeted|complaining|ranting|asking)\s+(?:about|on)\s+([\p{L}][\p{L}\s/&+.#-]{2,50})|\bon\s+(?:linkedin|twitter|x|reddit|instagram|tiktok|facebook)\b/iu;
 
@@ -1187,6 +1201,36 @@ export function detectRelation(text: string, subject: HeadClassification): Relat
     }
   }
 
+  if ((m = RECOMMENDATION_CUE_RE.exec(text))) {
+    const obj = takeObject(text, m.index + m[0].length);
+    if (obj.value) {
+      return hit(
+        "custom",
+        m,
+        openValue(obj.value.toLowerCase(), obj.value, canonicalize(obj.value), 0.75),
+        "subject_to_object",
+        0.75,
+        "asking_for_recommendations",
+        obj.end,
+      );
+    }
+  }
+
+  if ((m = FRUSTRATION_CUE_RE.exec(text))) {
+    const obj = takeObject(text, m.index + m[0].length);
+    if (obj.value) {
+      return hit(
+        "custom",
+        m,
+        openValue(obj.value.toLowerCase(), obj.value, canonicalize(obj.value), 0.7),
+        "subject_to_object",
+        0.7,
+        m[0].trim().toLowerCase().replace(/\s+/g, "_"),
+        obj.end,
+      );
+    }
+  }
+
   if ((m = ASKING_HELP_RE.exec(text))) {
     const obj = takeObject(text, m.index + m[0].length);
     if (obj.value) {
@@ -1369,6 +1413,10 @@ function plausiblePlace(span: string): boolean {
   if (/^(?:paying|salary|paid|this|that|these|those|much|size)$/i.test(s)) return false;
   if (isTemporalPhrase(s)) return false;
   if (strictPlace(s)) return true;
+  // An activity verb inside the span marks a clause, not a place: "worldwide
+  // building fintech", "switching away". One token is enough to veto — a real
+  // place containing one is gazetteer-known and already returned above.
+  if (s.split(/\s+/).some((tok) => ACTIVITY_VERB_TOKENS.has(activityToken(tok)))) return false;
   // A recognized entity/role/category noun is not a place. This is what stops
   // "interested in marketing agencies" from yielding a city called agencies.
   //
@@ -2162,6 +2210,27 @@ export function extractFrameDeterministic(
     ...tailSrc.sources.filter((s) => !sourceSeen.has(s.value)),
   ];
 
+  // 4c. A worldwide scope word says WHERE to search, not what to search for.
+  //     Masked before the target phrase reads it, or "startup founders
+  //     worldwide building fintech" peels into a place called "worldwide
+  //     building fintech" and the scope is lost with it. The narrower
+  //     wordings ("anywhere in the world", "the globe") still land in a place
+  //     span and are normalized from there.
+  const scopeWord = /\b(?:world\s*-?\s*wide|globally)\b/i.exec(work);
+  if (scopeWord) {
+    frame.constraints.push({
+      field: "geo_scope",
+      operator: "eq",
+      value: "worldwide",
+      unit: null,
+      negated: false,
+      raw: scopeWord[0],
+      confidence: 0.9,
+    });
+    work = mask(work, scopeWord.index, scopeWord.index + scopeWord[0].length);
+    notes.push(`"${scopeWord[0]}" is a search scope, not a place`);
+  }
+
   // 5. Constraints are read before location so an excluded place cannot also
   //    become the positive one.
   // Read twice, never as one string: concatenating the masked core and the raw
@@ -2233,6 +2302,25 @@ export function extractFrameDeterministic(
     plausiblePlace(tail) && !excluded.has(tail.toLowerCase()) &&
     !(/^[\p{L}]+(?:ing|ed)$/iu.test(tail) && !strictPlace(tail) && !knownCityName(tail));
 
+  // An activity verb inside the phrase opens a clause, not a modifier:
+  // "startup founders building fintech" is founders, and "building fintech" is
+  // what they make. Split at the verb and hand the tail back, so the relation,
+  // industry and location readers meet it in place. Only when the head in
+  // front of the verb still reads — a split that leaves no target is no split.
+  const verbAt = words.findIndex((w, i) => i > 0 && ACTIVITY_VERB_TOKENS.has(activityToken(w)));
+  if (verbAt > 0) {
+    const tail = words.slice(verbAt).join(" ");
+    const shorter = words.slice(0, verbAt).join(" ");
+    const retry = classifyHead(shorter);
+    if (retry.kind !== "unknown" && unmaskTail(work, spans, tail)) {
+      head = retry;
+      phrase = shorter;
+      notes.push(
+        `"${tail}" starts with the activity "${words[verbAt]}" — handed back rather than read into the target`,
+      );
+    }
+  }
+
   if (head.kind === "unknown" || head.guessed === true) {
     for (let drop = 1; drop <= Math.min(3, words.length - 1); drop++) {
       const shorter = words.slice(0, -drop).join(" ");
@@ -2282,6 +2370,27 @@ export function extractFrameDeterministic(
       notes.push(
         `neither word is familiar; read "${tail}" as a place and "${phrase}" as what is being searched for`,
       );
+    }
+  }
+
+  // An activity tail handed back above ("building fintech", "focusing on AI")
+  // names what the target makes or does. That is an industry when the object
+  // is a bare noun the head tables do not claim; an article ("building a
+  // team") or a recognized noun ("building owners") reads as something else.
+  const activity = /\b(?:building|developing|focusing\s+on|working\s+on)\s+([\p{L}][\p{L}'-]*(?:\s+[\p{L}][\p{L}'-]*)?)/iu.exec(work);
+  if (activity && !frame.target.industry) {
+    const activityWords: string[] = [];
+    for (const w of activity[1].split(/\s+/)) {
+      if (activityWords.length >= 2 || CLAUSE_STOP_TOKENS.has(normalizeFunctionWord(w.toLowerCase()))) break;
+      activityWords.push(w);
+    }
+    const noun = activityWords.join(" ");
+    if (noun && !/^(?:a|an|the|their|our|your|its|his|her|my)\b/i.test(noun) &&
+        classifyHead(noun.split(/\s+/)[0]!, { guess: false }).kind === "unknown") {
+      frame.target.industry = openValue(noun.toLowerCase(), noun, null, 0.65);
+      const at = activity.index + activity[0].length - activity[1].length;
+      spans.push([at, at + noun.length]);
+      notes.push(`"${activity[0].trim()}" read as the industry the target builds in`);
     }
   }
 

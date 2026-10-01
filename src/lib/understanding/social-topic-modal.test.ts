@@ -43,3 +43,31 @@ describe("tentative fit phrasing", () => {
     expect(spec.understanding?.user_context.selling?.service?.value).toBe("marketing");
   });
 });
+
+describe("expressed pain and defection", () => {
+  // A complaint is an intent signal: the spec must demand the signal and carry
+  // the topic as a criterion, not degrade into directory prospecting.
+  const cases: ReadonlyArray<[string, RegExp]> = [
+    ["Founders complaining about lead generation", /lead generation/i],
+    ["founders frustrated with CRMs", /crms/i],
+    ["people struggling with bookkeeping", /bookkeeping/i],
+    ["founders asking for recommendations for an SEO agency", /seo agency/i],
+    ["companies switching away from SAP", /sap/i],
+  ];
+  for (const [query, topic] of cases) {
+    it(`"${query}" keeps the topic and requires a signal`, () => {
+      const spec = understand(query);
+      expect(spec.criteria.find((c) => c.field === "content_topic")?.value).toMatch(topic);
+      expect(spec.signal_required).toBe(true);
+      expect(spec.signal_types).toEqual(["service_request"]);
+      expect(spec.understanding?.relation.type.value).toBe("custom");
+      expect(spec.understanding?.evidence.intent_signal_required).toBe(true);
+      expect(spec.understanding?.location).toBeNull();
+    });
+  }
+
+  it("stops the topic at a trailing place", () => {
+    expect(topic("founders in Toronto complaining about payroll")).toMatch(/^payroll$/i);
+    expect(understand("founders in Toronto complaining about payroll").criteria.find((c) => c.field === "location")?.value).toMatch(/toronto/i);
+  });
+});

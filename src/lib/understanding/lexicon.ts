@@ -227,6 +227,41 @@ export const PLACE_JOIN_TOKENS: ReadonlySet<string> = new Set([
 ]);
 
 /**
+ * Activity verbs (and the state words that introduce the same clause:
+ * frustrated, tired, sick, fed, stuck) that can never continue a place span or
+ * a target phrase — "Toronto building robots", "agencies tired of invoicing".
+ * Most overlap `CLAUSE_STOP_TOKENS`, which bounds place spans already; the ones
+ * missing there — building, complaining, struggling, switching, focusing,
+ * expanding, working, buying — are exactly how "worldwide building fintech"
+ * once became a place. A place name containing one of these is gazetteer-known
+ * and is returned before any caller consults this set.
+ */
+export const ACTIVITY_VERB_TOKENS: ReadonlySet<string> = new Set([
+  "building", "build", "builds", "built",
+  "hiring", "hire", "hires", "hired",
+  "looking", "look", "looks",
+  "seeking", "seek", "seeks",
+  "asking", "ask", "asks",
+  "working", "work", "works",
+  "focusing", "focus", "focuses",
+  "complaining", "complain", "complains", "complained",
+  "struggling", "struggle", "struggles", "struggled",
+  "switching", "switch", "switches", "switched",
+  "expanding", "expand", "expands", "expanded",
+  "raising", "raise", "raises",
+  "selling", "sell", "sells", "sold",
+  "buying", "buy", "buys", "bought",
+  "needing", "need", "needs",
+  "wanting", "want", "wants",
+  "frustrated", "tired", "sick", "fed", "stuck",
+]);
+
+/** The bare stem of a token, for membership tests against the verb sets above. */
+export function activityToken(word: string): string {
+  return word.toLowerCase().replace(/[^a-z]/g, "");
+}
+
+/**
  * A temporal expression, matched WHOLE against a candidate place span. This is
  * the `TEMPORAL_AS_LOCATION` guard: "in the last two weeks" reaches the place
  * parser as "last two weeks", and the only correct answer is "that is not a
@@ -1076,6 +1111,9 @@ export function takePlaceSpan(
   for (let n = Math.min(maxTokens, clipped.length); n >= 1; n--) {
     const span = clipped.slice(0, n);
     if (span.some((t) => CLAUSE_STOP_TOKENS.has(normalizeFunctionWord(t.toLowerCase())) && n > 1)) continue;
+    // An activity verb cannot sit inside a place span ("in Toronto building
+    // robots"), so no prefix containing one is a candidate.
+    if (span.some((t) => ACTIVITY_VERB_TOKENS.has(activityToken(t)))) continue;
     if (resolve(span.join(" "))) return span;
   }
 
@@ -1088,6 +1126,7 @@ export function takePlaceSpan(
   for (const tok of clipped.slice(0, maxTokens)) {
     const t = normalizeFunctionWord(tok.toLowerCase());
     if (CLAUSE_STOP_TOKENS.has(t)) break;
+    if (ACTIVITY_VERB_TOKENS.has(activityToken(tok))) break;
     // A pictograph is not part of a place name, and it ends one. "cafes in
     // porto 🙏" handed back "porto 🙏", which then failed the letters-only
     // check every caller applies — so ONE emoji anywhere after a preposition

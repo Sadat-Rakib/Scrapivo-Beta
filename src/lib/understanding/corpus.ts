@@ -639,6 +639,92 @@ export const TRAIN: Case[] = [
     relation: "hiring",
     temporal: true,
   }),
+
+  // ── Expressed pain and defection. The relation is `custom` with the wording
+  //    in its label, and the request is an INTENT signal: a complaint must not
+  //    degrade into directory prospecting with no signal evidence required.
+  c("t81", "Founders complaining about lead generation", {
+    entity_type: "person",
+    relation: "custom",
+    intent_signal_required: true,
+    role: "founder",
+    no_location: true,
+  }),
+  c("t82", "founders frustrated with CRMs", {
+    entity_type: "person",
+    relation: "custom",
+    object: "crm",
+    intent_signal_required: true,
+    role: "founder",
+    no_location: true,
+  }),
+  c("t83", "people struggling with bookkeeping", {
+    entity_type: "person",
+    relation: "custom",
+    object: "bookkeeping",
+    intent_signal_required: true,
+    no_location: true,
+  }),
+  c("t84", "founders asking for recommendations for an SEO agency", {
+    entity_type: "person",
+    relation: "custom",
+    object: "seo agency",
+    intent_signal_required: true,
+    role: "founder",
+    no_location: true,
+  }),
+  c("t85", "companies switching away from SAP", {
+    entity_type: "company",
+    relation: "custom",
+    object: "sap",
+    intent_signal_required: true,
+    no_location: true,
+  }),
+  c("t86", "agencies tired of manual invoicing", {
+    entity_type: ["company", "business"],
+    relation: "custom",
+    object: "invoicing",
+    intent_signal_required: true,
+    no_location: true,
+  }),
+
+  // ── A worldwide scope glued to an activity clause. The scope is never a
+  //    place, the activity is never a town, and a real place next to either
+  //    still reads.
+  c("t87", "find startup founders worldwide building fintech", {
+    entity_type: "person",
+    role: "founder",
+    industry: "fintech",
+    no_location: true,
+  }),
+  c("t88", "globally building AI", {
+    industry: "ai",
+    no_location: true,
+  }),
+  c("t89", "founders in London building fintech", {
+    entity_type: "person",
+    role: "founder",
+    industry: "fintech",
+    location: "london",
+  }),
+  c("t90", "SaaS founders across Canada hiring salespeople", {
+    entity_type: "person",
+    relation: "hiring",
+    object: "salespeople",
+    industry: "saas",
+    location: "canada",
+  }),
+  c("t91", "companies in Toronto looking for designers", {
+    relation: "needs_service",
+    object: "designer",
+    location: "toronto",
+  }),
+  c("t92", "people worldwide asking for SEO help", {
+    relation: "asking_for_help",
+    object: "seo help",
+    intent_signal_required: true,
+    no_location: true,
+  }),
 ];
 
 // ── Seeded generation ─────────────────────────────────────────────────────

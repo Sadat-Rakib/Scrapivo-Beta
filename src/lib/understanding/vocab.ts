@@ -230,6 +230,12 @@ export const MODE_BY_RELATION: Partial<Record<RelationType, ProspectingMode>> = 
   // sentence, where `received_funding` sits. But it is not plain fit either:
   // the portfolio is the search key, not a filter on a list of investors.
   investing_in: "investment_based",
+  // A custom relation is an EXPRESSED signal — posting, complaining,
+  // frustration, switching away — so it reads as the social-signal mode the
+  // `posting_about` label already implied. The extractor keeps the honest
+  // `custom` mode when the wording names no channel; this entry is what stops
+  // the validator from leaving a stray mode beside a relation it understood.
+  custom: "social_signal_based",
 };
 
 /**
@@ -263,6 +269,11 @@ export const EVIDENCE_BY_RELATION: Partial<
   attending_event: { claim: true, intent: false },
   received_funding: { claim: true, intent: false },
   investing_in: { claim: true, intent: false },
+  /** A custom relation ("posting about churn", "frustrated with CRMs") is an
+   *  expressed signal by definition — the label carries which kind. Skipping
+   *  it here left complaint searches delivered as directory rows with no
+   *  intent evidence required at all. */
+  custom: { claim: true, intent: true },
   /** Plain discovery still has to prove the entity IS what was asked for —
    *  "restaurants in Lisbon" needs evidence of each being a restaurant there.
    *  It needs no buyer-intent proof, and asserting one would invent a signal. */
