@@ -36,4 +36,15 @@ describe("candidate entity merging", () => {
       { kind: "job", title: "Engineer", detail: "", url: "https://example.test/jobs/2" },
     ])).toHaveLength(2);
   });
+  it("reports every dropped duplicate with the row that kept the entity", () => {
+    const result = mergeDuplicateCandidates([
+      person({ key: "db:1", entity_id: "db:1", email: "ada@example.test" }),
+      person({ key: "browser:1", entity_id: "browser:1", location: "Toronto" }),
+    ]);
+    expect(result).toHaveLength(1);
+    expect(result.mergeReport).toEqual([{ mergedKey: "browser:1", keptKey: "db:1" }]);
+    const unmerged = mergeDuplicateCandidates([person({ key: "solo" })]);
+    expect(unmerged).toHaveLength(1);
+    expect(unmerged.mergeReport).toEqual([]);
+  });
 });

@@ -681,20 +681,18 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
   // Diagnostics must never change or break discovery.
   const trace = (event: BrowserTraceEvent) => { try { options.onTrace?.(event); } catch { /* ignore */ } };
   const isVerified = options.isVerified ?? ((row: SpecRow) => qualifyLead(row, spec, row.evidence).disposition === "qualified");
-  // Progressive results: stream each verified lead once, the moment it
-  // verifies — whether that happens in its own research or later, when
-  // another page's extraction merges the missing fact into it.
+  // Progressive results, two honest stages (E2E-C10): the first sighting of a
+  // candidate is announced as found/provisional — the UI must never see
+  // "verified" before the row passed the strict verification. The verified
+  // stage still streams exactly once, whether verification happens in its own
+  // research or later, when another page's extraction merges the missing fact.
   const verifiedSeen = new Set<string>();
-  const announceVerified = (candidate: BrowserCandidateMemory) => {
-    if (candidate.status !== "verified" || controller.signal.aborted) return;
-    const verifiedKey = `${candidate.row.entity_id ?? ""}|${(candidate.row.title ?? "").toLowerCase()}`;
-    if (verifiedSeen.has(verifiedKey)) return;
-    verifiedSeen.add(verifiedKey);
-    progress("Candidate verified", undefined, candidate.row.title);
+  const foundSeen = new Set<string>();
+  const rowEvent = (candidate: BrowserCandidateMemory, rowStatus: "provisional" | "verified") => {
     const row = candidate.row;
     options.onProgress?.({
-      action: "Candidate verified",
-      detail: candidate.row.title,
+      action: rowStatus === "verified" ? "Candidate verified" : "Candidate found",
+      detail: row.title,
       row: {
         key: row.key ?? row.entity_id ?? "",
         entity_id: row.entity_id ?? "",
@@ -707,8 +705,23 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
         phone: row.phone ?? null,
         location: row.location ?? null,
         why_match: row.why_match ?? null,
+        rowStatus,
       },
     });
+  };
+  const announceVerified = (candidate: BrowserCandidateMemory) => {
+    if (controller.signal.aborted) return;
+    const stageKey = `${candidate.row.entity_id ?? ""}|${(candidate.row.title ?? "").toLowerCase()}`;
+    if (!foundSeen.has(stageKey)) {
+      foundSeen.add(stageKey);
+      progress("Candidate found", undefined, candidate.row.title);
+      rowEvent(candidate, "provisional");
+    }
+    if (candidate.status !== "verified") return;
+    if (verifiedSeen.has(stageKey)) return;
+    verifiedSeen.add(stageKey);
+    progress("Candidate verified", undefined, candidate.row.title);
+    rowEvent(candidate, "verified");
   };
   const refresh = (candidate: BrowserCandidateMemory) => {
     candidate.lastQualification = qualifyLead(candidate.row, spec, candidate.row.evidence);

@@ -37,6 +37,35 @@ describe("candidate ledger", () => {
     expect(summary.counts).toMatchObject({ rejected: 1, gated: 0, returned: 1, incomplete: 0 });
   });
 
+  it("accounts for every candidate retrieved via streamed() and retrieved()", () => {
+    const reconciled = createCandidateLedger();
+    reconciled.streamed({ key: "s", title: "S" });
+    reconciled.retrieved({ key: "r", title: "R" });
+    reconciled.delivered([{ key: "s", title: "S" }], [{ key: "r", title: "R" }]);
+    expect(reconciled.summary().accounting).toEqual({ retrieved: 2, fated: 2, unaccounted: 0, ok: true });
+  });
+
+  it("flags streamed rows the funnel never touched and retrievals it never fated", () => {
+    const stranded = createCandidateLedger();
+    stranded.streamed({ key: "x", title: "X" });
+    expect(stranded.summary().accounting).toEqual({ retrieved: 1, fated: 1, unaccounted: 1, ok: false });
+
+    const unfated = createCandidateLedger();
+    unfated.retrieved({ key: "y", title: "Y" });
+    expect(unfated.summary().accounting).toEqual({ retrieved: 1, fated: 0, unaccounted: 0, ok: false });
+  });
+
+  it("matches a re-minted entity id by registrable host and name", () => {
+    const ledger = createCandidateLedger();
+    ledger.streamed({ key: "browser:amina", entity_id: "browser:amina", title: "Amina Carter", company: "Acme", website_url: "https://www.amina.test/bio" });
+    // The DB merge re-minted the entity id and the key; host + name still bind.
+    ledger.delivered([{ key: "db:amina-9", entity_id: "db:amina-9", title: "Amina Carter", company: "Carter Labs", website_url: "https://amina.test" }], []);
+    const summary = ledger.summary();
+    expect(summary.counts).toMatchObject({ returned: 1, unaccounted: 0 });
+    expect(summary.streamedNotReturned).toEqual([]);
+    expect(summary.accounting).toEqual({ retrieved: 1, fated: 1, unaccounted: 0, ok: true });
+  });
+
   it("merges location branches without reporting a lead another branch delivered", () => {
     const one = createCandidateLedger();
     one.streamed({ key: "x", title: "X" });
@@ -67,9 +96,9 @@ const pages: Record<string, { title: string; text: string; links?: PageSnapshot[
     links: [{ ref: "l1", name: "Acme", url: "https://acme.test/" }, { ref: "l2", name: "Ledgerly", url: "https://ledgerly.test/" }],
   },
   "https://acme.test/": { title: "Acme — reporting software", text: "Acme builds reporting software for finance teams. Acme is a B2B SaaS company. ".repeat(3), links: [{ ref: "l3", name: "Contact", url: "https://acme.test/contact" }] },
-  "https://acme.test/contact": { title: "Contact Acme", text: "Contact Acme. Get in touch with our team about pricing, onboarding or support. Offices in Toronto, Ontario." },
+  "https://acme.test/contact": { title: "Contact Acme", text: "Contact Acme. Email amina@acme.test or call +1 416 555 0100 about pricing, onboarding or support. Offices in Toronto, Ontario." },
   "https://ledgerly.test/": { title: "Ledgerly — ledgers for SaaS", text: "Ledgerly builds accounting ledgers for SaaS teams. Ledgerly is a B2B SaaS company. ".repeat(3), links: [{ ref: "l4", name: "Contact", url: "https://ledgerly.test/contact" }] },
-  "https://ledgerly.test/contact": { title: "Contact Ledgerly", text: "Contact Ledgerly. Get in touch with our team about pricing, onboarding or support. Offices in Lagos, Nigeria." },
+  "https://ledgerly.test/contact": { title: "Contact Ledgerly", text: "Contact Ledgerly. Email ben@ledgerly.test or call +234 1 555 0199 about pricing, onboarding or support. Offices in Lagos, Nigeria." },
 };
 function fixtureBrowser(): AgentBrowser {
   let current: PageSnapshot | null = null;

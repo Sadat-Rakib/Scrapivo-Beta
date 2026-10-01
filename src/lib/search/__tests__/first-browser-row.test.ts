@@ -78,9 +78,9 @@ describe("HARD GATE: first browser row end to end", () => {
     expect(provenance?.verification_status).toBe("verified");
     expect(row!.evidence?.some((item) => item.evidence_type === "contact" && item.source_url === "https://acme.test/contact")).toBe(true);
     // The streamed row is the same lead that reached the final page, and it
-    // streams exactly once.
+    // streams once per stage: provisional on first sighting, then verified.
     expect(streamed.map((item) => item.key)).toContain(row!.key);
-    expect(streamed.filter((item) => item.key === row!.key)).toHaveLength(1);
+    expect(streamed.filter((item) => item.key === row!.key)).toHaveLength(2);
     // Leads without any observed contact channel do not qualify.
     expect(res.rows.some((item) => item.title === "Ben Okafor")).toBe(false);
   });

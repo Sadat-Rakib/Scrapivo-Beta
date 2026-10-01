@@ -30,10 +30,23 @@ export type LedgerRow = {
   entity_id?: string | null;
   title?: string | null;
   company?: string | null;
+  website_url?: string | null;
+  profile_url?: string | null;
   missingFields?: string[];
 };
 
 export type StreamedReconciliation = { key: string; title: string; fate: CandidateFate; reason: string | null };
+
+/** C6: did every candidate that entered the funnel end in exactly one fate? */
+export type CandidateAccounting = {
+  /** Distinct candidates that entered the funnel (via streamed() or retrieved()). */
+  retrieved: number;
+  /** Entries holding a fate. A streamed entry is born fated `unaccounted`; a
+   *  retrieved-only entry is a stub awaiting a funnel booking. */
+  fated: number;
+  unaccounted: number;
+  ok: boolean;
+};
 
 export type CandidateLedgerSummary = {
   counts: Record<CandidateFate, number>;
@@ -42,6 +55,7 @@ export type CandidateLedgerSummary = {
   streamed: number;
   /** Streamed leads that are not on the delivered page, each with its fate. */
   streamedNotReturned: StreamedReconciliation[];
+  accounting?: CandidateAccounting;
 };
 
 const FATES: CandidateFate[] = ["returned", "qualified_more", "rejected", "gated", "filtered", "incomplete", "excluded", "unaccounted"];
@@ -50,16 +64,31 @@ const RANK: Record<CandidateFate, number> = { unaccounted: 0, incomplete: 1, fil
 
 const norm = (value: string | null | undefined) => (value ?? "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 
-/** Identity tokens: a DB/live merge can change the key but not the entity. */
+/** Cheap registrable domain (last two labels) — enough to bind www-stripped hosts. */
+function registrableHost(url: string | null | undefined): string | null {
+  if (!url) return null;
+  try {
+    const host = new URL(url).hostname.toLowerCase().replace(/^www\./, "");
+    const labels = host.split(".").filter(Boolean);
+    return labels.length >= 2 ? labels.slice(-2).join(".") : host || null;
+  } catch {
+    return null;
+  }
+}
+
+/** Identity tokens: a DB/live merge can change the key but not the entity.
+ *  A re-minted entity_id still binds through registrable host + name. */
 function identities(row: LedgerRow): string[] {
   const tokens = [row.key, row.entity_id].filter((value): value is string => !!value).map((value) => `id:${value}`);
   const title = norm(row.title);
   if (title) tokens.push(`name:${title}|${norm(row.company)}`);
+  const host = registrableHost(row.website_url) ?? registrableHost(row.profile_url);
+  if (host && title) tokens.push(`host:${host}|name:${title}`);
   return tokens;
 }
 
 export function createCandidateLedger() {
-  type Entry = { key: string; title: string; fate: CandidateFate; reason: string | null; streamed: boolean; ids: string[] };
+  type Entry = { key: string; title: string; fate: CandidateFate; reason: string | null; streamed: boolean; fated: boolean; ids: string[] };
   const entries: Entry[] = [];
   const byId = new Map<string, Entry>();
 
@@ -73,13 +102,16 @@ export function createCandidateLedger() {
   const upsert = (row: LedgerRow, fate: CandidateFate, reason: string | null, streamed = false) => {
     let entry = find(row);
     if (!entry) {
-      entry = { key: row.key ?? row.entity_id ?? norm(row.title), title: row.title ?? "", fate, reason, streamed, ids: [] };
+      entry = { key: row.key ?? row.entity_id ?? norm(row.title), title: row.title ?? "", fate, reason, streamed, fated: true, ids: [] };
       entries.push(entry);
     } else if (fate !== "unaccounted" && (RANK[fate] >= RANK[entry.fate] || entry.fate === "unaccounted") && entry.fate !== "returned") {
       entry.fate = fate;
       entry.reason = reason;
     }
     entry.streamed ||= streamed;
+    // Any explicit fate booking (even a duplicate of the current one) marks
+    // the entry as fated; only retrieved()-born stubs stay unfated.
+    entry.fated = true;
     for (const id of identities(row)) {
       if (!byId.has(id)) byId.set(id, entry);
       if (!entry.ids.includes(id)) entry.ids.push(id);
@@ -90,6 +122,21 @@ export function createCandidateLedger() {
   return {
     /** A lead shown to the user while researching. */
     streamed(row: LedgerRow) { upsert(row, "unaccounted", null, true); },
+    /**
+     * A candidate that entered the funnel without streaming (DB/index rows
+     * filtered before any stage, merge outputs). Books the entry as a stub
+     * awaiting a fate so summary().accounting can prove no candidate leaked.
+     */
+    retrieved(row: LedgerRow) {
+      if (!find(row)) {
+        const entry: Entry = { key: row.key ?? row.entity_id ?? norm(row.title), title: row.title ?? "", fate: "unaccounted", reason: null, streamed: false, fated: false, ids: [] };
+        entries.push(entry);
+        for (const id of identities(row)) {
+          if (!byId.has(id)) byId.set(id, entry);
+          if (!entry.ids.includes(id)) entry.ids.push(id);
+        }
+      }
+    },
     /** Final lead-check decision for a complete candidate. */
     decided(row: LedgerRow, decision: { disposition: string; reject_code?: string | null }) {
       if (decision.disposition === "qualified") return;
@@ -117,12 +164,19 @@ export function createCandidateLedger() {
         if (entry.fate === "rejected" && entry.reason) rejectReasons[entry.reason] = (rejectReasons[entry.reason] ?? 0) + 1;
       }
       const streamed = entries.filter((entry) => entry.streamed);
+      const retrieved = entries.length;
+      // Streamed entries are born fated (unaccounted until booked); only
+      // retrieved()-born stubs awaiting a funnel booking stay unfated. A
+      // stub is internal accounting, not a user-facing unaccounted loss.
+      const fated = entries.filter((entry) => entry.fated).length;
+      const unaccounted = entries.filter((entry) => entry.streamed && entry.fate === "unaccounted").length;
       return {
         counts,
         rejectReasons,
         streamed: streamed.length,
         streamedNotReturned: streamed.filter((entry) => entry.fate !== "returned")
           .map(({ key, title, fate, reason }) => ({ key, title, fate, reason })),
+        accounting: { retrieved, fated, unaccounted, ok: retrieved === fated && unaccounted === 0 },
       };
     },
   };
@@ -145,7 +199,17 @@ export function mergeCandidateLedgers(summaries: Array<CandidateLedgerSummary | 
     seen.add(item.key);
     return true;
   });
-  return { counts, rejectReasons, streamed: present.reduce((sum, summary) => sum + summary.streamed, 0), streamedNotReturned };
+  const accountingParts = present.map((summary) => summary.accounting).filter((a): a is NonNullable<CandidateLedgerSummary["accounting"]> => !!a);
+  const accounting = accountingParts.length
+    ? {
+        retrieved: accountingParts.reduce((sum, a) => sum + a.retrieved, 0),
+        fated: accountingParts.reduce((sum, a) => sum + a.fated, 0),
+        unaccounted: accountingParts.reduce((sum, a) => sum + a.unaccounted, 0),
+        ok: false,
+      }
+    : undefined;
+  if (accounting) accounting.ok = accounting.retrieved === accounting.fated && accounting.unaccounted === 0;
+  return { counts, rejectReasons, streamed: present.reduce((sum, summary) => sum + summary.streamed, 0), streamedNotReturned, accounting };
 }
 
 /** Short, user-facing explanation for a streamed lead missing from the final list. */

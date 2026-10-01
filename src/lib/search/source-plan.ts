@@ -445,6 +445,12 @@ export function buildResearchPlan(
   // existing maxQueries rule.
   discoveryQueries = uniq([...discoveryQueries, ...planDiscoveryVariants(spec)]);
 
+  // Last resort: if every constructed query was filler, the user's own words
+  // are still the honest query — never hand the live browser an empty plan.
+  if (discoveryQueries.length === 0 && spec.raw_query?.trim()) {
+    discoveryQueries = [spec.raw_query.trim()];
+  }
+
   const requiredFields = uniq([
     "name",
     spec.entity === "person" || role ? "role" : null,

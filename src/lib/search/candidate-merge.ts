@@ -43,8 +43,17 @@ const richness = (row: SpecRow) => [row.role, row.company, row.industry, row.cat
   .filter((value) => value != null && value !== "").length
   + (row.entity_resolved ? 20 : 0) + (row.verification_status === "verified" ? 40 : 0);
 
+/** C6: which row was absorbed into which survivor, so the funnel can ledger
+ *  every dropped duplicate instead of losing it between stages. */
+export type MergedDuplicate = { mergedKey: string; keptKey: string };
+export type MergeDuplicateResult = SpecRow[] & { mergeReport?: MergedDuplicate[] };
+
+const rowKey = (row: SpecRow): string =>
+  row.key ?? row.entity_id ?? normalize(row.title).replace(/\s+/g, "-") ?? "";
+
 /** Merge only shared entity identifiers; preserve sources and subject binding. */
-export function mergeDuplicateCandidates(input: SpecRow[]): SpecRow[] {
+export function mergeDuplicateCandidates(input: SpecRow[]): MergeDuplicateResult {
+  const mergeReport: MergedDuplicate[] = [];
   const groups: { row: SpecRow; keys: Set<string> }[] = [];
   for (const incoming of input) {
     const keys = new Set(candidateIdentityKeys(incoming));
@@ -54,6 +63,7 @@ export function mergeDuplicateCandidates(input: SpecRow[]): SpecRow[] {
       const prior = group.row;
       const preferred = richness(prior) >= richness(row) ? prior : row;
       const secondary = preferred === prior ? row : prior;
+      mergeReport.push({ mergedKey: rowKey(secondary), keptKey: rowKey(preferred) });
       const combined = { ...secondary, ...preferred };
       for (const key of Object.keys(secondary) as (keyof SpecRow)[]) {
         if (combined[key] == null || combined[key] === "") {
@@ -95,5 +105,8 @@ export function mergeDuplicateCandidates(input: SpecRow[]): SpecRow[] {
     }
     groups.push({ row, keys });
   }
-  return groups.map(({ row }) => row);
+  const rows = groups.map(({ row }) => row) as MergeDuplicateResult;
+  // Non-enumerable: existing array consumers (JSON, spreads) are unaffected.
+  Object.defineProperty(rows, "mergeReport", { value: mergeReport, enumerable: false });
+  return rows;
 }

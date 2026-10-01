@@ -27,14 +27,15 @@ const person = (name: string, company: string): BrowserExtractedEntity => {
 };
 
 describe("progressive verified rows", () => {
-  it("streams every lead that verifies, once, even when it verifies outside its own research turn", async () => {
+  it("streams every lead that verifies, once per stage, even when it verifies outside its own research turn", async () => {
     const events: string[] = [];
     // Both leads verify the moment they are extracted (before research runs).
     const rows = await discoverWithBrowser(spec, { browser: browser(), discoveryQueries: ["SaaS founders"], isVerified: (row) => !!row.company,
       extractEntities: async () => [person("Amina Carter", "Acme"), person("Ben Okafor", "Ledgerly")],
       onProgress: (event) => { if (event.row) events.push(event.row.title); } });
     expect(rows).toHaveLength(2);
-    expect(events.sort()).toEqual(["Amina Carter", "Ben Okafor"]);
+    // Two honest stages: a provisional sighting, then the verified claim.
+    expect(events.sort()).toEqual(["Amina Carter", "Amina Carter", "Ben Okafor", "Ben Okafor"]);
   });
 
   it("publishes nothing after cancellation", async () => {

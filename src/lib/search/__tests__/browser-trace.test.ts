@@ -21,7 +21,10 @@ function fakeBrowser(pageSnapshot: (url: string) => PageSnapshot): AgentBrowser 
   const observation = (value: PageSnapshot) => ({ snapshot: value, action: "navigate", verified: true });
   return {
     createSession: vi.fn(async (options = {}) => ({ id: options.id ?? "t", visible: false, createdAt: new Date().toISOString(), screenshotDirectory: "", counters: { actions: 0, pages: 0, scrolls: 0, screenshots: 0, reasoningCalls: 0 }, limits: { actions: 30, pages: 8, scrolls: 2, screenshots: 1, reasoningCalls: 0 }, lastSnapshot: null })),
-    search: vi.fn(async () => observation(snapshot({ url: "https://duckduckgo.com/?q=x", pageType: "search_results", links: [{ ref: "", name: "Acme team", url: page.url }] }))),
+    // The SERP result must share a query term: discovery now runs the user's
+    // real query (C8) and serpResultShares drops zero-overlap results BEFORE
+    // a navigation is spent — the old empty-query fixture bypassed that gate.
+    search: vi.fn(async () => observation(snapshot({ url: "https://duckduckgo.com/?q=x", pageType: "search_results", links: [{ ref: "", name: "SaaS founders in Canada — Acme team", url: page.url }] }))),
     navigate: vi.fn(async (_s, url) => observation(current = pageSnapshot(url))),
     observe: vi.fn(async () => current),
     click: vi.fn(async () => observation(current)), type: vi.fn(async () => observation(current)), select: vi.fn(async () => observation(current)),
