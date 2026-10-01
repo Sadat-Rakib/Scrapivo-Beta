@@ -20,6 +20,7 @@ import { classifyPageRelevance } from "./page-relevance";
 import { extractStructuredFacts, factsFromJsonLdText, type StructuredPageFacts } from "./page-structured";
 import { normalizeDomain, normalizeEntityName, isFirstPartyEntityHost } from "./entity-resolve";
 import { buildResearchPlan, buildCandidateResearchQueries } from "./source-plan";
+import { triageSerpResults } from "./serp-triage.server";
 import { qualifyLead } from "./qualify";
 import { isDeadlineAbort } from "./search-run";
 import { computeResearchNeeds, researchStatus, type ResearchNeed, type ResearchStatus } from "./browser-research";
@@ -1369,9 +1370,23 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       const before = memory.length;
       const results = await search(query);
       const pages: BrowserObservedPage[] = [];
-      // PASS A: inspect several distinct results, then extract subjects in one
-      // bounded call. Preserve the rest of the budget for candidate research.
-      for (const link of (memory.length - before >= 2 ? [] : results.filter((item) => !visited.has(item.url)).slice(0, 2))) {
+      // PASS A: triage results BEFORE spending navigations (Workstream G) —
+      // the best-scoring share of the page budget goes to relevant,
+      // first-party-looking sources; contamination and zero-overlap sinks are
+      // skipped without a navigation.
+      const unseen = results.filter((item) => !visited.has(item.url));
+      const criterion = (field: string) => spec.criteria.find((c) => c.field === field)?.value ?? null;
+      const ranked = triageSerpResults(
+        unseen.map((item) => ({ url: item.url, title: item.title ?? "", snippet: null })),
+        {
+          query,
+          locationTerms: [criterion("location"), criterion("geo_scope")].filter(Boolean) as string[],
+          signalTerms: [criterion("requested_service"), criterion("requested_product"), criterion("content_topic"), criterion("requested_role")].filter(Boolean) as string[],
+        },
+      ).filter((item) => item.accept).slice(0, 2);
+      for (const rankedItem of ranked) {
+        const link = unseen.find((item) => item.url === rankedItem.url);
+        if (!link) continue;
         const value = await readPage(link, undefined, false, "discovery");
         if (value) pages.push(value.page);
       }
