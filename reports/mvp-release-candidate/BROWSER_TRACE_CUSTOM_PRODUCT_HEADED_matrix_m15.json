@@ -1,0 +1,743 @@
+{
+  "runId": "trace-custom-product-1790798286242",
+  "query": "Seed investors in fintech in London",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 65024,
+  "error": null,
+  "audit": [
+    {
+      "title": "Matt Robinson — Partner @ Accel",
+      "checks": [
+        {
+          "method": "stored_investor_record",
+          "url": "https://www.linkedin.com/in/mattjackrobinson",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": "mrobinson@accel.com",
+      "phone": "+16506144800"
+    },
+    {
+      "title": "Andrei Brasoveanu — Partner @ Accel",
+      "checks": [
+        {
+          "method": "stored_investor_record",
+          "url": "https://www.linkedin.com/in/andreibrasoveanu",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": "abrasoveanu@accel.com",
+      "phone": "+16506144800"
+    },
+    {
+      "title": "Zhenya Loginov — Partner @ Accel",
+      "checks": [
+        {
+          "method": "stored_investor_record",
+          "url": "https://www.linkedin.com/in/zhenyaloginov",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": "zhenya@accel.com",
+      "phone": "+16506144800"
+    },
+    {
+      "title": "Luca Bocchio — Partner @ Accel",
+      "checks": [
+        {
+          "method": "stored_investor_record",
+          "url": "https://www.linkedin.com/in/luca-bocchio-0247a621",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": "lbocchio@accel.com",
+      "phone": "+16506144800"
+    },
+    {
+      "title": "Sonali De Rycker — Partner @ Accel",
+      "checks": [
+        {
+          "method": "stored_investor_record",
+          "url": "https://www.linkedin.com/in/sonaliderycker",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": "sderycker@accel.com",
+      "phone": "+16506144800"
+    },
+    {
+      "title": "Bruce Golden — Partner @ Accel",
+      "checks": [
+        {
+          "method": "stored_investor_record",
+          "url": "https://www.linkedin.com/in/bgolden1",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": "bgolden@accel.com",
+      "phone": "+16506144800"
+    },
+    {
+      "title": "Philippe Botteri — Partner @ Accel",
+      "checks": [
+        {
+          "method": "stored_investor_record",
+          "url": "https://www.linkedin.com/in/philippebotteri",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": "pbotteri@accel.com",
+      "phone": "+16506144800"
+    },
+    {
+      "title": "Harry Nelis — Partner @ Accel",
+      "checks": [
+        {
+          "method": "stored_investor_record",
+          "url": "https://www.linkedin.com/in/harry-nelis-429801",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": "hnelis@accel.com",
+      "phone": "+16506144800"
+    }
+  ],
+  "browser": {
+    "adapter": "worker",
+    "status": "completed",
+    "pagesVisited": 7,
+    "currentUrl": "https://www.visitlondon.com/",
+    "retained": true,
+    "controller": "agent",
+    "sessionId": "885ad5e1-8e7f-4923-91d3-21eaec7a693d",
+    "frame": true
+  },
+  "runtime": [
+    {
+      "kind": "runtime",
+      "requested": "worker",
+      "used": "worker"
+    }
+  ],
+  "progressEvents": 35,
+  "streamedRows": [
+    "Luca Bocchio — Partner @ Accel",
+    "Sonali De Rycker — Partner @ Accel",
+    "Bruce Golden — Partner @ Accel",
+    "Philippe Botteri — Partner @ Accel",
+    "Harry Nelis — Partner @ Accel"
+  ],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [
+    {
+      "kind": "search",
+      "query": "investor London",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "investor London",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "London",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "London",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 9,
+      "reason": "raw_links=10 unrelated=0"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://events.reutersevents.com/investment/investment-london",
+      "pageType": "unknown",
+      "title": "Home - Investment London 2027",
+      "outcome": "read",
+      "textChars": 6566,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~502s; injected/not_called)",
+      "capture": "c6ab5fbbc2aa.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://allevents.in/london/investor",
+      "pageType": "list",
+      "title": "Investor Events | List Of All Upcoming Investor Events In London",
+      "outcome": "read",
+      "textChars": 6845,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~502s; injected/not_called)",
+      "capture": "51b277aea954.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://en.wikipedia.org/wiki/London",
+      "pageType": "unknown",
+      "title": "London - Wikipedia",
+      "outcome": "read",
+      "textChars": 18000,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~488s; injected/not_called)",
+      "capture": "d2dd63f36962.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.visitlondon.com/",
+      "pageType": "unknown",
+      "title": "Visit London - We are London's Official Visitor Guide",
+      "outcome": "read",
+      "textChars": 7310,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~488s; injected/not_called)",
+      "capture": "13985f2863c8.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://events.reutersevents.com/investment/investment-london",
+        "https://allevents.in/london/investor"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~502s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://events.reutersevents.com/investment/investment-london",
+        "https://allevents.in/london/investor"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://en.wikipedia.org/wiki/London",
+        "https://www.visitlondon.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~488s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://en.wikipedia.org/wiki/London",
+        "https://www.visitlondon.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    }
+  ],
+  "entityOutcomes": [],
+  "remember": [
+    {
+      "kind": "remember",
+      "name": "Luca Bocchio — Partner @ Accel",
+      "rowKind": "investor",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Sonali De Rycker — Partner @ Accel",
+      "rowKind": "investor",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Joe Dean — Partner @ Accel",
+      "rowKind": "investor",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Bruce Golden — Partner @ Accel",
+      "rowKind": "investor",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Philippe Botteri — Partner @ Accel",
+      "rowKind": "investor",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Harry Nelis — Partner @ Accel",
+      "rowKind": "investor",
+      "outcome": "accepted",
+      "resolved": true
+    }
+  ],
+  "candidates": [
+    {
+      "kind": "candidate",
+      "name": "Luca Bocchio — Partner @ Accel",
+      "status": "verified",
+      "rejectCode": null,
+      "label": null,
+      "needs": [],
+      "visited": 0,
+      "queries": 0
+    },
+    {
+      "kind": "candidate",
+      "name": "Sonali De Rycker — Partner @ Accel",
+      "status": "verified",
+      "rejectCode": null,
+      "label": null,
+      "needs": [],
+      "visited": 0,
+      "queries": 0
+    },
+    {
+      "kind": "candidate",
+      "name": "Joe Dean — Partner @ Accel",
+      "status": "rejected",
+      "rejectCode": "LOCATION_MISMATCH",
+      "label": "LOCATION_MISMATCH — candidate location \"Greater London\" does not satisfy Spec location",
+      "needs": [],
+      "visited": 0,
+      "queries": 0
+    },
+    {
+      "kind": "candidate",
+      "name": "Bruce Golden — Partner @ Accel",
+      "status": "verified",
+      "rejectCode": null,
+      "label": null,
+      "needs": [],
+      "visited": 0,
+      "queries": 0
+    },
+    {
+      "kind": "candidate",
+      "name": "Philippe Botteri — Partner @ Accel",
+      "status": "verified",
+      "rejectCode": null,
+      "label": null,
+      "needs": [],
+      "visited": 0,
+      "queries": 0
+    },
+    {
+      "kind": "candidate",
+      "name": "Harry Nelis — Partner @ Accel",
+      "status": "verified",
+      "rejectCode": null,
+      "label": null,
+      "needs": [],
+      "visited": 0,
+      "queries": 0
+    }
+  ],
+  "done": [
+    {
+      "kind": "done",
+      "status": "completed",
+      "candidates": 6,
+      "verified": 5,
+      "visited": 4,
+      "queries": 2,
+      "stoppingReason": "diminishing_returns",
+      "elapsedMs": 40353
+    }
+  ],
+  "persistenceSkipped": [
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "investor",
+    "criteria": [
+      "investor_sector=fintech",
+      "location=London",
+      "location_id=geo:city:london",
+      "location_kind=city",
+      "location_country=GB",
+      "location_parents=geo:metro:greater-london,geo:country:gb"
+    ],
+    "clarify": [],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "s3-parquet",
+          "partitions": [
+            "processed/investors/investor.parquet"
+          ],
+          "scanned": 90,
+          "matched": 11
+        },
+        {
+          "source": "live-browser",
+          "partitions": [
+            "live-gapfill(6)"
+          ],
+          "scanned": 6,
+          "matched": 6
+        }
+      ],
+      "rawCandidates": 17,
+      "postSpecFilter": 17,
+      "timings": {
+        "understanding_ms": 4025,
+        "stored_search_ms": 18601,
+        "research_ms": 40587,
+        "enrichment_ms": 6,
+        "qualification_ms": 97,
+        "total_ms": 63316
+      },
+      "researchable": 11,
+      "complete": 11,
+      "pendingEnrichment": 0,
+      "qualificationRejected": 3,
+      "qualified": 8,
+      "returned": 8,
+      "reason": "RESULTS",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "browser-live",
+            "label": "Public websites",
+            "state": "healthy",
+            "reason": "OK"
+          }
+        ],
+        "degraded": false,
+        "summary": null
+      }
+    },
+    "rowsReturned": 8,
+    "rows": [
+      {
+        "title": "Matt Robinson — Partner @ Accel",
+        "kind": "investor",
+        "role": null,
+        "company": null,
+        "location": "London",
+        "website_url": "https://accel.com",
+        "source_url": null,
+        "disposition": "qualified",
+        "why": "Identity · Matt Robinson — Partner @ Accel · Agentic AI AI Infrastructure Artificial Intelligence (AI) Foundational AI Generative A…",
+        "email": "mrobinson@accel.com",
+        "phone": "+16506144800",
+        "contact_page_url": null,
+        "profile_url": "https://www.linkedin.com/in/mattjackrobinson",
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "stored_investor_record",
+            "url": "https://www.linkedin.com/in/mattjackrobinson",
+            "excerpt": "Matt Robinson — Partner @ Accel · Agentic AI AI Infrastructure Artificial Intelligence (AI) Foundational AI Generative AI Cloud Consumer Cybersecurity Fintech M",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {
+          "phone": "contact-harvest@https://accel.com"
+        }
+      },
+      {
+        "title": "Andrei Brasoveanu — Partner @ Accel",
+        "kind": "investor",
+        "role": null,
+        "company": null,
+        "location": "London",
+        "website_url": "https://accel.com",
+        "source_url": null,
+        "disposition": "qualified",
+        "why": "Identity · Andrei Brasoveanu — Partner @ Accel · Agentic AI AI Infrastructure Artificial Intelligence (AI) Foundational AI Generati…",
+        "email": "abrasoveanu@accel.com",
+        "phone": "+16506144800",
+        "contact_page_url": null,
+        "profile_url": "https://www.linkedin.com/in/andreibrasoveanu",
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "stored_investor_record",
+            "url": "https://www.linkedin.com/in/andreibrasoveanu",
+            "excerpt": "Andrei Brasoveanu — Partner @ Accel · Agentic AI AI Infrastructure Artificial Intelligence (AI) Foundational AI Generative AI Cloud Consumer Cybersecurity Finte",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {
+          "phone": "contact-harvest@https://accel.com"
+        }
+      },
+      {
+        "title": "Zhenya Loginov — Partner @ Accel",
+        "kind": "investor",
+        "role": null,
+        "company": null,
+        "location": "London",
+        "website_url": "https://accel.com",
+        "source_url": null,
+        "disposition": "qualified",
+        "why": "Identity · Zhenya Loginov — Partner @ Accel · Agentic AI AI Infrastructure Artificial Intelligence (AI) Foundational AI Generative…",
+        "email": "zhenya@accel.com",
+        "phone": "+16506144800",
+        "contact_page_url": null,
+        "profile_url": "https://www.linkedin.com/in/zhenyaloginov",
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "stored_investor_record",
+            "url": "https://www.linkedin.com/in/zhenyaloginov",
+            "excerpt": "Zhenya Loginov — Partner @ Accel · Agentic AI AI Infrastructure Artificial Intelligence (AI) Foundational AI Generative AI Cloud Consumer Cybersecurity Fintech ",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {
+          "phone": "contact-harvest@https://accel.com"
+        }
+      },
+      {
+        "title": "Luca Bocchio — Partner @ Accel",
+        "kind": "investor",
+        "role": null,
+        "company": null,
+        "location": "London",
+        "website_url": "https://accel.com",
+        "source_url": null,
+        "disposition": "qualified",
+        "why": "Identity · Luca Bocchio — Partner @ Accel · Agentic AI AI Infrastructure Artificial Intelligence (AI) Foundational AI Generative AI…",
+        "email": "lbocchio@accel.com",
+        "phone": "+16506144800",
+        "contact_page_url": null,
+        "profile_url": "https://www.linkedin.com/in/luca-bocchio-0247a621",
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "stored_investor_record",
+            "url": "https://www.linkedin.com/in/luca-bocchio-0247a621",
+            "excerpt": "Luca Bocchio — Partner @ Accel · Agentic AI AI Infrastructure Artificial Intelligence (AI) Foundational AI Generative AI Cloud Consumer Cybersecurity Fintech Me",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {
+          "phone": "contact-harvest@https://accel.com"
+        }
+      },
+      {
+        "title": "Sonali De Rycker — Partner @ Accel",
+        "kind": "investor",
+        "role": null,
+        "company": null,
+        "location": "London",
+        "website_url": "https://accel.com",
+        "source_url": null,
+        "disposition": "qualified",
+        "why": "Identity · Sonali De Rycker — Partner @ Accel · Agentic AI AI Infrastructure Artificial Intelligence (AI) Foundational AI Generativ…",
+        "email": "sderycker@accel.com",
+        "phone": "+16506144800",
+        "contact_page_url": null,
+        "profile_url": "https://www.linkedin.com/in/sonaliderycker",
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "stored_investor_record",
+            "url": "https://www.linkedin.com/in/sonaliderycker",
+            "excerpt": "Sonali De Rycker — Partner @ Accel · Agentic AI AI Infrastructure Artificial Intelligence (AI) Foundational AI Generative AI Cloud Consumer Cybersecurity Fintec",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {
+          "phone": "contact-harvest@https://accel.com"
+        }
+      },
+      {
+        "title": "Bruce Golden — Partner @ Accel",
+        "kind": "investor",
+        "role": null,
+        "company": null,
+        "location": "London",
+        "website_url": "https://accel.com",
+        "source_url": null,
+        "disposition": "qualified",
+        "why": "Identity · Bruce Golden — Partner @ Accel · Agentic AI AI Infrastructure Artificial Intelligence (AI) Foundational AI Generative AI…",
+        "email": "bgolden@accel.com",
+        "phone": "+16506144800",
+        "contact_page_url": null,
+        "profile_url": "https://www.linkedin.com/in/bgolden1",
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "stored_investor_record",
+            "url": "https://www.linkedin.com/in/bgolden1",
+            "excerpt": "Bruce Golden — Partner @ Accel · Agentic AI AI Infrastructure Artificial Intelligence (AI) Foundational AI Generative AI Cloud Consumer Cybersecurity Fintech Me",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {
+          "phone": "contact-harvest@https://accel.com"
+        }
+      },
+      {
+        "title": "Philippe Botteri — Partner @ Accel",
+        "kind": "investor",
+        "role": null,
+        "company": null,
+        "location": "London",
+        "website_url": "https://accel.com",
+        "source_url": null,
+        "disposition": "qualified",
+        "why": "Identity · Philippe Botteri — Partner @ Accel · Agentic AI AI Infrastructure Artificial Intelligence (AI) Foundational AI Generativ…",
+        "email": "pbotteri@accel.com",
+        "phone": "+16506144800",
+        "contact_page_url": null,
+        "profile_url": "https://www.linkedin.com/in/philippebotteri",
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "stored_investor_record",
+            "url": "https://www.linkedin.com/in/philippebotteri",
+            "excerpt": "Philippe Botteri — Partner @ Accel · Agentic AI AI Infrastructure Artificial Intelligence (AI) Foundational AI Generative AI Cloud Consumer Cybersecurity Fintec",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {
+          "phone": "contact-harvest@https://accel.com"
+        }
+      },
+      {
+        "title": "Harry Nelis — Partner @ Accel",
+        "kind": "investor",
+        "role": null,
+        "company": null,
+        "location": "London",
+        "website_url": "https://accel.com",
+        "source_url": null,
+        "disposition": "qualified",
+        "why": "Identity · Harry Nelis — Partner @ Accel · Agentic AI AI Infrastructure Artificial Intelligence (AI) Foundational AI Generative AI…",
+        "email": "hnelis@accel.com",
+        "phone": "+16506144800",
+        "contact_page_url": null,
+        "profile_url": "https://www.linkedin.com/in/harry-nelis-429801",
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "stored_investor_record",
+            "url": "https://www.linkedin.com/in/harry-nelis-429801",
+            "excerpt": "Harry Nelis — Partner @ Accel · Agentic AI AI Infrastructure Artificial Intelligence (AI) Foundational AI Generative AI Cloud Consumer Cybersecurity Fintech Med",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {
+          "phone": "contact-harvest@https://accel.com"
+        }
+      }
+    ],
+    "diagnostics": [],
+    "cancelledAtMs": null,
+    "returnedAtMs": 65022,
+    "candidateLedger": {
+      "counts": {
+        "returned": 8,
+        "qualified_more": 0,
+        "rejected": 3,
+        "gated": 0,
+        "filtered": 0,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {
+        "LOCATION_MISMATCH": 3
+      },
+      "streamed": 5,
+      "streamedNotReturned": []
+    }
+  }
+}

@@ -143,7 +143,7 @@ import {
  * v15 preserves calendar granularity: this month is not this quarter, and a
  * named calendar period is not a rolling within_last window.
  */
-export const UNDERSTANDING_PROMPT_VERSION = "u1-v15";
+export const UNDERSTANDING_PROMPT_VERSION = "u1-v16";
 
 const list = (xs: readonly string[]) => xs.join(" | ");
 
@@ -226,15 +226,29 @@ for "backed", "VC-backed", "recently funded", "hiring", "just raised".
 
 PLAIN DISCOVERY IS NOT A FAILURE
 "restaurants in Lisbon", "law firms across Ontario" request NO relationship:
-relation.type="none", direction="none", prospecting_mode="fit_based",
-clarification.needed=false. Never invent a need, and never ask what should be
-true of the restaurants.
+relation.type="none", direction="none", prospecting_mode="fit_based".
+Never invent a need. An execution policy may still ask the user's purpose.
 
 WHAT THE USER SELLS IS NOT WHAT THE PROSPECT NEEDS
 "I sell website design. Find me 100 businesses in Alberta" ->
 user_context.selling.service="website design", target=business, quantity 100,
 relation="none". Only the user's own words about the PROSPECT ("...that don't
 have a website") create a relation.
+
+PRESERVE THE ENTIRE ASK
+"D2C skincare guys" can mean brands: the D2C business cue outranks the weak
+word "guys". "need website services" is needs_service, not no_website;
+only an explicit absence ("no website") is lacks_asset/no_website.
+"Chattogram or Dhaka" means one target in either place: location is first,
+locations[] contains both. A city followed by "or" is not a compound search.
+"not agencies", "exclude staffing agencies", "NOT already funded" are
+negated constraints; never turn their values into positive target filters.
+"paying this much" and "around this size" have unresolved[] entries with
+raw phrase and field (salary_min, revenue, employee_count). Do not guess a number.
+"email, phone, website and socials" populates required_fields when requested;
+"check when they last posted" populates verification/enrichment and needs
+fresh evidence. Record an explicit user purpose in user_context.objective;
+do not infer purpose merely from "find" or "need".
 
 A PROFESSION NOUN IS OFTEN BOTH A PERSON AND A PRACTICE
 "dentists", "audiologists", "plumbers", "opticians" name both the practitioner
@@ -371,6 +385,8 @@ Plus: relation.label (string, for custom), organization_context
   {"on_behalf_of_company":"yes|no|unknown","company":null},
   user_context {"selling":{"service":<open>,"product":<open>},"objective":<open>,"notes":[<open>]},
   location {"value":"Bristol","raw":"around Bristol","scope":"near","radius":null,"radius_unit":null},
+  locations[] is an array of locations when the user joins areas with OR;
+  unresolved[] {"field":"salary_min","raw":"this much"} for stated but unknown values,
   temporal {"relation":"within_last","window":"2w","year":null,"raw":"in the last two weeks"},
   constraints[] {"field":"employee_count","operator":"gte","value":20,"unit":null,"negated":false,"raw":"..."},
   evidence {"claim_evidence_required":bool,"intent_signal_required":bool},

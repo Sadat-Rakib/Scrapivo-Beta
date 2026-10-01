@@ -1,0 +1,714 @@
+{
+  "runId": "trace-custom-product-1790791733179",
+  "query": "Plumbers in Camrose, Alberta without a website, with phone numbers",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 162453,
+  "error": null,
+  "audit": [],
+  "browser": {
+    "adapter": "worker",
+    "status": "completed",
+    "pagesVisited": 17,
+    "currentUrl": "https://www.bing.com/search?q=%22Plumbing%20With%20Pride%22%20%22Camrose%22",
+    "retained": true,
+    "controller": "agent",
+    "sessionId": "6e2819d6-2ec8-468e-896f-5eeb84178da4",
+    "frame": true
+  },
+  "runtime": [
+    {
+      "kind": "runtime",
+      "requested": "worker",
+      "used": "worker"
+    }
+  ],
+  "progressEvents": 58,
+  "streamedRows": [],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [
+    {
+      "kind": "search",
+      "query": "plumber Camrose",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "plumber Camrose",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "\"Day Plumbing LTD.\" \"Camrose\"",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "\"Day Plumbing LTD.\" \"Camrose\"",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 9,
+      "reason": "raw_links=9 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "\"Ken E.G. Mechanical\" \"Camrose\"",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "\"Ken E.G. Mechanical\" \"Camrose\"",
+      "via": "duckduckgo",
+      "status": "blocked",
+      "results": 0,
+      "reason": "CAPTCHA"
+    },
+    {
+      "kind": "search",
+      "query": "\"Ken E.G. Mechanical\" \"Camrose\"",
+      "via": "bing",
+      "status": "ok",
+      "results": 4,
+      "reason": "raw_links=4 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "\"Ken E.G. Mechanical\" \"Camrose\" official website",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "\"Ken E.G. Mechanical\" \"Camrose\" official website",
+      "via": "duckduckgo",
+      "status": "skipped",
+      "results": 0,
+      "reason": "blocked_earlier_in_run"
+    },
+    {
+      "kind": "search",
+      "query": "\"Ken E.G. Mechanical\" \"Camrose\" official website",
+      "via": "bing",
+      "status": "ok",
+      "results": 9,
+      "reason": "raw_links=10 unrelated=1"
+    },
+    {
+      "kind": "search",
+      "query": "\"Plumbing With Pride\" \"Camrose\"",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "\"Plumbing With Pride\" \"Camrose\"",
+      "via": "duckduckgo",
+      "status": "skipped",
+      "results": 0,
+      "reason": "blocked_earlier_in_run"
+    },
+    {
+      "kind": "search",
+      "query": "\"Plumbing With Pride\" \"Camrose\"",
+      "via": "bing",
+      "status": "ok",
+      "results": 9,
+      "reason": "raw_links=10 unrelated=0"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://firstchoiceplumbingandheating.ca/plumbing-and-heating-in-camrose/",
+      "pageType": "unknown",
+      "title": "Plumbing and Heating in Camrose - First Choice Plumbing and Heating",
+      "outcome": "read",
+      "textChars": 5158,
+      "structured": {
+        "jobs": 0,
+        "organization": "First Choice Plumbing and Heating",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error openrouter:nex-agi/nex-n2.5-mini:free 404 (model_missing): {\"error\":{\"message\":\"This model is unavailable for free. The paid version is available now - use this; injected/not_called)",
+      "capture": "fcf209ff7421.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://camrose-ab.canadaplumberspot.com/plumbers",
+      "pageType": "unknown",
+      "title": "Plumbers in Camrose, Alberta – Licensed Local Contractors | Canada Plumber Spot",
+      "outcome": "read",
+      "textChars": 13100,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "Day Plumbing LTD.",
+        "Ken E.G. Mechanical",
+        "Plumbing With Pride",
+        "Austin's Plumbing",
+        "Dee-Jay Plumbing & Heating Ltd"
+      ],
+      "why": "",
+      "capture": null
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://dayplumbingltd.com/",
+      "pageType": "job_posting",
+      "title": "Day Plumbing Ltd.",
+      "outcome": "read",
+      "textChars": 1223,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/breaker model unavailable cooldown; injected/not_called)",
+      "capture": "de997a10342a.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.mapquest.com/ca/alberta/ken-eg-mechanical-716428899",
+      "pageType": "unknown",
+      "title": "Ken Eg Mechanical, Box 1161, Camrose, AB, CA - MapQuest",
+      "outcome": "read",
+      "textChars": 1748,
+      "structured": {
+        "jobs": 0,
+        "organization": "MapQuest",
+        "emails": 1,
+        "phones": 1
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "Ken Eg Mechanical"
+      ],
+      "why": "",
+      "capture": "dcb3d98b6204.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://camrose-ab.canadaplumberspot.com/plumbers/ken-eg-mechanical",
+      "pageType": "unknown",
+      "title": "Ken E.G. Mechanical – Plumbers in Camrose, Alberta | Canada Plumber Spot",
+      "outcome": "read",
+      "textChars": 7161,
+      "structured": {
+        "jobs": 0,
+        "organization": "Ken E.G. Mechanical",
+        "emails": 1,
+        "phones": 1
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "Ken E.G. Mechanical"
+      ],
+      "why": "",
+      "capture": "c1f47661eeea.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.bbb.org/ca/ab/camrose/profile/mechanical-contractors/ken-eg-mechanical-0017-232317",
+      "pageType": "unknown",
+      "title": "Ken E.G. Mechanical | BBB Business Profile",
+      "outcome": "read",
+      "textChars": 3027,
+      "structured": {
+        "jobs": 0,
+        "organization": "Ken E.G. Mechanical",
+        "emails": 0,
+        "phones": 1
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "Ken E.G. Mechanical"
+      ],
+      "why": "",
+      "capture": "cdfdce715823.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.camrose.ca/",
+      "pageType": "unknown",
+      "title": "Home | City of Camrose",
+      "outcome": "read",
+      "textChars": 3379,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/breaker model unavailable cooldown; injected/not_called)",
+      "capture": "0342b9dfc546.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://camrose-ab.canadaplumberspot.com/plumbers"
+      ],
+      "extractor": "json_ld",
+      "llm": "not_called",
+      "entities": 5
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://firstchoiceplumbingandheating.ca/plumbing-and-heating-in-camrose/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "openrouter:nex-agi/nex-n2.5-mini:free 404 (model_missing): {\"error\":{\"message\":\"This model is unavailable for free. The paid version is available now - use this"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://firstchoiceplumbingandheating.ca/plumbing-and-heating-in-camrose/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://dayplumbingltd.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "breaker",
+      "entities": 0,
+      "detail": "model unavailable cooldown"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://dayplumbingltd.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.mapquest.com/ca/alberta/ken-eg-mechanical-716428899"
+      ],
+      "extractor": "json_ld",
+      "llm": "not_called",
+      "entities": 1
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.mapquest.com/ca/alberta/ken-eg-mechanical-716428899"
+      ],
+      "extractor": "deterministic",
+      "llm": "breaker",
+      "entities": 0,
+      "detail": "model unavailable cooldown"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.mapquest.com/ca/alberta/ken-eg-mechanical-716428899"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://camrose-ab.canadaplumberspot.com/plumbers/ken-eg-mechanical"
+      ],
+      "extractor": "json_ld",
+      "llm": "not_called",
+      "entities": 1
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://camrose-ab.canadaplumberspot.com/plumbers/ken-eg-mechanical"
+      ],
+      "extractor": "deterministic",
+      "llm": "breaker",
+      "entities": 0,
+      "detail": "model unavailable cooldown"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://camrose-ab.canadaplumberspot.com/plumbers/ken-eg-mechanical"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.bbb.org/ca/ab/camrose/profile/mechanical-contractors/ken-eg-mechanical-0017-232317"
+      ],
+      "extractor": "json_ld",
+      "llm": "not_called",
+      "entities": 1
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.bbb.org/ca/ab/camrose/profile/mechanical-contractors/ken-eg-mechanical-0017-232317"
+      ],
+      "extractor": "deterministic",
+      "llm": "breaker",
+      "entities": 0,
+      "detail": "model unavailable cooldown"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.bbb.org/ca/ab/camrose/profile/mechanical-contractors/ken-eg-mechanical-0017-232317"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.camrose.ca/"
+      ],
+      "extractor": "deterministic",
+      "llm": "breaker",
+      "entities": 0,
+      "detail": "model unavailable cooldown"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.camrose.ca/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    }
+  ],
+  "entityOutcomes": [
+    {
+      "page": "https://camrose-ab.canadaplumberspot.com/plumbers",
+      "name": "Day Plumbing LTD.",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://camrose-ab.canadaplumberspot.com/plumbers",
+      "name": "Ken E.G. Mechanical",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://camrose-ab.canadaplumberspot.com/plumbers",
+      "name": "Plumbing With Pride",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://camrose-ab.canadaplumberspot.com/plumbers",
+      "name": "Austin's Plumbing",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://camrose-ab.canadaplumberspot.com/plumbers",
+      "name": "Dee-Jay Plumbing & Heating Ltd",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.mapquest.com/ca/alberta/ken-eg-mechanical-716428899",
+      "name": "Ken Eg Mechanical",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://camrose-ab.canadaplumberspot.com/plumbers/ken-eg-mechanical",
+      "name": "Ken E.G. Mechanical",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.bbb.org/ca/ab/camrose/profile/mechanical-contractors/ken-eg-mechanical-0017-232317",
+      "name": "Ken E.G. Mechanical",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    }
+  ],
+  "remember": [
+    {
+      "kind": "remember",
+      "name": "Day Plumbing LTD.",
+      "rowKind": "business",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Ken E.G. Mechanical",
+      "rowKind": "business",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Plumbing With Pride",
+      "rowKind": "business",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Austin's Plumbing",
+      "rowKind": "business",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Dee-Jay Plumbing & Heating Ltd",
+      "rowKind": "business",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Ken Eg Mechanical",
+      "rowKind": "business",
+      "outcome": "TARGET_MISMATCH",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Ken E.G. Mechanical",
+      "rowKind": "business",
+      "outcome": "TARGET_MISMATCH",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Ken E.G. Mechanical",
+      "rowKind": "business",
+      "outcome": "merged",
+      "resolved": true
+    }
+  ],
+  "candidates": [
+    {
+      "kind": "candidate",
+      "name": "Day Plumbing LTD.",
+      "status": "rejected",
+      "rejectCode": "CLAIM_PARAMETER_MISMATCH",
+      "label": "Observed website contradicts the requested website absence",
+      "needs": [
+        "industry",
+        "contact"
+      ],
+      "visited": 1,
+      "queries": 1
+    },
+    {
+      "kind": "candidate",
+      "name": "Ken E.G. Mechanical",
+      "status": "exhausted",
+      "rejectCode": "NO_CLAIM_EVIDENCE",
+      "label": "Website absence has not been verified for this business",
+      "needs": [
+        "industry",
+        "no_website_verification"
+      ],
+      "visited": 4,
+      "queries": 2
+    }
+  ],
+  "done": [
+    {
+      "kind": "done",
+      "status": "timeout",
+      "candidates": 5,
+      "verified": 0,
+      "visited": 8,
+      "queries": 5,
+      "stoppingReason": "BROWSER_DISCOVERY_TIMEOUT",
+      "elapsedMs": 90016
+    }
+  ],
+  "persistenceSkipped": [
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "NO_QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "business",
+    "criteria": [
+      "category=plumber",
+      "location=Camrose",
+      "location_id=geo:city:camrose",
+      "location_kind=city",
+      "location_country=CA",
+      "location_parents=geo:country:ca",
+      "opportunity=no_website",
+      "require_name=true",
+      "required_field=name",
+      "require_phone=true",
+      "required_field=phone"
+    ],
+    "clarify": [
+      "entity_business_model"
+    ],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_businesses(country,city_norm,category)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "s3-parquet",
+          "partitions": [
+            "processed/local-businesses/by_country/gb.parquet",
+            "processed/local-businesses/by_country/ca.parquet",
+            "(exact=2 nearby=0 for \"Camrose\")"
+          ],
+          "scanned": 800000,
+          "matched": 2
+        },
+        {
+          "source": "live-browser",
+          "partitions": [
+            "live-gapfill(5)"
+          ],
+          "scanned": 5,
+          "matched": 5
+        }
+      ],
+      "rawCandidates": 7,
+      "postSpecFilter": 5,
+      "timings": {
+        "understanding_ms": 14705,
+        "stored_search_ms": 31385,
+        "research_ms": 112660,
+        "enrichment_ms": 1373,
+        "qualification_ms": 459,
+        "total_ms": 160582
+      },
+      "researchable": 5,
+      "researched": 5,
+      "complete": 0,
+      "pendingEnrichment": 0,
+      "qualificationRejected": 0,
+      "qualified": 0,
+      "returned": 0,
+      "reason": "FAILED_QUALIFICATION",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "osm-local",
+            "label": "Public source",
+            "state": "empty",
+            "reason": "NO_RESULTS"
+          },
+          {
+            "source": "direct-http",
+            "label": "Public websites",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "browser-live",
+            "label": "Public websites",
+            "state": "healthy",
+            "reason": "OK"
+          }
+        ],
+        "degraded": true,
+        "summary": null
+      }
+    },
+    "rowsReturned": 0,
+    "rows": [],
+    "diagnostics": [
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "direct-http",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      }
+    ],
+    "cancelledAtMs": null,
+    "returnedAtMs": 162452,
+    "candidateLedger": {
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 0,
+        "gated": 0,
+        "filtered": 5,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {},
+      "streamed": 0,
+      "streamedNotReturned": []
+    }
+  }
+}

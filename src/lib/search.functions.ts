@@ -63,6 +63,8 @@ export const runSearch = createServerFn({ method: "POST" })
     const { validateLeads } = await import("./validation");
 
     const { supabase, userId } = context;
+    // Local acceptance runs never tick quota or write history (ignored in production).
+    const { skipPersistence } = await import("@/lib/persistence-policy.server");
     const { data: profile } = await supabase
       .from("profiles")
       .select("plan, searches_used, searches_reset_at, years_experience")
@@ -75,7 +77,7 @@ export const runSearch = createServerFn({ method: "POST" })
     const dayAgo = new Date(now.getTime() - 86400_000);
     if (resetAt < dayAgo) {
       used = 0;
-      await supabase
+      if (!skipPersistence("profiles")) await supabase
         .from("profiles")
         .update({ searches_used: 0, searches_reset_at: now.toISOString() })
         .eq("id", userId);
@@ -642,7 +644,7 @@ export const runSearch = createServerFn({ method: "POST" })
       // Social gate for firms — LinkedIn or a real website, never a bare name.
       const companies = mappedCompanies.filter((c) => !!(c.linkedin_url || c.website));
       // Owner runs unlimited searches — never tick the daily counter.
-      if (!isOwner) {
+      if (!isOwner && !skipPersistence("profiles")) {
         await supabase
           .from("profiles")
           .update({ searches_used: used + 1, searches_reset_at: now.toISOString() })
@@ -654,7 +656,7 @@ export const runSearch = createServerFn({ method: "POST" })
         decision === "local"
           ? ["investors-complete-file"]
           : ["investors-complete-file", "investors"];
-      await supabase.from("search_history").insert({
+      if (!skipPersistence("search_history")) await supabase.from("search_history").insert({
         user_id: userId,
         query: data.query,
         results_count: investors.length,
@@ -1580,10 +1582,10 @@ export const runSearch = createServerFn({ method: "POST" })
     }
 
     // Owner runs unlimited searches — never tick the daily counter.
-    if (!isOwner) {
+    if (!isOwner && !skipPersistence("profiles")) {
       await supabase.from("profiles").update({ searches_used: used + 1 }).eq("id", userId);
     }
-    await supabase.from("search_history").insert({
+    if (!skipPersistence("search_history")) await supabase.from("search_history").insert({
       user_id: userId,
       query: data.query,
       results_count: leadsWithContacts.length,

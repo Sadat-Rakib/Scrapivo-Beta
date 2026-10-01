@@ -1,0 +1,256 @@
+{
+  "runId": "trace-custom-product-1790790981769",
+  "query": "Heads of marketing at DTC brands in London",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 56220,
+  "error": null,
+  "audit": [],
+  "browser": {
+    "adapter": "worker",
+    "status": "completed",
+    "pagesVisited": 4,
+    "currentUrl": "https://www.bing.com/search?q=site%3Alinkedin.com%2Fin%20head%20of%20marketing%20DTC%20London",
+    "retained": true,
+    "controller": "agent",
+    "sessionId": "ddfa980b-a34a-4a45-9103-7f729811c511",
+    "frame": true
+  },
+  "runtime": [
+    {
+      "kind": "runtime",
+      "requested": "worker",
+      "used": "worker"
+    }
+  ],
+  "progressEvents": 13,
+  "streamedRows": [],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [
+    {
+      "kind": "search",
+      "query": "head of marketing DTC d2c London",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "head of marketing DTC d2c London",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "site:linkedin.com/in head of marketing DTC London",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "site:linkedin.com/in head of marketing DTC London",
+      "via": "duckduckgo",
+      "status": "empty",
+      "results": 0,
+      "reason": "raw_links=0 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "site:linkedin.com/in head of marketing DTC London",
+      "via": "bing",
+      "status": "empty",
+      "results": 0,
+      "reason": "raw_links=0 unrelated=0"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://uk.linkedin.com/in/jammax",
+      "pageType": "unknown",
+      "title": "James Maxwell - MoneyGram | LinkedIn",
+      "outcome": "read",
+      "textChars": 18000,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "7e0130cb289d.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://uk.linkedin.com/in/beth-c-7a178213",
+      "pageType": null,
+      "title": null,
+      "outcome": "navigation_failed",
+      "textChars": 0,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "navigation_failed: The page could not be read.",
+      "capture": null
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://uk.linkedin.com/in/jammax"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://uk.linkedin.com/in/jammax"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    }
+  ],
+  "entityOutcomes": [],
+  "remember": [],
+  "candidates": [],
+  "done": [
+    {
+      "kind": "done",
+      "status": "completed",
+      "candidates": 0,
+      "verified": 0,
+      "visited": 2,
+      "queries": 2,
+      "stoppingReason": "diminishing_returns",
+      "elapsedMs": 44562
+    }
+  ],
+  "persistenceSkipped": [
+    "ai_cache",
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "NO_QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "person",
+    "criteria": [
+      "role=head of marketing",
+      "industry=DTC",
+      "business_model=d2c",
+      "location=London",
+      "location_id=geo:city:london",
+      "location_kind=city",
+      "location_country=GB",
+      "location_parents=geo:metro:greater-london,geo:country:gb"
+    ],
+    "clarify": [],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_people(country,city_norm,role_norm)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "s3-parquet",
+          "partitions": [
+            "processed/people_by_country/_part=united-kingdom/data_0.parquet",
+            "processed/people_by_country/_part=united-kingdom/data_1.parquet"
+          ],
+          "scanned": 6392,
+          "matched": 0
+        }
+      ],
+      "rawCandidates": 0,
+      "postSpecFilter": 0,
+      "timings": {
+        "understanding_ms": 5947,
+        "stored_search_ms": 2952,
+        "research_ms": 44787,
+        "enrichment_ms": 3,
+        "qualification_ms": 286,
+        "total_ms": 53975
+      },
+      "researchable": 0,
+      "complete": 0,
+      "pendingEnrichment": 0,
+      "qualificationRejected": 0,
+      "qualified": 0,
+      "returned": 0,
+      "reason": "SOURCE_UNAVAILABLE",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "direct-http",
+            "label": "Public websites",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "searxng",
+            "label": "The web",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "browser-live",
+            "label": "Public websites",
+            "state": "empty",
+            "reason": "NO_RESULTS"
+          }
+        ],
+        "degraded": true,
+        "summary": null
+      }
+    },
+    "rowsReturned": 0,
+    "rows": [],
+    "diagnostics": [
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "direct-http",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "searxng",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      }
+    ],
+    "cancelledAtMs": null,
+    "returnedAtMs": 56219,
+    "candidateLedger": {
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 0,
+        "gated": 0,
+        "filtered": 0,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {},
+      "streamed": 0,
+      "streamedNotReturned": []
+    }
+  }
+}

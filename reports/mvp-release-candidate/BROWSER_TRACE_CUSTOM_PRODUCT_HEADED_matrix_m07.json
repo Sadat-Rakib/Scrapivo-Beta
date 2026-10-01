@@ -1,0 +1,346 @@
+{
+  "runId": "trace-custom-product-1790791245178",
+  "query": "Marketing agencies in Bristol with websites",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 274813,
+  "error": null,
+  "audit": [],
+  "browser": {
+    "adapter": "worker",
+    "status": "completed",
+    "pagesVisited": 6,
+    "currentUrl": "https://brightsprout.co.uk/",
+    "retained": true,
+    "controller": "agent",
+    "sessionId": "5c71144d-3520-4e35-813d-1d3cf017b138",
+    "frame": true
+  },
+  "runtime": [
+    {
+      "kind": "runtime",
+      "requested": "worker",
+      "used": "worker"
+    }
+  ],
+  "progressEvents": 23,
+  "streamedRows": [],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [
+    {
+      "kind": "search",
+      "query": "marketing agency company Bristol",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "marketing agency company Bristol",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "marketing agency startup Bristol",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "marketing agency startup Bristol",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://www.designrush.com/agency/ad-agencies/uk/bristol",
+      "pageType": "list",
+      "title": "Top Advertising Agencies in Bristol | 2026",
+      "outcome": "read",
+      "textChars": 10733,
+      "structured": {
+        "jobs": 0,
+        "organization": "DesignRush",
+        "emails": 1,
+        "phones": 1
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "entities rejected: ",
+      "capture": "88e9935e78fc.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://bristolmarketingcompany.co.uk/",
+      "pageType": "unknown",
+      "title": "Marketing Agency Bristol | SEO, PPC & Web Design | BMC",
+      "outcome": "read",
+      "textChars": 8955,
+      "structured": {
+        "jobs": 0,
+        "organization": "Bristol Marketing Company",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "entities rejected: PROVENANCE_INCOMPLETE/identity_quote_not_on_page",
+      "capture": "001fe0221781.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://rubiconmarketing.net/",
+      "pageType": "unknown",
+      "title": "Rubicon Marketing | Creative Design & Marketing Agency Bristol",
+      "outcome": "read",
+      "textChars": 2064,
+      "structured": {
+        "jobs": 0,
+        "organization": "Rubicon Marketing",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "entities rejected: ENTITY_TYPE_MISMATCH/kind_unsupported_by_quotes",
+      "capture": "f4aa68f9c5b1.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://brightsprout.co.uk/",
+      "pageType": "unknown",
+      "title": "Digital Marketing Agency Bristol - SEO, PPC, Social Media",
+      "outcome": "read",
+      "textChars": 6108,
+      "structured": {
+        "jobs": 0,
+        "organization": "Bright Sprout",
+        "emails": 1,
+        "phones": 1
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "entities rejected: PROVENANCE_INCOMPLETE/identity_quote_not_on_page",
+      "capture": "18782b484fa4.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.designrush.com/agency/ad-agencies/uk/bristol",
+        "https://bristolmarketingcompany.co.uk/"
+      ],
+      "extractor": "llm",
+      "llm": "ok",
+      "entities": 2
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.designrush.com/agency/ad-agencies/uk/bristol",
+        "https://bristolmarketingcompany.co.uk/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 2
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://rubiconmarketing.net/",
+        "https://brightsprout.co.uk/"
+      ],
+      "extractor": "llm",
+      "llm": "ok",
+      "entities": 2
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://rubiconmarketing.net/",
+        "https://brightsprout.co.uk/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 2
+    }
+  ],
+  "entityOutcomes": [
+    {
+      "page": "https://bristolmarketingcompany.co.uk/",
+      "name": "Bristol Marketing Company",
+      "kind": "company",
+      "outcome": "rejected",
+      "reason": "PROVENANCE_INCOMPLETE",
+      "detail": "identity_quote_not_on_page",
+      "dropped": []
+    },
+    {
+      "page": "https://bristolmarketingcompany.co.uk/",
+      "name": "Tristan",
+      "kind": "person",
+      "outcome": "rejected",
+      "reason": "PROVENANCE_INCOMPLETE",
+      "detail": "identity_quote_not_on_page",
+      "dropped": []
+    },
+    {
+      "page": "https://rubiconmarketing.net/",
+      "name": "Rubicon Marketing",
+      "kind": "company",
+      "outcome": "rejected",
+      "reason": "ENTITY_TYPE_MISMATCH",
+      "detail": "kind_unsupported_by_quotes",
+      "dropped": []
+    },
+    {
+      "page": "https://brightsprout.co.uk/",
+      "name": "Bright Sprout",
+      "kind": "company",
+      "outcome": "rejected",
+      "reason": "PROVENANCE_INCOMPLETE",
+      "detail": "identity_quote_not_on_page",
+      "dropped": []
+    }
+  ],
+  "remember": [],
+  "candidates": [],
+  "done": [
+    {
+      "kind": "done",
+      "status": "completed",
+      "candidates": 0,
+      "verified": 0,
+      "visited": 4,
+      "queries": 2,
+      "stoppingReason": "diminishing_returns",
+      "elapsedMs": 55182
+    }
+  ],
+  "persistenceSkipped": [
+    "ai_cache",
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "NO_QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "company",
+    "criteria": [
+      "industry=marketing agency",
+      "location=Bristol",
+      "location_id=geo:stated:bristol",
+      "location_kind=stated",
+      "website=true"
+    ],
+    "clarify": [
+      "entity_business_model"
+    ],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_companies(country,city_norm)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "s3-parquet",
+          "partitions": [
+            "processed/companies_by_initial/ (size-ordered, 8 largest)",
+            "processed/companies_by_initial/ (widened +102 shard(s))"
+          ],
+          "scanned": 1602141,
+          "matched": 0
+        }
+      ],
+      "rawCandidates": 0,
+      "postSpecFilter": 0,
+      "timings": {
+        "understanding_ms": 15489,
+        "stored_search_ms": 200986,
+        "research_ms": 55712,
+        "enrichment_ms": 3,
+        "qualification_ms": 534,
+        "total_ms": 272724
+      },
+      "researchable": 0,
+      "complete": 0,
+      "pendingEnrichment": 0,
+      "qualificationRejected": 0,
+      "qualified": 0,
+      "returned": 0,
+      "reason": "SOURCE_UNAVAILABLE",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "direct-http",
+            "label": "Public websites",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "searxng",
+            "label": "The web",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "browser-live",
+            "label": "Public websites",
+            "state": "empty",
+            "reason": "NO_RESULTS"
+          }
+        ],
+        "degraded": true,
+        "summary": null
+      }
+    },
+    "rowsReturned": 0,
+    "rows": [],
+    "diagnostics": [
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "direct-http",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "searxng",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      }
+    ],
+    "cancelledAtMs": null,
+    "returnedAtMs": 274812,
+    "candidateLedger": {
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 0,
+        "gated": 0,
+        "filtered": 0,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {},
+      "streamed": 0,
+      "streamedNotReturned": []
+    }
+  }
+}

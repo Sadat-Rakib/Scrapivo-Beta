@@ -1,0 +1,550 @@
+{
+  "seed": 27491,
+  "holdout": [
+    {
+      "id": "h000a",
+      "prompt": "millwrights looking for clients",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_client"
+      },
+      "pairWith": "h000b"
+    },
+    {
+      "id": "h000b",
+      "prompt": "businesses looking for millwrights",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "business",
+          "company"
+        ],
+        "relation": "needs_service",
+        "object": "millwright"
+      },
+      "pairWith": "h000a"
+    },
+    {
+      "id": "h002a",
+      "prompt": "millwrights who serve board game cafés in Örebro",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "location": "örebro"
+      },
+      "pairWith": "h002b"
+    },
+    {
+      "id": "h002b",
+      "prompt": "board game cafés in Örebro who need a millwright",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "needs_service",
+        "object": "millwright",
+        "location": "örebro"
+      },
+      "pairWith": "h002a"
+    },
+    {
+      "id": "h004a",
+      "prompt": "grant writing agencies in Split",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "split",
+        "clarification": "forbidden"
+      },
+      "pairWith": "h004b"
+    },
+    {
+      "id": "h004b",
+      "prompt": "companies in Split needing grant writing",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "needs_service",
+        "object": "grant writing",
+        "location": "split",
+        "intent_signal_required": true
+      },
+      "pairWith": "h004a"
+    },
+    {
+      "id": "h006a",
+      "prompt": "companies in Dunedin hiring fractional CFOs",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "hiring",
+        "location": "dunedin",
+        "intent_signal_required": true
+      },
+      "pairWith": "h006b"
+    },
+    {
+      "id": "h006b",
+      "prompt": "fractional CFOs in Dunedin looking for work",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_job",
+        "location": "dunedin"
+      },
+      "pairWith": "h006a"
+    },
+    {
+      "id": "h008a",
+      "prompt": "waste haulage agencies in Hsinchu",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "hsinchu",
+        "clarification": "forbidden"
+      },
+      "pairWith": "h008b"
+    },
+    {
+      "id": "h008b",
+      "prompt": "companies in Hsinchu needing waste haulage",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "needs_service",
+        "object": "waste haulage",
+        "location": "hsinchu",
+        "intent_signal_required": true
+      },
+      "pairWith": "h008a"
+    },
+    {
+      "id": "h010",
+      "prompt": "seed libraries in Napier",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "task_type": "lead_discovery",
+        "prospecting_mode": "fit_based",
+        "relation": "none",
+        "location": "napier",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity"
+    },
+    {
+      "id": "h011",
+      "prompt": "prosthetics labs in Cebu",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "task_type": "lead_discovery",
+        "prospecting_mode": "fit_based",
+        "relation": "none",
+        "location": "cebu",
+        "clarification": "forbidden"
+      },
+      "note": "plain_entity"
+    },
+    {
+      "id": "h012",
+      "prompt": "I need at least 15 mushroom farms in Vilnius",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "quantity_min": 15,
+        "location": "vilnius"
+      },
+      "note": "quantity_minimum"
+    },
+    {
+      "id": "h013",
+      "prompt": "haulage companies in Aarhus with at least 100 employees, not agencies",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "location": "aarhus",
+        "min_constraints": 2,
+        "negated": [
+          "category"
+        ]
+      },
+      "note": "constraints"
+    },
+    {
+      "id": "h014",
+      "prompt": "sports clubs in Gaborone that need grant writing",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "organization",
+          "business",
+          "company",
+          "other"
+        ],
+        "relation": "needs_service",
+        "location": "gaborone"
+      },
+      "note": "organization"
+    },
+    {
+      "id": "h015",
+      "prompt": "cider houses in Dunedin with no online booking",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "opportunity_based",
+        "relation": "lacks_asset",
+        "location": "dunedin",
+        "min_constraints": 1,
+        "intent_signal_required": false
+      },
+      "note": "lacks_asset"
+    },
+    {
+      "id": "h016",
+      "prompt": "forestry companies in Boise with at least 10 employees, not agencies",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "location": "boise",
+        "min_constraints": 2,
+        "negated": [
+          "category"
+        ]
+      },
+      "note": "constraints"
+    },
+    {
+      "id": "h017",
+      "prompt": "freelance AI safety researchers under $150/hour, excluding Pécs",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "no_location": true,
+        "negated": [
+          "location"
+        ]
+      },
+      "note": "excluded_location"
+    },
+    {
+      "id": "h018",
+      "prompt": "Give me 25 bell foundries in Hamilton, phone number required, Instagram if possible, verify they are currently open, and output a table I can paste into Notion",
+      "set": "holdout",
+      "size": "large",
+      "expect": {
+        "location": "hamilton",
+        "quantity": 25,
+        "required_fields": [
+          "phone"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ],
+        "min_verification": 1
+      },
+      "note": "long_form"
+    },
+    {
+      "id": "h019",
+      "prompt": "I'm selling warehouse automation to small firms. Find me 100+ hydroponic farms in Timișoara that don't have a real website, phone required, socials if possible, verify they exist, and give me a table plus outreach drafts.",
+      "set": "holdout",
+      "size": "large",
+      "expect": {
+        "prospecting_mode": "opportunity_based",
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "timișoara",
+        "quantity_min": 100,
+        "user_selling": "warehouse automation",
+        "required_fields": [
+          "phone"
+        ],
+        "min_verification": 1,
+        "output": [
+          "table",
+          "outreach_drafts"
+        ]
+      },
+      "note": "long_form_opportunity"
+    },
+    {
+      "id": "h020",
+      "prompt": "precision fermentation startups in Cebu that raised funding recently",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "prospecting_mode": "event_based",
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "received_funding",
+        "location": "cebu",
+        "temporal": true
+      },
+      "note": "received_funding"
+    },
+    {
+      "id": "h021",
+      "prompt": "firms in Kelowna that provide packaging design",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "object": "packaging design",
+        "location": "kelowna",
+        "intent_signal_required": false
+      },
+      "note": "offers_service"
+    },
+    {
+      "id": "h022",
+      "prompt": "give me 20 taxidermists in Dunedin",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "quantity": 20,
+        "location": "dunedin",
+        "relation": "none"
+      },
+      "note": "quantity_exact"
+    },
+    {
+      "id": "h023",
+      "prompt": "find prosthetics labs in Aberystwyth and also find taxidermists in Chattanooga",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "compound": true,
+        "min_subgoals": 2
+      },
+      "note": "compound"
+    },
+    {
+      "id": "h024",
+      "prompt": "harbour pilots attending Interzoo",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": [
+          "attending_event",
+          "custom"
+        ]
+      },
+      "note": "attending_event"
+    },
+    {
+      "id": "h025",
+      "prompt": "companies that posted a millwright role in the last 2 months",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "hiring",
+        "temporal": true,
+        "no_location": true
+      },
+      "note": "temporal_hiring"
+    },
+    {
+      "id": "h026",
+      "prompt": "agronomists in Wrocław hiring millwrights",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "hiring_based",
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "wrocław",
+        "intent_signal_required": true
+      },
+      "note": "person_hiring"
+    },
+    {
+      "id": "h027",
+      "prompt": "companies in Windhoek that need subtitling",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "intent_based",
+        "relation": "needs_service",
+        "object": "subtitling",
+        "location": "windhoek",
+        "intent_signal_required": true
+      },
+      "note": "needs_service"
+    },
+    {
+      "id": "h028",
+      "prompt": "port logistics",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "clarification": "required"
+      },
+      "note": "underspecified"
+    },
+    {
+      "id": "h029",
+      "prompt": "Give me 20 dive schools in Busan, phone number required, Instagram if possible, verify they are currently open, and output a table I can paste into Notion",
+      "set": "holdout",
+      "size": "large",
+      "expect": {
+        "location": "busan",
+        "quantity": 20,
+        "required_fields": [
+          "phone"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ],
+        "min_verification": 1
+      },
+      "note": "long_form"
+    },
+    {
+      "id": "h030",
+      "prompt": "companies that posted a brand strategist role in the last 6 months",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "hiring",
+        "temporal": true,
+        "no_location": true
+      },
+      "note": "temporal_hiring"
+    },
+    {
+      "id": "h031",
+      "prompt": "medical writers in Enschede looking for clients",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_client",
+        "location": "enschede"
+      },
+      "note": "seeking_client"
+    },
+    {
+      "id": "h032",
+      "prompt": "find bell foundries in Chattanooga and also find board game cafés in Sfax",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "compound": true,
+        "min_subgoals": 2
+      },
+      "note": "compound"
+    },
+    {
+      "id": "h033",
+      "prompt": "proptech startups in Brno that raised funding recently",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "event_based",
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "received_funding",
+        "location": "brno",
+        "temporal": true
+      },
+      "note": "received_funding"
+    },
+    {
+      "id": "h034",
+      "prompt": "space",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "clarification": "required"
+      },
+      "note": "underspecified"
+    },
+    {
+      "id": "h035",
+      "prompt": "Give me 100 hydroponic farms in Hsinchu, phone number required, Instagram if possible, verify they are currently open, and output a table I can paste into Notion",
+      "set": "holdout",
+      "size": "large",
+      "expect": {
+        "location": "hsinchu",
+        "quantity": 100,
+        "required_fields": [
+          "phone"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ],
+        "min_verification": 1
+      },
+      "note": "long_form"
+    },
+    {
+      "id": "h036",
+      "prompt": "harbour pilots in Arequipa hiring arborists",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "hiring_based",
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "arequipa",
+        "intent_signal_required": true
+      },
+      "note": "person_hiring"
+    },
+    {
+      "id": "h037",
+      "prompt": "prosthetists attending Interzoo",
+      "set": "holdout",
+      "size": "tiny",
+      "expect": {
+        "entity_type": "person",
+        "relation": [
+          "attending_event",
+          "custom"
+        ]
+      },
+      "note": "attending_event"
+    },
+    {
+      "id": "h038",
+      "prompt": "companies in Tromsø that need ISO certification",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "prospecting_mode": "intent_based",
+        "relation": "needs_service",
+        "object": "iso certification",
+        "location": "tromsø",
+        "intent_signal_required": true
+      },
+      "note": "needs_service"
+    },
+    {
+      "id": "h039",
+      "prompt": "I need at least 25 roasteries in Braga",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "quantity_min": 25,
+        "location": "braga"
+      },
+      "note": "quantity_minimum"
+    }
+  ],
+  "chaos": []
+}

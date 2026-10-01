@@ -1,0 +1,197 @@
+{
+  "runId": "trace-founders-smoke-1790728528629",
+  "query": "SaaS founders with recent hiring evidence and public contact details",
+  "which": "founders",
+  "mode": "smoke",
+  "durationMs": 24067,
+  "error": null,
+  "browser": {
+    "adapter": "playwright",
+    "status": "completed",
+    "pagesVisited": 12,
+    "currentUrl": "https://copilot.cloud.microsoft/"
+  },
+  "progressEvents": 26,
+  "streamedRows": [],
+  "searches": [
+    {
+      "kind": "search",
+      "query": "\"founder\" SaaS",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "\"founder\" SaaS",
+      "via": "duckduckgo",
+      "status": "empty",
+      "results": 0,
+      "reason": "raw_links=1"
+    },
+    {
+      "kind": "search",
+      "query": "\"founder\" SaaS",
+      "via": "bing",
+      "status": "ok",
+      "results": 11,
+      "reason": "raw_links=42"
+    },
+    {
+      "kind": "search",
+      "query": "\"co-founder\" SaaS",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "\"co-founder\" SaaS",
+      "via": "duckduckgo",
+      "status": "empty",
+      "results": 0,
+      "reason": "raw_links=1"
+    },
+    {
+      "kind": "search",
+      "query": "\"co-founder\" SaaS",
+      "via": "bing",
+      "status": "ok",
+      "results": 14,
+      "reason": "raw_links=45"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://support.microsoft.com/en-us/bing/accessibility-in-bing",
+      "pageType": "unknown",
+      "title": "Accessibility in Bing | Microsoft Support",
+      "outcome": "read",
+      "textChars": 3359,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "02a29ef956bc.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.bing.com/images/create/ai-image-generator?FORM=IRPGEN&imghpsrc=1",
+      "pageType": "unknown",
+      "title": "Free AI Image Generator - Bing Image Creator",
+      "outcome": "read",
+      "textChars": 897,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "31d9760c70eb.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://en.wikipedia.org/wiki/Carbon_monoxide",
+      "pageType": "unknown",
+      "title": "Carbon monoxide - Wikipedia",
+      "outcome": "read",
+      "textChars": 18000,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "4d50a7e8cfbd.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://copilot.cloud.microsoft/",
+      "pageType": "unknown",
+      "title": "Copilot | AI chat for work",
+      "outcome": "read",
+      "textChars": 2503,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "df1b7cde3c03.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://support.microsoft.com/en-us/bing/accessibility-in-bing",
+        "https://www.bing.com/images/create/ai-image-generator?FORM=IRPGEN&imghpsrc=1"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://support.microsoft.com/en-us/bing/accessibility-in-bing",
+        "https://www.bing.com/images/create/ai-image-generator?FORM=IRPGEN&imghpsrc=1"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://en.wikipedia.org/wiki/Carbon_monoxide",
+        "https://copilot.cloud.microsoft/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://en.wikipedia.org/wiki/Carbon_monoxide",
+        "https://copilot.cloud.microsoft/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    }
+  ],
+  "entityOutcomes": [],
+  "remember": [],
+  "candidates": [],
+  "done": [
+    {
+      "kind": "done",
+      "status": "completed",
+      "candidates": 0,
+      "verified": 0,
+      "visited": 4,
+      "queries": 2,
+      "stoppingReason": "search_budget_reached",
+      "elapsedMs": 24047
+    }
+  ],
+  "persistenceSkipped": [
+    "ai_cache"
+  ],
+  "result": {
+    "mode": "smoke",
+    "rowsReturned": 0,
+    "rows": []
+  }
+}

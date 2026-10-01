@@ -1,0 +1,832 @@
+{
+  "runId": "trace-custom-product-1790791636069",
+  "query": "Restaurants in Calgary, Alberta with official websites",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 96207,
+  "error": null,
+  "audit": [
+    {
+      "title": "Sakana Grill",
+      "checks": [
+        {
+          "method": "stored_business_record",
+          "url": "db://businesses/a687dac0-d17d-4859-9c3f-2b780f95cbfd",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": "+14032901118"
+    },
+    {
+      "title": "Deepam Dosa",
+      "checks": [
+        {
+          "method": "stored_business_record",
+          "url": "db://businesses/6c6ac3a3-1b63-440d-88b1-f358c0e29a3c",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": "+14032182902"
+    },
+    {
+      "title": "Maharajah East Indian Restaurant",
+      "checks": [
+        {
+          "method": "stored_business_record",
+          "url": "db://businesses/87e3f69b-306f-40ca-a57d-9405094b7b6f",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": "maharajahcalgary@gmail.com",
+      "phone": "+14032460080"
+    },
+    {
+      "title": "Primal Grounds Cafe",
+      "checks": [
+        {
+          "method": "stored_business_record",
+          "url": "db://businesses/c37ae1f6-f5e0-4e6e-92c4-ffff26b30709",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": "+14034545282"
+    },
+    {
+      "title": "Boston Pizza",
+      "checks": [
+        {
+          "method": "stored_business_record",
+          "url": "db://businesses/6f9c4c78-0012-4070-a79b-f838611547ca",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": "+14032404422"
+    },
+    {
+      "title": "Golden Bell Richmond",
+      "checks": [
+        {
+          "method": "stored_business_record",
+          "url": "db://businesses/00bf1e42-941f-4d5a-bbde-5a1f3087ea90",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": "+14032404048"
+    },
+    {
+      "title": "Jerusalem Shawarma",
+      "checks": [
+        {
+          "method": "stored_business_record",
+          "url": "db://businesses/dba62a10-14e7-4959-b16b-69f0ac6df541",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": "+14032497693"
+    },
+    {
+      "title": "KFC",
+      "checks": [
+        {
+          "method": "stored_business_record",
+          "url": "db://businesses/6bf26e11-d35a-4315-b520-6c17d2b0db28",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": null
+    },
+    {
+      "title": "Biryani Inn",
+      "checks": [
+        {
+          "method": "stored_business_record",
+          "url": "db://businesses/9d5b2cfd-01bb-4786-af78-aba6e4c904ad",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": "+15878891405"
+    },
+    {
+      "title": "Ruth's Chris Steak House",
+      "checks": [
+        {
+          "method": "stored_business_record",
+          "url": "db://businesses/a6f9c4d3-9212-439c-8b38-22e10b1a3568",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": "+14032463636"
+    }
+  ],
+  "browser": null,
+  "runtime": [],
+  "progressEvents": 6,
+  "streamedRows": [],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [],
+  "pages": [],
+  "extracts": [],
+  "entityOutcomes": [],
+  "remember": [],
+  "candidates": [],
+  "done": [],
+  "persistenceSkipped": [
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "business",
+    "criteria": [
+      "category=restaurant",
+      "location=Calgary",
+      "location_id=geo:city:calgary",
+      "location_kind=city",
+      "location_country=CA",
+      "location_parents=geo:country:ca",
+      "website=true"
+    ],
+    "clarify": [],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_businesses(country,city_norm,category)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "s3-parquet",
+          "partitions": [
+            "processed/local-businesses/by_country/ca.parquet",
+            "(exact=11 nearby=0 for \"Calgary\")"
+          ],
+          "scanned": 215848,
+          "matched": 11
+        },
+        {
+          "source": "live-osm",
+          "partitions": [
+            "live-gapfill(124)"
+          ],
+          "scanned": 124,
+          "matched": 124
+        }
+      ],
+      "rawCandidates": 135,
+      "postSpecFilter": 111,
+      "timings": {
+        "understanding_ms": 14405,
+        "stored_search_ms": 52182,
+        "research_ms": 6161,
+        "enrichment_ms": 21245,
+        "qualification_ms": 348,
+        "total_ms": 94341
+      },
+      "researchable": 100,
+      "researched": 100,
+      "complete": 56,
+      "pendingEnrichment": 54,
+      "qualificationRejected": 0,
+      "qualified": 56,
+      "returned": 10,
+      "reason": "RESULTS",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "osm-local",
+            "label": "Public source",
+            "state": "healthy",
+            "reason": "OK"
+          },
+          {
+            "source": "enrich:registry-identity",
+            "label": "Public source",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          }
+        ],
+        "degraded": true,
+        "summary": null
+      }
+    },
+    "rowsReturned": 10,
+    "rows": [
+      {
+        "title": "Sakana Grill",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Calgary, AB",
+        "website_url": "http://www.sakanagrill.ca",
+        "source_url": "db://businesses/a687dac0-d17d-4859-9c3f-2b780f95cbfd",
+        "disposition": "qualified",
+        "why": "Identity · Sakana Grill · sushi_restaurant · Calgary, AB · phone +14032901118",
+        "email": null,
+        "phone": "+14032901118",
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "stored_business_record",
+            "url": "db://businesses/a687dac0-d17d-4859-9c3f-2b780f95cbfd",
+            "excerpt": "Sakana Grill · sushi_restaurant · Calgary, AB · phone +14032901118",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {}
+      },
+      {
+        "title": "Deepam Dosa",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Calgary, AB",
+        "website_url": "https://deepamdosa.online/",
+        "source_url": "db://businesses/6c6ac3a3-1b63-440d-88b1-f358c0e29a3c",
+        "disposition": "qualified",
+        "why": "Identity · Deepam Dosa · indian_restaurant · Calgary, AB · phone +14032182902",
+        "email": null,
+        "phone": "+14032182902",
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "stored_business_record",
+            "url": "db://businesses/6c6ac3a3-1b63-440d-88b1-f358c0e29a3c",
+            "excerpt": "Deepam Dosa · indian_restaurant · Calgary, AB · phone +14032182902",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {}
+      },
+      {
+        "title": "Maharajah East Indian Restaurant",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Calgary, AB",
+        "website_url": "http://maharajahrestaurant.com/",
+        "source_url": "db://businesses/87e3f69b-306f-40ca-a57d-9405094b7b6f",
+        "disposition": "qualified",
+        "why": "Identity · Maharajah East Indian Restaurant · restaurant · Calgary, AB · phone +14032460080",
+        "email": "maharajahcalgary@gmail.com",
+        "phone": "+14032460080",
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "stored_business_record",
+            "url": "db://businesses/87e3f69b-306f-40ca-a57d-9405094b7b6f",
+            "excerpt": "Maharajah East Indian Restaurant · restaurant · Calgary, AB · phone +14032460080",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {
+          "email": "contact-harvest@http://maharajahrestaurant.com/"
+        }
+      },
+      {
+        "title": "Primal Grounds Cafe",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Calgary, AB",
+        "website_url": "http://primalsoupcompany.com",
+        "source_url": "db://businesses/c37ae1f6-f5e0-4e6e-92c4-ffff26b30709",
+        "disposition": "qualified",
+        "why": "Identity · Primal Grounds Cafe · restaurant · Calgary, AB · phone +14034545282",
+        "email": null,
+        "phone": "+14034545282",
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "stored_business_record",
+            "url": "db://businesses/c37ae1f6-f5e0-4e6e-92c4-ffff26b30709",
+            "excerpt": "Primal Grounds Cafe · restaurant · Calgary, AB · phone +14034545282",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {}
+      },
+      {
+        "title": "Boston Pizza",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Calgary, AB",
+        "website_url": "https://bostonpizza.com/richmond-road",
+        "source_url": "db://businesses/6f9c4c78-0012-4070-a79b-f838611547ca",
+        "disposition": "qualified",
+        "why": "Identity · Boston Pizza · restaurant · Calgary, AB · phone +14032404422",
+        "email": null,
+        "phone": "+14032404422",
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "stored_business_record",
+            "url": "db://businesses/6f9c4c78-0012-4070-a79b-f838611547ca",
+            "excerpt": "Boston Pizza · restaurant · Calgary, AB · phone +14032404422",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {}
+      },
+      {
+        "title": "Golden Bell Richmond",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Calgary, AB",
+        "website_url": "http://www.goldenbellrichmond.ca/",
+        "source_url": "db://businesses/00bf1e42-941f-4d5a-bbde-5a1f3087ea90",
+        "disposition": "qualified",
+        "why": "Identity · Golden Bell Richmond · restaurant · Calgary, AB · phone +14032404048",
+        "email": null,
+        "phone": "+14032404048",
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "stored_business_record",
+            "url": "db://businesses/00bf1e42-941f-4d5a-bbde-5a1f3087ea90",
+            "excerpt": "Golden Bell Richmond · restaurant · Calgary, AB · phone +14032404048",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {}
+      },
+      {
+        "title": "Jerusalem Shawarma",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Calgary, AB",
+        "website_url": "http://jerusalemshawarma.net",
+        "source_url": "db://businesses/dba62a10-14e7-4959-b16b-69f0ac6df541",
+        "disposition": "qualified",
+        "why": "Identity · Jerusalem Shawarma · mediterranean_restaurant · Calgary, AB · phone +14032497693",
+        "email": null,
+        "phone": "+14032497693",
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "stored_business_record",
+            "url": "db://businesses/dba62a10-14e7-4959-b16b-69f0ac6df541",
+            "excerpt": "Jerusalem Shawarma · mediterranean_restaurant · Calgary, AB · phone +14032497693",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {}
+      },
+      {
+        "title": "KFC",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Calgary, AB",
+        "website_url": "http://www.kfc.ca",
+        "source_url": "db://businesses/6bf26e11-d35a-4315-b520-6c17d2b0db28",
+        "disposition": "qualified",
+        "why": "Identity · KFC · fast_food_restaurant · Calgary, AB",
+        "email": null,
+        "phone": null,
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "stored_business_record",
+            "url": "db://businesses/6bf26e11-d35a-4315-b520-6c17d2b0db28",
+            "excerpt": "KFC · fast_food_restaurant · Calgary, AB",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {}
+      },
+      {
+        "title": "Biryani Inn",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Calgary, AB",
+        "website_url": null,
+        "source_url": "db://businesses/9d5b2cfd-01bb-4786-af78-aba6e4c904ad",
+        "disposition": "qualified",
+        "why": "Identity · Biryani Inn · indian_restaurant · Calgary, AB · phone +15878891405",
+        "email": null,
+        "phone": "+15878891405",
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "stored_business_record",
+            "url": "db://businesses/9d5b2cfd-01bb-4786-af78-aba6e4c904ad",
+            "excerpt": "Biryani Inn · indian_restaurant · Calgary, AB · phone +15878891405",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {}
+      },
+      {
+        "title": "Ruth's Chris Steak House",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Calgary, AB",
+        "website_url": null,
+        "source_url": "db://businesses/a6f9c4d3-9212-439c-8b38-22e10b1a3568",
+        "disposition": "qualified",
+        "why": "Identity · Ruth's Chris Steak House · restaurant · Calgary, AB · phone +14032463636",
+        "email": null,
+        "phone": "+14032463636",
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "stored_business_record",
+            "url": "db://businesses/a6f9c4d3-9212-439c-8b38-22e10b1a3568",
+            "excerpt": "Ruth's Chris Steak House · restaurant · Calgary, AB · phone +14032463636",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {}
+      }
+    ],
+    "diagnostics": [
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      }
+    ],
+    "cancelledAtMs": null,
+    "returnedAtMs": 96205,
+    "candidateLedger": {
+      "counts": {
+        "returned": 10,
+        "qualified_more": 45,
+        "rejected": 0,
+        "gated": 0,
+        "filtered": 24,
+        "incomplete": 54,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {},
+      "streamed": 0,
+      "streamedNotReturned": []
+    }
+  }
+}

@@ -1,0 +1,56 @@
+total=1568 passed=1498 failed=55 skipped=15 files=160 knownRedHit=55 NEW_FAILURES=0
+KNOWN src/lib/understanding/understanding.test.ts :: plain entity discovery "cafes in San Francisco" is executable without a question
+KNOWN src/lib/understanding/understanding.test.ts :: plain entity discovery "coffee roasters near Copenhagen" is executable without a question
+KNOWN src/lib/understanding/understanding.test.ts :: plain entity discovery "law firms across Ontario" is executable without a question
+KNOWN src/lib/understanding/understanding.test.ts :: plain entity discovery "restaurants in Lisbon" is executable without a question
+KNOWN src/lib/understanding/understanding.test.ts :: plain entity discovery "marketing agencies in Bristol" is executable without a question
+KNOWN src/lib/understanding/understanding.test.ts :: noun-phrase interpretation is open-world "dental practices in Leeds" reads as a business
+KNOWN src/lib/understanding/understanding.test.ts :: noun-phrase interpretation is open-world "coffee roasters near Copenhagen" reads as a business or company
+KNOWN src/lib/understanding/understanding.test.ts :: noun-phrase interpretation is open-world "law firms across Ontario" reads as a business or company
+KNOWN src/lib/understanding/understanding.test.ts :: noun-phrase interpretation is open-world "heads of talent in Berlin" reads as a person
+KNOWN src/lib/understanding/understanding.test.ts :: noun-phrase interpretation is open-world "freelance copywriters in Dublin" reads as a person
+KNOWN src/lib/understanding/understanding.test.ts :: a profession noun is both a person and a practice marks the ambiguity and does not ask about it
+KNOWN src/lib/understanding/understanding.test.ts :: a vertical on its own is not a target does not read the vertical's own word back as a head noun
+KNOWN src/lib/understanding/understanding.test.ts :: a vertical on its own is not a target accepts the vertical itself when it already names a kind
+KNOWN src/lib/understanding/understanding.test.ts :: a vertical on its own is not a target accepts a place as the bound for an unfamiliar trade
+KNOWN src/lib/understanding/understanding.test.ts :: a vertical on its own is not a target stays quiet once a head noun names the kind
+KNOWN src/lib/understanding/understanding.test.ts :: a vertical on its own is not a target stays quiet once anything else bounds the search
+KNOWN src/lib/__tests__/coverage-planned.test.ts :: coverage-planned retrieval (USE_COVERAGE_SELECTOR=true) uncovered geography (Dhaka): S3 serves after hot skip, provider disabled here
+KNOWN src/lib/__tests__/coverage-planned.test.ts :: coverage-planned retrieval (USE_COVERAGE_SELECTOR=true) sufficient hot tier stops the search: S3 never called (no fanout)
+KNOWN src/lib/__tests__/coverage-planned.test.ts :: coverage-planned retrieval (USE_COVERAGE_SELECTOR=true) thin hot tier falls through to S3 (bounded fallback, same budget)
+KNOWN src/lib/__tests__/coverage-planned.test.ts :: coverage-planned retrieval (USE_COVERAGE_SELECTOR=true) flag off keeps the legacy order byte-identical
+KNOWN src/lib/__tests__/mode-gate.test.ts :: mode gate in runSpecSearchCore bare SaaS founders asks intent, then location before retrieval
+KNOWN src/lib/__tests__/mode-gate.test.ts :: mode gate in runSpecSearchCore bare ready business query → exactly the mode question, zero retrieval
+KNOWN src/lib/__tests__/mode-gate.test.ts :: mode gate in runSpecSearchCore selling without offer → exactly the offer question
+KNOWN src/lib/__tests__/mode-gate.test.ts :: mode gate in runSpecSearchCore mode answer naming the offering skips the offer round (site follow-up next)
+KNOWN src/lib/__tests__/mode-gate.test.ts :: mode gate in runSpecSearchCore browsing-signal query is not gated (no unnecessary questions)
+KNOWN src/lib/__tests__/offer-taxonomy.test.ts :: offering-aware gate 'without a website' query: zero questions, selling + offer inferred, rows filtered
+KNOWN src/lib/__tests__/offer-taxonomy.test.ts :: offering-aware gate selling + website offer, no site pref → exactly the site follow-up
+KNOWN src/lib/__tests__/offer-taxonomy.test.ts :: offering-aware gate site=without answer filters to no-website rows
+KNOWN src/lib/__tests__/offer-taxonomy.test.ts :: offering-aware gate marketing offer → channel follow-up (pitch tailoring, no row filter)
+KNOWN src/lib/__tests__/offer-taxonomy.test.ts :: offering-aware gate channel answer proceeds without filtering rows
+KNOWN src/lib/__tests__/offer-taxonomy.test.ts :: offering-aware gate person hiring queries never infer selling offers
+KNOWN src/lib/__tests__/offer-taxonomy.test.ts :: offering-aware gate stale_site (design redesign angle) design offer, no site pref → design-worded site follow-up
+KNOWN src/lib/__tests__/offer-taxonomy.test.ts :: offering-aware gate stale_site (design redesign angle) design + site=with → opportunity=stale_site derived, only thin-presence rows
+KNOWN src/lib/__tests__/offer-taxonomy.test.ts :: offering-aware gate stale_site (design redesign angle) design + site=without → no_website as before
+KNOWN src/lib/__tests__/offer-taxonomy.test.ts :: offering-aware gate force (Search with defaults) bypasses the gate unfiltered — client shows the chip
+KNOWN src/lib/__tests__/offer-taxonomy.test.ts :: offering-aware gate P3-shape intent hunt keeps its signal behavior (looking-signal, no gate)
+KNOWN src/lib/__tests__/pagination.test.ts :: pagination (S3 path) page 1: limit rows, hasMore true, echo offset/limit
+KNOWN src/lib/__tests__/pagination.test.ts :: pagination (S3 path) middle page slices verified matches
+KNOWN src/lib/__tests__/pagination.test.ts :: pagination (S3 path) last page: remainder rows, hasMore false
+KNOWN src/lib/__tests__/phone-safety.test.ts :: serve-time enforcement S3 business mapper suppresses mismatched phones with a flag
+KNOWN src/lib/__tests__/spec-search.test.ts :: spec-first flow P1: SaaS founders NY → zero questions, validated rows
+KNOWN src/lib/__tests__/spec-search.test.ts :: spec-first flow indexed cutover (USE_INDEXED_SEARCH) flag on: index serves, S3 readers untouched
+KNOWN src/lib/__tests__/spec-search.test.ts :: spec-first flow indexed cutover (USE_INDEXED_SEARCH) flag on but index throws: falls back to S3
+KNOWN src/lib/__tests__/spec-search.test.ts :: spec-first flow indexed cutover (USE_INDEXED_SEARCH) registry-key invariant: keyless rows dropped + counted
+KNOWN src/lib/__tests__/spec-search.test.ts :: spec-first flow indexed cutover (USE_INDEXED_SEARCH) explicit flag off: index never called
+KNOWN src/lib/__tests__/spec-search.test.ts :: spec-first flow business detail carries full geo + email for cards
+KNOWN src/lib/__tests__/spec-search.test.ts :: spec-first flow keeps exact-location populated companies and reports stage counts
+KNOWN src/lib/search/__tests__/entity-taxonomy.test.ts :: taxonomy extraction existing contracts unchanged: trades stay business, bare stays clarify
+KNOWN src/lib/search/__tests__/jobs-spec-questions.test.ts :: thin job search offers refinements, rich search stays quiet stated slots are not re-asked on thin
+KNOWN src/lib/search/__tests__/m4-entity-resolve.test.ts :: M4 — SPEC_SEARCH runtime resolved OSM business can qualify; provisional web cannot
+KNOWN src/lib/search/__tests__/step2-resolver.test.ts :: Index-empty S3 fallthrough + throw safety index empty + location -> S3 rows used, both metas logged
+KNOWN src/lib/search/__tests__/step2-resolver.test.ts :: Index-empty S3 fallthrough + throw safety index empty + S3 throws -> honest empty, no crash
+KNOWN src/lib/search/__tests__/step2-resolver.test.ts :: Investor answers end to end (stubs) stage/sector/check asked, answered, filtered by row values
+KNOWN src/lib/search/__tests__/step2-resolver.test.ts :: Step 2.3 opportunity slot + investor phrasing no_website filters site rows on every engine
+KNOWN src/lib/search/__tests__/step2-resolver.test.ts :: Step 2.4 mode + offer questions (Phase 1.3: owned by the mode gate) panel asks missing fields only — never mode/offer (gate asks those pre-retrieval)

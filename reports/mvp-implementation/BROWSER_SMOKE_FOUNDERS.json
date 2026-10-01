@@ -1,0 +1,17 @@
+{
+  "runId": "mvp-local-browser-1790690220665",
+  "query": "SaaS founders with recent hiring evidence and public contact details",
+  "durationMs": 51005,
+  "error": null,
+  "browser": {
+    "adapter": "playwright",
+    "status": "completed",
+    "pagesVisited": 11,
+    "currentUrl": "https://www.co-op.crs/",
+    "screenshotPath": "reports/mvp-implementation/BROWSER_FOUNDERS.jpg"
+  },
+  "progressEvents": 26,
+  "streamedRows": 0,
+  "candidateRowsReturned": 0,
+  "verifiedRows": 0
+}

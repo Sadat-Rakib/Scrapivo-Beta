@@ -1,0 +1,389 @@
+{
+  "runId": "trace-custom-product-1790791521391",
+  "query": "AI startups in Paris that raised funding this year",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 113785,
+  "error": null,
+  "audit": [],
+  "browser": {
+    "adapter": "worker",
+    "status": "completed",
+    "pagesVisited": 3,
+    "currentUrl": "https://www.vcbacked.co/directory/cities/industry/paris-france/artificial-intelligence-ai",
+    "retained": true,
+    "controller": "agent",
+    "sessionId": "cc04ded0-d1ac-4b8b-8369-fddb0b0ecc20",
+    "frame": true
+  },
+  "runtime": [
+    {
+      "kind": "runtime",
+      "requested": "worker",
+      "used": "worker"
+    }
+  ],
+  "progressEvents": 17,
+  "streamedRows": [],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [
+    {
+      "kind": "search",
+      "query": "ai startup company Paris",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "ai startup company Paris",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://www.f6s.com/companies/artificial-intelligence/france/paris/co",
+      "pageType": "unknown",
+      "title": "Checking your browser",
+      "outcome": "read",
+      "textChars": 1018,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "entities rejected: ",
+      "capture": "02bb35ec2508.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.vcbacked.co/directory/cities/industry/paris-france/artificial-intelligence-ai",
+      "pageType": "aggregator",
+      "title": "251 Recently Funded Artificial Intelligence (AI) Startups in Paris (September 2026) | VCBacked",
+      "outcome": "read",
+      "textChars": 10192,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "Entalpic",
+        "DataHawk",
+        "Software editor",
+        "Quivr",
+        "ALEIA"
+      ],
+      "why": "",
+      "capture": "0c14ab635e6a.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://www.vcbacked.co/company/datahawk-technologies",
+      "pageType": null,
+      "title": "DataHawk Technologies Funding: $7M Series A (Sep 2021) | VCBacked",
+      "outcome": "http_read",
+      "textChars": 2792,
+      "structured": {
+        "jobs": 0,
+        "organization": "DataHawk Technologies",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "not sent to extractor",
+      "capture": "fd65d4084891.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.f6s.com/companies/artificial-intelligence/france/paris/co",
+        "https://www.vcbacked.co/directory/cities/industry/paris-france/artificial-intelligence-ai"
+      ],
+      "extractor": "deterministic",
+      "llm": "not_called",
+      "entities": 5
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.f6s.com/companies/artificial-intelligence/france/paris/co",
+        "https://www.vcbacked.co/directory/cities/industry/paris-france/artificial-intelligence-ai"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 5
+    }
+  ],
+  "entityOutcomes": [
+    {
+      "page": "https://www.vcbacked.co/directory/cities/industry/paris-france/artificial-intelligence-ai",
+      "name": "Entalpic",
+      "kind": "company",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.vcbacked.co/directory/cities/industry/paris-france/artificial-intelligence-ai",
+      "name": "DataHawk",
+      "kind": "company",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.vcbacked.co/directory/cities/industry/paris-france/artificial-intelligence-ai",
+      "name": "Software editor",
+      "kind": "company",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.vcbacked.co/directory/cities/industry/paris-france/artificial-intelligence-ai",
+      "name": "Quivr",
+      "kind": "company",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.vcbacked.co/directory/cities/industry/paris-france/artificial-intelligence-ai",
+      "name": "ALEIA",
+      "kind": "company",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    }
+  ],
+  "remember": [
+    {
+      "kind": "remember",
+      "name": "Entalpic",
+      "rowKind": "company",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "DataHawk",
+      "rowKind": "company",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Software editor",
+      "rowKind": "company",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Quivr",
+      "rowKind": "company",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "ALEIA",
+      "rowKind": "company",
+      "outcome": "accepted",
+      "resolved": true
+    }
+  ],
+  "candidates": [],
+  "done": [
+    {
+      "kind": "done",
+      "status": "timeout",
+      "candidates": 5,
+      "verified": 0,
+      "visited": 3,
+      "queries": 1,
+      "stoppingReason": "BROWSER_DISCOVERY_TIMEOUT",
+      "elapsedMs": 75002
+    }
+  ],
+  "persistenceSkipped": [
+    "ai_cache",
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "NO_QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "company",
+    "criteria": [
+      "industry=ai startup",
+      "location=Paris",
+      "location_id=geo:city:paris",
+      "location_kind=city",
+      "location_country=FR",
+      "location_parents=geo:country:fr"
+    ],
+    "clarify": [
+      "entity_business_model"
+    ],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_companies(country,city_norm)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "live-browser",
+          "partitions": [
+            "live-gapfill(5)"
+          ],
+          "scanned": 5,
+          "matched": 5
+        },
+        {
+          "source": "live-social:reddit-arctic-shift",
+          "partitions": [
+            "social(3)"
+          ],
+          "scanned": 3,
+          "matched": 3
+        }
+      ],
+      "rawCandidates": 5,
+      "postSpecFilter": 5,
+      "timings": {
+        "understanding_ms": 14766,
+        "stored_search_ms": 5406,
+        "research_ms": 80806,
+        "enrichment_ms": 62,
+        "qualification_ms": 313,
+        "total_ms": 101353
+      },
+      "researchable": 8,
+      "researched": 8,
+      "complete": 0,
+      "pendingEnrichment": 5,
+      "qualificationRejected": 0,
+      "qualified": 0,
+      "returned": 0,
+      "reason": "INCOMPLETE",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "direct-http",
+            "label": "Public websites",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "searxng",
+            "label": "The web",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "browser-live",
+            "label": "Public websites",
+            "state": "healthy",
+            "reason": "OK"
+          },
+          {
+            "source": "s3-parquet",
+            "label": "Available records",
+            "state": "degraded",
+            "reason": "TIMEOUT"
+          },
+          {
+            "source": "enrich:registry-identity",
+            "label": "Public source",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          }
+        ],
+        "degraded": true,
+        "summary": "Some sources could not be searched this time (Available records, Public source), so results may be incomplete."
+      }
+    },
+    "rowsReturned": 0,
+    "rows": [],
+    "diagnostics": [
+      {
+        "code": "SOURCE_ERROR",
+        "source": "s3-parquet",
+        "detail": "tier timeout: s3-parquet after 5000ms"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "direct-http",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "searxng",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      }
+    ],
+    "cancelledAtMs": null,
+    "returnedAtMs": 113784,
+    "candidateLedger": {
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 0,
+        "gated": 0,
+        "filtered": 3,
+        "incomplete": 5,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {},
+      "streamed": 0,
+      "streamedNotReturned": []
+    }
+  }
+}

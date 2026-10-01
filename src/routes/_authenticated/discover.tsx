@@ -31,7 +31,7 @@ import type { CompanyRow, PersonRow, LocalBusinessRow } from "@/lib/search/lead-
 import { filterBarModel, relevanceChips, type TurnFilter } from "@/lib/search/relevance";
 import { specRowsToCandidates } from "@/lib/intent/spec-candidates";
 import { LeadDetailPanel } from "@/components/lead-detail-panel";
-import { DiscoverWelcomeHero } from "@/components/discover/discover-welcome-hero";
+import { DiscoverWelcomeHero, GUIDED_SEARCH_TEXT } from "@/components/discover/discover-welcome-hero";
 import { ActiveSearchSession, isSearchAbortError } from "@/lib/search/search-run-client";
 import { cancelSearchRun } from "@/lib/search/search-run.functions";
 import {
@@ -67,6 +67,8 @@ import { GenerateModal } from "@/components/discover/generate-modal";
 import { Bell, Plus, X, ChevronDown, ChevronUp } from "lucide-react";
 import { ThinkingSteps } from "@/components/discover/thinking-steps";
 import { ScrapyBrowser } from "@/components/discover/scrapy-browser";
+import { StreamedReconciliationNote } from "@/components/discover/streamed-reconciliation-note";
+import { streamedFateLabel } from "@/lib/search/candidate-ledger";
 import { ClarifyPanel } from "@/components/discover/clarify-panel";
 import { UnderstandingInspector } from "@/components/discover/understanding-inspector";
 import type { ClarifyQuestion, ClarifyAnswers } from "@/lib/search/clarifier";
@@ -361,6 +363,9 @@ function DiscoverPage() {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   // Honest terminal-zero copy from the retrieval funnel (never invented fiction).
   const [zeroNarrative, setZeroNarrative] = useState<string | null>(null);
+  // Streamed-vs-final reconciliation: leads shown live while researching that
+  // the final list does not include, each with the reason (never a silent drop).
+  const [streamedMissing, setStreamedMissing] = useState<Array<{ key: string; title: string; label: string }>>([]);
   const [activityExpanded, setActivityExpanded] = useState(false);
   const [queryType, setQueryType] = useState<string | null>(null);
   // Clarifying-question flow. Questions are computed BEFORE the search runs and
@@ -567,6 +572,7 @@ function DiscoverPage() {
   // Accumulated panel answers for the active turn: partial answers persist
   // across clarify rounds so answering Q1 then Search on Q2 never loses Q1.
   const pendingTurnAnswersRef = useRef<Record<string, string>>({});
+  const pendingFrameRef = useRef<import("@/lib/understanding/frame").UnderstandingFrame | null>(null);
   // Spec-first cutover (SPEC_SEARCH_ENABLED): when true the turn is served by
   // the canonical spec path; legacy flow below runs untouched otherwise.
   const specModeRef = useRef(false);
@@ -679,6 +685,7 @@ function DiscoverPage() {
     setBrowserProgressRun(run.search_run_id);
     setBrowserProgressEvents([]);
     setZeroNarrative(null);
+    setStreamedMissing([]);
     setActivityExpanded(false);
     // Loading spinner only for the active run (stale cannot flip chrome).
     session.applyIfActive({ search_run_id: run.search_run_id }, () => {
@@ -694,6 +701,7 @@ function DiscoverPage() {
           limit: SPEC_PAGE_SIZE,
           offset,
           answers: merged,
+          prior_frame: pendingFrameRef.current ?? undefined,
           force,
           search_run_id: run.search_run_id,
           conversation_id: run.conversation_id,
@@ -707,6 +715,7 @@ function DiscoverPage() {
 
       setSpecEntity(res.spec.entity ?? null);
       if (res.clarify.length > 0) {
+        pendingFrameRef.current = res.spec.understanding ?? null;
         setClarifyQs(res.clarify);
         setPendingQuery(query);
         setActiveQuery(query);
@@ -804,13 +813,24 @@ function DiscoverPage() {
       // Typed outcomes — never bare "No results found"; superseded cancel is silent.
       const uiOutcome = outcomeUi(res.outcome, {
         superseded: session.wasSuperseded(res.search_run_id),
-        detail: res.boundary_message ?? zeroResultsNarrative(res.retrievalTrace) ?? res.diagnostics?.[0]?.detail,
+        // Raw provider diagnostics name internal infrastructure; only the
+        // user-safe source-health sentence may reach the toast.
+        detail: res.boundary_message ?? zeroResultsNarrative(res.retrievalTrace) ?? res.retrievalTrace?.sourceHealth?.summary ?? null,
       });
       setZeroNarrative(
         !append && qualifiedCount === 0 && res.outcome === "NO_QUALIFIED_RESULTS"
           ? zeroResultsNarrative(res.retrievalTrace)
           : null,
       );
+      if (!append) {
+        setStreamedMissing(
+          (res.candidateLedger?.streamedNotReturned ?? []).map((item) => ({
+            key: item.key,
+            title: item.title,
+            label: streamedFateLabel(item),
+          })),
+        );
+      }
       if (
         !append &&
         turnId === pendingTurnIdRef.current &&
@@ -839,7 +859,6 @@ function DiscoverPage() {
       // must not hide the newer search's spinner.
       if (session.activeRunId === run.search_run_id) {
         setSpecPending(false);
-        setBrowserProgressRun(null);
       }
     }
   };
@@ -962,6 +981,12 @@ function DiscoverPage() {
     const location = pick("entity_location", "geography");
     const investorSector = pick("investor_sector");
     const mode = pick("entity_mode");
+    const purpose = pick("entity_purpose");
+    const salary = pick("entity_salary");
+    const size = pick("entity_size");
+    const revenue = pick("entity_revenue");
+    const relation = pick("entity_relation");
+    const scope = pick("entity_scope");
     const offer = pick("entity_offer");
     // Investor slots survive the panel (previously dropped: answers existed
     // but never reached retrieval). "any" means no filter — skip it.
@@ -995,6 +1020,12 @@ function DiscoverPage() {
     // offer question only after a selling answer — just-looking never sees it.
     // Explicit "Search" (force) bypasses the gate.
     if (mode) out.mode = mode;
+    if (purpose) out.purpose = purpose;
+    if (salary) out.salary_min = salary;
+    if (size) out.employee_count = size;
+    if (revenue) out.revenue = revenue;
+    if (relation) out["relation.type"] = relation;
+    if (scope) out["target.scope"] = scope;
     if (offer) out.offer = offer;
     // ICP follow-up answers (Phase 1.4): site preference drives the
     // no_website retrieval filter; channel tailors the pitch (no row filter).
@@ -1029,6 +1060,9 @@ function DiscoverPage() {
   const turnId = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const resetConversation = () => {
     clearWorkspace();
+    setBrowserProgressRun(null);
+    setBrowserProgressEvents([]);
+    setStreamedMissing([]);
     setTurns([]);
     setExpandedTurns({});
     setContactByKey({});
@@ -1040,6 +1074,7 @@ function DiscoverPage() {
     rotateConversationId();
     pendingTurnIdRef.current = null;
     pendingTurnAnswersRef.current = {};
+    pendingFrameRef.current = null;
     setPlanTokens(null);
     setActiveQuery(null);
     setClarifyAnswers(null);
@@ -1404,6 +1439,7 @@ function DiscoverPage() {
     setIntentProgress(null);
     setBrowserProgressRun(null);
     setBrowserProgressEvents([]);
+    setStreamedMissing([]);
     setSpecPending(false);
   };
   const clearWorkspace = () => {
@@ -1459,6 +1495,7 @@ function DiscoverPage() {
       intentRunRef.current += 1;
       pendingTurnIdRef.current = null;
       pendingTurnAnswersRef.current = {};
+      pendingFrameRef.current = null;
       setPlanTokens(null);
       setClarifyQs([]);
       setPendingQuery(null);
@@ -1549,6 +1586,32 @@ function DiscoverPage() {
   const beginSearch = async (q: string) => {
     const trimmed = q.trim();
     if (!trimmed) return;
+    const pendingId = pendingTurnIdRef.current;
+    const pendingQuestion = clarifyQs[0];
+    const startsNewRequest = /^(?:find|search|show|look for|looking for)\b/i.test(trimmed) ||
+      (/^research\b/i.test(trimmed) && /\b(?:in|for|about|businesses|companies|people|jobs|investors)\b/i.test(trimmed));
+    if (specModeRef.current && pendingQuery && pendingId && pendingQuestion && !startsNewRequest) {
+      const field = ({
+        entity_location: "location",
+        entity_category: "category",
+        entity_industry: "industry",
+        entity_role: "role",
+        entity_mode: "mode",
+        entity_purpose: "purpose",
+        entity_salary: "salary_min",
+        entity_size: "employee_count",
+        entity_revenue: "revenue",
+        entity_relation: "relation.type",
+        entity_scope: "target.scope",
+      } as Record<string, string>)[pendingQuestion.id] ?? pendingQuestion.id;
+      setTurns((prev) => prev.map((turn) => turn.id === pendingId
+        ? { ...turn, text: `${turn.text}\n${trimmed}` }
+        : turn));
+      setClarifyQs([]);
+      setPendingQuery(null);
+      await runSpecBranch(pendingQuery, pendingId, { [field]: trimmed });
+      return;
+    }
     // User bubble first: the submitted text lives in the conversation from
     // this instant, independent of whatever happens downstream. Results are
     // attached to the owning turn by onSuccess (turn-owned transcript) — no
@@ -1556,6 +1619,7 @@ function DiscoverPage() {
     const newTurnId = turnId();
     pendingTurnIdRef.current = newTurnId;
     pendingTurnAnswersRef.current = {};
+    pendingFrameRef.current = null;
     intentRunRef.current += 1; // cancel any in-flight intent enrichment
     setIntentProgress(null);
     setTurns((prev) => [...prev, { id: newTurnId, text: trimmed, ts: Date.now() }]);
@@ -1909,14 +1973,9 @@ function DiscoverPage() {
             <div className="min-h-full flex flex-col items-center justify-center py-6 md:py-10">
               <DiscoverWelcomeHero
                 greetingName={greetingName || undefined}
-                onQuickSearch={(q) => {
-                  setInput(q);
-                  const text = q.trim();
-                  setInput("");
-                  void beginSearch(text).catch((e: unknown) => {
-                    console.error("[discover] quick search failed", e);
-                    toast.error(friendlyErrorText(e, "Search failed to start"));
-                    setInput(text);
+                onGuidedStart={(kind) => {
+                  void beginSearch(GUIDED_SEARCH_TEXT[kind]).catch((e: unknown) => {
+                    toast.error(friendlyErrorText(e, "Could not start guided search"));
                   });
                 }}
               />
@@ -2000,6 +2059,11 @@ function DiscoverPage() {
                                     setIntentProgress(null);
                                     intentRunRef.current += 1;
                                     pendingTurnIdRef.current = null;
+                                    pendingTurnAnswersRef.current = {};
+                                    pendingFrameRef.current = null;
+                                    setBrowserProgressRun(null);
+                                    setBrowserProgressEvents([]);
+                                    setStreamedMissing([]);
                                     rotateConversationId();
                                     setPlanTokens(null);
                                     setActiveQuery(null);
@@ -2277,10 +2341,17 @@ function DiscoverPage() {
                         </div>
                       </div>
                     )}
-                    <ScrapyBrowser runId={browserProgressRun} />
                   </div>
                 )}
               </div>
+            )}
+            {/* One mini-browser instance for the run: it stays mounted after
+                the search settles so a kept-open session remains viewable
+                and controllable (it renders nothing when the run used no
+                browser). */}
+            <ScrapyBrowser runId={browserProgressRun} />
+            {!specPending && !runSearchMut.isPending && streamedMissing.length > 0 && (
+              <StreamedReconciliationNote items={streamedMissing} />
             )}
             {/* Clarifying questions as an attached dropdown above the input —
                 never inside the results flow. Collapsible; reopens per round. */}
@@ -2316,7 +2387,7 @@ function DiscoverPage() {
                         setPendingQuery(null);
                         if (!q) return;
                         if (specModeRef.current) {
-                          void runSpecBranch(q, pendingTurnIdRef.current ?? "", {}).catch(
+                          void runSpecBranch(q, pendingTurnIdRef.current ?? "", {}, true).catch(
                             (e: Error) =>
                               toast.error(friendlyErrorText(e, "Search failed to start")),
                           );

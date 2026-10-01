@@ -1,0 +1,2 @@
+﻿  gate2c/research-agent b8d238c [origin/gate2c/research-agent] feat(research): finalize testable MVP and developer handoff
+* main                  7805e75 [origin/main] fix(deploy): move scheduled jobs from Vercel to Supabase

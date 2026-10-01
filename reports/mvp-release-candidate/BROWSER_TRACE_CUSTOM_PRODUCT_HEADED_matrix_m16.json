@@ -1,0 +1,272 @@
+{
+  "runId": "trace-custom-product-1790798352573",
+  "query": "Angel investors in Toronto",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 30369,
+  "error": null,
+  "audit": [],
+  "browser": {
+    "adapter": "worker",
+    "status": "completed",
+    "pagesVisited": 7,
+    "currentUrl": "https://en.wikipedia.org/wiki/Toronto",
+    "retained": true,
+    "controller": "agent",
+    "sessionId": "e4685a58-808e-4966-8751-79b901e1e02e",
+    "frame": true
+  },
+  "runtime": [
+    {
+      "kind": "runtime",
+      "requested": "worker",
+      "used": "worker"
+    }
+  ],
+  "progressEvents": 23,
+  "streamedRows": [],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [
+    {
+      "kind": "search",
+      "query": "investor Toronto",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "investor Toronto",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 8,
+      "reason": "raw_links=10 unrelated=2"
+    },
+    {
+      "kind": "search",
+      "query": "Toronto",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "Toronto",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://www.openvc.app/investor-lists/venture-capital-firms-investors-toronto",
+      "pageType": "list",
+      "title": "Top VC Firms and Investors in Toronto [2026]",
+      "outcome": "read",
+      "textChars": 18000,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~480s; injected/not_called)",
+      "capture": "738a9a7af290.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://clutch.co/ca/funding-investment/toronto",
+      "pageType": "list",
+      "title": "Top Investment Firms in Toronto - Sep 2026 Rankings | Clutch.co",
+      "outcome": "read",
+      "textChars": 18000,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~480s; injected/not_called)",
+      "capture": "4e74dd3dcbd8.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.toronto.ca/",
+      "pageType": "unknown",
+      "title": "City of Toronto",
+      "outcome": "read",
+      "textChars": 898,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~474s; injected/not_called)",
+      "capture": "af7b7729e607.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://en.wikipedia.org/wiki/Toronto",
+      "pageType": "unknown",
+      "title": "Toronto - Wikipedia",
+      "outcome": "read",
+      "textChars": 18000,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~474s; injected/not_called)",
+      "capture": "abec01eb0e97.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.openvc.app/investor-lists/venture-capital-firms-investors-toronto",
+        "https://clutch.co/ca/funding-investment/toronto"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~480s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.openvc.app/investor-lists/venture-capital-firms-investors-toronto",
+        "https://clutch.co/ca/funding-investment/toronto"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.toronto.ca/",
+        "https://en.wikipedia.org/wiki/Toronto"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~474s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.toronto.ca/",
+        "https://en.wikipedia.org/wiki/Toronto"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    }
+  ],
+  "entityOutcomes": [],
+  "remember": [],
+  "candidates": [],
+  "done": [
+    {
+      "kind": "done",
+      "status": "completed",
+      "candidates": 0,
+      "verified": 0,
+      "visited": 4,
+      "queries": 2,
+      "stoppingReason": "diminishing_returns",
+      "elapsedMs": 22817
+    }
+  ],
+  "persistenceSkipped": [
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "NO_QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "investor",
+    "criteria": [
+      "investor_sector=angel investor",
+      "location=Toronto",
+      "location_id=geo:city:toronto",
+      "location_kind=city",
+      "location_country=CA",
+      "location_parents=geo:admin:ontario,geo:country:ca,geo:metro:gta"
+    ],
+    "clarify": [],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "s3-parquet",
+          "partitions": [
+            "processed/investors/investor.parquet"
+          ],
+          "scanned": 8076,
+          "matched": 0
+        }
+      ],
+      "rawCandidates": 0,
+      "postSpecFilter": 0,
+      "timings": {
+        "understanding_ms": 3666,
+        "stored_search_ms": 2094,
+        "research_ms": 22969,
+        "enrichment_ms": 1,
+        "qualification_ms": 8,
+        "total_ms": 28738
+      },
+      "researchable": 0,
+      "complete": 0,
+      "pendingEnrichment": 0,
+      "qualificationRejected": 0,
+      "qualified": 0,
+      "returned": 0,
+      "reason": "NO_CATEGORY_MATCH",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "browser-live",
+            "label": "Public websites",
+            "state": "empty",
+            "reason": "NO_RESULTS"
+          }
+        ],
+        "degraded": false,
+        "summary": null
+      }
+    },
+    "rowsReturned": 0,
+    "rows": [],
+    "diagnostics": [],
+    "cancelledAtMs": null,
+    "returnedAtMs": 30369,
+    "candidateLedger": {
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 0,
+        "gated": 0,
+        "filtered": 0,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {},
+      "streamed": 0,
+      "streamedNotReturned": []
+    }
+  }
+}

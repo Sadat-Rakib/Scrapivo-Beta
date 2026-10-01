@@ -1,0 +1,167 @@
+> build
+> vite build
+[nitro:vercel] ℹ Using nodejs24.x runtime.
+[nitro:vercel] ℹ Using web entry format.
+vite v7.3.2 building client environment for production...
+transforming...
+✓ 4050 modules transformed.
+rendering chunks...
+computing gzip size...
+.vercel/output/static/assets/hero-logo-DNIRRUMq.jpg                             6.21 kB
+.vercel/output/static/assets/hero-statue-wO3yLrsg.png                         285.29 kB
+.vercel/output/static/assets/auth-columns-A0_rBtql.png                        333.19 kB
+.vercel/output/static/assets/hero-cloud-COCIabFg.png                          958.00 kB
+.vercel/output/static/assets/styles-DaVw1gep.css                              134.41 kB │ gzip:  21.61 kB
+.vercel/output/static/assets/hero-logo-DVHuMTNJ.js                              0.06 kB │ gzip:   0.08 kB
+.vercel/output/static/assets/check-Bsg_6WrF.js                                  0.13 kB │ gzip:   0.14 kB
+.vercel/output/static/assets/chevron-right-BVy1WoWO.js                          0.13 kB │ gzip:   0.14 kB
+.vercel/output/static/assets/chevron-left-C5M0nY9o.js                           0.13 kB │ gzip:   0.14 kB
+.vercel/output/static/assets/plus-CsdSedh-.js                                   0.15 kB │ gzip:   0.15 kB
+.vercel/output/static/assets/arrow-left-BOmUfUu4.js                             0.17 kB │ gzip:   0.16 kB
+.vercel/output/static/assets/index-BF_9AaQt.js                                  0.17 kB │ gzip:   0.15 kB
+.vercel/output/static/assets/search-BgxizxsE.js                                 0.18 kB │ gzip:   0.17 kB
+.vercel/output/static/assets/search-check-CHbryaKU.js                           0.22 kB │ gzip:   0.19 kB
+.vercel/output/static/assets/bookmark-8it0IsZ-.js                               0.23 kB │ gzip:   0.20 kB
+.vercel/output/static/assets/history-CRm7ebe7.js                                0.24 kB │ gzip:   0.19 kB
+.vercel/output/static/assets/circle-question-mark-tTdTLRpO.js                   0.25 kB │ gzip:   0.21 kB
+.vercel/output/static/assets/list-plus-BJ10jNh9.js                              0.27 kB │ gzip:   0.19 kB
+.vercel/output/static/assets/book-open-LVlAJh2T.js                              0.28 kB │ gzip:   0.20 kB
+.vercel/output/static/assets/bell-C1o0eBcJ.js                                   0.29 kB │ gzip:   0.24 kB
+.vercel/output/static/assets/refresh-cw-DwhtfuX3.js                             0.32 kB │ gzip:   0.23 kB
+.vercel/output/static/assets/trash-2-Cxa3FRZT.js                                0.33 kB │ gzip:   0.21 kB
+.vercel/output/static/assets/mic-DWYGJ8ay.js                                    0.35 kB │ gzip:   0.26 kB
+.vercel/output/static/assets/folder-kanban-D9965OEb.js                          0.35 kB │ gzip:   0.25 kB
+.vercel/output/static/assets/vertical-C05wk36t.js                               0.44 kB │ gzip:   0.29 kB
+.vercel/output/static/assets/textarea-BX52XoTS.js                               0.46 kB │ gzip:   0.32 kB
+.vercel/output/static/assets/sparkles-CBOFo2-S.js                               0.50 kB │ gzip:   0.28 kB
+.vercel/output/static/assets/store-DYUynnA2.js                                  0.50 kB │ gzip:   0.29 kB
+.vercel/output/static/assets/zap-CRIHKn7y.js                                    0.54 kB │ gzip:   0.32 kB
+.vercel/output/static/assets/input-Cw4Sgkwk.js                                  0.56 kB │ gzip:   0.35 kB
+.vercel/output/static/assets/search.functions-BPTO0w8U.js                       0.57 kB │ gzip:   0.39 kB
+.vercel/output/static/assets/brain-Z1sadZ1x.js                                  0.58 kB │ gzip:   0.31 kB
+.vercel/output/static/assets/campaigns.functions-DG-fG8xt.js                    0.68 kB │ gzip:   0.38 kB
+.vercel/output/static/assets/index-DwLSoEO-.js                                  0.70 kB │ gzip:   0.42 kB
+.vercel/output/static/assets/outreach.functions-DkDYQfnf.js                     0.82 kB │ gzip:   0.50 kB
+.vercel/output/static/assets/profile-Bsrw7U3F.js                                0.91 kB │ gzip:   0.53 kB
+.vercel/output/static/assets/unsubscribe-DjjLDzxZ.js                            1.32 kB │ gzip:   0.72 kB
+.vercel/output/static/assets/leads.functions-C4SyOI82.js                        1.34 kB │ gzip:   0.67 kB
+.vercel/output/static/assets/history-C_eQc6Il.js                                2.03 kB │ gzip:   0.96 kB
+.vercel/output/static/assets/index-DKTGRZRb.js                                  2.20 kB │ gzip:   0.99 kB
+.vercel/output/static/assets/sheet-Cjw-qozF.js                                  2.26 kB │ gzip:   0.88 kB
+.vercel/output/static/assets/saved-DHuX-bp9.js                                  2.49 kB │ gzip:   1.15 kB
+.vercel/output/static/assets/guides-CVvTbfg4.js                                 2.54 kB │ gzip:   1.14 kB
+.vercel/output/static/assets/index-Cp_mKZ9F.js                                  2.63 kB │ gzip:   1.18 kB
+.vercel/output/static/assets/projects._projectId.lists._listId-CWvzLb2_.js      2.81 kB │ gzip:   1.22 kB
+.vercel/output/static/assets/projects.functions-CFTYn-mW.js                     2.97 kB │ gzip:   1.18 kB
+.vercel/output/static/assets/button-DuoD7W7L.js                                 3.01 kB │ gzip:   1.35 kB
+.vercel/output/static/assets/tokenize-input-CHn3l-TE.js                         3.28 kB │ gzip:   1.57 kB
+.vercel/output/static/assets/field-labels-DU31jxSZ.js                           4.13 kB │ gzip:   1.80 kB
+.vercel/output/static/assets/pipeline-BP4YXrhK.js                               4.61 kB │ gzip:   1.95 kB
+.vercel/output/static/assets/help-DIfKQG1M.js                                   4.73 kB │ gzip:   1.96 kB
+.vercel/output/static/assets/projects.index-25uam1SU.js                         6.20 kB │ gzip:   2.31 kB
+.vercel/output/static/assets/city-gazetteer-6c1NhPy4.js                         6.56 kB │ gzip:   3.34 kB
+.vercel/output/static/assets/tabs-Cmepxltk.js                                   7.36 kB │ gzip:   2.96 kB
+.vercel/output/static/assets/lead-card-C3NrNFMf.js                              9.05 kB │ gzip:   3.39 kB
+.vercel/output/static/assets/jobs-Bh1mEuVA.js                                   9.82 kB │ gzip:   3.97 kB
+.vercel/output/static/assets/auth-CrWB2Utw.js                                  10.60 kB │ gzip:   4.08 kB
+.vercel/output/static/assets/local-businesses-CAoz1siX.js                      10.64 kB │ gzip:   4.11 kB
+.vercel/output/static/assets/projects._projectId-BLoYxPWC.js                   11.13 kB │ gzip:   3.25 kB
+.vercel/output/static/assets/friendly-error-C_96GYN_.js                        17.31 kB │ gzip:   6.74 kB
+.vercel/output/static/assets/watches-BMueAS_m.js                               17.74 kB │ gzip:   5.86 kB
+.vercel/output/static/assets/investors-CLswhqnH.js                             21.50 kB │ gzip:   8.03 kB
+.vercel/output/static/assets/lead-detail-panel-CmkyXsV1.js                     22.36 kB │ gzip:   6.61 kB
+.vercel/output/static/assets/clarifier-CMpyzMTd.js                             22.62 kB │ gzip:   7.79 kB
+.vercel/output/static/assets/index-CbuMi-Pc.js                                 26.13 kB │ gzip:   9.23 kB
+.vercel/output/static/assets/route-C-I94wO1.js                                 27.82 kB │ gzip:   9.20 kB
+.vercel/output/static/assets/query-classifier-CHuItHEI.js                      36.84 kB │ gzip:  11.13 kB
+.vercel/output/static/assets/company-360-view-P3mgqf42.js                      49.90 kB │ gzip:  14.64 kB
+.vercel/output/static/assets/index-C9aypRr2.js                                 96.22 kB │ gzip:  22.09 kB
+.vercel/output/static/assets/proxy-S-qC8WrB.js                                126.76 kB │ gzip:  41.67 kB
+.vercel/output/static/assets/discover-CYjokrL-.js                             251.36 kB │ gzip:  75.21 kB
+.vercel/output/static/assets/index-sJcrmxre.js                                665.74 kB │ gzip: 197.75 kB
+.vercel/output/static/assets/index-DtiNMe6n.js                              1,948.59 kB │ gzip: 382.86 kB
+✓ built in 57.12s
+vite v7.3.2 building ssr environment for production...
+transforming...
+[plugin vite:resolve] Module "module" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/bootstrap.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "events" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/xml2js/lib/parser.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "timers" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/xml2js/lib/parser.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "stream" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/sax/lib/sax.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "os" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/coreBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "path" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/coreBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "fs" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/coreBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "crypto" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/coreBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "dns" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/coreBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "http" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/coreBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "http2" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/coreBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "https" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/coreBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "net" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/coreBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "child_process" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/coreBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "readline" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/coreBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "inspector" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/coreBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "events" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/coreBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "async_hooks" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/coreBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "stream" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/coreBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "util" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/coreBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "module" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/coreBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "tls" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/coreBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "zlib" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/coreBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "url" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/coreBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "vm" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/coreBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "assert" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/coreBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "os" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "util" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "tty" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "fs" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "path" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "crypto" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "stream" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "zlib" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "assert" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "buffer" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "net" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "events" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "https" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "http" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "tls" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "url" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "process" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "readline" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "constants" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "child_process" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "dns" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "fs/promises" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin vite:resolve] Module "http2" has been externalized for browser compatibility, imported by "C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/node_modules/playwright-core/lib/utilsBundle.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+"chromium-bidi/lib/cjs/cdp/CdpConnection" is imported by " chromium-bidi/lib/cjs/cdp/CdpConnection?commonjs-external", but could not be resolved – treating it as an external dependency.
+"chromium-bidi/lib/cjs/bidiMapper/BidiMapper" is imported by " chromium-bidi/lib/cjs/bidiMapper/BidiMapper?commonjs-external", but could not be resolved – treating it as an external dependency.
+[plugin vite:reporter] 
+(!) C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/search/search-spec-extract.ts is dynamically imported by C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/canonical/businesses.server.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/canonical/businesses.server.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/spec-search.functions.ts but also statically imported by C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/canonical/people.server.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/indexed/search-index.server.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/object-index/normalization.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/object-index/search.server.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/search/job.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/search/person-employment.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/search/person.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/spec-search.functions.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/understanding/fallback.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/understanding/to-search-spec.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/understanding/validate.ts, dynamic import will not move module into another chunk.
+[plugin vite:reporter] 
+(!) C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/search/search-run.ts is dynamically imported by C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/search/live-gapfill.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/search/live-gapfill.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/spec-search.functions.ts but also statically imported by C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/contact/discover-contacts.server.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/contact/harvest.server.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/research-agent/playwright-browser.server.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/search/browser-live.server.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/search/enrich-incomplete.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/search/enrichment-run.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/search/http-fetch.server.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/search/qualified-lead.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/search/search-run-client.ts, dynamic import will not move module into another chunk.
+[plugin vite:reporter] 
+(!) C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/search/qualify.ts is dynamically imported by C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/spec-search.functions.ts but also statically imported by C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/search/browser-live.server.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/search/live-gapfill.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/search/qualified-lead.ts, C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/src/lib/signals/deep-pass.server.ts, dynamic import will not move module into another chunk.
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+<--- Last few GCs --->
+[46852:000001C8297D9000]    92177 ms: Scavenge (interleaved) 1519.2 (1537.5) -> 1519.1 (1561.8) MB, pooled: 0 MB, 8.20 / 0.00 ms  (average mu = 0.267, current mu = 0.030) allocation failure; 
+[46852:000001C8297D9000]    93886 ms: Mark-Compact (reduce) 1549.6 (1586.7) -> 1549.4 (1560.7) MB, pooled: 0 MB, 1141.01 / 0.00 ms  (+ 191.3 ms in 89 steps since start of marking, biggest step 10.0 ms, walltime since start of marking 1709 ms) (average mu 
+FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+ 1: 00007FF6476850BF node::OnFatalError+1343
+ 2: 00007FF6462ADD27 v8::Function::NewInstance+423
+ 3: 00007FF6460AE567 X509_STORE_get_lookup_certs+54423
+ 4: 00007FF6460AC206 X509_STORE_get_lookup_certs+45366
+ 5: 00007FF6460C688A X509_STORE_set_cleanup+5098
+ 6: 00007FF6460D26E8 uv_timer_set_repeat+19096
+ 7: 00007FF6460EDA45 uv_timer_set_repeat+130549
+ 8: 00007FF6460ED9AC uv_timer_set_repeat+130396
+ 9: 00007FF6460D5898 uv_timer_set_repeat+31816
+10: 00007FF6460D5A74 uv_timer_set_repeat+32292
+11: 00007FF645F48EB2 v8::Promise::MarkAsSilent+219842
+12: 00007FF645F4ED8D v8::Promise::MarkAsSilent+244125
+13: 00007FF6462644D1 X509_STORE_CTX_get_check_issued+269585
+14: 00007FF647858DBA node::AsyncResource::CallbackScope::CallbackScope+752330
+15: 000001C842541C3D 
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings

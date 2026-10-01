@@ -1,0 +1,7 @@
+{
+  "url": "https://aeroleads.com/list/top-saas-companies-in-toronto",
+  "title": "",
+  "text": "\n    \n    \n        AwsWafIntegration.saveReferrer();\n        AwsWafIntegration.checkForceRefresh().then((forceRefresh) => {\n            if (forceRefresh) {\n                AwsWafIntegration.forceRefreshToken().then(() => {\n                    window.location.reload(true);\n                });\n            } else {\n                AwsWafIntegration.getToken().then(() => {\n                    window.location.reload(true);\n                });\n            }\n        });\n    \n    \n        <h1>JavaScript is disabled</h1>\n        In order to continue, we need to verify that you're not a robot.\n        This requires JavaScript. Enable JavaScript and then reload the page.\n    \n\n",
+  "structured": null,
+  "captured_at": "2026-09-30T19:13:49.724Z"
+}

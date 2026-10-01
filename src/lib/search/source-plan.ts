@@ -474,6 +474,9 @@ export function buildCandidateResearchQueries(
     if (missing.includes("profile")) queries.push([subject, "LinkedIn"].join(" "));
     if (missing.includes("contact")) queries.push([destinationName, "contact"].join(" "));
   }
+  if (missing.includes("social")) {
+    queries.push([`"${exactName}"`, "Instagram OR Facebook OR LinkedIn recent posts"].join(" "));
+  }
   if (spec.signal_required && missing.some((f) => /signal|evidence/.test(f))) {
     if (requestedRole) queries.push([subject, "hiring", requestedRole].join(" "));
     if (requestedService) queries.push([subject, "needs", requestedService].join(" "));

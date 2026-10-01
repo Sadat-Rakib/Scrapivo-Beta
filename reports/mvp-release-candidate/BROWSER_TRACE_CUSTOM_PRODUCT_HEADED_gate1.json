@@ -1,0 +1,544 @@
+{
+  "runId": "trace-custom-product-1790735290812",
+  "query": "B2B SaaS founders with public contact details",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 119329,
+  "error": null,
+  "browser": {
+    "adapter": "playwright",
+    "status": "cancelled",
+    "pagesVisited": 4,
+    "currentUrl": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL"
+  },
+  "progressEvents": 30,
+  "streamedRows": [
+    "Andrew Breen",
+    "Alex Circei"
+  ],
+  "searches": [
+    {
+      "kind": "search",
+      "query": "\"founder\" SaaS b2b",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "\"founder\" SaaS b2b",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 9,
+      "reason": "raw_links=9 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "Thrust Carbon official website",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "pageType": "list",
+      "title": "Top 25 B2B SaaS Founder List",
+      "outcome": "read",
+      "textChars": 3155,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "Andrew Breen",
+        "Alex Circei",
+        "Mark Corbett",
+        "Pranjal Daga",
+        "Garry Drummond",
+        "Jennifer Dulski",
+        "Henrik Grim",
+        "Ajay Kamble",
+        "Amir Kaplan",
+        "Erik Kostelnik"
+      ],
+      "why": "",
+      "capture": "9a86eab11d1b.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL",
+      "pageType": "list",
+      "title": "Top 25 B2B SaaS Founder List | Capchase | 17 comments",
+      "outcome": "read",
+      "textChars": 3310,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "entities rejected: ",
+      "capture": "3f7fbd815069.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://www.outshine.com/",
+      "pageType": null,
+      "title": "Outshine | Digital Marketing & Analytics Experts For B2B SaaS",
+      "outcome": "http_read",
+      "textChars": 4186,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "entities rejected: ENTITY_TYPE_MISMATCH/kind_unsupported_by_quotes",
+      "capture": "02d86d4030d1.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://waydev.co/",
+      "pageType": null,
+      "title": "Productivity Insights: SPACE Framework, DX and DORA metrics - Waydev",
+      "outcome": "http_read",
+      "textChars": 7508,
+      "structured": {
+        "jobs": 0,
+        "organization": "Waydev",
+        "emails": 1,
+        "phones": 1
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error groq:openai/gpt-oss-20b 400 (bad_request): {\"error\":{\"message\":\"Failed to generate JSON. Please adjust your prompt. See 'failed_generation' for more details.\",\"; injected/not_called)",
+      "capture": "e754128598c9.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.capchase.com/top-25-b2b-saas-founder-list",
+        "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL"
+      ],
+      "extractor": "deterministic",
+      "llm": "not_called",
+      "entities": 10
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.capchase.com/top-25-b2b-saas-founder-list",
+        "https://www.linkedin.com/posts/capchase_top-25-b2b-saas-founder-list-activity-7219377149969891328-jYNL"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 10
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.outshine.com/"
+      ],
+      "extractor": "llm",
+      "llm": "ok",
+      "entities": 1
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.outshine.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 1
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://waydev.co/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "groq:openai/gpt-oss-20b 400 (bad_request): {\"error\":{\"message\":\"Failed to generate JSON. Please adjust your prompt. See 'failed_generation' for more details.\",\""
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://waydev.co/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    }
+  ],
+  "entityOutcomes": [
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Andrew Breen",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Alex Circei",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Mark Corbett",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Pranjal Daga",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Garry Drummond",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Jennifer Dulski",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Henrik Grim",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Ajay Kamble",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Amir Kaplan",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Erik Kostelnik",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.outshine.com/",
+      "name": "Colin White",
+      "kind": "person",
+      "outcome": "rejected",
+      "reason": "ENTITY_TYPE_MISMATCH",
+      "detail": "kind_unsupported_by_quotes",
+      "dropped": [
+        "industry:not_subject_bound",
+        "category:not_subject_bound",
+        "location:not_subject_bound",
+        "country:not_subject_bound",
+        "sector:not_subject_bound",
+        "stage:value_not_in_quote",
+        "email:not_subject_bound",
+        "phone:not_subject_bound",
+        "content_topic:value_not_in_quote",
+        "opportunity:value_not_in_quote",
+        "salary:value_not_in_quote"
+      ]
+    }
+  ],
+  "remember": [
+    {
+      "kind": "remember",
+      "name": "Andrew Breen",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Alex Circei",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Mark Corbett",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Pranjal Daga",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Garry Drummond",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Jennifer Dulski",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Henrik Grim",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Ajay Kamble",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Amir Kaplan",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Erik Kostelnik",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    }
+  ],
+  "candidates": [
+    {
+      "kind": "candidate",
+      "name": "Andrew Breen",
+      "status": "verified",
+      "rejectCode": null,
+      "label": null,
+      "needs": [
+        "contact"
+      ],
+      "visited": 1,
+      "queries": 0
+    },
+    {
+      "kind": "candidate",
+      "name": "Alex Circei",
+      "status": "verified",
+      "rejectCode": null,
+      "label": null,
+      "needs": [
+        "contact"
+      ],
+      "visited": 1,
+      "queries": 0
+    }
+  ],
+  "done": [
+    {
+      "kind": "done",
+      "status": "timeout",
+      "candidates": 10,
+      "verified": 2,
+      "visited": 4,
+      "queries": 2,
+      "stoppingReason": "BROWSER_DISCOVERY_TIMEOUT",
+      "elapsedMs": 90014
+    }
+  ],
+  "persistenceSkipped": [
+    "ai_cache",
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "person",
+    "criteria": [
+      "role=founder",
+      "industry=SaaS",
+      "business_model=b2b"
+    ],
+    "clarify": [],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_people(country,city_norm,role_norm)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "live-browser",
+          "partitions": [
+            "live-gapfill(10)"
+          ],
+          "scanned": 10,
+          "matched": 10
+        }
+      ],
+      "rawCandidates": 10,
+      "postSpecFilter": 10,
+      "timings": {
+        "understanding_ms": 3140,
+        "stored_search_ms": 3870,
+        "research_ms": 90389,
+        "enrichment_ms": 11802,
+        "qualification_ms": 440,
+        "total_ms": 109641
+      },
+      "researchable": 10,
+      "researched": 10,
+      "complete": 2,
+      "pendingEnrichment": 8,
+      "qualificationRejected": 0,
+      "qualified": 2,
+      "returned": 2,
+      "reason": "RESULTS"
+    },
+    "rowsReturned": 2,
+    "rows": [
+      {
+        "title": "Andrew Breen",
+        "kind": "person",
+        "role": "Founder & CEO",
+        "company": "Outshine",
+        "location": null,
+        "website_url": "https://www.outshine.com",
+        "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+        "disposition": "qualified",
+        "why": "Identity · Andrew Breen\nFounder & CEO\nOutshine"
+      },
+      {
+        "title": "Alex Circei",
+        "kind": "person",
+        "role": "CEO & Co-Founder",
+        "company": "Waydev",
+        "location": null,
+        "website_url": "https://waydev.co",
+        "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+        "disposition": "qualified",
+        "why": "Identity · Alex Circei\nCEO & Co-Founder\nWaydev"
+      }
+    ],
+    "diagnostics": [
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "direct-http",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "searxng",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      }
+    ]
+  }
+}

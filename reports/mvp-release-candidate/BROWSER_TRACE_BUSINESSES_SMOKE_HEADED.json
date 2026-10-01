@@ -1,0 +1,906 @@
+{
+  "runId": "trace-businesses-smoke-1790737394883",
+  "query": "Restaurants in Calgary, Alberta with official websites",
+  "which": "businesses",
+  "mode": "smoke",
+  "durationMs": 17376,
+  "error": null,
+  "browser": {
+    "adapter": "playwright",
+    "status": "completed",
+    "pagesVisited": 7,
+    "currentUrl": "https://www.tenfoothenry.com/"
+  },
+  "progressEvents": 24,
+  "streamedRows": [],
+  "searches": [
+    {
+      "kind": "search",
+      "query": "restaurant Calgary",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "restaurant Calgary",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "Ten Foot Henry Calgary official website",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "Ten Foot Henry Calgary official website",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "pageType": "list",
+      "title": "THE 10 BEST Restaurants in Calgary Updated September 2026",
+      "outcome": "read",
+      "textChars": 12328,
+      "structured": {
+        "jobs": 0,
+        "organization": "Tripadvisor",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "Ten Foot Henry",
+        "Marko's Kitchen",
+        "OEB Breakfast Co.",
+        "Saltlik",
+        "Blue Star Diner",
+        "Vero Bistro Moderne",
+        "Caesar's Steak House & Lounge",
+        "Minas Brazilian Steakhouse",
+        "Gaga Pizza",
+        "Native Tongues Taqueria",
+        "Santorini Greek Taverna",
+        "Cactus Club Cafe Barlow Trail",
+        "Silver Dragon Restaurant Calgary",
+        "NOtaBLE - The Restaurant",
+        "JOEY Eau Claire",
+        "The Keg Steakhouse + Bar - 4th Ave",
+        "The Himalayan",
+        "La Brezza Ristorante",
+        "UNA Pizza + Wine",
+        "James Joyce Irish Pub",
+        "River Cafe",
+        "Bow Valley Ranche Restaurant",
+        "Nick's Steak House & Pizza",
+        "Sky 360",
+        "Masala Bhavan",
+        "CattleBaron Steakhouse",
+        "Hayden Block",
+        "clay pot Asian food kitchen",
+        "Klein and Harris",
+        "Ruth's Chris Steak House"
+      ],
+      "why": "",
+      "capture": null
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.avenuecalgary.com/best-restaurants-calgary/",
+      "pageType": "list",
+      "title": "Calgary's Best Restaurants - Avenue Calgary",
+      "outcome": "read",
+      "textChars": 2335,
+      "structured": {
+        "jobs": 0,
+        "organization": "Avenue Calgary",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "ab63d57c2862.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://www.tripadvisor.ca/Restaurant_Review-g154913-d10053014-Reviews-Ten_Foot_Henry-Calgary_Alberta.html",
+      "pageType": null,
+      "title": null,
+      "outcome": "navigation_failed",
+      "textChars": 0,
+      "structured": null,
+      "candidateProduced": "YES",
+      "produced": [
+        "Ten Foot Henry",
+        "Private | Calgary City Highlights Walking Tour",
+        "Iconic Eats of Calgary Food Tour",
+        "Calgary #1 Food Bike Tour: Taste Local And See The City By E-Bike",
+        "Calgary Food Walking Tour: Calgary Farmers Market"
+      ],
+      "why": "navigation_failed: HTTP 403",
+      "capture": null
+    },
+    {
+      "origin": "source_link",
+      "url": "https://www.tripadvisor.ca/Restaurant_Review-g154913-d10053014-Reviews-Ten_Foot_Henry-Calgary_Alberta.html",
+      "pageType": "unknown",
+      "title": "TEN FOOT HENRY, Calgary - 2026 Reviews & Information",
+      "outcome": "read",
+      "textChars": 14952,
+      "structured": {
+        "jobs": 0,
+        "organization": "Tripadvisor",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "Ten Foot Henry",
+        "Private | Calgary City Highlights Walking Tour",
+        "Iconic Eats of Calgary Food Tour",
+        "Calgary #1 Food Bike Tour: Taste Local And See The City By E-Bike",
+        "Calgary Food Walking Tour: Calgary Farmers Market"
+      ],
+      "why": "",
+      "capture": null
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.tenfoothenry.com/",
+      "pageType": "unknown",
+      "title": "Ten Foot Henry",
+      "outcome": "read",
+      "textChars": 3266,
+      "structured": {
+        "jobs": 0,
+        "organization": "TEN FOOT HENRY",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "TEN FOOT HENRY",
+        "TEN FOOT HENRY"
+      ],
+      "why": "",
+      "capture": "f83556ade7cc.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html"
+      ],
+      "extractor": "json_ld",
+      "llm": "not_called",
+      "entities": 30
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.avenuecalgary.com/best-restaurants-calgary/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.avenuecalgary.com/best-restaurants-calgary/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.tripadvisor.ca/Restaurant_Review-g154913-d10053014-Reviews-Ten_Foot_Henry-Calgary_Alberta.html"
+      ],
+      "extractor": "json_ld",
+      "llm": "not_called",
+      "entities": 5
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.tenfoothenry.com/"
+      ],
+      "extractor": "json_ld",
+      "llm": "not_called",
+      "entities": 1
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.tenfoothenry.com/"
+      ],
+      "extractor": "llm",
+      "llm": "ok",
+      "entities": 1
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.tenfoothenry.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 1
+    }
+  ],
+  "entityOutcomes": [
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "Ten Foot Henry",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "Marko's Kitchen",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "OEB Breakfast Co.",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "Saltlik",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "Blue Star Diner",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "Vero Bistro Moderne",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "Caesar's Steak House & Lounge",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "Minas Brazilian Steakhouse",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "Gaga Pizza",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "Native Tongues Taqueria",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "Santorini Greek Taverna",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "Cactus Club Cafe Barlow Trail",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "Silver Dragon Restaurant Calgary",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "NOtaBLE - The Restaurant",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "JOEY Eau Claire",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "The Keg Steakhouse + Bar - 4th Ave",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "The Himalayan",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "La Brezza Ristorante",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "UNA Pizza + Wine",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "James Joyce Irish Pub",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "River Cafe",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "Bow Valley Ranche Restaurant",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "Nick's Steak House & Pizza",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "Sky 360",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "Masala Bhavan",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "CattleBaron Steakhouse",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "Hayden Block",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "clay pot Asian food kitchen",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "Klein and Harris",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+      "name": "Ruth's Chris Steak House",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurant_Review-g154913-d10053014-Reviews-Ten_Foot_Henry-Calgary_Alberta.html",
+      "name": "Ten Foot Henry",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurant_Review-g154913-d10053014-Reviews-Ten_Foot_Henry-Calgary_Alberta.html",
+      "name": "Private | Calgary City Highlights Walking Tour",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurant_Review-g154913-d10053014-Reviews-Ten_Foot_Henry-Calgary_Alberta.html",
+      "name": "Iconic Eats of Calgary Food Tour",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurant_Review-g154913-d10053014-Reviews-Ten_Foot_Henry-Calgary_Alberta.html",
+      "name": "Calgary #1 Food Bike Tour: Taste Local And See The City By E-Bike",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tripadvisor.ca/Restaurant_Review-g154913-d10053014-Reviews-Ten_Foot_Henry-Calgary_Alberta.html",
+      "name": "Calgary Food Walking Tour: Calgary Farmers Market",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tenfoothenry.com/",
+      "name": "TEN FOOT HENRY",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://www.tenfoothenry.com/",
+      "name": "TEN FOOT HENRY",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": [
+        "location:not_subject_bound"
+      ]
+    }
+  ],
+  "remember": [
+    {
+      "kind": "remember",
+      "name": "Ten Foot Henry",
+      "rowKind": "business",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Marko's Kitchen",
+      "rowKind": "business",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "OEB Breakfast Co.",
+      "rowKind": "business",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Saltlik",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Blue Star Diner",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Vero Bistro Moderne",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Caesar's Steak House & Lounge",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Minas Brazilian Steakhouse",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Gaga Pizza",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Native Tongues Taqueria",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Santorini Greek Taverna",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Cactus Club Cafe Barlow Trail",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Silver Dragon Restaurant Calgary",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "NOtaBLE - The Restaurant",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "JOEY Eau Claire",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "The Keg Steakhouse + Bar - 4th Ave",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "The Himalayan",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "La Brezza Ristorante",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "UNA Pizza + Wine",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "James Joyce Irish Pub",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "River Cafe",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Bow Valley Ranche Restaurant",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Nick's Steak House & Pizza",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Sky 360",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Masala Bhavan",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "CattleBaron Steakhouse",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Hayden Block",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "clay pot Asian food kitchen",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Klein and Harris",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Ruth's Chris Steak House",
+      "rowKind": "business",
+      "outcome": "BUDGET_CAP",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Ten Foot Henry",
+      "rowKind": "business",
+      "outcome": "TARGET_MISMATCH",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Private | Calgary City Highlights Walking Tour",
+      "rowKind": "business",
+      "outcome": "TARGET_MISMATCH",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Iconic Eats of Calgary Food Tour",
+      "rowKind": "business",
+      "outcome": "TARGET_MISMATCH",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Calgary #1 Food Bike Tour: Taste Local And See The City By E-Bike",
+      "rowKind": "business",
+      "outcome": "TARGET_MISMATCH",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Calgary Food Walking Tour: Calgary Farmers Market",
+      "rowKind": "business",
+      "outcome": "TARGET_MISMATCH",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "TEN FOOT HENRY",
+      "rowKind": "business",
+      "outcome": "TARGET_MISMATCH",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "TEN FOOT HENRY",
+      "rowKind": "business",
+      "outcome": "merged",
+      "resolved": true
+    }
+  ],
+  "candidates": [
+    {
+      "kind": "candidate",
+      "name": "Ten Foot Henry",
+      "status": "exhausted",
+      "rejectCode": "MISSING_QUERY_REQUIRED",
+      "label": "MISSING_QUERY_REQUIRED — missing query-required: location",
+      "needs": [
+        "location"
+      ],
+      "visited": 2,
+      "queries": 1
+    }
+  ],
+  "done": [
+    {
+      "kind": "done",
+      "status": "completed",
+      "candidates": 3,
+      "verified": 0,
+      "visited": 4,
+      "queries": 2,
+      "stoppingReason": "search_budget_reached",
+      "elapsedMs": 15351
+    }
+  ],
+  "persistenceSkipped": [
+    "ai_cache"
+  ],
+  "result": {
+    "mode": "smoke",
+    "rowsReturned": 3,
+    "rows": [
+      {
+        "title": "Ten Foot Henry",
+        "kind": "business",
+        "location": null,
+        "website_url": "https://www.tenfoothenry.com",
+        "source_url": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+        "verification_status": "discovered"
+      },
+      {
+        "title": "Marko's Kitchen",
+        "kind": "business",
+        "location": null,
+        "website_url": null,
+        "source_url": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+        "verification_status": "discovered"
+      },
+      {
+        "title": "OEB Breakfast Co.",
+        "kind": "business",
+        "location": null,
+        "website_url": null,
+        "source_url": "https://www.tripadvisor.ca/Restaurants-g154913-Calgary_Alberta.html",
+        "verification_status": "discovered"
+      }
+    ]
+  }
+}

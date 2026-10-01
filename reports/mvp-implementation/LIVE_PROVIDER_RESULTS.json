@@ -1,0 +1,6132 @@
+[
+  {
+    "query": "Find me D2C skincare brands in Dhaka, Bangladesh that are doing marketing and active online. Give me websites, phone numbers, emails and socials, and check when they last posted.",
+    "provider": "groq:openai/gpt-oss-20b",
+    "model": "openai/gpt-oss-20b",
+    "fallback": false,
+    "error": null,
+    "rawSemanticResult": "{\"task_type\":{\"value\":\"lead_discovery\",\"raw\":\"Find me D2C skincare brands\",\"confidence\":0.95},\"prospecting_mode\":{\"value\":\"fit_based\",\"raw\":\"Find me D2C skincare brands\",\"confidence\":0.9},\"target\":{\"entity_type\":{\"value\":\"business\",\"raw\":\"brands\",\"confidence\":0.95},\"category\":{\"value\":\"skincare brand\",\"raw\":\"skincare brands\"},\"business_type\":{\"value\":\"D2C\",\"raw\":\"D2C\"},\"industry\":{\"value\":\"skincare\",\"raw\":\"skincare\"},\"role\":{\"value\":\"brand\",\"raw\":\"brands\"}},\"relation\":{\"type\":{\"value\":\"custom\",\"raw\":\"doing marketing and active online\",\"confidence\":0.9},\"direction\":{\"value\":\"none\",\"confidence\":0.9}},\"location\":{\"value\":\"Dhaka, Bangladesh\",\"raw\":\"in Dhaka, Bangladesh\",\"scope\":\"in\"},\"required_fields\":[{\"value\":\"website\",\"raw\":\"websites\"},{\"value\":\"phone\",\"raw\":\"phone numbers\"},{\"value\":\"email\",\"raw\":\"emails\"},{\"value\":\"socials\",\"raw\":\"socials\"}],\"verification\":[{\"kind\":\"other\",\"label\":\"last post date\",\"raw\":\"check when they last posted\"}],\"evidence\":{\"claim_evidence_required\":true,\"intent_signal_required\":false},\"output\":[{\"kind\":\"table\",\"raw\":\"table\"}]}",
+    "validationRepairs": [
+      {
+        "code": "CUSTOM_RELATION_LABEL_FROM_RAW",
+        "message": "custom relation labelled \"doing marketing and active online\" from the span it was read off",
+        "path": "relation.label"
+      },
+      {
+        "code": "SPAN_HARVESTED_TWICE",
+        "message": "industry \"skincare\" was cut out of target.category \"skincare brands\" — one word cannot narrow twice",
+        "path": "target.industry"
+      },
+      {
+        "code": "SPAN_HARVESTED_TWICE",
+        "message": "role \"brand\" was cut out of target.category \"skincare brands\" — one word cannot narrow twice",
+        "path": "target.role"
+      },
+      {
+        "code": "LOCATION_CANONICALIZED",
+        "message": "\"Dhaka, Bangladesh\" -> Dhaka",
+        "path": "location.canonical"
+      }
+    ],
+    "frame": {
+      "version": "u1",
+      "input": {
+        "raw": "Find me D2C skincare brands in Dhaka, Bangladesh that are doing marketing and active online. Give me websites, phone numbers, emails and socials, and check when they last posted.",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "lead_discovery",
+        "raw": "Find me D2C skincare brands",
+        "confidence": 0.95
+      },
+      "prospecting_mode": {
+        "value": "fit_based",
+        "raw": "Find me D2C skincare brands",
+        "confidence": 0.9
+      },
+      "target": {
+        "entity_type": {
+          "value": "business",
+          "raw": "brands",
+          "confidence": 0.95
+        },
+        "entity_ambiguous": false,
+        "entity_subtype": null,
+        "role": null,
+        "job_title": null,
+        "industry": null,
+        "category": {
+          "value": "skincare brand",
+          "raw": "skincare brands",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "business_type": {
+          "value": "D2C",
+          "raw": "D2C",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "niche": null,
+        "company_stage": null,
+        "technologies": [],
+        "descriptors": []
+      },
+      "relation": {
+        "type": {
+          "value": "custom",
+          "raw": "doing marketing and active online",
+          "confidence": 0.9
+        },
+        "label": "doing marketing and active online",
+        "object": null,
+        "direction": {
+          "value": "none",
+          "raw": null,
+          "confidence": 0.9
+        }
+      },
+      "organization_context": {
+        "on_behalf_of_company": "unknown",
+        "company": null
+      },
+      "user_context": {
+        "selling": null,
+        "objective": null,
+        "notes": []
+      },
+      "location": {
+        "value": "Dhaka, Bangladesh",
+        "raw": "in Dhaka, Bangladesh",
+        "scope": "in",
+        "radius": null,
+        "radius_unit": null,
+        "country_code": "BD",
+        "canonical": "Dhaka",
+        "confidence": 0.5
+      },
+      "locations": [],
+      "unresolved": [],
+      "temporal": null,
+      "constraints": [],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": false,
+        "reasons": []
+      },
+      "quantity": null,
+      "required_fields": [
+        {
+          "value": "website",
+          "raw": "websites",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        {
+          "value": "phone",
+          "raw": "phone numbers",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        {
+          "value": "email",
+          "raw": "emails",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        {
+          "value": "socials",
+          "raw": "socials",
+          "normalized": null,
+          "confidence": 0.5
+        }
+      ],
+      "preferred_fields": [],
+      "contact_requirements": [],
+      "verification": [
+        {
+          "kind": "other",
+          "label": "last post date",
+          "raw": "check when they last posted"
+        }
+      ],
+      "output": [
+        {
+          "kind": "table",
+          "label": null,
+          "raw": "table"
+        }
+      ],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": true,
+        "fields": [
+          "relation.object"
+        ],
+        "reason": "missing_relation_object",
+        "question": "What should they be doing?"
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": "groq:openai/gpt-oss-20b",
+        "model": "openai/gpt-oss-20b",
+        "prompt_version": "u1-v16",
+        "latency_ms": 1607,
+        "fallback_used": false,
+        "cached": false,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": null,
+          "repair_attempted": false,
+          "repair_reason": null,
+          "repair_success": null
+        },
+        "notes": []
+      }
+    },
+    "spec": {
+      "entity": "business",
+      "criteria": [
+        {
+          "field": "category",
+          "value": "skincare brand",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "business_model",
+          "value": "d2c",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location",
+          "value": "Dhaka",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "location_id",
+          "value": "geo:city:dhaka",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "city",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_country",
+          "value": "BD",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_parents",
+          "value": "geo:country:bd",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "needs_live",
+          "value": "true",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "verify_last_social_post",
+          "value": "true",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "require_website",
+          "value": "true",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "required_field",
+          "value": "website",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "require_phone",
+          "value": "true",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "required_field",
+          "value": "phone",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "require_email",
+          "value": "true",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "required_field",
+          "value": "email",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "require_socials",
+          "value": "true",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "required_field",
+          "value": "socials",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "verify_other",
+          "value": "last post date",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "output_table",
+          "value": "true",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "Find me D2C skincare brands in Dhaka, Bangladesh that are doing marketing and active online. Give me websites, phone numbers, emails and socials, and check when they last posted.",
+      "locationSuggestion": null,
+      "understanding": {
+        "version": "u1",
+        "input": {
+          "raw": "Find me D2C skincare brands in Dhaka, Bangladesh that are doing marketing and active online. Give me websites, phone numbers, emails and socials, and check when they last posted.",
+          "normalized": null
+        },
+        "task_type": {
+          "value": "lead_discovery",
+          "raw": "Find me D2C skincare brands",
+          "confidence": 0.95
+        },
+        "prospecting_mode": {
+          "value": "fit_based",
+          "raw": "Find me D2C skincare brands",
+          "confidence": 0.9
+        },
+        "target": {
+          "entity_type": {
+            "value": "business",
+            "raw": "brands",
+            "confidence": 0.95
+          },
+          "entity_ambiguous": false,
+          "entity_subtype": null,
+          "role": null,
+          "job_title": null,
+          "industry": null,
+          "category": {
+            "value": "skincare brand",
+            "raw": "skincare brands",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "business_type": {
+            "value": "D2C",
+            "raw": "D2C",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "niche": null,
+          "company_stage": null,
+          "technologies": [],
+          "descriptors": []
+        },
+        "relation": {
+          "type": {
+            "value": "custom",
+            "raw": "doing marketing and active online",
+            "confidence": 0.9
+          },
+          "label": "doing marketing and active online",
+          "object": null,
+          "direction": {
+            "value": "none",
+            "raw": null,
+            "confidence": 0.9
+          }
+        },
+        "organization_context": {
+          "on_behalf_of_company": "unknown",
+          "company": null
+        },
+        "user_context": {
+          "selling": null,
+          "objective": null,
+          "notes": []
+        },
+        "location": {
+          "value": "Dhaka, Bangladesh",
+          "raw": "in Dhaka, Bangladesh",
+          "scope": "in",
+          "radius": null,
+          "radius_unit": null,
+          "country_code": "BD",
+          "canonical": "Dhaka",
+          "confidence": 0.5
+        },
+        "locations": [],
+        "unresolved": [],
+        "temporal": null,
+        "constraints": [],
+        "evidence": {
+          "claim_evidence_required": true,
+          "intent_signal_required": false,
+          "reasons": []
+        },
+        "quantity": null,
+        "required_fields": [
+          {
+            "value": "website",
+            "raw": "websites",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          {
+            "value": "phone",
+            "raw": "phone numbers",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          {
+            "value": "email",
+            "raw": "emails",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          {
+            "value": "socials",
+            "raw": "socials",
+            "normalized": null,
+            "confidence": 0.5
+          }
+        ],
+        "preferred_fields": [],
+        "contact_requirements": [],
+        "verification": [
+          {
+            "kind": "other",
+            "label": "last post date",
+            "raw": "check when they last posted"
+          }
+        ],
+        "output": [
+          {
+            "kind": "table",
+            "label": null,
+            "raw": "table"
+          }
+        ],
+        "source_preferences": [],
+        "enrichment_requirements": [],
+        "compound": {
+          "is_compound": false,
+          "subgoals": []
+        },
+        "clarification": {
+          "needed": true,
+          "fields": [
+            "relation.object"
+          ],
+          "reason": "missing_relation_object",
+          "question": "What should they be doing?"
+        },
+        "meta": {
+          "extractor": "llm",
+          "provider": "groq:openai/gpt-oss-20b",
+          "model": "openai/gpt-oss-20b",
+          "prompt_version": "u1-v16",
+          "latency_ms": 1607,
+          "fallback_used": false,
+          "cached": false,
+          "repair": {
+            "initial_parse_status": "valid_json",
+            "initial_failure_class": null,
+            "repair_attempted": false,
+            "repair_reason": null,
+            "repair_success": null
+          },
+          "notes": []
+        }
+      },
+      "locations": [
+        "Dhaka"
+      ],
+      "unresolved": [],
+      "purpose": null,
+      "requested_fields": [
+        "website",
+        "phone",
+        "email",
+        "socials"
+      ]
+    },
+    "decision": {
+      "type": "clarify",
+      "question": {
+        "id": "entity_relation",
+        "question": "What should they be doing?",
+        "options": [],
+        "allowOther": true
+      }
+    }
+  },
+  {
+    "query": "yo d2c skincare guys arnd Dhaka who r active online, nums n socials pls",
+    "provider": "groq:openai/gpt-oss-120b",
+    "model": "openai/gpt-oss-120b",
+    "fallback": false,
+    "error": null,
+    "rawSemanticResult": "{\"task_type\":{\"value\":\"lead_discovery\",\"raw\":\"lead discovery\",\"confidence\":0.95},\"prospecting_mode\":{\"value\":\"fit_based\",\"raw\":\"fit based\",\"confidence\":0.9},\"target\":{\"entity_type\":{\"value\":\"business\",\"raw\":\"guys\",\"confidence\":0.95},\"category\":{\"value\":\"skincare\",\"raw\":\"skincare\"},\"descriptors\":[{\"value\":\"d2c\",\"raw\":\"d2c\"}]},\"relation\":{\"type\":{\"value\":\"none\",\"raw\":\"none\",\"confidence\":0.95},\"direction\":{\"value\":\"none\",\"raw\":\"none\",\"confidence\":0.95}},\"location\":{\"value\":\"Dhaka\",\"raw\":\"arnd Dhaka\",\"scope\":\"near\"},\"required_fields\":[{\"value\":\"phone\",\"raw\":\"nums\"}],\"preferred_fields\":[{\"value\":\"socials\",\"raw\":\"socials\"}],\"evidence\":{\"claim_evidence_required\":true,\"intent_signal_required\":false}}",
+    "validationRepairs": [
+      {
+        "code": "LOCATION_CANONICALIZED",
+        "message": "\"Dhaka\" -> Dhaka",
+        "path": "location.canonical"
+      }
+    ],
+    "frame": {
+      "version": "u1",
+      "input": {
+        "raw": "yo d2c skincare guys arnd Dhaka who r active online, nums n socials pls",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "lead_discovery",
+        "raw": "lead discovery",
+        "confidence": 0.95
+      },
+      "prospecting_mode": {
+        "value": "fit_based",
+        "raw": "fit based",
+        "confidence": 0.9
+      },
+      "target": {
+        "entity_type": {
+          "value": "business",
+          "raw": "guys",
+          "confidence": 0.95
+        },
+        "entity_ambiguous": false,
+        "entity_subtype": null,
+        "role": null,
+        "job_title": null,
+        "industry": null,
+        "category": {
+          "value": "skincare",
+          "raw": "skincare",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "business_type": null,
+        "niche": null,
+        "company_stage": null,
+        "technologies": [],
+        "descriptors": [
+          {
+            "value": "d2c",
+            "raw": "d2c",
+            "normalized": null,
+            "confidence": 0.5
+          }
+        ]
+      },
+      "relation": {
+        "type": {
+          "value": "none",
+          "raw": "none",
+          "confidence": 0.95
+        },
+        "label": null,
+        "object": null,
+        "direction": {
+          "value": "none",
+          "raw": "none",
+          "confidence": 0.95
+        }
+      },
+      "organization_context": {
+        "on_behalf_of_company": "unknown",
+        "company": null
+      },
+      "user_context": {
+        "selling": null,
+        "objective": null,
+        "notes": []
+      },
+      "location": {
+        "value": "Dhaka",
+        "raw": "arnd Dhaka",
+        "scope": "near",
+        "radius": null,
+        "radius_unit": null,
+        "country_code": "BD",
+        "canonical": "Dhaka",
+        "confidence": 0.5
+      },
+      "locations": [],
+      "unresolved": [],
+      "temporal": null,
+      "constraints": [],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": false,
+        "reasons": []
+      },
+      "quantity": null,
+      "required_fields": [
+        {
+          "value": "phone",
+          "raw": "nums",
+          "normalized": null,
+          "confidence": 0.5
+        }
+      ],
+      "preferred_fields": [
+        {
+          "value": "socials",
+          "raw": "socials",
+          "normalized": null,
+          "confidence": 0.5
+        }
+      ],
+      "contact_requirements": [],
+      "verification": [],
+      "output": [],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": false,
+        "fields": [],
+        "reason": null,
+        "question": null
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": "groq:openai/gpt-oss-120b",
+        "model": "openai/gpt-oss-120b",
+        "prompt_version": "u1-v16",
+        "latency_ms": 2054,
+        "fallback_used": false,
+        "cached": false,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": null,
+          "repair_attempted": false,
+          "repair_reason": null,
+          "repair_success": null
+        },
+        "notes": []
+      }
+    },
+    "spec": {
+      "entity": "business",
+      "criteria": [
+        {
+          "field": "category",
+          "value": "skincare",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "location",
+          "value": "Dhaka",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "location_id",
+          "value": "geo:city:dhaka",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "city",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_country",
+          "value": "BD",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_parents",
+          "value": "geo:country:bd",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "require_phone",
+          "value": "true",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "required_field",
+          "value": "phone",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "prefer_socials",
+          "value": "true",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "yo d2c skincare guys arnd Dhaka who r active online, nums n socials pls",
+      "locationSuggestion": null,
+      "understanding": {
+        "version": "u1",
+        "input": {
+          "raw": "yo d2c skincare guys arnd Dhaka who r active online, nums n socials pls",
+          "normalized": null
+        },
+        "task_type": {
+          "value": "lead_discovery",
+          "raw": "lead discovery",
+          "confidence": 0.95
+        },
+        "prospecting_mode": {
+          "value": "fit_based",
+          "raw": "fit based",
+          "confidence": 0.9
+        },
+        "target": {
+          "entity_type": {
+            "value": "business",
+            "raw": "guys",
+            "confidence": 0.95
+          },
+          "entity_ambiguous": false,
+          "entity_subtype": null,
+          "role": null,
+          "job_title": null,
+          "industry": null,
+          "category": {
+            "value": "skincare",
+            "raw": "skincare",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "business_type": null,
+          "niche": null,
+          "company_stage": null,
+          "technologies": [],
+          "descriptors": [
+            {
+              "value": "d2c",
+              "raw": "d2c",
+              "normalized": null,
+              "confidence": 0.5
+            }
+          ]
+        },
+        "relation": {
+          "type": {
+            "value": "none",
+            "raw": "none",
+            "confidence": 0.95
+          },
+          "label": null,
+          "object": null,
+          "direction": {
+            "value": "none",
+            "raw": "none",
+            "confidence": 0.95
+          }
+        },
+        "organization_context": {
+          "on_behalf_of_company": "unknown",
+          "company": null
+        },
+        "user_context": {
+          "selling": null,
+          "objective": null,
+          "notes": []
+        },
+        "location": {
+          "value": "Dhaka",
+          "raw": "arnd Dhaka",
+          "scope": "near",
+          "radius": null,
+          "radius_unit": null,
+          "country_code": "BD",
+          "canonical": "Dhaka",
+          "confidence": 0.5
+        },
+        "locations": [],
+        "unresolved": [],
+        "temporal": null,
+        "constraints": [],
+        "evidence": {
+          "claim_evidence_required": true,
+          "intent_signal_required": false,
+          "reasons": []
+        },
+        "quantity": null,
+        "required_fields": [
+          {
+            "value": "phone",
+            "raw": "nums",
+            "normalized": null,
+            "confidence": 0.5
+          }
+        ],
+        "preferred_fields": [
+          {
+            "value": "socials",
+            "raw": "socials",
+            "normalized": null,
+            "confidence": 0.5
+          }
+        ],
+        "contact_requirements": [],
+        "verification": [],
+        "output": [],
+        "source_preferences": [],
+        "enrichment_requirements": [],
+        "compound": {
+          "is_compound": false,
+          "subgoals": []
+        },
+        "clarification": {
+          "needed": false,
+          "fields": [],
+          "reason": null,
+          "question": null
+        },
+        "meta": {
+          "extractor": "llm",
+          "provider": "groq:openai/gpt-oss-120b",
+          "model": "openai/gpt-oss-120b",
+          "prompt_version": "u1-v16",
+          "latency_ms": 2054,
+          "fallback_used": false,
+          "cached": false,
+          "repair": {
+            "initial_parse_status": "valid_json",
+            "initial_failure_class": null,
+            "repair_attempted": false,
+            "repair_reason": null,
+            "repair_success": null
+          },
+          "notes": []
+        }
+      },
+      "locations": [
+        "Dhaka"
+      ],
+      "unresolved": [],
+      "purpose": null,
+      "requested_fields": [
+        "phone"
+      ]
+    },
+    "decision": {
+      "type": "clarify",
+      "question": {
+        "id": "entity_purpose",
+        "question": "What are you trying to do with these results?",
+        "options": [
+          {
+            "id": "research",
+            "label": "Research",
+            "hint": "Browse and learn"
+          },
+          {
+            "id": "prospecting",
+            "label": "Find prospects",
+            "hint": "Sell a product or service"
+          },
+          {
+            "id": "recruiting",
+            "label": "Recruit",
+            "hint": "Find people to hire"
+          },
+          {
+            "id": "partnership",
+            "label": "Find partners",
+            "hint": "Explore partnerships"
+          }
+        ],
+        "allowOther": true
+      }
+    }
+  },
+  {
+    "query": "Find businesses in Camrose, Alberta with no website and active Facebook pages",
+    "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+    "model": "nvidia/nemotron-3-super-120b-a12b:free",
+    "fallback": false,
+    "error": null,
+    "rawSemanticResult": "{\"task_type\":{\"value\":\"lead_discovery\",\"confidence\":0.95},\"prospecting_mode\":{\"value\":\"opportunity_based\",\"confidence\":0.9},\"target\":{\"entity_type\":{\"value\":\"business\",\"raw\":\"businesses\",\"confidence\":0.95},\"role\":null,\"job_title\":null,\"industry\":null,\"category\":null,\"business_type\":null,\"niche\":null,\"company_stage\":null},\"relation\":{\"type\":{\"value\":\"lacks_asset\",\"confidence\":0.95},\"object\":{\"value\":\"website\",\"raw\":\"website\"},\"direction\":{\"value\":\"subject_to_object\",\"confidence\":0.95}},\"location\":{\"value\":\"Camrose, Alberta\",\"raw\":\"in Camrose, Alberta\",\"scope\":\"in\"},\"constraints\":[{\"field\":\"website\",\"operator\":\"exists\",\"negated\":true,\"raw\":\"no website\"},{\"field\":\"facebook_page\",\"operator\":\"exists\",\"negated\":false,\"raw\":\"active Facebook pages\"}],\"verification\":[{\"kind\":\"business_exists\"},{\"kind\":\"no_owned_website\"}],\"evidence\":{\"claim_evidence_required\":true,\"intent_signal_required\":false}\n}",
+    "validationRepairs": [
+      {
+        "code": "CONSTRAINT_FIELD_KEYED",
+        "message": "constraint field \"facebook_page\" keyed as facebook",
+        "path": "constraints"
+      },
+      {
+        "code": "OBJECT_NORMALIZED",
+        "message": "object -> website",
+        "path": "relation.object"
+      },
+      {
+        "code": "LOCATION_CANONICALIZED",
+        "message": "\"Camrose, Alberta\" -> Camrose, Alberta",
+        "path": "location.canonical"
+      },
+      {
+        "code": "UNSTATED_BUSINESS_EXISTS_DROPPED",
+        "message": "business_exists requires an explicit user verification request; candidate existence is not user provenance",
+        "path": "verification"
+      }
+    ],
+    "frame": {
+      "version": "u1",
+      "input": {
+        "raw": "Find businesses in Camrose, Alberta with no website and active Facebook pages",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "lead_discovery",
+        "raw": null,
+        "confidence": 0.95
+      },
+      "prospecting_mode": {
+        "value": "opportunity_based",
+        "raw": null,
+        "confidence": 0.9
+      },
+      "target": {
+        "entity_type": {
+          "value": "business",
+          "raw": "businesses",
+          "confidence": 0.95
+        },
+        "entity_ambiguous": false,
+        "entity_subtype": null,
+        "role": null,
+        "job_title": null,
+        "industry": null,
+        "category": null,
+        "business_type": null,
+        "niche": null,
+        "company_stage": null,
+        "technologies": [],
+        "descriptors": []
+      },
+      "relation": {
+        "type": {
+          "value": "lacks_asset",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "label": null,
+        "object": {
+          "value": "website",
+          "raw": "website",
+          "normalized": "website",
+          "confidence": 0.5
+        },
+        "direction": {
+          "value": "subject_to_object",
+          "raw": null,
+          "confidence": 0.95
+        }
+      },
+      "organization_context": {
+        "on_behalf_of_company": "unknown",
+        "company": null
+      },
+      "user_context": {
+        "selling": null,
+        "objective": null,
+        "notes": []
+      },
+      "location": {
+        "value": "Camrose, Alberta",
+        "raw": "in Camrose, Alberta",
+        "scope": "in",
+        "radius": null,
+        "radius_unit": null,
+        "country_code": null,
+        "canonical": "Camrose, Alberta",
+        "confidence": 0.5
+      },
+      "locations": [],
+      "unresolved": [],
+      "temporal": null,
+      "constraints": [
+        {
+          "field": "website",
+          "operator": "exists",
+          "value": null,
+          "unit": null,
+          "negated": true,
+          "raw": "no website",
+          "confidence": 0.5
+        },
+        {
+          "field": "facebook",
+          "operator": "exists",
+          "value": null,
+          "unit": null,
+          "negated": false,
+          "raw": "active Facebook pages",
+          "confidence": 0.5
+        }
+      ],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": false,
+        "reasons": []
+      },
+      "quantity": null,
+      "required_fields": [],
+      "preferred_fields": [],
+      "contact_requirements": [],
+      "verification": [
+        {
+          "kind": "no_owned_website",
+          "label": null,
+          "raw": null
+        }
+      ],
+      "output": [],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": false,
+        "fields": [],
+        "reason": null,
+        "question": null
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "prompt_version": "u1-v16",
+        "latency_ms": 27751,
+        "fallback_used": false,
+        "cached": false,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": null,
+          "repair_attempted": false,
+          "repair_reason": null,
+          "repair_success": null
+        },
+        "notes": []
+      }
+    },
+    "spec": {
+      "entity": "business",
+      "criteria": [
+        {
+          "field": "location",
+          "value": "Camrose, Alberta",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "location_id",
+          "value": "geo:stated:camrose-alberta",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "stated",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "opportunity",
+          "value": "no_website",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "verify_no_owned_website",
+          "value": "true",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "Find businesses in Camrose, Alberta with no website and active Facebook pages",
+      "locationSuggestion": null,
+      "understanding": {
+        "version": "u1",
+        "input": {
+          "raw": "Find businesses in Camrose, Alberta with no website and active Facebook pages",
+          "normalized": null
+        },
+        "task_type": {
+          "value": "lead_discovery",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "prospecting_mode": {
+          "value": "opportunity_based",
+          "raw": null,
+          "confidence": 0.9
+        },
+        "target": {
+          "entity_type": {
+            "value": "business",
+            "raw": "businesses",
+            "confidence": 0.95
+          },
+          "entity_ambiguous": false,
+          "entity_subtype": null,
+          "role": null,
+          "job_title": null,
+          "industry": null,
+          "category": null,
+          "business_type": null,
+          "niche": null,
+          "company_stage": null,
+          "technologies": [],
+          "descriptors": []
+        },
+        "relation": {
+          "type": {
+            "value": "lacks_asset",
+            "raw": null,
+            "confidence": 0.95
+          },
+          "label": null,
+          "object": {
+            "value": "website",
+            "raw": "website",
+            "normalized": "website",
+            "confidence": 0.5
+          },
+          "direction": {
+            "value": "subject_to_object",
+            "raw": null,
+            "confidence": 0.95
+          }
+        },
+        "organization_context": {
+          "on_behalf_of_company": "unknown",
+          "company": null
+        },
+        "user_context": {
+          "selling": null,
+          "objective": null,
+          "notes": []
+        },
+        "location": {
+          "value": "Camrose, Alberta",
+          "raw": "in Camrose, Alberta",
+          "scope": "in",
+          "radius": null,
+          "radius_unit": null,
+          "country_code": null,
+          "canonical": "Camrose, Alberta",
+          "confidence": 0.5
+        },
+        "locations": [],
+        "unresolved": [],
+        "temporal": null,
+        "constraints": [
+          {
+            "field": "website",
+            "operator": "exists",
+            "value": null,
+            "unit": null,
+            "negated": true,
+            "raw": "no website",
+            "confidence": 0.5
+          },
+          {
+            "field": "facebook",
+            "operator": "exists",
+            "value": null,
+            "unit": null,
+            "negated": false,
+            "raw": "active Facebook pages",
+            "confidence": 0.5
+          }
+        ],
+        "evidence": {
+          "claim_evidence_required": true,
+          "intent_signal_required": false,
+          "reasons": []
+        },
+        "quantity": null,
+        "required_fields": [],
+        "preferred_fields": [],
+        "contact_requirements": [],
+        "verification": [
+          {
+            "kind": "no_owned_website",
+            "label": null,
+            "raw": null
+          }
+        ],
+        "output": [],
+        "source_preferences": [],
+        "enrichment_requirements": [],
+        "compound": {
+          "is_compound": false,
+          "subgoals": []
+        },
+        "clarification": {
+          "needed": false,
+          "fields": [],
+          "reason": null,
+          "question": null
+        },
+        "meta": {
+          "extractor": "llm",
+          "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+          "model": "nvidia/nemotron-3-super-120b-a12b:free",
+          "prompt_version": "u1-v16",
+          "latency_ms": 27751,
+          "fallback_used": false,
+          "cached": false,
+          "repair": {
+            "initial_parse_status": "valid_json",
+            "initial_failure_class": null,
+            "repair_attempted": false,
+            "repair_reason": null,
+            "repair_success": null
+          },
+          "notes": []
+        }
+      },
+      "locations": [
+        "Camrose, Alberta"
+      ],
+      "unresolved": [],
+      "purpose": null,
+      "requested_fields": []
+    },
+    "decision": {
+      "type": "clarify",
+      "question": {
+        "id": "entity_purpose",
+        "question": "What are you trying to do with these results?",
+        "options": [
+          {
+            "id": "research",
+            "label": "Research",
+            "hint": "Browse and learn"
+          },
+          {
+            "id": "prospecting",
+            "label": "Find prospects",
+            "hint": "Sell a product or service"
+          },
+          {
+            "id": "recruiting",
+            "label": "Recruit",
+            "hint": "Find people to hire"
+          },
+          {
+            "id": "partnership",
+            "label": "Find partners",
+            "hint": "Explore partnerships"
+          }
+        ],
+        "allowOther": true
+      }
+    }
+  },
+  {
+    "query": "Find plumbers in Austin",
+    "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+    "model": "nvidia/nemotron-3-super-120b-a12b:free",
+    "fallback": false,
+    "error": null,
+    "rawSemanticResult": "{\n  \"task_type\": {\"value\": \"lead_discovery\", \"confidence\": 0.95},\n  \"prospecting_mode\": {\"value\": \"fit_based\", \"confidence\": 0.9},\n  \"target\": {\n    \"entity_type\": {\"value\": \"business\", \"raw\": \"plumbers\", \"confidence\": 0.95},\n    \"category\": {\"value\": \"plumber\", \"raw\": \"plumbers\"},\n    \"entity_ambiguous\": true\n  },\n  \"relation\": {\n    \"type\": {\"value\": \"none\", \"confidence\": 0.95},\n    \"direction\": {\"value\": \"none\", \"confidence\": 0.95}\n  },\n  \"location\": {\n    \"value\": \"Austin\",\n    \"raw\": \"in Austin\",\n    \"scope\": \"in\"\n  },\n  \"evidence\": {\n    \"claim_evidence_required\": true,\n    \"intent_signal_required\": false\n  },\n  \"clarification\": {\"needed\": false}\n}",
+    "validationRepairs": [
+      {
+        "code": "LOCATION_CANONICALIZED",
+        "message": "\"Austin\" -> Austin",
+        "path": "location.canonical"
+      }
+    ],
+    "frame": {
+      "version": "u1",
+      "input": {
+        "raw": "Find plumbers in Austin",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "lead_discovery",
+        "raw": null,
+        "confidence": 0.95
+      },
+      "prospecting_mode": {
+        "value": "fit_based",
+        "raw": null,
+        "confidence": 0.9
+      },
+      "target": {
+        "entity_type": {
+          "value": "business",
+          "raw": "plumbers",
+          "confidence": 0.95
+        },
+        "entity_ambiguous": true,
+        "entity_subtype": null,
+        "role": null,
+        "job_title": null,
+        "industry": null,
+        "category": {
+          "value": "plumber",
+          "raw": "plumbers",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "business_type": null,
+        "niche": null,
+        "company_stage": null,
+        "technologies": [],
+        "descriptors": []
+      },
+      "relation": {
+        "type": {
+          "value": "none",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "label": null,
+        "object": null,
+        "direction": {
+          "value": "none",
+          "raw": null,
+          "confidence": 0.95
+        }
+      },
+      "organization_context": {
+        "on_behalf_of_company": "unknown",
+        "company": null
+      },
+      "user_context": {
+        "selling": null,
+        "objective": null,
+        "notes": []
+      },
+      "location": {
+        "value": "Austin",
+        "raw": "in Austin",
+        "scope": "in",
+        "radius": null,
+        "radius_unit": null,
+        "country_code": "US",
+        "canonical": "Austin",
+        "confidence": 0.5
+      },
+      "locations": [],
+      "unresolved": [],
+      "temporal": null,
+      "constraints": [],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": false,
+        "reasons": []
+      },
+      "quantity": null,
+      "required_fields": [],
+      "preferred_fields": [],
+      "contact_requirements": [],
+      "verification": [],
+      "output": [],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": false,
+        "fields": [],
+        "reason": null,
+        "question": null
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "prompt_version": "u1-v16",
+        "latency_ms": 11031,
+        "fallback_used": false,
+        "cached": false,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": null,
+          "repair_attempted": false,
+          "repair_reason": null,
+          "repair_success": null
+        },
+        "notes": []
+      }
+    },
+    "spec": {
+      "entity": "business",
+      "criteria": [
+        {
+          "field": "category",
+          "value": "plumber",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "location",
+          "value": "Austin",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "location_id",
+          "value": "geo:city:austin",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "city",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_country",
+          "value": "US",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_parents",
+          "value": "geo:country:us",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "Find plumbers in Austin",
+      "locationSuggestion": null,
+      "understanding": {
+        "version": "u1",
+        "input": {
+          "raw": "Find plumbers in Austin",
+          "normalized": null
+        },
+        "task_type": {
+          "value": "lead_discovery",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "prospecting_mode": {
+          "value": "fit_based",
+          "raw": null,
+          "confidence": 0.9
+        },
+        "target": {
+          "entity_type": {
+            "value": "business",
+            "raw": "plumbers",
+            "confidence": 0.95
+          },
+          "entity_ambiguous": true,
+          "entity_subtype": null,
+          "role": null,
+          "job_title": null,
+          "industry": null,
+          "category": {
+            "value": "plumber",
+            "raw": "plumbers",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "business_type": null,
+          "niche": null,
+          "company_stage": null,
+          "technologies": [],
+          "descriptors": []
+        },
+        "relation": {
+          "type": {
+            "value": "none",
+            "raw": null,
+            "confidence": 0.95
+          },
+          "label": null,
+          "object": null,
+          "direction": {
+            "value": "none",
+            "raw": null,
+            "confidence": 0.95
+          }
+        },
+        "organization_context": {
+          "on_behalf_of_company": "unknown",
+          "company": null
+        },
+        "user_context": {
+          "selling": null,
+          "objective": null,
+          "notes": []
+        },
+        "location": {
+          "value": "Austin",
+          "raw": "in Austin",
+          "scope": "in",
+          "radius": null,
+          "radius_unit": null,
+          "country_code": "US",
+          "canonical": "Austin",
+          "confidence": 0.5
+        },
+        "locations": [],
+        "unresolved": [],
+        "temporal": null,
+        "constraints": [],
+        "evidence": {
+          "claim_evidence_required": true,
+          "intent_signal_required": false,
+          "reasons": []
+        },
+        "quantity": null,
+        "required_fields": [],
+        "preferred_fields": [],
+        "contact_requirements": [],
+        "verification": [],
+        "output": [],
+        "source_preferences": [],
+        "enrichment_requirements": [],
+        "compound": {
+          "is_compound": false,
+          "subgoals": []
+        },
+        "clarification": {
+          "needed": false,
+          "fields": [],
+          "reason": null,
+          "question": null
+        },
+        "meta": {
+          "extractor": "llm",
+          "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+          "model": "nvidia/nemotron-3-super-120b-a12b:free",
+          "prompt_version": "u1-v16",
+          "latency_ms": 11031,
+          "fallback_used": false,
+          "cached": false,
+          "repair": {
+            "initial_parse_status": "valid_json",
+            "initial_failure_class": null,
+            "repair_attempted": false,
+            "repair_reason": null,
+            "repair_success": null
+          },
+          "notes": []
+        }
+      },
+      "locations": [
+        "Austin"
+      ],
+      "unresolved": [],
+      "purpose": null,
+      "requested_fields": []
+    },
+    "decision": {
+      "type": "clarify",
+      "question": {
+        "id": "entity_purpose",
+        "question": "What are you trying to do with these results?",
+        "options": [
+          {
+            "id": "research",
+            "label": "Research",
+            "hint": "Browse and learn"
+          },
+          {
+            "id": "prospecting",
+            "label": "Find prospects",
+            "hint": "Sell a product or service"
+          },
+          {
+            "id": "recruiting",
+            "label": "Recruit",
+            "hint": "Find people to hire"
+          },
+          {
+            "id": "partnership",
+            "label": "Find partners",
+            "hint": "Explore partnerships"
+          }
+        ],
+        "allowOther": true
+      }
+    }
+  },
+  {
+    "query": "I sell SEO. Find restaurants in Porto that could use SEO help",
+    "provider": "groq:openai/gpt-oss-120b",
+    "model": "openai/gpt-oss-120b",
+    "fallback": false,
+    "error": null,
+    "rawSemanticResult": "{\"task_type\":{\"value\":\"lead_discovery\",\"confidence\":0.95},\"prospecting_mode\":{\"value\":\"intent_based\",\"confidence\":0.9},\"target\":{\"entity_type\":{\"value\":\"business\",\"raw\":\"restaurants\",\"confidence\":0.95},\"category\":{\"value\":\"restaurant\",\"raw\":\"restaurants\"}},\"relation\":{\"type\":{\"value\":\"needs_service\",\"raw\":\"could use SEO help\",\"confidence\":0.9},\"direction\":{\"value\":\"subject_to_object\",\"confidence\":0.9}},\"location\":{\"value\":\"Porto\",\"raw\":\"in Porto\",\"scope\":\"in\"},\"user_context\":{\"selling\":{\"service\":{\"value\":\"SEO\",\"raw\":\"I sell SEO\"}}},\"evidence\":{\"claim_evidence_required\":true,\"intent_signal_required\":true}}",
+    "validationRepairs": [
+      {
+        "code": "LOCATION_CANONICALIZED",
+        "message": "\"Porto\" -> Porto",
+        "path": "location.canonical"
+      }
+    ],
+    "frame": {
+      "version": "u1",
+      "input": {
+        "raw": "I sell SEO. Find restaurants in Porto that could use SEO help",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "lead_discovery",
+        "raw": null,
+        "confidence": 0.95
+      },
+      "prospecting_mode": {
+        "value": "intent_based",
+        "raw": null,
+        "confidence": 0.9
+      },
+      "target": {
+        "entity_type": {
+          "value": "business",
+          "raw": "restaurants",
+          "confidence": 0.95
+        },
+        "entity_ambiguous": false,
+        "entity_subtype": null,
+        "role": null,
+        "job_title": null,
+        "industry": null,
+        "category": {
+          "value": "restaurant",
+          "raw": "restaurants",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "business_type": null,
+        "niche": null,
+        "company_stage": null,
+        "technologies": [],
+        "descriptors": []
+      },
+      "relation": {
+        "type": {
+          "value": "needs_service",
+          "raw": "could use SEO help",
+          "confidence": 0.9
+        },
+        "label": null,
+        "object": null,
+        "direction": {
+          "value": "subject_to_object",
+          "raw": null,
+          "confidence": 0.9
+        }
+      },
+      "organization_context": {
+        "on_behalf_of_company": "unknown",
+        "company": null
+      },
+      "user_context": {
+        "selling": {
+          "service": {
+            "value": "SEO",
+            "raw": "I sell SEO",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "product": null
+        },
+        "objective": null,
+        "notes": []
+      },
+      "location": {
+        "value": "Porto",
+        "raw": "in Porto",
+        "scope": "in",
+        "radius": null,
+        "radius_unit": null,
+        "country_code": null,
+        "canonical": "Porto",
+        "confidence": 0.5
+      },
+      "locations": [],
+      "unresolved": [],
+      "temporal": null,
+      "constraints": [],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": true,
+        "reasons": []
+      },
+      "quantity": null,
+      "required_fields": [],
+      "preferred_fields": [],
+      "contact_requirements": [],
+      "verification": [],
+      "output": [],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": true,
+        "fields": [
+          "relation.object"
+        ],
+        "reason": "missing_relation_object",
+        "question": "What should they be looking for help with?"
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": "groq:openai/gpt-oss-120b",
+        "model": "openai/gpt-oss-120b",
+        "prompt_version": "u1-v16",
+        "latency_ms": 1328,
+        "fallback_used": false,
+        "cached": false,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": null,
+          "repair_attempted": false,
+          "repair_reason": null,
+          "repair_success": null
+        },
+        "notes": []
+      }
+    },
+    "spec": {
+      "entity": "business",
+      "criteria": [
+        {
+          "field": "category",
+          "value": "restaurant",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "location",
+          "value": "Porto",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "location_id",
+          "value": "geo:stated:porto",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "stated",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "offer",
+          "value": "SEO",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "mode",
+          "value": "selling",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": true,
+      "signal_types": [
+        "service_request"
+      ],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "I sell SEO. Find restaurants in Porto that could use SEO help",
+      "locationSuggestion": null,
+      "understanding": {
+        "version": "u1",
+        "input": {
+          "raw": "I sell SEO. Find restaurants in Porto that could use SEO help",
+          "normalized": null
+        },
+        "task_type": {
+          "value": "lead_discovery",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "prospecting_mode": {
+          "value": "intent_based",
+          "raw": null,
+          "confidence": 0.9
+        },
+        "target": {
+          "entity_type": {
+            "value": "business",
+            "raw": "restaurants",
+            "confidence": 0.95
+          },
+          "entity_ambiguous": false,
+          "entity_subtype": null,
+          "role": null,
+          "job_title": null,
+          "industry": null,
+          "category": {
+            "value": "restaurant",
+            "raw": "restaurants",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "business_type": null,
+          "niche": null,
+          "company_stage": null,
+          "technologies": [],
+          "descriptors": []
+        },
+        "relation": {
+          "type": {
+            "value": "needs_service",
+            "raw": "could use SEO help",
+            "confidence": 0.9
+          },
+          "label": null,
+          "object": null,
+          "direction": {
+            "value": "subject_to_object",
+            "raw": null,
+            "confidence": 0.9
+          }
+        },
+        "organization_context": {
+          "on_behalf_of_company": "unknown",
+          "company": null
+        },
+        "user_context": {
+          "selling": {
+            "service": {
+              "value": "SEO",
+              "raw": "I sell SEO",
+              "normalized": null,
+              "confidence": 0.5
+            },
+            "product": null
+          },
+          "objective": null,
+          "notes": []
+        },
+        "location": {
+          "value": "Porto",
+          "raw": "in Porto",
+          "scope": "in",
+          "radius": null,
+          "radius_unit": null,
+          "country_code": null,
+          "canonical": "Porto",
+          "confidence": 0.5
+        },
+        "locations": [],
+        "unresolved": [],
+        "temporal": null,
+        "constraints": [],
+        "evidence": {
+          "claim_evidence_required": true,
+          "intent_signal_required": true,
+          "reasons": []
+        },
+        "quantity": null,
+        "required_fields": [],
+        "preferred_fields": [],
+        "contact_requirements": [],
+        "verification": [],
+        "output": [],
+        "source_preferences": [],
+        "enrichment_requirements": [],
+        "compound": {
+          "is_compound": false,
+          "subgoals": []
+        },
+        "clarification": {
+          "needed": true,
+          "fields": [
+            "relation.object"
+          ],
+          "reason": "missing_relation_object",
+          "question": "What should they be looking for help with?"
+        },
+        "meta": {
+          "extractor": "llm",
+          "provider": "groq:openai/gpt-oss-120b",
+          "model": "openai/gpt-oss-120b",
+          "prompt_version": "u1-v16",
+          "latency_ms": 1328,
+          "fallback_used": false,
+          "cached": false,
+          "repair": {
+            "initial_parse_status": "valid_json",
+            "initial_failure_class": null,
+            "repair_attempted": false,
+            "repair_reason": null,
+            "repair_success": null
+          },
+          "notes": []
+        }
+      },
+      "locations": [
+        "Porto"
+      ],
+      "unresolved": [],
+      "purpose": "prospecting",
+      "requested_fields": []
+    },
+    "decision": {
+      "type": "clarify",
+      "question": {
+        "id": "entity_relation",
+        "question": "What should they be looking for help with?",
+        "options": [],
+        "allowOther": true
+      }
+    }
+  },
+  {
+    "query": "Research only: restaurants in Lusaka with websites",
+    "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+    "model": "nvidia/nemotron-3-super-120b-a12b:free",
+    "fallback": false,
+    "error": null,
+    "rawSemanticResult": "{\"task_type\":{\"value\":\"lead_discovery\",\"confidence\":0.95},\n\"prospecting_mode\":{\"value\":\"fit_based\",\"confidence\":0.9},\n\"target\":{\"entity_type\":{\"value\":\"business\",\"raw\":\"restaurants\",\"confidence\":0.95},\n\"category\":{\"value\":\"restaurant\",\"raw\":\"restaurants\"}},\n\"relation\":{\"type\":{\"value\":\"has_asset\",\"raw\":\"with websites\",\"confidence\":0.95},\n\"object\":{\"value\":\"website\",\"raw\":\"websites\"},\n\"direction\":{\"value\":\"subject_to_object\",\"confidence\":0.95}},\n\"location\":{\"value\":\"Lusaka\",\"raw\":\"in Lusaka\",\"scope\":\"in\"},\n\"verification\":[{\"kind\":\"website_is_real\",\"raw\":\"with websites\"}],\n\"evidence\":{\"claim_evidence_required\":true,\"intent_signal_required\":false}\n}",
+    "validationRepairs": [
+      {
+        "code": "OBJECT_NORMALIZED",
+        "message": "object -> website",
+        "path": "relation.object"
+      },
+      {
+        "code": "LOCATION_CANONICALIZED",
+        "message": "\"Lusaka\" -> Lusaka",
+        "path": "location.canonical"
+      }
+    ],
+    "frame": {
+      "version": "u1",
+      "input": {
+        "raw": "Research only: restaurants in Lusaka with websites",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "lead_discovery",
+        "raw": null,
+        "confidence": 0.95
+      },
+      "prospecting_mode": {
+        "value": "fit_based",
+        "raw": null,
+        "confidence": 0.9
+      },
+      "target": {
+        "entity_type": {
+          "value": "business",
+          "raw": "restaurants",
+          "confidence": 0.95
+        },
+        "entity_ambiguous": false,
+        "entity_subtype": null,
+        "role": null,
+        "job_title": null,
+        "industry": null,
+        "category": {
+          "value": "restaurant",
+          "raw": "restaurants",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "business_type": null,
+        "niche": null,
+        "company_stage": null,
+        "technologies": [],
+        "descriptors": []
+      },
+      "relation": {
+        "type": {
+          "value": "has_asset",
+          "raw": "with websites",
+          "confidence": 0.95
+        },
+        "label": null,
+        "object": {
+          "value": "website",
+          "raw": "websites",
+          "normalized": "website",
+          "confidence": 0.5
+        },
+        "direction": {
+          "value": "subject_to_object",
+          "raw": null,
+          "confidence": 0.95
+        }
+      },
+      "organization_context": {
+        "on_behalf_of_company": "unknown",
+        "company": null
+      },
+      "user_context": {
+        "selling": null,
+        "objective": null,
+        "notes": []
+      },
+      "location": {
+        "value": "Lusaka",
+        "raw": "in Lusaka",
+        "scope": "in",
+        "radius": null,
+        "radius_unit": null,
+        "country_code": null,
+        "canonical": "Lusaka",
+        "confidence": 0.5
+      },
+      "locations": [],
+      "unresolved": [],
+      "temporal": null,
+      "constraints": [],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": false,
+        "reasons": []
+      },
+      "quantity": null,
+      "required_fields": [],
+      "preferred_fields": [],
+      "contact_requirements": [],
+      "verification": [
+        {
+          "kind": "website_is_real",
+          "label": null,
+          "raw": "with websites"
+        }
+      ],
+      "output": [],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": false,
+        "fields": [],
+        "reason": null,
+        "question": null
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "prompt_version": "u1-v16",
+        "latency_ms": 8661,
+        "fallback_used": false,
+        "cached": false,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": null,
+          "repair_attempted": false,
+          "repair_reason": null,
+          "repair_success": null
+        },
+        "notes": []
+      }
+    },
+    "spec": {
+      "entity": "business",
+      "criteria": [
+        {
+          "field": "category",
+          "value": "restaurant",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "location",
+          "value": "Lusaka",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "location_id",
+          "value": "geo:stated:lusaka",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "stated",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "website",
+          "value": "true",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "verify_website_is_real",
+          "value": "true",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "Research only: restaurants in Lusaka with websites",
+      "locationSuggestion": null,
+      "understanding": {
+        "version": "u1",
+        "input": {
+          "raw": "Research only: restaurants in Lusaka with websites",
+          "normalized": null
+        },
+        "task_type": {
+          "value": "lead_discovery",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "prospecting_mode": {
+          "value": "fit_based",
+          "raw": null,
+          "confidence": 0.9
+        },
+        "target": {
+          "entity_type": {
+            "value": "business",
+            "raw": "restaurants",
+            "confidence": 0.95
+          },
+          "entity_ambiguous": false,
+          "entity_subtype": null,
+          "role": null,
+          "job_title": null,
+          "industry": null,
+          "category": {
+            "value": "restaurant",
+            "raw": "restaurants",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "business_type": null,
+          "niche": null,
+          "company_stage": null,
+          "technologies": [],
+          "descriptors": []
+        },
+        "relation": {
+          "type": {
+            "value": "has_asset",
+            "raw": "with websites",
+            "confidence": 0.95
+          },
+          "label": null,
+          "object": {
+            "value": "website",
+            "raw": "websites",
+            "normalized": "website",
+            "confidence": 0.5
+          },
+          "direction": {
+            "value": "subject_to_object",
+            "raw": null,
+            "confidence": 0.95
+          }
+        },
+        "organization_context": {
+          "on_behalf_of_company": "unknown",
+          "company": null
+        },
+        "user_context": {
+          "selling": null,
+          "objective": null,
+          "notes": []
+        },
+        "location": {
+          "value": "Lusaka",
+          "raw": "in Lusaka",
+          "scope": "in",
+          "radius": null,
+          "radius_unit": null,
+          "country_code": null,
+          "canonical": "Lusaka",
+          "confidence": 0.5
+        },
+        "locations": [],
+        "unresolved": [],
+        "temporal": null,
+        "constraints": [],
+        "evidence": {
+          "claim_evidence_required": true,
+          "intent_signal_required": false,
+          "reasons": []
+        },
+        "quantity": null,
+        "required_fields": [],
+        "preferred_fields": [],
+        "contact_requirements": [],
+        "verification": [
+          {
+            "kind": "website_is_real",
+            "label": null,
+            "raw": "with websites"
+          }
+        ],
+        "output": [],
+        "source_preferences": [],
+        "enrichment_requirements": [],
+        "compound": {
+          "is_compound": false,
+          "subgoals": []
+        },
+        "clarification": {
+          "needed": false,
+          "fields": [],
+          "reason": null,
+          "question": null
+        },
+        "meta": {
+          "extractor": "llm",
+          "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+          "model": "nvidia/nemotron-3-super-120b-a12b:free",
+          "prompt_version": "u1-v16",
+          "latency_ms": 8661,
+          "fallback_used": false,
+          "cached": false,
+          "repair": {
+            "initial_parse_status": "valid_json",
+            "initial_failure_class": null,
+            "repair_attempted": false,
+            "repair_reason": null,
+            "repair_success": null
+          },
+          "notes": []
+        }
+      },
+      "locations": [
+        "Lusaka"
+      ],
+      "unresolved": [],
+      "purpose": null,
+      "requested_fields": []
+    },
+    "decision": {
+      "type": "clarify",
+      "question": {
+        "id": "entity_purpose",
+        "question": "What are you trying to do with these results?",
+        "options": [
+          {
+            "id": "research",
+            "label": "Research",
+            "hint": "Browse and learn"
+          },
+          {
+            "id": "prospecting",
+            "label": "Find prospects",
+            "hint": "Sell a product or service"
+          },
+          {
+            "id": "recruiting",
+            "label": "Recruit",
+            "hint": "Find people to hire"
+          },
+          {
+            "id": "partnership",
+            "label": "Find partners",
+            "hint": "Explore partnerships"
+          }
+        ],
+        "allowOther": true
+      }
+    }
+  },
+  {
+    "query": "Remote React jobs paying this much",
+    "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+    "model": "nvidia/nemotron-3-super-120b-a12b:free",
+    "fallback": false,
+    "error": null,
+    "rawSemanticResult": "{\n  \"task_type\": {\"value\": \"job_discovery\", \"confidence\": 0.9},\n  \"prospecting_mode\": {\"value\": \"job_based\", \"confidence\": 0.9},\n  \"target\": {\n    \"entity_type\": {\"value\": \"job\", \"raw\": \"Remote React jobs\", \"confidence\": 0.95},\n    \"job_title\": {\"value\": \"React\", \"raw\": \"React\"}\n  },\n  \"relation\": {\n    \"type\": {\"value\": \"none\", \"confidence\": 0.95},\n    \"direction\": {\"value\": \"none\", \"confidence\": 0.95}\n  },\n  \"location\": {\"value\": \"Remote\", \"raw\": \"Remote\", \"scope\": \"remote\"},\n  \"unresolved\": [\n    {\"field\": \"salary_min\", \"raw\": \"paying this much\"}\n  ],\n  \"evidence\": {\n    \"claim_evidence_required\": true,\n    \"intent_signal_required\": false\n  }\n}",
+    "validationRepairs": [
+      {
+        "code": "LOCATION_CANONICALIZED",
+        "message": "\"Remote\" -> Remote",
+        "path": "location.canonical"
+      }
+    ],
+    "frame": {
+      "version": "u1",
+      "input": {
+        "raw": "Remote React jobs paying this much",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "job_discovery",
+        "raw": null,
+        "confidence": 0.9
+      },
+      "prospecting_mode": {
+        "value": "job_based",
+        "raw": null,
+        "confidence": 0.9
+      },
+      "target": {
+        "entity_type": {
+          "value": "job",
+          "raw": "Remote React jobs",
+          "confidence": 0.95
+        },
+        "entity_ambiguous": false,
+        "entity_subtype": null,
+        "role": null,
+        "job_title": {
+          "value": "React",
+          "raw": "React",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "industry": null,
+        "category": null,
+        "business_type": null,
+        "niche": null,
+        "company_stage": null,
+        "technologies": [],
+        "descriptors": []
+      },
+      "relation": {
+        "type": {
+          "value": "none",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "label": null,
+        "object": null,
+        "direction": {
+          "value": "none",
+          "raw": null,
+          "confidence": 0.95
+        }
+      },
+      "organization_context": {
+        "on_behalf_of_company": "unknown",
+        "company": null
+      },
+      "user_context": {
+        "selling": null,
+        "objective": null,
+        "notes": []
+      },
+      "location": {
+        "value": "Remote",
+        "raw": "Remote",
+        "scope": "remote",
+        "radius": null,
+        "radius_unit": null,
+        "country_code": null,
+        "canonical": "Remote",
+        "confidence": 0.5
+      },
+      "locations": [],
+      "unresolved": [
+        {
+          "field": "salary_min",
+          "raw": "paying this much"
+        }
+      ],
+      "temporal": null,
+      "constraints": [],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": false,
+        "reasons": []
+      },
+      "quantity": null,
+      "required_fields": [],
+      "preferred_fields": [],
+      "contact_requirements": [],
+      "verification": [],
+      "output": [],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": false,
+        "fields": [],
+        "reason": null,
+        "question": null
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "prompt_version": "u1-v16",
+        "latency_ms": 23462,
+        "fallback_used": false,
+        "cached": false,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": "schema_invalid",
+          "repair_attempted": true,
+          "repair_reason": "schema_invalid",
+          "repair_success": true
+        },
+        "notes": [
+          "recovered on reprompt: schema_invalid"
+        ]
+      }
+    },
+    "spec": {
+      "entity": "job",
+      "criteria": [
+        {
+          "field": "role",
+          "value": "react",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "employment",
+          "value": "remote",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "geo_scope",
+          "value": "worldwide",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [
+        "salary_min"
+      ],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "needs_clarification",
+      "raw_query": "Remote React jobs paying this much",
+      "locationSuggestion": null,
+      "understanding": {
+        "version": "u1",
+        "input": {
+          "raw": "Remote React jobs paying this much",
+          "normalized": null
+        },
+        "task_type": {
+          "value": "job_discovery",
+          "raw": null,
+          "confidence": 0.9
+        },
+        "prospecting_mode": {
+          "value": "job_based",
+          "raw": null,
+          "confidence": 0.9
+        },
+        "target": {
+          "entity_type": {
+            "value": "job",
+            "raw": "Remote React jobs",
+            "confidence": 0.95
+          },
+          "entity_ambiguous": false,
+          "entity_subtype": null,
+          "role": null,
+          "job_title": {
+            "value": "React",
+            "raw": "React",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "industry": null,
+          "category": null,
+          "business_type": null,
+          "niche": null,
+          "company_stage": null,
+          "technologies": [],
+          "descriptors": []
+        },
+        "relation": {
+          "type": {
+            "value": "none",
+            "raw": null,
+            "confidence": 0.95
+          },
+          "label": null,
+          "object": null,
+          "direction": {
+            "value": "none",
+            "raw": null,
+            "confidence": 0.95
+          }
+        },
+        "organization_context": {
+          "on_behalf_of_company": "unknown",
+          "company": null
+        },
+        "user_context": {
+          "selling": null,
+          "objective": null,
+          "notes": []
+        },
+        "location": {
+          "value": "Remote",
+          "raw": "Remote",
+          "scope": "remote",
+          "radius": null,
+          "radius_unit": null,
+          "country_code": null,
+          "canonical": "Remote",
+          "confidence": 0.5
+        },
+        "locations": [],
+        "unresolved": [
+          {
+            "field": "salary_min",
+            "raw": "paying this much"
+          }
+        ],
+        "temporal": null,
+        "constraints": [],
+        "evidence": {
+          "claim_evidence_required": true,
+          "intent_signal_required": false,
+          "reasons": []
+        },
+        "quantity": null,
+        "required_fields": [],
+        "preferred_fields": [],
+        "contact_requirements": [],
+        "verification": [],
+        "output": [],
+        "source_preferences": [],
+        "enrichment_requirements": [],
+        "compound": {
+          "is_compound": false,
+          "subgoals": []
+        },
+        "clarification": {
+          "needed": false,
+          "fields": [],
+          "reason": null,
+          "question": null
+        },
+        "meta": {
+          "extractor": "llm",
+          "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+          "model": "nvidia/nemotron-3-super-120b-a12b:free",
+          "prompt_version": "u1-v16",
+          "latency_ms": 23462,
+          "fallback_used": false,
+          "cached": false,
+          "repair": {
+            "initial_parse_status": "valid_json",
+            "initial_failure_class": "schema_invalid",
+            "repair_attempted": true,
+            "repair_reason": "schema_invalid",
+            "repair_success": true
+          },
+          "notes": [
+            "recovered on reprompt: schema_invalid"
+          ]
+        }
+      },
+      "locations": [],
+      "unresolved": [
+        {
+          "field": "salary_min",
+          "raw": "paying this much"
+        }
+      ],
+      "purpose": null,
+      "requested_fields": []
+    },
+    "decision": {
+      "type": "clarify",
+      "question": {
+        "id": "entity_salary",
+        "question": "What salary amount do you mean?",
+        "options": [],
+        "allowOther": true
+      }
+    }
+  },
+  {
+    "query": "Companies around this size in Pune with public contacts",
+    "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+    "model": "nvidia/nemotron-3-super-120b-a12b:free",
+    "fallback": false,
+    "error": null,
+    "rawSemanticResult": "{\"task_type\":{\"value\":\"lead_discovery\",\"confidence\":0.95},\"prospecting_mode\":{\"value\":\"fit_based\",\"confidence\":0.9},\"target\":{\"entity_type\":{\"value\":\"company\",\"raw\":\"Companies\",\"confidence\":0.95}},\"relation\":{\"type\":{\"value\":\"none\",\"confidence\":0.95},\"direction\":{\"value\":\"none\",\"confidence\":0.95}},\"location\":{\"value\":\"Pune\",\"raw\":\"in Pune\",\"scope\":\"in\"},\"unresolved\":[{\"field\":\"employee_count\",\"raw\":\"around this size\"}],\"verification\":[{\"kind\":\"other\",\"label\":\"has public contact info\",\"raw\":\"with public contacts\"}],\"evidence\":{\"claim_evidence_required\":true,\"intent_signal_required\":false}\n}",
+    "validationRepairs": [
+      {
+        "code": "LOCATION_CANONICALIZED",
+        "message": "\"Pune\" -> Pune",
+        "path": "location.canonical"
+      }
+    ],
+    "frame": {
+      "version": "u1",
+      "input": {
+        "raw": "Companies around this size in Pune with public contacts",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "lead_discovery",
+        "raw": null,
+        "confidence": 0.95
+      },
+      "prospecting_mode": {
+        "value": "fit_based",
+        "raw": null,
+        "confidence": 0.9
+      },
+      "target": {
+        "entity_type": {
+          "value": "company",
+          "raw": "Companies",
+          "confidence": 0.95
+        },
+        "entity_ambiguous": false,
+        "entity_subtype": null,
+        "role": null,
+        "job_title": null,
+        "industry": null,
+        "category": null,
+        "business_type": null,
+        "niche": null,
+        "company_stage": null,
+        "technologies": [],
+        "descriptors": []
+      },
+      "relation": {
+        "type": {
+          "value": "none",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "label": null,
+        "object": null,
+        "direction": {
+          "value": "none",
+          "raw": null,
+          "confidence": 0.95
+        }
+      },
+      "organization_context": {
+        "on_behalf_of_company": "unknown",
+        "company": null
+      },
+      "user_context": {
+        "selling": null,
+        "objective": null,
+        "notes": []
+      },
+      "location": {
+        "value": "Pune",
+        "raw": "in Pune",
+        "scope": "in",
+        "radius": null,
+        "radius_unit": null,
+        "country_code": "IN",
+        "canonical": "Pune",
+        "confidence": 0.5
+      },
+      "locations": [],
+      "unresolved": [
+        {
+          "field": "employee_count",
+          "raw": "around this size"
+        }
+      ],
+      "temporal": null,
+      "constraints": [],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": false,
+        "reasons": []
+      },
+      "quantity": null,
+      "required_fields": [],
+      "preferred_fields": [],
+      "contact_requirements": [],
+      "verification": [
+        {
+          "kind": "other",
+          "label": "has public contact info",
+          "raw": "with public contacts"
+        }
+      ],
+      "output": [],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": true,
+        "fields": [
+          "target.scope"
+        ],
+        "reason": "underspecified_scope",
+        "question": "Where should I look for companies, or what kind of companies do you want?"
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "prompt_version": "u1-v16",
+        "latency_ms": 17108,
+        "fallback_used": false,
+        "cached": false,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": null,
+          "repair_attempted": false,
+          "repair_reason": null,
+          "repair_success": null
+        },
+        "notes": []
+      }
+    },
+    "spec": {
+      "entity": "company",
+      "criteria": [
+        {
+          "field": "location",
+          "value": "Pune",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "location_id",
+          "value": "geo:city:pune",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "city",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_country",
+          "value": "IN",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_parents",
+          "value": "geo:country:in",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "verify_other",
+          "value": "has public contact info",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [
+        "employee_count"
+      ],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "needs_clarification",
+      "raw_query": "Companies around this size in Pune with public contacts",
+      "locationSuggestion": null,
+      "understanding": {
+        "version": "u1",
+        "input": {
+          "raw": "Companies around this size in Pune with public contacts",
+          "normalized": null
+        },
+        "task_type": {
+          "value": "lead_discovery",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "prospecting_mode": {
+          "value": "fit_based",
+          "raw": null,
+          "confidence": 0.9
+        },
+        "target": {
+          "entity_type": {
+            "value": "company",
+            "raw": "Companies",
+            "confidence": 0.95
+          },
+          "entity_ambiguous": false,
+          "entity_subtype": null,
+          "role": null,
+          "job_title": null,
+          "industry": null,
+          "category": null,
+          "business_type": null,
+          "niche": null,
+          "company_stage": null,
+          "technologies": [],
+          "descriptors": []
+        },
+        "relation": {
+          "type": {
+            "value": "none",
+            "raw": null,
+            "confidence": 0.95
+          },
+          "label": null,
+          "object": null,
+          "direction": {
+            "value": "none",
+            "raw": null,
+            "confidence": 0.95
+          }
+        },
+        "organization_context": {
+          "on_behalf_of_company": "unknown",
+          "company": null
+        },
+        "user_context": {
+          "selling": null,
+          "objective": null,
+          "notes": []
+        },
+        "location": {
+          "value": "Pune",
+          "raw": "in Pune",
+          "scope": "in",
+          "radius": null,
+          "radius_unit": null,
+          "country_code": "IN",
+          "canonical": "Pune",
+          "confidence": 0.5
+        },
+        "locations": [],
+        "unresolved": [
+          {
+            "field": "employee_count",
+            "raw": "around this size"
+          }
+        ],
+        "temporal": null,
+        "constraints": [],
+        "evidence": {
+          "claim_evidence_required": true,
+          "intent_signal_required": false,
+          "reasons": []
+        },
+        "quantity": null,
+        "required_fields": [],
+        "preferred_fields": [],
+        "contact_requirements": [],
+        "verification": [
+          {
+            "kind": "other",
+            "label": "has public contact info",
+            "raw": "with public contacts"
+          }
+        ],
+        "output": [],
+        "source_preferences": [],
+        "enrichment_requirements": [],
+        "compound": {
+          "is_compound": false,
+          "subgoals": []
+        },
+        "clarification": {
+          "needed": true,
+          "fields": [
+            "target.scope"
+          ],
+          "reason": "underspecified_scope",
+          "question": "Where should I look for companies, or what kind of companies do you want?"
+        },
+        "meta": {
+          "extractor": "llm",
+          "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+          "model": "nvidia/nemotron-3-super-120b-a12b:free",
+          "prompt_version": "u1-v16",
+          "latency_ms": 17108,
+          "fallback_used": false,
+          "cached": false,
+          "repair": {
+            "initial_parse_status": "valid_json",
+            "initial_failure_class": null,
+            "repair_attempted": false,
+            "repair_reason": null,
+            "repair_success": null
+          },
+          "notes": []
+        }
+      },
+      "locations": [
+        "Pune"
+      ],
+      "unresolved": [
+        {
+          "field": "employee_count",
+          "raw": "around this size"
+        }
+      ],
+      "purpose": null,
+      "requested_fields": []
+    },
+    "decision": {
+      "type": "clarify",
+      "question": {
+        "id": "entity_size",
+        "question": "What company size do you mean?",
+        "options": [],
+        "allowOther": true
+      }
+    }
+  },
+  {
+    "query": "D2C brands in Chattogram or Dhaka, not agencies, selling skincare",
+    "provider": "groq:openai/gpt-oss-120b",
+    "model": "openai/gpt-oss-120b",
+    "fallback": false,
+    "error": null,
+    "rawSemanticResult": "{\"task_type\":{\"value\":\"lead_discovery\",\"raw\":\"D2C brands\",\"confidence\":0.95},\"prospecting_mode\":{\"value\":\"fit_based\",\"raw\":\"selling skincare\",\"confidence\":0.95},\"target\":{\"entity_type\":{\"value\":\"business\",\"raw\":\"brands\",\"confidence\":0.95},\"category\":{\"value\":\"brand\",\"raw\":\"brands\"},\"descriptors\":[{\"value\":\"D2C\",\"raw\":\"D2C\"}]},\"relation\":{\"type\":{\"value\":\"offers_service\",\"raw\":\"selling skincare\",\"confidence\":0.95},\"object\":{\"value\":\"skincare\",\"raw\":\"skincare\"},\"direction\":{\"value\":\"subject_to_object\",\"confidence\":0.95}},\"location\":{\"value\":\"Chattogram\",\"raw\":\"in Chattogram\",\"scope\":\"in\"},\"locations\":[{\"value\":\"Chattogram\",\"raw\":\"Chattogram\",\"scope\":\"in\"},{\"value\":\"Dhaka\",\"raw\":\"Dhaka\",\"scope\":\"in\"}],\"constraints\":[{\"field\":\"category\",\"operator\":\"eq\",\"value\":\"agency\",\"negated\":true,\"raw\":\"not agencies\"}],\"evidence\":{\"claim_evidence_required\":true,\"intent_signal_required\":false}}",
+    "validationRepairs": [
+      {
+        "code": "LOCATION_CANONICALIZED",
+        "message": "\"Chattogram\" -> Chattogram",
+        "path": "location.canonical"
+      }
+    ],
+    "frame": {
+      "version": "u1",
+      "input": {
+        "raw": "D2C brands in Chattogram or Dhaka, not agencies, selling skincare",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "lead_discovery",
+        "raw": "D2C brands",
+        "confidence": 0.95
+      },
+      "prospecting_mode": {
+        "value": "fit_based",
+        "raw": "selling skincare",
+        "confidence": 0.95
+      },
+      "target": {
+        "entity_type": {
+          "value": "business",
+          "raw": "brands",
+          "confidence": 0.95
+        },
+        "entity_ambiguous": false,
+        "entity_subtype": null,
+        "role": null,
+        "job_title": null,
+        "industry": null,
+        "category": {
+          "value": "brand",
+          "raw": "brands",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "business_type": null,
+        "niche": null,
+        "company_stage": null,
+        "technologies": [],
+        "descriptors": [
+          {
+            "value": "D2C",
+            "raw": "D2C",
+            "normalized": null,
+            "confidence": 0.5
+          }
+        ]
+      },
+      "relation": {
+        "type": {
+          "value": "offers_service",
+          "raw": "selling skincare",
+          "confidence": 0.95
+        },
+        "label": null,
+        "object": {
+          "value": "skincare",
+          "raw": "skincare",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "direction": {
+          "value": "subject_to_object",
+          "raw": null,
+          "confidence": 0.95
+        }
+      },
+      "organization_context": {
+        "on_behalf_of_company": "unknown",
+        "company": null
+      },
+      "user_context": {
+        "selling": null,
+        "objective": null,
+        "notes": []
+      },
+      "location": {
+        "value": "Chattogram",
+        "raw": "in Chattogram",
+        "scope": "in",
+        "radius": null,
+        "radius_unit": null,
+        "country_code": "BD",
+        "canonical": "Chattogram",
+        "confidence": 0.5
+      },
+      "locations": [
+        {
+          "value": "Chattogram",
+          "raw": "Chattogram",
+          "scope": "in",
+          "radius": null,
+          "radius_unit": null,
+          "country_code": null,
+          "canonical": null,
+          "confidence": 0.5
+        },
+        {
+          "value": "Dhaka",
+          "raw": "Dhaka",
+          "scope": "in",
+          "radius": null,
+          "radius_unit": null,
+          "country_code": null,
+          "canonical": null,
+          "confidence": 0.5
+        }
+      ],
+      "unresolved": [],
+      "temporal": null,
+      "constraints": [
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": "agency",
+          "unit": null,
+          "negated": true,
+          "raw": "not agencies",
+          "confidence": 0.5
+        }
+      ],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": false,
+        "reasons": []
+      },
+      "quantity": null,
+      "required_fields": [],
+      "preferred_fields": [],
+      "contact_requirements": [],
+      "verification": [],
+      "output": [],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": false,
+        "fields": [],
+        "reason": null,
+        "question": null
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": "groq:openai/gpt-oss-120b",
+        "model": "openai/gpt-oss-120b",
+        "prompt_version": "u1-v16",
+        "latency_ms": 3976,
+        "fallback_used": false,
+        "cached": false,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": "schema_invalid",
+          "repair_attempted": true,
+          "repair_reason": "schema_invalid",
+          "repair_success": true
+        },
+        "notes": [
+          "recovered on reprompt: schema_invalid"
+        ]
+      }
+    },
+    "spec": {
+      "entity": "business",
+      "criteria": [
+        {
+          "field": "category",
+          "value": "brand",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "location",
+          "value": "Chattogram",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "location_id",
+          "value": "geo:city:chattogram",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "city",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_country",
+          "value": "BD",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_parents",
+          "value": "geo:country:bd",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "exclude_category",
+          "value": "agency",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "D2C brands in Chattogram or Dhaka, not agencies, selling skincare",
+      "locationSuggestion": null,
+      "understanding": {
+        "version": "u1",
+        "input": {
+          "raw": "D2C brands in Chattogram or Dhaka, not agencies, selling skincare",
+          "normalized": null
+        },
+        "task_type": {
+          "value": "lead_discovery",
+          "raw": "D2C brands",
+          "confidence": 0.95
+        },
+        "prospecting_mode": {
+          "value": "fit_based",
+          "raw": "selling skincare",
+          "confidence": 0.95
+        },
+        "target": {
+          "entity_type": {
+            "value": "business",
+            "raw": "brands",
+            "confidence": 0.95
+          },
+          "entity_ambiguous": false,
+          "entity_subtype": null,
+          "role": null,
+          "job_title": null,
+          "industry": null,
+          "category": {
+            "value": "brand",
+            "raw": "brands",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "business_type": null,
+          "niche": null,
+          "company_stage": null,
+          "technologies": [],
+          "descriptors": [
+            {
+              "value": "D2C",
+              "raw": "D2C",
+              "normalized": null,
+              "confidence": 0.5
+            }
+          ]
+        },
+        "relation": {
+          "type": {
+            "value": "offers_service",
+            "raw": "selling skincare",
+            "confidence": 0.95
+          },
+          "label": null,
+          "object": {
+            "value": "skincare",
+            "raw": "skincare",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "direction": {
+            "value": "subject_to_object",
+            "raw": null,
+            "confidence": 0.95
+          }
+        },
+        "organization_context": {
+          "on_behalf_of_company": "unknown",
+          "company": null
+        },
+        "user_context": {
+          "selling": null,
+          "objective": null,
+          "notes": []
+        },
+        "location": {
+          "value": "Chattogram",
+          "raw": "in Chattogram",
+          "scope": "in",
+          "radius": null,
+          "radius_unit": null,
+          "country_code": "BD",
+          "canonical": "Chattogram",
+          "confidence": 0.5
+        },
+        "locations": [
+          {
+            "value": "Chattogram",
+            "raw": "Chattogram",
+            "scope": "in",
+            "radius": null,
+            "radius_unit": null,
+            "country_code": null,
+            "canonical": null,
+            "confidence": 0.5
+          },
+          {
+            "value": "Dhaka",
+            "raw": "Dhaka",
+            "scope": "in",
+            "radius": null,
+            "radius_unit": null,
+            "country_code": null,
+            "canonical": null,
+            "confidence": 0.5
+          }
+        ],
+        "unresolved": [],
+        "temporal": null,
+        "constraints": [
+          {
+            "field": "category",
+            "operator": "eq",
+            "value": "agency",
+            "unit": null,
+            "negated": true,
+            "raw": "not agencies",
+            "confidence": 0.5
+          }
+        ],
+        "evidence": {
+          "claim_evidence_required": true,
+          "intent_signal_required": false,
+          "reasons": []
+        },
+        "quantity": null,
+        "required_fields": [],
+        "preferred_fields": [],
+        "contact_requirements": [],
+        "verification": [],
+        "output": [],
+        "source_preferences": [],
+        "enrichment_requirements": [],
+        "compound": {
+          "is_compound": false,
+          "subgoals": []
+        },
+        "clarification": {
+          "needed": false,
+          "fields": [],
+          "reason": null,
+          "question": null
+        },
+        "meta": {
+          "extractor": "llm",
+          "provider": "groq:openai/gpt-oss-120b",
+          "model": "openai/gpt-oss-120b",
+          "prompt_version": "u1-v16",
+          "latency_ms": 3976,
+          "fallback_used": false,
+          "cached": false,
+          "repair": {
+            "initial_parse_status": "valid_json",
+            "initial_failure_class": "schema_invalid",
+            "repair_attempted": true,
+            "repair_reason": "schema_invalid",
+            "repair_success": true
+          },
+          "notes": [
+            "recovered on reprompt: schema_invalid"
+          ]
+        }
+      },
+      "locations": [
+        "Chattogram",
+        "Dhaka"
+      ],
+      "unresolved": [],
+      "purpose": null,
+      "requested_fields": []
+    },
+    "decision": {
+      "type": "clarify",
+      "question": {
+        "id": "entity_purpose",
+        "question": "What are you trying to do with these results?",
+        "options": [
+          {
+            "id": "research",
+            "label": "Research",
+            "hint": "Browse and learn"
+          },
+          {
+            "id": "prospecting",
+            "label": "Find prospects",
+            "hint": "Sell a product or service"
+          },
+          {
+            "id": "recruiting",
+            "label": "Recruit",
+            "hint": "Find people to hire"
+          },
+          {
+            "id": "partnership",
+            "label": "Find partners",
+            "hint": "Explore partnerships"
+          }
+        ],
+        "allowOther": true
+      }
+    }
+  },
+  {
+    "query": "Startups in Cluj-Napoca or Tbilisi, exclude staffing agencies",
+    "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+    "model": "nvidia/nemotron-3-super-120b-a12b:free",
+    "fallback": false,
+    "error": null,
+    "rawSemanticResult": "{\"task_type\":{\"value\":\"lead_discovery\",\"confidence\":0.95},\"prospecting_mode\":{\"value\":\"fit_based\",\"confidence\":0.9},\"target\":{\"entity_type\":{\"value\":\"company\",\"raw\":\"Startups\",\"confidence\":0.95},\"company_stage\":{\"value\":\"startup\",\"raw\":\"Startups\"}},\"locations\":[{\"value\":\"Cluj-Napoca\",\"raw\":\"in Cluj-Napoca\",\"scope\":\"in\"},{\"value\":\"Tbilisi\",\"raw\":\"in Tbilisi\",\"scope\":\"in\"}],\"relation\":{\"type\":{\"value\":\"none\",\"confidence\":0.95},\"direction\":{\"value\":\"none\",\"confidence\":0.95}},\"constraints\":[{\"field\":\"category\",\"operator\":\"eq\",\"value\":\"staffing agency\",\"negated\":true,\"raw\":\"exclude staffing agencies\"}],\"evidence\":{\"claim_evidence_required\":true,\"intent_signal_required\":false}\n}",
+    "validationRepairs": [],
+    "frame": {
+      "version": "u1",
+      "input": {
+        "raw": "Startups in Cluj-Napoca or Tbilisi, exclude staffing agencies",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "lead_discovery",
+        "raw": null,
+        "confidence": 0.95
+      },
+      "prospecting_mode": {
+        "value": "fit_based",
+        "raw": null,
+        "confidence": 0.9
+      },
+      "target": {
+        "entity_type": {
+          "value": "company",
+          "raw": "Startups",
+          "confidence": 0.95
+        },
+        "entity_ambiguous": false,
+        "entity_subtype": null,
+        "role": null,
+        "job_title": null,
+        "industry": null,
+        "category": null,
+        "business_type": null,
+        "niche": null,
+        "company_stage": {
+          "value": "startup",
+          "raw": "Startups",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "technologies": [],
+        "descriptors": []
+      },
+      "relation": {
+        "type": {
+          "value": "none",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "label": null,
+        "object": null,
+        "direction": {
+          "value": "none",
+          "raw": null,
+          "confidence": 0.95
+        }
+      },
+      "organization_context": {
+        "on_behalf_of_company": "unknown",
+        "company": null
+      },
+      "user_context": {
+        "selling": null,
+        "objective": null,
+        "notes": []
+      },
+      "location": null,
+      "locations": [
+        {
+          "value": "Cluj-Napoca",
+          "raw": "in Cluj-Napoca",
+          "scope": "in",
+          "radius": null,
+          "radius_unit": null,
+          "country_code": null,
+          "canonical": null,
+          "confidence": 0.5
+        },
+        {
+          "value": "Tbilisi",
+          "raw": "in Tbilisi",
+          "scope": "in",
+          "radius": null,
+          "radius_unit": null,
+          "country_code": null,
+          "canonical": null,
+          "confidence": 0.5
+        }
+      ],
+      "unresolved": [],
+      "temporal": null,
+      "constraints": [
+        {
+          "field": "category",
+          "operator": "eq",
+          "value": "staffing agency",
+          "unit": null,
+          "negated": true,
+          "raw": "exclude staffing agencies",
+          "confidence": 0.5
+        }
+      ],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": false,
+        "reasons": []
+      },
+      "quantity": null,
+      "required_fields": [],
+      "preferred_fields": [],
+      "contact_requirements": [],
+      "verification": [],
+      "output": [],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": false,
+        "fields": [],
+        "reason": null,
+        "question": null
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "prompt_version": "u1-v16",
+        "latency_ms": 14290,
+        "fallback_used": false,
+        "cached": false,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": null,
+          "repair_attempted": false,
+          "repair_reason": null,
+          "repair_success": null
+        },
+        "notes": []
+      }
+    },
+    "spec": {
+      "entity": "company",
+      "criteria": [
+        {
+          "field": "company_stage",
+          "value": "startup",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "location",
+          "value": "Cluj-Napoca",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "location_id",
+          "value": "geo:stated:cluj-napoca",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "stated",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "exclude_category",
+          "value": "staffing agency",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "Startups in Cluj-Napoca or Tbilisi, exclude staffing agencies",
+      "locationSuggestion": null,
+      "understanding": {
+        "version": "u1",
+        "input": {
+          "raw": "Startups in Cluj-Napoca or Tbilisi, exclude staffing agencies",
+          "normalized": null
+        },
+        "task_type": {
+          "value": "lead_discovery",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "prospecting_mode": {
+          "value": "fit_based",
+          "raw": null,
+          "confidence": 0.9
+        },
+        "target": {
+          "entity_type": {
+            "value": "company",
+            "raw": "Startups",
+            "confidence": 0.95
+          },
+          "entity_ambiguous": false,
+          "entity_subtype": null,
+          "role": null,
+          "job_title": null,
+          "industry": null,
+          "category": null,
+          "business_type": null,
+          "niche": null,
+          "company_stage": {
+            "value": "startup",
+            "raw": "Startups",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "technologies": [],
+          "descriptors": []
+        },
+        "relation": {
+          "type": {
+            "value": "none",
+            "raw": null,
+            "confidence": 0.95
+          },
+          "label": null,
+          "object": null,
+          "direction": {
+            "value": "none",
+            "raw": null,
+            "confidence": 0.95
+          }
+        },
+        "organization_context": {
+          "on_behalf_of_company": "unknown",
+          "company": null
+        },
+        "user_context": {
+          "selling": null,
+          "objective": null,
+          "notes": []
+        },
+        "location": null,
+        "locations": [
+          {
+            "value": "Cluj-Napoca",
+            "raw": "in Cluj-Napoca",
+            "scope": "in",
+            "radius": null,
+            "radius_unit": null,
+            "country_code": null,
+            "canonical": null,
+            "confidence": 0.5
+          },
+          {
+            "value": "Tbilisi",
+            "raw": "in Tbilisi",
+            "scope": "in",
+            "radius": null,
+            "radius_unit": null,
+            "country_code": null,
+            "canonical": null,
+            "confidence": 0.5
+          }
+        ],
+        "unresolved": [],
+        "temporal": null,
+        "constraints": [
+          {
+            "field": "category",
+            "operator": "eq",
+            "value": "staffing agency",
+            "unit": null,
+            "negated": true,
+            "raw": "exclude staffing agencies",
+            "confidence": 0.5
+          }
+        ],
+        "evidence": {
+          "claim_evidence_required": true,
+          "intent_signal_required": false,
+          "reasons": []
+        },
+        "quantity": null,
+        "required_fields": [],
+        "preferred_fields": [],
+        "contact_requirements": [],
+        "verification": [],
+        "output": [],
+        "source_preferences": [],
+        "enrichment_requirements": [],
+        "compound": {
+          "is_compound": false,
+          "subgoals": []
+        },
+        "clarification": {
+          "needed": false,
+          "fields": [],
+          "reason": null,
+          "question": null
+        },
+        "meta": {
+          "extractor": "llm",
+          "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+          "model": "nvidia/nemotron-3-super-120b-a12b:free",
+          "prompt_version": "u1-v16",
+          "latency_ms": 14290,
+          "fallback_used": false,
+          "cached": false,
+          "repair": {
+            "initial_parse_status": "valid_json",
+            "initial_failure_class": null,
+            "repair_attempted": false,
+            "repair_reason": null,
+            "repair_success": null
+          },
+          "notes": []
+        }
+      },
+      "locations": [
+        "Cluj-Napoca",
+        "Tbilisi"
+      ],
+      "unresolved": [],
+      "purpose": null,
+      "requested_fields": []
+    },
+    "decision": {
+      "type": "clarify",
+      "question": {
+        "id": "entity_purpose",
+        "question": "What are you trying to do with these results?",
+        "options": [
+          {
+            "id": "research",
+            "label": "Research",
+            "hint": "Browse and learn"
+          },
+          {
+            "id": "prospecting",
+            "label": "Find prospects",
+            "hint": "Sell a product or service"
+          },
+          {
+            "id": "recruiting",
+            "label": "Recruit",
+            "hint": "Find people to hire"
+          },
+          {
+            "id": "partnership",
+            "label": "Find partners",
+            "hint": "Explore partnerships"
+          }
+        ],
+        "allowOther": true
+      }
+    }
+  },
+  {
+    "query": "Find companies that are NOT already funded",
+    "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+    "model": "nvidia/nemotron-3-super-120b-a12b:free",
+    "fallback": false,
+    "error": null,
+    "rawSemanticResult": "{\"task_type\":{\"value\":\"lead_discovery\",\"confidence\":0.95},\"prospecting_mode\":{\"value\":\"opportunity_based\",\"confidence\":0.9},\"target\":{\"entity_type\":{\"value\":\"company\",\"raw\":\"companies\",\"confidence\":0.95}},\"relation\":{\"type\":{\"value\":\"lacks_asset\",\"raw\":\"NOT already funded\",\"confidence\":0.9},\"object\":{\"value\":\"funding\",\"raw\":\"funding\"},\"direction\":{\"value\":\"subject_to_object\",\"confidence\":0.9}},\"constraints\":[{\"field\":\"funding\",\"operator\":\"exists\",\"negated\":true,\"raw\":\"NOT already funded\"}],\"verification\":[{\"kind\":\"other\",\"label\":\"has no funding\",\"raw\":\"NOT already funded\"}],\"evidence\":{\"claim_evidence_required\":true,\"intent_signal_required\":false}\n}",
+    "validationRepairs": [
+      {
+        "code": "CONSTRAINT_FIELD_KEYED",
+        "message": "constraint field \"funding\" keyed as funding_amount",
+        "path": "constraints"
+      }
+    ],
+    "frame": {
+      "version": "u1",
+      "input": {
+        "raw": "Find companies that are NOT already funded",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "lead_discovery",
+        "raw": null,
+        "confidence": 0.95
+      },
+      "prospecting_mode": {
+        "value": "opportunity_based",
+        "raw": null,
+        "confidence": 0.9
+      },
+      "target": {
+        "entity_type": {
+          "value": "company",
+          "raw": "companies",
+          "confidence": 0.95
+        },
+        "entity_ambiguous": false,
+        "entity_subtype": null,
+        "role": null,
+        "job_title": null,
+        "industry": null,
+        "category": null,
+        "business_type": null,
+        "niche": null,
+        "company_stage": null,
+        "technologies": [],
+        "descriptors": []
+      },
+      "relation": {
+        "type": {
+          "value": "lacks_asset",
+          "raw": "NOT already funded",
+          "confidence": 0.9
+        },
+        "label": null,
+        "object": {
+          "value": "funding",
+          "raw": "funding",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "direction": {
+          "value": "subject_to_object",
+          "raw": null,
+          "confidence": 0.9
+        }
+      },
+      "organization_context": {
+        "on_behalf_of_company": "unknown",
+        "company": null
+      },
+      "user_context": {
+        "selling": null,
+        "objective": null,
+        "notes": []
+      },
+      "location": null,
+      "locations": [],
+      "unresolved": [],
+      "temporal": null,
+      "constraints": [
+        {
+          "field": "funding_amount",
+          "operator": "exists",
+          "value": null,
+          "unit": null,
+          "negated": true,
+          "raw": "NOT already funded",
+          "confidence": 0.5
+        }
+      ],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": false,
+        "reasons": []
+      },
+      "quantity": null,
+      "required_fields": [],
+      "preferred_fields": [],
+      "contact_requirements": [],
+      "verification": [
+        {
+          "kind": "other",
+          "label": "has no funding",
+          "raw": "NOT already funded"
+        }
+      ],
+      "output": [],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": false,
+        "fields": [],
+        "reason": null,
+        "question": null
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "prompt_version": "u1-v16",
+        "latency_ms": 41725,
+        "fallback_used": false,
+        "cached": false,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": null,
+          "repair_attempted": false,
+          "repair_reason": null,
+          "repair_success": null
+        },
+        "notes": []
+      }
+    },
+    "spec": {
+      "entity": "company",
+      "criteria": [
+        {
+          "field": "verify_other",
+          "value": "has no funding",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "Find companies that are NOT already funded",
+      "locationSuggestion": null,
+      "understanding": {
+        "version": "u1",
+        "input": {
+          "raw": "Find companies that are NOT already funded",
+          "normalized": null
+        },
+        "task_type": {
+          "value": "lead_discovery",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "prospecting_mode": {
+          "value": "opportunity_based",
+          "raw": null,
+          "confidence": 0.9
+        },
+        "target": {
+          "entity_type": {
+            "value": "company",
+            "raw": "companies",
+            "confidence": 0.95
+          },
+          "entity_ambiguous": false,
+          "entity_subtype": null,
+          "role": null,
+          "job_title": null,
+          "industry": null,
+          "category": null,
+          "business_type": null,
+          "niche": null,
+          "company_stage": null,
+          "technologies": [],
+          "descriptors": []
+        },
+        "relation": {
+          "type": {
+            "value": "lacks_asset",
+            "raw": "NOT already funded",
+            "confidence": 0.9
+          },
+          "label": null,
+          "object": {
+            "value": "funding",
+            "raw": "funding",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "direction": {
+            "value": "subject_to_object",
+            "raw": null,
+            "confidence": 0.9
+          }
+        },
+        "organization_context": {
+          "on_behalf_of_company": "unknown",
+          "company": null
+        },
+        "user_context": {
+          "selling": null,
+          "objective": null,
+          "notes": []
+        },
+        "location": null,
+        "locations": [],
+        "unresolved": [],
+        "temporal": null,
+        "constraints": [
+          {
+            "field": "funding_amount",
+            "operator": "exists",
+            "value": null,
+            "unit": null,
+            "negated": true,
+            "raw": "NOT already funded",
+            "confidence": 0.5
+          }
+        ],
+        "evidence": {
+          "claim_evidence_required": true,
+          "intent_signal_required": false,
+          "reasons": []
+        },
+        "quantity": null,
+        "required_fields": [],
+        "preferred_fields": [],
+        "contact_requirements": [],
+        "verification": [
+          {
+            "kind": "other",
+            "label": "has no funding",
+            "raw": "NOT already funded"
+          }
+        ],
+        "output": [],
+        "source_preferences": [],
+        "enrichment_requirements": [],
+        "compound": {
+          "is_compound": false,
+          "subgoals": []
+        },
+        "clarification": {
+          "needed": false,
+          "fields": [],
+          "reason": null,
+          "question": null
+        },
+        "meta": {
+          "extractor": "llm",
+          "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+          "model": "nvidia/nemotron-3-super-120b-a12b:free",
+          "prompt_version": "u1-v16",
+          "latency_ms": 41725,
+          "fallback_used": false,
+          "cached": false,
+          "repair": {
+            "initial_parse_status": "valid_json",
+            "initial_failure_class": null,
+            "repair_attempted": false,
+            "repair_reason": null,
+            "repair_success": null
+          },
+          "notes": []
+        }
+      },
+      "locations": [],
+      "unresolved": [],
+      "purpose": null,
+      "requested_fields": []
+    },
+    "decision": {
+      "type": "clarify",
+      "question": {
+        "id": "entity_purpose",
+        "question": "What are you trying to do with these results?",
+        "options": [
+          {
+            "id": "research",
+            "label": "Research",
+            "hint": "Browse and learn"
+          },
+          {
+            "id": "prospecting",
+            "label": "Find prospects",
+            "hint": "Sell a product or service"
+          },
+          {
+            "id": "recruiting",
+            "label": "Recruit",
+            "hint": "Find people to hire"
+          },
+          {
+            "id": "partnership",
+            "label": "Find partners",
+            "hint": "Explore partnerships"
+          }
+        ],
+        "allowOther": true
+      }
+    }
+  },
+  {
+    "query": "Find businesses that need website services, with email and phone",
+    "provider": "groq:openai/gpt-oss-20b",
+    "model": "openai/gpt-oss-20b",
+    "fallback": false,
+    "error": null,
+    "rawSemanticResult": "{\"task_type\":{\"value\":\"lead_discovery\",\"confidence\":0.95},\"prospecting_mode\":{\"value\":\"intent_based\",\"confidence\":0.9},\"target\":{\"entity_type\":{\"value\":\"business\",\"confidence\":0.95}},\"relation\":{\"type\":{\"value\":\"needs_service\",\"confidence\":0.95},\"direction\":{\"value\":\"subject_to_object\",\"confidence\":0.95},\"object\":{\"value\":\"website services\",\"raw\":\"website services\"}},\"required_fields\":[{\"value\":\"email\",\"raw\":\"email\"},{\"value\":\"phone\",\"raw\":\"phone\"}],\"evidence\":{\"claim_evidence_required\":true,\"intent_signal_required\":true}}",
+    "validationRepairs": [],
+    "frame": {
+      "version": "u1",
+      "input": {
+        "raw": "Find businesses that need website services, with email and phone",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "lead_discovery",
+        "raw": null,
+        "confidence": 0.95
+      },
+      "prospecting_mode": {
+        "value": "intent_based",
+        "raw": null,
+        "confidence": 0.9
+      },
+      "target": {
+        "entity_type": {
+          "value": "business",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "entity_ambiguous": false,
+        "entity_subtype": null,
+        "role": null,
+        "job_title": null,
+        "industry": null,
+        "category": null,
+        "business_type": null,
+        "niche": null,
+        "company_stage": null,
+        "technologies": [],
+        "descriptors": []
+      },
+      "relation": {
+        "type": {
+          "value": "needs_service",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "label": null,
+        "object": {
+          "value": "website services",
+          "raw": "website services",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "direction": {
+          "value": "subject_to_object",
+          "raw": null,
+          "confidence": 0.95
+        }
+      },
+      "organization_context": {
+        "on_behalf_of_company": "unknown",
+        "company": null
+      },
+      "user_context": {
+        "selling": null,
+        "objective": null,
+        "notes": []
+      },
+      "location": null,
+      "locations": [],
+      "unresolved": [],
+      "temporal": null,
+      "constraints": [],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": true,
+        "reasons": []
+      },
+      "quantity": null,
+      "required_fields": [
+        {
+          "value": "email",
+          "raw": "email",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        {
+          "value": "phone",
+          "raw": "phone",
+          "normalized": null,
+          "confidence": 0.5
+        }
+      ],
+      "preferred_fields": [],
+      "contact_requirements": [],
+      "verification": [],
+      "output": [],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": false,
+        "fields": [],
+        "reason": null,
+        "question": null
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": "groq:openai/gpt-oss-20b",
+        "model": "openai/gpt-oss-20b",
+        "prompt_version": "u1-v16",
+        "latency_ms": 980,
+        "fallback_used": false,
+        "cached": false,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": null,
+          "repair_attempted": false,
+          "repair_reason": null,
+          "repair_success": null
+        },
+        "notes": []
+      }
+    },
+    "spec": {
+      "entity": "business",
+      "criteria": [
+        {
+          "field": "requested_service",
+          "value": "website services",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "require_email",
+          "value": "true",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "required_field",
+          "value": "email",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "require_phone",
+          "value": "true",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "required_field",
+          "value": "phone",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [
+        "location"
+      ],
+      "signal_required": true,
+      "signal_types": [
+        "service_request"
+      ],
+      "signal_recency": null,
+      "status": "needs_clarification",
+      "raw_query": "Find businesses that need website services, with email and phone",
+      "locationSuggestion": null,
+      "understanding": {
+        "version": "u1",
+        "input": {
+          "raw": "Find businesses that need website services, with email and phone",
+          "normalized": null
+        },
+        "task_type": {
+          "value": "lead_discovery",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "prospecting_mode": {
+          "value": "intent_based",
+          "raw": null,
+          "confidence": 0.9
+        },
+        "target": {
+          "entity_type": {
+            "value": "business",
+            "raw": null,
+            "confidence": 0.95
+          },
+          "entity_ambiguous": false,
+          "entity_subtype": null,
+          "role": null,
+          "job_title": null,
+          "industry": null,
+          "category": null,
+          "business_type": null,
+          "niche": null,
+          "company_stage": null,
+          "technologies": [],
+          "descriptors": []
+        },
+        "relation": {
+          "type": {
+            "value": "needs_service",
+            "raw": null,
+            "confidence": 0.95
+          },
+          "label": null,
+          "object": {
+            "value": "website services",
+            "raw": "website services",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "direction": {
+            "value": "subject_to_object",
+            "raw": null,
+            "confidence": 0.95
+          }
+        },
+        "organization_context": {
+          "on_behalf_of_company": "unknown",
+          "company": null
+        },
+        "user_context": {
+          "selling": null,
+          "objective": null,
+          "notes": []
+        },
+        "location": null,
+        "locations": [],
+        "unresolved": [],
+        "temporal": null,
+        "constraints": [],
+        "evidence": {
+          "claim_evidence_required": true,
+          "intent_signal_required": true,
+          "reasons": []
+        },
+        "quantity": null,
+        "required_fields": [
+          {
+            "value": "email",
+            "raw": "email",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          {
+            "value": "phone",
+            "raw": "phone",
+            "normalized": null,
+            "confidence": 0.5
+          }
+        ],
+        "preferred_fields": [],
+        "contact_requirements": [],
+        "verification": [],
+        "output": [],
+        "source_preferences": [],
+        "enrichment_requirements": [],
+        "compound": {
+          "is_compound": false,
+          "subgoals": []
+        },
+        "clarification": {
+          "needed": false,
+          "fields": [],
+          "reason": null,
+          "question": null
+        },
+        "meta": {
+          "extractor": "llm",
+          "provider": "groq:openai/gpt-oss-20b",
+          "model": "openai/gpt-oss-20b",
+          "prompt_version": "u1-v16",
+          "latency_ms": 980,
+          "fallback_used": false,
+          "cached": false,
+          "repair": {
+            "initial_parse_status": "valid_json",
+            "initial_failure_class": null,
+            "repair_attempted": false,
+            "repair_reason": null,
+            "repair_success": null
+          },
+          "notes": []
+        }
+      },
+      "locations": [],
+      "unresolved": [],
+      "purpose": "prospecting",
+      "requested_fields": [
+        "email",
+        "phone"
+      ]
+    },
+    "decision": {
+      "type": "clarify",
+      "question": {
+        "id": "entity_location",
+        "question": "You're looking for Find businesses that need website services, with email and phone. Which location (city, region, or country)?",
+        "options": [
+          {
+            "id": "global",
+            "label": "Worldwide",
+            "hint": "Search globally"
+          }
+        ],
+        "allowOther": true
+      }
+    }
+  },
+  {
+    "query": "Find local businesses in Alberta without websites",
+    "provider": "groq:openai/gpt-oss-120b",
+    "model": "openai/gpt-oss-120b",
+    "fallback": false,
+    "error": null,
+    "rawSemanticResult": "{\"task_type\":{\"value\":\"lead_discovery\",\"confidence\":0.95},\"prospecting_mode\":{\"value\":\"opportunity_based\",\"confidence\":0.9},\"target\":{\"entity_type\":{\"value\":\"business\",\"raw\":\"businesses\",\"confidence\":0.95}},\"relation\":{\"type\":{\"value\":\"lacks_asset\",\"raw\":\"without websites\",\"confidence\":0.95},\"object\":{\"value\":\"website\",\"raw\":\"websites\"},\"direction\":{\"value\":\"subject_to_object\",\"confidence\":0.95}},\"location\":{\"value\":\"Alberta\",\"raw\":\"in Alberta\",\"scope\":\"in\"},\"constraints\":[{\"field\":\"website\",\"operator\":\"exists\",\"negated\":true,\"raw\":\"without websites\"}],\"verification\":[{\"kind\":\"no_owned_website\",\"raw\":\"without websites\"}],\"evidence\":{\"claim_evidence_required\":true,\"intent_signal_required\":false},\"clarification\":{\"needed\":false}}",
+    "validationRepairs": [
+      {
+        "code": "OBJECT_NORMALIZED",
+        "message": "object -> website",
+        "path": "relation.object"
+      },
+      {
+        "code": "LOCATION_CANONICALIZED",
+        "message": "\"Alberta\" -> Alberta",
+        "path": "location.canonical"
+      }
+    ],
+    "frame": {
+      "version": "u1",
+      "input": {
+        "raw": "Find local businesses in Alberta without websites",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "lead_discovery",
+        "raw": null,
+        "confidence": 0.95
+      },
+      "prospecting_mode": {
+        "value": "opportunity_based",
+        "raw": null,
+        "confidence": 0.9
+      },
+      "target": {
+        "entity_type": {
+          "value": "business",
+          "raw": "businesses",
+          "confidence": 0.95
+        },
+        "entity_ambiguous": false,
+        "entity_subtype": null,
+        "role": null,
+        "job_title": null,
+        "industry": null,
+        "category": null,
+        "business_type": null,
+        "niche": null,
+        "company_stage": null,
+        "technologies": [],
+        "descriptors": []
+      },
+      "relation": {
+        "type": {
+          "value": "lacks_asset",
+          "raw": "without websites",
+          "confidence": 0.95
+        },
+        "label": null,
+        "object": {
+          "value": "website",
+          "raw": "websites",
+          "normalized": "website",
+          "confidence": 0.5
+        },
+        "direction": {
+          "value": "subject_to_object",
+          "raw": null,
+          "confidence": 0.95
+        }
+      },
+      "organization_context": {
+        "on_behalf_of_company": "unknown",
+        "company": null
+      },
+      "user_context": {
+        "selling": null,
+        "objective": null,
+        "notes": []
+      },
+      "location": {
+        "value": "Alberta",
+        "raw": "in Alberta",
+        "scope": "in",
+        "radius": null,
+        "radius_unit": null,
+        "country_code": null,
+        "canonical": "Alberta",
+        "confidence": 0.5
+      },
+      "locations": [],
+      "unresolved": [],
+      "temporal": null,
+      "constraints": [
+        {
+          "field": "website",
+          "operator": "exists",
+          "value": null,
+          "unit": null,
+          "negated": true,
+          "raw": "without websites",
+          "confidence": 0.5
+        }
+      ],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": false,
+        "reasons": []
+      },
+      "quantity": null,
+      "required_fields": [],
+      "preferred_fields": [],
+      "contact_requirements": [],
+      "verification": [
+        {
+          "kind": "no_owned_website",
+          "label": null,
+          "raw": "without websites"
+        }
+      ],
+      "output": [],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": false,
+        "fields": [],
+        "reason": null,
+        "question": null
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": "groq:openai/gpt-oss-120b",
+        "model": "openai/gpt-oss-120b",
+        "prompt_version": "u1-v16",
+        "latency_ms": 1757,
+        "fallback_used": false,
+        "cached": false,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": null,
+          "repair_attempted": false,
+          "repair_reason": null,
+          "repair_success": null
+        },
+        "notes": []
+      }
+    },
+    "spec": {
+      "entity": "business",
+      "criteria": [
+        {
+          "field": "location",
+          "value": "Alberta",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "location_id",
+          "value": "geo:stated:alberta",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "stated",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "opportunity",
+          "value": "no_website",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "verify_no_owned_website",
+          "value": "true",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "Find local businesses in Alberta without websites",
+      "locationSuggestion": null,
+      "understanding": {
+        "version": "u1",
+        "input": {
+          "raw": "Find local businesses in Alberta without websites",
+          "normalized": null
+        },
+        "task_type": {
+          "value": "lead_discovery",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "prospecting_mode": {
+          "value": "opportunity_based",
+          "raw": null,
+          "confidence": 0.9
+        },
+        "target": {
+          "entity_type": {
+            "value": "business",
+            "raw": "businesses",
+            "confidence": 0.95
+          },
+          "entity_ambiguous": false,
+          "entity_subtype": null,
+          "role": null,
+          "job_title": null,
+          "industry": null,
+          "category": null,
+          "business_type": null,
+          "niche": null,
+          "company_stage": null,
+          "technologies": [],
+          "descriptors": []
+        },
+        "relation": {
+          "type": {
+            "value": "lacks_asset",
+            "raw": "without websites",
+            "confidence": 0.95
+          },
+          "label": null,
+          "object": {
+            "value": "website",
+            "raw": "websites",
+            "normalized": "website",
+            "confidence": 0.5
+          },
+          "direction": {
+            "value": "subject_to_object",
+            "raw": null,
+            "confidence": 0.95
+          }
+        },
+        "organization_context": {
+          "on_behalf_of_company": "unknown",
+          "company": null
+        },
+        "user_context": {
+          "selling": null,
+          "objective": null,
+          "notes": []
+        },
+        "location": {
+          "value": "Alberta",
+          "raw": "in Alberta",
+          "scope": "in",
+          "radius": null,
+          "radius_unit": null,
+          "country_code": null,
+          "canonical": "Alberta",
+          "confidence": 0.5
+        },
+        "locations": [],
+        "unresolved": [],
+        "temporal": null,
+        "constraints": [
+          {
+            "field": "website",
+            "operator": "exists",
+            "value": null,
+            "unit": null,
+            "negated": true,
+            "raw": "without websites",
+            "confidence": 0.5
+          }
+        ],
+        "evidence": {
+          "claim_evidence_required": true,
+          "intent_signal_required": false,
+          "reasons": []
+        },
+        "quantity": null,
+        "required_fields": [],
+        "preferred_fields": [],
+        "contact_requirements": [],
+        "verification": [
+          {
+            "kind": "no_owned_website",
+            "label": null,
+            "raw": "without websites"
+          }
+        ],
+        "output": [],
+        "source_preferences": [],
+        "enrichment_requirements": [],
+        "compound": {
+          "is_compound": false,
+          "subgoals": []
+        },
+        "clarification": {
+          "needed": false,
+          "fields": [],
+          "reason": null,
+          "question": null
+        },
+        "meta": {
+          "extractor": "llm",
+          "provider": "groq:openai/gpt-oss-120b",
+          "model": "openai/gpt-oss-120b",
+          "prompt_version": "u1-v16",
+          "latency_ms": 1757,
+          "fallback_used": false,
+          "cached": false,
+          "repair": {
+            "initial_parse_status": "valid_json",
+            "initial_failure_class": null,
+            "repair_attempted": false,
+            "repair_reason": null,
+            "repair_success": null
+          },
+          "notes": []
+        }
+      },
+      "locations": [
+        "Alberta"
+      ],
+      "unresolved": [],
+      "purpose": null,
+      "requested_fields": []
+    },
+    "decision": {
+      "type": "clarify",
+      "question": {
+        "id": "entity_purpose",
+        "question": "What are you trying to do with these results?",
+        "options": [
+          {
+            "id": "research",
+            "label": "Research",
+            "hint": "Browse and learn"
+          },
+          {
+            "id": "prospecting",
+            "label": "Find prospects",
+            "hint": "Sell a product or service"
+          },
+          {
+            "id": "recruiting",
+            "label": "Recruit",
+            "hint": "Find people to hire"
+          },
+          {
+            "id": "partnership",
+            "label": "Find partners",
+            "hint": "Explore partnerships"
+          }
+        ],
+        "allowOther": true
+      }
+    }
+  },
+  {
+    "query": "Find founders of SaaS companies in Southeast Asia who recently raised",
+    "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+    "model": "nvidia/nemotron-3-super-120b-a12b:free",
+    "fallback": false,
+    "error": null,
+    "rawSemanticResult": "{\"task_type\":{\"value\":\"lead_discovery\",\"confidence\":0.9},\"prospecting_mode\":{\"value\":\"event_based\",\"confidence\":0.9},\"target\":{\"entity_type\":{\"value\":\"person\",\"raw\":\"founders\",\"confidence\":0.9},\"role\":{\"value\":\"founder\",\"raw\":\"founders\"},\"industry\":{\"value\":\"SaaS\",\"raw\":\"SaaS\"}},\"relation\":{\"type\":{\"value\":\"received_funding\",\"raw\":\"recently raised\",\"confidence\":0.9},\"direction\":{\"value\":\"subject_to_object\",\"confidence\":0.9},\"object\":{\"value\":\"funding\",\"raw\":\"raised\"}},\"location\":{\"value\":\"Southeast Asia\",\"raw\":\"in Southeast Asia\",\"scope\":\"in\"},\"temporal\":{\"relation\":\"recent\",\"raw\":\"recently\"},\"organization_context\":{\"on_behalf_of_company\":\"no\"},\"evidence\":{\"claim_evidence_required\":true,\"intent_signal_required\":false}}",
+    "validationRepairs": [
+      {
+        "code": "LOCATION_CANONICALIZED",
+        "message": "\"Southeast Asia\" -> Southeast Asia",
+        "path": "location.canonical"
+      }
+    ],
+    "frame": {
+      "version": "u1",
+      "input": {
+        "raw": "Find founders of SaaS companies in Southeast Asia who recently raised",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "lead_discovery",
+        "raw": null,
+        "confidence": 0.9
+      },
+      "prospecting_mode": {
+        "value": "event_based",
+        "raw": null,
+        "confidence": 0.9
+      },
+      "target": {
+        "entity_type": {
+          "value": "person",
+          "raw": "founders",
+          "confidence": 0.9
+        },
+        "entity_ambiguous": false,
+        "entity_subtype": null,
+        "role": {
+          "value": "founder",
+          "raw": "founders",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "job_title": null,
+        "industry": {
+          "value": "SaaS",
+          "raw": "SaaS",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "category": null,
+        "business_type": null,
+        "niche": null,
+        "company_stage": null,
+        "technologies": [],
+        "descriptors": []
+      },
+      "relation": {
+        "type": {
+          "value": "received_funding",
+          "raw": "recently raised",
+          "confidence": 0.9
+        },
+        "label": null,
+        "object": {
+          "value": "funding",
+          "raw": "raised",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "direction": {
+          "value": "subject_to_object",
+          "raw": null,
+          "confidence": 0.9
+        }
+      },
+      "organization_context": {
+        "on_behalf_of_company": "no",
+        "company": null
+      },
+      "user_context": {
+        "selling": null,
+        "objective": null,
+        "notes": []
+      },
+      "location": {
+        "value": "Southeast Asia",
+        "raw": "in Southeast Asia",
+        "scope": "in",
+        "radius": null,
+        "radius_unit": null,
+        "country_code": null,
+        "canonical": "Southeast Asia",
+        "confidence": 0.5
+      },
+      "locations": [],
+      "unresolved": [],
+      "temporal": {
+        "relation": "recent",
+        "window": null,
+        "year": null,
+        "raw": "recently",
+        "confidence": 0.5
+      },
+      "constraints": [],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": false,
+        "reasons": []
+      },
+      "quantity": null,
+      "required_fields": [],
+      "preferred_fields": [],
+      "contact_requirements": [],
+      "verification": [],
+      "output": [],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": false,
+        "fields": [],
+        "reason": null,
+        "question": null
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "prompt_version": "u1-v16",
+        "latency_ms": 28484,
+        "fallback_used": false,
+        "cached": false,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": null,
+          "repair_attempted": false,
+          "repair_reason": null,
+          "repair_success": null
+        },
+        "notes": []
+      }
+    },
+    "spec": {
+      "entity": "person",
+      "criteria": [
+        {
+          "field": "role",
+          "value": "founder",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "industry",
+          "value": "SaaS",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "location",
+          "value": "Southeast Asia",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "location_id",
+          "value": "geo:stated:southeast-asia",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "stated",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": true,
+      "signal_types": [
+        "funding"
+      ],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "Find founders of SaaS companies in Southeast Asia who recently raised",
+      "locationSuggestion": null,
+      "understanding": {
+        "version": "u1",
+        "input": {
+          "raw": "Find founders of SaaS companies in Southeast Asia who recently raised",
+          "normalized": null
+        },
+        "task_type": {
+          "value": "lead_discovery",
+          "raw": null,
+          "confidence": 0.9
+        },
+        "prospecting_mode": {
+          "value": "event_based",
+          "raw": null,
+          "confidence": 0.9
+        },
+        "target": {
+          "entity_type": {
+            "value": "person",
+            "raw": "founders",
+            "confidence": 0.9
+          },
+          "entity_ambiguous": false,
+          "entity_subtype": null,
+          "role": {
+            "value": "founder",
+            "raw": "founders",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "job_title": null,
+          "industry": {
+            "value": "SaaS",
+            "raw": "SaaS",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "category": null,
+          "business_type": null,
+          "niche": null,
+          "company_stage": null,
+          "technologies": [],
+          "descriptors": []
+        },
+        "relation": {
+          "type": {
+            "value": "received_funding",
+            "raw": "recently raised",
+            "confidence": 0.9
+          },
+          "label": null,
+          "object": {
+            "value": "funding",
+            "raw": "raised",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "direction": {
+            "value": "subject_to_object",
+            "raw": null,
+            "confidence": 0.9
+          }
+        },
+        "organization_context": {
+          "on_behalf_of_company": "no",
+          "company": null
+        },
+        "user_context": {
+          "selling": null,
+          "objective": null,
+          "notes": []
+        },
+        "location": {
+          "value": "Southeast Asia",
+          "raw": "in Southeast Asia",
+          "scope": "in",
+          "radius": null,
+          "radius_unit": null,
+          "country_code": null,
+          "canonical": "Southeast Asia",
+          "confidence": 0.5
+        },
+        "locations": [],
+        "unresolved": [],
+        "temporal": {
+          "relation": "recent",
+          "window": null,
+          "year": null,
+          "raw": "recently",
+          "confidence": 0.5
+        },
+        "constraints": [],
+        "evidence": {
+          "claim_evidence_required": true,
+          "intent_signal_required": false,
+          "reasons": []
+        },
+        "quantity": null,
+        "required_fields": [],
+        "preferred_fields": [],
+        "contact_requirements": [],
+        "verification": [],
+        "output": [],
+        "source_preferences": [],
+        "enrichment_requirements": [],
+        "compound": {
+          "is_compound": false,
+          "subgoals": []
+        },
+        "clarification": {
+          "needed": false,
+          "fields": [],
+          "reason": null,
+          "question": null
+        },
+        "meta": {
+          "extractor": "llm",
+          "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+          "model": "nvidia/nemotron-3-super-120b-a12b:free",
+          "prompt_version": "u1-v16",
+          "latency_ms": 28484,
+          "fallback_used": false,
+          "cached": false,
+          "repair": {
+            "initial_parse_status": "valid_json",
+            "initial_failure_class": null,
+            "repair_attempted": false,
+            "repair_reason": null,
+            "repair_success": null
+          },
+          "notes": []
+        }
+      },
+      "locations": [
+        "Southeast Asia"
+      ],
+      "unresolved": [],
+      "purpose": null,
+      "requested_fields": []
+    },
+    "decision": {
+      "type": "clarify",
+      "question": {
+        "id": "entity_purpose",
+        "question": "What are you trying to do with these results?",
+        "options": [
+          {
+            "id": "research",
+            "label": "Research",
+            "hint": "Browse and learn"
+          },
+          {
+            "id": "prospecting",
+            "label": "Find prospects",
+            "hint": "Sell a product or service"
+          },
+          {
+            "id": "recruiting",
+            "label": "Recruit",
+            "hint": "Find people to hire"
+          },
+          {
+            "id": "partnership",
+            "label": "Find partners",
+            "hint": "Explore partnerships"
+          }
+        ],
+        "allowOther": true
+      }
+    }
+  },
+  {
+    "query": "Find pre-seed AI investors in Singapore actively writing checks",
+    "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+    "model": "nvidia/nemotron-3-super-120b-a12b:free",
+    "fallback": false,
+    "error": null,
+    "rawSemanticResult": "{\n  \"task_type\": {\"value\": \"lead_discovery\", \"confidence\": 0.95},\n  \"prospecting_mode\": {\"value\": \"investment_based\", \"confidence\": 0.9},\n  \"target\": {\n    \"entity_type\": {\"value\": \"investor\", \"raw\": \"investors\", \"confidence\": 0.95},\n    \"role\": {\"value\": \"investor\", \"raw\": \"investors\"},\n    \"industry\": {\"value\": \"AI\", \"raw\": \"AI\"},\n    \"company_stage\": {\"value\": \"pre-seed\", \"raw\": \"pre-seed\"}\n  },\n  \"relation\": {\n    \"type\": {\"value\": \"investing_in\", \"raw\": \"actively writing checks\", \"confidence\": 0.9},\n    \"direction\": {\"value\": \"subject_to_object\", \"confidence\": 0.9}\n  },\n  \"location\": {\n    \"value\": \"Singapore\",\n    \"raw\": \"in Singapore\",\n    \"scope\": \"in\"\n  },\n  \"evidence\": {\n    \"claim_evidence_required\": true,\n    \"intent_signal_required\": true\n  }\n}",
+    "validationRepairs": [
+      {
+        "code": "GENERIC_DESCRIPTOR_DROPPED",
+        "message": "role \"investor\" only restates entity_type \"investor\" — it narrows nothing",
+        "path": "target.role"
+      },
+      {
+        "code": "LOCATION_CANONICALIZED",
+        "message": "\"Singapore\" -> Singapore",
+        "path": "location.canonical"
+      },
+      {
+        "code": "INTENT_SIGNAL_SET",
+        "message": "relation \"investing_in\" implies intent_signal_required=false",
+        "path": "evidence.intent_signal_required"
+      }
+    ],
+    "frame": {
+      "version": "u1",
+      "input": {
+        "raw": "Find pre-seed AI investors in Singapore actively writing checks",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "lead_discovery",
+        "raw": null,
+        "confidence": 0.95
+      },
+      "prospecting_mode": {
+        "value": "investment_based",
+        "raw": null,
+        "confidence": 0.9
+      },
+      "target": {
+        "entity_type": {
+          "value": "investor",
+          "raw": "investors",
+          "confidence": 0.95
+        },
+        "entity_ambiguous": false,
+        "entity_subtype": null,
+        "role": null,
+        "job_title": null,
+        "industry": {
+          "value": "AI",
+          "raw": "AI",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "category": null,
+        "business_type": null,
+        "niche": null,
+        "company_stage": {
+          "value": "pre-seed",
+          "raw": "pre-seed",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "technologies": [],
+        "descriptors": []
+      },
+      "relation": {
+        "type": {
+          "value": "investing_in",
+          "raw": "actively writing checks",
+          "confidence": 0.9
+        },
+        "label": null,
+        "object": null,
+        "direction": {
+          "value": "subject_to_object",
+          "raw": null,
+          "confidence": 0.9
+        }
+      },
+      "organization_context": {
+        "on_behalf_of_company": "unknown",
+        "company": null
+      },
+      "user_context": {
+        "selling": null,
+        "objective": null,
+        "notes": []
+      },
+      "location": {
+        "value": "Singapore",
+        "raw": "in Singapore",
+        "scope": "in",
+        "radius": null,
+        "radius_unit": null,
+        "country_code": "SG",
+        "canonical": "Singapore",
+        "confidence": 0.5
+      },
+      "locations": [],
+      "unresolved": [],
+      "temporal": null,
+      "constraints": [],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": true,
+        "reasons": []
+      },
+      "quantity": null,
+      "required_fields": [],
+      "preferred_fields": [],
+      "contact_requirements": [],
+      "verification": [],
+      "output": [],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": false,
+        "fields": [],
+        "reason": null,
+        "question": null
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "prompt_version": "u1-v16",
+        "latency_ms": 21827,
+        "fallback_used": false,
+        "cached": false,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": null,
+          "repair_attempted": false,
+          "repair_reason": null,
+          "repair_success": null
+        },
+        "notes": []
+      }
+    },
+    "spec": {
+      "entity": "investor",
+      "criteria": [
+        {
+          "field": "investor_sector",
+          "value": "AI",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "company_stage",
+          "value": "pre-seed",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "location",
+          "value": "Singapore",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "location_id",
+          "value": "geo:country:sg",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "country",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_country",
+          "value": "SG",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "content_topic",
+          "value": "checks",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "needs_live",
+          "value": "true",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": true,
+      "signal_types": [
+        "funding"
+      ],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "Find pre-seed AI investors in Singapore actively writing checks",
+      "locationSuggestion": null,
+      "understanding": {
+        "version": "u1",
+        "input": {
+          "raw": "Find pre-seed AI investors in Singapore actively writing checks",
+          "normalized": null
+        },
+        "task_type": {
+          "value": "lead_discovery",
+          "raw": null,
+          "confidence": 0.95
+        },
+        "prospecting_mode": {
+          "value": "investment_based",
+          "raw": null,
+          "confidence": 0.9
+        },
+        "target": {
+          "entity_type": {
+            "value": "investor",
+            "raw": "investors",
+            "confidence": 0.95
+          },
+          "entity_ambiguous": false,
+          "entity_subtype": null,
+          "role": null,
+          "job_title": null,
+          "industry": {
+            "value": "AI",
+            "raw": "AI",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "category": null,
+          "business_type": null,
+          "niche": null,
+          "company_stage": {
+            "value": "pre-seed",
+            "raw": "pre-seed",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "technologies": [],
+          "descriptors": []
+        },
+        "relation": {
+          "type": {
+            "value": "investing_in",
+            "raw": "actively writing checks",
+            "confidence": 0.9
+          },
+          "label": null,
+          "object": null,
+          "direction": {
+            "value": "subject_to_object",
+            "raw": null,
+            "confidence": 0.9
+          }
+        },
+        "organization_context": {
+          "on_behalf_of_company": "unknown",
+          "company": null
+        },
+        "user_context": {
+          "selling": null,
+          "objective": null,
+          "notes": []
+        },
+        "location": {
+          "value": "Singapore",
+          "raw": "in Singapore",
+          "scope": "in",
+          "radius": null,
+          "radius_unit": null,
+          "country_code": "SG",
+          "canonical": "Singapore",
+          "confidence": 0.5
+        },
+        "locations": [],
+        "unresolved": [],
+        "temporal": null,
+        "constraints": [
+          {
+            "field": "content_topic",
+            "operator": "eq",
+            "value": "checks",
+            "raw": "writing checks",
+            "confidence": 1,
+            "negated": false,
+            "unit": null
+          }
+        ],
+        "evidence": {
+          "claim_evidence_required": true,
+          "intent_signal_required": true,
+          "reasons": []
+        },
+        "quantity": null,
+        "required_fields": [],
+        "preferred_fields": [],
+        "contact_requirements": [],
+        "verification": [],
+        "output": [],
+        "source_preferences": [],
+        "enrichment_requirements": [],
+        "compound": {
+          "is_compound": false,
+          "subgoals": []
+        },
+        "clarification": {
+          "needed": false,
+          "fields": [],
+          "reason": null,
+          "question": null
+        },
+        "meta": {
+          "extractor": "llm",
+          "provider": "openrouter:nvidia/nemotron-3-super-120b-a12b:free",
+          "model": "nvidia/nemotron-3-super-120b-a12b:free",
+          "prompt_version": "u1-v16",
+          "latency_ms": 21827,
+          "fallback_used": false,
+          "cached": false,
+          "repair": {
+            "initial_parse_status": "valid_json",
+            "initial_failure_class": null,
+            "repair_attempted": false,
+            "repair_reason": null,
+            "repair_success": null
+          },
+          "notes": []
+        }
+      },
+      "locations": [
+        "Singapore"
+      ],
+      "unresolved": [],
+      "purpose": null,
+      "requested_fields": []
+    },
+    "decision": {
+      "type": "clarify",
+      "question": {
+        "id": "entity_purpose",
+        "question": "What are you trying to do with these results?",
+        "options": [
+          {
+            "id": "research",
+            "label": "Research",
+            "hint": "Browse and learn"
+          },
+          {
+            "id": "prospecting",
+            "label": "Find prospects",
+            "hint": "Sell a product or service"
+          },
+          {
+            "id": "recruiting",
+            "label": "Recruit",
+            "hint": "Find people to hire"
+          },
+          {
+            "id": "partnership",
+            "label": "Find partners",
+            "hint": "Explore partnerships"
+          }
+        ],
+        "allowOther": true
+      }
+    }
+  },
+  {
+    "query": "Find people hiring marketing managers in Calgary",
+    "provider": "groq:openai/gpt-oss-20b",
+    "model": "openai/gpt-oss-20b",
+    "fallback": false,
+    "error": null,
+    "rawSemanticResult": "{\"task_type\":{\"value\":\"lead_discovery\",\"raw\":\"Find people hiring marketing managers in Calgary\"},\"prospecting_mode\":{\"value\":\"hiring_based\",\"raw\":\"Find people hiring marketing managers in Calgary\"},\"target\":{\"entity_type\":{\"value\":\"person\",\"raw\":\"people\"}},\"relation\":{\"type\":{\"value\":\"hiring\",\"raw\":\"hiring\"},\"object\":{\"value\":\"marketing manager\",\"raw\":\"marketing managers\"},\"direction\":{\"value\":\"subject_to_object\",\"raw\":\"Find people hiring marketing managers in Calgary\"}},\"location\":{\"value\":\"Calgary\",\"raw\":\"in Calgary\",\"scope\":\"in\"}}",
+    "validationRepairs": [
+      {
+        "code": "LOCATION_CANONICALIZED",
+        "message": "\"Calgary\" -> Calgary",
+        "path": "location.canonical"
+      },
+      {
+        "code": "INTENT_SIGNAL_SET",
+        "message": "relation \"hiring\" implies intent_signal_required=true",
+        "path": "evidence.intent_signal_required"
+      }
+    ],
+    "frame": {
+      "version": "u1",
+      "input": {
+        "raw": "Find people hiring marketing managers in Calgary",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "lead_discovery",
+        "raw": "Find people hiring marketing managers in Calgary",
+        "confidence": 0.5
+      },
+      "prospecting_mode": {
+        "value": "hiring_based",
+        "raw": "Find people hiring marketing managers in Calgary",
+        "confidence": 0.5
+      },
+      "target": {
+        "entity_type": {
+          "value": "person",
+          "raw": "people",
+          "confidence": 0.5
+        },
+        "entity_ambiguous": false,
+        "entity_subtype": null,
+        "role": null,
+        "job_title": null,
+        "industry": null,
+        "category": null,
+        "business_type": null,
+        "niche": null,
+        "company_stage": null,
+        "technologies": [],
+        "descriptors": []
+      },
+      "relation": {
+        "type": {
+          "value": "hiring",
+          "raw": "hiring",
+          "confidence": 0.5
+        },
+        "label": null,
+        "object": {
+          "value": "marketing manager",
+          "raw": "marketing managers",
+          "normalized": null,
+          "confidence": 0.5
+        },
+        "direction": {
+          "value": "subject_to_object",
+          "raw": "Find people hiring marketing managers in Calgary",
+          "confidence": 0.5
+        }
+      },
+      "organization_context": {
+        "on_behalf_of_company": "unknown",
+        "company": null
+      },
+      "user_context": {
+        "selling": null,
+        "objective": null,
+        "notes": []
+      },
+      "location": {
+        "value": "Calgary",
+        "raw": "in Calgary",
+        "scope": "in",
+        "radius": null,
+        "radius_unit": null,
+        "country_code": "CA",
+        "canonical": "Calgary",
+        "confidence": 0.5
+      },
+      "locations": [],
+      "unresolved": [],
+      "temporal": null,
+      "constraints": [],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": true,
+        "reasons": []
+      },
+      "quantity": null,
+      "required_fields": [],
+      "preferred_fields": [],
+      "contact_requirements": [],
+      "verification": [],
+      "output": [],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": false,
+        "fields": [],
+        "reason": null,
+        "question": null
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": "groq:openai/gpt-oss-20b",
+        "model": "openai/gpt-oss-20b",
+        "prompt_version": "u1-v16",
+        "latency_ms": 946,
+        "fallback_used": false,
+        "cached": false,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": null,
+          "repair_attempted": false,
+          "repair_reason": null,
+          "repair_success": null
+        },
+        "notes": []
+      }
+    },
+    "spec": {
+      "entity": "person",
+      "criteria": [
+        {
+          "field": "location",
+          "value": "Calgary",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "location_id",
+          "value": "geo:city:calgary",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "city",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_country",
+          "value": "CA",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_parents",
+          "value": "geo:country:ca",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "requested_role",
+          "value": "marketing manager",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": true,
+      "signal_types": [
+        "hiring"
+      ],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "Find people hiring marketing managers in Calgary",
+      "locationSuggestion": null,
+      "understanding": {
+        "version": "u1",
+        "input": {
+          "raw": "Find people hiring marketing managers in Calgary",
+          "normalized": null
+        },
+        "task_type": {
+          "value": "lead_discovery",
+          "raw": "Find people hiring marketing managers in Calgary",
+          "confidence": 0.5
+        },
+        "prospecting_mode": {
+          "value": "hiring_based",
+          "raw": "Find people hiring marketing managers in Calgary",
+          "confidence": 0.5
+        },
+        "target": {
+          "entity_type": {
+            "value": "person",
+            "raw": "people",
+            "confidence": 0.5
+          },
+          "entity_ambiguous": false,
+          "entity_subtype": null,
+          "role": null,
+          "job_title": null,
+          "industry": null,
+          "category": null,
+          "business_type": null,
+          "niche": null,
+          "company_stage": null,
+          "technologies": [],
+          "descriptors": []
+        },
+        "relation": {
+          "type": {
+            "value": "hiring",
+            "raw": "hiring",
+            "confidence": 0.5
+          },
+          "label": null,
+          "object": {
+            "value": "marketing manager",
+            "raw": "marketing managers",
+            "normalized": null,
+            "confidence": 0.5
+          },
+          "direction": {
+            "value": "subject_to_object",
+            "raw": "Find people hiring marketing managers in Calgary",
+            "confidence": 0.5
+          }
+        },
+        "organization_context": {
+          "on_behalf_of_company": "unknown",
+          "company": null
+        },
+        "user_context": {
+          "selling": null,
+          "objective": null,
+          "notes": []
+        },
+        "location": {
+          "value": "Calgary",
+          "raw": "in Calgary",
+          "scope": "in",
+          "radius": null,
+          "radius_unit": null,
+          "country_code": "CA",
+          "canonical": "Calgary",
+          "confidence": 0.5
+        },
+        "locations": [],
+        "unresolved": [],
+        "temporal": null,
+        "constraints": [],
+        "evidence": {
+          "claim_evidence_required": true,
+          "intent_signal_required": true,
+          "reasons": []
+        },
+        "quantity": null,
+        "required_fields": [],
+        "preferred_fields": [],
+        "contact_requirements": [],
+        "verification": [],
+        "output": [],
+        "source_preferences": [],
+        "enrichment_requirements": [],
+        "compound": {
+          "is_compound": false,
+          "subgoals": []
+        },
+        "clarification": {
+          "needed": false,
+          "fields": [],
+          "reason": null,
+          "question": null
+        },
+        "meta": {
+          "extractor": "llm",
+          "provider": "groq:openai/gpt-oss-20b",
+          "model": "openai/gpt-oss-20b",
+          "prompt_version": "u1-v16",
+          "latency_ms": 946,
+          "fallback_used": false,
+          "cached": false,
+          "repair": {
+            "initial_parse_status": "valid_json",
+            "initial_failure_class": null,
+            "repair_attempted": false,
+            "repair_reason": null,
+            "repair_success": null
+          },
+          "notes": []
+        }
+      },
+      "locations": [
+        "Calgary"
+      ],
+      "unresolved": [],
+      "purpose": null,
+      "requested_fields": []
+    },
+    "decision": {
+      "type": "clarify",
+      "question": {
+        "id": "entity_purpose",
+        "question": "What are you trying to do with these results?",
+        "options": [
+          {
+            "id": "research",
+            "label": "Research",
+            "hint": "Browse and learn"
+          },
+          {
+            "id": "prospecting",
+            "label": "Find prospects",
+            "hint": "Sell a product or service"
+          },
+          {
+            "id": "recruiting",
+            "label": "Recruit",
+            "hint": "Find people to hire"
+          },
+          {
+            "id": "partnership",
+            "label": "Find partners",
+            "hint": "Explore partnerships"
+          }
+        ],
+        "allowOther": true
+      }
+    }
+  },
+  {
+    "query": "Find companies for partnership opportunities in Nairobi",
+    "provider": "groq:openai/gpt-oss-20b",
+    "model": "openai/gpt-oss-20b",
+    "fallback": false,
+    "error": null,
+    "rawSemanticResult": "{\"task_type\":{\"value\":\"lead_discovery\",\"raw\":\"Find companies for partnership opportunities in Nairobi\"},\"prospecting_mode\":{\"value\":\"opportunity_based\",\"raw\":\"for partnership opportunities\"},\"target\":{\"entity_type\":{\"value\":\"business\",\"raw\":\"companies\"}},\"relation\":{\"type\":{\"value\":\"partnered_with\",\"raw\":\"for partnership opportunities\"},\"direction\":{\"value\":\"subject_to_object\",\"raw\":\"for partnership opportunities\"}},\"location\":{\"value\":\"Nairobi\",\"raw\":\"in Nairobi\",\"scope\":\"in\"},\"evidence\":{\"claim_evidence_required\":true,\"intent_signal_required\":true}}",
+    "validationRepairs": [
+      {
+        "code": "MODE_FROM_RELATION",
+        "message": "relation \"partnered_with\" implies prospecting_mode event_based (was opportunity_based)",
+        "path": "prospecting_mode"
+      },
+      {
+        "code": "LOCATION_CANONICALIZED",
+        "message": "\"Nairobi\" -> Nairobi",
+        "path": "location.canonical"
+      },
+      {
+        "code": "INTENT_SIGNAL_SET",
+        "message": "relation \"partnered_with\" implies intent_signal_required=false",
+        "path": "evidence.intent_signal_required"
+      }
+    ],
+    "frame": {
+      "version": "u1",
+      "input": {
+        "raw": "Find companies for partnership opportunities in Nairobi",
+        "normalized": null
+      },
+      "task_type": {
+        "value": "lead_discovery",
+        "raw": "Find companies for partnership opportunities in Nairobi",
+        "confidence": 0.5
+      },
+      "prospecting_mode": {
+        "value": "event_based",
+        "raw": "for partnership opportunities",
+        "confidence": 0.5
+      },
+      "target": {
+        "entity_type": {
+          "value": "business",
+          "raw": "companies",
+          "confidence": 0.5
+        },
+        "entity_ambiguous": false,
+        "entity_subtype": null,
+        "role": null,
+        "job_title": null,
+        "industry": null,
+        "category": null,
+        "business_type": null,
+        "niche": null,
+        "company_stage": null,
+        "technologies": [],
+        "descriptors": []
+      },
+      "relation": {
+        "type": {
+          "value": "partnered_with",
+          "raw": "for partnership opportunities",
+          "confidence": 0.5
+        },
+        "label": null,
+        "object": null,
+        "direction": {
+          "value": "subject_to_object",
+          "raw": "for partnership opportunities",
+          "confidence": 0.5
+        }
+      },
+      "organization_context": {
+        "on_behalf_of_company": "unknown",
+        "company": null
+      },
+      "user_context": {
+        "selling": null,
+        "objective": null,
+        "notes": []
+      },
+      "location": {
+        "value": "Nairobi",
+        "raw": "in Nairobi",
+        "scope": "in",
+        "radius": null,
+        "radius_unit": null,
+        "country_code": null,
+        "canonical": "Nairobi",
+        "confidence": 0.5
+      },
+      "locations": [],
+      "unresolved": [],
+      "temporal": null,
+      "constraints": [],
+      "evidence": {
+        "claim_evidence_required": true,
+        "intent_signal_required": false,
+        "reasons": []
+      },
+      "quantity": null,
+      "required_fields": [],
+      "preferred_fields": [],
+      "contact_requirements": [],
+      "verification": [],
+      "output": [],
+      "source_preferences": [],
+      "enrichment_requirements": [],
+      "compound": {
+        "is_compound": false,
+        "subgoals": []
+      },
+      "clarification": {
+        "needed": true,
+        "fields": [
+          "relation.object"
+        ],
+        "reason": "missing_relation_object",
+        "question": "What should they be doing?"
+      },
+      "meta": {
+        "extractor": "llm",
+        "provider": "groq:openai/gpt-oss-20b",
+        "model": "openai/gpt-oss-20b",
+        "prompt_version": "u1-v16",
+        "latency_ms": 1014,
+        "fallback_used": false,
+        "cached": false,
+        "repair": {
+          "initial_parse_status": "valid_json",
+          "initial_failure_class": null,
+          "repair_attempted": false,
+          "repair_reason": null,
+          "repair_success": null
+        },
+        "notes": []
+      }
+    },
+    "spec": {
+      "entity": "business",
+      "criteria": [
+        {
+          "field": "location",
+          "value": "Nairobi",
+          "stated": true,
+          "confidence": 0.5
+        },
+        {
+          "field": "location_id",
+          "value": "geo:stated:nairobi",
+          "stated": true,
+          "confidence": 1
+        },
+        {
+          "field": "location_kind",
+          "value": "stated",
+          "stated": true,
+          "confidence": 1
+        }
+      ],
+      "missing": [],
+      "signal_required": false,
+      "signal_types": [],
+      "signal_recency": null,
+      "status": "ready_to_search",
+      "raw_query": "Find companies for partnership opportunities in Nairobi",
+      "locationSuggestion": null,
+      "understanding": {
+        "version": "u1",
+        "input": {
+          "raw": "Find companies for partnership opportunities in Nairobi",
+          "normalized": null
+        },
+        "task_type": {
+          "value": "lead_discovery",
+          "raw": "Find companies for partnership opportunities in Nairobi",
+          "confidence": 0.5
+        },
+        "prospecting_mode": {
+          "value": "event_based",
+          "raw": "for partnership opportunities",
+          "confidence": 0.5
+        },
+        "target": {
+          "entity_type": {
+            "value": "business",
+            "raw": "companies",
+            "confidence": 0.5
+          },
+          "entity_ambiguous": false,
+          "entity_subtype": null,
+          "role": null,
+          "job_title": null,
+          "industry": null,
+          "category": null,
+          "business_type": null,
+          "niche": null,
+          "company_stage": null,
+          "technologies": [],
+          "descriptors": []
+        },
+        "relation": {
+          "type": {
+            "value": "partnered_with",
+            "raw": "for partnership opportunities",
+            "confidence": 0.5
+          },
+          "label": null,
+          "object": null,
+          "direction": {
+            "value": "subject_to_object",
+            "raw": "for partnership opportunities",
+            "confidence": 0.5
+          }
+        },
+        "organization_context": {
+          "on_behalf_of_company": "unknown",
+          "company": null
+        },
+        "user_context": {
+          "selling": null,
+          "objective": null,
+          "notes": []
+        },
+        "location": {
+          "value": "Nairobi",
+          "raw": "in Nairobi",
+          "scope": "in",
+          "radius": null,
+          "radius_unit": null,
+          "country_code": null,
+          "canonical": "Nairobi",
+          "confidence": 0.5
+        },
+        "locations": [],
+        "unresolved": [],
+        "temporal": null,
+        "constraints": [],
+        "evidence": {
+          "claim_evidence_required": true,
+          "intent_signal_required": false,
+          "reasons": []
+        },
+        "quantity": null,
+        "required_fields": [],
+        "preferred_fields": [],
+        "contact_requirements": [],
+        "verification": [],
+        "output": [],
+        "source_preferences": [],
+        "enrichment_requirements": [],
+        "compound": {
+          "is_compound": false,
+          "subgoals": []
+        },
+        "clarification": {
+          "needed": true,
+          "fields": [
+            "relation.object"
+          ],
+          "reason": "missing_relation_object",
+          "question": "What should they be doing?"
+        },
+        "meta": {
+          "extractor": "llm",
+          "provider": "groq:openai/gpt-oss-20b",
+          "model": "openai/gpt-oss-20b",
+          "prompt_version": "u1-v16",
+          "latency_ms": 1014,
+          "fallback_used": false,
+          "cached": false,
+          "repair": {
+            "initial_parse_status": "valid_json",
+            "initial_failure_class": null,
+            "repair_attempted": false,
+            "repair_reason": null,
+            "repair_success": null
+          },
+          "notes": []
+        }
+      },
+      "locations": [
+        "Nairobi"
+      ],
+      "unresolved": [],
+      "purpose": null,
+      "requested_fields": []
+    },
+    "decision": {
+      "type": "clarify",
+      "question": {
+        "id": "entity_relation",
+        "question": "What should they be doing?",
+        "options": [],
+        "allowOther": true
+      }
+    }
+  }
+]

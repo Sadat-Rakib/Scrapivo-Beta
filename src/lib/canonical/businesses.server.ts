@@ -210,15 +210,27 @@ const CATEGORY_FAMILIES: Record<string, string[]> = {
 };
 export const expandCategory = (canon: string): string[] => CATEGORY_FAMILIES[canon] ?? [canon];
 
-/** Plural/stem-insensitive craft equality for validation. */
-export function craftMatches(a: unknown, b: unknown): boolean {
-  if (typeof a !== "string" || typeof b !== "string") return false;
-  const ca = canonCraft(a);
-  const cb = canonCraft(b);
+/** CRAFT_QUERY words that broaden meaning: a person asking for "clinics" is
+ *  routed to dentists, but an OBSERVED row category "clinic" (OSM
+ *  amenity=clinic) is a general medical clinic and keeps its literal meaning. */
+const BROADENING_QUERY_WORDS = new Set(["clinic", "clinics"]);
+const plainCraft = (s: string) => s.toLowerCase().trim().replace(/-/g, " ").replace(/\s+/g, "_");
+const singularCraft = (s: string) => s.replace(/(?:es|s)$/, "");
+
+function looseCraftEqual(ca: string, cb: string): boolean {
   if (ca === cb) return true;
   const sa = ca.replace(/er$/, "");
   const sb = cb.replace(/er$/, "");
   return ca.includes(cb) || cb.includes(ca) || sa === sb || ca.includes(sb) || cb.includes(sa);
+}
+
+/** Plural/stem-insensitive craft equality for validation.
+ *  `a` is the observed row category, `b` the requested craft. */
+export function craftMatches(a: unknown, b: unknown): boolean {
+  if (typeof a !== "string" || typeof b !== "string") return false;
+  // Only the literal word ("clinics" → clinic rows), never its alias target.
+  if (BROADENING_QUERY_WORDS.has(a.toLowerCase().trim())) return singularCraft(plainCraft(a)) === singularCraft(plainCraft(b));
+  return looseCraftEqual(canonCraft(a), canonCraft(b));
 }
 
 export async function searchBusinessesDB(q: {

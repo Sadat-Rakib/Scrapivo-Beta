@@ -1,0 +1,17 @@
+{
+  "runId": "mvp-local-browser-1790709807268",
+  "query": "Restaurants in Calgary, Alberta with official websites",
+  "durationMs": 47247,
+  "error": null,
+  "browser": {
+    "adapter": "playwright",
+    "status": "completed",
+    "pagesVisited": 11,
+    "currentUrl": "https://forums.redflagdeals.com/",
+    "screenshotPath": "reports/mvp-implementation/BROWSER_BUSINESSES.jpg"
+  },
+  "progressEvents": 26,
+  "streamedRows": 0,
+  "candidateRowsReturned": 0,
+  "verifiedRows": 0
+}

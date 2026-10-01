@@ -45,6 +45,14 @@ export interface LocationSuggestion {
 
 export interface SearchSpec {
   entity: SpecEntity;
+  /** Alternative search areas; all are requested, with OR semantics. */
+  locations?: string[];
+  /** Explicit references whose values still need an answer. */
+  unresolved?: Array<{ field: string; raw: string }>;
+  /** The user's stated reason for this search, if known. */
+  purpose?: "research" | "prospecting" | "recruiting" | "partnership" | null;
+  /** Fields the user asked to receive, independent of target filters. */
+  requested_fields?: string[];
   /** Extracted criteria (stated + inferred). */
   criteria: SpecField[];
   /** Fields materially missing for this entity+intent (drives questions). */

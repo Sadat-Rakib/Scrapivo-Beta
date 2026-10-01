@@ -1,0 +1,333 @@
+{
+  "runId": "trace-custom-product-1790791964184",
+  "query": "Coffee roasters in Copenhagen with email addresses",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 122835,
+  "error": null,
+  "audit": [],
+  "browser": {
+    "adapter": "worker",
+    "status": "completed",
+    "pagesVisited": 7,
+    "currentUrl": "https://impactroasters.dk/",
+    "retained": true,
+    "controller": "agent",
+    "sessionId": "70a8a67f-6de9-4360-b1ab-5c07e1ec6814",
+    "frame": true
+  },
+  "runtime": [
+    {
+      "kind": "runtime",
+      "requested": "worker",
+      "used": "worker"
+    }
+  ],
+  "progressEvents": 29,
+  "streamedRows": [],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [
+    {
+      "kind": "search",
+      "query": "coffee roaster Copenhagen",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "coffee roaster Copenhagen",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "coffee roaster business Copenhagen",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "coffee roaster business Copenhagen",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://coffeeroasterfinder.com/best-coffee-roasters-in-copenhagen/",
+      "pageType": "list",
+      "title": "10 Best Coffee Roasters in Copenhagen (With Maps) in 2024",
+      "outcome": "read",
+      "textChars": 15080,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "762ede36ee60.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.nordicroasting.com/",
+      "pageType": "unknown",
+      "title": "Nordic Roasting Co. High-quality, responsibly-sourced specialty coffee",
+      "outcome": "read",
+      "textChars": 3149,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "9402c0f322a7.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://smage-compagniet.dk/copenhagen-roaster/",
+      "pageType": "unknown",
+      "title": "Copenhagen Roaster | Delikat slow roast kaffe i særklasse",
+      "outcome": "read",
+      "textChars": 2089,
+      "structured": {
+        "jobs": 0,
+        "organization": "Smage-Compagniet",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "79ae4e38dee8.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://impactroasters.dk/",
+      "pageType": "unknown",
+      "title": "Impact Roasters - Specialty Coffee Roasters in Copenhagen",
+      "outcome": "read",
+      "textChars": 3714,
+      "structured": {
+        "jobs": 0,
+        "organization": "Impact Roasters",
+        "emails": 1,
+        "phones": 1
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "IMPACT ROASTERS"
+      ],
+      "why": "",
+      "capture": "afdd3b67b4e9.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://coffeeroasterfinder.com/best-coffee-roasters-in-copenhagen/",
+        "https://www.nordicroasting.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://coffeeroasterfinder.com/best-coffee-roasters-in-copenhagen/",
+        "https://www.nordicroasting.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://impactroasters.dk/"
+      ],
+      "extractor": "json_ld",
+      "llm": "not_called",
+      "entities": 1
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://smage-compagniet.dk/copenhagen-roaster/",
+        "https://impactroasters.dk/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://smage-compagniet.dk/copenhagen-roaster/",
+        "https://impactroasters.dk/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    }
+  ],
+  "entityOutcomes": [
+    {
+      "page": "https://impactroasters.dk/",
+      "name": "IMPACT ROASTERS",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    }
+  ],
+  "remember": [
+    {
+      "kind": "remember",
+      "name": "IMPACT ROASTERS",
+      "rowKind": "business",
+      "outcome": "accepted",
+      "resolved": true
+    }
+  ],
+  "candidates": [],
+  "done": [
+    {
+      "kind": "done",
+      "status": "timeout",
+      "candidates": 1,
+      "verified": 0,
+      "visited": 5,
+      "queries": 2,
+      "stoppingReason": "BROWSER_DISCOVERY_TIMEOUT",
+      "elapsedMs": 90024
+    }
+  ],
+  "persistenceSkipped": [
+    "ai_cache",
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "NO_QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "business",
+    "criteria": [
+      "category=coffee roaster",
+      "location=Copenhagen",
+      "location_id=geo:stated:copenhagen",
+      "location_kind=stated",
+      "require_email=true",
+      "required_field=email",
+      "verify_other=has email address"
+    ],
+    "clarify": [
+      "entity_business_model"
+    ],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_businesses(country,city_norm,category)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "s3-parquet",
+          "partitions": [
+            "processed/local-businesses/by_country/dk.parquet",
+            "(exact=0 nearby=0 for \"Copenhagen\")"
+          ],
+          "scanned": 130000,
+          "matched": 0
+        },
+        {
+          "source": "live-osm+browser",
+          "partitions": [
+            "live-gapfill(146)"
+          ],
+          "scanned": 146,
+          "matched": 146
+        }
+      ],
+      "rawCandidates": 146,
+      "postSpecFilter": 0,
+      "timings": {
+        "understanding_ms": 11231,
+        "stored_search_ms": 9913,
+        "research_ms": 99475,
+        "enrichment_ms": 2,
+        "qualification_ms": 514,
+        "total_ms": 121135
+      },
+      "researchable": 0,
+      "complete": 0,
+      "pendingEnrichment": 0,
+      "qualificationRejected": 0,
+      "qualified": 0,
+      "returned": 0,
+      "reason": "FILTERED_BY_SPEC",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "osm-local",
+            "label": "Public source",
+            "state": "healthy",
+            "reason": "OK"
+          },
+          {
+            "source": "browser-live",
+            "label": "Public websites",
+            "state": "healthy",
+            "reason": "OK"
+          }
+        ],
+        "degraded": false,
+        "summary": null
+      }
+    },
+    "rowsReturned": 0,
+    "rows": [],
+    "diagnostics": [],
+    "cancelledAtMs": null,
+    "returnedAtMs": 122833,
+    "candidateLedger": {
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 0,
+        "gated": 0,
+        "filtered": 146,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {},
+      "streamed": 0,
+      "streamedNotReturned": []
+    }
+  }
+}

@@ -122,6 +122,9 @@ export function theoremCandidateFromRow(
       employer: r.employer ?? (r.kind === "job" ? null : r.detail) ?? null,
       company: r.detail ?? null,
       apply_url: r.apply_url ?? (r.kind === "job" ? r.url : null) ?? null,
+      // Observed destinations, so website/contact requirements can be checked.
+      website_url: r.website_url ?? null,
+      contact_page_url: r.contact_page_url ?? null,
     },
     evidence: evidence ?? r.evidence ?? [],
   };

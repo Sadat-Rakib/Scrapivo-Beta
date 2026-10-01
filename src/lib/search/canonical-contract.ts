@@ -167,6 +167,8 @@ export function isStableEntityId(id: string | null | undefined): boolean {
  */
 export function queryRequiredFields(spec: SearchSpec): string[] {
   const req: string[] = ["entity_id", "entity_type", "name"];
+  const requested = new Set(spec.requested_fields?.map((field) => field.toLowerCase()) ?? []);
+  const legacyText = !spec.understanding;
   if (fieldOf(spec, "location")) req.push("location");
   // Spec.role is a retrieval filter, not a QualifiedLead column.
   if (spec.entity === "job") {
@@ -175,26 +177,30 @@ export function queryRequiredFields(spec: SearchSpec): string[] {
   if (
     fieldOf(spec, "salary_min") ||
     fieldOf(spec, "salary") ||
-    /\b(paying|salary|\$\s*\d)/i.test(spec.raw_query)
+    (legacyText && /\b(paying|salary|\$\s*\d)/i.test(spec.raw_query))
   ) {
     req.push("salary");
   }
   if (
-    /\b(?:(?:with|require(?:s|d)?|must have)\s+(?:(?:emails?|email addresses?)\s+(?:and|or)\s+)?phone(?: numbers?)?|phone(?: numbers?)?\s+required)\b/i.test(
+    (legacyText && /\b(?:(?:with|require(?:s|d)?|must have)\s+(?:(?:emails?|email addresses?)\s+(?:and|or)\s+)?phone(?: numbers?)?|phone(?: numbers?)?\s+required)\b/i.test(
       spec.raw_query,
-    ) ||
-    fieldOf(spec, "require_phone") === "true"
+    )) ||
+    fieldOf(spec, "require_phone") === "true" || requested.has("phone")
   ) {
     req.push("phone");
   }
   if (
-    /\b(with emails?|email addresses?|emails?\s+required|require(?:s|d)?\s+email)\b/i.test(
+    (legacyText && /\b(with emails?|email addresses?|emails?\s+required|require(?:s|d)?\s+email)\b/i.test(
       spec.raw_query,
-    ) ||
-    fieldOf(spec, "require_email") === "true"
+    )) ||
+    fieldOf(spec, "require_email") === "true" || requested.has("email")
   ) {
     req.push("email");
   }
+  if (requested.has("website") || fieldOf(spec, "require_website") === "true") req.push("website");
+  // Any public contact channel (email, phone, or first-party contact page).
+  if (requested.has("contact") || fieldOf(spec, "require_contact") === "true") req.push("contact");
+  if (requested.has("socials") || requested.has("social") || fieldOf(spec, "require_socials") === "true") req.push("socials");
   if (spec.signal_required) {
     req.push("claim_evidence");
   }
@@ -395,6 +401,17 @@ export function evaluateQualifiedLeadTheorem(
   if (qFields.includes("email")) {
     const email = f.email ?? null;
     if (typeof email !== "string" || !email.trim()) missing.push("email");
+  }
+  if (qFields.includes("website") && !(typeof f.website_url === "string" && f.website_url.trim())) {
+    missing.push("website");
+  }
+  if (qFields.includes("contact") && ![f.email, f.phone, f.contact_page_url].some((value) => typeof value === "string" && value.trim())) {
+    missing.push("contact");
+  }
+  if (qFields.includes("socials") && !candidate.evidence?.some((item) =>
+    ("source_type" in item && item.source_type === "social" && !!item.source_url) ||
+    ("evidence_source" in item && /social|instagram|facebook|linkedin|tiktok|youtube/i.test(item.evidence_source ?? "") && !!item.evidence_url))) {
+    missing.push("socials");
   }
   if (spec.entity === "job") {
     if (!candidate.source_url?.trim() && !f.apply_url) missing.push("apply_or_source_url");

@@ -155,12 +155,15 @@ export class SupabaseQualifiedLeadStore implements QualifiedLeadStore {
 }
 
 import { getAdmin } from "@/integrations/my-supabase/admin.server";
+import { skipPersistence } from "@/lib/persistence-policy.server";
 
 /** Open the production store when Supabase admin env is present. */
 export function tryOpenSupabaseQualifiedLeadStore(): SupabaseQualifiedLeadStore | null {
   const url = process.env.MY_SUPABASE_URL?.trim();
   const key = process.env.MY_SUPABASE_SERVICE_ROLE_KEY?.trim();
   if (!url || !key) return null;
+  // Local acceptance: callers fall back to the in-memory store.
+  if (skipPersistence("qualified_leads")) return null;
   return new SupabaseQualifiedLeadStore(getAdmin());
 }
 

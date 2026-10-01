@@ -181,6 +181,8 @@ async function triggerAtsCheck(companies: string[]): Promise<void> {
     console.info("[news-signals] ATS-check trigger for:", unique.join(", "));
   }
   try {
+    const { skipPersistence } = await import("@/lib/persistence-policy.server");
+    if (skipPersistence("ats_check_queue")) return;
     const { getAdmin } = await import("@/integrations/my-supabase/admin.server");
     await getAdmin()
       .from("ats_check_queue")

@@ -189,6 +189,8 @@ Produce the JSON brief with at least 2 verified_hooks when multiple sources exis
   };
 
   try {
+    const { skipPersistence } = await import("@/lib/persistence-policy.server");
+    if (skipPersistence("lead_research")) return out;
     await supabase.from("lead_research").upsert(
       {
         user_id: userId,

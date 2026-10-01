@@ -338,6 +338,10 @@ export const UnderstandingFrameSchema = z.object({
   user_context: UserContextSchema.default({ selling: null, objective: null, notes: [] }),
 
   location: LocationSchema.nullable().default(null),
+  /** Alternative search areas joined by OR; the primary area remains location. */
+  locations: z.array(LocationSchema).max(10).default([]),
+  /** Explicit values the user referred to but did not supply. */
+  unresolved: z.array(z.object({ field: z.string().max(80), raw: z.string().max(200) })).max(10).default([]),
   temporal: TemporalSchema.nullable().default(null),
   constraints: z.array(ConstraintSchema).max(40).default([]),
   evidence: EvidenceRequirementsSchema.default({

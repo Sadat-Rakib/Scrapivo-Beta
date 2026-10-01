@@ -130,6 +130,8 @@ export type LocalBusinessRow = {
   why_match?: string;
   /** Soft flag: same phone+address as another row on this page. */
   soft_duplicate?: boolean;
+  /** Spec path: claim-bound evidence from the qualified lead (website status proof). */
+  claim_evidence?: import("@/lib/search/website-status").WebsiteStatusInput["claim_evidence"];
 };
 
 /** Derive filterable opportunity tags from observed fields only. */

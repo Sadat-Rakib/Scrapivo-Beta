@@ -1,0 +1,299 @@
+{
+  "runId": "trace-custom-product-1790790876342",
+  "query": "Founders of fintech startups in Berlin",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 53844,
+  "error": null,
+  "audit": [],
+  "browser": {
+    "adapter": "worker",
+    "status": "completed",
+    "pagesVisited": 8,
+    "currentUrl": "https://berlinstartupjobs.com/de/seeking-co-founders/",
+    "retained": true,
+    "controller": "agent",
+    "sessionId": "688864cc-c754-4217-a315-620fa6e77894",
+    "frame": true
+  },
+  "runtime": [
+    {
+      "kind": "runtime",
+      "requested": "worker",
+      "used": "worker"
+    }
+  ],
+  "progressEvents": 22,
+  "streamedRows": [],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [
+    {
+      "kind": "search",
+      "query": "\"founder\" fintech Berlin",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "\"founder\" fintech Berlin",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 7,
+      "reason": "raw_links=7 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "\"co-founder\" fintech Berlin",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "\"co-founder\" fintech Berlin",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 8,
+      "reason": "raw_links=8 unrelated=0"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://www.vcbacked.co/directory/cities/industry/berlin-germany/fintech",
+      "pageType": "aggregator",
+      "title": "70 Recently Funded FinTech Startups in Berlin (September 2026) | VCBacked",
+      "outcome": "read",
+      "textChars": 9168,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "97e8d2ef3c12.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://de.linkedin.com/in/ingmar-st",
+      "pageType": null,
+      "title": null,
+      "outcome": "navigation_failed",
+      "textChars": 0,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "navigation_failed: The page could not be read.",
+      "capture": null
+    },
+    {
+      "origin": "discovery",
+      "url": "https://foundersbase.com/",
+      "pageType": "unknown",
+      "title": "Just a moment...",
+      "outcome": "read",
+      "textChars": 697,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "d5802be6dfd1.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://berlinstartupjobs.com/de/seeking-co-founders/",
+      "pageType": "unknown",
+      "title": "Mitgründer / Co-Founder Gesucht in Berlin | Berlin Startup Jobs",
+      "outcome": "read",
+      "textChars": 4633,
+      "structured": {
+        "jobs": 0,
+        "organization": "Berlin Startup Jobs",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "7e006153b037.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.vcbacked.co/directory/cities/industry/berlin-germany/fintech"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.vcbacked.co/directory/cities/industry/berlin-germany/fintech"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://foundersbase.com/",
+        "https://berlinstartupjobs.com/de/seeking-co-founders/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://foundersbase.com/",
+        "https://berlinstartupjobs.com/de/seeking-co-founders/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    }
+  ],
+  "entityOutcomes": [],
+  "remember": [],
+  "candidates": [],
+  "done": [
+    {
+      "kind": "done",
+      "status": "completed",
+      "candidates": 0,
+      "verified": 0,
+      "visited": 4,
+      "queries": 2,
+      "stoppingReason": "diminishing_returns",
+      "elapsedMs": 40895
+    }
+  ],
+  "persistenceSkipped": [
+    "ai_cache",
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "NO_QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "person",
+    "criteria": [
+      "role=founder",
+      "industry=fintech",
+      "location=Berlin",
+      "location_id=geo:city:berlin",
+      "location_kind=city",
+      "location_country=DE",
+      "location_parents=geo:country:de"
+    ],
+    "clarify": [],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_people(country,city_norm,role_norm)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "s3-parquet",
+          "partitions": [
+            "processed/people_by_country/_part=germany/data_0.parquet",
+            "processed/people_by_country/_part=germany/data_1.parquet"
+          ],
+          "scanned": 11950,
+          "matched": 0
+        }
+      ],
+      "rawCandidates": 0,
+      "postSpecFilter": 0,
+      "timings": {
+        "understanding_ms": 5409,
+        "stored_search_ms": 3100,
+        "research_ms": 41115,
+        "enrichment_ms": 4,
+        "qualification_ms": 358,
+        "total_ms": 49986
+      },
+      "researchable": 0,
+      "complete": 0,
+      "pendingEnrichment": 0,
+      "qualificationRejected": 0,
+      "qualified": 0,
+      "returned": 0,
+      "reason": "SOURCE_UNAVAILABLE",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "direct-http",
+            "label": "Public websites",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "searxng",
+            "label": "The web",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "browser-live",
+            "label": "Public websites",
+            "state": "empty",
+            "reason": "NO_RESULTS"
+          }
+        ],
+        "degraded": true,
+        "summary": null
+      }
+    },
+    "rowsReturned": 0,
+    "rows": [],
+    "diagnostics": [
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "direct-http",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "searxng",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      }
+    ],
+    "cancelledAtMs": null,
+    "returnedAtMs": 53843,
+    "candidateLedger": {
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 0,
+        "gated": 0,
+        "filtered": 0,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {},
+      "streamed": 0,
+      "streamedNotReturned": []
+    }
+  }
+}

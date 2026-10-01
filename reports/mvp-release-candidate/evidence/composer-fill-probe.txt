@@ -1,0 +1,1 @@
+[{"mode":"fill","mobile":false,"readyMs":2580,"textareas":1,"intact":true,"changed":[]},{"mode":"fill","mobile":false,"readyMs":1768,"textareas":1,"intact":true,"changed":[]},{"mode":"type","mobile":false,"readyMs":1253,"textareas":1,"intact":true,"changed":[]},{"mode":"fill","mobile":true,"readyMs":990,"textareas":1,"intact":true,"changed":[]}]

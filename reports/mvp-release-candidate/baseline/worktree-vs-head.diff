@@ -1,0 +1,2504 @@
+diff --git a/.kiro/specs/freehire-job-integration/tasks.md b/.kiro/specs/freehire-job-integration/tasks.md
+index 9b67570..218a77d 100644
+--- a/.kiro/specs/freehire-job-integration/tasks.md
++++ b/.kiro/specs/freehire-job-integration/tasks.md
+@@ -44,7 +44,7 @@ This implementation plan converts the FreeHire job integration design into a ser
+     - Verify running ingestion twice with same input produces no duplicates
+     - Verify second run updates existing records (jobs_updated > 0)
+ 
+-- [~] 2. Checkpoint - Phase 1 Verification Complete
++- [ ] 2. Checkpoint - Phase 1 Verification Complete
+   - Verify Docker Compose starts without errors
+   - Verify PostgreSQL and Meilisearch are healthy
+   - Verify FreeHire ingestion completes successfully with live data
+@@ -52,14 +52,14 @@ This implementation plan converts the FreeHire job integration design into a ser
+   - Ensure all Phase 1 tests pass, ask the user if questions arise
+ 
+ - [ ] 3. Canonical Job Model and Schema Reconciliation
+-  - [~] 3.1 Audit FreeHire schema and define canonical model
++  - [ ] 3.1 Audit FreeHire schema and define canonical model
+     - Review FreeHire's existing PostgreSQL schema
+     - Create TypeScript interface CanonicalJob in src/lib/jobs/canonical-model.ts
+     - Include all required fields: id, source, sources, source_job_id, dedupe_id, company_id, company_name, company_domain, title, description, url, location, cities, countries, regions, work_mode, employment_type, seniority, role, category, skills, domains, company_type, relocation, english_level, salary_min, salary_max, salary_currency, posted_at, updated_at, expires_at, is_active, created_at
+     - Create mapping function mapScrapivoToCanonical to convert existing JobPosting type
+     - _Requirements: 3.1, 3.2, 3.3_
+ 
+-  - [~] 3.2 Extend PostgreSQL schema if necessary
++  - [ ] 3.2 Extend PostgreSQL schema if necessary
+     - Compare CanonicalJob fields with FreeHire schema
+     - Create ALTER TABLE migrations for missing fields only if semantically different
+     - Document field mappings between Scrapivo and FreeHire schemas
+@@ -78,20 +78,20 @@ This implementation plan converts the FreeHire job integration design into a ser
+     - _Requirements: 3.1_
+ 
+ - [ ] 4. Deduplication Engine Implementation
+-  - [~] 4.1 Implement deterministic deduplication
++  - [ ] 4.1 Implement deterministic deduplication
+     - Create src/lib/jobs/deduplication.ts
+     - Implement computeDedupeId function using SHA256 hash
+     - Implement normalization functions: normalizeDomain, normalizeTitle, normalizeLocation
+     - Add city alias mappings for common abbreviations
+     - _Requirements: 4.1_
+ 
+-  - [~] 4.2 Implement fuzzy deduplication
++  - [ ] 4.2 Implement fuzzy deduplication
+     - Install rapidfuzz library
+     - Implement fuzzyMatchScore function using token_sort_ratio
+     - Implement shouldMerge function with 0.85 similarity threshold
+     - _Requirements: 4.3, 4.4_
+ 
+-  - [~] 4.3 Implement job record merge logic
++  - [ ] 4.3 Implement job record merge logic
+     - Create merge strategy preferring ATS sources over aggregators
+     - Implement source provenance preservation in sources array
+     - Implement timestamp preservation (earliest posted_at, latest updated_at)
+@@ -126,7 +126,7 @@ This implementation plan converts the FreeHire job integration design into a ser
+     - Test shouldMerge boundary conditions
+ 
+ - [ ] 5. Multi-Tier Source Integration
+-  - [~] 5.1 Implement Tier 2 ATS adapters
++  - [ ] 5.1 Implement Tier 2 ATS adapters
+     - Create src/lib/jobs/tier2-adapters.ts
+     - Implement Greenhouse adapter: https://boards-api.greenhouse.io/v1/boards/{company}/jobs
+     - Implement Lever adapter: https://api.lever.co/v0/postings/{company}?mode=json
+@@ -135,7 +135,7 @@ This implementation plan converts the FreeHire job integration design into a ser
+     - Each adapter should parse source-specific JSON to CanonicalJob model
+     - _Requirements: 5.3, 5.4, 5.5, 5.6, 5.7_
+ 
+-  - [~] 5.2 Implement Tier 3 JobSpy worker
++  - [ ] 5.2 Implement Tier 3 JobSpy worker
+     - Create src/workers/jobspy-worker.ts
+     - Integrate JobSpy Python library via child process or microservice
+     - Implement scheduled fetch for LinkedIn, Indeed, Glassdoor
+@@ -143,7 +143,7 @@ This implementation plan converts the FreeHire job integration design into a ser
+     - Implement isolation so JobSpy failures don't impact Tier 1/2 ingestion
+     - _Requirements: 5.8, 5.9_
+ 
+-  - [~] 5.3 Implement ingestion error handling and metrics
++  - [ ] 5.3 Implement ingestion error handling and metrics
+     - Create src/lib/jobs/ingestion-error-handler.ts
+     - Implement error classification (network, parse, validation, database)
+     - Record errors in ingestion_runs table with job_url, error_type, message, stack_trace
+@@ -166,26 +166,26 @@ This implementation plan converts the FreeHire job integration design into a ser
+     - Test error handling for malformed responses
+     - Test pagination for SmartRecruiters adapter
+ 
+-- [~] 6. Checkpoint - Multi-Source Ingestion Working
++- [ ] 6. Checkpoint - Multi-Source Ingestion Working
+   - Verify Tier 2 adapters can fetch and normalize jobs
+   - Verify JobSpy worker runs without blocking main ingestion
+   - Verify errors are logged and other sources continue processing
+   - Ensure all tests pass, ask the user if questions arise
+ 
+ - [ ] 7. PostgreSQL Integration and Meilisearch Configuration
+-  - [~] 7.1 Configure database connection pooling
++  - [ ] 7.1 Configure database connection pooling
+     - Set up PostgreSQL client with connection pool (min: 5, max: 20)
+     - Implement connection health checks on startup
+     - Implement error handling for connection limit exceeded
+     - _Requirements: 6.5, 6.6, 6.7, 6.8_
+ 
+-  - [~] 7.2 Implement PostgreSQL-first write ordering
++  - [ ] 7.2 Implement PostgreSQL-first write ordering
+     - Ensure all job writes commit to PostgreSQL before Meilisearch indexing
+     - Implement async Meilisearch indexing with 5-second timeout
+     - Log warnings if indexing exceeds timeout
+     - _Requirements: 6.1, 6.2, 2.4, 2.5_
+ 
+-  - [~] 7.3 Configure Meilisearch index settings
++  - [ ] 7.3 Configure Meilisearch index settings
+     - Reuse FreeHire's Meilisearch configuration
+     - Set searchableAttributes: title, description, company_name, location, cities, countries, skills, domains, role, category
+     - Set filterableAttributes: collections, regions, work_mode, role, category, ai_archetype, seniority, skills, domains, company_type, countries, cities, relocation, employment_type, english_level, salary_min, salary_max, salary_currency, is_active
+@@ -193,7 +193,7 @@ This implementation plan converts the FreeHire job integration design into a ser
+     - Configure synonyms for common skill abbreviations
+     - _Requirements: 7.1, 7.2, 7.3, 7.9_
+ 
+-  - [~] 7.4 Implement Meilisearch index rebuild function
++  - [ ] 7.4 Implement Meilisearch index rebuild function
+     - Create function to rebuild entire Meilisearch index from PostgreSQL
+     - Filter for active jobs only (is_active = true)
+     - _Requirements: 6.3, 6.4_
+@@ -209,7 +209,7 @@ This implementation plan converts the FreeHire job integration design into a ser
+     - Verify rebuilt index contains all and only active jobs from PostgreSQL
+ 
+ - [ ] 8. Meilisearch Query Adapter Implementation
+-  - [~] 8.1 Create Meilisearch query adapter
++  - [ ] 8.1 Create Meilisearch query adapter
+     - Create src/lib/jobs/meilisearch-adapter.ts
+     - Implement searchJobs function converting JobSearchFilters to Meilisearch query
+     - Implement buildFilterString to translate Scrapivo filters
+@@ -217,12 +217,12 @@ This implementation plan converts the FreeHire job integration design into a ser
+     - Return jobs, total, facets, page, pageSize
+     - _Requirements: 7.4, 7.5, 7.6, 7.8_
+ 
+-  - [~] 8.2 Implement pagination and facet aggregation
++  - [ ] 8.2 Implement pagination and facet aggregation
+     - Enforce page size limits (min: 10, max: 100)
+     - Return facet counts for work_mode, seniority, employment_type, countries, regions, company_type
+     - _Requirements: 7.6, 7.7, 7.8_
+ 
+-  - [~] 8.3 Implement search error handling with graceful degradation
++  - [ ] 8.3 Implement search error handling with graceful degradation
+     - Create src/lib/jobs/search-error-handler.ts
+     - Fall back to PostgreSQL queries if Meilisearch unavailable
+     - Return empty result set with error message for invalid queries
+@@ -245,13 +245,13 @@ This implementation plan converts the FreeHire job integration design into a ser
+     - Test response time requirements (<200ms for queries under 50 chars)
+ 
+ - [ ] 9. Profile Matching Engine - Deterministic Scoring
+-  - [~] 9.1 Create user profile data model
++  - [ ] 9.1 Create user profile data model
+     - Create src/lib/profile/types.ts
+     - Define UserProfile interface with skills, experience_years, seniority, quotas, notification preferences
+     - Define NotificationChannel interface
+     - _Requirements: 9.1_
+ 
+-  - [~] 9.2 Implement deterministic match score computation
++  - [ ] 9.2 Implement deterministic match score computation
+     - Create src/lib/matching/deterministic-matcher.ts
+     - Implement computeMatch function returning MatchResult
+     - Compute skills_have as exact intersection (case-insensitive)
+@@ -260,7 +260,7 @@ This implementation plan converts the FreeHire job integration design into a ser
+     - Compute match_percentage using formula: ((h + 0.5 * c) / r) * 100
+     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6_
+ 
+-  - [~] 9.3 Add skill synonym mappings
++  - [ ] 9.3 Add skill synonym mappings
+     - Define SKILL_SYNONYMS dictionary for common abbreviations
+     - Support js/javascript, ts/typescript, py/python, k8s/kubernetes, etc.
+     - _Requirements: 9.3_
+@@ -297,21 +297,21 @@ This implementation plan converts the FreeHire job integration design into a ser
+     - Test edge cases (empty profile, no required skills, 100% match)
+ 
+ - [ ] 10. Profile Matching Engine - Deep Analysis (Optional LLM)
+-  - [~] 10.1 Implement deep match analysis with LLM
++  - [ ] 10.1 Implement deep match analysis with LLM
+     - Create src/lib/matching/deep-matcher.ts
+     - Implement computeDeepMatch function returning DeepMatchResult
+     - Construct LLM prompt with candidate profile and job description
+     - Cache results by (profile_id, job_id) combination with 30-day TTL
+     - _Requirements: 10.1, 10.2, 10.3, 10.4_
+ 
+-  - [~] 10.2 Implement deep match quota management
++  - [ ] 10.2 Implement deep match quota management
+     - Check user quota before calling LLM
+     - Reject requests if quota exhausted
+     - Decrement quota after successful analysis
+     - Return cached results without consuming quota
+     - _Requirements: 10.5, 10.6, 10.7_
+ 
+-  - [~] 10.3 Implement LLM error handling
++  - [ ] 10.3 Implement LLM error handling
+     - Create src/lib/matching/match-error-handler.ts
+     - Handle quota exhaustion with friendly error message
+     - Fall back to deterministic match if LLM unavailable
+@@ -335,14 +335,14 @@ This implementation plan converts the FreeHire job integration design into a ser
+     - Test quota enforcement logic
+     - Test error handling for LLM unavailability
+ 
+-- [~] 11. Checkpoint - Profile Matching Complete
++- [ ] 11. Checkpoint - Profile Matching Complete
+   - Verify deterministic match scores are computed correctly
+   - Verify deep match analysis works with LLM (if configured)
+   - Verify quota enforcement prevents overuse
+   - Ensure all matching tests pass, ask the user if questions arise
+ 
+ - [ ] 12. Email Generation Service
+-  - [~] 12.1 Implement personalized email generation
++  - [ ] 12.1 Implement personalized email generation
+     - Create src/lib/email/email-generator.ts
+     - Accept inputs: candidate profile, job description, company context
+     - Ground all statements in supplied candidate data
+@@ -356,24 +356,24 @@ This implementation plan converts the FreeHire job integration design into a ser
+     - Test handling of missing profile fields
+ 
+ - [ ] 13. Notification System Implementation
+-  - [~] 13.1 Create notification service
++  - [ ] 13.1 Create notification service
+     - Create src/lib/notifications/notification-service.ts
+     - Support Telegram, Discord, Email, Slack, WhatsApp channels
+     - Send notifications for new jobs matching saved search criteria
+     - Include job title, company, location, match percentage, direct link
+     - _Requirements: 15.1, 15.2, 15.3_
+ 
+-  - [~] 13.2 Implement notification rate limiting
++  - [ ] 13.2 Implement notification rate limiting
+     - Enforce max 10 notifications per user per hour
+     - Track notification counts per user per time window
+     - _Requirements: 15.4, 15.5_
+ 
+-  - [~] 13.3 Implement notification retry logic
++  - [ ] 13.3 Implement notification retry logic
+     - Retry failed notifications up to 3 times with exponential backoff (1s, 2s, 4s)
+     - Log all failures
+     - _Requirements: 15.6, 15.8_
+ 
+-  - [~] 13.4 Implement notification preferences management
++  - [ ] 13.4 Implement notification preferences management
+     - Create UI for managing notification channels
+     - Allow users to enable/disable channels
+     - Provide notification history view
+@@ -405,30 +405,30 @@ This implementation plan converts the FreeHire job integration design into a ser
+     - Test retry logic with simulated failures
+ 
+ - [ ] 14. Frontend Integration with Scrapivo UI
+-  - [~] 14.1 Migrate job search to Meilisearch queries
++  - [ ] 14.1 Migrate job search to Meilisearch queries
+     - Update src/routes/_authenticated/jobs.tsx
+     - Replace in-memory filtering with Meilisearch queries via TanStack server functions
+     - Preserve existing UI components and layout
+     - _Requirements: 12.1, 12.2, 19.2, 19.3_
+ 
+-  - [~] 14.2 Implement match sidebar component
++  - [ ] 14.2 Implement match sidebar component
+     - Display match percentage, skills_have, skills_close, skills_missing
+     - Add "Analyze Match" button for deep analysis
+     - Show deep match results (compatibility_score, reasoning, strengths, gaps, recommendations)
+     - _Requirements: 12.5, 9.7_
+ 
+-  - [~] 14.3 Implement job detail view
++  - [ ] 14.3 Implement job detail view
+     - Display full job description with company, location, salary, requirements
+     - Show source badge indicating data provenance
+     - Integrate match sidebar
+     - _Requirements: 12.4_
+ 
+-  - [~] 14.4 Implement bookmarking functionality
++  - [ ] 14.4 Implement bookmarking functionality
+     - Allow users to save jobs for later review
+     - Display bookmarked jobs in separate view
+     - _Requirements: 12.6_
+ 
+-  - [~] 14.5 Update job card display
++  - [ ] 14.5 Update job card display
+     - Show title, company, location, work_mode, seniority, salary, source badge
+     - Display match percentage if user has profile
+     - _Requirements: 12.3_
+@@ -444,7 +444,7 @@ This implementation plan converts the FreeHire job integration design into a ser
+     - Test match sidebar display
+     - Test responsive design on mobile and desktop
+ 
+-- [~] 15. Checkpoint - Frontend Integration Complete
++- [ ] 15. Checkpoint - Frontend Integration Complete
+   - Verify search UI works with Meilisearch queries
+   - Verify job details display correctly
+   - Verify match sidebar shows accurate scores
+@@ -452,19 +452,19 @@ This implementation plan converts the FreeHire job integration design into a ser
+   - Ensure all tests pass, ask the user if questions arise
+ 
+ - [ ] 16. Migration from In-Memory to Persistent Storage
+-  - [~] 16.1 Refactor job registry to use PostgreSQL
++  - [ ] 16.1 Refactor job registry to use PostgreSQL
+     - Remove in-memory job arrays from src/lib/jobs/registry.ts
+     - Replace with PostgreSQL queries
+     - Remove dedupeJobs function (rely on database-level deduplication)
+     - _Requirements: 19.1, 19.4_
+ 
+-  - [~] 16.2 Update existing job source adapters
++  - [ ] 16.2 Update existing job source adapters
+     - Refactor adapters to write to PostgreSQL instead of returning arrays
+     - Ensure adapters call deduplication logic
+     - Ensure adapters record ingestion run metadata
+     - _Requirements: 19.6, 19.8_
+ 
+-  - [~] 16.3 Preserve backward compatibility
++  - [ ] 16.3 Preserve backward compatibility
+     - Maintain JobPosting TypeScript interface
+     - Maintain JobSearchFilters interface
+     - _Requirements: 19.5, 19.8_
+@@ -496,21 +496,21 @@ This implementation plan converts the FreeHire job integration design into a ser
+     - Verify parse(serialize(job)) == job for all valid canonical jobs from SmartRecruiters
+ 
+ - [ ] 18. Data Retention and Privacy Implementation
+-  - [~] 18.1 Implement data retention policy
++  - [ ] 18.1 Implement data retention policy
+     - Create job archival process for records inactive > 90 days
+     - Create separate archive table for historical data
+     - _Requirements: 20.1, 20.2_
+ 
+-  - [~] 18.2 Implement encryption for sensitive fields
++  - [ ] 18.2 Implement encryption for sensitive fields
+     - Encrypt user profile sensitive fields (email, contact details, API keys)
+     - Use TLS for data transmission between services
+     - _Requirements: 20.3, 20.4_
+ 
+-  - [~] 18.3 Implement data export API
++  - [ ] 18.3 Implement data export API
+     - Allow users to download all profile, search history, bookmarks, notifications
+     - _Requirements: 20.5_
+ 
+-  - [~] 18.4 Implement account deletion
++  - [ ] 18.4 Implement account deletion
+     - Remove all user data within 30 days of deletion request
+     - Delete profile, search history, bookmarks, notification preferences, cached matches
+     - _Requirements: 20.6_
+@@ -536,18 +536,18 @@ This implementation plan converts the FreeHire job integration design into a ser
+     - Verify all user data is removed after deletion
+ 
+ - [ ] 19. Ingestion Observability and Monitoring
+-  - [~] 19.1 Implement ingestion run metrics tracking
++  - [ ] 19.1 Implement ingestion run metrics tracking
+     - Record started_at, completed_at, duration for each run
+     - Track jobs_seen, jobs_created, jobs_updated, jobs_deactivated, jobs_failed
+     - Capture errors with stack traces in errors field
+     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7_
+ 
+-  - [~] 19.2 Implement stale job auto-deactivation
++  - [ ] 19.2 Implement stale job auto-deactivation
+     - Check job age against source-specific refresh interval
+     - Automatically mark stale jobs inactive
+     - _Requirements: 8.10_
+ 
+-  - [~] 19.3 Create ingestion status API endpoint
++  - [ ] 19.3 Create ingestion status API endpoint
+     - Return most recent ingestion run status for each source
+     - Include metrics and error details
+     - _Requirements: 8.9_
+@@ -568,29 +568,29 @@ This implementation plan converts the FreeHire job integration design into a ser
+     - Test ingestion status API response format
+ 
+ - [ ] 20. Final Integration and End-to-End Testing
+-  - [~] 20.1 Integration testing for complete workflow
++  - [ ] 20.1 Integration testing for complete workflow
+     - Test job ingestion from source to PostgreSQL to Meilisearch to UI
+     - Test profile matching with deterministic and deep analysis
+     - Test notification delivery for matched jobs
+     - Test email generation for applications
+ 
+-  - [~] 20.2 Performance testing
++  - [ ] 20.2 Performance testing
+     - Verify search response times <200ms for typical queries
+     - Verify Meilisearch indexing completes within 5 seconds
+     - Verify connection pool handles concurrent requests
+ 
+-  - [~] 20.3 Error recovery testing
++  - [ ] 20.3 Error recovery testing
+     - Test graceful degradation when Meilisearch unavailable
+     - Test ingestion continues when one source fails
+     - Test notification retry logic with simulated failures
+ 
+-  - [~] 20.4 Documentation and deployment guide
++  - [ ] 20.4 Documentation and deployment guide
+     - Document Docker Compose setup for Windows
+     - Document environment variable configuration
+     - Document ingestion scheduling and monitoring
+     - Document API endpoints and TypeScript interfaces
+ 
+-- [~] 21. Final Checkpoint - Project Complete
++- [ ] 21. Final Checkpoint - Project Complete
+   - All Phase 1 verification criteria met
+   - All ingestion tiers operational (FreeHire, Tier 2, Tier 3)
+   - Profile matching and email generation working
+diff --git a/freehire b/freehire
+--- a/freehire
++++ b/freehire
+@@ -1 +1 @@
+-Subproject commit 59718b25cb4834c4ced8e661c0bcbaf3ee2706f5
++Subproject commit 59718b25cb4834c4ced8e661c0bcbaf3ee2706f5-dirty
+diff --git a/src/components/discover/clarify-panel.tsx b/src/components/discover/clarify-panel.tsx
+index b09fe5f..c180b78 100644
+--- a/src/components/discover/clarify-panel.tsx
++++ b/src/components/discover/clarify-panel.tsx
+@@ -56,8 +56,8 @@ export function ClarifyPanel({ questions, refinement, onApply, onDismiss, disabl
+   };
+ 
+   return (
+-    <div className="space-y-3 rounded-2xl border border-primary/25 bg-primary/5 p-4">
+-      <div className="flex items-start justify-between gap-2">
++    <div className="flex max-h-[65dvh] min-h-0 flex-col gap-3 overflow-hidden rounded-2xl border border-primary/25 bg-primary/5 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:max-h-none sm:overflow-visible">
++      <div className="flex shrink-0 items-start justify-between gap-2">
+         <div className="flex items-center gap-1.5 text-xs font-medium text-primary">
+           <Sparkles className="size-3.5" />
+           Narrow this down
+@@ -79,7 +79,7 @@ export function ClarifyPanel({ questions, refinement, onApply, onDismiss, disabl
+         aria-valuenow={step + 1}
+         aria-valuemin={1}
+         aria-valuemax={questions.length}
+-        className="h-1 w-full overflow-hidden rounded-full bg-primary/10"
++        className="h-1 w-full shrink-0 overflow-hidden rounded-full bg-primary/10"
+       >
+         <div
+           className="h-full rounded-full bg-primary transition-all"
+@@ -88,14 +88,14 @@ export function ClarifyPanel({ questions, refinement, onApply, onDismiss, disabl
+       </div>
+ 
+       {refinement && step === 0 ? (
+-        <p className="text-[11px] text-muted-foreground">
++        <p className="shrink-0 text-[11px] text-muted-foreground">
+           Right now we assumed: <span className="text-foreground/80">{refinement}</span>
+         </p>
+       ) : null}
+ 
+-      <p className="text-sm font-medium">{q.question}</p>
++      <p className="shrink-0 text-sm font-medium">{q.question}</p>
+ 
+-      <div className="space-y-1.5">
++      <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto overscroll-contain pr-1 sm:overflow-visible">
+         {q.options.map((o) => (
+           <button
+             key={o.id}
+@@ -143,7 +143,7 @@ export function ClarifyPanel({ questions, refinement, onApply, onDismiss, disabl
+         ) : null}
+       </div>
+ 
+-      <div className="flex items-center justify-between gap-2 pt-1">
++      <div className="flex shrink-0 items-center justify-between gap-2 border-t border-border/60 bg-card/80 pt-2">
+         <button
+           onClick={() => {
+             setOtherText("");
+diff --git a/src/components/discover/discover-welcome-hero.tsx b/src/components/discover/discover-welcome-hero.tsx
+index d2cff5f..a3b21b2 100644
+--- a/src/components/discover/discover-welcome-hero.tsx
++++ b/src/components/discover/discover-welcome-hero.tsx
+@@ -1,23 +1,23 @@
+ import { Mascot } from "page-mascot";
+ import { useIsMobile } from "@/hooks/use-mobile";
+ 
+-const QUICK_CHIPS = [
+-  { label: "Find investors", query: "find me investors" },
+-  { label: "Find founders", query: "find me founders" },
+-  { label: "Find companies", query: "find me SaaS companies" },
+-  { label: "Find jobs", query: "find me remote frontend jobs" },
+-  { label: "Find local businesses", query: "find plumbers in Austin" },
++export type GuidedSearchKind = "investors" | "founders" | "companies" | "jobs" | "local_businesses";
++
++const QUICK_CHIPS: Array<{ label: string; kind: GuidedSearchKind }> = [
++  { label: "Find investors", kind: "investors" },
++  { label: "Find founders", kind: "founders" },
++  { label: "Find companies", kind: "companies" },
++  { label: "Find jobs", kind: "jobs" },
++  { label: "Find local businesses", kind: "local_businesses" },
+ ];
+ 
+ export function DiscoverWelcomeHero({
+   greetingName,
+-  onQuickSearch,
++  onGuidedStart,
+ }: {
+   greetingName?: string;
+-  /** Chip taps flow through the SAME composer pipeline — Scrapy guides, the
+-      composer stays universal. The query then hits the readiness gate, so a
+-      bare "find me investors" becomes one conversational question. */
+-  onQuickSearch?: (query: string) => void;
++  /** A category hint for the canonical clarification pipeline, never a demo query. */
++  onGuidedStart?: (kind: GuidedSearchKind) => void;
+ }) {
+   const firstName = greetingName?.trim() ? greetingName.trim().split(" ")[0] : null;
+   // Single instance: page-mascot mounts a fixed-position canvas, so CSS
+@@ -32,7 +32,9 @@ export function DiscoverWelcomeHero({
+           respects prefers-reduced-motion. */}
+       {/* Scrapy speaks first — conversational onboarding, not a landing page. */}
+       <div className="relative mx-auto mb-3 max-w-sm rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-white/85 backdrop-blur-sm">
+-        {firstName ? `Hey ${firstName} 👋 I'm Scrapy. What are you looking for today?` : "Hey 👋 I'm Scrapy. What are you looking for today?"}
++        {firstName
++          ? `Hey ${firstName} 👋 I'm Scrapy. What are you looking for today?`
++          : "Hey 👋 I'm Scrapy. What are you looking for today?"}
+         <span className="absolute -bottom-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-b border-r border-white/10 bg-white/[0.06]" />
+       </div>
+       <div className="mt-4 flex justify-center">
+@@ -44,13 +46,13 @@ export function DiscoverWelcomeHero({
+         />
+       </div>
+ 
+-      {/* Quick paths — same pipeline as typing; power users keep the composer. */}
++      {/* Category hints enter the same clarification pipeline as typed requests. */}
+       <div className="mt-5 flex flex-wrap justify-center gap-2">
+         {QUICK_CHIPS.map((chip) => (
+           <button
+             key={chip.label}
+             type="button"
+-            onClick={() => onQuickSearch?.(chip.query)}
++            onClick={() => onGuidedStart?.(chip.kind)}
+             className="rounded-full border border-white/15 bg-white/[0.05] px-3.5 py-1.5 text-xs font-medium text-white/80 transition-colors hover:border-primary/50 hover:bg-primary/10 hover:text-white"
+           >
+             {chip.label}
+diff --git a/src/components/discover/entity-detail-panel.tsx b/src/components/discover/entity-detail-panel.tsx
+index 766d80a..1af0fe9 100644
+--- a/src/components/discover/entity-detail-panel.tsx
++++ b/src/components/discover/entity-detail-panel.tsx
+@@ -7,6 +7,7 @@ import type { ResolvedContactInfo } from "@/components/discover/result-tabs";
+ import { TIER_LABEL, type EvidenceObject } from "@/lib/intent/evidence";
+ import { ensureHttpUrl } from "@/lib/search/site-url";
+ import { fixMojibake } from "@/lib/encoding";
++import { publicSourceLabel } from "@/lib/search/activity-presenter";
+ // getWebsiteBio is a serverFn — TanStack Start replaces the import with a
+ // client stub, so this value import is safe. The type import is the same module.
+ import { getWebsiteBio, type WebsiteBio } from "@/lib/search/website-bio.server";
+@@ -273,7 +274,8 @@ export function EntityDetailPanel({
+             {c.latest_signal && (
+               <Row label="Latest">
+                 <span className="inline-flex items-center gap-1 text-sm">
+-                  <Clock className="size-3.5 text-muted-foreground" /> {fixMojibake(c.latest_signal)}
++                  <Clock className="size-3.5 text-muted-foreground" />{" "}
++                  {fixMojibake(c.latest_signal)}
+                 </span>
+               </Row>
+             )}
+@@ -288,7 +290,10 @@ export function EntityDetailPanel({
+             {c.platforms?.length > 0 && (
+               <Row label="Seen on">
+                 <span className="text-sm text-muted-foreground">
+-                  {c.platforms.slice(0, 6).join(" · ")}
++                  {c.platforms
++                    .slice(0, 6)
++                    .map((source) => publicSourceLabel(source, c.sample_url))
++                    .join(" · ")}
+                   {c.signal_count > 1 ? ` · ${c.signal_count} signals` : ""}
+                 </span>
+               </Row>
+@@ -313,7 +318,12 @@ export function EntityDetailPanel({
+             {(p.platform || p.posted_at_relative) && (
+               <Row label="Source">
+                 <span className="text-sm text-muted-foreground">
+-                  {[p.platform, p.posted_at_relative].filter(Boolean).join(" · ")}
++                  {[
++                    p.platform ? publicSourceLabel(p.platform, p.sample_url) : null,
++                    p.posted_at_relative,
++                  ]
++                    .filter(Boolean)
++                    .join(" · ")}
+                   {p.signal_count > 1 ? ` · ${p.signal_count} signals` : ""}
+                 </span>
+               </Row>
+@@ -321,7 +331,8 @@ export function EntityDetailPanel({
+             {p.location_hint && (
+               <Row label="Location">
+                 <span className="inline-flex items-center gap-1 text-sm">
+-                  <MapPin className="size-3.5 text-muted-foreground" /> {fixMojibake(p.location_hint)}
++                  <MapPin className="size-3.5 text-muted-foreground" />{" "}
++                  {fixMojibake(p.location_hint)}
+                 </span>
+               </Row>
+             )}
+@@ -461,7 +472,7 @@ export function EntityDetailPanel({
+                   <p className="text-xs text-foreground/80">{ev.reason}</p>
+                   <p className="text-[11px] text-muted-foreground line-clamp-2">“{ev.excerpt}”</p>
+                   <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-muted-foreground">
+-                    <span>{ev.source}</span>
++                    <span>{publicSourceLabel(ev.source, ev.url)}</span>
+                     {ev.publishedAt ? (
+                       <span>{new Date(ev.publishedAt).toLocaleDateString()}</span>
+                     ) : null}
+@@ -524,7 +535,9 @@ export function EntityDetailPanel({
+             >
+               <div className="flex items-center gap-2 text-[10px] text-muted-foreground mb-1">
+                 <FileText className="size-3" />
+-                <span className="truncate">{l.platform_label ?? l.platform ?? "Signal"}</span>
++                <span className="truncate">
++                  {publicSourceLabel(l.platform_label ?? l.platform, l.full_post_url)}
++                </span>
+                 {l.posted_at_relative ? (
+                   <span className="ml-auto shrink-0">{l.posted_at_relative}</span>
+                 ) : null}
+diff --git a/src/components/discover/result-tabs.tsx b/src/components/discover/result-tabs.tsx
+index f410421..052a691 100644
+--- a/src/components/discover/result-tabs.tsx
++++ b/src/components/discover/result-tabs.tsx
+@@ -10,6 +10,7 @@ import { IntentBadge } from "@/components/discover/intent-badge";
+ import type { SignalTier } from "@/lib/intent/strategy";
+ import { Button } from "@/components/ui/button";
+ import { ensureHttpUrl } from "@/lib/search/site-url";
++import { publicSourceLabel } from "@/lib/search/activity-presenter";
+ 
+ /** Verified-intent badge input (null/undefined = no badge, never shown). */
+ export type IntentBadgeInput = { tier: SignalTier; confidence?: number } | null | undefined;
+@@ -245,7 +246,7 @@ export function CompanyCard({
+               key={p}
+               className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground"
+             >
+-              {p}
++              {publicSourceLabel(p, row.sample_url)}
+             </span>
+           ))}
+         </div>
+@@ -356,7 +357,7 @@ export function PersonCard({
+             {intent ? <IntentBadge tier={intent.tier} confidence={intent.confidence} /> : null}
+             {row.platform && (
+               <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground truncate max-w-[130px]">
+-                {row.platform}
++                {publicSourceLabel(row.platform, row.sample_url)}
+               </span>
+             )}
+             {row.posted_at_relative ? (
+@@ -947,7 +948,7 @@ export function PostsList({ leads, onOpen }: { leads: Lead[]; onOpen: (l: Lead)
+           <span className="min-w-0 flex-1">
+             <span className="block text-sm font-medium truncate">{l.title}</span>
+             <span className="block text-[11px] text-muted-foreground truncate">
+-              {l.platform ?? l.source ?? "Post"}
++              {publicSourceLabel(l.platform ?? l.source, l.full_post_url)}
+             </span>
+           </span>
+           <ExternalLink className="size-3.5 text-muted-foreground shrink-0" />
+diff --git a/src/components/discover/scrapy-browser.tsx b/src/components/discover/scrapy-browser.tsx
+index 3beedbf..5ff1d94 100644
+--- a/src/components/discover/scrapy-browser.tsx
++++ b/src/components/discover/scrapy-browser.tsx
+@@ -12,13 +12,14 @@
+ import { useEffect, useRef, useState } from "react";
+ import { ExternalLink, Eye, EyeOff, Globe, PauseCircle } from "lucide-react";
+ import { getScrapyBrowserState } from "@/lib/spec-search.functions";
++import { presentActivityEvent, publicSourceLabel } from "@/lib/search/activity-presenter";
+ 
+ type ScrapyState = Awaited<ReturnType<typeof getScrapyBrowserState>>;
+ 
+ function domainOf(url: string | null | undefined): string {
+   if (!url) return "";
+   try {
+-    return new URL(url).hostname.replace(/^www\./, "");
++    return publicSourceLabel(null, url);
+   } catch {
+     return "";
+   }
+@@ -60,8 +61,14 @@ export function ScrapyBrowser({ runId }: { runId: string | null }) {
+     };
+   }, [runId]);
+ 
+-  if (!runId || !state || state.pagesVisited === 0) return null;
++  // A session can exist before its first navigation; show that state so the
++  // research surface does not disappear while the browser is starting.
++  if (!runId || !state || !state.status) return null;
+   const domain = domainOf(state.currentUrl);
++  const browsing = state.active;
++  const title = state.currentTitle
++    ? presentActivityEvent({ action: state.currentTitle }).action
++    : null;
+ 
+   if (!expanded) {
+     return (
+@@ -71,11 +78,14 @@ export function ScrapyBrowser({ runId }: { runId: string | null }) {
+         className="mt-2 flex w-full items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-left text-xs text-muted-foreground transition-colors hover:border-primary/40"
+       >
+         <span className="relative flex size-2 shrink-0">
+-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
++          {browsing && (
++            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
++          )}
+           <span className="relative inline-flex size-2 rounded-full bg-primary" />
+         </span>
+         <span className="min-w-0 flex-1 truncate">
+-          Scrapy is browsing{domain ? ` · ${domain}` : ""} · {state.pagesVisited} pages · {elapsed(state.elapsedMs)}
++          {browsing ? "Scrapy is browsing" : "Scrapy browser session"}
++          {domain ? ` · ${domain}` : ""} · {state.pagesVisited} pages · {elapsed(state.elapsedMs)}
+         </span>
+         <Eye className="size-3.5 shrink-0" />
+       </button>
+@@ -86,7 +96,9 @@ export function ScrapyBrowser({ runId }: { runId: string | null }) {
+     <div className="mt-2 overflow-hidden rounded-xl border border-border bg-card">
+       <div className="flex items-center gap-2 border-b border-border px-3 py-2">
+         <span className="relative flex size-2 shrink-0">
+-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
++          {browsing && (
++            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
++          )}
+           <span className="relative inline-flex size-2 rounded-full bg-primary" />
+         </span>
+         <span className="text-xs font-medium text-foreground">Scrapy</span>
+@@ -115,13 +127,15 @@ export function ScrapyBrowser({ runId }: { runId: string | null }) {
+         />
+       ) : (
+         <div className="flex h-32 items-center justify-center bg-black/40 text-xs text-muted-foreground">
+-          Capturing page…
++          {browsing ? "Opening a page…" : "No page captured"}
+         </div>
+       )}
+       <div className="space-y-1 px-3 py-2 text-xs text-muted-foreground">
+         <div className="flex items-center gap-1.5">
+-          <span className="text-foreground">{state.currentAction ?? "Working"}</span>
+-          {state.currentTitle ? <span className="truncate">· {state.currentTitle}</span> : null}
++          <span className="text-foreground">
++            {presentActivityEvent({ action: state.currentAction ?? "Working" }).action}
++          </span>
++          {title && title !== "Working" ? <span className="truncate">· {title}</span> : null}
+         </div>
+         <div className="flex items-center gap-3">
+           <span>{state.pagesVisited} pages</span>
+diff --git a/src/components/lead-card.tsx b/src/components/lead-card.tsx
+index ec5d9a5..675a6df 100644
+--- a/src/components/lead-card.tsx
++++ b/src/components/lead-card.tsx
+@@ -1,4 +1,5 @@
+ import type { Lead } from "@/lib/scoring";
++import { publicSourceLabel } from "@/lib/search/activity-presenter";
+ import {
+   Bookmark,
+   Crown,
+@@ -38,30 +39,11 @@ function displaySource(lead: Lead): string {
+     if (company) return company.charAt(0).toUpperCase() + company.slice(1);
+     return "Company careers";
+   }
+-  if (lead.source === "secedgar") return "SEC filing";
+-  if (lead.source === "news") return "News";
+   const label = lead.platform_label ?? lead.platform ?? "";
+   if (label) {
+-    return label.includes(":") ? label.split(":").slice(1).join(":").trim() || label : label;
++    return publicSourceLabel(label, lead.full_post_url);
+   }
+-  const fallback: Record<string, string> = {
+-    reddit: "Reddit",
+-    redditrss: "Reddit",
+-    linkedin: "LinkedIn",
+-    twitter: "X",
+-    instagram: "Instagram",
+-    facebook: "Facebook",
+-    hn: "Hacker News",
+-    bluesky: "Bluesky",
+-    mastodon: "Mastodon",
+-    freelancer: "Freelancer",
+-    fiverr: "Fiverr",
+-    serpapi: "Web",
+-    tavily: "Web",
+-    searxng: "Web",
+-    webboolean: "Web",
+-  };
+-  return fallback[lead.source] || lead.source || "Web";
++  return publicSourceLabel(lead.source, lead.full_post_url);
+ }
+ 
+ function VerificationBadge({ lead }: { lead: Lead }) {
+@@ -202,9 +184,9 @@ export function LeadCard({
+       <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
+         <span className="truncate">
+           {!isDirectory
+-            ? (lead.source.startsWith("canonical-")
++            ? lead.source.startsWith("canonical-")
+               ? (lead.author ?? "")
+-              : (lead.author ?? "anon"))
++              : (lead.author ?? "anon")
+             : ""}
+           {!isDirectory && lead.engagement != null ? ` · ${lead.engagement} eng.` : ""}
+         </span>
+diff --git a/src/lib/research-agent/orchestrator.server.ts b/src/lib/research-agent/orchestrator.server.ts
+index 3bb9d25..fd3fe74 100644
+--- a/src/lib/research-agent/orchestrator.server.ts
++++ b/src/lib/research-agent/orchestrator.server.ts
+@@ -167,7 +167,11 @@ function requiredValue(row: SpecRow, field: string): boolean {
+   const value = field.toLowerCase().replace(/[\s-]+/g, "_");
+   if (value === "email") return !!row.email;
+   if (value === "phone" || value === "phone_number") return !!row.phone;
+-  if (value === "website" || value === "url") return !!row.url;
++  if (value === "website") return !!row.website_url;
++  if (value === "url") return !!row.url;
++  if (value === "socials" || value === "social" || value === "social_profiles") {
++    return !!row.evidence?.some((item) => item.source_type === "social" && !!item.source_url);
++  }
+   if (value === "contact" || value === "public_contact" || value === "contact_channel") return !!(row.email || row.phone || row.url);
+   if (value === "location" || value === "geography") return !!(row.location || row.country);
+   if (value === "role" || value === "title") return !!(row.title && row.detail);
+diff --git a/src/lib/search/activity-presenter.ts b/src/lib/search/activity-presenter.ts
+index 3559c81..37aecfe 100644
+--- a/src/lib/search/activity-presenter.ts
++++ b/src/lib/search/activity-presenter.ts
+@@ -1,81 +1,149 @@
+-/**
+- * Public activity presentation — the privacy boundary between Scrapy's
+- * internals and what the user sees.
+- *
+- * Internal event may know about SearXNG, DuckDuckGo, parquet tiers, provider
+- * ladders, adapters. The USER sees product concepts only: "Checking saved
+- * leads", "Searching the web", "Opening result", "Resolving company
+- * website". Any event text that would leak infrastructure is dropped.
+- */
++/** The public boundary for activity text and source labels. Keep raw telemetry internal. */
++import type { StreamedLead } from "@/lib/search/search-browser-progress.server";
+ 
+ const SOURCE_LABELS: Record<string, string> = {
+-  database: "saved leads",
+-  "s3-parquet": "saved leads",
+-  "pg-index": "saved leads",
+-  "hot-index": "saved leads",
+-  "live-web": "online leads",
+-  "live-osm": "public maps",
+-  "live-jobs": "job boards",
+-  osm: "public maps",
+-  web: "the web",
+-  searxng: "the web",
+-  duckduckgo: "the web",
+-  jobs: "job boards",
+-  browser: "online leads",
+-  enrich: "public contacts",
+-  verification: "verification",
++  database: "Available records",
++  "s3-parquet": "Available records",
++  "pg-index": "Available records",
++  "hot-index": "Available records",
++  "saved leads": "Available records",
++  "live-web": "Public websites",
++  "live-osm": "Public business sources",
++  "live-jobs": "Public job listings",
++  osm: "Public business sources",
++  openstreetmap: "Public business sources",
++  geoapify: "Public directories",
++  foursquare: "Public directories",
++  web: "The web",
++  searxng: "The web",
++  duckduckgo: "The web",
++  jobs: "Public job listings",
++  browser: "Public websites",
++  enrich: "Public contact details",
++  verification: "Public evidence",
++  linkedin: "LinkedIn",
++  github: "GitHub",
++  techcrunch: "TechCrunch",
++  reddit: "Reddit",
++  youtube: "YouTube",
++  instagram: "Instagram",
++  facebook: "Facebook",
++  tiktok: "TikTok",
++  twitter: "X",
++  x: "X",
++  indeed: "Indeed",
++  glassdoor: "Glassdoor",
++  hn: "Hacker News",
++  bluesky: "Bluesky",
++  mastodon: "Mastodon",
++  freelancer: "Freelancer",
++  fiverr: "Fiverr",
++  redditrss: "Reddit",
++  secedgar: "SEC filing",
++  news: "News",
++  serpapi: "The web",
++  tavily: "The web",
++  webboolean: "The web",
+ };
+ 
+ const ACTION_LABELS: Array<[RegExp, string]> = [
+-  [/^stored search complete$/i, "Checked saved leads"],
++  [/^stored search complete$/i, "Checked available records"],
+   [/^searching candidates$/i, "Searching the web"],
+   [/^searching the web$/i, "Searching the web"],
+   [/^found candidate sources$/i, "Found possible leads"],
+   [/^found search results$/i, "Found possible leads"],
+   [/^found web candidates$/i, "Found possible leads"],
+-  [/^live discovery complete$/i, "Checked online leads"],
++  [/^live discovery complete$/i, "Checked public sources"],
+   [/^read page$/i, "Reading page"],
+   [/^clicking result$/i, "Opening result"],
+   [/^navigating to result$/i, "Opening result"],
+   [/^opened result$/i, "Reading page"],
+   [/^extracted candidates$/i, "Found possible leads"],
+-  [/^checking possible official domain$/i, "Resolving company website"],
+-  [/^resolving official website$/i, "Resolving company website"],
++  [/^checking possible official domain$/i, "Checking company website"],
++  [/^resolving official website$/i, "Checking company website"],
+   [/^official destination resolved$/i, "Found company website"],
+-  [/^checking contact page$/i, "Checking public contacts"],
+-  [/^enrichment pass complete$/i, "Checked public contacts"],
++  [/^checking contact page$/i, "Checking contact details"],
++  [/^enrichment pass complete$/i, "Checked contact details"],
+   [/^leads verified$/i, "Verified leads"],
+   [/^candidate verified$/i, "Lead verified"],
+   [/^leads qualified$/i, "Verified matches ready"],
+   [/^found public contact$/i, "Found public contact"],
+ ];
+ 
++/** Names of providers, storage systems, and implementation details. */
+ const INTERNAL_RE =
+-  /searxng|duckduckgo|provider|adapter|parquet|postgres|supabase|registry-identity|browser-live|pg-index|hot-index|overpass|resilientfetch|json-?ld/i;
++  /\b(?:openstreetmap|osm|searxng|duckduckgo|geoapify|foursquare|s3|parquet|duckdb|supabase|postgres|pg-index|hot-index|saved leads|provider|adapter|overpass|resilientfetch|json-?ld|registry-identity|browser-live)\b/i;
++
++function publicHostname(value: string | null | undefined): string | undefined {
++  if (!value) return undefined;
++  try {
++    const url = new URL(value.includes("://") ? value : `https://${value}`);
++    if (url.protocol !== "https:" && url.protocol !== "http:") return undefined;
++    const host = url.hostname.replace(/^www\./i, "");
++    return host.includes(".") && !INTERNAL_RE.test(host) ? host : undefined;
++  } catch {
++    return undefined;
++  }
++}
++
++function safePublicUrl(value: string | null | undefined): string | null {
++  if (!value) return null;
++  try {
++    const url = new URL(value);
++    return (url.protocol === "https:" || url.protocol === "http:") &&
++      !INTERNAL_RE.test(url.hostname) ? url.toString() : null;
++  } catch {
++    return null;
++  }
++}
++
++/** Use this for every user-visible source or platform label. */
++export function publicSourceLabel(source: string | null | undefined, url?: string | null): string {
++  const key = source?.trim().toLowerCase() ?? "";
++  if (SOURCE_LABELS[key]) return SOURCE_LABELS[key];
++  return publicHostname(url) ?? publicHostname(source) ?? "Public source";
++}
++
++function safeNarrative(value: string | null | undefined): string | undefined {
++  return value && !INTERNAL_RE.test(value) ? value : undefined;
++}
+ 
+ export type PublicActivityEvent = {
+   action: string;
+   source?: string;
+   detail?: string;
+   count?: number | string;
++  row?: StreamedLead;
+ };
+ 
+-/** Map one internal event to its user-safe presentation. */
+-export function presentActivityEvent<T extends { action: string; source?: string; detail?: string; count?: number | string }>(
+-  event: T,
+-): PublicActivityEvent {
+-  let action = event.action ?? "Working";
+-  for (const [re, label] of ACTION_LABELS) {
+-    if (re.test(action)) {
+-      action = label;
+-      break;
+-    }
+-  }
+-  const rawSource = (event.source ?? "").toLowerCase();
+-  let source: string | undefined = SOURCE_LABELS[rawSource];
+-  let detail = event.detail ?? undefined;
+-  if (INTERNAL_RE.test(action)) action = "Working";
+-  if (detail && INTERNAL_RE.test(detail)) detail = undefined;
+-  if (source && INTERNAL_RE.test(source)) source = undefined;
+-  return { action, source, detail, count: event.count };
++/** Preserve the allowlisted progressive row without passing through raw event fields. */
++export function presentActivityEvent(event: {
++  action: string;
++  source?: string;
++  detail?: string;
++  count?: number | string;
++  row?: StreamedLead;
++}): PublicActivityEvent {
++  const mapped = ACTION_LABELS.find(([re]) => re.test(event.action ?? ""));
++  const action = mapped?.[1] ?? safeNarrative(event.action) ?? "Working";
++  const row = event.row && {
++    key: event.row.key,
++    entity_id: event.row.entity_id,
++    kind: event.row.kind,
++    title: safeNarrative(event.row.title) ?? "Verified result",
++    url: safePublicUrl(event.row.url),
++    website_url: safePublicUrl(event.row.website_url),
++    profile_url: safePublicUrl(event.row.profile_url),
++    email: event.row.email,
++    phone: event.row.phone,
++    location: event.row.location,
++    why_match: safeNarrative(event.row.why_match) ?? null,
++  };
++  return {
++    action,
++    source: event.source ? publicSourceLabel(event.source) : undefined,
++    detail: safeNarrative(event.detail),
++    count: event.count,
++    row,
++  };
+ }
+diff --git a/src/lib/search/browser-research.ts b/src/lib/search/browser-research.ts
+index cec03bf..288c28e 100644
+--- a/src/lib/search/browser-research.ts
++++ b/src/lib/search/browser-research.ts
+@@ -4,7 +4,7 @@ import type { Qualification } from "./qualify";
+ import { queryRequiredFields } from "./canonical-contract";
+ import { missingRequiredFields } from "./completeness";
+ 
+-export type ResearchNeed = "identity" | "role" | "company" | "industry" | "location" | "website" | "profile" | "contact" | "signal" | "topic" | "no_website_verification";
++export type ResearchNeed = "identity" | "role" | "company" | "industry" | "location" | "website" | "profile" | "contact" | "social" | "signal" | "topic" | "no_website_verification";
+ export type ResearchStatus = "discovered" | "researching" | "ready_for_qualification" | "verified" | "exhausted" | "rejected";
+ 
+ const requested = (spec: SearchSpec, field: string) => spec.criteria.some((criterion) => criterion.field === field);
+@@ -14,7 +14,12 @@ export function computeResearchNeeds(row: SpecRow, spec: SearchSpec, qualificati
+   const destination = row.kind === "person" ? row.profile_url ?? row.website_url : row.kind === "job" ? row.apply_url : row.website_url;
+   const incomplete = missingRequiredFields({ ...row, url: destination ?? null });
+   const wantsPublicContact = /public contact details?/i.test(spec.raw_query) && !row.email && !row.phone && !row.contact_page_url;
+-  if (qualification.disposition === "qualified" && incomplete.length === 0 && !wantsPublicContact) return [];
++  const required = queryRequiredFields(spec);
++  const missingRequested = required.some((field) =>
++    (field === "email" && !row.email) || (field === "phone" && !row.phone) ||
++    (field === "website" && !row.website_url) ||
++    (field === "socials" && !row.evidence?.some((item) => item.source_type === "social" && !!item.source_url)));
++  if (qualification.disposition === "qualified" && incomplete.length === 0 && !wantsPublicContact && !missingRequested) return [];
+   if (qualification.reject_code === "ENTITY_TYPE_MISMATCH" || qualification.reject_code === "LOCATION_MISMATCH") return [];
+   const needs: ResearchNeed[] = [];
+   const add = (need: ResearchNeed) => { if (!needs.includes(need)) needs.push(need); };
+@@ -29,8 +34,9 @@ export function computeResearchNeeds(row: SpecRow, spec: SearchSpec, qualificati
+   else if (row.kind === "job") { if (!row.apply_url) add("website"); }
+   else if (!row.website_url && !requested(spec, "opportunity")) add("website");
+   if (requested(spec, "opportunity") && spec.criteria.some((criterion) => criterion.field === "opportunity" && criterion.value === "no_website") && !row.website_url) add("no_website_verification");
+-  const required = queryRequiredFields(spec);
+   if (required.some((field) => (field === "email" && !row.email) || (field === "phone" && !row.phone)) || wantsPublicContact) add("contact");
++  if (required.includes("website") && !row.website_url) add("website");
++  if (required.includes("socials") && !row.evidence?.some((item) => item.source_type === "social" && !!item.source_url)) add("social");
+   if (requested(spec, "content_topic") && qualification.reject_code === "NO_CLAIM_EVIDENCE") add("topic");
+   if (spec.signal_required && ["NO_CLAIM_EVIDENCE", "CLAIM_NOT_SUBJECT_BOUND"].includes(qualification.reject_code ?? "")) add("signal");
+   if (qualification.reject_code === "MISSING_QUERY_REQUIRED") for (const field of required) {
+diff --git a/src/lib/search/canonical-contract.ts b/src/lib/search/canonical-contract.ts
+index 63df673..624202f 100644
+--- a/src/lib/search/canonical-contract.ts
++++ b/src/lib/search/canonical-contract.ts
+@@ -167,6 +167,8 @@ export function isStableEntityId(id: string | null | undefined): boolean {
+  */
+ export function queryRequiredFields(spec: SearchSpec): string[] {
+   const req: string[] = ["entity_id", "entity_type", "name"];
++  const requested = new Set(spec.requested_fields?.map((field) => field.toLowerCase()) ?? []);
++  const legacyText = !spec.understanding;
+   if (fieldOf(spec, "location")) req.push("location");
+   // Spec.role is a retrieval filter, not a QualifiedLead column.
+   if (spec.entity === "job") {
+@@ -175,26 +177,28 @@ export function queryRequiredFields(spec: SearchSpec): string[] {
+   if (
+     fieldOf(spec, "salary_min") ||
+     fieldOf(spec, "salary") ||
+-    /\b(paying|salary|\$\s*\d)/i.test(spec.raw_query)
++    (legacyText && /\b(paying|salary|\$\s*\d)/i.test(spec.raw_query))
+   ) {
+     req.push("salary");
+   }
+   if (
+-    /\b(?:(?:with|require(?:s|d)?|must have)\s+(?:(?:emails?|email addresses?)\s+(?:and|or)\s+)?phone(?: numbers?)?|phone(?: numbers?)?\s+required)\b/i.test(
++    (legacyText && /\b(?:(?:with|require(?:s|d)?|must have)\s+(?:(?:emails?|email addresses?)\s+(?:and|or)\s+)?phone(?: numbers?)?|phone(?: numbers?)?\s+required)\b/i.test(
+       spec.raw_query,
+-    ) ||
+-    fieldOf(spec, "require_phone") === "true"
++    )) ||
++    fieldOf(spec, "require_phone") === "true" || requested.has("phone")
+   ) {
+     req.push("phone");
+   }
+   if (
+-    /\b(with emails?|email addresses?|emails?\s+required|require(?:s|d)?\s+email)\b/i.test(
++    (legacyText && /\b(with emails?|email addresses?|emails?\s+required|require(?:s|d)?\s+email)\b/i.test(
+       spec.raw_query,
+-    ) ||
+-    fieldOf(spec, "require_email") === "true"
++    )) ||
++    fieldOf(spec, "require_email") === "true" || requested.has("email")
+   ) {
+     req.push("email");
+   }
++  if (requested.has("website") || fieldOf(spec, "require_website") === "true") req.push("website");
++  if (requested.has("socials") || requested.has("social") || fieldOf(spec, "require_socials") === "true") req.push("socials");
+   if (spec.signal_required) {
+     req.push("claim_evidence");
+   }
+@@ -396,6 +400,14 @@ export function evaluateQualifiedLeadTheorem(
+     const email = f.email ?? null;
+     if (typeof email !== "string" || !email.trim()) missing.push("email");
+   }
++  if (qFields.includes("website") && !(typeof f.website_url === "string" && f.website_url.trim())) {
++    missing.push("website");
++  }
++  if (qFields.includes("socials") && !candidate.evidence?.some((item) =>
++    ("source_type" in item && item.source_type === "social" && !!item.source_url) ||
++    ("evidence_source" in item && /social|instagram|facebook|linkedin|tiktok|youtube/i.test(item.evidence_source ?? "") && !!item.evidence_url))) {
++    missing.push("socials");
++  }
+   if (spec.entity === "job") {
+     if (!candidate.source_url?.trim() && !f.apply_url) missing.push("apply_or_source_url");
+     if (!f.employer && !f.company) missing.push("employer");
+diff --git a/src/lib/search/clarifier.ts b/src/lib/search/clarifier.ts
+index cea5ec8..03a602f 100644
+--- a/src/lib/search/clarifier.ts
++++ b/src/lib/search/clarifier.ts
+@@ -44,7 +44,13 @@ export type ClarifyQuestionId =
+   | "entity_mode"
+   | "entity_offer"
+   | "entity_site"
+-  | "entity_channel";
++  | "entity_channel"
++  | "entity_purpose"
++  | "entity_salary"
++  | "entity_size"
++  | "entity_revenue"
++  | "entity_relation"
++  | "entity_scope";
+ 
+ export type ClarifyQuestion = {
+   id: ClarifyQuestionId;
+diff --git a/src/lib/search/qualified-lead-view.ts b/src/lib/search/qualified-lead-view.ts
+index 8eeefbf..67ab425 100644
+--- a/src/lib/search/qualified-lead-view.ts
++++ b/src/lib/search/qualified-lead-view.ts
+@@ -196,12 +196,22 @@ export function projectSpecRowsToQualifiedViews(args: {
+     [];
+ 
+   for (const row of args.rows) {
+-    const projected = projectQualifiedLead({
+-      row,
+-      spec: args.spec,
+-      run: args.run,
+-      nowMs: args.nowMs,
+-    });
++    const places = (args.spec.locations?.length ?? 0) > 1 ? args.spec.locations! : [null];
++    let projected: ReturnType<typeof projectQualifiedLead> | null = null;
++    for (const place of places) {
++      const spec = place === null ? args.spec : {
++        ...args.spec,
++        locations: [place],
++        criteria: [
++          ...args.spec.criteria.filter((criterion) => criterion.field !== "location"),
++          { field: "location", value: place, stated: true, confidence: 1 },
++        ],
++      };
++      const attempt = projectQualifiedLead({ row, spec, run: args.run, nowMs: args.nowMs });
++      projected = attempt;
++      if (attempt.ok) break;
++    }
++    if (!projected) continue;
+     if (!projected.ok) {
+       rejected.push({
+         title: row.title ?? "",
+diff --git a/src/lib/search/search-spec.ts b/src/lib/search/search-spec.ts
+index d8b988d..0285375 100644
+--- a/src/lib/search/search-spec.ts
++++ b/src/lib/search/search-spec.ts
+@@ -45,6 +45,14 @@ export interface LocationSuggestion {
+ 
+ export interface SearchSpec {
+   entity: SpecEntity;
++  /** Alternative search areas; all are requested, with OR semantics. */
++  locations?: string[];
++  /** Explicit references whose values still need an answer. */
++  unresolved?: Array<{ field: string; raw: string }>;
++  /** The user's stated reason for this search, if known. */
++  purpose?: "research" | "prospecting" | "recruiting" | "partnership" | null;
++  /** Fields the user asked to receive, independent of target filters. */
++  requested_fields?: string[];
+   /** Extracted criteria (stated + inferred). */
+   criteria: SpecField[];
+   /** Fields materially missing for this entity+intent (drives questions). */
+diff --git a/src/lib/search/source-plan.ts b/src/lib/search/source-plan.ts
+index b6e4b45..160797a 100644
+--- a/src/lib/search/source-plan.ts
++++ b/src/lib/search/source-plan.ts
+@@ -474,6 +474,9 @@ export function buildCandidateResearchQueries(
+     if (missing.includes("profile")) queries.push([subject, "LinkedIn"].join(" "));
+     if (missing.includes("contact")) queries.push([destinationName, "contact"].join(" "));
+   }
++  if (missing.includes("social")) {
++    queries.push([`"${exactName}"`, "Instagram OR Facebook OR LinkedIn recent posts"].join(" "));
++  }
+   if (spec.signal_required && missing.some((f) => /signal|evidence/.test(f))) {
+     if (requestedRole) queries.push([subject, "hiring", requestedRole].join(" "));
+     if (requestedService) queries.push([subject, "needs", requestedService].join(" "));
+diff --git a/src/lib/spec-search.functions.ts b/src/lib/spec-search.functions.ts
+index 62a6a51..ec288c2 100644
+--- a/src/lib/spec-search.functions.ts
++++ b/src/lib/spec-search.functions.ts
+@@ -12,6 +12,7 @@ import { z } from "zod";
+ import { requireMyAuth } from "@/integrations/my-supabase/auth-middleware";
+ import { extractSearchSpec } from "@/lib/search/search-spec-extract";
+ import type { SearchSpec } from "@/lib/search/search-spec";
++import type { UnderstandingFrame } from "@/lib/understanding/frame";
+ import { investorSectorMatches } from "@/lib/search/search-spec";
+ import type { DbHitMeta } from "@/lib/canonical/read-parquet.server";
+ import { personRoleMatches } from "@/lib/canonical/people.server";
+@@ -376,12 +377,39 @@ export function businessModelMatches(rowText: string, model: string): boolean {
+   return re.test(rowText);
+ }
+ 
++function violatesExclusion(spec: SearchSpec, row: SpecRow): boolean {
++  for (const criterion of spec.criteria) {
++    if (!criterion.field.startsWith("exclude_")) continue;
++    const excluded = criterion.value.trim();
++    if (!excluded) continue;
++    const field = criterion.field.slice("exclude_".length);
++    if (field === "business_model") {
++      const rowText = `${row.title ?? ""} ${row.category ?? ""}`;
++      const modelPattern = BUSINESS_MODEL_SIGNALS[excluded.toLowerCase()];
++      if (modelPattern ? modelPattern.test(rowText) : like(rowText, excluded)) return true;
++    }
++    if (field === "category" && like(row.category ?? "", excluded)) return true;
++    if (field === "industry" && like(row.industry ?? row.category ?? "", excluded)) return true;
++    if (field === "funding_status" &&
++      (row.evidence?.some((e) => e.evidence_type === "funding") || /\b(?:recently\s+)?funded\b/i.test(row.detail ?? ""))) return true;
++  }
++  return false;
++}
++
+ /** Result-correctness validation: every displayed row must satisfy the spec.
+  *  Uses the row's OWN category/location fields with craft-aware matching
+  *  (never raw title substring alone) — the DB reader already filtered, so
+  *  this catches misassigned/empty rows. Fixed the bug where 50 fetched
+  *  dentists were all rejected because clinic names lack the word "dentists". */
+ export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
++  if (violatesExclusion(spec, row)) return false;
++  if ((spec.locations?.length ?? 0) > 1) return spec.locations!.some((place) =>
++    rowSatisfiesSpec({
++      ...spec,
++      locations: [place],
++      criteria: [...spec.criteria.filter((criterion) => criterion.field !== "location"),
++        { field: "location", value: place, stated: true, confidence: 1 }],
++    }, row));
+   if (spec.entity === "person") {
+     const role = fieldOf(spec, "role");
+     const industry = fieldOf(spec, "industry");
+@@ -508,6 +536,14 @@ const ROLE_WORD_RE =
+  * gate only decides whether a candidate survives INTO research.
+  */
+ export function rowCouldSatisfySpec(spec: SearchSpec, row: SpecRow): boolean {
++  if (violatesExclusion(spec, row)) return false;
++  if ((spec.locations?.length ?? 0) > 1) return spec.locations!.some((place) =>
++    rowCouldSatisfySpec({
++      ...spec,
++      locations: [place],
++      criteria: [...spec.criteria.filter((criterion) => criterion.field !== "location"),
++        { field: "location", value: place, stated: true, confidence: 1 }],
++    }, row));
+   if (spec.entity === "person") {
+     const role = fieldOf(spec, "role");
+     const industry = fieldOf(spec, "industry");
+@@ -1023,6 +1059,10 @@ export async function runSpecSearchCore(
+     request_id?: string;
+     /** Pre-compiled spec (job passes reuse the compiled thesis; skips understanding). */
+     spec?: SearchSpec;
++    /** Pending clarification continues from this validated canonical frame. */
++    priorFrame?: UnderstandingFrame;
++    /** Internal OR-location branch; prevents recursive fanout. */
++    locationBranch?: boolean;
+     /** Data-asset pass: engine-driven widening + candidate dedupe for job modes. */
+     jobContext?: {
+       poolTargetOverride?: number;
+@@ -1109,8 +1149,10 @@ export async function runSpecSearchCore(
+     hasMore: false,
+     totalAvailable: null as number | null,
+   };
+-  const { understandSearchSpec, isActionableFrame } = await import("@/lib/understanding/to-search-spec");
+-  const base = opts.spec ?? (await understandSearchSpec(query, answers, deps.signal));
++  const { understandSearchSpec, frameToSearchSpec, applyClarificationToFrame, isActionableFrame } = await import("@/lib/understanding/to-search-spec");
++  const base = opts.spec ?? (opts.priorFrame
++    ? frameToSearchSpec(applyClarificationToFrame(opts.priorFrame, answers))
++    : await understandSearchSpec(query, answers, deps.signal));
+   understandingDoneAt = Date.now();
+   if (deps.signal?.aborted) return withRun({ spec: base, ...pageInfo }, 0, true);
+   // Merge prior answers as stated criteria (multi-turn without session store).
+@@ -1174,6 +1216,21 @@ export async function runSpecSearchCore(
+   const { computeMissing } = await import("@/lib/search/search-spec");
+   spec.missing = computeMissing(spec);
+   spec.status = spec.missing.length ? "needs_clarification" : "ready_to_search";
++  if (spec.understanding) {
++    const { decideSpecClarification } = await import("@/lib/search/spec-clarification");
++    const question = decideSpecClarification(spec, opts.force);
++    if (question) {
++      spec.status = "needs_clarification";
++      return withRun({
++        spec,
++        questions: [question.question],
++        clarify: [question],
++        rows: [],
++        ...pageInfo,
++      } as unknown as Record<string, unknown>, 0, false);
++    }
++    spec.status = "ready_to_search";
++  }
+   // Explicit user command ("Search" button): proceed with stated criteria even
+   // when optional fields are still missing. Unknown entity still clarifies.
+   const forcedReady = !!opts.force && spec.entity !== "unknown";
+@@ -1182,7 +1239,7 @@ export async function runSpecSearchCore(
+   // highest-information question instead of searching with arbitrary
+   // assumptions. "Search with defaults" in the panel bypasses; an explicit
+   // count in the query signals the user knows what they want.
+-  if (spec.status === "ready_to_search") {
++  if (!spec.understanding && spec.status === "ready_to_search") {
+     const { evaluateQueryReadiness } = await import("@/lib/search/query-readiness");
+     const readiness = evaluateQueryReadiness({ spec, query, force: opts.force });
+     if (!readiness.ready && readiness.question) {
+@@ -1200,7 +1257,7 @@ export async function runSpecSearchCore(
+   // once ready, an unstated mode blocks with exactly one question. The offer
+   // question follows ONLY a selling answer, so just-looking never sees it.
+   // Explicit "Search" (force) and investor/unknown entities bypass the gate.
+-  if (!opts.force && !isActionableFrame(spec) && isDirectoryEntity(spec.entity) && spec.status === "ready_to_search") {
++  if (!spec.understanding && !opts.force && !isActionableFrame(spec) && isDirectoryEntity(spec.entity) && spec.status === "ready_to_search") {
+     const modeCrit = criteria.find((c) => c.field === "mode");
+     const offerCrit = criteria.find((c) => c.field === "offer");
+     let mode = detectModeFromQuery(query);
+@@ -1365,6 +1422,45 @@ export async function runSpecSearchCore(
+       outcome: "NO_QUALIFIED_RESULTS",
+     });
+   }
++  if (!opts.locationBranch && (spec.locations?.length ?? 0) > 1) {
++    const branchResults: SpecSearchResult[] = [];
++    for (const place of spec.locations!) {
++      const locationCriterion = { field: "location", value: place, stated: true, confidence: 1 };
++      const criteria = spec.criteria.filter((criterion) => ![
++        "location", "location_id", "location_kind", "location_country", "location_scope", "location_parents",
++      ].includes(criterion.field));
++      criteria.push(locationCriterion);
++      branchResults.push(await runSpecSearchCore(query, deps, limit + effOffset, {}, {
++        ...opts,
++        offset: 0,
++        priorFrame: undefined,
++        locationBranch: true,
++        spec: { ...spec, locations: [place], criteria },
++      }));
++      if (deps.signal?.aborted) break;
++    }
++    const unique = new Map<string, SpecRow>();
++    for (const result of branchResults) for (const row of result.rows) {
++      const key = row.entity_id ?? row.key ?? row.url ?? `${row.kind}:${row.title}:${row.location ?? ""}`;
++      if (!unique.has(key)) unique.set(key, row);
++    }
++    const all = [...unique.values()];
++    const rows = all.slice(effOffset, effOffset + limit);
++    const representative = branchResults.find((result) => result.rows.length > 0) ?? branchResults[0];
++    if (representative) return {
++      ...representative,
++      spec,
++      rows,
++      dbMeta: branchResults.flatMap((result) => result.dbMeta),
++      qualified_count: rows.length,
++      offset: effOffset,
++      limit,
++      hasMore: all.length > effOffset + limit || branchResults.some((result) => result.hasMore),
++      totalAvailable: branchResults.every((result) => result.totalAvailable !== null)
++        ? branchResults.reduce((sum, result) => sum + (result.totalAvailable ?? 0), 0)
++        : null,
++    };
++  }
+   // S3 + index readers reach node builtins (AWS SDK -> node:os/crypto), so they
+   // load dynamically — a static import would pull them into the client bundle.
+   const [peopleMod, companiesMod, businessesMod, investorsMod] = await Promise.all([
+@@ -2589,6 +2685,7 @@ export const runSpecSearch = createServerFn({ method: "POST" })
+         limit: z.number().int().min(1).max(100).optional().default(25),
+         offset: z.number().int().min(0).optional().default(0),
+         answers: z.record(z.string(), z.string()).optional().default({}),
++        prior_frame: z.unknown().optional(),
+         force: z.boolean().optional().default(false),
+         search_run_id: z.string().max(80).optional(),
+         conversation_id: z.string().max(80).optional(),
+@@ -2601,6 +2698,9 @@ export const runSpecSearch = createServerFn({ method: "POST" })
+     const { getRequest } = await import("@tanstack/react-start/server");
+     const runId = data.search_run_id;
+     const ownerId = context.userId;
++    const priorFrame = data.prior_frame === undefined
++      ? undefined
++      : (await import("@/lib/understanding/frame")).UnderstandingFrameSchema.parse(data.prior_frame);
+     const { beginRegisteredSearchRun } = await import("@/lib/search/search-run.server");
+     // Beta-reality fix: a flat 120s deadline killed live people/company research
+     // mid-flight (premature honest-looking zeros). Scale the budget with the
+@@ -2616,6 +2716,7 @@ export const runSpecSearch = createServerFn({ method: "POST" })
+         ownerId,
+       }, data.limit, data.answers, {
+         force: data.force,
++        priorFrame,
+         offset: data.offset,
+         search_run_id: runId,
+         conversation_id: data.conversation_id,
+diff --git a/src/lib/understanding/clarify-state.ts b/src/lib/understanding/clarify-state.ts
+index 42168a8..16b3684 100644
+--- a/src/lib/understanding/clarify-state.ts
++++ b/src/lib/understanding/clarify-state.ts
+@@ -18,6 +18,7 @@
+ import { resolveCanonicalLocation } from "@/lib/search/location-resolver";
+ import type { UnderstandingFrame } from "./frame";
+ import { openValue } from "./frame";
++import { purposeFromFrame, repairExplicitPurpose } from "./purpose";
+ import { classifyHead, narrowsTarget, RELATION_SIGNAL_RE } from "./lexicon";
+ import {
+   canonicalize,
+@@ -41,6 +42,7 @@ import {
+ export const BLOCKING_FIELDS = [
+   "target.entity_type",
+   "target.scope",
++  "user_context.objective",
+   "relation.type",
+   "relation.object",
+   "relation.direction",
+@@ -143,6 +145,13 @@ export function blockers(state: ClarificationState): Blocker[] {
+     out.push({ field: "compound.split", reason: "compound_parse_uncertain" });
+   }
+ 
++  if (out.length === 0 && hasScope(frame) &&
++      ["person", "company", "business", "investor"].includes(frame.target.entity_type.value) &&
++      !purposeFromFrame(frame) && !frame.user_context.objective?.value &&
++      unanswered("user_context.objective")) {
++    out.push({ field: "user_context.objective", reason: "missing_purpose" });
++  }
++
+   // Last, and only when nothing above blocks: understood but unrunnable.
+   // "find businesses" — a real request, missing the one thing that would make
+   // it a search. Deliberately last so it never pre-empts a real ambiguity.
+@@ -301,6 +310,12 @@ export function nextQuestion(state: ClarificationState): Question | null {
+         options: [],
+       };
+     }
++    case "user_context.objective":
++      return {
++        field,
++        question: "What are you trying to do with these results?",
++        options: ["Research", "Find prospects", "Recruit", "Find partners"],
++      };
+     case "relation.object": {
+       const rel = state.frame.relation.type.value;
+       const verb =
+@@ -398,6 +413,12 @@ export function patchFrame(
+     note = "empty answer — field marked answered so it is not repeated";
+   } else {
+     switch (field) {
++      case "user_context.objective": {
++        frame.user_context.objective = openValue(answer, answer, null, 1);
++        applied = true;
++        note = `purpose recorded from the user's answer`;
++        break;
++      }
+       case "target.entity_type": {
+         const t = interpretEntityType(answer);
+         if (t) {
+@@ -570,8 +591,8 @@ function clarificationBlock(state: ClarificationState): UnderstandingFrame["clar
+ /** Refresh the clarification block without answering anything — used right
+  *  after extraction so the frame reports the same thing the state machine does. */
+ export function syncClarification(frame: UnderstandingFrame): UnderstandingFrame {
+-  const out = structuredClone(frame);
+-  out.clarification = clarificationBlock(initState(frame));
++  const out = repairExplicitPurpose(structuredClone(frame));
++  out.clarification = clarificationBlock(initState(out));
+   return out;
+ }
+ 
+diff --git a/src/lib/understanding/extract.server.ts b/src/lib/understanding/extract.server.ts
+index ace9873..1824fff 100644
+--- a/src/lib/understanding/extract.server.ts
++++ b/src/lib/understanding/extract.server.ts
+@@ -143,7 +143,7 @@ import {
+  * v15 preserves calendar granularity: this month is not this quarter, and a
+  * named calendar period is not a rolling within_last window.
+  */
+-export const UNDERSTANDING_PROMPT_VERSION = "u1-v15";
++export const UNDERSTANDING_PROMPT_VERSION = "u1-v16";
+ 
+ const list = (xs: readonly string[]) => xs.join(" | ");
+ 
+@@ -226,9 +226,8 @@ for "backed", "VC-backed", "recently funded", "hiring", "just raised".
+ 
+ PLAIN DISCOVERY IS NOT A FAILURE
+ "restaurants in Lisbon", "law firms across Ontario" request NO relationship:
+-relation.type="none", direction="none", prospecting_mode="fit_based",
+-clarification.needed=false. Never invent a need, and never ask what should be
+-true of the restaurants.
++relation.type="none", direction="none", prospecting_mode="fit_based".
++Never invent a need. An execution policy may still ask the user's purpose.
+ 
+ WHAT THE USER SELLS IS NOT WHAT THE PROSPECT NEEDS
+ "I sell website design. Find me 100 businesses in Alberta" ->
+@@ -236,6 +235,21 @@ user_context.selling.service="website design", target=business, quantity 100,
+ relation="none". Only the user's own words about the PROSPECT ("...that don't
+ have a website") create a relation.
+ 
++PRESERVE THE ENTIRE ASK
++"D2C skincare guys" can mean brands: the D2C business cue outranks the weak
++word "guys". "need website services" is needs_service, not no_website;
++only an explicit absence ("no website") is lacks_asset/no_website.
++"Chattogram or Dhaka" means one target in either place: location is first,
++locations[] contains both. A city followed by "or" is not a compound search.
++"not agencies", "exclude staffing agencies", "NOT already funded" are
++negated constraints; never turn their values into positive target filters.
++"paying this much" and "around this size" have unresolved[] entries with
++raw phrase and field (salary_min, revenue, employee_count). Do not guess a number.
++"email, phone, website and socials" populates required_fields when requested;
++"check when they last posted" populates verification/enrichment and needs
++fresh evidence. Record an explicit user purpose in user_context.objective;
++do not infer purpose merely from "find" or "need".
++
+ A PROFESSION NOUN IS OFTEN BOTH A PERSON AND A PRACTICE
+ "dentists", "audiologists", "plumbers", "opticians" name both the practitioner
+ and the premises they work from, because the trade is what you visit. Either
+@@ -371,6 +385,8 @@ Plus: relation.label (string, for custom), organization_context
+   {"on_behalf_of_company":"yes|no|unknown","company":null},
+   user_context {"selling":{"service":<open>,"product":<open>},"objective":<open>,"notes":[<open>]},
+   location {"value":"Bristol","raw":"around Bristol","scope":"near","radius":null,"radius_unit":null},
++  locations[] is an array of locations when the user joins areas with OR;
++  unresolved[] {"field":"salary_min","raw":"this much"} for stated but unknown values,
+   temporal {"relation":"within_last","window":"2w","year":null,"raw":"in the last two weeks"},
+   constraints[] {"field":"employee_count","operator":"gte","value":20,"unit":null,"negated":false,"raw":"..."},
+   evidence {"claim_evidence_required":bool,"intent_signal_required":bool},
+diff --git a/src/lib/understanding/fallback.ts b/src/lib/understanding/fallback.ts
+index 9f04d27..15a849a 100644
+--- a/src/lib/understanding/fallback.ts
++++ b/src/lib/understanding/fallback.ts
+@@ -369,6 +369,12 @@ function detectUserContext(text: string): { context: UserContext; analysis: stri
+       .trim();
+   }
+ 
++  // A stated use for the results belongs to user context, not the target or
++  // exclusion filters. Keep the original wording in input.raw for provenance.
++  if (/\bresearch\s+only\s*:/i.test(text) || /\bno\s+outreach\b/i.test(text)) {
++    context.objective = openValue("research", "research only / no outreach", "research", 1);
++    analysis = analysis.replace(/\bresearch\s+only\s*:\s*/i, "").replace(/[,;]?\s*\bno\s+outreach\b/gi, "").trim();
++  }
+   return { context, analysis: analysis || text };
+ }
+ 
+@@ -380,9 +386,13 @@ function detectUserContext(text: string): { context: UserContext; analysis: stri
+ // then read separately for required/preferred/verification/output.
+ 
+ const DELIVERABLE_CUT_RE =
+-  /(?:[,;.]|\band\b)\s*(?=(?:phone|phones|email|emails|socials?|social\s+media|instagram|insta|ig|facebook|fb|linkedin|twitter|reviews?|ratings?|opening\s+hours|hours|address(?:es)?|owner|owners|verify|verified|confirm|double-?check|make\s+sure|prove|include|including|output|export|give\s+me|gimme|send|return|prefer(?:ably)?|ideally|bonus|optional|if\s+possible|if\s+available|nice\s+to\s+have|must\s+have|required|contact\s+info|contacts?|evidence|proof|source|(?:pull|scrape|grab|fetch|extract|collect|gather|note|add|append|attach)\s)\b)/i;
++  /(?:[,;.]|\band\b)\s*(?=(?:phone|phones|email|emails|socials?|social\s+media|instagram|insta|ig|facebook|fb|linkedin|twitter|reviews?|ratings?|opening\s+hours|hours|address(?:es)?|owner|owners|verify|verified|confirm|double-?check|make\s+sure|prove|include|including|output|export|give\s+me|gimme|send|return|prefer(?:ably)?|ideally|bonus|optional|if\s+possible|if\s+available|nice\s+to\s+have|must\s+have|required|contact\s+info|contacts?|evidence|proof|source|(?:pull|scrape|grab|get|fetch|extract|collect|gather|note|add|append|attach)\s)\b)/i;
+ 
+ function coreSegment(text: string): { core: string; tail: string } {
++  const contactAsk = /\b(?:need|want)\s+(?:the\s+|their\s+)?(?:emails?|phone|nums|socials?|contact\s+(?:details|info))\b/i.exec(text);
++  if (contactAsk && contactAsk.index >= 8) {
++    return { core: text.slice(0, contactAsk.index).trim(), tail: text.slice(contactAsk.index).trim() };
++  }
+   const m = DELIVERABLE_CUT_RE.exec(text);
+   if (!m || m.index < 8) return { core: text, tail: "" };
+   return { core: text.slice(0, m.index).trim(), tail: text.slice(m.index).trim() };
+@@ -481,6 +491,12 @@ function detectQuantity(text: string): { quantity: Quantity | null; text: string
+     const [minWord, minNum, maxWord, maxNum, apxWord, apxNum, plusNum, verbNum, bareNum] =
+       m.slice(1);
+ 
++    // A currency amount can contain a shorter digit match ("$120,000" used
++    // to yield a requested count of zero from its final three digits).
++    const before = text.slice(0, m.index);
++    const following = text.slice(m.index + m[0].length);
++    if (/(?:[$€£]\s*|\d,)$/.test(before) || /^,\d/.test(following) || /^\d/.test(following)) continue;
++
+     // Reject when what follows the number is a unit — that is a filter.
+     const after = text.slice(m.index + m[0].length).trim().split(/\s+/)[0] ?? "";
+     const tail = singularize(after.replace(/[^\p{L}\p{N}%]/gu, ""));
+@@ -506,7 +522,7 @@ function detectQuantity(text: string): { quantity: Quantity | null; text: string
+     } else if (isPlus) q.minimum = toNumber(plusNum);
+     else q.requested = toNumber(verbNum ?? bareNum);
+ 
+-    if (q.requested === null && q.minimum === null && q.maximum === null) continue;
++    if ((q.requested ?? q.minimum ?? q.maximum ?? 0) <= 0) continue;
+     return { quantity: q, text: mask(text, m.index, m.index + m[0].length) };
+   }
+   return openEnded ?? { quantity: null, text };
+@@ -838,7 +854,7 @@ const RECEIVED_FUNDING_RE =
+   /\b(?:raised|just\s+raised|closed|secured|landed|announced|got|received|took)\s+(?:a\s+|an\s+|their\s+|some\s+|new\s+)?(pre-?seed|seed|series\s+[a-e]|angel\s+round|bridge|funding\s+round|round\s+of\s+funding|round|funding|investment|capital|money|cash|\$[\d.]+\s*[mkb]?)\b|\b(?:recently\s+|newly\s+|just\s+)?(?:funded|backed)\b|\bventure[-\s]backed\b|\bpost[-\s](?:seed|series\s+[a-e])\b/i;
+ 
+ const INVESTING_RE =
+-  /\b(?:funding|invest(?:ing|s)?\s+in|back(?:ing|s)|writing\s+cheques?\s+(?:to|for)|deploying\s+capital\s+(?:into|in))\s*/i;
++  /\b(?:funding|invest(?:ing|s)?\s+in|back(?:ing|s)?|writing\s+(?:cheques?|checks?)(?:\s+(?:to|for|of))?|deploying\s+capital\s+(?:into|in))\s*/i;
+ 
+ const SEEKING_FUNDING_RE =
+   /\b(?:raising|looking\s+to\s+raise|trying\s+to\s+raise|seeking\s+(?:funding|investment|investors?|capital)|looking\s+for\s+(?:funding|investment|investors?|capital)|fundrais(?:ing|e))\b/i;
+@@ -1107,7 +1123,10 @@ export function detectRelation(text: string, subject: HeadClassification): Relat
+   // recruiters" wants one. Both contain a hiring word, so the EARLIER cue wins
+   // — the verb the user actually chose comes first.
+   const offerFirst = OFFERS_RE.exec(text);
+-  const hireFirst = HIRING_RE.exec(text);
++  const postedIsJob = (hit: RegExpExecArray | null) => !hit || !/posted|advertis/i.test(hit[0]) ||
++    /\b(?:job|role|vacancy|opening|position|candidate|staff|engineer|developer)\b/i.test(text.slice(hit.index, hit.index + 90));
++  const tentativeHire = HIRING_RE.exec(text);
++  const hireFirst = postedIsJob(tentativeHire) ? tentativeHire : null;
+   if (offerFirst && (!hireFirst || offerFirst.index < hireFirst.index)) {
+     const obj = objectAfterCue(text, offerFirst);
+     const what = obj.value;
+@@ -1122,7 +1141,7 @@ export function detectRelation(text: string, subject: HeadClassification): Relat
+     );
+   }
+ 
+-  if ((m = HIRING_RE.exec(text))) {
++  if ((m = hireFirst)) {
+     const obj = takeObject(text, m.index + m[0].length);
+     const isPosting = /posted|advertis/i.test(m[0]);
+     return hit(
+@@ -1345,6 +1364,7 @@ const strictPlace = (s: string) => {
+ function plausiblePlace(span: string): boolean {
+   const s = span.trim();
+   if (s.length < 2 || /\|/.test(s)) return false;
++  if (/^(?:paying|salary|paid|this|that|these|those|much|size)$/i.test(s)) return false;
+   if (isTemporalPhrase(s)) return false;
+   if (strictPlace(s)) return true;
+   // A recognized entity/role/category noun is not a place. This is what stops
+@@ -1474,6 +1494,20 @@ function detectLocation(
+   return { location: null, text };
+ }
+ 
++/** A single target searched in either place is one request with OR geography. */
++function detectOrLocations(text: string, primary: FrameLocation | null): FrameLocation[] {
++  if (!primary || primary.scope === "remote") return [];
++  const re = /\b(?:in|near|around|across|from)\s+([\p{L}'-]+(?:\s+[\p{L}'-]+){0,3})\s+or\s+([\p{L}'-]+(?:\s+[\p{L}'-]+){0,3})/giu;
++  for (const match of text.matchAll(re)) {
++    const first = takePlaceSpan(tokenize(match[1]), strictPlace).join(" ");
++    const second = takePlaceSpan(tokenize(match[2]), strictPlace).join(" ");
++    if (!first || !second || !plausiblePlace(first) || !plausiblePlace(second)) continue;
++    if (first.toLowerCase() !== primary.value.toLowerCase() && first.toLowerCase() !== primary.canonical?.toLowerCase()) continue;
++    return [primary, geoFor(second, second, primary.scope)];
++  }
++  return [];
++}
++
+ // ── Constraints ───────────────────────────────────────────────────────────
+ 
+ const NUM = String.raw`(\d[\d,.]*)`;
+@@ -1517,7 +1551,7 @@ function detectExclusions(text: string): Constraint[] {
+     // filter beside a relation that already says it — and the check goes
+     // through the shared vocabulary, which tolerates "no proper wesbite",
+     // rather than through a second list of asset words that drifts from it.
+-    const value = words.join(" ");
++    const value = words.map((w, i) => i === words.length - 1 ? singularize(w) : w).join(" ");
+     if (isAssetPhrase(value)) continue;
+ 
+     // What KIND of thing is being excluded decides the field, and the
+@@ -1614,11 +1648,11 @@ export function detectConstraints(text: string): Constraint[] {
+     if (v > 0) push({ field: "rating", operator: op, value: v, unit: "stars", raw: m[0] });
+   }
+ 
+-  const MONEY = new RegExp(
+-    `\\b(under|below|less\\s+than|over|above|more\\s+than|at\\s+least|around|about)\\s*\\$?\\s*${NUM}\\s*(k|m|b)?\\s*(?:\\/|\\s+per\\s+)?\\s*(hour|hr|month|mo|year|yr|day)?`,
++    const MONEY = new RegExp(
++    `\\b(under|below|less\\s+than|over|above|more\\s+than|at\\s+least|around|about)\\s*[$€£]?\\s*${NUM}\\s*(k|m|b)?\\s*(?:\\/|\\s+per\\s+)?\\s*(hour|hr|month|mo|year|yr|day)?`,
+     "i",
+   );
+-  if ((m = MONEY.exec(text)) && /\$|budget|rate|price|revenue|cost|pay|\/\s*(?:hour|hr)/i.test(text)) {
++  if ((m = MONEY.exec(text)) && /[$€£]|budget|rate|price|revenue|cost|pay|\/\s*(?:hour|hr)/i.test(text)) {
+     const q = m[1].toLowerCase();
+     let v = num(m[2]);
+     const mult = (m[3] ?? "").toLowerCase();
+@@ -1695,7 +1729,7 @@ const REQUIRED_MARKER =
+  * "include socials if possible" is preferred, not required.
+  */
+ const DELIVERY_MARKER =
+-  /\b(pull|scrape|grab|fetch|extract|collect|gather|include|including|add|append|attach|note|give\s+me|gimme|send|return|export|output|along\s+with|list)\b/i;
++  /\b(pull|scrape|grab|fetch|extract|collect|gather|include|including|add|append|attach|note|give\s+me|gimme|get|send|return|export|output|along\s+with|list)\b/i;
+ 
+ /**
+  * Split on clause boundaries so "phone required, socials if possible" lands in
+@@ -1723,6 +1757,7 @@ export function fieldRequirements(
+     if (!isPreferred && !isRequired) continue;
+     const bucket = isPreferred ? preferred : required;
+     for (const name of fieldsNamedIn(clause)) {
++      if (name === "website" && /\bneed(?:s)?\s+(?:a\s+)?websites?\b/i.test(clause) && !DELIVERY_MARKER.test(clause)) continue;
+       if (!bucket.some((f) => f.value === name)) bucket.push(openValue(name, clause.trim(), name, 0.7));
+     }
+   }
+@@ -1737,6 +1772,14 @@ export function fieldRequirements(
+       required.push(openValue(name, name, name, 0.6));
+     }
+   }
++  if (/\ball\s+contact\s+details?\b|\bcontact\s+info(?:rmation)?\b/i.test(text)) {
++    for (const name of ["email", "phone"]) {
++      if (!required.some((f) => f.value === name)) required.push(openValue(name, "all contact details", name, 0.8));
++    }
++  }
++  if (/\bemails?\b[^.;]{0,25}\bif\s+public\b/i.test(text) && !required.some((f) => f.value === "email")) {
++    required.push(openValue("email", "email if public", "email", 0.8));
++  }
+   return { required, preferred };
+ }
+ 
+@@ -2060,8 +2103,10 @@ export function extractFrameDeterministic(
+   }
+ 
+   // 1. The searcher's own sentence, lifted out before anything reads the rest.
+-  const { context, analysis } = detectUserContext(text);
++  let { context, analysis } = detectUserContext(text);
+   frame.user_context = context;
++  analysis = analysis.replace(/\b(in|near|around)\s+(.+?)\s+(?:wait\s+)?no\s+(?:make\s+that|actually|rather|instead)\s+([\p{L}\s-]+?)(?=,|\.|\bwith\b|$)/iu,
++    (_whole, prep: string, _old: string, replacement: string) => `${prep} ${replacement.trim()}`);
+ 
+   // 2. Deliverables are cut BEFORE the compound split, or "…and give me a
+   //    table plus outreach drafts" reads as a second search for tables. What
+@@ -2077,6 +2122,18 @@ export function extractFrameDeterministic(
+   const q = detectQuantity(work);
+   frame.quantity = q.quantity;
+   work = q.text;
++  const amountPlaceholder = /\bthis\s+much\b/i.exec(primaryRaw);
++  if (amountPlaceholder) {
++    const field = /\b(?:jobs?|salary|paying|paid|compensation|wages?)\b/i.test(primaryRaw)
++      ? "salary_min" : /\brevenue\b/i.test(primaryRaw) ? "revenue" : "amount";
++    frame.unresolved.push({ field, raw: amountPlaceholder[0] });
++    frame.constraints.push({ field, operator: "gte", value: null, unit: null, negated: false, raw: amountPlaceholder[0], confidence: 1 });
++  }
++  const sizePlaceholder = /\b(?:around|about|roughly|at least|under)\s+this\s+size\b/i.exec(primaryRaw);
++  if (sizePlaceholder) {
++    frame.unresolved.push({ field: "employee_count", raw: sizePlaceholder[0] });
++    frame.constraints.push({ field: "employee_count", operator: "eq", value: null, unit: null, negated: false, raw: sizePlaceholder[0], confidence: 1 });
++  }
+   const t = detectTemporal(work);
+   frame.temporal = t.temporal;
+   work = t.text;
+@@ -2103,10 +2160,13 @@ export function extractFrameDeterministic(
+   //    become the positive one.
+   // Read twice, never as one string: concatenating the masked core and the raw
+   // request let a match start in one and end in the other.
+-  frame.constraints = dedupeConstraints([
++  frame.constraints = dedupeConstraints([...frame.constraints,
+     ...detectConstraints(work.slice(0, 1600)),
+     ...detectConstraints(analysis.slice(0, 1600)),
+   ]);
++  if (/\b(?:not|never|exclude|excluding|without)\s+(?:already\s+)?funded\b/i.test(analysis)) {
++    frame.constraints.push({ field: "funding_status", operator: "neq", value: "funded", unit: null, negated: true, raw: "not already funded", confidence: 0.9 });
++  }
+   const excluded = new Set(
+     frame.constraints
+       .filter((c) => c.field === "location" && c.negated)
+@@ -2297,6 +2357,21 @@ export function extractFrameDeterministic(
+   if (head.industry) {
+     frame.target.industry = openValue(head.industry, head.industry, head.industry, 0.7);
+   }
++  if (frame.target.entity_type.value === "job") {
++    for (const match of analysis.matchAll(/\b(?:React|TypeScript)\b/gi)) {
++      const named = /^react$/i.test(match[0]) ? "React" : "TypeScript";
++      if (!frame.target.technologies.some((t) => t.value === named)) {
++        frame.target.technologies.push(openValue(named, match[0], named, 0.9));
++      }
++    }
++  }
++  const colloquialBrand = /\bd2c\s+(.+?)\s+(?:guys|people|folks)\b/i.exec(phrase);
++  if (colloquialBrand && frame.target.entity_type.value === "company") {
++    frame.target.entity_subtype = openValue("brand", colloquialBrand[0], "brand", 0.85);
++    frame.target.industry = openValue(colloquialBrand[1].toLowerCase(), colloquialBrand[1], null, 0.75);
++    frame.target.business_type = openValue("d2c", "D2C", "d2c", 0.9);
++    frame.target.category = null;
++  }
+   // The claim to prove is the target itself — "marketing agencies in Bristol"
+   // has to be shown to really be marketing agencies. The flags themselves are
+   // the validator's, derived from the relation; this only names the claim.
+@@ -2408,7 +2483,7 @@ export function extractFrameDeterministic(
+     if ((rel.type === "hiring" || rel.type === "seeking_client") && entity === "person") {
+       frame.organization_context.on_behalf_of_company = rel.type === "hiring" ? "yes" : "unknown";
+     }
+-  } else if (RELATION_SIGNAL_RE.test(work)) {
++  } else if (RELATION_SIGNAL_RE.test(work) && !/\b(?:posted?|posts?)\s+(?:recently|lately|this\s+(?:week|month))\b/i.test(work)) {
+     // Wording announces a relationship we could not read. That is `unknown`,
+     // and it is a different statement from `none`.
+     frame.relation.type = {
+@@ -2424,6 +2499,21 @@ export function extractFrameDeterministic(
+     frame.relation.direction = { value: "none", raw: null, confidence: 0.85 };
+     frame.relation.object = null;
+   }
++  if (frame.constraints.some((c) => c.field === "funding_status" && c.negated) && frame.relation.type.value === "received_funding") {
++    frame.relation.type = { value: "none", raw: null, confidence: 0.85 };
++    frame.relation.direction = { value: "none", raw: null, confidence: 0.85 };
++    frame.relation.object = null;
++  }
++  if (frame.constraints.some((c) => c.field === "funding_status" && c.negated) && /\braising\b/i.test(primaryRaw)) {
++    frame.relation.type = { value: "seeking_funding", raw: "raising", confidence: 0.85 };
++    frame.relation.direction = { value: "subject_to_object", raw: "raising", confidence: 0.85 };
++    frame.relation.object = openValue("funding", "raising", "funding", 0.85);
++    frame.constraints = frame.constraints.filter((c) => c.field !== "relation" && c.field !== "service");
++  }
++  if (frame.target.entity_type.value === "company" && /\bbrands?\b/i.test(frame.target.category?.value ?? "") &&
++      frame.relation.type.value === "offers_service" && frame.relation.object && !frame.target.industry) {
++    frame.target.industry = frame.relation.object;
++  }
+ 
+   // 7b. One relation settles the target's kind by itself: only a person seeks
+   //      employment. "arborists looking for work" is a practitioner even where
+@@ -2456,15 +2546,37 @@ export function extractFrameDeterministic(
+     loc.location ??
+     modifierLocation ??
+     (trailingPlace ? geoFor(trailingPlace, trailingPlace, "in", 0.4) : null);
++  frame.locations = detectOrLocations(primaryRaw, frame.location);
++  if (!frame.location) {
++    const prefix = /^([\p{Lu}][\p{L}'-]+(?:\s+[\p{Lu}][\p{L}'-]+){0,2})\s+(?:businesses|firms|shops|companies|brands|jobs|restaurants)\b/u.exec(primaryRaw);
++    if (prefix) {
++      const words = prefix[1].split(/\s+/);
++      const place = words.length > 1 && strictPlace(words.at(-1)!) ? words.slice(0, -1).join(" ") : prefix[1];
++      if (plausiblePlace(place)) frame.location = geoFor(place, place, "in", 0.5);
++    }
++  }
++  if (frame.location && frame.target.entity_type.value === "business" && !frame.target.entity_subtype &&
++      /^\s*[\p{Lu}][\p{L}'-]+\s+(?:[\p{Lu}][\p{L}'-]+\s+)?businesses\b/u.test(primaryRaw)) {
++    frame.target.entity_subtype = openValue("local", null, "local", 0.6);
++  }
+ 
+   // 9. Deliverables, from the whole request — the cut segment included.
+   const fields = fieldRequirements(analysis, deliverableTail);
+   frame.required_fields = fields.required;
++  if (frame.required_fields.some((f) => ["linkedin", "instagram", "facebook"].includes(f.value)) &&
++      !frame.required_fields.some((f) => f.value === "socials")) {
++    frame.required_fields.push(openValue("socials", null, "socials", 0.6));
++  }
+   frame.preferred_fields = fields.preferred;
+   frame.contact_requirements = fields.required.filter((f) =>
+     ["phone", "email", "address", "linkedin", "instagram", "facebook", "socials"].includes(f.value),
+   );
+   frame.verification = detectVerification(analysis);
++  if (/\b(?:last|latest|recent|recently|this\s+(?:week|month)|active)\b[^.!?]{0,70}\b(?:social|posts?|posted|instagram|insta|facebook|linkedin)\b|\b(?:social|posts?|posted|instagram|insta|facebook|linkedin)\b[^.!?]{0,70}\b(?:last|latest|recent|recently|this\s+(?:week|month)|active)\b/i.test(analysis)) {
++    if (!frame.verification.some((v) => /social post/i.test(v.label ?? ""))) {
++      frame.verification.push({ kind: "other", label: "last social post date", raw: span(analysis) });
++    }
++  }
+   frame.output = detectOutput(analysis);
+ 
+   // A request that specifies deliverables at all implies two it never spells
+@@ -2521,6 +2633,9 @@ export function extractFrameDeterministic(
+     frame.evidence.claim_evidence_required = obligation.claim;
+     frame.evidence.intent_signal_required = obligation.intent;
+   }
++  if (relType === "investing_in" && /\b(?:actively|recent|recently|actual|current)\b/i.test(analysis)) {
++    frame.evidence.intent_signal_required = true;
++  }
+   frame.task_type = {
+     value: entity === "job" ? "job_discovery" : "lead_discovery",
+     raw: null,
+diff --git a/src/lib/understanding/frame.ts b/src/lib/understanding/frame.ts
+index 1dda577..54a2e9c 100644
+--- a/src/lib/understanding/frame.ts
++++ b/src/lib/understanding/frame.ts
+@@ -338,6 +338,10 @@ export const UnderstandingFrameSchema = z.object({
+   user_context: UserContextSchema.default({ selling: null, objective: null, notes: [] }),
+ 
+   location: LocationSchema.nullable().default(null),
++  /** Alternative search areas joined by OR; the primary area remains location. */
++  locations: z.array(LocationSchema).max(10).default([]),
++  /** Explicit values the user referred to but did not supply. */
++  unresolved: z.array(z.object({ field: z.string().max(80), raw: z.string().max(200) })).max(10).default([]),
+   temporal: TemporalSchema.nullable().default(null),
+   constraints: z.array(ConstraintSchema).max(40).default([]),
+   evidence: EvidenceRequirementsSchema.default({
+diff --git a/src/lib/understanding/lexicon.ts b/src/lib/understanding/lexicon.ts
+index da1962c..a466a98 100644
+--- a/src/lib/understanding/lexicon.ts
++++ b/src/lib/understanding/lexicon.ts
+@@ -187,7 +187,7 @@ export const CLAUSE_STOP_TOKENS: ReadonlySet<string> = new Set([
+   "raised", "raising", "raise", "funded", "funding", "posted", "posting",
+   "accredited", "certified", "licensed", "registered", "listed", "rated",
+   "built", "powered", "running", "run", "doing", "does", "do", "done",
+-  "interested", "ready", "shopping", "after", "open",
++  "interested", "ready", "shopping", "after", "open", "paying", "actively",
+   // negation / possession
+   "with", "without", "no", "not", "non", "none", "lacking", "lack", "lacks",
+   "missing", "excluding", "except", "excluded", "skip", "avoid", "only", "just",
+@@ -905,6 +905,12 @@ export function classifyHead(
+   // not a trade. Answered before the suffix backstops because those read shape
+   // alone and would send "growth pros" to a business on `-th`-style accidents.
+   if (droppedTransparent) {
++    // "D2C skincare guys" names brands colloquially. The business-model cue
++    // is stronger than the weak human head; a role phrase such as "dev guys"
++    // continues to mean people.
++    if (/\b(?:d2c|direct[- ]to[- ]consumer)\b/i.test(cleaned)) {
++      return { kind: "company", head: last, ambiguous: false, confidence: 0.75, modifiers, industry: last };
++    }
+     return { kind: "person", head: last, ambiguous: false, confidence: 0.6, modifiers, industry };
+   }
+ 
+diff --git a/src/lib/understanding/to-search-spec.ts b/src/lib/understanding/to-search-spec.ts
+index 19a9a52..00e23c2 100644
+--- a/src/lib/understanding/to-search-spec.ts
++++ b/src/lib/understanding/to-search-spec.ts
+@@ -1,19 +1,20 @@
+ import { buildSpec, type SearchSpec, type SpecEntity, type SpecField } from '../search/search-spec';
+-import { extractSearchSpec, normalizeRole } from '../search/search-spec-extract';
++import { normalizeRole } from '../search/search-spec-extract';
+ import { resolveCanonicalLocation } from '../search/location-resolver';
++import { initState, patchFrame, syncClarification, type BlockingField } from './clarify-state';
+ import { extractFrameDeterministic } from './fallback';
++import { openValue, type FrameLocation, type OpenValue, type UnderstandingFrame } from './frame';
+ import { validateFrame } from './validate';
+-import type { OpenValue, UnderstandingFrame } from './frame';
++import { purposeFromFrame, repairExplicitPurpose } from './purpose';
+ 
+ const clean = (value: string) => value.trim().replace(/[.!?]+$/, '').trim();
+ const valueOf = (value: OpenValue | null | undefined) => value ? clean(value.normalized ?? value.value) : '';
+-const GLOBAL = /\b(?:globally|global|worldwide|anywhere|all countries)\b/i;
+ const MODAL_NEED = /\b(?:may|might|could)\s+(?:potentially\s+)?(?:need|benefit from)\b|\b(?:relevant|suitable|a good fit)\s+for\b/i;
+ const SOCIAL_TOPIC = /\b(?:talk(?:s|ing)?|post(?:s|ing)?|writ(?:e|es|ing)|discuss(?:es|ing)?)\s+(?:about\s+)?(.+?)(?=[.!?]?$)/i;
+ 
+-/** Repair only distinctions that the legacy grammar cannot represent. Raw spans stay attached. */
++/** Narrow validation repair: tentative fit is not observed buying intent. */
+ export function normalizeSearchFrame(input: UnderstandingFrame): UnderstandingFrame {
+-  const frame = structuredClone(input);
++  const frame = repairExplicitPurpose(structuredClone(input));
+   const raw = frame.input.raw;
+   const modal = raw.match(MODAL_NEED);
+   const hardClause = /\b(?:and|but|also)\s+(?:who\s+|that\s+)?(?:are\s+)?(?:need|seeking|hiring|asking|looking for)\b/i.test(raw);
+@@ -24,163 +25,234 @@ export function normalizeSearchFrame(input: UnderstandingFrame): UnderstandingFr
+     frame.relation = { type: { value: 'none', raw: modal[0], confidence: 0.95 }, direction: { value: 'none', raw: modal[0], confidence: 0.95 }, label: null, object: null };
+     frame.prospecting_mode = { value: 'fit_based', raw: modal[0], confidence: 0.95 };
+     frame.evidence.intent_signal_required = false;
+-    frame.meta.notes.push('Modal need describes potential fit; expressed buying intent is not required.');
+   }
+   const social = raw.match(SOCIAL_TOPIC);
+-  if (social) {
+-    const topic = clean(social[1]);
++  if (social && !/^(?:\s*(?:and|or)\s+(?:emails?|phones?|socials?)|\s*(?:this|last|next)\s+(?:week|month|year))\b/i.test(social[1])) {
+     frame.constraints = frame.constraints.filter((c) => c.field !== 'content_topic');
+-    frame.constraints.push({ field: 'content_topic', operator: 'eq', value: topic, raw: social[0], confidence: 1, negated: false, unit: null });
+-    if (!frame.evidence.intent_signal_required) {
+-      frame.prospecting_mode = { value: 'social_signal_based', raw: social[0], confidence: 1 };
++    frame.constraints.push({ field: 'content_topic', operator: 'eq', value: clean(social[1]), raw: social[0], confidence: 1, negated: false, unit: null });
++    if (!frame.evidence.intent_signal_required) frame.prospecting_mode = { value: 'social_signal_based', raw: social[0], confidence: 1 };
++  }
++  if (frame.meta.extractor === 'llm') {
++    const deterministic = validateFrame(extractFrameDeterministic(raw)).frame;
++    if (frame.target.entity_type.value === 'business' && deterministic.target.entity_type.value === 'company' &&
++        /\b(?:compan(?:y|ies)|firms?|startups?|brands?|d2c|dtc|direct.to.consumer)\b/i.test(raw)) {
++      frame.target.entity_type = { ...deterministic.target.entity_type, confidence: 0.85 };
++      frame.meta.notes.push('repaired company target from explicit organization wording');
++    }
++    if (/\b(?:d2c|dtc|direct.to.consumer)\b/i.test(raw) &&
++        !/\b(?:d2c|dtc|direct.to.consumer)\b/i.test(valueOf(frame.target.business_type))) {
++      frame.target.business_type = openValue('d2c', 'D2C', 'd2c', 0.95);
++      frame.meta.notes.push('recovered explicit D2C model');
++    }
++    if (frame.target.entity_type.value === 'company' && /\bbrands?\b/i.test(raw) &&
++        frame.relation.type.value === 'offers_service' && frame.relation.object && !frame.target.industry) {
++      frame.target.industry = frame.relation.object;
++      frame.meta.notes.push('treated sold product as brand industry');
++    }
++    for (const negative of deterministic.constraints.filter((item) => item.negated || item.operator === 'neq')) {
++      if (!frame.constraints.some((item) => item.field === negative.field && (item.negated || item.operator === 'neq'))) {
++        frame.constraints = frame.constraints.filter((item) => item.field !== negative.field);
++        frame.constraints.push(negative);
++        frame.meta.notes.push(`recovered exclusion: ${negative.field}`);
++      }
++    }
++    for (const required of deterministic.required_fields) {
++      if (required.value === 'name' || required.value === 'evidence') continue;
++      if (!frame.required_fields.some((item) => item.value === required.value)) {
++        frame.required_fields.push(required);
++        frame.meta.notes.push(`recovered requested field: ${required.value}`);
++      }
++    }
++    if (/\bsocials?\b/i.test(raw) && /\b(?:give|need|want|include|with|pls|please|n)\b/i.test(raw) &&
++        !frame.required_fields.some((item) => item.value === 'socials')) {
++      frame.required_fields.push(openValue('socials', 'socials', null, 0.9));
++      frame.meta.notes.push('recovered requested field: socials');
++    }
++    if (frame.relation.type.value === 'custom' && /\bdoing marketing\b/i.test(frame.relation.label ?? '') &&
++        !/\b(?:provides?|offers?|sells?)\s+marketing\b/i.test(raw)) {
++      frame.relation = { type: { value: 'none', raw: null, confidence: 0.85 },
++        direction: { value: 'none', raw: null, confidence: 0.85 }, label: null, object: null };
++      frame.meta.notes.push('treated marketing activity as a target attribute');
++    }
++    if (frame.relation.type.value === 'partnered_with' && !frame.relation.object &&
++        /\bfor partnership opportunities\b/i.test(raw)) {
++      frame.relation = { type: { value: 'none', raw: null, confidence: 0.9 },
++        direction: { value: 'none', raw: null, confidence: 0.9 }, label: null, object: null };
++      frame.meta.notes.push('treated partnership as user purpose');
+     }
+   }
+-  return frame;
++  return syncClarification(frame);
+ }
+ 
+-/** Existing readers consume SearchSpec; the authoritative frame supplies its semantic fields. */
++const entityOf = (frame: UnderstandingFrame): SpecEntity => {
++  const kind = frame.target.entity_type.value;
++  if (kind === 'organization') return 'company';
++  return ['person', 'company', 'business', 'investor', 'job'].includes(kind) ? kind as SpecEntity : 'unknown';
++};
++
++/** Convert the validated interpretation, with no second raw-query extractor. */
+ export function frameToSearchSpec(input: UnderstandingFrame): SearchSpec {
+   const frame = normalizeSearchFrame(input);
+-  const raw = frame.input.raw;
+-  const legacy = extractSearchSpec(raw);
+-  const supported = ['person', 'company', 'business', 'investor', 'job'];
+-  // An explicit SaaS company request is an organization search even when the
+-  // understanding provider labels the city-scoped target as a local business.
+-  const legacyEntity: SpecEntity = /\bSaaS\s+compan(?:y|ies)\b/i.test(raw)
+-    ? 'company'
+-    : supported.includes(frame.target.entity_type.value)
+-      ? frame.target.entity_type.value as SpecEntity
+-      : frame.target.entity_type.value === 'organization' ? 'company' : legacy.entity;
+-  // Investor nouns beat the frame's target: "investors backing pre-seed AI
+-  // STARTUPS" describes the PORTFOLIO, not the entity being searched.
+-  const entity: SpecEntity = /\b(investors?|vcs?|angels?|funds?)\b/i.test(raw)
+-    ? 'investor'
+-    : legacyEntity;
+-  const semanticFields = new Set(['role', 'industry', 'category', 'requested_service', 'requested_role', 'requested_product']);
+-  const criteria: SpecField[] = legacy.criteria.filter((c) => !semanticFields.has(c.field));
+-  const put = (field: string, value: string, confidence = 1, stated = true) => {
+-    if (!value) return;
++  const entity = entityOf(frame);
++  const criteria: SpecField[] = [];
++  const put = (field: string, value: string | number | boolean | null | undefined, confidence = 1, stated = true) => {
++    if (value == null || String(value).trim() === '') return;
++    const next = { field, value: String(value), stated, confidence };
+     const index = criteria.findIndex((c) => c.field === field);
+-    const next = { field, value, stated, confidence };
+     if (index < 0) criteria.push(next); else criteria[index] = next;
+   };
+-  // Last-chance geography: the deterministic segmenter can miss multi-word
+-  // canonical places ("HVAC companies in the Greater Toronto Area") when a
+-  // strict place-span rule rejects the leading modifier. Bounded n-gram scan
+-  // against the curated geo index — a canonical hit becomes the location.
+-  // Runs only when the frame produced NO location at all.
+-  if (!criteria.some((c) => c.field === 'location')) {
+-    const words = raw.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean);
+-    outer: for (let n = Math.min(4, words.length); n >= 2; n--) {
+-      for (let i = 0; i + n <= words.length; i++) {
+-        const phrase = words.slice(i, i + n).join(' ');
+-        const geo = resolveCanonicalLocation(phrase);
+-        if (geo && ['metro', 'city', 'country', 'admin'].includes(geo.kind)) {
+-          put('location', geo.name, 0.6);
+-          put('location_id', geo.id);
+-          put('location_kind', geo.kind);
+-          if (geo.country_code) put('location_country', geo.country_code);
+-          if (geo.scope) put('location_scope', geo.scope);
+-          if (geo.parent_ids.length) put('location_parents', geo.parent_ids.join(','));
+-          break outer;
+-        }
+-      }
+-    }
+-  }
+-  const descriptor = (field: string, value: OpenValue | null | undefined, transform = (s: string) => s) => {
+-    if (value) put(field, transform(valueOf(value)), value.confidence, !!value.raw);
++  const descriptor = (field: string, value: OpenValue | null | undefined) => {
++    if (value) put(field, valueOf(value), value.confidence, !!value.raw);
+   };
+-  const deterministicTarget = extractFrameDeterministic(raw).target;
+-  let role = valueOf(frame.target.job_title ?? frame.target.role) ||
+-    (entity === 'person' && deterministicTarget.role?.raw && raw.includes(deterministicTarget.role.raw)
+-      ? valueOf(deterministicTarget.role) : '');
+-  const statedIndustry = valueOf(frame.target.industry) || legacy.criteria.find((c) => c.field === 'industry')?.value || '';
+-  const topicStart = raw.search(SOCIAL_TOPIC);
+-  const industryStart = statedIndustry ? raw.toLowerCase().indexOf(statedIndustry.toLowerCase()) : -1;
+-  const industry = topicStart >= 0 && industryStart >= topicStart ? '' : statedIndustry;
+-  // "SaaS founders" has separate industry and role slots downstream.
+-  if (industry && role.toLowerCase().startsWith(industry.toLowerCase() + ' ')) role = role.slice(industry.length).trim();
+-  if (!role && entity === 'job') {
+-    const titlePhrase = frame.target.category ??
+-      (deterministicTarget.category?.raw && raw.includes(deterministicTarget.category.raw) ? deterministicTarget.category : null);
+-    role = valueOf(titlePhrase).replace(/\b(?:remote|jobs?|positions?|openings?|roles?)\b/gi, '').replace(/\s+/g, ' ').trim();
++
++  const role = frame.target.job_title ?? frame.target.role;
++  if (role) put('role', normalizeRole(valueOf(role)), role.confidence, !!role.raw);
++  else if (entity === 'job' && frame.target.category) {
++    put('role', normalizeRole(valueOf(frame.target.category).replace(/\b(?:remote|jobs?|positions?|openings?|roles?)\b/gi, '').trim()), frame.target.category.confidence);
+   }
+-  if (role) put('role', normalizeRole(role), (frame.target.role ?? frame.target.job_title ?? frame.target.category)?.confidence ?? 1);
+-  if (industry) put(entity === 'business' ? 'category' : entity === 'investor' ? 'investor_sector' : 'industry', industry);
+-  // A provider can identify the entity and geography but omit an explicit trade
+-  // that the deterministic frame found verbatim in the target phrase.
+-  const deterministicCategory = !frame.target.category && ['company', 'business'].includes(entity)
+-    ? deterministicTarget.category
+-    : null;
+-  const safeCategory = deterministicCategory?.raw && raw.indexOf(deterministicCategory.raw) >= 0 &&
+-    (!MODAL_NEED.test(raw) || raw.indexOf(deterministicCategory.raw) < (raw.search(MODAL_NEED)))
+-    ? deterministicCategory : null;
+-  const category = valueOf(frame.target.category ?? frame.target.business_type ?? safeCategory).replace(/\s+(?:companies|company|businesses|business)$/i, '');
+-  if (category && ['company', 'business'].includes(entity)) put(entity === 'company' ? 'industry' : 'category', industry || category);
++  const trade = frame.target.industry ?? frame.target.category ?? frame.target.business_type;
++  if (trade) put(entity === 'business' ? 'category' : entity === 'investor' ? 'investor_sector' : 'industry', valueOf(trade), trade.confidence, !!trade.raw);
+   descriptor('company_stage', frame.target.company_stage);
+   if (frame.target.technologies.length) put('technology', frame.target.technologies.map(valueOf).join(', '));
++  const modelText = [frame.target.business_type, frame.target.category, frame.target.entity_subtype].map(valueOf).join(' ');
++  if (/\b(?:d2c|direct.to.consumer)\b/i.test(modelText)) put('business_model', 'd2c');
++  if (/\b(?:b2b|business.to.business)\b/i.test(modelText)) put('business_model', 'b2b');
+ 
+-  if (frame.location) {
+-    const location = frame.location.canonical ?? frame.location.value;
+-    if (GLOBAL.test(location)) {
+-      for (let i = criteria.length - 1; i >= 0; i--) if (criteria[i].field.startsWith('location')) criteria.splice(i, 1);
+-      put('geo_scope', 'worldwide');
+-    } else if (!legacy.locationSuggestion) {
+-      const geo = resolveCanonicalLocation(location.replace(/^the\s+/i, ''));
+-      for (let i = criteria.length - 1; i >= 0; i--) if (criteria[i].field.startsWith('location')) criteria.splice(i, 1);
+-      put('location', geo?.name ?? location, frame.location.confidence);
+-      if (geo) {
+-        put('location_id', geo.id);
+-        put('location_kind', geo.kind);
+-        if (geo.country_code) put('location_country', geo.country_code);
+-        if (geo.scope) put('location_scope', geo.scope);
+-        if (geo.parent_ids.length) put('location_parents', geo.parent_ids.join(','));
+-      }
++  const places = frame.locations.length ? frame.locations : frame.location ? [frame.location] : [];
++  const locationNames = places.filter((p) => p.scope !== 'remote').map((p) => p.canonical ?? p.value);
++  let locationSuggestion: SearchSpec['locationSuggestion'] = null;
++  if (locationNames.length) {
++    const first = places[0]!;
++    const geo = resolveCanonicalLocation(locationNames[0]!);
++    if (geo?.resolution === 'provisional' && geo.name.toLowerCase() !== locationNames[0]!.toLowerCase()) {
++      locationSuggestion = { typed: locationNames[0]!, suggestion: geo.name, confidence: geo.confidence };
++    } else {
++      put('location', geo?.name ?? locationNames[0], first.confidence, !!first.raw);
++    }
++    if (geo && !locationSuggestion) {
++      put('location_id', geo.id);
++      put('location_kind', geo.kind);
++      if (geo.country_code) put('location_country', geo.country_code);
++      if (geo.scope) put('location_scope', geo.scope);
++      if (geo.parent_ids.length) put('location_parents', geo.parent_ids.join(','));
+     }
+   }
++  if (frame.location?.scope === 'remote') {
++    put('employment', 'remote');
++    put('geo_scope', 'worldwide');
++  }
++  if (entity === 'job' && /\bremote\b/i.test(frame.target.category?.value ?? '')) {
++    put('employment', 'remote');
++    put('geo_scope', 'worldwide');
++  }
+ 
++  const relation = frame.relation.type.value;
+   const object = valueOf(frame.relation.object);
+-  // Tentative help-seeking ("may need help with X") is a curiosity frame, not
+-  // an explicit buying ask — never demand service_request evidence for it.
+-  // Explicit asks (looking for / seeking / hiring / needing <service>) keep
+-  // their frame-level intent.
+-  const tentativeHelp = /\b(?:may|might|could)\s+(?:need|benefit\s+from)\s+help\b/i.test(raw);
+-  if (frame.evidence.intent_signal_required && object && !tentativeHelp) {
+-    put(frame.relation.type.value === 'hiring' ? 'requested_role' : 'requested_service', object);
+-  }
++  if (relation === 'needs_service' || relation === 'asking_for_help') put('requested_service', object);
++  if (relation === 'hiring') put('requested_role', object);
++  if (relation === 'seeking_funding') put('funding_status', 'seeking');
++  if (relation === 'has_asset' && /\b(?:website|site)\b/i.test(object)) put('website', 'true');
++  if (relation === 'lacks_asset' && /\b(?:website|site)\b/i.test(object)) put('opportunity', 'no_website');
+   const offer = valueOf(frame.user_context.selling?.service ?? frame.user_context.selling?.product);
+   if (offer) { put('offer', offer); put('mode', 'selling'); }
+-  // A tentative need for a BETTER website never states that no website exists.
+-  if (MODAL_NEED.test(raw) && !/\b(?:without|no|lacks?|missing)\s+(?:a\s+|any\s+)?website/i.test(raw)) {
+-    const index = criteria.findIndex((c) => c.field === 'opportunity');
+-    if (index >= 0) criteria.splice(index, 1);
+-  }
++
+   for (const constraint of frame.constraints) {
+-    if (constraint.field === 'content_topic' && typeof constraint.value === 'string' && !constraint.negated) {
+-      put('content_topic', constraint.value);
+-      put('needs_live', 'true');
++    const value = Array.isArray(constraint.value) ? constraint.value.join('|') : constraint.value;
++    if (constraint.field === 'website' && constraint.operator === 'exists') {
++      if (constraint.negated) put('opportunity', 'no_website'); else put('website', 'true');
++      continue;
++    }
++    if (constraint.negated || constraint.operator === 'neq') {
++      put(`exclude_${constraint.field}`, value);
++      continue;
++    }
++    if (constraint.field === 'work_mode') { put('employment', value); continue; }
++    if (entity === 'job' && ['price', 'salary', 'annual_salary'].includes(constraint.field) && ['gte', 'gt', 'eq'].includes(constraint.operator)) {
++      put('salary_min', value); continue;
+     }
++    if (constraint.field === 'content_topic') { put('content_topic', value); put('needs_live', 'true'); continue; }
++    put(constraint.field, value, constraint.confidence, !!constraint.raw);
+   }
+   if (frame.temporal?.relation === 'within_last' && frame.temporal.window) put('needs_live', 'true');
+-  // "Remote" is a work MODE, not geography: worldwide scope replaces any
+-  // location criterion so downstream gates never geo-gate remote hunts.
+-  const remoteMode = criteria.some((c) => c.field === 'employment' && /remote/i.test(c.value)) ||
+-    /remote/i.test(raw);
+-  if (remoteMode && entity !== 'unknown') {
+-    for (let i = criteria.length - 1; i >= 0; i--) {
+-      if (criteria[i].field === 'location') criteria.splice(i, 1);
+-    }
+-    put('geo_scope', 'worldwide');
++  if (frame.verification.some((v) => /last social post|recent social|last posted/i.test(v.label ?? '') || /last posted|last social post/i.test(v.raw ?? ''))) {
++    put('needs_live', 'true');
++    put('verify_last_social_post', 'true');
+   }
+ 
+-  const eventSignal = ['hiring', 'received_funding', 'seeking_funding'].includes(frame.relation.type.value);
+-  const signalRequired = !tentativeHelp && (frame.evidence.intent_signal_required || eventSignal);
+-  const signalTypes = signalRequired ? legacy.signal_types.length ? legacy.signal_types : [frame.relation.type.value === 'hiring' ? 'hiring' : frame.relation.type.value === 'received_funding' ? 'funding' : 'service_request'] : [];
+-  return {
+-    ...buildSpec({ entity, criteria, raw_query: raw, signal_required: signalRequired, signal_types: signalTypes,
+-      signal_recency: frame.temporal?.window ?? legacy.signal_recency, locationSuggestion: legacy.locationSuggestion }),
+-    understanding: frame,
+-  };
++  const requestedFields = [...new Set(frame.required_fields.map(valueOf))];
++  for (const field of requestedFields) {
++    put(`require_${field}`, 'true');
++    criteria.push({ field: 'required_field', value: field, stated: true, confidence: 1 });
++  }
++  for (const field of frame.preferred_fields.map(valueOf)) put(`prefer_${field}`, 'true');
++  for (const item of frame.verification) put(`verify_${item.kind}`, item.label ?? 'true');
++  for (const item of frame.output) put(`output_${item.kind}`, item.label ?? 'true');
++  if (frame.quantity?.requested) put('requested_count', frame.quantity.requested);
++  if (frame.quantity?.minimum) put('minimum_count', frame.quantity.minimum);
++
++  const signalRequired = frame.evidence.intent_signal_required || ['hiring', 'received_funding', 'seeking_funding', 'needs_service', 'asking_for_help'].includes(relation);
++  const signalTypes = signalRequired ? [['received_funding', 'seeking_funding', 'investing_in'].includes(relation) ? 'funding' : relation === 'hiring' ? 'hiring' : 'service_request'] : [];
++  const purpose = purposeFromFrame(frame);
++  const spec = buildSpec({ entity, criteria, raw_query: frame.input.raw, signal_required: signalRequired, signal_types: signalTypes,
++    signal_recency: frame.temporal?.window ?? null, locationSuggestion });
++  spec.understanding = frame;
++  spec.locations = locationNames;
++  spec.unresolved = frame.unresolved;
++  spec.purpose = purpose;
++  spec.requested_fields = requestedFields;
++  for (const item of frame.unresolved) if (!spec.missing.includes(item.field)) spec.missing.push(item.field);
++  if (locationSuggestion && !spec.missing.includes('location')) spec.missing.push('location');
++  if (spec.missing.length) spec.status = 'needs_clarification';
++  return spec;
++}
++
++/** Apply a dialog answer to the prior frame, without extracting the original request again. */
++export function applyClarificationToFrame(input: UnderstandingFrame, answers: Record<string, string>): UnderstandingFrame {
++  let frame = structuredClone(input);
++  for (const [key, rawAnswer] of Object.entries(answers)) {
++    const answer = rawAnswer.trim();
++    if (!answer) continue;
++    const canonical = key === 'entity' ? 'target.entity_type' : key === 'entity_scope' ? 'target.scope' : key === 'entity_relation' ? 'relation.type' : key;
++    if (['target.entity_type', 'target.scope', 'relation.type', 'relation.object', 'relation.direction'].includes(canonical)) {
++      frame = patchFrame(initState(frame), canonical as BlockingField, answer).state.frame;
++      continue;
++    }
++    if (canonical === 'purpose' || canonical === 'mode') {
++      const purpose = /\b(?:sell|selling|prospect(?:ing)?|outreach)\b/i.test(answer) ? 'prospecting' : /\b(?:recruit|hire)\b/i.test(answer) ? 'recruiting' : /\bpartner\b/i.test(answer) ? 'partnership' : 'research';
++      frame.user_context.objective = openValue(purpose, answer, purpose, 1);
++      continue;
++    }
++    if (canonical === 'location') {
++      const geo = resolveCanonicalLocation(answer);
++      const location: FrameLocation = { value: geo?.name ?? answer, raw: answer, scope: 'in', radius: null, radius_unit: null,
++        country_code: geo?.country_code ?? null, canonical: geo?.resolution === 'resolved' ? geo.name : null, confidence: 1 };
++      frame.location = location;
++      frame.locations = [location];
++      continue;
++    }
++    if (canonical === 'category' || canonical === 'industry' || canonical === 'investor_sector' || canonical === 'role') {
++      const targetField = canonical === 'investor_sector' ? 'industry' : canonical;
++      frame.target[targetField] = openValue(answer, answer, null, 1);
++      continue;
++    }
++    if (canonical === 'offer') {
++      frame.user_context.selling ??= { service: null, product: null };
++      frame.user_context.selling.service = openValue(answer, answer, null, 1);
++      frame.user_context.objective ??= openValue('prospecting', answer, 'prospecting', 1);
++      continue;
++    }
++    const field = canonical.replace(/^unresolved\./, '');
++    if (frame.unresolved.some((u) => u.field === field) || ['salary_min', 'revenue', 'employee_count', 'amount'].includes(field)) {
++      const short = /(-?\d+(?:\.\d+)?)\s*([kmb])\b/i.exec(answer.replace(/,/g, ''));
++      const amount = short ? Number(short[1]) * ({ k: 1_000, m: 1_000_000, b: 1_000_000_000 }[short[2].toLowerCase() as 'k' | 'm' | 'b']) : Number(answer.replace(/[^\d.]/g, ''));
++      if (Number.isFinite(amount) && amount > 0) {
++        frame.constraints = frame.constraints.filter((c) => c.field !== field);
++        frame.constraints.push({ field, operator: 'gte', value: amount, unit: null, negated: false, raw: answer, confidence: 1 });
++        frame.unresolved = frame.unresolved.filter((u) => u.field !== field);
++      }
++    }
++  }
++  return syncClarification(frame);
+ }
+ 
+ /** A known target with usable scope can search without optional sales coaching. */
+@@ -190,9 +262,9 @@ export function isActionableFrame(spec: SearchSpec): boolean {
+   return !!(frame.target.role || frame.target.job_title || frame.target.industry || frame.target.category || frame.target.business_type || frame.relation.object);
+ }
+ 
+-/** Server extraction is bounded; a provider failure returns the existing deterministic frame. */
++/** Server extraction is bounded; provider failure returns the deterministic frame. */
+ export async function understandSearchSpec(query: string, context: Record<string, string>, signal?: AbortSignal | null): Promise<SearchSpec> {
+-  if (process.env.VITEST) return frameToSearchSpec(validateFrame(extractFrameDeterministic(query)).frame);
++  if (process.env.VITEST) return frameToSearchSpec(applyClarificationToFrame(validateFrame(extractFrameDeterministic(query)).frame, context));
+   let timer: ReturnType<typeof setTimeout> | undefined;
+   let abort: (() => void) | undefined;
+   const fallback = (reason: string) => {
+@@ -209,7 +281,7 @@ export async function understandSearchSpec(query: string, context: Record<string
+     });
+     const extraction = import('./extract.server').then(({ extractFrameLLM }) => extractFrameLLM(query, { context, waitForSlotMs: 250 }))
+       .then((result) => result.frame).catch(() => fallback('Understanding provider failed; deterministic fallback used.'));
+-    return frameToSearchSpec(validateFrame(await Promise.race([extraction, bounded])).frame);
++    return frameToSearchSpec(applyClarificationToFrame(validateFrame(await Promise.race([extraction, bounded])).frame, context));
+   } finally {
+     if (timer) clearTimeout(timer);
+     if (abort) signal?.removeEventListener('abort', abort);
+diff --git a/src/lib/understanding/validate.ts b/src/lib/understanding/validate.ts
+index 3fac8b0..97624bd 100644
+--- a/src/lib/understanding/validate.ts
++++ b/src/lib/understanding/validate.ts
+@@ -521,6 +521,7 @@ function normalizeSemanticCore(
+   }
+ 
+   for (const slot of REHARVESTABLE) {
++    if (slot === "industry" && relation.type.value === "offers_service" && /\bbrands?\b/i.test(target.category?.value ?? "")) continue;
+     const held = target[slot];
+     const span = spanOf(held);
+     if (!span) continue;
+@@ -1154,6 +1155,9 @@ export function validateFrame(input: UnderstandingFrame): ValidationResult {
+   // Spans that merely sit side by side ("seed-stage fintechs" -> stage
+   // "seed-stage" + category "fintechs") contain nothing and are left alone.
+   for (const slot of REHARVESTABLE) {
++    // A brand's sold product can also name its market: "brands selling
++    // skincare" needs the offer relation and skincare industry for retrieval.
++    if (slot === "industry" && frame.relation.type.value === "offers_service" && /\bbrands?\b/i.test(frame.target.category?.value ?? "")) continue;
+     const held = frame.target[slot];
+     const span = spanOf(held);
+     if (!span) continue;
+@@ -1652,6 +1656,9 @@ export function validateFrame(input: UnderstandingFrame): ValidationResult {
+       });
+     }
+   }
++  if (relation === "investing_in" && /\b(?:actively|recent|recently|actual|current)\b/i.test(raw)) {
++    frame.evidence.intent_signal_required = true;
++  }
+ 
+   // — lacks_asset(website) is a constraint, not just a relation ——————————
+   //
+diff --git a/src/lib/understanding/vocab.ts b/src/lib/understanding/vocab.ts
+index 8b936b4..76d4037 100644
+--- a/src/lib/understanding/vocab.ts
++++ b/src/lib/understanding/vocab.ts
+@@ -513,7 +513,7 @@ export const CONSTRAINT_FIELD_ALIASES: Record<string, string> = {
+  * the wording around the field and the plural on it.
+  */
+ export const DELIVERABLE_FIELD_PATTERNS: ReadonlyArray<readonly [RegExp, string]> = [
+-  [/\bphone(?:\s+numbers?)?\b/i, "phone"],
++  [/\bphone(?:\s+numbers?)?\b|\bnums\b/i, "phone"],
+   [/\bemails?(?:\s+address(?:es)?)?\b/i, "email"],
+   [/\bwebsites?\b/i, "website"],
+   [/\baddress(?:es)?\b/i, "address"],
+@@ -645,6 +645,7 @@ export const CLARIFICATION_REASONS = [
+   "unreadable_relation",
+   "missing_relation_object",
+   "underspecified_scope",
++  "missing_purpose",
+   "compound_parse_uncertain",
+   "contradiction",
+   "invalid_answer",
+diff --git a/src/routes/_authenticated/discover.tsx b/src/routes/_authenticated/discover.tsx
+index 94a7eec..5b05772 100644
+--- a/src/routes/_authenticated/discover.tsx
++++ b/src/routes/_authenticated/discover.tsx
+@@ -567,6 +567,7 @@ function DiscoverPage() {
+   // Accumulated panel answers for the active turn: partial answers persist
+   // across clarify rounds so answering Q1 then Search on Q2 never loses Q1.
+   const pendingTurnAnswersRef = useRef<Record<string, string>>({});
++  const pendingFrameRef = useRef<import("@/lib/understanding/frame").UnderstandingFrame | null>(null);
+   // Spec-first cutover (SPEC_SEARCH_ENABLED): when true the turn is served by
+   // the canonical spec path; legacy flow below runs untouched otherwise.
+   const specModeRef = useRef(false);
+@@ -694,6 +695,7 @@ function DiscoverPage() {
+           limit: SPEC_PAGE_SIZE,
+           offset,
+           answers: merged,
++          prior_frame: pendingFrameRef.current ?? undefined,
+           force,
+           search_run_id: run.search_run_id,
+           conversation_id: run.conversation_id,
+@@ -707,6 +709,7 @@ function DiscoverPage() {
+ 
+       setSpecEntity(res.spec.entity ?? null);
+       if (res.clarify.length > 0) {
++        pendingFrameRef.current = res.spec.understanding ?? null;
+         setClarifyQs(res.clarify);
+         setPendingQuery(query);
+         setActiveQuery(query);
+@@ -839,7 +842,6 @@ function DiscoverPage() {
+       // must not hide the newer search's spinner.
+       if (session.activeRunId === run.search_run_id) {
+         setSpecPending(false);
+-        setBrowserProgressRun(null);
+       }
+     }
+   };
+@@ -962,6 +964,12 @@ function DiscoverPage() {
+     const location = pick("entity_location", "geography");
+     const investorSector = pick("investor_sector");
+     const mode = pick("entity_mode");
++    const purpose = pick("entity_purpose");
++    const salary = pick("entity_salary");
++    const size = pick("entity_size");
++    const revenue = pick("entity_revenue");
++    const relation = pick("entity_relation");
++    const scope = pick("entity_scope");
+     const offer = pick("entity_offer");
+     // Investor slots survive the panel (previously dropped: answers existed
+     // but never reached retrieval). "any" means no filter — skip it.
+@@ -995,6 +1003,12 @@ function DiscoverPage() {
+     // offer question only after a selling answer — just-looking never sees it.
+     // Explicit "Search" (force) bypasses the gate.
+     if (mode) out.mode = mode;
++    if (purpose) out.purpose = purpose;
++    if (salary) out.salary_min = salary;
++    if (size) out.employee_count = size;
++    if (revenue) out.revenue = revenue;
++    if (relation) out["relation.type"] = relation;
++    if (scope) out["target.scope"] = scope;
+     if (offer) out.offer = offer;
+     // ICP follow-up answers (Phase 1.4): site preference drives the
+     // no_website retrieval filter; channel tailors the pitch (no row filter).
+@@ -1029,6 +1043,8 @@ function DiscoverPage() {
+   const turnId = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+   const resetConversation = () => {
+     clearWorkspace();
++    setBrowserProgressRun(null);
++    setBrowserProgressEvents([]);
+     setTurns([]);
+     setExpandedTurns({});
+     setContactByKey({});
+@@ -1040,6 +1056,7 @@ function DiscoverPage() {
+     rotateConversationId();
+     pendingTurnIdRef.current = null;
+     pendingTurnAnswersRef.current = {};
++    pendingFrameRef.current = null;
+     setPlanTokens(null);
+     setActiveQuery(null);
+     setClarifyAnswers(null);
+@@ -1459,6 +1476,7 @@ function DiscoverPage() {
+       intentRunRef.current += 1;
+       pendingTurnIdRef.current = null;
+       pendingTurnAnswersRef.current = {};
++      pendingFrameRef.current = null;
+       setPlanTokens(null);
+       setClarifyQs([]);
+       setPendingQuery(null);
+@@ -1549,6 +1567,32 @@ function DiscoverPage() {
+   const beginSearch = async (q: string) => {
+     const trimmed = q.trim();
+     if (!trimmed) return;
++    const pendingId = pendingTurnIdRef.current;
++    const pendingQuestion = clarifyQs[0];
++    const startsNewRequest = /^(?:find|search|show|look for|looking for)\b/i.test(trimmed) ||
++      (/^research\b/i.test(trimmed) && /\b(?:in|for|about|businesses|companies|people|jobs|investors)\b/i.test(trimmed));
++    if (specModeRef.current && pendingQuery && pendingId && pendingQuestion && !startsNewRequest) {
++      const field = ({
++        entity_location: "location",
++        entity_category: "category",
++        entity_industry: "industry",
++        entity_role: "role",
++        entity_mode: "mode",
++        entity_purpose: "purpose",
++        entity_salary: "salary_min",
++        entity_size: "employee_count",
++        entity_revenue: "revenue",
++        entity_relation: "relation.type",
++        entity_scope: "target.scope",
++      } as Record<string, string>)[pendingQuestion.id] ?? pendingQuestion.id;
++      setTurns((prev) => prev.map((turn) => turn.id === pendingId
++        ? { ...turn, text: `${turn.text}\n${trimmed}` }
++        : turn));
++      setClarifyQs([]);
++      setPendingQuery(null);
++      await runSpecBranch(pendingQuery, pendingId, { [field]: trimmed });
++      return;
++    }
+     // User bubble first: the submitted text lives in the conversation from
+     // this instant, independent of whatever happens downstream. Results are
+     // attached to the owning turn by onSuccess (turn-owned transcript) — no
+@@ -1556,6 +1600,7 @@ function DiscoverPage() {
+     const newTurnId = turnId();
+     pendingTurnIdRef.current = newTurnId;
+     pendingTurnAnswersRef.current = {};
++    pendingFrameRef.current = null;
+     intentRunRef.current += 1; // cancel any in-flight intent enrichment
+     setIntentProgress(null);
+     setTurns((prev) => [...prev, { id: newTurnId, text: trimmed, ts: Date.now() }]);
+@@ -1909,14 +1954,16 @@ function DiscoverPage() {
+             <div className="min-h-full flex flex-col items-center justify-center py-6 md:py-10">
+               <DiscoverWelcomeHero
+                 greetingName={greetingName || undefined}
+-                onQuickSearch={(q) => {
+-                  setInput(q);
+-                  const text = q.trim();
+-                  setInput("");
+-                  void beginSearch(text).catch((e: unknown) => {
+-                    console.error("[discover] quick search failed", e);
+-                    toast.error(friendlyErrorText(e, "Search failed to start"));
+-                    setInput(text);
++                onGuidedStart={(kind) => {
++                  const category = {
++                    investors: "investors",
++                    founders: "founders",
++                    companies: "companies",
++                    jobs: "jobs",
++                    local_businesses: "local businesses",
++                  }[kind];
++                  void beginSearch(category).catch((e: unknown) => {
++                    toast.error(friendlyErrorText(e, "Could not start guided search"));
+                   });
+                 }}
+               />
+@@ -2000,6 +2047,10 @@ function DiscoverPage() {
+                                     setIntentProgress(null);
+                                     intentRunRef.current += 1;
+                                     pendingTurnIdRef.current = null;
++                                    pendingTurnAnswersRef.current = {};
++                                    pendingFrameRef.current = null;
++                                    setBrowserProgressRun(null);
++                                    setBrowserProgressEvents([]);
+                                     rotateConversationId();
+                                     setPlanTokens(null);
+                                     setActiveQuery(null);
+@@ -2316,7 +2367,7 @@ function DiscoverPage() {
+                         setPendingQuery(null);
+                         if (!q) return;
+                         if (specModeRef.current) {
+-                          void runSpecBranch(q, pendingTurnIdRef.current ?? "", {}).catch(
++                          void runSpecBranch(q, pendingTurnIdRef.current ?? "", {}, true).catch(
+                             (e: Error) =>
+                               toast.error(friendlyErrorText(e, "Search failed to start")),
+                           );

@@ -43,10 +43,12 @@ export type LiveGapfillResult = {
 
 export type LiveGapfillDeps = {
   /** Injectable browser discovery; production always uses the browser adapter. */
-  browser?: ((spec: SearchSpec, options: { searchRunId?: string; signal?: AbortSignal | null; onProgress?: (event: { action: string; source?: string; detail?: string }) => void; researchPlan?: ReturnType<typeof buildResearchPlan>; initialCandidates?: SpecRow[]; desiredCount?: number; isVerified?: (row: SpecRow) => boolean; timeoutMs?: number }) => Promise<SpecRow[]>) | null;
+  browser?: ((spec: SearchSpec, options: { searchRunId?: string; signal?: AbortSignal | null; onProgress?: (event: { action: string; source?: string; detail?: string }) => void; researchPlan?: ReturnType<typeof buildResearchPlan>; initialCandidates?: SpecRow[]; desiredCount?: number; isVerified?: (row: SpecRow) => boolean; timeoutMs?: number; onTrace?: (event: import("./browser-live.server").BrowserTraceEvent) => void }) => Promise<SpecRow[]>) | null;
   searchRunId?: string;
   ownerId?: string;
   onBrowserProgress?: (event: { action: string; source?: string; detail?: string; count?: number | string; row?: import("@/lib/search/search-browser-progress.server").StreamedLead }) => void;
+  /** Diagnostic browser lifecycle trace (harnesses only); never changes behavior. */
+  onBrowserTrace?: (event: import("./browser-live.server").BrowserTraceEvent) => void;
   desiredCount?: number;
   initialCandidates?: SpecRow[];
   isVerified?: (row: SpecRow) => boolean;
@@ -77,10 +79,13 @@ function has(v: unknown) {
 }
 
 /** Lightweight craft normalise — avoids importing spec-search (cycle). */
-function craftFromTag(tag: string, fallback: string): string {
+export function craftFromTag(tag: string, fallback: string, name = ""): string {
   const t = (tag ?? "").trim().toLowerCase();
   if (!t) return fallback;
   if (/dental|dentist/.test(t)) return "dentist";
+  // A general medical tag (amenity=clinic) stays a clinic unless the
+  // business's own name says it is a dental practice.
+  if (/^(?:clinic|doctors?|healthcare)$/.test(t) && /\b(?:dental|dentist\w*|orthodont\w*|endodont\w*|periodont\w*)\b/i.test(name)) return "dentist";
   if (/plumb/.test(t)) return "plumber";
   if (/caf[eé]|coffee|roaster/.test(t)) return "cafe";
   if (/yoga/.test(t)) return "yoga";
@@ -153,7 +158,7 @@ async function defaultOsm(
         structured_absence: (l as typeof l & { structured_website_absent?: boolean }).structured_website_absent === true,
         exact_queries: [],
       },
-      category: craftFromTag(tag, category),
+      category: craftFromTag(tag, category, l.title ?? ""),
       location,
       country: null,
       // The actual OSM record supports identity/contact facts, never website absence.
@@ -681,7 +686,7 @@ export async function runLiveGapfill(
 ): Promise<LiveGapfillResult> {
   const { throwIfAborted, isDeadlineAbort } = await import("./search-run");
   throwIfAborted(deps.signal);
-  const browser = deps.browser === null ? null : (deps.browser ?? (process.env.VITEST ? async () => [] as SpecRow[] : async (query: SearchSpec, options: { searchRunId?: string; signal?: AbortSignal | null; onProgress?: (event: { action: string; source?: string; detail?: string }) => void }) => {
+  const browser = deps.browser === null ? null : (deps.browser ?? (process.env.VITEST ? async () => [] as SpecRow[] : async (query: SearchSpec, options: { searchRunId?: string; signal?: AbortSignal | null; onProgress?: (event: { action: string; source?: string; detail?: string }) => void; onTrace?: (event: import("./browser-live.server").BrowserTraceEvent) => void }) => {
     const { discoverWithBrowser } = await import("./browser-live.server");
     return discoverWithBrowser(query, options);
   }));
@@ -703,6 +708,11 @@ export async function runLiveGapfill(
   const matchSeed = fieldOf(spec, "opportunity") === "no_website"
     ? (await import("@/lib/spec-search.functions")).rowSatisfiesSpec
     : null;
+  // Browser research is the scarce budget. A seed whose known category, role
+  // or location already contradicts the request (a structured source's
+  // generic "company" office for "marketing agencies") is never researched.
+  const specGate = !matchSeed && initialCandidates.length ? await import("@/lib/spec-search.functions") : null;
+  const researchable = (row: SpecRow) => !specGate || specGate.rowCouldSatisfySpec(spec, specGate.sanitizeSpecRow(row, spec));
   const browserSeeds = matchSeed
     ? initialCandidates
         .filter((row) => !row.website_url && row.no_website_verification?.structured_absence === true &&
@@ -715,13 +725,14 @@ export async function runLiveGapfill(
           return strength(b) - strength(a);
         })
         .slice(0, Math.min(20, Math.max(15, desiredCount * 2)))
-    : initialCandidates.slice(0, 6);
+    : initialCandidates.filter(researchable).slice(0, 6);
   const researchPlan = buildResearchPlan(spec, { desiredCount });
   const browserOptions = {
     ...(deps.searchRunId ? { searchRunId: deps.searchRunId } : {}),
     ...(deps.ownerId ? { ownerId: deps.ownerId } : {}),
     ...(deps.signal ? { signal: deps.signal } : {}),
     ...(deps.onBrowserProgress ? { onProgress: deps.onBrowserProgress } : {}),
+    ...(deps.onBrowserTrace ? { onTrace: deps.onBrowserTrace } : {}),
     researchPlan,
     initialCandidates: browserSeeds,
     desiredCount,

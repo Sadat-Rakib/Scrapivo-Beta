@@ -44,7 +44,7 @@
  * being careful.
  */
 
-import { resolveCanonicalLocation } from "@/lib/search/location-resolver";
+import { knownCityName, resolveCanonicalLocation } from "@/lib/search/location-resolver";
 import { normalizeRole } from "@/lib/search/search-spec-extract";
 import {
   clamp,
@@ -369,6 +369,12 @@ function detectUserContext(text: string): { context: UserContext; analysis: stri
       .trim();
   }
 
+  // A stated use for the results belongs to user context, not the target or
+  // exclusion filters. Keep the original wording in input.raw for provenance.
+  if (/\bresearch\s+only\s*:/i.test(text) || /\bno\s+outreach\b/i.test(text)) {
+    context.objective = openValue("research", "research only / no outreach", "research", 1);
+    analysis = analysis.replace(/\bresearch\s+only\s*:\s*/i, "").replace(/[,;]?\s*\bno\s+outreach\b/gi, "").trim();
+  }
   return { context, analysis: analysis || text };
 }
 
@@ -380,9 +386,13 @@ function detectUserContext(text: string): { context: UserContext; analysis: stri
 // then read separately for required/preferred/verification/output.
 
 const DELIVERABLE_CUT_RE =
-  /(?:[,;.]|\band\b)\s*(?=(?:phone|phones|email|emails|socials?|social\s+media|instagram|insta|ig|facebook|fb|linkedin|twitter|reviews?|ratings?|opening\s+hours|hours|address(?:es)?|owner|owners|verify|verified|confirm|double-?check|make\s+sure|prove|include|including|output|export|give\s+me|gimme|send|return|prefer(?:ably)?|ideally|bonus|optional|if\s+possible|if\s+available|nice\s+to\s+have|must\s+have|required|contact\s+info|contacts?|evidence|proof|source|(?:pull|scrape|grab|fetch|extract|collect|gather|note|add|append|attach)\s)\b)/i;
+  /(?:[,;.]|\band\b)\s*(?=(?:phone|phones|email|emails|socials?|social\s+media|instagram|insta|ig|facebook|fb|linkedin|twitter|reviews?|ratings?|opening\s+hours|hours|address(?:es)?|owner|owners|verify|verified|confirm|double-?check|make\s+sure|prove|include|including|output|export|give\s+me|gimme|send|return|prefer(?:ably)?|ideally|bonus|optional|if\s+possible|if\s+available|nice\s+to\s+have|must\s+have|required|contact\s+info|contacts?|evidence|proof|source|(?:pull|scrape|grab|get|fetch|extract|collect|gather|note|add|append|attach)\s)\b)/i;
 
 function coreSegment(text: string): { core: string; tail: string } {
+  const contactAsk = /\b(?:need|want)\s+(?:the\s+|their\s+)?(?:emails?|phone|nums|socials?|contact\s+(?:details|info))\b/i.exec(text);
+  if (contactAsk && contactAsk.index >= 8) {
+    return { core: text.slice(0, contactAsk.index).trim(), tail: text.slice(contactAsk.index).trim() };
+  }
   const m = DELIVERABLE_CUT_RE.exec(text);
   if (!m || m.index < 8) return { core: text, tail: "" };
   return { core: text.slice(0, m.index).trim(), tail: text.slice(m.index).trim() };
@@ -481,6 +491,12 @@ function detectQuantity(text: string): { quantity: Quantity | null; text: string
     const [minWord, minNum, maxWord, maxNum, apxWord, apxNum, plusNum, verbNum, bareNum] =
       m.slice(1);
 
+    // A currency amount can contain a shorter digit match ("$120,000" used
+    // to yield a requested count of zero from its final three digits).
+    const before = text.slice(0, m.index);
+    const following = text.slice(m.index + m[0].length);
+    if (/(?:[$€£]\s*|\d,)$/.test(before) || /^,\d/.test(following) || /^\d/.test(following)) continue;
+
     // Reject when what follows the number is a unit — that is a filter.
     const after = text.slice(m.index + m[0].length).trim().split(/\s+/)[0] ?? "";
     const tail = singularize(after.replace(/[^\p{L}\p{N}%]/gu, ""));
@@ -506,7 +522,7 @@ function detectQuantity(text: string): { quantity: Quantity | null; text: string
     } else if (isPlus) q.minimum = toNumber(plusNum);
     else q.requested = toNumber(verbNum ?? bareNum);
 
-    if (q.requested === null && q.minimum === null && q.maximum === null) continue;
+    if ((q.requested ?? q.minimum ?? q.maximum ?? 0) <= 0) continue;
     return { quantity: q, text: mask(text, m.index, m.index + m[0].length) };
   }
   return openEnded ?? { quantity: null, text };
@@ -838,7 +854,7 @@ const RECEIVED_FUNDING_RE =
   /\b(?:raised|just\s+raised|closed|secured|landed|announced|got|received|took)\s+(?:a\s+|an\s+|their\s+|some\s+|new\s+)?(pre-?seed|seed|series\s+[a-e]|angel\s+round|bridge|funding\s+round|round\s+of\s+funding|round|funding|investment|capital|money|cash|\$[\d.]+\s*[mkb]?)\b|\b(?:recently\s+|newly\s+|just\s+)?(?:funded|backed)\b|\bventure[-\s]backed\b|\bpost[-\s](?:seed|series\s+[a-e])\b/i;
 
 const INVESTING_RE =
-  /\b(?:funding|invest(?:ing|s)?\s+in|back(?:ing|s)|writing\s+cheques?\s+(?:to|for)|deploying\s+capital\s+(?:into|in))\s*/i;
+  /\b(?:funding|invest(?:ing|s)?\s+in|back(?:ing|s)?|writing\s+(?:cheques?|checks?)(?:\s+(?:to|for|of))?|deploying\s+capital\s+(?:into|in))\s*/i;
 
 const SEEKING_FUNDING_RE =
   /\b(?:raising|looking\s+to\s+raise|trying\s+to\s+raise|seeking\s+(?:funding|investment|investors?|capital)|looking\s+for\s+(?:funding|investment|investors?|capital)|fundrais(?:ing|e))\b/i;
@@ -1107,7 +1123,10 @@ export function detectRelation(text: string, subject: HeadClassification): Relat
   // recruiters" wants one. Both contain a hiring word, so the EARLIER cue wins
   // — the verb the user actually chose comes first.
   const offerFirst = OFFERS_RE.exec(text);
-  const hireFirst = HIRING_RE.exec(text);
+  const postedIsJob = (hit: RegExpExecArray | null) => !hit || !/posted|advertis/i.test(hit[0]) ||
+    /\b(?:job|role|vacancy|opening|position|candidate|staff|engineer|developer)\b/i.test(text.slice(hit.index, hit.index + 90));
+  const tentativeHire = HIRING_RE.exec(text);
+  const hireFirst = postedIsJob(tentativeHire) ? tentativeHire : null;
   if (offerFirst && (!hireFirst || offerFirst.index < hireFirst.index)) {
     const obj = objectAfterCue(text, offerFirst);
     const what = obj.value;
@@ -1122,7 +1141,7 @@ export function detectRelation(text: string, subject: HeadClassification): Relat
     );
   }
 
-  if ((m = HIRING_RE.exec(text))) {
+  if ((m = hireFirst)) {
     const obj = takeObject(text, m.index + m[0].length);
     const isPosting = /posted|advertis/i.test(m[0]);
     return hit(
@@ -1342,9 +1361,12 @@ const strictPlace = (s: string) => {
  * preposition — and this function's job is only to veto the spans that are
  * demonstrably something else.
  */
+const DELIVERABLE_WORD = /\b(?:public|contacts?|details?|info|e-?mails?|phones?|numbers?|websites?|socials?|linkedin)\b/i;
+
 function plausiblePlace(span: string): boolean {
   const s = span.trim();
   if (s.length < 2 || /\|/.test(s)) return false;
+  if (/^(?:paying|salary|paid|this|that|these|those|much|size)$/i.test(s)) return false;
   if (isTemporalPhrase(s)) return false;
   if (strictPlace(s)) return true;
   // A recognized entity/role/category noun is not a place. This is what stops
@@ -1369,6 +1391,10 @@ function plausiblePlace(span: string): boolean {
   // so "compliance" gets through; a place the gazetteer knows is already past
   // this by the `strictPlace` check above.
   if (/(?:tion|sion|ment|ics|ology|ism|ship)$/i.test(s.split(/\s+/).at(-1)!)) return false;
+  // A requested deliverable is not a town: "founders public contact details",
+  // "SaaS founders public emails" (the `with` dropped). A real place with one of
+  // these words in its name is gazetteer-known and returned above.
+  if (DELIVERABLE_WORD.test(s)) return false;
   return true;
 }
 
@@ -1474,6 +1500,20 @@ function detectLocation(
   return { location: null, text };
 }
 
+/** A single target searched in either place is one request with OR geography. */
+function detectOrLocations(text: string, primary: FrameLocation | null): FrameLocation[] {
+  if (!primary || primary.scope === "remote") return [];
+  const re = /\b(?:in|near|around|across|from)\s+([\p{L}'-]+(?:\s+[\p{L}'-]+){0,3})\s+or\s+([\p{L}'-]+(?:\s+[\p{L}'-]+){0,3})/giu;
+  for (const match of text.matchAll(re)) {
+    const first = takePlaceSpan(tokenize(match[1]), strictPlace).join(" ");
+    const second = takePlaceSpan(tokenize(match[2]), strictPlace).join(" ");
+    if (!first || !second || !plausiblePlace(first) || !plausiblePlace(second)) continue;
+    if (first.toLowerCase() !== primary.value.toLowerCase() && first.toLowerCase() !== primary.canonical?.toLowerCase()) continue;
+    return [primary, geoFor(second, second, primary.scope)];
+  }
+  return [];
+}
+
 // ── Constraints ───────────────────────────────────────────────────────────
 
 const NUM = String.raw`(\d[\d,.]*)`;
@@ -1517,7 +1557,7 @@ function detectExclusions(text: string): Constraint[] {
     // filter beside a relation that already says it — and the check goes
     // through the shared vocabulary, which tolerates "no proper wesbite",
     // rather than through a second list of asset words that drifts from it.
-    const value = words.join(" ");
+    const value = words.map((w, i) => i === words.length - 1 ? singularize(w) : w).join(" ");
     if (isAssetPhrase(value)) continue;
 
     // What KIND of thing is being excluded decides the field, and the
@@ -1614,11 +1654,11 @@ export function detectConstraints(text: string): Constraint[] {
     if (v > 0) push({ field: "rating", operator: op, value: v, unit: "stars", raw: m[0] });
   }
 
-  const MONEY = new RegExp(
-    `\\b(under|below|less\\s+than|over|above|more\\s+than|at\\s+least|around|about)\\s*\\$?\\s*${NUM}\\s*(k|m|b)?\\s*(?:\\/|\\s+per\\s+)?\\s*(hour|hr|month|mo|year|yr|day)?`,
+    const MONEY = new RegExp(
+    `\\b(under|below|less\\s+than|over|above|more\\s+than|at\\s+least|around|about)\\s*[$€£]?\\s*${NUM}\\s*(k|m|b)?\\s*(?:\\/|\\s+per\\s+)?\\s*(hour|hr|month|mo|year|yr|day)?`,
     "i",
   );
-  if ((m = MONEY.exec(text)) && /\$|budget|rate|price|revenue|cost|pay|\/\s*(?:hour|hr)/i.test(text)) {
+  if ((m = MONEY.exec(text)) && /[$€£]|budget|rate|price|revenue|cost|pay|\/\s*(?:hour|hr)/i.test(text)) {
     const q = m[1].toLowerCase();
     let v = num(m[2]);
     const mult = (m[3] ?? "").toLowerCase();
@@ -1695,7 +1735,7 @@ const REQUIRED_MARKER =
  * "include socials if possible" is preferred, not required.
  */
 const DELIVERY_MARKER =
-  /\b(pull|scrape|grab|fetch|extract|collect|gather|include|including|add|append|attach|note|give\s+me|gimme|send|return|export|output|along\s+with|list)\b/i;
+  /\b(pull|scrape|grab|fetch|extract|collect|gather|include|including|add|append|attach|note|give\s+me|gimme|get|send|return|export|output|along\s+with|list)\b/i;
 
 /**
  * Split on clause boundaries so "phone required, socials if possible" lands in
@@ -1723,6 +1763,7 @@ export function fieldRequirements(
     if (!isPreferred && !isRequired) continue;
     const bucket = isPreferred ? preferred : required;
     for (const name of fieldsNamedIn(clause)) {
+      if (name === "website" && /\bneed(?:s)?\s+(?:a\s+)?websites?\b/i.test(clause) && !DELIVERY_MARKER.test(clause)) continue;
       if (!bucket.some((f) => f.value === name)) bucket.push(openValue(name, clause.trim(), name, 0.7));
     }
   }
@@ -1736,6 +1777,14 @@ export function fieldRequirements(
     if (!required.some((f) => f.value === name) && !preferred.some((f) => f.value === name)) {
       required.push(openValue(name, name, name, 0.6));
     }
+  }
+  if (/\ball\s+contact\s+details?\b|\bcontact\s+info(?:rmation)?\b/i.test(text)) {
+    for (const name of ["email", "phone"]) {
+      if (!required.some((f) => f.value === name)) required.push(openValue(name, "all contact details", name, 0.8));
+    }
+  }
+  if (/\bemails?\b[^.;]{0,25}\bif\s+public\b/i.test(text) && !required.some((f) => f.value === "email")) {
+    required.push(openValue("email", "email if public", "email", 0.8));
   }
   return { required, preferred };
 }
@@ -2060,8 +2109,10 @@ export function extractFrameDeterministic(
   }
 
   // 1. The searcher's own sentence, lifted out before anything reads the rest.
-  const { context, analysis } = detectUserContext(text);
+  let { context, analysis } = detectUserContext(text);
   frame.user_context = context;
+  analysis = analysis.replace(/\b(in|near|around)\s+(.+?)\s+(?:wait\s+)?no\s+(?:make\s+that|actually|rather|instead)\s+([\p{L}\s-]+?)(?=,|\.|\bwith\b|$)/iu,
+    (_whole, prep: string, _old: string, replacement: string) => `${prep} ${replacement.trim()}`);
 
   // 2. Deliverables are cut BEFORE the compound split, or "…and give me a
   //    table plus outreach drafts" reads as a second search for tables. What
@@ -2077,6 +2128,18 @@ export function extractFrameDeterministic(
   const q = detectQuantity(work);
   frame.quantity = q.quantity;
   work = q.text;
+  const amountPlaceholder = /\bthis\s+much\b/i.exec(primaryRaw);
+  if (amountPlaceholder) {
+    const field = /\b(?:jobs?|salary|paying|paid|compensation|wages?)\b/i.test(primaryRaw)
+      ? "salary_min" : /\brevenue\b/i.test(primaryRaw) ? "revenue" : "amount";
+    frame.unresolved.push({ field, raw: amountPlaceholder[0] });
+    frame.constraints.push({ field, operator: "gte", value: null, unit: null, negated: false, raw: amountPlaceholder[0], confidence: 1 });
+  }
+  const sizePlaceholder = /\b(?:around|about|roughly|at least|under)\s+this\s+size\b/i.exec(primaryRaw);
+  if (sizePlaceholder) {
+    frame.unresolved.push({ field: "employee_count", raw: sizePlaceholder[0] });
+    frame.constraints.push({ field: "employee_count", operator: "eq", value: null, unit: null, negated: false, raw: sizePlaceholder[0], confidence: 1 });
+  }
   const t = detectTemporal(work);
   frame.temporal = t.temporal;
   work = t.text;
@@ -2103,10 +2166,13 @@ export function extractFrameDeterministic(
   //    become the positive one.
   // Read twice, never as one string: concatenating the masked core and the raw
   // request let a match start in one and end in the other.
-  frame.constraints = dedupeConstraints([
+  frame.constraints = dedupeConstraints([...frame.constraints,
     ...detectConstraints(work.slice(0, 1600)),
     ...detectConstraints(analysis.slice(0, 1600)),
   ]);
+  if (/\b(?:not|never|exclude|excluding|without)\s+(?:already\s+)?funded\b/i.test(analysis)) {
+    frame.constraints.push({ field: "funding_status", operator: "neq", value: "funded", unit: null, negated: true, raw: "not already funded", confidence: 0.9 });
+  }
   const excluded = new Set(
     frame.constraints
       .filter((c) => c.field === "location" && c.negated)
@@ -2160,8 +2226,12 @@ export function extractFrameDeterministic(
   // every two-word category would be halved.
   let trailingPlace: string | null = null;
   const words = phrase.split(/\s+/).filter(Boolean);
+  // A bare participle after the head noun opens a clause ("founders talking
+  // about churn", "agencies based…"); it is not a town, unless it is a place
+  // someone actually knows ("cafes beijing").
   const takePlace = (tail: string): boolean =>
-    plausiblePlace(tail) && !excluded.has(tail.toLowerCase());
+    plausiblePlace(tail) && !excluded.has(tail.toLowerCase()) &&
+    !(/^[\p{L}]+(?:ing|ed)$/iu.test(tail) && !strictPlace(tail) && !knownCityName(tail));
 
   if (head.kind === "unknown" || head.guessed === true) {
     for (let drop = 1; drop <= Math.min(3, words.length - 1); drop++) {
@@ -2170,7 +2240,10 @@ export function extractFrameDeterministic(
       if (retry.kind === "unknown") continue;
       const tail = words.slice(-drop).join(" ");
       const placelike = takePlace(tail);
-      if (head.kind !== "unknown" && !(placelike && retry.confidence > head.confidence)) continue;
+      // A shape-guessed head loses to a known head when what follows it is a
+      // requested deliverable ("founders public contact details").
+      const deliverableTail = head.guessed === true && retry.guessed !== true && DELIVERABLE_WORD.test(tail);
+      if (head.kind !== "unknown" && !(placelike && retry.confidence > head.confidence) && !deliverableTail) continue;
       head = retry;
       phrase = shorter;
       if (placelike) {
@@ -2262,12 +2335,41 @@ export function extractFrameDeterministic(
     // A repaired head belongs in the value, not only in `normalized`: the
     // typo is preserved verbatim in `raw`, and "foundders" as the value is a
     // descriptor nothing downstream can match on.
-    const spelled = head.repairedFrom
+    let spelled = head.repairedFrom
       ? phrase.replace(new RegExp(`\\b${head.repairedFrom}\\b`, "i"), head.head ?? head.repairedFrom)
       : phrase;
+    // "b2b saas founders" is role=founder + industry=saas (+ model b2b, read
+    // from the raw text later) — the lexicon's intent. Leaving the industry in
+    // the role made validation drop the industry as a span harvested twice,
+    // and the role then matched no real founder title.
+    let rolePhrase = phrase;
+    if (entity === "person" && head.industry && head.head) {
+      const industryTokens = new Set(head.industry.toLowerCase().split(/\s+/));
+      const keep = (word: string) => !industryTokens.has(word.toLowerCase()) && !/^(?:b2b|b2c|d2c|dtc)$/i.test(word);
+      const stripped = spelled.split(/\s+/).filter(keep).join(" ").trim();
+      if (stripped && stripped.toLowerCase() !== spelled.toLowerCase()) {
+        spelled = stripped;
+        rolePhrase = phrase.split(/\s+/).filter(keep).join(" ").trim() || phrase;
+      }
+    }
+    // "founders of (B2B SaaS) startups": a GENERIC organization noun is no
+    // part of the title ("founder of startups" matches no real founder). A
+    // startup noun is the company stage. A noun that narrows the kind of
+    // organization ("founders of agencies", "of brands") is kept as said.
+    if (entity === "person" && head.head) {
+      const ofOrg = /^(.+?)\s+(?:of|at|from)\s+(startups?|scale-?ups?|companies|company|firms?|businesses)$/i.exec(spelled.trim());
+      if (ofOrg && ofOrg[1].toLowerCase().includes(head.head.toLowerCase().replace(/s$/, ""))) {
+        spelled = ofOrg[1];
+        rolePhrase = rolePhrase.replace(/\s+(?:of|at|from)\s+\S+$/i, "").trim() || rolePhrase;
+        if (/^(?:startups?|scale-?ups?)$/i.test(ofOrg[2]) && !frame.target.company_stage) {
+          frame.target.company_stage = openValue("startup", ofOrg[2], "startup", 0.8);
+          notes.push(`"${ofOrg[2]}" names the company stage, not part of the role`);
+        }
+      }
+    }
     const descriptor = openValue(
       spelled.toLowerCase(),
-      phrase,
+      rolePhrase,
       canonicalize(spelled) ?? singularPhrase(spelled, head.head, head.repairedFrom),
       head.confidence,
     );
@@ -2296,6 +2398,21 @@ export function extractFrameDeterministic(
   }
   if (head.industry) {
     frame.target.industry = openValue(head.industry, head.industry, head.industry, 0.7);
+  }
+  if (frame.target.entity_type.value === "job") {
+    for (const match of analysis.matchAll(/\b(?:React|TypeScript)\b/gi)) {
+      const named = /^react$/i.test(match[0]) ? "React" : "TypeScript";
+      if (!frame.target.technologies.some((t) => t.value === named)) {
+        frame.target.technologies.push(openValue(named, match[0], named, 0.9));
+      }
+    }
+  }
+  const colloquialBrand = /\bd2c\s+(.+?)\s+(?:guys|people|folks)\b/i.exec(phrase);
+  if (colloquialBrand && frame.target.entity_type.value === "company") {
+    frame.target.entity_subtype = openValue("brand", colloquialBrand[0], "brand", 0.85);
+    frame.target.industry = openValue(colloquialBrand[1].toLowerCase(), colloquialBrand[1], null, 0.75);
+    frame.target.business_type = openValue("d2c", "D2C", "d2c", 0.9);
+    frame.target.category = null;
   }
   // The claim to prove is the target itself — "marketing agencies in Bristol"
   // has to be shown to really be marketing agencies. The flags themselves are
@@ -2408,7 +2525,7 @@ export function extractFrameDeterministic(
     if ((rel.type === "hiring" || rel.type === "seeking_client") && entity === "person") {
       frame.organization_context.on_behalf_of_company = rel.type === "hiring" ? "yes" : "unknown";
     }
-  } else if (RELATION_SIGNAL_RE.test(work)) {
+  } else if (RELATION_SIGNAL_RE.test(work) && !/\b(?:posted?|posts?)\s+(?:recently|lately|this\s+(?:week|month))\b/i.test(work)) {
     // Wording announces a relationship we could not read. That is `unknown`,
     // and it is a different statement from `none`.
     frame.relation.type = {
@@ -2423,6 +2540,21 @@ export function extractFrameDeterministic(
     frame.relation.type = { value: "none", raw: null, confidence: 0.85 };
     frame.relation.direction = { value: "none", raw: null, confidence: 0.85 };
     frame.relation.object = null;
+  }
+  if (frame.constraints.some((c) => c.field === "funding_status" && c.negated) && frame.relation.type.value === "received_funding") {
+    frame.relation.type = { value: "none", raw: null, confidence: 0.85 };
+    frame.relation.direction = { value: "none", raw: null, confidence: 0.85 };
+    frame.relation.object = null;
+  }
+  if (frame.constraints.some((c) => c.field === "funding_status" && c.negated) && /\braising\b/i.test(primaryRaw)) {
+    frame.relation.type = { value: "seeking_funding", raw: "raising", confidence: 0.85 };
+    frame.relation.direction = { value: "subject_to_object", raw: "raising", confidence: 0.85 };
+    frame.relation.object = openValue("funding", "raising", "funding", 0.85);
+    frame.constraints = frame.constraints.filter((c) => c.field !== "relation" && c.field !== "service");
+  }
+  if (frame.target.entity_type.value === "company" && /\bbrands?\b/i.test(frame.target.category?.value ?? "") &&
+      frame.relation.type.value === "offers_service" && frame.relation.object && !frame.target.industry) {
+    frame.target.industry = frame.relation.object;
   }
 
   // 7b. One relation settles the target's kind by itself: only a person seeks
@@ -2456,15 +2588,37 @@ export function extractFrameDeterministic(
     loc.location ??
     modifierLocation ??
     (trailingPlace ? geoFor(trailingPlace, trailingPlace, "in", 0.4) : null);
+  frame.locations = detectOrLocations(primaryRaw, frame.location);
+  if (!frame.location) {
+    const prefix = /^([\p{Lu}][\p{L}'-]+(?:\s+[\p{Lu}][\p{L}'-]+){0,2})\s+(?:businesses|firms|shops|companies|brands|jobs|restaurants)\b/u.exec(primaryRaw);
+    if (prefix) {
+      const words = prefix[1].split(/\s+/);
+      const place = words.length > 1 && strictPlace(words.at(-1)!) ? words.slice(0, -1).join(" ") : prefix[1];
+      if (plausiblePlace(place)) frame.location = geoFor(place, place, "in", 0.5);
+    }
+  }
+  if (frame.location && frame.target.entity_type.value === "business" && !frame.target.entity_subtype &&
+      /^\s*[\p{Lu}][\p{L}'-]+\s+(?:[\p{Lu}][\p{L}'-]+\s+)?businesses\b/u.test(primaryRaw)) {
+    frame.target.entity_subtype = openValue("local", null, "local", 0.6);
+  }
 
   // 9. Deliverables, from the whole request — the cut segment included.
   const fields = fieldRequirements(analysis, deliverableTail);
   frame.required_fields = fields.required;
+  if (frame.required_fields.some((f) => ["linkedin", "instagram", "facebook"].includes(f.value)) &&
+      !frame.required_fields.some((f) => f.value === "socials")) {
+    frame.required_fields.push(openValue("socials", null, "socials", 0.6));
+  }
   frame.preferred_fields = fields.preferred;
   frame.contact_requirements = fields.required.filter((f) =>
     ["phone", "email", "address", "linkedin", "instagram", "facebook", "socials"].includes(f.value),
   );
   frame.verification = detectVerification(analysis);
+  if (/\b(?:last|latest|recent|recently|this\s+(?:week|month)|active)\b[^.!?]{0,70}\b(?:social|posts?|posted|instagram|insta|facebook|linkedin)\b|\b(?:social|posts?|posted|instagram|insta|facebook|linkedin)\b[^.!?]{0,70}\b(?:last|latest|recent|recently|this\s+(?:week|month)|active)\b/i.test(analysis)) {
+    if (!frame.verification.some((v) => /social post/i.test(v.label ?? ""))) {
+      frame.verification.push({ kind: "other", label: "last social post date", raw: span(analysis) });
+    }
+  }
   frame.output = detectOutput(analysis);
 
   // A request that specifies deliverables at all implies two it never spells
@@ -2520,6 +2674,9 @@ export function extractFrameDeterministic(
   if (obligation) {
     frame.evidence.claim_evidence_required = obligation.claim;
     frame.evidence.intent_signal_required = obligation.intent;
+  }
+  if (relType === "investing_in" && /\b(?:actively|recent|recently|actual|current)\b/i.test(analysis)) {
+    frame.evidence.intent_signal_required = true;
   }
   frame.task_type = {
     value: entity === "job" ? "job_discovery" : "lead_discovery",

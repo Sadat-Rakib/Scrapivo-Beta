@@ -10,6 +10,28 @@ import { IntentBadge } from "@/components/discover/intent-badge";
 import type { SignalTier } from "@/lib/intent/strategy";
 import { Button } from "@/components/ui/button";
 import { ensureHttpUrl } from "@/lib/search/site-url";
+import { publicSourceLabel } from "@/lib/search/activity-presenter";
+import { websiteStatus, type WebsiteStatusView } from "@/lib/search/website-status";
+
+const WEBSITE_TONE: Record<WebsiteStatusView["tone"], string> = {
+  opportunity: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
+  warning: "border-amber-500/30 bg-amber-500/10 text-amber-300",
+  neutral: "border-border bg-muted text-muted-foreground",
+};
+
+/** Evidence-backed website status chip; a present site is shown by its link instead. */
+export function WebsiteStatusChip({ row }: { row: LocalBusinessRow }) {
+  const status = websiteStatus(row);
+  if (status.state === "has_website") return null;
+  return (
+    <span
+      title={status.proof ?? undefined}
+      className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full border ${WEBSITE_TONE[status.tone]}`}
+    >
+      <Globe className="size-3" aria-hidden="true" /> {status.label}
+    </span>
+  );
+}
 
 /** Verified-intent badge input (null/undefined = no badge, never shown). */
 export type IntentBadgeInput = { tier: SignalTier; confidence?: number } | null | undefined;
@@ -245,7 +267,7 @@ export function CompanyCard({
               key={p}
               className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground"
             >
-              {p}
+              {publicSourceLabel(p, row.sample_url)}
             </span>
           ))}
         </div>
@@ -356,7 +378,7 @@ export function PersonCard({
             {intent ? <IntentBadge tier={intent.tier} confidence={intent.confidence} /> : null}
             {row.platform && (
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground truncate max-w-[130px]">
-                {row.platform}
+                {publicSourceLabel(row.platform, row.sample_url)}
               </span>
             )}
             {row.posted_at_relative ? (
@@ -879,6 +901,7 @@ export function LocalBusinessCard({
             <Globe className="size-3" /> Website
           </a>
         )}
+        <WebsiteStatusChip row={row} />
         {row.phone && (
           <span className="inline-flex items-center gap-1 text-muted-foreground">
             <Phone className="size-3" /> {row.phone}
@@ -947,7 +970,7 @@ export function PostsList({ leads, onOpen }: { leads: Lead[]; onOpen: (l: Lead) 
           <span className="min-w-0 flex-1">
             <span className="block text-sm font-medium truncate">{l.title}</span>
             <span className="block text-[11px] text-muted-foreground truncate">
-              {l.platform ?? l.source ?? "Post"}
+              {publicSourceLabel(l.platform ?? l.source, l.full_post_url)}
             </span>
           </span>
           <ExternalLink className="size-3.5 text-muted-foreground shrink-0" />

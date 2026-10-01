@@ -37,12 +37,17 @@ export function zeroResultsNarrative(
     pendingEnrichment?: number;
     qualificationRejected?: number;
     reason?: string;
+    /** User-safe source health sentence (never raw provider errors). */
+    sourceHealth?: { summary?: string | null } | null;
   } | null,
 ): string | null {
   if (!trace) return null;
   const discovered = trace.rawCandidates ?? 0;
+  const health = trace.sourceHealth?.summary ?? null;
   if (discovered === 0) {
-    return "No public sources returned candidates for this query yet. Try broadening the location or removing a constraint.";
+    return health
+      ? `${health} The sources that answered returned no candidates for this query.`
+      : "No public sources returned candidates for this query yet. Try broadening the location or removing a constraint.";
   }
   if (trace.reason === "INCOMPLETE" && (trace.pendingEnrichment ?? 0) > 0) {
     return `${trace.pendingEnrichment} candidates were found, but their public details could not be verified in the time available.`;

@@ -62,6 +62,8 @@ export function buildSourceHealthRows(
 export async function logSourceHealth(rows: SourceHealthRow[]): Promise<void> {
   if (!rows.length) return;
   try {
+    const { skipPersistence } = await import("@/lib/persistence-policy.server");
+    if (skipPersistence("source_health")) return;
     const { getAdmin } = await import("@/integrations/my-supabase/admin.server");
     const { error } = await getAdmin().from("source_health").insert(rows);
     if (error && process.env.NODE_ENV === "development") {

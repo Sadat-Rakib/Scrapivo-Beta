@@ -17,6 +17,22 @@ export type StructuredJobPosting = {
   employmentType: string | null;
 };
 
+/** A literal schema.org local-business node (standalone, @graph, or ItemList entry). */
+export type StructuredLocalBusiness = {
+  name: string;
+  /** Literal @type values, e.g. ["Restaurant"]. */
+  types: string[];
+  url: string | null;
+  telephone: string | null;
+  streetAddress: string | null;
+  locality: string | null;
+  region: string | null;
+  postalCode: string | null;
+  country: string | null;
+  /** Where on the page it came from: a list entry or a standalone node. */
+  source: "item_list" | "node";
+};
+
 export type StructuredPageFacts = {
   jobs: StructuredJobPosting[];
   organizationName: string | null;
@@ -24,7 +40,47 @@ export type StructuredPageFacts = {
   organizationLocation: string | null;
   emails: string[];
   phones: string[];
+  /** Local businesses literally described by JSON-LD (directory lists included). */
+  businesses?: StructuredLocalBusiness[];
 };
+
+/** Separator a browser adapter uses when returning several JSON-LD blocks. */
+export const JSONLD_BLOCK_SEPARATOR = "\u001E";
+const MAX_BUSINESSES = 150;
+/** schema.org LocalBusiness and its common subclasses (never plain Organization). */
+const LOCAL_BUSINESS_TYPE = /^(?:LocalBusiness|Restaurant|FoodEstablishment|FastFoodRestaurant|CafeOrCoffeeShop|Bakery|BarOrPub|Brewery|Winery|Distillery|IceCreamShop|Store|\w+Store|AutoRepair|AutomotiveBusiness|AutoDealer|AutoBodyShop|HomeAndConstructionBusiness|Plumber|Electrician|HVACBusiness|RoofingContractor|GeneralContractor|HousePainter|Locksmith|MovingCompany|ProfessionalService|LegalService|Attorney|Notary|AccountingService|FinancialService|InsuranceAgency|RealEstateAgent|TravelAgency|Dentist|MedicalBusiness|MedicalClinic|Physician|Pharmacy|Optician|Physiotherapy|HealthAndBeautyBusiness|BeautySalon|HairSalon|NailSalon|DaySpa|TattooParlor|SportsActivityLocation|ExerciseGym|HealthClub|ChildCare|DryCleaningOrLaundry|EntertainmentBusiness|LodgingBusiness|Hotel|Motel|BedAndBreakfast|VeterinaryCare|AnimalShelter|EmploymentAgency|RecyclingCenter|SelfStorage|ShoppingCenter|TouristInformationCenter|GovernmentOffice|PostOffice|Library|EmergencyService)$/;
+
+function localBusinessOf(node: Record<string, unknown>, source: StructuredLocalBusiness["source"]): StructuredLocalBusiness | null {
+  const types = asArray(node["@type"]).flatMap((t) => String(t).split(/[\s,]+/)).map((t) => t.replace(/^.*[/#]/, "")).filter(Boolean);
+  if (!types.some((t) => LOCAL_BUSINESS_TYPE.test(t))) return null;
+  const name = asText(node.name);
+  if (!name || name.length < 2) return null;
+  const address = node.address && typeof node.address === "object" && !Array.isArray(node.address)
+    ? (node.address as Record<string, unknown>) : asArray(node.address)[0] as Record<string, unknown> | undefined;
+  const country = address && typeof address === "object" ? address.addressCountry : null;
+  const telephone = asText(node.telephone);
+  return {
+    name: name.slice(0, 160),
+    types: types.filter((t) => LOCAL_BUSINESS_TYPE.test(t)),
+    url: asText(node.url),
+    telephone: telephone && /^[+\d\s().-]{7,}$/.test(telephone) ? telephone : null,
+    streetAddress: address && typeof address === "object" ? asText(address.streetAddress) : null,
+    locality: address && typeof address === "object" ? asText(address.addressLocality) : null,
+    region: address && typeof address === "object" ? asText(address.addressRegion) : null,
+    postalCode: address && typeof address === "object" ? asText(address.postalCode) : null,
+    country: country && typeof country === "object" ? asText((country as Record<string, unknown>).name) : asText(country),
+    source,
+  };
+}
+
+function pushBusiness(facts: StructuredPageFacts, business: StructuredLocalBusiness | null): void {
+  if (!business) return;
+  facts.businesses ??= [];
+  if (facts.businesses.length >= MAX_BUSINESSES) return;
+  const key = `${business.name.toLowerCase()}|${(business.streetAddress ?? business.locality ?? "").toLowerCase()}`;
+  if (facts.businesses.some((b) => `${b.name.toLowerCase()}|${(b.streetAddress ?? b.locality ?? "").toLowerCase()}` === key)) return;
+  facts.businesses.push(business);
+}
 
 function orgAddressText(address: unknown): string | null {
   if (!address || typeof address !== "object") return asText(address);
@@ -96,6 +152,18 @@ function salaryText(baseSalary: unknown): string | null {
 function interpretNode(node: Record<string, unknown>, facts: StructuredPageFacts): void {
   const types = asArray(node["@type"]).flatMap((t) => String(t).split(/[\s,]+/));
   const type = types[0]?.toLowerCase() ?? "";
+  // Directory lists describe many businesses. Their entries are collected as
+  // businesses only; they never become the page's own organization/contacts.
+  if (types.some((t) => /^itemlist$/i.test(t))) {
+    for (const element of asArray(node.itemListElement)) {
+      if (!element || typeof element !== "object") continue;
+      const entry = element as Record<string, unknown>;
+      const item = entry.item && typeof entry.item === "object" && !Array.isArray(entry.item) ? entry.item as Record<string, unknown> : entry;
+      pushBusiness(facts, localBusinessOf(item, "item_list"));
+    }
+    return;
+  }
+  pushBusiness(facts, localBusinessOf(node, "node"));
   if (type === "jobposting") {
     const title = asText(node.title);
     if (!title) return;
@@ -173,22 +241,29 @@ export function extractStructuredFacts(html: string): StructuredPageFacts {
   return facts;
 }
 
-/** Parse a bare JSON-LD payload (e.g. a browser extract field) — no HTML. */
+/**
+ * Parse a bare JSON-LD payload (e.g. a browser extract field) — no HTML.
+ * Several blocks may be joined by JSONLD_BLOCK_SEPARATOR; each parses alone,
+ * so one malformed block never hides the others.
+ */
 export function factsFromJsonLdText(text: string): StructuredPageFacts {
   const facts: StructuredPageFacts = { jobs: [], organizationName: null, organizationLocation: null, emails: [], phones: [] };
-  const raw = text?.trim();
-  if (!raw) return facts;
-  try {
-    const parsed: unknown = JSON.parse(raw);
-    const nodes: unknown[] = [];
-    collectJsonLd(parsed, nodes);
-    for (const node of nodes) {
-      if (node && typeof node === "object" && !Array.isArray(node)) {
-        interpretNode(node as Record<string, unknown>, facts);
+  if (!text?.trim()) return facts;
+  for (const block of text.split(JSONLD_BLOCK_SEPARATOR)) {
+    const raw = block.trim();
+    if (!raw) continue;
+    try {
+      const parsed: unknown = JSON.parse(raw);
+      const nodes: unknown[] = [];
+      collectJsonLd(parsed, nodes);
+      for (const node of nodes) {
+        if (node && typeof node === "object" && !Array.isArray(node)) {
+          interpretNode(node as Record<string, unknown>, facts);
+        }
       }
+    } catch {
+      // Malformed or truncated block — skip it; never fabricate from a partial parse.
     }
-  } catch {
-    // Malformed or concatenated payloads — skip.
   }
   return facts;
 }

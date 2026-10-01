@@ -4,9 +4,14 @@ import { z } from "zod";
 import { retrievalPlanFromInputs } from "../lib/research-agent/plan";
 import { researchSessions } from "../lib/research-agent/session.server";
 import type { SearchSpec } from "../lib/search/search-spec";
+import { workerToken } from "../lib/research-agent/browser-worker-config.server";
+import { createSessionManager } from "../browser-worker/session-manager";
+import { createBrowserRoutes } from "../browser-worker/routes";
 
 const port = Number(process.env.RESEARCH_WORKER_PORT || 8788);
-const token = process.env.SCRAPIVO_BROWSER_WORKER_TOKEN || "";
+// Canonical SCRAPIVO_BROWSER_WORKER_TOKEN, legacy alias BROWSER_WORKER_TOKEN;
+// at least 32 characters. One private service, one token.
+const token = workerToken() ?? "";
 const Spec = z.custom<SearchSpec>(
   (v) => !!v && typeof v === "object" && typeof (v as SearchSpec).raw_query === "string",
 );
@@ -38,8 +43,15 @@ function send(res: import("node:http").ServerResponse, status: number, value: un
   res.end(JSON.stringify(value));
 }
 
-if (!token) throw new Error("SCRAPIVO_BROWSER_WORKER_TOKEN is required");
+if (!token) throw new Error("SCRAPIVO_BROWSER_WORKER_TOKEN (at least 32 characters) is required");
+// Persistent Chromium sessions (browser runtime) live in this same private process.
+const browserSessions = await createSessionManager();
+const browserRoutes = createBrowserRoutes(browserSessions, token);
+const shutdown = () => { void browserSessions.shutdown().finally(() => process.exit(0)); };
+process.once("SIGINT", shutdown);
+process.once("SIGTERM", shutdown);
 createServer(async (req, res) => {
+  if (await browserRoutes(req, res)) return;
   if (req.method === "GET" && req.url === "/health") {
     send(res, 200, {
       status: "ok",

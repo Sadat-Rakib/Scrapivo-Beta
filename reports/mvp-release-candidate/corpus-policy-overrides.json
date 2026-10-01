@@ -1,0 +1,11 @@
+﻿{
+  "note": "Contract changes applied on top of the FROZEN corpus (reports/understanding-forensic/CORPUS.json is never edited). Each override cites the policy that intentionally replaced the old expectation. Raw and mechanics-only scores are always reported alongside.",
+  "overrides": [
+    { "id": "h004a", "set": { "clarification": "required", "clarification_id": "entity_purpose" }, "policy": "src/lib/search/spec-clarification.ts#decideSpecClarification (missing purpose for business/company/person/investor)", "rationale": "Bare discovery request ('grant writing agencies in Split') states no purpose; the canonical SPEC decision asks the purpose question once. The generated holdout expected 'forbidden' under the pre-policy fit-based rule." },
+    { "id": "h008a", "set": { "clarification": "required", "clarification_id": "entity_purpose" }, "policy": "src/lib/search/spec-clarification.ts#decideSpecClarification", "rationale": "Same as h004a: 'waste haulage agencies in Hsinchu' has no stated purpose." },
+    { "id": "h010", "set": { "clarification": "required", "clarification_id": "entity_purpose" }, "policy": "src/lib/search/spec-clarification.ts#decideSpecClarification", "rationale": "Same as h004a: 'seed libraries in Napier' has no stated purpose. It passed the raw scorer only because that scorer graded the old readiness/mode gates, which the SPEC route no longer applies when a frame is attached." },
+    { "id": "h011", "set": { "clarification": "required", "clarification_id": "entity_purpose" }, "policy": "src/lib/search/spec-clarification.ts#decideSpecClarification", "rationale": "Same as h004a: 'prosthetics labs in Cebu' has no stated purpose." },
+    { "id": "c002a", "set": { "clarification": "required", "clarification_id": "entity_purpose" }, "policy": "src/lib/search/spec-clarification.ts#decideSpecClarification", "rationale": "Same as h004a: 'voiceover agencies in Fayetteville rn' has no stated purpose." },
+    { "id": "c008a", "set": { "clarification": "required", "clarification_id": "entity_purpose" }, "policy": "src/lib/search/spec-clarification.ts#decideSpecClarification", "rationale": "Same as h004a: 'fleet maintenance agncies in sfax' has no stated purpose." }
+  ]
+}

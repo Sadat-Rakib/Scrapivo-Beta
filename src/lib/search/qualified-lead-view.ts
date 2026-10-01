@@ -196,12 +196,22 @@ export function projectSpecRowsToQualifiedViews(args: {
     [];
 
   for (const row of args.rows) {
-    const projected = projectQualifiedLead({
-      row,
-      spec: args.spec,
-      run: args.run,
-      nowMs: args.nowMs,
-    });
+    const places = (args.spec.locations?.length ?? 0) > 1 ? args.spec.locations! : [null];
+    let projected: ReturnType<typeof projectQualifiedLead> | null = null;
+    for (const place of places) {
+      const spec = place === null ? args.spec : {
+        ...args.spec,
+        locations: [place],
+        criteria: [
+          ...args.spec.criteria.filter((criterion) => criterion.field !== "location"),
+          { field: "location", value: place, stated: true, confidence: 1 },
+        ],
+      };
+      const attempt = projectQualifiedLead({ row, spec, run: args.run, nowMs: args.nowMs });
+      projected = attempt;
+      if (attempt.ok) break;
+    }
+    if (!projected) continue;
     if (!projected.ok) {
       rejected.push({
         title: row.title ?? "",

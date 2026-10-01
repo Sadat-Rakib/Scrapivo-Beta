@@ -44,7 +44,13 @@ export type ClarifyQuestionId =
   | "entity_mode"
   | "entity_offer"
   | "entity_site"
-  | "entity_channel";
+  | "entity_channel"
+  | "entity_purpose"
+  | "entity_salary"
+  | "entity_size"
+  | "entity_revenue"
+  | "entity_relation"
+  | "entity_scope";
 
 export type ClarifyQuestion = {
   id: ClarifyQuestionId;

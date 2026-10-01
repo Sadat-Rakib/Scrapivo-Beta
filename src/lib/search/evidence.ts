@@ -49,6 +49,18 @@ export interface Evidence {
   claim_parameters?: Record<string, string | number | boolean | null>;
   /** When the claimed event occurred (temporal Spec); not discovery time. */
   event_at?: string | null;
+  /** Unique id of this evidence record (never a browser session id). */
+  id?: string;
+  /** How the observation was acquired (browser research stamps this). */
+  provenance?: EvidenceProvenance;
+}
+
+export interface EvidenceProvenance {
+  acquisition: "browser" | "http" | "structured" | "provider";
+  /** URL the browser was asked to open; `source_url` is the final URL. */
+  requested_url?: string | null;
+  search_run_id?: string | null;
+  browser_session_id?: string | null;
 }
 
 export interface FieldProvenance {

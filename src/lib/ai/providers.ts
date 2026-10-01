@@ -450,6 +450,11 @@ export function classifyFailure(status: number, body: string): FailureKind {
       : "rate_limited";
   }
   if (status >= 500) return "server";
+  // Groq's JSON mode answers 400 when the MODEL failed to produce valid JSON
+  // ("json_validate_failed" / "Failed to generate JSON"). The payload was
+  // fine; another model can answer it. Filed as an empty answer so the
+  // ladder moves on instead of stopping the whole extraction.
+  if (status === 400 && /json_validate_failed|failed to generate json/.test(b)) return "empty";
   return "bad_request";
 }
 

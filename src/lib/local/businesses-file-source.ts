@@ -139,7 +139,8 @@ type CityCountryMap = Record<string, CityMapEntry>;
 
 let cityMapCache: CityCountryMap | null = null;
 
-function loadCityCountryMap(): CityCountryMap {
+/** Shared with the query gazetteer (gazetteer.server.ts): one parse per process. */
+export function loadCityCountryMap(): CityCountryMap {
   if (cityMapCache) return cityMapCache;
   for (const dir of dataDirs()) {
     const p = join(dir, "city_country_map.json");

@@ -64,6 +64,8 @@ export async function recordSourceOutcome(
   now: Date = new Date(),
 ): Promise<boolean> {
   try {
+    const { skipPersistence } = await import("@/lib/persistence-policy.server");
+    if (skipPersistence("source_yield_stats")) return false;
     const { getAdmin } = await import("@/integrations/my-supabase/admin.server");
     const admin = getAdmin();
     const windowStart = utcWindowStart(now);

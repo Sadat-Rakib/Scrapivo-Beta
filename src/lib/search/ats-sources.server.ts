@@ -261,6 +261,8 @@ function rotatingSeed(provider: AtsProvider): string[] {
 async function markChecked(provider: AtsProvider, boards: string[]): Promise<void> {
   if (!boards.length) return;
   try {
+    const { skipPersistence } = await import("@/lib/persistence-policy.server");
+    if (skipPersistence("ats_companies")) return;
     const { getAdmin } = await import("@/integrations/my-supabase/admin.server");
     await getAdmin()
       .from("ats_companies")

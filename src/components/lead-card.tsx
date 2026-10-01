@@ -1,4 +1,5 @@
 import type { Lead } from "@/lib/scoring";
+import { publicSourceLabel } from "@/lib/search/activity-presenter";
 import {
   Bookmark,
   Crown,
@@ -38,30 +39,11 @@ function displaySource(lead: Lead): string {
     if (company) return company.charAt(0).toUpperCase() + company.slice(1);
     return "Company careers";
   }
-  if (lead.source === "secedgar") return "SEC filing";
-  if (lead.source === "news") return "News";
   const label = lead.platform_label ?? lead.platform ?? "";
   if (label) {
-    return label.includes(":") ? label.split(":").slice(1).join(":").trim() || label : label;
+    return publicSourceLabel(label, lead.full_post_url);
   }
-  const fallback: Record<string, string> = {
-    reddit: "Reddit",
-    redditrss: "Reddit",
-    linkedin: "LinkedIn",
-    twitter: "X",
-    instagram: "Instagram",
-    facebook: "Facebook",
-    hn: "Hacker News",
-    bluesky: "Bluesky",
-    mastodon: "Mastodon",
-    freelancer: "Freelancer",
-    fiverr: "Fiverr",
-    serpapi: "Web",
-    tavily: "Web",
-    searxng: "Web",
-    webboolean: "Web",
-  };
-  return fallback[lead.source] || lead.source || "Web";
+  return publicSourceLabel(lead.source, lead.full_post_url);
 }
 
 function VerificationBadge({ lead }: { lead: Lead }) {
@@ -201,10 +183,12 @@ export function LeadCard({
         )}
       <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
         <span className="truncate">
+          {/* "anon" is a post-author fallback. Verified entity results
+              (qualified-* spec rows, canonical-* rows) have no poster. */}
           {!isDirectory
-            ? (lead.source.startsWith("canonical-")
+            ? /^(?:canonical|qualified)-/.test(lead.source)
               ? (lead.author ?? "")
-              : (lead.author ?? "anon"))
+              : (lead.author ?? "anon")
             : ""}
           {!isDirectory && lead.engagement != null ? ` · ${lead.engagement} eng.` : ""}
         </span>

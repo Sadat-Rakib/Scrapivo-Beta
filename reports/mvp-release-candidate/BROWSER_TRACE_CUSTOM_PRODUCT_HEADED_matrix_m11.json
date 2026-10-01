@@ -1,0 +1,755 @@
+{
+  "runId": "trace-custom-product-1790791896450",
+  "query": "Dentists in Portland, Oregon with phone numbers",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 66942,
+  "error": null,
+  "audit": [
+    {
+      "title": "NW Heights Dental of Portland",
+      "checks": [
+        {
+          "method": "osm_tags",
+          "url": "https://www.openstreetmap.org/node/1631860078",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": "+1-503-646-1463"
+    },
+    {
+      "title": "Pearl District Dental",
+      "checks": [
+        {
+          "method": "osm_tags",
+          "url": "https://www.openstreetmap.org/node/1968955547",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": "+1-503-977-3275"
+    },
+    {
+      "title": "Maternal-Fetal Medicine Center",
+      "checks": [
+        {
+          "method": "osm_tags",
+          "url": "https://www.openstreetmap.org/node/2631807086",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": "+1-503-413-1122"
+    },
+    {
+      "title": "Everywoman's Health",
+      "checks": [
+        {
+          "method": "osm_tags",
+          "url": "https://www.openstreetmap.org/node/2631807089",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": "+1-503-284-5220"
+    },
+    {
+      "title": "Blossom Clinic",
+      "checks": [
+        {
+          "method": "osm_tags",
+          "url": "https://www.openstreetmap.org/node/2726419627",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": "+1-503-287-0886"
+    },
+    {
+      "title": "David A. Goldwyn",
+      "checks": [
+        {
+          "method": "osm_tags",
+          "url": "https://www.openstreetmap.org/node/3371341135",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": "+1-503-245-0180"
+    },
+    {
+      "title": "David L. May",
+      "checks": [
+        {
+          "method": "osm_tags",
+          "url": "https://www.openstreetmap.org/node/3371341136",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": "+1-503-246-4272"
+    },
+    {
+      "title": "Gail L. Nakata",
+      "checks": [
+        {
+          "method": "osm_tags",
+          "url": "https://www.openstreetmap.org/node/3371341137",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": "+1-503-246-7109"
+    },
+    {
+      "title": "Randy A. Castle",
+      "checks": [
+        {
+          "method": "osm_tags",
+          "url": "https://www.openstreetmap.org/node/3371341139",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": "+1-503-245-3515"
+    },
+    {
+      "title": "Shoun N. Ishikawa",
+      "checks": [
+        {
+          "method": "osm_tags",
+          "url": "https://www.openstreetmap.org/node/3371341141",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": "+1-503-246-2111"
+    }
+  ],
+  "browser": null,
+  "runtime": [],
+  "progressEvents": 6,
+  "streamedRows": [],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [],
+  "pages": [],
+  "extracts": [],
+  "entityOutcomes": [],
+  "remember": [],
+  "candidates": [],
+  "done": [],
+  "persistenceSkipped": [
+    "ai_cache",
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "business",
+    "criteria": [
+      "category=dentist",
+      "location=Portland",
+      "location_id=geo:city:portland",
+      "location_kind=city",
+      "location_country=US",
+      "location_parents=geo:country:us",
+      "require_phone=true",
+      "required_field=phone",
+      "verify_phone_is_public=true"
+    ],
+    "clarify": [],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_businesses(country,city_norm,category)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "s3-parquet",
+          "partitions": [
+            "(exact=0 nearby=0 for \"Portland\")"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "live-osm",
+          "partitions": [
+            "live-gapfill(136)"
+          ],
+          "scanned": 136,
+          "matched": 136
+        }
+      ],
+      "rawCandidates": 136,
+      "postSpecFilter": 136,
+      "timings": {
+        "understanding_ms": 13311,
+        "stored_search_ms": 20127,
+        "research_ms": 6171,
+        "enrichment_ms": 25128,
+        "qualification_ms": 466,
+        "total_ms": 65203
+      },
+      "researchable": 136,
+      "researched": 136,
+      "complete": 105,
+      "pendingEnrichment": 31,
+      "qualificationRejected": 36,
+      "qualified": 69,
+      "returned": 10,
+      "reason": "RESULTS",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "osm-local",
+            "label": "Public source",
+            "state": "healthy",
+            "reason": "OK"
+          },
+          {
+            "source": "s3-parquet",
+            "label": "Available records",
+            "state": "unavailable",
+            "reason": "ERROR"
+          },
+          {
+            "source": "enrich:registry-identity",
+            "label": "Public source",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          }
+        ],
+        "degraded": true,
+        "summary": "Some sources could not be searched this time (Available records), so results may be incomplete."
+      }
+    },
+    "rowsReturned": 10,
+    "rows": [
+      {
+        "title": "NW Heights Dental of Portland",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Portland",
+        "website_url": null,
+        "source_url": "https://www.openstreetmap.org/node/1631860078",
+        "disposition": "qualified",
+        "why": "Identity · NW Heights Dental of Portland · dentist · Portland · phone +1-503-646-1463",
+        "email": null,
+        "phone": "+1-503-646-1463",
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "osm_tags",
+            "url": "https://www.openstreetmap.org/node/1631860078",
+            "excerpt": "NW Heights Dental of Portland · dentist · Portland · phone +1-503-646-1463",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {}
+      },
+      {
+        "title": "Pearl District Dental",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Portland",
+        "website_url": "https://pearldistrictdental.com/",
+        "source_url": "https://www.openstreetmap.org/node/1968955547",
+        "disposition": "qualified",
+        "why": "Identity · Pearl District Dental · dentist · Portland · phone +1-503-977-3275",
+        "email": null,
+        "phone": "+1-503-977-3275",
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "osm_tags",
+            "url": "https://www.openstreetmap.org/node/1968955547",
+            "excerpt": "Pearl District Dental · dentist · Portland · phone +1-503-977-3275",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {}
+      },
+      {
+        "title": "Maternal-Fetal Medicine Center",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Portland",
+        "website_url": "https://www.legacyhealth.org/",
+        "source_url": "https://www.openstreetmap.org/node/2631807086",
+        "disposition": "qualified",
+        "why": "Identity · Maternal-Fetal Medicine Center · clinic · Portland · phone +1-503-413-1122",
+        "email": null,
+        "phone": "+1-503-413-1122",
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "osm_tags",
+            "url": "https://www.openstreetmap.org/node/2631807086",
+            "excerpt": "Maternal-Fetal Medicine Center · clinic · Portland · phone +1-503-413-1122",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {}
+      },
+      {
+        "title": "Everywoman's Health",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Portland",
+        "website_url": "http://www.everywomanshealth.org/",
+        "source_url": "https://www.openstreetmap.org/node/2631807089",
+        "disposition": "qualified",
+        "why": "Identity · Everywoman's Health · clinic · Portland · phone +1-503-284-5220",
+        "email": null,
+        "phone": "+1-503-284-5220",
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "osm_tags",
+            "url": "https://www.openstreetmap.org/node/2631807089",
+            "excerpt": "Everywoman's Health · clinic · Portland · phone +1-503-284-5220",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {}
+      },
+      {
+        "title": "Blossom Clinic",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Portland",
+        "website_url": "https://www.blossomclinic.net/",
+        "source_url": "https://www.openstreetmap.org/node/2726419627",
+        "disposition": "qualified",
+        "why": "Identity · Blossom Clinic · clinic · Portland · phone +1-503-287-0886",
+        "email": null,
+        "phone": "+1-503-287-0886",
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "osm_tags",
+            "url": "https://www.openstreetmap.org/node/2726419627",
+            "excerpt": "Blossom Clinic · clinic · Portland · phone +1-503-287-0886",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {}
+      },
+      {
+        "title": "David A. Goldwyn",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Portland",
+        "website_url": "https://www.portlandperiodontics.com/",
+        "source_url": "https://www.openstreetmap.org/node/3371341135",
+        "disposition": "qualified",
+        "why": "Identity · David A. Goldwyn · dentist · Portland · phone +1-503-245-0180",
+        "email": null,
+        "phone": "+1-503-245-0180",
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "osm_tags",
+            "url": "https://www.openstreetmap.org/node/3371341135",
+            "excerpt": "David A. Goldwyn · dentist · Portland · phone +1-503-245-0180",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {}
+      },
+      {
+        "title": "David L. May",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Portland",
+        "website_url": null,
+        "source_url": "https://www.openstreetmap.org/node/3371341136",
+        "disposition": "qualified",
+        "why": "Identity · David L. May · dentist · Portland · phone +1-503-246-4272",
+        "email": null,
+        "phone": "+1-503-246-4272",
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "osm_tags",
+            "url": "https://www.openstreetmap.org/node/3371341136",
+            "excerpt": "David L. May · dentist · Portland · phone +1-503-246-4272",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {}
+      },
+      {
+        "title": "Gail L. Nakata",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Portland",
+        "website_url": "https://www.nakatadmd.com/",
+        "source_url": "https://www.openstreetmap.org/node/3371341137",
+        "disposition": "qualified",
+        "why": "Identity · Gail L. Nakata · dentist · Portland · phone +1-503-246-7109",
+        "email": null,
+        "phone": "+1-503-246-7109",
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "osm_tags",
+            "url": "https://www.openstreetmap.org/node/3371341137",
+            "excerpt": "Gail L. Nakata · dentist · Portland · phone +1-503-246-7109",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {}
+      },
+      {
+        "title": "Randy A. Castle",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Portland",
+        "website_url": "https://www.swportlanddentist.com/",
+        "source_url": "https://www.openstreetmap.org/node/3371341139",
+        "disposition": "qualified",
+        "why": "Identity · Randy A. Castle · dentist · Portland · phone +1-503-245-3515",
+        "email": null,
+        "phone": "+1-503-245-3515",
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "osm_tags",
+            "url": "https://www.openstreetmap.org/node/3371341139",
+            "excerpt": "Randy A. Castle · dentist · Portland · phone +1-503-245-3515",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {}
+      },
+      {
+        "title": "Shoun N. Ishikawa",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Portland",
+        "website_url": null,
+        "source_url": "https://www.openstreetmap.org/node/3371341141",
+        "disposition": "qualified",
+        "why": "Identity · Shoun N. Ishikawa · dentist · Portland · phone +1-503-246-2111",
+        "email": null,
+        "phone": "+1-503-246-2111",
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "osm_tags",
+            "url": "https://www.openstreetmap.org/node/3371341141",
+            "excerpt": "Shoun N. Ishikawa · dentist · Portland · phone +1-503-246-2111",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {}
+      }
+    ],
+    "diagnostics": [
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "s3-parquet",
+        "detail": "Stored people scan reached its time budget; coverage is incomplete."
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      }
+    ],
+    "cancelledAtMs": null,
+    "returnedAtMs": 66941,
+    "candidateLedger": {
+      "counts": {
+        "returned": 10,
+        "qualified_more": 59,
+        "rejected": 36,
+        "gated": 0,
+        "filtered": 0,
+        "incomplete": 31,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {
+        "MISSING_QUERY_REQUIRED": 36
+      },
+      "streamed": 0,
+      "streamedNotReturned": []
+    }
+  }
+}

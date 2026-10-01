@@ -1,0 +1,31 @@
+{
+  "url": "https://alexbagri.com/",
+  "title": "Alex Bagri — Full-Stack Developer & Entrepreneur | Tallinn, Estonia",
+  "text": "Founder · Developer · Entrepreneur\nServices\nContact\nI build digital products from zero to launch\n\nFull-stack development, product strategy, and everything in between. I take ideas from concept to production — from landing pages to complex platforms with custom backends.\n\nWHAT I BUILD\nWebsites\n\nCustom-coded websites with clean architecture, responsive layouts, and performance optimization. No templates, no page builders.\n\nLanding Pages\n\nConversion-driven pages with integrated analytics, A/B testing infrastructure, and sub-second load times. Built to perform.\n\nFull-Stack Applications\n\nSaaS platforms, admin dashboards, custom CRM systems — complete backend-to-frontend solutions designed to scale with your business.\n\nTelegram Bots\n\nProduction-grade bots with payment processing, AI integration, and sophisticated user flows. Designed for real business operations.\n\nAPI Integrations\n\nSeamless connections between payment gateways, CRMs, AI services, and third-party platforms. Reliable architecture with proper error handling.\n\nSupport & Hosting\n\nServer configuration, deployment pipelines, SSL, uptime monitoring, and ongoing maintenance. Long-term reliability, not just a launch.\n\nGot a project?\nLet's talk.\nTelegram\nSend",
+  "structured": {
+    "jobs": [],
+    "organizationName": "Alex Bagri — Web Development",
+    "organizationLocation": "Tallinn, Harjumaa, EE",
+    "emails": [
+      "hello@alexbagri.com"
+    ],
+    "phones": [],
+    "businesses": [
+      {
+        "name": "Alex Bagri — Web Development",
+        "types": [
+          "ProfessionalService"
+        ],
+        "url": "https://alexbagri.com/",
+        "telephone": null,
+        "streetAddress": null,
+        "locality": "Tallinn",
+        "region": "Harjumaa",
+        "postalCode": null,
+        "country": "EE",
+        "source": "node"
+      }
+    ]
+  },
+  "captured_at": "2026-09-30T19:14:57.560Z"
+}

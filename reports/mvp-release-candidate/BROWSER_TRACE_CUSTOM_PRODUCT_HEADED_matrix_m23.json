@@ -1,0 +1,896 @@
+{
+  "runId": "trace-custom-product-1790793008336",
+  "query": "Yoga studios near Brooklyn with Instagram",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 179797,
+  "error": null,
+  "audit": [],
+  "browser": {
+    "adapter": "worker",
+    "status": "completed",
+    "pagesVisited": 23,
+    "currentUrl": "https://andyogastudios.com/contact-us",
+    "retained": true,
+    "controller": "agent",
+    "sessionId": "bbd615c2-8f7e-4072-bc1e-12f2c2117ebf",
+    "frame": true
+  },
+  "runtime": [
+    {
+      "kind": "runtime",
+      "requested": "worker",
+      "used": "worker"
+    }
+  ],
+  "progressEvents": 74,
+  "streamedRows": [],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [
+    {
+      "kind": "search",
+      "query": "yoga studio Brooklyn",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "yoga studio Brooklyn",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "\"ONEYOGAHOUSE\" Instagram OR Facebook OR LinkedIn recent posts",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "\"ONEYOGAHOUSE\" Instagram OR Facebook OR LinkedIn recent posts",
+      "via": "duckduckgo",
+      "status": "empty",
+      "results": 0,
+      "reason": "raw_links=0 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "\"ONEYOGAHOUSE\" Instagram OR Facebook OR LinkedIn recent posts",
+      "via": "bing",
+      "status": "ok",
+      "results": 5,
+      "reason": "raw_links=7 unrelated=1"
+    },
+    {
+      "kind": "search",
+      "query": "\"And Yoga Studios\" Instagram OR Facebook OR LinkedIn recent posts",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "\"And Yoga Studios\" Instagram OR Facebook OR LinkedIn recent posts",
+      "via": "duckduckgo",
+      "status": "blocked",
+      "results": 0,
+      "reason": "CAPTCHA"
+    },
+    {
+      "kind": "search",
+      "query": "\"And Yoga Studios\" Instagram OR Facebook OR LinkedIn recent posts",
+      "via": "bing",
+      "status": "ok",
+      "results": 5,
+      "reason": "raw_links=7 unrelated=1"
+    },
+    {
+      "kind": "search",
+      "query": "yoga studio business Brooklyn",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "yoga studio business Brooklyn",
+      "via": "duckduckgo",
+      "status": "skipped",
+      "results": 0,
+      "reason": "blocked_earlier_in_run"
+    },
+    {
+      "kind": "search",
+      "query": "yoga studio business Brooklyn",
+      "via": "bing",
+      "status": "ok",
+      "results": 4,
+      "reason": "raw_links=4 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "yoga studio contact Brooklyn",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "yoga studio contact Brooklyn",
+      "via": "duckduckgo",
+      "status": "skipped",
+      "results": 0,
+      "reason": "blocked_earlier_in_run"
+    },
+    {
+      "kind": "search",
+      "query": "yoga studio contact Brooklyn",
+      "via": "bing",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://oneyogahouse.com/",
+      "pageType": "unknown",
+      "title": "Brooklyn Yoga Studio | ONEYOGAHOUSE",
+      "outcome": "read",
+      "textChars": 10670,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "ONEYOGAHOUSE",
+        "ONEYOGAHOUSE"
+      ],
+      "why": "",
+      "capture": "72fb0a049563.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://andyogastudios.com/",
+      "pageType": "unknown",
+      "title": "Elevate your well being at yoga studio in brooklyn ny",
+      "outcome": "read",
+      "textChars": 14160,
+      "structured": {
+        "jobs": 0,
+        "organization": "And Yoga Studios",
+        "emails": 1,
+        "phones": 1
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "And Yoga Studios",
+        "And Yoga Studios"
+      ],
+      "why": "",
+      "capture": "7fca771f4db7.json"
+    },
+    {
+      "origin": "seed",
+      "url": "https://oneyogahouse.com/",
+      "pageType": "unknown",
+      "title": "Brooklyn Yoga Studio | ONEYOGAHOUSE",
+      "outcome": "read",
+      "textChars": 10670,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "ONEYOGAHOUSE",
+        "ONEYOGAHOUSE"
+      ],
+      "why": "",
+      "capture": "72fb0a049563.json"
+    },
+    {
+      "origin": "contact_or_company_page",
+      "url": "https://oneyogahouse.com/about-us/",
+      "pageType": "unknown",
+      "title": "About Our Yoga Studio | ONEYOGAHOUSE",
+      "outcome": "read",
+      "textChars": 18000,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "ONEYOGAHOUSE"
+      ],
+      "why": "",
+      "capture": "410294cea2d7.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.facebook.com/",
+      "pageType": "unknown",
+      "title": "Facebook",
+      "outcome": "read",
+      "textChars": 436,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~440s; injected/not_called; deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~424s; injected/not_called)",
+      "capture": "0b2df0f63558.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.facebook.com/%E6%AD%",
+      "pageType": "unknown",
+      "title": "Facebook",
+      "outcome": "read",
+      "textChars": 238,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~431s; injected/not_called)",
+      "capture": "125e77c69ddd.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://andyogastudios.com/",
+      "pageType": null,
+      "title": null,
+      "outcome": "cached",
+      "textChars": 0,
+      "structured": null,
+      "candidateProduced": "YES",
+      "produced": [
+        "And Yoga Studios",
+        "And Yoga Studios"
+      ],
+      "why": "cached",
+      "capture": "7fca771f4db7.json"
+    },
+    {
+      "origin": "contact_or_company_page",
+      "url": "https://andyogastudios.com/about",
+      "pageType": "unknown",
+      "title": "About — And Yoga Studios",
+      "outcome": "read",
+      "textChars": 4664,
+      "structured": {
+        "jobs": 0,
+        "organization": "And Yoga Studios",
+        "emails": 1,
+        "phones": 1
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "And Yoga Studios"
+      ],
+      "why": "",
+      "capture": "08cbb1a2b2dc.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.facebook.com/",
+      "pageType": null,
+      "title": null,
+      "outcome": "cached",
+      "textChars": 0,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "cached",
+      "capture": "0b2df0f63558.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.facebook.com/instagram/",
+      "pageType": "unknown",
+      "title": "Instagram",
+      "outcome": "read",
+      "textChars": 691,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~419s; injected/not_called)",
+      "capture": "9e4b681aea0e.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.noiryogabk.com/",
+      "pageType": "unknown",
+      "title": "Noir Yoga",
+      "outcome": "read",
+      "textChars": 1327,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~402s; injected/not_called)",
+      "capture": "9be5853a11d0.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.noiryogabk.com/about-1",
+      "pageType": "unknown",
+      "title": "About — Noir Yoga",
+      "outcome": "read",
+      "textChars": 3678,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~402s; injected/not_called)",
+      "capture": "3619bdb8e337.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://andyogastudios.com/contact-us",
+      "pageType": "unknown",
+      "title": "Contact Us — And Yoga Studios",
+      "outcome": "read",
+      "textChars": 3182,
+      "structured": {
+        "jobs": 0,
+        "organization": "And Yoga Studios",
+        "emails": 1,
+        "phones": 1
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "not sent to extractor",
+      "capture": null
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://oneyogahouse.com/",
+        "https://andyogastudios.com/"
+      ],
+      "extractor": "json_ld",
+      "llm": "not_called",
+      "entities": 2
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://oneyogahouse.com/",
+        "https://andyogastudios.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~458s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://oneyogahouse.com/",
+        "https://andyogastudios.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://oneyogahouse.com/"
+      ],
+      "extractor": "json_ld",
+      "llm": "not_called",
+      "entities": 1
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://oneyogahouse.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~454s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://oneyogahouse.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://oneyogahouse.com/about-us/"
+      ],
+      "extractor": "json_ld",
+      "llm": "not_called",
+      "entities": 1
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://oneyogahouse.com/about-us/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~451s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://oneyogahouse.com/about-us/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.facebook.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~440s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.facebook.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.facebook.com/%E6%AD%"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~431s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.facebook.com/%E6%AD%"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://andyogastudios.com/"
+      ],
+      "extractor": "json_ld",
+      "llm": "not_called",
+      "entities": 1
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://andyogastudios.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~431s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://andyogastudios.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://andyogastudios.com/about"
+      ],
+      "extractor": "json_ld",
+      "llm": "not_called",
+      "entities": 1
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://andyogastudios.com/about"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~428s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://andyogastudios.com/about"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.facebook.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~424s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.facebook.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.facebook.com/instagram/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~419s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.facebook.com/instagram/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.noiryogabk.com/",
+        "https://www.noiryogabk.com/about-1"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~402s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.noiryogabk.com/",
+        "https://www.noiryogabk.com/about-1"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    }
+  ],
+  "entityOutcomes": [
+    {
+      "page": "https://oneyogahouse.com/",
+      "name": "ONEYOGAHOUSE",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://andyogastudios.com/",
+      "name": "And Yoga Studios",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://oneyogahouse.com/",
+      "name": "ONEYOGAHOUSE",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://oneyogahouse.com/about-us/",
+      "name": "ONEYOGAHOUSE",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://andyogastudios.com/",
+      "name": "And Yoga Studios",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    },
+    {
+      "page": "https://andyogastudios.com/about",
+      "name": "And Yoga Studios",
+      "kind": "business",
+      "outcome": "row",
+      "reason": null,
+      "detail": "json_ld_local_business",
+      "dropped": []
+    }
+  ],
+  "remember": [
+    {
+      "kind": "remember",
+      "name": "ONEYOGAHOUSE",
+      "rowKind": "business",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "And Yoga Studios",
+      "rowKind": "business",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "ONEYOGAHOUSE",
+      "rowKind": "business",
+      "outcome": "merged",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "ONEYOGAHOUSE",
+      "rowKind": "business",
+      "outcome": "merged",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "And Yoga Studios",
+      "rowKind": "business",
+      "outcome": "merged",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "And Yoga Studios",
+      "rowKind": "business",
+      "outcome": "merged",
+      "resolved": true
+    }
+  ],
+  "candidates": [
+    {
+      "kind": "candidate",
+      "name": "ONEYOGAHOUSE",
+      "status": "exhausted",
+      "rejectCode": "MISSING_QUERY_REQUIRED",
+      "label": "MISSING_QUERY_REQUIRED — missing query-required: socials",
+      "needs": [
+        "social"
+      ],
+      "visited": 4,
+      "queries": 1
+    },
+    {
+      "kind": "candidate",
+      "name": "And Yoga Studios",
+      "status": "exhausted",
+      "rejectCode": "MISSING_QUERY_REQUIRED",
+      "label": "MISSING_QUERY_REQUIRED — missing query-required: location, socials",
+      "needs": [
+        "industry",
+        "location",
+        "social"
+      ],
+      "visited": 4,
+      "queries": 1
+    }
+  ],
+  "done": [
+    {
+      "kind": "done",
+      "status": "timeout",
+      "candidates": 2,
+      "verified": 0,
+      "visited": 12,
+      "queries": 5,
+      "stoppingReason": "BROWSER_DISCOVERY_TIMEOUT",
+      "elapsedMs": 90020
+    }
+  ],
+  "persistenceSkipped": [
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "NO_QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "business",
+    "criteria": [
+      "category=yoga studio",
+      "location=Brooklyn",
+      "location_id=geo:stated:brooklyn",
+      "location_kind=stated",
+      "require_name=true",
+      "required_field=name",
+      "require_instagram=true",
+      "required_field=instagram",
+      "require_socials=true",
+      "required_field=socials"
+    ],
+    "clarify": [
+      "entity_business_model"
+    ],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_businesses(country,city_norm,category)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "s3-parquet",
+          "partitions": [
+            "(exact=0 nearby=0 for \"Brooklyn\")"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "live-browser",
+          "partitions": [
+            "live-gapfill(2)"
+          ],
+          "scanned": 2,
+          "matched": 2
+        }
+      ],
+      "rawCandidates": 2,
+      "postSpecFilter": 1,
+      "timings": {
+        "understanding_ms": 5724,
+        "stored_search_ms": 21143,
+        "research_ms": 94622,
+        "enrichment_ms": 2363,
+        "qualification_ms": 298,
+        "total_ms": 124150
+      },
+      "researchable": 1,
+      "researched": 1,
+      "complete": 0,
+      "pendingEnrichment": 0,
+      "qualificationRejected": 0,
+      "qualified": 0,
+      "returned": 0,
+      "reason": "FAILED_QUALIFICATION",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "osm-local",
+            "label": "Public source",
+            "state": "empty",
+            "reason": "NO_RESULTS"
+          },
+          {
+            "source": "direct-http",
+            "label": "Public websites",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "searxng",
+            "label": "The web",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "browser-live",
+            "label": "Public websites",
+            "state": "healthy",
+            "reason": "OK"
+          },
+          {
+            "source": "s3-parquet",
+            "label": "Available records",
+            "state": "unavailable",
+            "reason": "ERROR"
+          }
+        ],
+        "degraded": true,
+        "summary": "Some sources could not be searched this time (Available records), so results may be incomplete."
+      }
+    },
+    "rowsReturned": 0,
+    "rows": [],
+    "diagnostics": [
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "s3-parquet",
+        "detail": "Stored people scan reached its time budget; coverage is incomplete."
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "direct-http",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "searxng",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      }
+    ],
+    "cancelledAtMs": null,
+    "returnedAtMs": 179794,
+    "candidateLedger": {
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 0,
+        "gated": 0,
+        "filtered": 2,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {},
+      "streamed": 0,
+      "streamedNotReturned": []
+    }
+  }
+}

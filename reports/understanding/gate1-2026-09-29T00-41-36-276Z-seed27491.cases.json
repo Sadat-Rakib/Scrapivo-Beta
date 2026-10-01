@@ -1,0 +1,569 @@
+{
+  "seed": 27491,
+  "holdout": [
+    {
+      "id": "h000a",
+      "prompt": "millwrights looking for clients",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_client"
+      },
+      "pairWith": "h000b"
+    },
+    {
+      "id": "h000b",
+      "prompt": "businesses looking for millwrights",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "business",
+          "company"
+        ],
+        "relation": "needs_service",
+        "object": "millwright"
+      },
+      "pairWith": "h000a"
+    },
+    {
+      "id": "h002a",
+      "prompt": "millwrights who serve board game cafés in Örebro",
+      "set": "holdout",
+      "size": "small",
+      "expect": {
+        "relation": "offers_service",
+        "location": "örebro"
+      },
+      "pairWith": "h002b"
+    },
+    {
+      "id": "h002b",
+      "prompt": "board game cafés in Örebro who need a millwright",
+      "set": "holdout",
+      "size": "medium",
+      "expect": {
+        "relation": "needs_service",
+        "object": "millwright",
+        "location": "örebro"
+      },
+      "pairWith": "h002a"
+    }
+  ],
+  "chaos": [
+    {
+      "id": "c000a",
+      "prompt": "looking for compnies in enschede hiring actuarys",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "hiring",
+        "location": "enschede",
+        "intent_signal_required": true
+      },
+      "pairWith": "c000b"
+    },
+    {
+      "id": "c000b",
+      "prompt": "help me find ACTUARYS IN ENSCHEDE LOOKING FOR WORK if poss",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_job",
+        "location": "enschede"
+      },
+      "pairWith": "c000a"
+    },
+    {
+      "id": "c002a",
+      "prompt": "voiceover agencies in Fayetteville rn",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "fayetteville",
+        "clarification": "forbidden"
+      },
+      "pairWith": "c002b"
+    },
+    {
+      "id": "c002b",
+      "prompt": "companies in fyetteville needing voiceover 🚀",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "needs_service",
+        "object": "voiceover",
+        "location": "fayetteville",
+        "intent_signal_required": true
+      },
+      "pairWith": "c002a"
+    },
+    {
+      "id": "c004a",
+      "prompt": "hey COMPANIES IN AARHUS HIRRING ORTHODONTISTS pls",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "hiring",
+        "location": "aarhus",
+        "intent_signal_required": true
+      },
+      "pairWith": "c004b"
+    },
+    {
+      "id": "c004b",
+      "prompt": "orthodontists in Aarhus looking for work",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "entity_type": "person",
+        "relation": "seeking_job",
+        "location": "aarhus"
+      },
+      "pairWith": "c004a"
+    },
+    {
+      "id": "c006a",
+      "prompt": "yo investors funding aquaculture startups in Kelowna",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "entity_type": "investor",
+        "location": "kelowna"
+      },
+      "pairWith": "c006b"
+    },
+    {
+      "id": "c006b",
+      "prompt": "aquaculture startups in Kelowna raising money",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "seeking_funding",
+        "location": "kelowna"
+      },
+      "pairWith": "c006a"
+    },
+    {
+      "id": "c008a",
+      "prompt": "fleet maintenance agncies in sfax",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "sfax",
+        "clarification": "forbidden"
+      },
+      "pairWith": "c008b"
+    },
+    {
+      "id": "c008b",
+      "prompt": "ok so companies in sfax needing fleet maintenance",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "needs_service",
+        "object": "fleet maintenance",
+        "location": "sfax",
+        "intent_signal_required": true
+      },
+      "pairWith": "c008a"
+    },
+    {
+      "id": "c010",
+      "prompt": "need circular economy startups košice funded this yr + founders names if u can",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "received_funding",
+        "location": "košice",
+        "temporal": true
+      },
+      "note": "chaos_funding"
+    },
+    {
+      "id": "c011",
+      "prompt": "find me 20 board game cafés outsde gaborone, not chains, insta if possbile",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "quantity": 20,
+        "location": "gaborone",
+        "min_constraints": 1,
+        "negated": [
+          "category"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ]
+      },
+      "note": "chaos_quantity_constraints"
+    },
+    {
+      "id": "c012",
+      "prompt": "need  mining startups leipzig funded  this yr + founders names if u can",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "received_funding",
+        "location": "leipzig",
+        "temporal": true
+      },
+      "note": "chaos_funding"
+    },
+    {
+      "id": "c013",
+      "prompt": "need FARIRERS NAGOYA PLS thx?",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "nagoya"
+      },
+      "note": "chaos_plain"
+    },
+    {
+      "id": "c014",
+      "prompt": "need proptech startups arequipa funded this yr + founders names if u can today",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "received_funding",
+        "location": "arequipa",
+        "temporal": true
+      },
+      "note": "chaos_funding"
+    },
+    {
+      "id": "c015",
+      "prompt": "i want need some founders round daugavpils tryna bring on localisation manager ppl rn",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "daugavpils"
+      },
+      "note": "chaos_hiring"
+    },
+    {
+      "id": "c016",
+      "prompt": "need some founders round vinlius tryna bring on localistaion manager ppl rn",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "vilnius"
+      },
+      "note": "chaos_hiring"
+    },
+    {
+      "id": "c017",
+      "prompt": "prsthetics labs in swansea and also roasteries in swasea when u can",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "compound": true,
+        "min_subgoals": 2
+      },
+      "note": "chaos_compound"
+    },
+    {
+      "id": "c018",
+      "prompt": "dive schools in windhoek and also chocolatiers in maribor",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "compound": true,
+        "min_subgoals": 2
+      },
+      "note": "chaos_compound"
+    },
+    {
+      "id": "c019",
+      "prompt": "WHO AROUND SFAX NEEDS SOMEONE FOR GRANT WRTING ASAP when u can",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "needs_service",
+        "object": "grant writing",
+        "location": "sfax"
+      },
+      "note": "chaos_needs_service"
+    },
+    {
+      "id": "c020",
+      "prompt": "need some  founders  round cebu tryna bring on tax barrister  ppl  rn as  many  as  u can",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "cebu"
+      },
+      "note": "chaos_hiring"
+    },
+    {
+      "id": "c021",
+      "prompt": "PIANO TUNERS IN AREQUIPA AND ALSO CIDER HOUSES IN CURITIBA",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "compound": true,
+        "min_subgoals": 2
+      },
+      "note": "chaos_compound"
+    },
+    {
+      "id": "c022",
+      "prompt": "looking for who around ghent needs someone for warehouse automation asap",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "needs_service",
+        "object": "warehouse automation",
+        "location": "ghent"
+      },
+      "note": "chaos_needs_service"
+    },
+    {
+      "id": "c023",
+      "prompt": "need satellite imaging startups turku funded this yr + founders names if u can as many as u can",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": [
+          "company",
+          "business"
+        ],
+        "relation": "received_funding",
+        "location": "turku",
+        "temporal": true
+      },
+      "note": "chaos_funding"
+    },
+    {
+      "id": "c024",
+      "prompt": "hi taxidermists aberystwyyth pls...",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "aberystwyth"
+      },
+      "note": "chaos_plain"
+    },
+    {
+      "id": "c025",
+      "prompt": "who around trois-rivières needs someone for drone surveying asap",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "needs_service",
+        "object": "drone surveying",
+        "location": "trois-rivières"
+      },
+      "note": "chaos_needs_service"
+    },
+    {
+      "id": "c026",
+      "prompt": "find me 30 bell foundires outtside daugavpils, not chains, insta if possible today",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "quantity": 30,
+        "location": "daugavpils",
+        "min_constraints": 1,
+        "negated": [
+          "category"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ]
+      },
+      "note": "chaos_quantity_constraints"
+    },
+    {
+      "id": "c027",
+      "prompt": "any quilt shops near brno no prper  website n got phone? as  many  as  u can",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "brno",
+        "location_scope": "near"
+      },
+      "note": "chaos_lacks_asset"
+    },
+    {
+      "id": "c028",
+      "prompt": "need some founders round maribor tryna bring on agronomist ppl rn",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "maribor"
+      },
+      "note": "chaos_hiring"
+    },
+    {
+      "id": "c029",
+      "prompt": "sauas saskatoon pls",
+      "set": "chaos",
+      "size": "tiny",
+      "expect": {
+        "relation": "none",
+        "location": "saskatoon"
+      },
+      "note": "chaos_plain"
+    },
+    {
+      "id": "c030",
+      "prompt": "yo ok so i do trade show fabriication n im tryna find like cider houses around pereira that dont got a site, phone would b great, thx",
+      "set": "chaos",
+      "size": "large",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "pereira",
+        "user_selling": "trade show fabrication"
+      },
+      "note": "chaos_rambling"
+    },
+    {
+      "id": "c031",
+      "prompt": "find me 40 piano tuners outside geelong, not chains, insta if possible",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "quantity": 40,
+        "location": "geelong",
+        "min_constraints": 1,
+        "negated": [
+          "category"
+        ],
+        "preferred_fields": [
+          "instagram"
+        ]
+      },
+      "note": "chaos_quantity_constraints"
+    },
+    {
+      "id": "c032",
+      "prompt": "prosthetics labs turku pls",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "turku"
+      },
+      "note": "chaos_plain"
+    },
+    {
+      "id": "c033",
+      "prompt": "need taxidermists in örebro and also taxidermists in aberystwyth",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "compound": true,
+        "min_subgoals": 2
+      },
+      "note": "chaos_compound"
+    },
+    {
+      "id": "c034",
+      "prompt": "looking for need some founders round swansea tryna bring on  luthier ppl  rn?",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "entity_type": "person",
+        "relation": "hiring",
+        "location": "swansea"
+      },
+      "note": "chaos_hiring"
+    },
+    {
+      "id": "c035",
+      "prompt": "hi cobblers arequippa pls",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "arequipa"
+      },
+      "note": "chaos_plain"
+    },
+    {
+      "id": "c036",
+      "prompt": "any  orthotics cliinics near lipzig no proper  website  n  got phone?",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "leipzig",
+        "location_scope": "near"
+      },
+      "note": "chaos_lacks_asset"
+    },
+    {
+      "id": "c037",
+      "prompt": "orthotiics  clinics waterford  pls",
+      "set": "chaos",
+      "size": "small",
+      "expect": {
+        "relation": "none",
+        "location": "waterford"
+      },
+      "note": "chaos_plain"
+    },
+    {
+      "id": "c038",
+      "prompt": "any optometrists near saskatoon no proper website n got phone?",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "saskatoon",
+        "location_scope": "near"
+      },
+      "note": "chaos_lacks_asset"
+    },
+    {
+      "id": "c039",
+      "prompt": "help me find any farriers near invernesss no proper website n got phone?",
+      "set": "chaos",
+      "size": "medium",
+      "expect": {
+        "relation": "lacks_asset",
+        "object": "website",
+        "location": "inverness",
+        "location_scope": "near"
+      },
+      "note": "chaos_lacks_asset"
+    }
+  ]
+}

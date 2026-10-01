@@ -1,22 +1,20 @@
 import { createHash, randomUUID } from "node:crypto";
 import type { SpecRow } from "@/lib/spec-search.functions";
 import type { AgentBrowser, BrowserSession, PageSnapshot } from "@/lib/research-agent/browser";
-import { AgentBrowserCliAdapter } from "@/lib/research-agent/agent-browser-cli.server";
-import { PlaywrightBrowserAdapter } from "@/lib/research-agent/playwright-browser.server";
+import { buildAgentBrowserRuntime, type RuntimeInfo } from "@/lib/research-agent/browser-runtime.server";
 
-/** Browser worker selection: persistent Playwright primary, CLI fallback. */
+/**
+ * Browser runtime selection (SCRAPIVO_BROWSER_ADAPTER = playwright | cli |
+ * worker). Consumers only ever see the AgentBrowser interface.
+ */
 export function buildDefaultAgentBrowser(
   signal: AbortSignal | null,
-  meta: { runId?: string; ownerId?: string; visible?: boolean } = {},
+  meta: { runId?: string; ownerId?: string; visible?: boolean; onRuntime?: (info: RuntimeInfo) => void } = {},
 ): AgentBrowser {
-  const adapter = (process.env.SCRAPIVO_BROWSER_ADAPTER ?? "playwright").toLowerCase();
-  if (adapter === "playwright") {
-    return new PlaywrightBrowserAdapter(signal, meta);
-  }
-  return new AgentBrowserCliAdapter(undefined, signal);
+  return buildAgentBrowserRuntime(signal, meta);
 }
 import type { SearchSpec } from "./search-spec";
-import { makeEvidence } from "./evidence";
+import { makeEvidence, type Evidence, type EvidenceProvenance } from "./evidence";
 import { classifyPage } from "./page-classify";
 import { classifyPageRelevance } from "./page-relevance";
 import { extractStructuredFacts, factsFromJsonLdText, type StructuredPageFacts } from "./page-structured";
@@ -26,6 +24,7 @@ import { qualifyLead } from "./qualify";
 import { isDeadlineAbort } from "./search-run";
 import { computeResearchNeeds, researchStatus, type ResearchNeed, type ResearchStatus } from "./browser-research";
 import { discoverWebFreeFirst } from "./provider-ladder";
+import { attributableEmail, attributablePhone } from "./contact-attribution";
 
 type QuotedField = { value: string; quote: string };
 export type BrowserExtractedEntity = {
@@ -36,7 +35,56 @@ export type BrowserExtractedEntity = {
   claims?: Array<{ type: "hiring" | "service_request" | "funding" | "social_ask"; quote: string; eventDate?: string }>;
   fields?: Partial<Record<"role" | "company" | "category" | "industry" | "location" | "country" | "sector" | "stage" | "email" | "phone" | "salary" | "employer" | "opportunity" | "content_topic", QuotedField>>;
 };
-export type BrowserObservedPage = { url: string; title: string; text: string; structured?: StructuredPageFacts };
+export type BrowserObservedPage = {
+  url: string;
+  title: string;
+  text: string;
+  structured?: StructuredPageFacts;
+  /** Acquisition provenance: the URL asked for (url is the final URL), the run and the browser session. */
+  requestedUrl?: string;
+  searchRunId?: string;
+  browserSessionId?: string;
+  acquisition?: EvidenceProvenance["acquisition"];
+};
+
+/**
+ * Stamp a unique id on evidence observed on a page, plus acquisition
+ * provenance when the page records how it was acquired. Pages without an
+ * acquisition (fixtures, callers outside discovery) get an id only.
+ */
+function withProvenance<T extends Evidence>(evidence: T, page: BrowserObservedPage | undefined): T {
+  if (!page) return evidence;
+  return {
+    ...evidence,
+    id: evidence.id ?? `ev:${randomUUID()}`,
+    ...(evidence.provenance || !page.acquisition ? {} : {
+      provenance: {
+        acquisition: page.acquisition,
+        requested_url: page.requestedUrl ?? null,
+        search_run_id: page.searchRunId ?? null,
+        browser_session_id: page.browserSessionId ?? null,
+      },
+    }),
+  };
+}
+/**
+ * Lifecycle trace (diagnostic only). Every place discovery can lose evidence
+ * reports here; the default is a no-op, so behavior never depends on it.
+ * Entity reasons reuse QualificationRejectCode; page/search reasons are
+ * acquisition outcomes (never qualification codes).
+ */
+export type BrowserEntityRejectReason = "MISSING_IDENTITY" | "PROVENANCE_INCOMPLETE" | "LIST_PAGE_AS_ENTITY" | "ENTITY_TYPE_MISMATCH" | "LOCATION_MISMATCH";
+export type BrowserTraceEvent =
+  | { kind: "search"; query: string; via: string; status: "ok" | "empty" | "unavailable" | "blocked" | "failed" | "skipped" | "cached"; results: number; reason?: string }
+  | { kind: "page"; origin: string; requestedUrl: string; finalUrl?: string; title?: string; pageType?: string;
+      outcome: "read" | "http_read" | "blocked" | "irrelevant" | "thin" | "navigation_failed" | "budget" | "cached" | "unsafe";
+      reason?: string; textChars?: number; structured?: { jobs: number; organization: string | null; emails: number; phones: number } }
+  | { kind: "extract"; pages: string[]; extractor: string; llm: "ok" | "empty" | "error" | "timeout" | "breaker" | "skipped" | "not_called"; entities: number; detail?: string }
+  | { kind: "entity"; pageUrl?: string; name: string; entityKind: string; outcome: "row" | "rejected"; reason?: BrowserEntityRejectReason; detail?: string; droppedFields?: string[] }
+  | { kind: "remember"; name: string; rowKind: string; outcome: "accepted" | "merged" | "ENTITY_TYPE_MISMATCH" | "BUDGET_CAP" | "TARGET_MISMATCH"; resolved: boolean | null | undefined }
+  | { kind: "candidate"; name: string; status: string; rejectCode?: string | null; label?: string | null; needs: string[]; visited: number; queries: number }
+  | { kind: "done"; status: string; candidates: number; verified: number; visited: number; queries: number; stoppingReason: string; elapsedMs: number }
+  | { kind: "runtime"; requested: string; used: string; reason?: string };
 export type BrowserDiscoveryOptions = {
   searchRunId?: string;
   ownerId?: string;
@@ -52,7 +100,9 @@ export type BrowserDiscoveryOptions = {
   isVerified?: (row: SpecRow) => boolean;
   onCandidateMemory?: (candidates: BrowserCandidateMemory[]) => void;
   onProgress?: (event: { action: string; source?: string; detail?: string; count?: number | string; row?: import("@/lib/search/search-browser-progress.server").StreamedLead }) => void;
-  extractEntities?: (pages: BrowserObservedPage[], spec: SearchSpec) => Promise<BrowserExtractedEntity[]>;
+  extractEntities?: (pages: BrowserObservedPage[], spec: SearchSpec, trace?: (event: BrowserTraceEvent) => void) => Promise<BrowserExtractedEntity[]>;
+  /** Diagnostic lifecycle hook; no-op by default. */
+  onTrace?: (event: BrowserTraceEvent) => void;
 };
 
 export type BrowserCandidateMemory = {
@@ -108,19 +158,127 @@ function publicUrl(value: string, base?: string): string | null {
   } catch { return null; }
 }
 
+/** Search-engine-owned hosts: their pages are never research results. */
+const ENGINE_HOST = /(?:^|\.)(?:duckduckgo\.com|duck\.ai|bing\.com|bing\.net|microsoft\.com|msn\.com|live\.com|office\.com|cloud\.microsoft|google\.[a-z]{2,3}(?:\.[a-z]{2})?|gstatic\.com|googleusercontent\.com)$/i;
+
 function destination(value: string, base: string): string | null {
   const raw = publicUrl(value, base);
   if (!raw) return null;
-  const url = new URL(raw);
-  if (/(^|\.)duckduckgo\.com$/.test(url.hostname) && url.searchParams.has("uddg")) return publicUrl(url.searchParams.get("uddg")!);
-  if (/(^|\.)bing\.com$/.test(url.hostname) && url.pathname === "/ck/a") {
+  let url = new URL(raw);
+  // Unwrap engine redirects, then apply the same host rules to the target:
+  // an engine's own help/nav pages arrive wrapped in these redirects too.
+  if (/(^|\.)duckduckgo\.com$/.test(url.hostname) && url.searchParams.has("uddg")) {
+    const target = publicUrl(url.searchParams.get("uddg")!);
+    if (!target) return null;
+    url = new URL(target);
+  } else if (/(^|\.)bing\.com$/.test(url.hostname) && url.pathname === "/ck/a") {
     const encoded = url.searchParams.get("u");
-    if (encoded?.startsWith("a1")) return publicUrl(Buffer.from(encoded.slice(2), "base64url").toString("utf8"));
+    const target = encoded?.startsWith("a1") ? publicUrl(Buffer.from(encoded.slice(2), "base64url").toString("utf8")) : null;
+    if (!target) return null;
+    url = new URL(target);
   }
-  if (/(^|\.)(duckduckgo|bing|google|microsoft)\.(com|net)$/.test(url.hostname)) return null;
+  if (ENGINE_HOST.test(url.hostname)) return null;
   if (/\.(pdf|zip|png|jpg|svg)(?:$|\?)/i.test(url.pathname) || /\/(login|signin|signup|privacy|terms)(\/|$)/i.test(url.pathname)) return null;
-  return raw;
+  return url.href;
 }
+
+/** Exported for tests: the public result URL a SERP link points to, or null. */
+export const resultDestination = destination;
+
+/** Page body plus EVERY JSON-LD block (directory lists often use later blocks). */
+const PAGE_EXTRACT_FIELDS = {
+  body: { selector: "body" },
+  jsonld: { selector: 'script[type="application/ld+json"]', all: true, maxChars: 400_000 },
+};
+
+const SCHEMA_TYPE_LABELS: Record<string, string> = {
+  CafeOrCoffeeShop: "cafe", BarOrPub: "bar", FastFoodRestaurant: "fast food restaurant", IceCreamShop: "ice cream shop",
+  HVACBusiness: "hvac contractor", HomeAndConstructionBusiness: "home services", MedicalBusiness: "medical clinic",
+  HealthAndBeautyBusiness: "beauty business", ExerciseGym: "gym", HealthClub: "gym", DryCleaningOrLaundry: "laundry",
+  AutoRepair: "auto repair", AutomotiveBusiness: "automotive business", LegalService: "legal service",
+  AccountingService: "accountant", FinancialService: "financial service", VeterinaryCare: "veterinarian",
+};
+/** Literal schema.org subtype → category words ("Restaurant" → "restaurant"). Generic LocalBusiness → null. */
+function schemaTypeCategory(types: string[]): string | null {
+  const specific = types.find((type) => type !== "LocalBusiness");
+  if (!specific) return null;
+  return SCHEMA_TYPE_LABELS[specific] ?? specific.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase();
+}
+
+/**
+ * Deterministic business candidates from literal JSON-LD on visited pages.
+ * Identity/location/phone come verbatim from the structured listing; a
+ * directory's own listing URL is never treated as the business website, and a
+ * listing whose literal locality contradicts a requested city is skipped.
+ */
+export function structuredBusinessRows(pages: BrowserObservedPage[], spec: SearchSpec, onTrace?: (event: BrowserTraceEvent) => void): SpecRow[] {
+  if (spec.entity !== "business") return [];
+  const city = spec.criteria.find((c) => c.field === "location_kind")?.value === "city" || !spec.criteria.some((c) => c.field === "location_kind")
+    ? spec.criteria.find((c) => c.field === "location")?.value ?? null : null;
+  const rows: SpecRow[] = [];
+  for (const page of pages) {
+    const pageHost = (() => { try { return new URL(page.url).hostname.replace(/^www\./, ""); } catch { return ""; } })();
+    for (const business of page.structured?.businesses ?? []) {
+      if (city && business.locality && !contains(business.locality, city) && !contains(city, business.locality)) {
+        onTrace?.({ kind: "entity", pageUrl: page.url, name: business.name.slice(0, 120), entityKind: "business", outcome: "rejected", reason: "LOCATION_MISMATCH", detail: `listing locality ${business.locality.slice(0, 60)} vs requested ${city.slice(0, 60)}` });
+        continue;
+      }
+      const id = `business:jsonld:${createHash("sha256").update(`${pageHost}|${normalized(business.name)}|${normalized(business.streetAddress ?? business.locality ?? "")}`).digest("hex").slice(0, 24)}`;
+      const category = schemaTypeCategory(business.types);
+      // Structural page context: an address-less entry of a list page whose
+      // own title names the requested city belongs to that city's list. Only
+      // then, and only as separate lower-confidence evidence.
+      const titledForCity = !!city && business.source === "item_list" && !business.locality && !business.region &&
+        new RegExp(`\\b(?:in|near|around)\\s+${normalized(city).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(normalized(page.title));
+      const location = [business.locality, business.region].filter(Boolean).join(", ") || (titledForCity ? city : null);
+      const address = [business.streetAddress, business.locality, business.region, business.postalCode].filter(Boolean).join(", ");
+      const excerpt = `${business.name} — ${business.types.join("/")}${address ? ` — ${address}` : ""}${business.telephone ? ` — ${business.telephone}` : ""} (structured listing)`;
+      const observedAt = new Date().toISOString();
+      // Only a first-party page's own url is the business website.
+      const itemHost = (() => { try { return business.url ? new URL(business.url, page.url).hostname.replace(/^www\./, "") : ""; } catch { return ""; } })();
+      const firstParty = !!itemHost && itemHost === pageHost && business.source === "node" && contains(pageHost.replace(/\.[a-z.]+$/, ""), business.name.split(/\s+/)[0] ?? "");
+      const provenance: NonNullable<SpecRow["field_provenance"]> = {};
+      const stamp = (field: string, value: string | null) => { if (value) provenance[field] = { value, source: "json_ld", source_url: page.url, observed_at: observedAt, confidence: 0.8 }; };
+      stamp("category", category); stamp("location", location); stamp("phone", business.telephone); stamp("country", business.country);
+      onTrace?.({ kind: "entity", pageUrl: page.url, name: business.name.slice(0, 120), entityKind: "business", outcome: "row", detail: "json_ld_local_business" });
+      rows.push({
+        key: id, entity_id: id, entity_resolved: true, identity_confidence: 0.8,
+        kind: "business", title: business.name,
+        detail: [category, address].filter(Boolean).join(" | "),
+        category, location, country: business.country, phone: business.telephone,
+        source_url: page.url, url: firstParty ? business.url : null, website_url: firstParty ? business.url : null,
+        page_type: "entity_page", source_page_type: classifyPage({ url: page.url, title: page.title, snippet: page.text.slice(0, 500) }).page_type,
+        resolution_method: "json_ld_local_business",
+        evidence: [
+          makeEvidence({ source_url: page.url, source_type: "web", evidence_type: "identity", supports: "identity", subject: id, excerpt, confidence: 0.8, extraction_method: "json_ld_local_business", observed_at: observedAt }),
+          ...(titledForCity ? [makeEvidence({ source_url: page.url, source_type: "web", evidence_type: "identity", supports: "identity", subject: id,
+            excerpt: `${page.title.slice(0, 160)} — lists ${business.name}`, confidence: 0.6, extraction_method: "json_ld_list_page_context", observed_at: observedAt,
+            claim_parameters: { location: city! } })] : []),
+        ].map((item) => withProvenance(item, page)),
+        field_provenance: titledForCity
+          ? { ...provenance, location: { value: city!, source: "json_ld_list_page_context", source_url: page.url, observed_at: observedAt, confidence: 0.6 } }
+          : provenance,
+        verification_status: "discovered", why_match: excerpt,
+      } as SpecRow);
+    }
+  }
+  return rows;
+}
+
+const SERP_STOPWORDS = new Set(["the", "and", "for", "with", "that", "who", "are", "near", "best", "top", "find", "list", "site", "com", "www", "http", "https", "official", "website", "contact", "business", "company", "companies", "startup", "startups", "job", "jobs", "remote"]);
+const tokensOf = (value: string) => normalized(value.replace(/\bsite:\S+/gi, " ")).split(" ").filter((token) => token.length > 2 && !SERP_STOPWORDS.has(token));
+/**
+ * A SERP result is kept only if its title or URL shares a significant query
+ * term. Drops engine chrome and degraded results ("Best Buy" for "best
+ * restaurants in Calgary") without judging relevance any further.
+ */
+function serpResultShares(query: string, title: string | undefined, url: string): boolean {
+  const terms = tokensOf(query);
+  if (!terms.length) return true;
+  const haystack = normalized(`${title ?? ""} ${url.replace(/[/._-]+/g, " ")}`);
+  return terms.some((term) => haystack.includes(term) || (term.endsWith("s") && haystack.includes(term.slice(0, -1))));
+}
+const SERP_CHALLENGE = /captcha|complete the following challenge|confirm this search was made by a human|bots use duckduckgo too|unusual traffic|verify you are (?:a )?human/i;
 
 function kindSupported(kind: SpecRow["kind"], quote: string): boolean {
   const patterns: Record<SpecRow["kind"], RegExp> = {
@@ -134,31 +292,41 @@ function kindSupported(kind: SpecRow["kind"], quote: string): boolean {
 }
 
 /** Model output locates observations; quotations and field values must exist on the visited page. */
-export function browserEntitiesToRows(entities: BrowserExtractedEntity[], pages: BrowserObservedPage[]): SpecRow[] {
+export function browserEntitiesToRows(
+  entities: BrowserExtractedEntity[],
+  pages: BrowserObservedPage[],
+  onTrace?: (event: BrowserTraceEvent) => void,
+): SpecRow[] {
   const rows = new Map<string, SpecRow>();
+  const reject = (entity: Partial<BrowserExtractedEntity> | null | undefined, reason: BrowserEntityRejectReason, detail: string) =>
+    onTrace?.({ kind: "entity", pageUrl: entity && typeof entity.page === "number" ? pages[entity.page]?.url : undefined,
+      name: typeof entity?.name === "string" ? entity.name.slice(0, 120) : "", entityKind: String(entity?.kind ?? ""), outcome: "rejected", reason, detail });
   for (const entity of entities) {
-    if (!entity || typeof entity !== "object") continue;
+    if (!entity || typeof entity !== "object") { reject(null, "MISSING_IDENTITY", "entity_not_object"); continue; }
     const page = pages[entity.page];
-    if (!page || typeof entity.name !== "string" || typeof entity.identityQuote !== "string") continue;
-    if (entity.name.length < 2 || entity.name.length > 180 || entity.identityQuote.length < 15) continue;
-    if (entity.kind === "company" && (taxonomyLabel(entity.name) || sourceHeading(entity.name))) continue;
-    if (!contains(page.text, entity.identityQuote) || !contains(entity.identityQuote, entity.name)) continue;
+    if (!page) { reject(entity, "PROVENANCE_INCOMPLETE", "page_index_unknown"); continue; }
+    if (typeof entity.name !== "string" || typeof entity.identityQuote !== "string") { reject(entity, "MISSING_IDENTITY", "name_or_quote_missing"); continue; }
+    if (entity.name.length < 2 || entity.name.length > 180 || entity.identityQuote.length < 15) { reject(entity, "MISSING_IDENTITY", "name_or_quote_length"); continue; }
+    if (entity.kind === "company" && (taxonomyLabel(entity.name) || sourceHeading(entity.name))) { reject(entity, "LIST_PAGE_AS_ENTITY", "taxonomy_or_heading_name"); continue; }
+    if (!contains(page.text, entity.identityQuote)) { reject(entity, "PROVENANCE_INCOMPLETE", "identity_quote_not_on_page"); continue; }
+    if (!contains(entity.identityQuote, entity.name)) { reject(entity, "PROVENANCE_INCOMPLETE", "identity_quote_missing_name"); continue; }
     const fields: Record<string, string> = {};
     const quotes: Record<string, string> = {};
+    const droppedFields: string[] = [];
     for (const [key, field] of Object.entries(entity.fields ?? {})) {
-      if (!field || typeof field.value !== "string" || typeof field.quote !== "string") continue;
-      if (!contains(page.text, field.quote)) continue;
+      if (!field || typeof field.value !== "string" || typeof field.quote !== "string") { droppedFields.push(`${key}:shape`); continue; }
+      if (!contains(page.text, field.quote)) { droppedFields.push(`${key}:quote_not_on_page`); continue; }
       // A page may describe many entities. Require a subject in each field's
       // excerpt; a matching value elsewhere on the page proves nothing.
       const organization = entity.fields?.company?.value ?? entity.fields?.employer?.value;
       const organizationField = ["industry", "category", "sector", "stage"].includes(key);
       const identityCardSupports = contains(entity.identityQuote, entity.name) && contains(entity.identityQuote, field.value) && entity.identityQuote.length <= 360;
-      if (!contains(field.quote, entity.name) && !identityCardSupports && !(organizationField && organization && contains(entity.identityQuote, organization) && contains(field.quote, organization))) continue;
+      if (!contains(field.quote, entity.name) && !identityCardSupports && !(organizationField && organization && contains(entity.identityQuote, organization) && contains(field.quote, organization))) { droppedFields.push(`${key}:not_subject_bound`); continue; }
       const alias = key === "industry" && /^saas$/i.test(field.value) && /software[ -]as[ -]a[ -]service|\bsaas\b/i.test(field.quote);
       const noSite = key === "opportunity" && field.value === "no_website" && /(?:no|without|does not have|doesn't have)\s+(?:a\s+)?website/i.test(field.quote);
-      if (!contains(field.quote, field.value) && !alias && !noSite) continue;
-      if (key === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value)) continue;
-      if (key === "phone" && !/^[+\d\s().-]+$/.test(field.value)) continue;
+      if (!contains(field.quote, field.value) && !alias && !noSite) { droppedFields.push(`${key}:value_not_in_quote`); continue; }
+      if (key === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value)) { droppedFields.push(`${key}:malformed`); continue; }
+      if (key === "phone" && !/^[+\d\s().-]+$/.test(field.value)) { droppedFields.push(`${key}:malformed`); continue; }
       fields[key] = field.value.trim();
       quotes[key] = (identityCardSupports && !contains(field.quote, entity.name) ? entity.identityQuote : field.quote).trim();
     }
@@ -177,7 +345,12 @@ export function browserEntitiesToRows(entities: BrowserExtractedEntity[], pages:
       if (!fields.role) { fields.role = cardRole; quotes.role = cardQuote; }
       if (!fields.company) { fields.company = cardCompany; quotes.company = cardQuote; }
     }
-    if (!kindSupported(entity.kind, [entity.identityQuote, ...Object.values(quotes)].join(" "))) continue;
+    if (!kindSupported(entity.kind, [entity.identityQuote, ...Object.values(quotes)].join(" "))) {
+      onTrace?.({ kind: "entity", pageUrl: page.url, name: entity.name.slice(0, 120), entityKind: entity.kind, outcome: "rejected",
+        reason: "ENTITY_TYPE_MISMATCH", detail: "kind_unsupported_by_quotes", droppedFields });
+      continue;
+    }
+    onTrace?.({ kind: "entity", pageUrl: page.url, name: entity.name.slice(0, 120), entityKind: entity.kind, outcome: "row", droppedFields });
     // A named founder card inside an explicitly labeled SaaS-founder cohort is
     // evidence of sector membership; a generic article about SaaS is not.
     const cohortHeading = page.text.match(/\b(?:top\s+\d+\s+)?(?:b2b\s+)?saas\s+founders?(?:\s+list)?(?:\s+of\s+\d{4})?\b/i)?.[0] ?? null;
@@ -237,6 +410,7 @@ export function browserEntitiesToRows(entities: BrowserExtractedEntity[], pages:
     const personEmail = entity.kind !== "person" || namePartsForContact.length >= 2 &&
       emailLocal.includes(namePartsForContact[0]) && emailLocal.includes(namePartsForContact.at(-1)!)
       ? fields.email ?? null : null;
+    const stamped = evidence.map((item) => withProvenance(item, page));
     const provenance: NonNullable<SpecRow["field_provenance"]> = {};
     for (const [key, value] of Object.entries(fields)) {
       if (entity.kind === "person" && (key === "phone" || key === "email" && !personEmail)) continue;
@@ -257,17 +431,25 @@ export function browserEntitiesToRows(entities: BrowserExtractedEntity[], pages:
       employer: fields.employer ?? fields.company ?? null, salary: fields.salary ?? null,
       opportunity: fields.opportunity ?? null,
       page_type: "entity_page", source_page_type: classifyPage({ url: page.url, title: page.title, snippet: page.text.slice(0, 500) }).page_type,
-      resolution_method: "browser_observed_subject", evidence, field_provenance: provenance,
+      resolution_method: "browser_observed_subject", evidence: stamped, field_provenance: provenance,
       verification_status: "discovered", why_match: entity.identityQuote,
     };
     const previous = rows.get(id);
-    rows.set(id, previous ? { ...previous, evidence: [...previous.evidence!, ...evidence] } : row);
+    rows.set(id, previous ? { ...previous, evidence: [...previous.evidence!, ...stamped] } : row);
   }
   return [...rows.values()];
 }
 
-export async function extractEntities(pages: BrowserObservedPage[], spec: SearchSpec): Promise<BrowserExtractedEntity[]> {
+export async function extractEntities(
+  pages: BrowserObservedPage[],
+  spec: SearchSpec,
+  trace?: (event: BrowserTraceEvent) => void,
+): Promise<BrowserExtractedEntity[]> {
   if (!pages.length) return [];
+  const report = (extractor: string, llm: Extract<BrowserTraceEvent, { kind: "extract" }>["llm"], entities: BrowserExtractedEntity[], detail?: string) => {
+    trace?.({ kind: "extract", pages: pages.map((page) => page.url), extractor, llm, entities: entities.length, detail });
+    return entities;
+  };
   const observedFallback = (): BrowserExtractedEntity[] => {
     const found: BrowserExtractedEntity[] = [];
     for (const [pageIndex, page] of pages.entries()) {
@@ -307,8 +489,8 @@ export async function extractEntities(pages: BrowserObservedPage[], spec: Search
     return found;
   };
   const fallback = observedFallback();
-  if (fallback.length >= 3) return fallback;
-  if (Date.now() < extractionModelUnavailableUntil) return fallback;
+  if (fallback.length >= 3) return report("deterministic", "not_called", fallback);
+  if (Date.now() < extractionModelUnavailableUntil) return report("deterministic", "breaker", fallback, "model unavailable cooldown");
   const terms = spec.criteria.map((criterion) => criterion.value.toLowerCase()).filter((value) => value.length > 2);
   const rankedPages = pages.map((page, index) => ({ page, index, score: terms.reduce((score, term) => score + (page.text.toLowerCase().includes(term) ? 1 : 0) + (page.title.toLowerCase().includes(term) ? 2 : 0), 0) }))
     .sort((a, b) => b.score - a.score).slice(0, 2);
@@ -335,10 +517,12 @@ export async function extractEntities(pages: BrowserObservedPage[], spec: Search
     user: JSON.stringify({ intent: { entity: spec.entity, criteria: spec.criteria.map(({ field, value }) => ({ field, value })) }, pages: compactPages }),
   });
     const result = safeJsonParse<{ entities?: BrowserExtractedEntity[] }>(content);
-    return Array.isArray(result?.entities) && result.entities.length ? result.entities : observedFallback();
+    if (Array.isArray(result?.entities) && result.entities.length) return report("llm", "ok", result.entities);
+    return report("deterministic", "empty", observedFallback(), content ? `unparsed_or_empty(${String(content).length} chars)` : "no content");
   } catch (error) {
     if (/model_missing|model.*unavailable|no.*model/i.test(String(error))) extractionModelUnavailableUntil = Date.now() + 60_000;
-    return observedFallback();
+    const message = String(error instanceof Error ? error.message : error);
+    return report("deterministic", /timeout|timed out|abort/i.test(message) ? "timeout" : "error", observedFallback(), message.slice(0, 160));
   }
 }
 
@@ -391,7 +575,7 @@ export function structuredSnippetRows(results: Array<{ url: string; title: strin
   for (const result of results) {
     if (!publicUrl(result.url) || !result.content) continue;
     const pageIndex = pages.length;
-    const page = { url: result.url, title: result.title, text: `${result.title}\n${result.content}`.slice(0, 650) };
+    const page: BrowserObservedPage = { url: result.url, title: result.title, text: `${result.title}\n${result.content}`.slice(0, 650), requestedUrl: result.url, acquisition: "provider" };
     if (spec.entity === "person" && /\bsaas\b/i.test(result.title) && /\bfounders?\b/i.test(result.title) && /\bthe founders\b/i.test(result.content)) {
       for (const match of result.content.matchAll(/\b([A-Z][a-z'’-]+(?:\s+[A-Z][a-z'’-]+){1,2})\s*[·•]\s*([A-Z][A-Za-z0-9&.'’-]*(?:\s+[A-Z][A-Za-z0-9&.'’-]*){0,3})(?=\s*[;|]|\s*$)/g)) {
         const name = match[1].trim();
@@ -432,10 +616,14 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
   // primary — one browser process for the whole run (≈50-150ms per action vs
   // a CLI process spawn per action) and screenshots for the Scrapy viewer.
   // SCRAPIVO_BROWSER_ADAPTER=cli forces the legacy per-command adapter.
+  // Runtime selection is reported (requested vs used, and why) once the
+  // session exists — a worker→legacy fallback is never silent.
+  const runtimeInfos: RuntimeInfo[] = [];
   const browser = options.browser ?? buildDefaultAgentBrowser(controller.signal, {
     runId: options.searchRunId,
     ownerId: options.ownerId,
     visible: options.visible,
+    onRuntime: (info) => { runtimeInfos.push(info); },
   });
   let session: BrowserSession | null = null;
   const memory: BrowserCandidateMemory[] = [];
@@ -447,6 +635,11 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
   // Provider errors and blocked browser SERPs are inconclusive.
   const checkedQueries = new Set<string>();
   let browserSearches = 0;
+  // Browser SERPs replace structured search when it is down: allow the planned
+  // discovery queries plus a little candidate research, never unbounded.
+  const browserSerpBudget = Math.min(8, Math.max(2, plan.stoppingRules.maxQueries + 2));
+  const blockedEngines = new Set<string>();
+  let structuredUnavailable = false;
   let accessibleSearch = false;
   let emptyStructuredSearches = 0;
   let extractionError: unknown;
@@ -464,7 +657,38 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
   };
   const progress = (action: string, source?: string, detail?: string, count?: number | string) => options.onProgress?.({ action, source, detail, count });
   const log = (fields: Record<string, unknown>) => console.log(`[browser-live] ${JSON.stringify({ run, ...fields })}`);
+  // Diagnostics must never change or break discovery.
+  const trace = (event: BrowserTraceEvent) => { try { options.onTrace?.(event); } catch { /* ignore */ } };
   const isVerified = options.isVerified ?? ((row: SpecRow) => qualifyLead(row, spec, row.evidence).disposition === "qualified");
+  // Progressive results: stream each verified lead once, the moment it
+  // verifies — whether that happens in its own research or later, when
+  // another page's extraction merges the missing fact into it.
+  const verifiedSeen = new Set<string>();
+  const announceVerified = (candidate: BrowserCandidateMemory) => {
+    if (candidate.status !== "verified" || controller.signal.aborted) return;
+    const verifiedKey = `${candidate.row.entity_id ?? ""}|${(candidate.row.title ?? "").toLowerCase()}`;
+    if (verifiedSeen.has(verifiedKey)) return;
+    verifiedSeen.add(verifiedKey);
+    progress("Candidate verified", undefined, candidate.row.title);
+    const row = candidate.row;
+    options.onProgress?.({
+      action: "Candidate verified",
+      detail: candidate.row.title,
+      row: {
+        key: row.key ?? row.entity_id ?? "",
+        entity_id: row.entity_id ?? "",
+        kind: row.kind,
+        title: row.title ?? "",
+        url: row.url ?? null,
+        website_url: row.website_url ?? null,
+        profile_url: row.profile_url ?? null,
+        email: row.email ?? null,
+        phone: row.phone ?? null,
+        location: row.location ?? null,
+        why_match: row.why_match ?? null,
+      },
+    });
+  };
   const refresh = (candidate: BrowserCandidateMemory) => {
     candidate.lastQualification = qualifyLead(candidate.row, spec, candidate.row.evidence);
     candidate.needs = computeResearchNeeds(candidate.row, spec, candidate.lastQualification);
@@ -472,23 +696,29 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
     candidate.status = isVerified(candidate.row) && (candidate.needs.length === 0 || !!options.isVerified)
       ? "verified" : researchStatus(candidate.lastQualification, candidate.needs);
     candidate.verificationStatus = candidate.status === "verified" ? "verified" : "discovered";
+    announceVerified(candidate);
   };
   const remember = (rows: SpecRow[], query?: string, target?: BrowserCandidateMemory) => {
     for (const row of rows) {
+      const note = (outcome: Extract<BrowserTraceEvent, { kind: "remember" }>["outcome"]) =>
+        trace({ kind: "remember", name: String(row.title ?? "").slice(0, 120), rowKind: row.kind, outcome, resolved: row.entity_resolved });
       // Search hits are neutral source pages until opened. Let them enter the
       // research queue even when the source mapper used a placeholder kind.
-      if (spec.entity !== "unknown" && row.kind !== spec.entity && row.entity_resolved !== false) continue;
-      if (target && !sameCandidate(target.row, row)) continue;
+      if (spec.entity !== "unknown" && row.kind !== spec.entity && row.entity_resolved !== false) { note("ENTITY_TYPE_MISMATCH"); continue; }
+      if (target && !sameCandidate(target.row, row)) { note("TARGET_MISMATCH"); continue; }
       const previous = target ?? memory.find((item) => sameCandidate(item.row, row));
       if (previous) {
         previous.row = mergeCandidate(previous.row, row);
         if (query && !previous.queriesRun.includes(query)) previous.queriesRun.push(query);
         refresh(previous);
+        note("merged");
       } else if (memory.length < maxCandidates) {
-        const candidate: BrowserCandidateMemory = { row, missing: [], needs: [], visitedUrls: [], queriesRun: [], attempts: 0, status: "discovered", verificationStatus: "discovered" };
+        // Research mutates candidate rows; never mutate the caller's objects.
+        const candidate: BrowserCandidateMemory = { row: { ...row }, missing: [], needs: [], visitedUrls: [], queriesRun: [], attempts: 0, status: "discovered", verificationStatus: "discovered" };
         refresh(candidate);
         memory.push(candidate);
-      }
+        note("accepted");
+      } else note("BUDGET_CAP");
     }
   };
   const verifiedCount = () => memory.filter((candidate) => candidate.status === "verified").length;
@@ -497,13 +727,17 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
   const search = async (query: string, candidate?: BrowserCandidateMemory): Promise<Link[]> => {
     check();
     if (!query.trim()) return [];
-    if (searchCache.has(query)) return searchCache.get(query)!;
-    if (queriesRun.size >= 42) return [];
+    if (searchCache.has(query)) { trace({ kind: "search", query, via: "cache", status: "cached", results: searchCache.get(query)!.length }); return searchCache.get(query)!; }
+    if (queriesRun.size >= 42) { trace({ kind: "search", query, via: "budget", status: "skipped", results: 0, reason: "query_budget" }); return []; }
     queriesRun.add(query);
     try {
       if (emptyStructuredSearches >= 2 && !spec.criteria.some((criterion) => criterion.field === "opportunity" && criterion.value === "no_website")) throw new Error("STRUCTURED_SEARCH_EMPTY_FOR_RUN");
+      // Unavailable once in this run means unavailable for the run: never
+      // spend another probe timeout on a provider already known to be down.
+      if (structuredUnavailable) throw new Error("STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN");
       progress("Searching candidates", "SearXNG", query);
       const found = await bounded(discoverWebFreeFirst({ queries: [query], maxQueries: 1, timeRange: "", sourceKey: "browser-research", operation: "browser-research-url-discovery", signal: controller.signal }));
+      trace({ kind: "search", query, via: found.provider_used, status: found.results.length ? "ok" : "empty", results: found.results.length });
       emptyStructuredSearches = found.results.length ? 0 : emptyStructuredSearches + 1;
       if (found.results.length) checkedQueries.add(query);
       accessibleSearch = true;
@@ -527,63 +761,100 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
         return score(b) - score(a);
       }).slice(0, 12);
       if (urls.length) { searchCache.set(query, urls); progress("Found candidate sources", found.provider_used, `${urls.length} URLs`); return urls; }
-    } catch (error) { check(); if (!(error instanceof Error && error.message === "STRUCTURED_SEARCH_EMPTY_FOR_RUN")) log({ source: "searxng", action: "search", status: "unavailable" }); }
-    if (browserSearches >= 2) { searchCache.set(query, []); return []; }
+    } catch (error) {
+      check();
+      const message = error instanceof Error ? error.message : String(error);
+      const skippedForRun = message === "STRUCTURED_SEARCH_EMPTY_FOR_RUN" || message === "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN";
+      if (!skippedForRun && (error as Error & { code?: string })?.code === "SOURCE_UNAVAILABLE") structuredUnavailable = true;
+      trace({ kind: "search", query, via: "structured", status: skippedForRun ? "skipped" : "unavailable", results: 0, reason: message.slice(0, 120) });
+      if (!skippedForRun) log({ source: "searxng", action: "search", status: "unavailable" });
+    }
+    if (browserSearches >= browserSerpBudget) { trace({ kind: "search", query, via: "browser", status: "skipped", results: 0, reason: "browser_serp_budget" }); searchCache.set(query, []); return []; }
     browserSearches++;
     for (const engine of ["duckduckgo", "bing"] as const) {
+      // An engine that challenged this run once will challenge again; skip it.
+      if (blockedEngines.has(engine)) { trace({ kind: "search", query, via: engine, status: "skipped", results: 0, reason: "blocked_earlier_in_run" }); continue; }
       try {
         check();
         progress("Searching the web", engine, query);
         const observation = await bounded(engine === "duckduckgo" ? browser.search(session!, query) : browser.navigate(session!, `https://www.bing.com/search?q=${encodeURIComponent(query)}`));
-        if (blocked(observation.snapshot)) { log({ source: engine, status: "restricted" }); continue; }
+        if (blocked(observation.snapshot)) { blockedEngines.add(engine); trace({ kind: "search", query, via: engine, status: "blocked", results: 0, reason: observation.snapshot.friction.join(",") || observation.snapshot.pageType }); log({ source: engine, status: "restricted" }); continue; }
+        // Challenge pages are not always flagged as friction; read the page text too.
         const body = browser.extractLinks ? await bounded(browser.extract(session!, { fields: { body: { selector: "body" } } })) : null;
-        if (/captcha|complete the following challenge|confirm this search was made by a human|unusual traffic/i.test(body?.values.body ?? "")) continue;
+        if (SERP_CHALLENGE.test(`${observation.snapshot.title} ${observation.snapshot.visibleRelevantText.slice(0, 1500)} ${(body?.values.body ?? "").slice(0, 1500)}`)) {
+          blockedEngines.add(engine);
+          trace({ kind: "search", query, via: engine, status: "blocked", results: 0, reason: "challenge_page" });
+          continue;
+        }
         accessibleSearch = true;
         checkedQueries.add(query);
         const links = browser.extractLinks ? await bounded(browser.extractLinks(session!, engine === "duckduckgo" ? '[data-testid="result-title-a"], a.result__a' : '#b_results .b_algo h2 a', 5000)) : observation.snapshot.links;
-        const output = [...new Map(links.flatMap((link) => {
+        const unwrapped = [...new Map(links.flatMap((link) => {
           const url = link.url ? destination(link.url, observation.snapshot.url) : null;
-          return url ? [[url, { url, ref: link.ref }] as const] : [];
+          return url ? [[url, { url, ref: link.ref, title: link.name }] as const] : [];
         })).values()];
+        const output = unwrapped.filter((link) => serpResultShares(query, link.title, link.url));
+        trace({ kind: "search", query, via: engine, status: output.length ? "ok" : "empty", results: output.length, reason: `raw_links=${links.length} unrelated=${unwrapped.length - output.length}` });
         log({ source: engine, action: "search", query, resultLinks: output.length });
         if (output.length) { searchCache.set(query, output); progress("Found search results", engine, `${output.length} links`); return output; }
-      } catch { check(); log({ source: engine, status: "failed" }); }
+      } catch (error) {
+        check();
+        trace({ kind: "search", query, via: engine, status: "failed", results: 0, reason: String(error instanceof Error ? error.message : error).slice(0, 120) });
+        log({ source: engine, status: "failed" });
+      }
     }
     searchCache.set(query, []);
     return [];
   };
-  const readPage = async (link: Link, candidate?: BrowserCandidateMemory, allowHttpFallback = false) => {
+  const readPage = async (link: Link, candidate?: BrowserCandidateMemory, allowHttpFallback = false, origin = "discovery") => {
     check();
     if (candidate && !candidate.visitedUrls.includes(link.url)) candidate.visitedUrls.push(link.url);
-    if (pageCache.has(link.url)) return pageCache.get(link.url)!;
-    if (visited.has(link.url) || visited.size >= maxPages) return null;
+    const pageTrace = (outcome: Extract<BrowserTraceEvent, { kind: "page" }>["outcome"], extra: Partial<Extract<BrowserTraceEvent, { kind: "page" }>> = {}) =>
+      trace({ kind: "page", origin, requestedUrl: link.url, outcome, ...extra });
+    const summarize = (facts?: StructuredPageFacts) => facts && { jobs: facts.jobs.length, organization: facts.organizationName, emails: facts.emails.length, phones: facts.phones.length };
+    // Acquisition provenance carried onto every evidence item from this page.
+    // The browser session id stays in provenance only, never in evidence ids.
+    const acquiredVia = (acquisition: "browser" | "http") => ({
+      requestedUrl: link.url,
+      searchRunId: options.searchRunId ?? run,
+      ...(acquisition === "browser" && session ? { browserSessionId: session.id } : {}),
+      acquisition,
+    });
+    if (pageCache.has(link.url)) { pageTrace("cached"); return pageCache.get(link.url)!; }
+    if (visited.has(link.url) || visited.size >= maxPages) { pageTrace("budget", { reason: visited.has(link.url) ? "already_visited" : "page_budget" }); return null; }
     visited.add(link.url);
     const domain = new URL(link.url).hostname;
+    // A page the server says does not exist must not be "read" by rendering
+    // the site's 404 template in the browser (e.g. a guessed /contact).
+    let httpMissing = false;
     const httpFallback = async () => {
       if (!allowHttpFallback || process.env.VITEST || controller.signal.aborted) return null;
       try {
         const [{ resilientFetch }, { load }] = await Promise.all([import("./http-fetch.server"), import("cheerio")]);
         const response = await resilientFetch(link.url, { retries: 0, signal: AbortSignal.timeout(5_000) });
         const finalUrl = publicUrl(response.url || link.url);
-        if (!response.ok || !finalUrl || !/html/i.test(response.headers.get("content-type") ?? "")) return null;
+        if (response.status === 404 || response.status === 410) httpMissing = true;
+        if (!response.ok || !finalUrl || !/html/i.test(response.headers.get("content-type") ?? "")) { pageTrace("navigation_failed", { reason: `http_${response.status}` }); return null; }
         const html = (await response.text()).slice(0, 250_000);
         // Structured facts must come from the raw HTML — cheerio strips scripts.
         const structured = extractStructuredFacts(html);
         const $ = load(html);
         $("script,style,noscript,svg").remove();
         const text = $("body").text().replace(/\s+/g, " ").trim().slice(0, 18_000);
-        if (text.length < 100 || /(?:captcha|verify you are human|access denied)/i.test(text.slice(0, 500))) return null;
-        const value = { page: { url: finalUrl, title: $("title").text().trim(), text, structured }, links: [] };
+        if (text.length < 100 || /(?:captcha|verify you are human|access denied)/i.test(text.slice(0, 500))) { pageTrace(text.length < 100 ? "thin" : "blocked", { finalUrl, textChars: text.length, reason: "http_read" }); return null; }
+        const value = { page: { url: finalUrl, title: $("title").text().trim(), text, structured, ...acquiredVia("http") }, links: [] };
         pageCache.set(link.url, value);
+        pageTrace("http_read", { finalUrl, title: value.page.title.slice(0, 160), textChars: text.length, structured: summarize(structured) });
         progress("Read page", new URL(finalUrl).hostname, `${text.length} characters`);
         return value;
-      } catch { return null; }
+      } catch (error) { pageTrace("navigation_failed", { reason: String(error instanceof Error ? error.message : error).slice(0, 120) }); return null; }
     };
     // A short HTTP read is sufficient to validate a guessed first-party host;
     // use the browser when the site needs rendering or the response is thin.
     if (allowHttpFallback) {
       const value = await httpFallback();
       if (value) return value;
+      if (httpMissing) return null;
     }
     try {
       let snapshot: PageSnapshot | null = null;
@@ -598,7 +869,11 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
         snapshot = (await bounded(browser.navigate(session!, link.url))).snapshot;
       }
       progress("Opened result", domain);
-      if (blocked(snapshot) || !publicUrl(snapshot.url)) return await httpFallback();
+      if (blocked(snapshot) || !publicUrl(snapshot.url)) {
+        pageTrace(publicUrl(snapshot.url) ? "blocked" : "unsafe", { finalUrl: snapshot.url, title: snapshot.title?.slice(0, 160),
+          reason: [snapshot.pageType, snapshot.loadingState, ...snapshot.friction].filter(Boolean).join(",") });
+        return await httpFallback();
+      }
       // Beta-reality fix (§15): live runs spent 8-10 browser pages on
       // microsoft.com/support furniture while researching unrelated entities.
       // Boilerplate/legal/support/consent pages are skipped before any
@@ -611,11 +886,12 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
           text: snapshot.visibleRelevantText,
         });
         if (relevance.verdict === "IRRELEVANT" || relevance.verdict === "ERROR") {
+          pageTrace("irrelevant", { finalUrl: snapshot.url, title: snapshot.title?.slice(0, 160), reason: `${relevance.verdict}:${relevance.reason}` });
           progress("This page isn't useful for the search — moving on", domain, relevance.reason);
           return null;
         }
       }
-      let extracted = await bounded(browser.extract(session!, { fields: { body: { selector: "body" }, jsonld: { selector: 'script[type="application/ld+json"]' } } }));
+      let extracted = await bounded(browser.extract(session!, { fields: PAGE_EXTRACT_FIELDS }));
       check();
       let text = (extracted.values.body || snapshot.visibleRelevantText).slice(0, 18_000);
       const structured = extracted.values.jsonld ? factsFromJsonLdText(String(extracted.values.jsonld)) : undefined;
@@ -623,18 +899,28 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       if (thin()) {
         try {
           snapshot = (await bounded(browser.scroll(session!, null, "down"))).snapshot;
-          if (blocked(snapshot)) return null;
-          extracted = await bounded(browser.extract(session!, { fields: { body: { selector: "body" }, jsonld: { selector: 'script[type="application/ld+json"]' } } }));
+          if (blocked(snapshot)) { pageTrace("blocked", { finalUrl: snapshot.url, reason: "blocked_after_scroll" }); return null; }
+          extracted = await bounded(browser.extract(session!, { fields: PAGE_EXTRACT_FIELDS }));
           text = (extracted.values.body || snapshot.visibleRelevantText).slice(0, 18_000);
         } catch { check(); }
       }
-      if (thin() || /(?:sign in|log in) to (?:continue|view)|enable javascript|verify you are human/i.test(text.slice(0, 500)) && text.length < 500) return await httpFallback();
+      if (thin() || /(?:sign in|log in) to (?:continue|view)|enable javascript|verify you are human/i.test(text.slice(0, 500)) && text.length < 500) {
+        pageTrace("thin", { finalUrl: snapshot.url, title: snapshot.title?.slice(0, 160), textChars: text.length, reason: thin() ? "under_100_chars" : "login_or_js_wall" });
+        return await httpFallback();
+      }
       const structuredFacts = structured ?? (extracted.values.jsonld ? factsFromJsonLdText(String(extracted.values.jsonld)) : undefined);
-      const value = { page: { url: snapshot.url, title: snapshot.title, text, structured: structuredFacts }, links: snapshot.links };
+      const value = { page: { url: snapshot.url, title: snapshot.title, text, structured: structuredFacts, ...acquiredVia("browser") }, links: snapshot.links };
       pageCache.set(link.url, value);
+      pageTrace("read", { finalUrl: snapshot.url, title: snapshot.title?.slice(0, 160), textChars: text.length, structured: summarize(structuredFacts),
+        pageType: classifyPage({ url: snapshot.url, title: snapshot.title, snippet: text.slice(0, 500) }).page_type });
       progress("Read page", domain, `${text.length} characters`);
       return value;
-    } catch { check(); log({ source: domain, action: "navigate", status: "failed" }); return await httpFallback(); }
+    } catch (error) {
+      check();
+      pageTrace("navigation_failed", { reason: String(error instanceof Error ? error.message : error).slice(0, 120) });
+      log({ source: domain, action: "navigate", status: "failed" });
+      return await httpFallback();
+    }
   };
   // JSON-LD JobPosting rows: deterministic, quote-able, no model needed.
   const structuredJobRows = (pages: BrowserObservedPage[]): SpecRow[] => {
@@ -674,7 +960,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
               event_at: job.datePosted ? `${job.datePosted}T00:00:00.000Z` : null,
               claim_parameters: job.employer ? { role: job.title, organization_name: job.employer } : { role: job.title },
             }),
-          ],
+          ].map((item) => withProvenance(item, page)),
           verification_status: "discovered",
         } as SpecRow);
       }
@@ -700,12 +986,16 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       candidate.row = { ...candidate.row, location: facts.organizationLocation };
       merged = true;
     }
-    if (!candidate.row.email && facts.emails[0]) {
-      candidate.row = { ...candidate.row, email: facts.emails[0] };
+    // Only contacts attributable to this lead (a person never inherits the
+    // company switchboard or another employee's address).
+    const email = attributableEmail(candidate.row, facts.emails);
+    const phone = attributablePhone(candidate.row, facts.phones);
+    if (!candidate.row.email && email) {
+      candidate.row = { ...candidate.row, email };
       merged = true;
     }
-    if (!candidate.row.phone && facts.phones[0]) {
-      candidate.row = { ...candidate.row, phone: facts.phones[0] };
+    if (!candidate.row.phone && phone) {
+      candidate.row = { ...candidate.row, phone };
       merged = true;
     }
     if (merged) {
@@ -716,18 +1006,35 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
   const extract = async (pages: BrowserObservedPage[], query?: string, candidate?: BrowserCandidateMemory) => {
     if (!pages.length) return;
     try {
-      const entities = await bounded((options.extractEntities ?? extractEntities)(pages, spec));
+      // Literal JSON-LD listings first: deterministic, quotable, free. When a
+      // page already yields several, the model is not asked about it.
+      const structuredRows = structuredBusinessRows(pages, spec, trace);
+      if (structuredRows.length) remember(structuredRows, query, candidate);
+      const structuredPages = new Set(structuredRows.map((row) => row.source_url));
+      const modelPages = pages.filter((page) => structuredRows.filter((row) => row.source_url === page.url).length < 3);
+      if (structuredRows.length) trace({ kind: "extract", pages: [...structuredPages].filter((url): url is string => !!url), extractor: "json_ld", llm: "not_called", entities: structuredRows.length });
+      if (!modelPages.length) {
+        progress("Extracted candidates", undefined, `${memory.length} candidates; ${verifiedCount()} verified`);
+        return;
+      }
+      pages = modelPages;
+      const entities = await bounded((options.extractEntities ?? extractEntities)(pages, spec, trace));
       check();
-      remember(browserEntitiesToRows(entities, pages), query, candidate);
+      if (options.extractEntities) trace({ kind: "extract", pages: pages.map((page) => page.url), extractor: "injected", llm: "not_called", entities: entities.length });
+      remember(browserEntitiesToRows(entities, pages, trace), query, candidate);
       if (spec.entity === "job") remember(structuredJobRows(pages), query, candidate);
       progress("Extracted candidates", undefined, `${memory.length} candidates; ${verifiedCount()} verified`);
     } catch (error) { check(); extractionError = error; log({ action: "extract", status: "failed" }); }
   };
-  const verifiedSeen = new Set<string>();
   const research = async (candidate: BrowserCandidateMemory) => {
     refresh(candidate);
     const done = () => candidate.status === "verified" || candidate.status === "rejected";
-    if (done() || limitReached()) return;
+    if (done() || limitReached()) {
+      trace({ kind: "candidate", name: String(candidate.row.title ?? "").slice(0, 120), status: done() ? candidate.status : "not_researched_budget",
+        rejectCode: candidate.lastQualification?.reject_code ?? null, label: candidate.lastQualification?.label ?? null,
+        needs: [...candidate.needs], visited: candidate.visitedUrls.length, queries: candidate.queriesRun.length });
+      return;
+    }
     const researchedSoFar = memory.filter((item) => item.attempts > 0).length;
     progress("Researching", undefined, candidate.row.title, `${Math.min(researchedSoFar + 1, memory.length)}/${memory.length}`);
     const verifiedBefore = verifiedCount();
@@ -740,7 +1047,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       for (const url of plausibleFirstPartyDomains(companyName).filter((url) => !candidate.visitedUrls.includes(url)).slice(0, 1)) {
         if (candidate.visitedUrls.length >= 4 || limitReached()) break;
         progress("Checking possible official domain", new URL(url).hostname, candidate.row.title);
-        const value = await readPage({ url, ref: "" }, candidate, true);
+        const value = await readPage({ url, ref: "" }, candidate, true, "first_party_probe");
         if (!value) continue;
         const synthetic: BrowserExtractedEntity = { page: 0, kind: candidate.row.kind, name: candidate.row.title, identityQuote: candidate.row.title };
         const resolved = entityDestination(value.page, synthetic, companyName);
@@ -764,7 +1071,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
           !candidate.row.no_website_verification?.structured_absence &&
           candidate.row.source_url && !pageCache.has(candidate.row.source_url) ? candidate.row.source_url : null);
       if (seed && !candidate.visitedUrls.includes(seed)) {
-        const value = await readPage({ url: seed, ref: "" }, candidate);
+        const value = await readPage({ url: seed, ref: "" }, candidate, false, "seed");
         if (value) await extract([value.page], undefined, candidate.row.entity_resolved === false ? undefined : candidate);
         refresh(candidate);
         if (done()) break;
@@ -789,7 +1096,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
         }))[0];
         if (sourceLink) {
           secondary++;
-          const value = await readPage(sourceLink, candidate, true);
+          const value = await readPage(sourceLink, candidate, true, "source_link");
           if (value) {
             const synthetic: BrowserExtractedEntity = { page: 0, kind: candidate.row.kind, name: candidate.row.title, identityQuote: candidate.row.title };
             candidate.row = { ...candidate.row, ...entityDestination(value.page, synthetic, companyName ?? undefined) };
@@ -812,9 +1119,13 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
         if (next) {
           secondary++;
           progress(/contact/i.test(next.url) ? "Checking contact page" : "Opening company page", baseHost);
-          const value = await readPage(next, candidate, candidate.needs.includes("contact"));
+          const value = await readPage(next, candidate, candidate.needs.includes("contact"), "contact_or_company_page");
           if (value) {
-            if (/\/contact(?:\/|$|\?)/i.test(new URL(value.page.url).pathname) && new URL(value.page.url).hostname === baseHost) {
+            // A contact page must be one: the site's own /contact route that
+            // renders contact content, never a 404 template or a demo form.
+            const notFound = /\b(?:404|page not found|not be found|doesn['’]t exist|does not exist|nothing (?:was )?found)\b/i.test(`${value.page.title} ${value.page.text.slice(0, 600)}`);
+            const contactContent = /\b(?:contact|get in touch|reach us|email us|call us|send (?:us )?a message|support@|hello@|info@|@[a-z0-9-]+\.[a-z]{2,}|\+?\d[\d ().-]{7,}\d)\b/i.test(value.page.text.slice(0, 6000));
+            if (/\/contact(?:\/|$|\?)/i.test(new URL(value.page.url).pathname) && new URL(value.page.url).hostname === baseHost && !notFound && contactContent) {
               candidate.row.contact_page_url = value.page.url;
               candidate.row.field_provenance = { ...candidate.row.field_provenance, contact_page_url: {
                 value: value.page.url, source: "browser_observed_text", source_url: value.page.url,
@@ -836,7 +1147,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       let inspectedThisCheck = 0;
       for (const link of results.filter((item) => !candidate.visitedUrls.includes(item.url)).slice(0, 2)) {
         if (candidate.visitedUrls.length >= 4 || limitReached()) break;
-        const value = await readPage(link, candidate);
+        const value = await readPage(link, candidate, false, "candidate_research");
         if (!value) continue;
         mergeStructuredContacts(candidate, value.page);
         inspectedThisCheck++;
@@ -932,37 +1243,24 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
     if (!done()) {
       candidate.status = "exhausted";
       candidate.verificationStatus = "unresolved";
-    } else if (candidate.status === "verified") {
-      // One verified event per distinct candidate identity.
-      const verifiedKey = `${candidate.row.entity_id ?? ""}|${(candidate.row.title ?? "").toLowerCase()}`;
-      if (verifiedSeen.has(verifiedKey)) return;
-      verifiedSeen.add(verifiedKey);
-      progress("Candidate verified", undefined, candidate.row.title);
-      // Progressive results: stream the verified lead immediately so the UI
-      // shows it while research continues on remaining candidates.
-      const row = candidate.row;
-      options.onProgress?.({
-        action: "Candidate verified",
-        detail: candidate.row.title,
-        row: {
-          key: row.key ?? row.entity_id ?? "",
-          entity_id: row.entity_id ?? "",
-          kind: row.kind,
-          title: row.title ?? "",
-          url: row.url ?? null,
-          website_url: row.website_url ?? null,
-          profile_url: row.profile_url ?? null,
-          email: row.email ?? null,
-          phone: row.phone ?? null,
-          location: row.location ?? null,
-          why_match: row.why_match ?? null,
-        },
-      });
     }
+    trace({ kind: "candidate", name: String(candidate.row.title ?? "").slice(0, 120), status: candidate.status,
+      rejectCode: candidate.lastQualification?.reject_code ?? null, label: candidate.lastQualification?.label ?? null,
+      needs: [...candidate.needs], visited: candidate.visitedUrls.length, queries: candidate.queriesRun.length });
+    announceVerified(candidate);
   };
   try {
     check();
-    session = await bounded(browser.createSession({ id: `live-${run}-${randomUUID().slice(0, 6)}`, visible: options.visible ?? process.env.RESEARCH_BROWSER_VISIBLE?.toLowerCase() !== "false", limits: { pages: maxPages + plan.stoppingRules.maxQueries * 2, actions: maxPages * 6 + plan.stoppingRules.maxQueries * 5, scrolls: 4, screenshots: 1 } }));
+    try {
+      session = await bounded(browser.createSession({ id: `live-${run}-${randomUUID().slice(0, 6)}`, visible: options.visible ?? process.env.RESEARCH_BROWSER_VISIBLE?.toLowerCase() !== "false", limits: { pages: maxPages + plan.stoppingRules.maxQueries * 2, actions: maxPages * 6 + plan.stoppingRules.maxQueries * 5, scrolls: 4, screenshots: 1 } }));
+    } finally {
+      // Reported even when the fallback runtime also failed to start: a
+      // worker -> playwright switch must never disappear from the trace.
+      for (const info of runtimeInfos.splice(0)) {
+        trace({ kind: "runtime", requested: info.requested, used: info.used, ...(info.reason ? { reason: info.reason } : {}) });
+        log({ action: "runtime", requested: info.requested, used: info.used, reason: info.reason ?? null });
+      }
+    }
     // Partial entity rows are precisely the candidates that need this pass.
     // Structured POIs and indexed rows can have a strong identity without a
     // destination URL. Research them by exact name and location.
@@ -1017,7 +1315,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       // PASS A: inspect several distinct results, then extract subjects in one
       // bounded call. Preserve the rest of the budget for candidate research.
       for (const link of (memory.length - before >= 2 ? [] : results.filter((item) => !visited.has(item.url)).slice(0, 2))) {
-        const value = await readPage(link);
+        const value = await readPage(link, undefined, false, "discovery");
         if (value) pages.push(value.page);
       }
       await extract(pages, query);
@@ -1034,6 +1332,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
     if (extractionError && !memory.length) throw extractionError;
     if (verifiedCount() >= plan.desiredCount) stoppingReason = "verified_target_reached";
     else if (limitReached()) stoppingReason = "search_budget_reached";
+    trace({ kind: "done", status: "completed", candidates: memory.length, verified: verifiedCount(), visited: visited.size, queries: queriesRun.size, stoppingReason, elapsedMs: Date.now() - startedAt });
     log({ status: "completed", elapsedMs: Date.now() - startedAt, candidates: memory.length, researched: memory.filter((candidate) => candidate.attempts > 0).length, verified: verifiedCount(), visited: visited.size, queries: queriesRun.size, stoppingReason, sample: memory.slice(0, 12).map(({ row, missing }) => ({ name: row.title, role: row.role, company: row.company, industry: row.industry, source: row.source_page_type, missing })) });
     return memory.map((candidate) => candidate.row);
   } catch (error) {
@@ -1044,6 +1343,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
     if (options.signal?.aborted) {
       // Hard deadline: hand back the candidates already researched so the
       // caller can finalize whatever qualifies — real work is never erased.
+      trace({ kind: "done", status: "deadline", candidates: memory.length, verified: verifiedCount(), visited: visited.size, queries: queriesRun.size, stoppingReason: "deadline", elapsedMs: Date.now() - startedAt });
       log({
         status: "deadline",
         elapsedMs: Date.now() - startedAt,
@@ -1053,6 +1353,8 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       });
       return memory.map((candidate) => candidate.row);
     }
+    trace({ kind: "done", status: controller.signal.aborted ? "timeout" : "provider_error", candidates: memory.length, verified: verifiedCount(), visited: visited.size, queries: queriesRun.size,
+      stoppingReason: String(error instanceof Error ? error.message : error).slice(0, 80), elapsedMs: Date.now() - startedAt });
     log({ status: "partial", elapsedMs: Date.now() - startedAt, reason: controller.signal.aborted ? "timeout" : "provider_error", candidates: memory.length, researched: memory.filter((candidate) => candidate.attempts > 0).length, verified: verifiedCount(), sample: memory.slice(0, 12).map(({ row, missing }) => ({ name: row.title, role: row.role, company: row.company, industry: row.industry, source: row.source_page_type, missing })) });
     if (memory.length) return memory.map((candidate) => candidate.row);
     const failure = error instanceof Error ? error : new Error("BROWSER_DISCOVERY_FAILED");
@@ -1061,7 +1363,10 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
     clearTimeout(timer);
     options.signal?.removeEventListener("abort", abort);
     options.onCandidateMemory?.(memory);
-    if (session) await browser.close(session).catch(() => undefined);
+    // Only a user cancel is a cancellation; a time budget or run deadline
+    // still hands back results, so the browser may stay open for viewing.
+    const cancelled = !!options.signal?.aborted && !isDeadlineAbort(options.signal);
+    if (session) await browser.close(session, cancelled ? "cancelled" : "completed").catch(() => undefined);
   }
 }
 

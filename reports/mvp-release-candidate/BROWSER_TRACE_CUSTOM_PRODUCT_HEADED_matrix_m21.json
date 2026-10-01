@@ -1,0 +1,1224 @@
+{
+  "runId": "trace-custom-product-1790792570702",
+  "query": "Find 10 SaaS founders globally who may need help with AI automation",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 125561,
+  "error": null,
+  "audit": [
+    {
+      "title": "Andrew Breen",
+      "checks": [
+        {
+          "method": "browser_observed_text",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        },
+        {
+          "method": "browser_named_founder_cohort",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": null
+    },
+    {
+      "title": "Alex Circei",
+      "checks": [
+        {
+          "method": "browser_observed_text",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        },
+        {
+          "method": "browser_named_founder_cohort",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": null
+    },
+    {
+      "title": "Mark Corbett",
+      "checks": [
+        {
+          "method": "browser_observed_text",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        },
+        {
+          "method": "browser_named_founder_cohort",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": null
+    },
+    {
+      "title": "Pranjal Daga",
+      "checks": [
+        {
+          "method": "browser_observed_text",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        },
+        {
+          "method": "browser_named_founder_cohort",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": null
+    },
+    {
+      "title": "Garry Drummond",
+      "checks": [
+        {
+          "method": "browser_observed_text",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        },
+        {
+          "method": "browser_named_founder_cohort",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": null
+    },
+    {
+      "title": "Jennifer Dulski",
+      "checks": [
+        {
+          "method": "browser_observed_text",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        },
+        {
+          "method": "browser_named_founder_cohort",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": null
+    },
+    {
+      "title": "Henrik Grim",
+      "checks": [
+        {
+          "method": "browser_observed_text",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        },
+        {
+          "method": "browser_named_founder_cohort",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": null
+    }
+  ],
+  "browser": {
+    "adapter": "worker",
+    "status": "completed",
+    "pagesVisited": 9,
+    "currentUrl": "https://risingteam.com/",
+    "retained": true,
+    "controller": "agent",
+    "sessionId": "57f90315-3dde-4807-ae8f-344d01bb40e2",
+    "frame": true
+  },
+  "runtime": [
+    {
+      "kind": "runtime",
+      "requested": "worker",
+      "used": "worker"
+    }
+  ],
+  "progressEvents": 71,
+  "streamedRows": [
+    "Andrew Breen",
+    "Alex Circei",
+    "Mark Corbett",
+    "Pranjal Daga",
+    "Garry Drummond",
+    "Jennifer Dulski"
+  ],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [
+    {
+      "kind": "search",
+      "query": "\"founder\" saas",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "\"founder\" saas",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 6,
+      "reason": "raw_links=7 unrelated=1"
+    },
+    {
+      "kind": "search",
+      "query": "Thrust Carbon official website",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "Thrust Carbon official website",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "LOCH Technologies official website",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "LOCH Technologies official website",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "Rising Team official website",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "Rising Team official website",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "pageType": "list",
+      "title": "Top 25 B2B SaaS Founder List",
+      "outcome": "read",
+      "textChars": 3155,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "Andrew Breen",
+        "Alex Circei",
+        "Mark Corbett",
+        "Pranjal Daga",
+        "Garry Drummond",
+        "Jennifer Dulski",
+        "Henrik Grim",
+        "Ajay Kamble",
+        "Amir Kaplan",
+        "Erik Kostelnik"
+      ],
+      "why": "",
+      "capture": "9a86eab11d1b.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://saasclub.io/",
+      "pageType": "unknown",
+      "title": "SaaS Club: How Founders Grow Profitable SaaS Businesses | SaaS Club",
+      "outcome": "read",
+      "textChars": 3226,
+      "structured": {
+        "jobs": 0,
+        "organization": "SaaS Club",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "entities rejected: ",
+      "capture": "57c6a6b5cbe3.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://www.outshine.com/",
+      "pageType": null,
+      "title": "Outshine | Digital Marketing & Analytics Experts For B2B SaaS",
+      "outcome": "http_read",
+      "textChars": 4138,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~959s; injected/not_called)",
+      "capture": "02d86d4030d1.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://waydev.co/",
+      "pageType": null,
+      "title": "Productivity Insights: SPACE Framework, DX and DORA metrics - Waydev",
+      "outcome": "http_read",
+      "textChars": 7508,
+      "structured": {
+        "jobs": 0,
+        "organization": "Waydev",
+        "emails": 1,
+        "phones": 1
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~958s; injected/not_called)",
+      "capture": "e754128598c9.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://thrustcarbon.com/",
+      "pageType": "unknown",
+      "title": "Reduce Business Travel Emissions & Cost - Thrust Carbon",
+      "outcome": "read",
+      "textChars": 9596,
+      "structured": {
+        "jobs": 0,
+        "organization": "Thrust Carbon",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~939s; injected/not_called)",
+      "capture": "2b1ebc0b3d96.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://www.withaccend.com/",
+      "pageType": null,
+      "title": "Accend",
+      "outcome": "http_read",
+      "textChars": 10658,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~938s; injected/not_called)",
+      "capture": "0bce60e28cb4.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://loch.io/",
+      "pageType": "unknown",
+      "title": "LOCH Technologies | Leaders in Wireless Airspace Defense",
+      "outcome": "read",
+      "textChars": 6242,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~925s; injected/not_called)",
+      "capture": "16e754abb890.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://risingteam.com/",
+      "pageType": "unknown",
+      "title": "Rising Team | AI Leadership Personal Trainer",
+      "outcome": "read",
+      "textChars": 7630,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~903s; injected/not_called)",
+      "capture": "0ca873a619f3.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://mimohq.com/",
+      "pageType": null,
+      "title": "Accountants recurring work, running on AI",
+      "outcome": "http_read",
+      "textChars": 3627,
+      "structured": {
+        "jobs": 0,
+        "organization": "Mimo",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~902s)",
+      "capture": "c1f585a8cd9b.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.capchase.com/top-25-b2b-saas-founder-list",
+        "https://saasclub.io/"
+      ],
+      "extractor": "deterministic",
+      "llm": "not_called",
+      "entities": 10
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.capchase.com/top-25-b2b-saas-founder-list",
+        "https://saasclub.io/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 10
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.outshine.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~959s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.outshine.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://waydev.co/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~958s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://waydev.co/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://thrustcarbon.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~939s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://thrustcarbon.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.withaccend.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~938s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.withaccend.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://loch.io/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~925s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://loch.io/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://risingteam.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~903s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://risingteam.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://mimohq.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~902s"
+    }
+  ],
+  "entityOutcomes": [
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Andrew Breen",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Alex Circei",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Mark Corbett",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Pranjal Daga",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Garry Drummond",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Jennifer Dulski",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Henrik Grim",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Ajay Kamble",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Amir Kaplan",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Erik Kostelnik",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    }
+  ],
+  "remember": [
+    {
+      "kind": "remember",
+      "name": "Andrew Breen",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Alex Circei",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Mark Corbett",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Pranjal Daga",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Garry Drummond",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Jennifer Dulski",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Henrik Grim",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Ajay Kamble",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Amir Kaplan",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Erik Kostelnik",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    }
+  ],
+  "candidates": [
+    {
+      "kind": "candidate",
+      "name": "Andrew Breen",
+      "status": "verified",
+      "rejectCode": null,
+      "label": null,
+      "needs": [],
+      "visited": 1,
+      "queries": 0
+    },
+    {
+      "kind": "candidate",
+      "name": "Alex Circei",
+      "status": "verified",
+      "rejectCode": null,
+      "label": null,
+      "needs": [],
+      "visited": 1,
+      "queries": 0
+    },
+    {
+      "kind": "candidate",
+      "name": "Mark Corbett",
+      "status": "verified",
+      "rejectCode": null,
+      "label": null,
+      "needs": [],
+      "visited": 1,
+      "queries": 1
+    },
+    {
+      "kind": "candidate",
+      "name": "Pranjal Daga",
+      "status": "verified",
+      "rejectCode": null,
+      "label": null,
+      "needs": [],
+      "visited": 1,
+      "queries": 0
+    },
+    {
+      "kind": "candidate",
+      "name": "Garry Drummond",
+      "status": "verified",
+      "rejectCode": null,
+      "label": null,
+      "needs": [],
+      "visited": 1,
+      "queries": 1
+    },
+    {
+      "kind": "candidate",
+      "name": "Jennifer Dulski",
+      "status": "verified",
+      "rejectCode": null,
+      "label": null,
+      "needs": [],
+      "visited": 1,
+      "queries": 1
+    }
+  ],
+  "done": [
+    {
+      "kind": "done",
+      "status": "timeout",
+      "candidates": 10,
+      "verified": 6,
+      "visited": 9,
+      "queries": 4,
+      "stoppingReason": "BROWSER_DISCOVERY_TIMEOUT",
+      "elapsedMs": 90047
+    }
+  ],
+  "persistenceSkipped": [
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "person",
+    "criteria": [
+      "role=founder",
+      "industry=saas",
+      "offer=AI automation",
+      "mode=selling",
+      "geo_scope=worldwide",
+      "requested_count=10"
+    ],
+    "clarify": [],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_people(country,city_norm,role_norm)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "live-browser",
+          "partitions": [
+            "live-gapfill(10)"
+          ],
+          "scanned": 10,
+          "matched": 10
+        }
+      ],
+      "rawCandidates": 10,
+      "postSpecFilter": 10,
+      "timings": {
+        "understanding_ms": 3917,
+        "stored_search_ms": 5869,
+        "research_ms": 90327,
+        "enrichment_ms": 21358,
+        "qualification_ms": 2115,
+        "total_ms": 123586
+      },
+      "researchable": 10,
+      "researched": 10,
+      "complete": 7,
+      "pendingEnrichment": 3,
+      "qualificationRejected": 0,
+      "qualified": 7,
+      "returned": 7,
+      "reason": "RESULTS",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "direct-http",
+            "label": "Public websites",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "searxng",
+            "label": "The web",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "browser-live",
+            "label": "Public websites",
+            "state": "healthy",
+            "reason": "OK"
+          },
+          {
+            "source": "enrich:registry-identity",
+            "label": "Public source",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          }
+        ],
+        "degraded": true,
+        "summary": "Some sources could not be searched this time (Public source), so results may be incomplete."
+      }
+    },
+    "rowsReturned": 7,
+    "rows": [
+      {
+        "title": "Andrew Breen",
+        "kind": "person",
+        "role": "Founder & CEO",
+        "company": "Outshine",
+        "location": null,
+        "website_url": "https://www.outshine.com",
+        "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+        "disposition": "qualified",
+        "why": "Identity · Andrew Breen\nFounder & CEO\nOutshine",
+        "email": null,
+        "phone": null,
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "browser_observed_text",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Andrew Breen\nFounder & CEO\nOutshine",
+            "id": "ev:ed2f3040-f20d-4e79-8380-7236298c81c7",
+            "acquisition": "browser",
+            "requested": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "session": "57f90315-3dde-4807-ae8f-344d01bb40e2"
+          },
+          {
+            "type": "identity",
+            "method": "browser_named_founder_cohort",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Top 25 B2B SaaS Founder List of 2024: Andrew Breen\nFounder & CEO\nOutshine",
+            "id": "ev:86abd753-afdc-431b-a526-f24db0f48802",
+            "acquisition": "browser",
+            "requested": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "session": "57f90315-3dde-4807-ae8f-344d01bb40e2"
+          }
+        ],
+        "provenance": {
+          "role": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "company": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "industry": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list"
+        }
+      },
+      {
+        "title": "Alex Circei",
+        "kind": "person",
+        "role": "CEO & Co-Founder",
+        "company": "Waydev",
+        "location": null,
+        "website_url": "https://waydev.co",
+        "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+        "disposition": "qualified",
+        "why": "Identity · Alex Circei\nCEO & Co-Founder\nWaydev",
+        "email": null,
+        "phone": null,
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "browser_observed_text",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Alex Circei\nCEO & Co-Founder\nWaydev",
+            "id": "ev:6081778b-0eb3-4df3-9605-e25c6b409c08",
+            "acquisition": "browser",
+            "requested": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "session": "57f90315-3dde-4807-ae8f-344d01bb40e2"
+          },
+          {
+            "type": "identity",
+            "method": "browser_named_founder_cohort",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Top 25 B2B SaaS Founder List of 2024: Alex Circei\nCEO & Co-Founder\nWaydev",
+            "id": "ev:ca1b4ce3-a809-497a-987a-b842d0045be3",
+            "acquisition": "browser",
+            "requested": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "session": "57f90315-3dde-4807-ae8f-344d01bb40e2"
+          }
+        ],
+        "provenance": {
+          "role": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "company": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "industry": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list"
+        }
+      },
+      {
+        "title": "Mark Corbett",
+        "kind": "person",
+        "role": "Founder",
+        "company": "Thrust Carbon",
+        "location": null,
+        "website_url": "https://thrustcarbon.com",
+        "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+        "disposition": "qualified",
+        "why": "Identity · Mark Corbett\nFounder\nThrust Carbon",
+        "email": null,
+        "phone": null,
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "browser_observed_text",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Mark Corbett\nFounder\nThrust Carbon",
+            "id": "ev:25d0af0c-f8cf-4df0-91fd-27c320847a15",
+            "acquisition": "browser",
+            "requested": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "session": "57f90315-3dde-4807-ae8f-344d01bb40e2"
+          },
+          {
+            "type": "identity",
+            "method": "browser_named_founder_cohort",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Top 25 B2B SaaS Founder List of 2024: Mark Corbett\nFounder\nThrust Carbon",
+            "id": "ev:84488ab5-62bc-4d50-9311-d10cf3be2bb8",
+            "acquisition": "browser",
+            "requested": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "session": "57f90315-3dde-4807-ae8f-344d01bb40e2"
+          }
+        ],
+        "provenance": {
+          "role": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "company": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "industry": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "website_url": "browser_observed_text@https://thrustcarbon.com/"
+        }
+      },
+      {
+        "title": "Pranjal Daga",
+        "kind": "person",
+        "role": "Co-Founder & Co-CEO",
+        "company": "Accend",
+        "location": null,
+        "website_url": "https://www.withaccend.com",
+        "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+        "disposition": "qualified",
+        "why": "Identity · Pranjal Daga\nCo-Founder & Co-CEO\nAccend",
+        "email": null,
+        "phone": null,
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "browser_observed_text",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Pranjal Daga\nCo-Founder & Co-CEO\nAccend",
+            "id": "ev:64e0f38d-9772-4b31-b209-7615628577db",
+            "acquisition": "browser",
+            "requested": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "session": "57f90315-3dde-4807-ae8f-344d01bb40e2"
+          },
+          {
+            "type": "identity",
+            "method": "browser_named_founder_cohort",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Top 25 B2B SaaS Founder List of 2024: Pranjal Daga\nCo-Founder & Co-CEO\nAccend",
+            "id": "ev:c3dcffd8-7767-46b6-a19d-1ef5690441e5",
+            "acquisition": "browser",
+            "requested": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "session": "57f90315-3dde-4807-ae8f-344d01bb40e2"
+          }
+        ],
+        "provenance": {
+          "role": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "company": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "industry": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list"
+        }
+      },
+      {
+        "title": "Garry Drummond",
+        "kind": "person",
+        "role": "CEO & Founder",
+        "company": "LOCH Technologies",
+        "location": null,
+        "website_url": "https://loch.io",
+        "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+        "disposition": "qualified",
+        "why": "Identity · Garry Drummond\nCEO & Founder\nLOCH Technologies",
+        "email": null,
+        "phone": null,
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "browser_observed_text",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Garry Drummond\nCEO & Founder\nLOCH Technologies",
+            "id": "ev:8f886082-4e1e-4c0c-b217-5ff5dbfb37db",
+            "acquisition": "browser",
+            "requested": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "session": "57f90315-3dde-4807-ae8f-344d01bb40e2"
+          },
+          {
+            "type": "identity",
+            "method": "browser_named_founder_cohort",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Top 25 B2B SaaS Founder List of 2024: Garry Drummond\nCEO & Founder\nLOCH Technologies",
+            "id": "ev:fb728965-a609-410f-bf15-2f261f93203f",
+            "acquisition": "browser",
+            "requested": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "session": "57f90315-3dde-4807-ae8f-344d01bb40e2"
+          }
+        ],
+        "provenance": {
+          "role": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "company": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "industry": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "website_url": "browser_observed_text@https://loch.io/"
+        }
+      },
+      {
+        "title": "Jennifer Dulski",
+        "kind": "person",
+        "role": "CEO & Founder",
+        "company": "Rising Team",
+        "location": null,
+        "website_url": "https://risingteam.com",
+        "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+        "disposition": "qualified",
+        "why": "Identity · Jennifer Dulski\nCEO & Founder\nRising Team",
+        "email": null,
+        "phone": null,
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "browser_observed_text",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Jennifer Dulski\nCEO & Founder\nRising Team",
+            "id": "ev:1e464e99-64f3-42b2-ae2c-b5f25060b2e5",
+            "acquisition": "browser",
+            "requested": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "session": "57f90315-3dde-4807-ae8f-344d01bb40e2"
+          },
+          {
+            "type": "identity",
+            "method": "browser_named_founder_cohort",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Top 25 B2B SaaS Founder List of 2024: Jennifer Dulski\nCEO & Founder\nRising Team",
+            "id": "ev:12bfa59a-be59-4cb4-9a84-9f19828da6bd",
+            "acquisition": "browser",
+            "requested": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "session": "57f90315-3dde-4807-ae8f-344d01bb40e2"
+          }
+        ],
+        "provenance": {
+          "role": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "company": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "industry": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "website_url": "browser_observed_text@https://risingteam.com/"
+        }
+      },
+      {
+        "title": "Henrik Grim",
+        "kind": "person",
+        "role": "CEO & Co-Founder",
+        "company": "Mimo",
+        "location": null,
+        "website_url": "https://mimohq.com",
+        "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+        "disposition": "qualified",
+        "why": "Identity · Henrik Grim\nCEO & Co-Founder\nMimo",
+        "email": null,
+        "phone": null,
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "browser_observed_text",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Henrik Grim\nCEO & Co-Founder\nMimo",
+            "id": "ev:feff5fc9-b590-4d9c-b581-fb05c9eb0d8a",
+            "acquisition": "browser",
+            "requested": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "session": "57f90315-3dde-4807-ae8f-344d01bb40e2"
+          },
+          {
+            "type": "identity",
+            "method": "browser_named_founder_cohort",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Top 25 B2B SaaS Founder List of 2024: Henrik Grim\nCEO & Co-Founder\nMimo",
+            "id": "ev:ffb111fa-f261-4c45-9417-68e3161a3894",
+            "acquisition": "browser",
+            "requested": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "session": "57f90315-3dde-4807-ae8f-344d01bb40e2"
+          }
+        ],
+        "provenance": {
+          "role": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "company": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "industry": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list"
+        }
+      }
+    ],
+    "diagnostics": [
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "direct-http",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "searxng",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      }
+    ],
+    "cancelledAtMs": null,
+    "returnedAtMs": 125507,
+    "candidateLedger": {
+      "counts": {
+        "returned": 7,
+        "qualified_more": 0,
+        "rejected": 0,
+        "gated": 0,
+        "filtered": 0,
+        "incomplete": 3,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {},
+      "streamed": 6,
+      "streamedNotReturned": []
+    }
+  }
+}

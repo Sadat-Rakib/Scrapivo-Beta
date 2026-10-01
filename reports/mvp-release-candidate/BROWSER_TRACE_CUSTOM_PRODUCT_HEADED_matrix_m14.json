@@ -1,0 +1,348 @@
+{
+  "runId": "trace-custom-product-1790792159995",
+  "query": "Data engineer jobs in Berlin",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 37026,
+  "error": null,
+  "audit": [
+    {
+      "title": "Data Scientist / Machine Learning Engineer (m/w/d) | Healthcare & Life Science @ Limebit GmbH",
+      "checks": [
+        {
+          "method": "structured_job_provider",
+          "url": "https://www.arbeitnow.com/jobs/companies/limebit-gmbh/data-scientist-machine-learning-engineer-healthcare-life-science-berlin-309913",
+          "status": "no_capture"
+        }
+      ],
+      "contactPage": null,
+      "email": null,
+      "phone": null
+    }
+  ],
+  "browser": {
+    "adapter": "worker",
+    "status": "completed",
+    "pagesVisited": 8,
+    "currentUrl": "https://ca.linkedin.com/jobs/remote-data-engineer-jobs",
+    "retained": true,
+    "controller": "agent",
+    "sessionId": "23859db6-fb40-4593-aaeb-3d3a1a62cea8",
+    "frame": true
+  },
+  "runtime": [
+    {
+      "kind": "runtime",
+      "requested": "worker",
+      "used": "worker"
+    }
+  ],
+  "progressEvents": 28,
+  "streamedRows": [
+    "Data Scientist / Machine Learning Engineer (m/w/d) | Healthcare & Life Science @ Limebit GmbH"
+  ],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [
+    {
+      "kind": "search",
+      "query": "data engineer Berlin job",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "data engineer Berlin job",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "data engineer remote job",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "data engineer remote job",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://www.linkedin.com/jobs/data-engineer-jobs-berlin",
+      "pageType": "job_board",
+      "title": "1,000+ Data Engineer jobs in Berlin",
+      "outcome": "read",
+      "textChars": 11873,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1386s; injected/not_called)",
+      "capture": "c0e80777e7f8.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://databerlin.net/jobs/category/data-engineer",
+      "pageType": "job_board",
+      "title": "Data Engineer Jobs in Berlin | Data Berlin",
+      "outcome": "read",
+      "textChars": 12962,
+      "structured": {
+        "jobs": 0,
+        "organization": "Data Berlin",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1386s; injected/not_called)",
+      "capture": "1cf0d7a4ba1a.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://ca.indeed.com/Data-Engineer-Remote-jobs-in-Canada",
+      "pageType": "job_board",
+      "title": "Flexible Data Engineer Remote Jobs – Apply Today to Work From Home in Canada (30 September 2026) | Indeed",
+      "outcome": "read",
+      "textChars": 12879,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1379s; injected/not_called)",
+      "capture": "64021ccb89e1.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://ca.linkedin.com/jobs/remote-data-engineer-jobs",
+      "pageType": "job_board",
+      "title": "4,000+ Remote Data Engineer jobs in Canada",
+      "outcome": "read",
+      "textChars": 6959,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1379s; injected/not_called)",
+      "capture": "bc2f958260b5.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.linkedin.com/jobs/data-engineer-jobs-berlin",
+        "https://databerlin.net/jobs/category/data-engineer"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1386s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.linkedin.com/jobs/data-engineer-jobs-berlin",
+        "https://databerlin.net/jobs/category/data-engineer"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://ca.indeed.com/Data-Engineer-Remote-jobs-in-Canada",
+        "https://ca.linkedin.com/jobs/remote-data-engineer-jobs"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1379s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://ca.indeed.com/Data-Engineer-Remote-jobs-in-Canada",
+        "https://ca.linkedin.com/jobs/remote-data-engineer-jobs"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    }
+  ],
+  "entityOutcomes": [],
+  "remember": [
+    {
+      "kind": "remember",
+      "name": "Data Scientist / Machine Learning Engineer (m/w/d) | Healthcare & Life Science @ Limebit GmbH",
+      "rowKind": "job",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Data Scientist / Machine Learning Engineer (m/w/d) | Healthcare & Life Science @ Limebit GmbH",
+      "rowKind": "job",
+      "outcome": "merged",
+      "resolved": true
+    }
+  ],
+  "candidates": [
+    {
+      "kind": "candidate",
+      "name": "Data Scientist / Machine Learning Engineer (m/w/d) | Healthcare & Life Science @ Limebit GmbH",
+      "status": "verified",
+      "rejectCode": null,
+      "label": null,
+      "needs": [],
+      "visited": 0,
+      "queries": 0
+    }
+  ],
+  "done": [
+    {
+      "kind": "done",
+      "status": "completed",
+      "candidates": 1,
+      "verified": 1,
+      "visited": 4,
+      "queries": 2,
+      "stoppingReason": "diminishing_returns",
+      "elapsedMs": 21247
+    }
+  ],
+  "persistenceSkipped": [
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "job",
+    "criteria": [
+      "role=data engineer",
+      "industry=data engineer job",
+      "location=Berlin",
+      "location_id=geo:city:berlin",
+      "location_kind=city",
+      "location_country=DE",
+      "location_parents=geo:country:de"
+    ],
+    "clarify": [],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "provider-jobs",
+          "partitions": [
+            "jobs-fleet(15/15 sources ok, 8 seeker-filtered)"
+          ],
+          "scanned": 271,
+          "matched": 100
+        },
+        {
+          "source": "live-jobs+browser",
+          "partitions": [
+            "live-gapfill(26)"
+          ],
+          "scanned": 26,
+          "matched": 25
+        }
+      ],
+      "rawCandidates": 125,
+      "postSpecFilter": 2,
+      "timings": {
+        "understanding_ms": 5359,
+        "stored_search_ms": 4518,
+        "research_ms": 24473,
+        "enrichment_ms": 4,
+        "qualification_ms": 286,
+        "total_ms": 34640
+      },
+      "researchable": 1,
+      "complete": 1,
+      "pendingEnrichment": 0,
+      "qualificationRejected": 0,
+      "qualified": 1,
+      "returned": 1,
+      "reason": "RESULTS",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "jobs-fleet",
+            "label": "Public source",
+            "state": "healthy",
+            "reason": "OK"
+          },
+          {
+            "source": "browser-live",
+            "label": "Public websites",
+            "state": "healthy",
+            "reason": "OK"
+          }
+        ],
+        "degraded": false,
+        "summary": null
+      }
+    },
+    "rowsReturned": 1,
+    "rows": [
+      {
+        "title": "Data Scientist / Machine Learning Engineer (m/w/d) | Healthcare & Life Science @ Limebit GmbH",
+        "kind": "job",
+        "role": null,
+        "company": null,
+        "location": "Berlin",
+        "website_url": null,
+        "source_url": null,
+        "disposition": "qualified",
+        "why": "Hiring signal · “Data Scientist / Machine Learning Engineer (m/w/d) | Healthcare & Life Science at Limebit GmbH” · arbeitnow.com",
+        "email": null,
+        "phone": null,
+        "contact_page_url": null,
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "hiring",
+            "method": "structured_job_provider",
+            "url": "https://www.arbeitnow.com/jobs/companies/limebit-gmbh/data-scientist-machine-learning-engineer-healthcare-life-science-berlin-309913",
+            "excerpt": "Data Scientist / Machine Learning Engineer (m/w/d) | Healthcare & Life Science at Limebit GmbH",
+            "id": null,
+            "acquisition": null,
+            "requested": null,
+            "session": null
+          }
+        ],
+        "provenance": {}
+      }
+    ],
+    "diagnostics": [],
+    "cancelledAtMs": null,
+    "returnedAtMs": 37024,
+    "candidateLedger": {
+      "counts": {
+        "returned": 1,
+        "qualified_more": 0,
+        "rejected": 0,
+        "gated": 0,
+        "filtered": 24,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {},
+      "streamed": 1,
+      "streamedNotReturned": []
+    }
+  }
+}

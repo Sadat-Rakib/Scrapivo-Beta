@@ -220,6 +220,9 @@ describe("browser discovery evidence boundary", () => {
       { field: "role", value: "founder", stated: true, confidence: 1 },
       { field: "industry", value: "SaaS", stated: true, confidence: 1 },
     ] };
+    // SERP results that share no query term are treated as degraded (engine
+    // chrome, bot-degraded results); give the organic hit a realistic title.
+    vi.mocked(browser.search).mockResolvedValue({ snapshot: snapshot({ url: "https://duckduckgo.com/?q=founders", pageType: "search_results", links: [{ ref: "@e1", name: "Acme team — SaaS founder profile", url: observed[0].url }] }), action: "search", verified: true });
     await discoverWithBrowser(understood, { browser, extractEntities: async () => [entity], onProgress });
     const firstQuery = vi.mocked(browser.search).mock.calls[0][1];
     expect(firstQuery).toMatch(/\bfounder\b/i);

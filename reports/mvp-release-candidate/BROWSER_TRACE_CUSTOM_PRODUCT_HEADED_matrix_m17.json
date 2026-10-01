@@ -1,0 +1,1729 @@
+{
+  "runId": "trace-custom-product-1790797843183",
+  "query": "SaaS founders talking about churn on LinkedIn",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 120137,
+  "error": null,
+  "audit": [],
+  "browser": {
+    "adapter": "worker",
+    "status": "completed",
+    "pagesVisited": 41,
+    "currentUrl": "https://revalgo.ai/",
+    "retained": true,
+    "controller": "agent",
+    "sessionId": "17bc859e-91cc-4a05-a20e-dc07b242db53",
+    "frame": true
+  },
+  "runtime": [
+    {
+      "kind": "runtime",
+      "requested": "worker",
+      "used": "worker"
+    }
+  ],
+  "progressEvents": 80,
+  "streamedRows": [],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [
+    {
+      "kind": "search",
+      "query": "founder \"churn on LinkedIn\"",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "founder \"churn on LinkedIn\"",
+      "via": "duckduckgo",
+      "status": "empty",
+      "results": 0,
+      "reason": "raw_links=0 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "founder \"churn on LinkedIn\"",
+      "via": "bing",
+      "status": "ok",
+      "results": 2,
+      "reason": "raw_links=2 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "\"founder\" saas",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "\"founder\" saas",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 6,
+      "reason": "raw_links=7 unrelated=1"
+    },
+    {
+      "kind": "search",
+      "query": "Andrew Breen Outshine \"churn on LinkedIn\"",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "Andrew Breen Outshine \"churn on LinkedIn\"",
+      "via": "duckduckgo",
+      "status": "blocked",
+      "results": 0,
+      "reason": "CAPTCHA"
+    },
+    {
+      "kind": "search",
+      "query": "Andrew Breen Outshine \"churn on LinkedIn\"",
+      "via": "bing",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "Alex Circei Waydev \"churn on LinkedIn\"",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "Alex Circei Waydev \"churn on LinkedIn\"",
+      "via": "duckduckgo",
+      "status": "skipped",
+      "results": 0,
+      "reason": "blocked_earlier_in_run"
+    },
+    {
+      "kind": "search",
+      "query": "Alex Circei Waydev \"churn on LinkedIn\"",
+      "via": "bing",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "Mark Corbett Thrust Carbon \"churn on LinkedIn\"",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "Mark Corbett Thrust Carbon \"churn on LinkedIn\"",
+      "via": "duckduckgo",
+      "status": "skipped",
+      "results": 0,
+      "reason": "blocked_earlier_in_run"
+    },
+    {
+      "kind": "search",
+      "query": "Mark Corbett Thrust Carbon \"churn on LinkedIn\"",
+      "via": "bing",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "Pranjal Daga Accend \"churn on LinkedIn\"",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "Pranjal Daga Accend \"churn on LinkedIn\"",
+      "via": "duckduckgo",
+      "status": "skipped",
+      "results": 0,
+      "reason": "blocked_earlier_in_run"
+    },
+    {
+      "kind": "search",
+      "query": "Pranjal Daga Accend \"churn on LinkedIn\"",
+      "via": "bing",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "Garry Drummond LOCH Technologies \"churn on LinkedIn\"",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "Garry Drummond LOCH Technologies \"churn on LinkedIn\"",
+      "via": "duckduckgo",
+      "status": "skipped",
+      "results": 0,
+      "reason": "blocked_earlier_in_run"
+    },
+    {
+      "kind": "search",
+      "query": "Garry Drummond LOCH Technologies \"churn on LinkedIn\"",
+      "via": "bing",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "Jennifer Dulski Rising Team \"churn on LinkedIn\"",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "Jennifer Dulski Rising Team \"churn on LinkedIn\"",
+      "via": "duckduckgo",
+      "status": "skipped",
+      "results": 0,
+      "reason": "blocked_earlier_in_run"
+    },
+    {
+      "kind": "search",
+      "query": "Jennifer Dulski Rising Team \"churn on LinkedIn\"",
+      "via": "bing",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "Henrik Grim Mimo \"churn on LinkedIn\"",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "Henrik Grim Mimo \"churn on LinkedIn\"",
+      "via": "browser",
+      "status": "skipped",
+      "results": 0,
+      "reason": "browser_serp_budget"
+    },
+    {
+      "kind": "search",
+      "query": "Ajay Kamble Revalgo \"churn on LinkedIn\"",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "Ajay Kamble Revalgo \"churn on LinkedIn\"",
+      "via": "browser",
+      "status": "skipped",
+      "results": 0,
+      "reason": "browser_serp_budget"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://www.linkedin.com/pub/dir/%20/Churn/us-0-United-States",
+      "pageType": null,
+      "title": null,
+      "outcome": "navigation_failed",
+      "textChars": 0,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "navigation_failed: The page could not be read.",
+      "capture": null
+    },
+    {
+      "origin": "discovery",
+      "url": "https://business.linkedin.com/sell/sales-navigator/reduce-churn",
+      "pageType": "article",
+      "title": "How to Reduce Churn with LinkedIn Sales Navigator",
+      "outcome": "read",
+      "textChars": 14636,
+      "structured": {
+        "jobs": 0,
+        "organization": "LinkedIn",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~997s; injected/not_called)",
+      "capture": "dfda713da58c.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "pageType": "list",
+      "title": "Top 25 B2B SaaS Founder List",
+      "outcome": "read",
+      "textChars": 3155,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "Andrew Breen",
+        "Alex Circei",
+        "Mark Corbett",
+        "Pranjal Daga",
+        "Garry Drummond",
+        "Jennifer Dulski",
+        "Henrik Grim",
+        "Ajay Kamble",
+        "Amir Kaplan",
+        "Erik Kostelnik"
+      ],
+      "why": "",
+      "capture": "9a86eab11d1b.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://saasclub.io/",
+      "pageType": "unknown",
+      "title": "SaaS Club: How Founders Grow Profitable SaaS Businesses | SaaS Club",
+      "outcome": "read",
+      "textChars": 3226,
+      "structured": {
+        "jobs": 0,
+        "organization": "SaaS Club",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "entities rejected: ",
+      "capture": "57c6a6b5cbe3.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://www.outshine.com/",
+      "pageType": null,
+      "title": "Outshine | Digital Marketing & Analytics Experts For B2B SaaS",
+      "outcome": "http_read",
+      "textChars": 4138,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~982s; injected/not_called; deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~969s; injected/not_called)",
+      "capture": "02d86d4030d1.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://ca.linkedin.com/in/andrewbreenoutshine",
+      "pageType": "unknown",
+      "title": "Andrew Breen - Outshine | LinkedIn",
+      "outcome": "read",
+      "textChars": 17805,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "Andrew Breen"
+      ],
+      "why": "",
+      "capture": "afab4e04e313.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.outshine.com/team",
+      "pageType": "unknown",
+      "title": "Team",
+      "outcome": "read",
+      "textChars": 2100,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~970s; injected/not_called)",
+      "capture": "c71f2abeaaa9.json"
+    },
+    {
+      "origin": "seed",
+      "url": "https://www.outshine.com/",
+      "pageType": "unknown",
+      "title": "Outshine | Digital Marketing & Analytics Experts For B2B SaaS",
+      "outcome": "read",
+      "textChars": 3978,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~982s; injected/not_called; deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~969s; injected/not_called)",
+      "capture": "02d86d4030d1.json"
+    },
+    {
+      "origin": "contact_or_company_page",
+      "url": "https://www.outshine.com/contact",
+      "pageType": "unknown",
+      "title": "Contact",
+      "outcome": "read",
+      "textChars": 533,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~968s; injected/not_called)",
+      "capture": "1f906c2a1245.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://waydev.co/",
+      "pageType": null,
+      "title": "Productivity Insights: SPACE Framework, DX and DORA metrics - Waydev",
+      "outcome": "http_read",
+      "textChars": 7508,
+      "structured": {
+        "jobs": 0,
+        "organization": "Waydev",
+        "emails": 1,
+        "phones": 1
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~968s; injected/not_called; deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~963s; injected/not_called)",
+      "capture": "e754128598c9.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.linkedin.com/in/alexcircei",
+      "pageType": null,
+      "title": null,
+      "outcome": "navigation_failed",
+      "textChars": 0,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "navigation_failed: The page could not be read.",
+      "capture": null
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://waydev.co/about-alex-circei/",
+      "pageType": "unknown",
+      "title": "About Alex Circei – Founder & CEO of Waydev",
+      "outcome": "read",
+      "textChars": 4442,
+      "structured": {
+        "jobs": 0,
+        "organization": "Waydev",
+        "emails": 1,
+        "phones": 1
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~964s; injected/not_called)",
+      "capture": "2663c5b471ca.json"
+    },
+    {
+      "origin": "seed",
+      "url": "https://waydev.co/",
+      "pageType": "unknown",
+      "title": "Productivity Insights: SPACE Framework, DX and DORA metrics - Waydev",
+      "outcome": "read",
+      "textChars": 2873,
+      "structured": {
+        "jobs": 0,
+        "organization": "Waydev",
+        "emails": 1,
+        "phones": 1
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~968s; injected/not_called; deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~963s; injected/not_called)",
+      "capture": "e754128598c9.json"
+    },
+    {
+      "origin": "contact_or_company_page",
+      "url": "https://waydev.co/glossary/",
+      "pageType": "unknown",
+      "title": "Glossary - Waydev",
+      "outcome": "read",
+      "textChars": 2123,
+      "structured": {
+        "jobs": 0,
+        "organization": "Waydev",
+        "emails": 1,
+        "phones": 1
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~961s; injected/not_called)",
+      "capture": "923fbc8320b7.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://uk.linkedin.com/in/mwcorbett",
+      "pageType": "job_posting",
+      "title": "Mark Corbett - Navan | LinkedIn",
+      "outcome": "read",
+      "textChars": 11945,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~958s; injected/not_called)",
+      "capture": "f3a3f0e79e72.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.linkedin.com/posts/thrustcarbon_thrust-carbons-very-own-mark-corbett-activity-7008407626392707073-ZyXU",
+      "pageType": "social_post",
+      "title": "🔥🔥 Thrust Carbon's very own Mark Corbett has been named as one of BTN Group’s most influential people in travel! What an incredible achievement and end to 202",
+      "outcome": "read",
+      "textChars": 1896,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~949s; injected/not_called)",
+      "capture": "10f9b6fc9766.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://www.withaccend.com/",
+      "pageType": null,
+      "title": "Accend",
+      "outcome": "http_read",
+      "textChars": 10658,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~948s; injected/not_called; deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~934s; injected/not_called)",
+      "capture": "0bce60e28cb4.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.linkedin.com/in/pranjaldaga",
+      "pageType": "unknown",
+      "title": "Pranjal Daga - Accend (YC S23) | LinkedIn",
+      "outcome": "read",
+      "textChars": 18000,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~944s; injected/not_called)",
+      "capture": "57f612b51cec.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.linkedin.com/pub/dir/pranjal/daga",
+      "pageType": null,
+      "title": null,
+      "outcome": "navigation_failed",
+      "textChars": 0,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "navigation_failed: The page could not be read.",
+      "capture": null
+    },
+    {
+      "origin": "seed",
+      "url": "https://www.withaccend.com/",
+      "pageType": "unknown",
+      "title": "Accend",
+      "outcome": "read",
+      "textChars": 7450,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~948s; injected/not_called; deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~934s; injected/not_called)",
+      "capture": "0bce60e28cb4.json"
+    },
+    {
+      "origin": "contact_or_company_page",
+      "url": "https://www.withaccend.com/about",
+      "pageType": "unknown",
+      "title": "About",
+      "outcome": "read",
+      "textChars": 1865,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~933s; injected/not_called)",
+      "capture": "dd05fb2545f8.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.linkedin.com/in/garry-drummond-cissp-cwna-cwsp-7964b83",
+      "pageType": null,
+      "title": null,
+      "outcome": "navigation_failed",
+      "textChars": 0,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "navigation_failed: The page could not be read.",
+      "capture": null
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://loch.io/company/leadership/garry-drummond",
+      "pageType": "unknown",
+      "title": "Garry Drummond",
+      "outcome": "read",
+      "textChars": 2207,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~931s; injected/not_called)",
+      "capture": "39e5b530aaf7.json"
+    },
+    {
+      "origin": "seed",
+      "url": "https://loch.io/",
+      "pageType": "unknown",
+      "title": "LOCH Technologies | Leaders in Wireless Airspace Defense",
+      "outcome": "read",
+      "textChars": 6242,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~929s; injected/not_called)",
+      "capture": "16e754abb890.json"
+    },
+    {
+      "origin": "contact_or_company_page",
+      "url": "https://loch.io/company/about-us",
+      "pageType": "unknown",
+      "title": "About Us",
+      "outcome": "read",
+      "textChars": 2482,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~928s; injected/not_called)",
+      "capture": "e273fb49140d.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.linkedin.com/in/jdulski",
+      "pageType": null,
+      "title": null,
+      "outcome": "navigation_failed",
+      "textChars": 0,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "navigation_failed: The page could not be read.",
+      "capture": null
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://risingteam.com/about",
+      "pageType": "unknown",
+      "title": "About Rising Team | Leadership & Management Experts",
+      "outcome": "read",
+      "textChars": 11201,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~925s; injected/not_called)",
+      "capture": "5b0fa329007f.json"
+    },
+    {
+      "origin": "seed",
+      "url": "https://risingteam.com/",
+      "pageType": "unknown",
+      "title": "Rising Team | AI Leadership Personal Trainer",
+      "outcome": "read",
+      "textChars": 7630,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~924s; injected/not_called)",
+      "capture": "0ca873a619f3.json"
+    },
+    {
+      "origin": "contact_or_company_page",
+      "url": "https://risingteam.com/team-building",
+      "pageType": "unknown",
+      "title": "Ready-to-run team building activities for managers",
+      "outcome": "read",
+      "textChars": 15357,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~924s; injected/not_called)",
+      "capture": "9fb35c132928.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://mimohq.com/",
+      "pageType": null,
+      "title": "Accountants recurring work, running on AI",
+      "outcome": "http_read",
+      "textChars": 3627,
+      "structured": {
+        "jobs": 0,
+        "organization": "Mimo",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~923s; injected/not_called; deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~922s; injected/not_called)",
+      "capture": "c1f585a8cd9b.json"
+    },
+    {
+      "origin": "seed",
+      "url": "https://mimohq.com/",
+      "pageType": "unknown",
+      "title": "Accountants recurring work, running on AI",
+      "outcome": "read",
+      "textChars": 4362,
+      "structured": {
+        "jobs": 0,
+        "organization": "Mimo",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~923s; injected/not_called; deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~922s; injected/not_called)",
+      "capture": "c1f585a8cd9b.json"
+    },
+    {
+      "origin": "contact_or_company_page",
+      "url": "https://mimohq.com/company/about-us",
+      "pageType": "unknown",
+      "title": "About Us - Mimo",
+      "outcome": "read",
+      "textChars": 3204,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~922s; injected/not_called)",
+      "capture": "213cbfe76caa.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://revalgo.ai/",
+      "pageType": null,
+      "title": "The Autopilot for Wholesale Distribution | Revalgo",
+      "outcome": "http_read",
+      "textChars": 9613,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 1,
+        "phones": 1
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~921s; injected/not_called; deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~920s)",
+      "capture": "e01de50e9888.json"
+    },
+    {
+      "origin": "seed",
+      "url": "https://revalgo.ai/",
+      "pageType": "unknown",
+      "title": "The Autopilot for Wholesale Distribution | Revalgo",
+      "outcome": "read",
+      "textChars": 8540,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~921s; injected/not_called; deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~920s)",
+      "capture": "e01de50e9888.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://business.linkedin.com/sell/sales-navigator/reduce-churn"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~997s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://business.linkedin.com/sell/sales-navigator/reduce-churn"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.capchase.com/top-25-b2b-saas-founder-list",
+        "https://saasclub.io/"
+      ],
+      "extractor": "deterministic",
+      "llm": "not_called",
+      "entities": 10
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.capchase.com/top-25-b2b-saas-founder-list",
+        "https://saasclub.io/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 10
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.outshine.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~982s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.outshine.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://ca.linkedin.com/in/andrewbreenoutshine"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 1,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~979s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://ca.linkedin.com/in/andrewbreenoutshine"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 1
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.outshine.com/team"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~970s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.outshine.com/team"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.outshine.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~969s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.outshine.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.outshine.com/contact"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~968s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.outshine.com/contact"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://waydev.co/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~968s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://waydev.co/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://waydev.co/about-alex-circei/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~964s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://waydev.co/about-alex-circei/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://waydev.co/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~963s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://waydev.co/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://waydev.co/glossary/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~961s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://waydev.co/glossary/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://uk.linkedin.com/in/mwcorbett"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~958s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://uk.linkedin.com/in/mwcorbett"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.linkedin.com/posts/thrustcarbon_thrust-carbons-very-own-mark-corbett-activity-7008407626392707073-ZyXU"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~949s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.linkedin.com/posts/thrustcarbon_thrust-carbons-very-own-mark-corbett-activity-7008407626392707073-ZyXU"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.withaccend.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~948s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.withaccend.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.linkedin.com/in/pranjaldaga"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~944s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.linkedin.com/in/pranjaldaga"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.withaccend.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~934s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.withaccend.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.withaccend.com/about"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~933s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.withaccend.com/about"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://loch.io/company/leadership/garry-drummond"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~931s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://loch.io/company/leadership/garry-drummond"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://loch.io/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~929s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://loch.io/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://loch.io/company/about-us"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~928s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://loch.io/company/about-us"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://risingteam.com/about"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~925s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://risingteam.com/about"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://risingteam.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~924s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://risingteam.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://risingteam.com/team-building"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~924s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://risingteam.com/team-building"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://mimohq.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~923s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://mimohq.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://mimohq.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~922s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://mimohq.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://mimohq.com/company/about-us"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~922s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://mimohq.com/company/about-us"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://revalgo.ai/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~921s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://revalgo.ai/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://revalgo.ai/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~920s"
+    }
+  ],
+  "entityOutcomes": [
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Andrew Breen",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Alex Circei",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Mark Corbett",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Pranjal Daga",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Garry Drummond",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Jennifer Dulski",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Henrik Grim",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Ajay Kamble",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Amir Kaplan",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Erik Kostelnik",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://ca.linkedin.com/in/andrewbreenoutshine",
+      "name": "Andrew Breen",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    }
+  ],
+  "remember": [
+    {
+      "kind": "remember",
+      "name": "Andrew Breen",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Alex Circei",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Mark Corbett",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Pranjal Daga",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Garry Drummond",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Jennifer Dulski",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Henrik Grim",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Ajay Kamble",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Amir Kaplan",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Erik Kostelnik",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Andrew Breen",
+      "rowKind": "person",
+      "outcome": "merged",
+      "resolved": true
+    }
+  ],
+  "candidates": [
+    {
+      "kind": "candidate",
+      "name": "Andrew Breen",
+      "status": "exhausted",
+      "rejectCode": "NO_CLAIM_EVIDENCE",
+      "label": "No observed discussion of the requested topic bound to this person",
+      "needs": [
+        "topic"
+      ],
+      "visited": 5,
+      "queries": 1
+    },
+    {
+      "kind": "candidate",
+      "name": "Alex Circei",
+      "status": "exhausted",
+      "rejectCode": "NO_CLAIM_EVIDENCE",
+      "label": "No observed discussion of the requested topic bound to this person",
+      "needs": [
+        "topic"
+      ],
+      "visited": 5,
+      "queries": 1
+    },
+    {
+      "kind": "candidate",
+      "name": "Mark Corbett",
+      "status": "exhausted",
+      "rejectCode": "NO_CLAIM_EVIDENCE",
+      "label": "No observed discussion of the requested topic bound to this person",
+      "needs": [
+        "topic"
+      ],
+      "visited": 2,
+      "queries": 1
+    },
+    {
+      "kind": "candidate",
+      "name": "Pranjal Daga",
+      "status": "exhausted",
+      "rejectCode": "NO_CLAIM_EVIDENCE",
+      "label": "No observed discussion of the requested topic bound to this person",
+      "needs": [
+        "topic"
+      ],
+      "visited": 5,
+      "queries": 1
+    },
+    {
+      "kind": "candidate",
+      "name": "Garry Drummond",
+      "status": "exhausted",
+      "rejectCode": "NO_CLAIM_EVIDENCE",
+      "label": "No observed discussion of the requested topic bound to this person",
+      "needs": [
+        "topic"
+      ],
+      "visited": 4,
+      "queries": 1
+    },
+    {
+      "kind": "candidate",
+      "name": "Jennifer Dulski",
+      "status": "exhausted",
+      "rejectCode": "NO_CLAIM_EVIDENCE",
+      "label": "No observed discussion of the requested topic bound to this person",
+      "needs": [
+        "topic"
+      ],
+      "visited": 4,
+      "queries": 1
+    },
+    {
+      "kind": "candidate",
+      "name": "Henrik Grim",
+      "status": "exhausted",
+      "rejectCode": "NO_CLAIM_EVIDENCE",
+      "label": "No observed discussion of the requested topic bound to this person",
+      "needs": [
+        "topic"
+      ],
+      "visited": 3,
+      "queries": 1
+    }
+  ],
+  "done": [
+    {
+      "kind": "done",
+      "status": "timeout",
+      "candidates": 10,
+      "verified": 0,
+      "visited": 34,
+      "queries": 10,
+      "stoppingReason": "BROWSER_DISCOVERY_TIMEOUT",
+      "elapsedMs": 90004
+    }
+  ],
+  "persistenceSkipped": [
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "NO_QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "person",
+    "criteria": [
+      "role=founder",
+      "industry=saas",
+      "content_topic=churn on LinkedIn",
+      "needs_live=true"
+    ],
+    "clarify": [
+      "entity_location"
+    ],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_people(country,city_norm,role_norm)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "live-browser",
+          "partitions": [
+            "live-gapfill(10)"
+          ],
+          "scanned": 10,
+          "matched": 10
+        }
+      ],
+      "rawCandidates": 10,
+      "postSpecFilter": 10,
+      "timings": {
+        "understanding_ms": 1982,
+        "stored_search_ms": 4944,
+        "research_ms": 90250,
+        "enrichment_ms": 22156,
+        "qualification_ms": 11,
+        "total_ms": 119343
+      },
+      "researchable": 10,
+      "researched": 10,
+      "complete": 8,
+      "pendingEnrichment": 2,
+      "qualificationRejected": 8,
+      "qualified": 0,
+      "returned": 0,
+      "reason": "FAILED_QUALIFICATION",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "direct-http",
+            "label": "Public websites",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "searxng",
+            "label": "The web",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "browser-live",
+            "label": "Public websites",
+            "state": "healthy",
+            "reason": "OK"
+          },
+          {
+            "source": "enrich:registry-identity",
+            "label": "Public source",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          }
+        ],
+        "degraded": true,
+        "summary": "Some sources could not be searched this time (Public source), so results may be incomplete."
+      }
+    },
+    "rowsReturned": 0,
+    "rows": [],
+    "diagnostics": [
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "direct-http",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "searxng",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      }
+    ],
+    "cancelledAtMs": null,
+    "returnedAtMs": 120136,
+    "candidateLedger": {
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 8,
+        "gated": 0,
+        "filtered": 0,
+        "incomplete": 2,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {
+        "NO_CLAIM_EVIDENCE": 8
+      },
+      "streamed": 0,
+      "streamedNotReturned": []
+    }
+  }
+}

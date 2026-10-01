@@ -1,0 +1,765 @@
+{
+  "runId": "trace-custom-product-1790795583618",
+  "query": "SaaS companies in Toronto with public contact details",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 98505,
+  "error": null,
+  "audit": [],
+  "browser": {
+    "adapter": "worker",
+    "status": "completed",
+    "pagesVisited": 16,
+    "currentUrl": "https://kr.linkedin.com/pulse/top-10-micro-saas-development-companies-canada-best-partners-n1vhc?tl=ko",
+    "retained": true,
+    "controller": "agent",
+    "sessionId": "b647ece9-a923-44fb-a7ce-e82299d4458b",
+    "frame": true
+  },
+  "runtime": [
+    {
+      "kind": "runtime",
+      "requested": "worker",
+      "used": "worker"
+    }
+  ],
+  "progressEvents": 53,
+  "streamedRows": [],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [
+    {
+      "kind": "search",
+      "query": "saas company company Toronto",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "saas company company Toronto",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "saas company startup Toronto",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "saas company startup Toronto",
+      "via": "duckduckgo",
+      "status": "failed",
+      "results": 0,
+      "reason": "The page could not be loaded."
+    },
+    {
+      "kind": "search",
+      "query": "saas company startup Toronto",
+      "via": "bing",
+      "status": "ok",
+      "results": 6,
+      "reason": "raw_links=10 unrelated=2"
+    },
+    {
+      "kind": "search",
+      "query": "\"What\" Toronto saas company official website",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "\"What\" Toronto saas company official website",
+      "via": "duckduckgo",
+      "status": "empty",
+      "results": 0,
+      "reason": "raw_links=0 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "\"What\" Toronto saas company official website",
+      "via": "bing",
+      "status": "ok",
+      "results": 4,
+      "reason": "raw_links=7 unrelated=3"
+    },
+    {
+      "kind": "search",
+      "query": "\"Many SaaS vendors also\" Toronto saas company official website",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "\"Many SaaS vendors also\" Toronto saas company official website",
+      "via": "duckduckgo",
+      "status": "empty",
+      "results": 0,
+      "reason": "raw_links=0 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "\"Many SaaS vendors also\" Toronto saas company official website",
+      "via": "bing",
+      "status": "ok",
+      "results": 4,
+      "reason": "raw_links=8 unrelated=4"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://www.f6s.com/companies/saas/canada/toronto/co",
+      "pageType": "unknown",
+      "title": "Checking your browser",
+      "outcome": "read",
+      "textChars": 1018,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~577s; injected/not_called)",
+      "capture": "4fbaf78f00e0.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://aeroleads.com/list/top-saas-companies-in-toronto",
+      "pageType": "unknown",
+      "title": "",
+      "outcome": "read",
+      "textChars": 675,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~577s; injected/not_called)",
+      "capture": "22f62ec3039c.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://builtin.com/articles/saas",
+      "pageType": "article",
+      "title": "What Is SaaS? (Definition, Examples, Benefits, Risks) | Built In",
+      "outcome": "read",
+      "textChars": 8822,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "The vendor",
+        "What"
+      ],
+      "why": "",
+      "capture": "736774ad44c2.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.ibm.com/think/topics/saas",
+      "pageType": "article",
+      "title": "What Is Software as a Service (SaaS)? | IBM",
+      "outcome": "read",
+      "textChars": 18000,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "Today SaaS",
+        "Many SaaS vendors also",
+        "Cloud computing"
+      ],
+      "why": "",
+      "capture": "0b94d67a7814.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://builtin.com/software-engineering-perspectives/latency",
+      "pageType": null,
+      "title": "What Is Latency? (Definition, How to Reduce, Examples) | Built In",
+      "outcome": "http_read",
+      "textChars": 9847,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~555s; injected/not_called)",
+      "capture": "60812b93223a.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://getlatka.com/companies/countries/canada/cities/toronto",
+      "pageType": "unknown",
+      "title": "Toronto, Canada SaaS Companies | GetLatka",
+      "outcome": "read",
+      "textChars": 7260,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~546s; injected/not_called)",
+      "capture": "29e98bbf367c.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://247labs.com/",
+      "pageType": null,
+      "title": null,
+      "outcome": "navigation_failed",
+      "textChars": 0,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "navigation_failed: The page could not be loaded.",
+      "capture": null
+    },
+    {
+      "origin": "first_party_probe",
+      "url": "https://bestshop.com/",
+      "pageType": null,
+      "title": "BestShop | Best Price, Smart Shopping",
+      "outcome": "http_read",
+      "textChars": 3295,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "not sent to extractor",
+      "capture": null
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://kr.linkedin.com/pulse/top-10-micro-saas-development-companies-canada-best-partners-n1vhc?tl=ko",
+      "pageType": "list",
+      "title": "Top 10 Micro SaaS Development Companies in Canada for 2026",
+      "outcome": "read",
+      "textChars": 18000,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "They also",
+        "iTechnolabs",
+        "WhiteLabelApps",
+        "CalgaryAppDeveloper",
+        "The SaaS Headquarters",
+        "Essential Designs",
+        "AppStudio"
+      ],
+      "why": "",
+      "capture": "768be801788c.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.f6s.com/companies/saas/canada/toronto/co",
+        "https://aeroleads.com/list/top-saas-companies-in-toronto"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~577s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.f6s.com/companies/saas/canada/toronto/co",
+        "https://aeroleads.com/list/top-saas-companies-in-toronto"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://builtin.com/articles/saas",
+        "https://www.ibm.com/think/topics/saas"
+      ],
+      "extractor": "deterministic",
+      "llm": "not_called",
+      "entities": 5
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://builtin.com/articles/saas",
+        "https://www.ibm.com/think/topics/saas"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 5
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://builtin.com/software-engineering-perspectives/latency"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~555s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://builtin.com/software-engineering-perspectives/latency"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://getlatka.com/companies/countries/canada/cities/toronto"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~546s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://getlatka.com/companies/countries/canada/cities/toronto"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://kr.linkedin.com/pulse/top-10-micro-saas-development-companies-canada-best-partners-n1vhc?tl=ko"
+      ],
+      "extractor": "deterministic",
+      "llm": "not_called",
+      "entities": 7
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://kr.linkedin.com/pulse/top-10-micro-saas-development-companies-canada-best-partners-n1vhc?tl=ko"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 7
+    }
+  ],
+  "entityOutcomes": [
+    {
+      "page": "https://builtin.com/articles/saas",
+      "name": "The vendor",
+      "kind": "company",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://builtin.com/articles/saas",
+      "name": "What",
+      "kind": "company",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.ibm.com/think/topics/saas",
+      "name": "Today SaaS",
+      "kind": "company",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.ibm.com/think/topics/saas",
+      "name": "Many SaaS vendors also",
+      "kind": "company",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.ibm.com/think/topics/saas",
+      "name": "Cloud computing",
+      "kind": "company",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://kr.linkedin.com/pulse/top-10-micro-saas-development-companies-canada-best-partners-n1vhc?tl=ko",
+      "name": "They also",
+      "kind": "company",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://kr.linkedin.com/pulse/top-10-micro-saas-development-companies-canada-best-partners-n1vhc?tl=ko",
+      "name": "iTechnolabs",
+      "kind": "company",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://kr.linkedin.com/pulse/top-10-micro-saas-development-companies-canada-best-partners-n1vhc?tl=ko",
+      "name": "WhiteLabelApps",
+      "kind": "company",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://kr.linkedin.com/pulse/top-10-micro-saas-development-companies-canada-best-partners-n1vhc?tl=ko",
+      "name": "CalgaryAppDeveloper",
+      "kind": "company",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://kr.linkedin.com/pulse/top-10-micro-saas-development-companies-canada-best-partners-n1vhc?tl=ko",
+      "name": "The SaaS Headquarters",
+      "kind": "company",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://kr.linkedin.com/pulse/top-10-micro-saas-development-companies-canada-best-partners-n1vhc?tl=ko",
+      "name": "Essential Designs",
+      "kind": "company",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://kr.linkedin.com/pulse/top-10-micro-saas-development-companies-canada-best-partners-n1vhc?tl=ko",
+      "name": "AppStudio",
+      "kind": "company",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    }
+  ],
+  "remember": [
+    {
+      "kind": "remember",
+      "name": "The vendor",
+      "rowKind": "company",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "What",
+      "rowKind": "company",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Today SaaS",
+      "rowKind": "company",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Many SaaS vendors also",
+      "rowKind": "company",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Cloud computing",
+      "rowKind": "company",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "They also",
+      "rowKind": "company",
+      "outcome": "TARGET_MISMATCH",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "iTechnolabs",
+      "rowKind": "company",
+      "outcome": "TARGET_MISMATCH",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "WhiteLabelApps",
+      "rowKind": "company",
+      "outcome": "TARGET_MISMATCH",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "CalgaryAppDeveloper",
+      "rowKind": "company",
+      "outcome": "TARGET_MISMATCH",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "The SaaS Headquarters",
+      "rowKind": "company",
+      "outcome": "TARGET_MISMATCH",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Essential Designs",
+      "rowKind": "company",
+      "outcome": "TARGET_MISMATCH",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "AppStudio",
+      "rowKind": "company",
+      "outcome": "TARGET_MISMATCH",
+      "resolved": true
+    }
+  ],
+  "candidates": [
+    {
+      "kind": "candidate",
+      "name": "What",
+      "status": "exhausted",
+      "rejectCode": "MISSING_QUERY_REQUIRED",
+      "label": "MISSING_QUERY_REQUIRED — missing query-required: location, contact",
+      "needs": [
+        "location",
+        "website",
+        "contact"
+      ],
+      "visited": 4,
+      "queries": 1
+    }
+  ],
+  "done": [
+    {
+      "kind": "done",
+      "status": "timeout",
+      "candidates": 5,
+      "verified": 0,
+      "visited": 10,
+      "queries": 4,
+      "stoppingReason": "BROWSER_DISCOVERY_TIMEOUT",
+      "elapsedMs": 75006
+    }
+  ],
+  "persistenceSkipped": [
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "NO_QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "company",
+    "criteria": [
+      "industry=saas company",
+      "location=Toronto",
+      "location_id=geo:city:toronto",
+      "location_kind=city",
+      "location_country=CA",
+      "location_parents=geo:admin:ontario,geo:country:ca,geo:metro:gta",
+      "require_contact=true",
+      "required_field=contact"
+    ],
+    "clarify": [
+      "entity_business_model"
+    ],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_companies(country,city_norm)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "live-browser",
+          "partitions": [
+            "live-gapfill(5)"
+          ],
+          "scanned": 5,
+          "matched": 5
+        }
+      ],
+      "rawCandidates": 5,
+      "postSpecFilter": 5,
+      "timings": {
+        "understanding_ms": 3118,
+        "stored_search_ms": 5278,
+        "research_ms": 79921,
+        "enrichment_ms": 22,
+        "qualification_ms": 16,
+        "total_ms": 88355
+      },
+      "researchable": 5,
+      "researched": 5,
+      "complete": 0,
+      "pendingEnrichment": 5,
+      "qualificationRejected": 0,
+      "qualified": 0,
+      "returned": 0,
+      "reason": "INCOMPLETE",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "direct-http",
+            "label": "Public websites",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "searxng",
+            "label": "The web",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "browser-live",
+            "label": "Public websites",
+            "state": "healthy",
+            "reason": "OK"
+          },
+          {
+            "source": "s3-parquet",
+            "label": "Available records",
+            "state": "degraded",
+            "reason": "TIMEOUT"
+          },
+          {
+            "source": "enrich:registry-identity",
+            "label": "Public source",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          }
+        ],
+        "degraded": true,
+        "summary": "Some sources could not be searched this time (Available records, Public source), so results may be incomplete."
+      }
+    },
+    "rowsReturned": 0,
+    "rows": [],
+    "diagnostics": [
+      {
+        "code": "SOURCE_ERROR",
+        "source": "s3-parquet",
+        "detail": "tier timeout: s3-parquet after 5000ms"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "direct-http",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "searxng",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      }
+    ],
+    "cancelledAtMs": null,
+    "returnedAtMs": 98504,
+    "candidateLedger": {
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 0,
+        "gated": 0,
+        "filtered": 0,
+        "incomplete": 5,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {},
+      "streamed": 0,
+      "streamedNotReturned": []
+    }
+  }
+}

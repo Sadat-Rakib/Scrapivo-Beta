@@ -1,0 +1,257 @@
+{
+  "runId": "trace-founders-product-1790728332173",
+  "query": "SaaS founders with recent hiring evidence and public contact details",
+  "which": "founders",
+  "mode": "product",
+  "durationMs": 38267,
+  "error": null,
+  "browser": {
+    "adapter": "playwright",
+    "status": "completed",
+    "pagesVisited": 12,
+    "currentUrl": "https://copilot.cloud.microsoft/"
+  },
+  "progressEvents": 29,
+  "streamedRows": [],
+  "searches": [
+    {
+      "kind": "search",
+      "query": "\"founder\" SaaS",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "\"founder\" SaaS",
+      "via": "duckduckgo",
+      "status": "empty",
+      "results": 0,
+      "reason": "raw_links=1"
+    },
+    {
+      "kind": "search",
+      "query": "\"founder\" SaaS",
+      "via": "bing",
+      "status": "ok",
+      "results": 13,
+      "reason": "raw_links=54"
+    },
+    {
+      "kind": "search",
+      "query": "\"co-founder\" SaaS",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "\"co-founder\" SaaS",
+      "via": "duckduckgo",
+      "status": "empty",
+      "results": 0,
+      "reason": "raw_links=1"
+    },
+    {
+      "kind": "search",
+      "query": "\"co-founder\" SaaS",
+      "via": "bing",
+      "status": "ok",
+      "results": 13,
+      "reason": "raw_links=54"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://www.zhihu.com/signin?next=%2F",
+      "pageType": null,
+      "title": "知乎 - 有问题，就会有答案",
+      "outcome": "irrelevant",
+      "textChars": 0,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "irrelevant: IRRELEVANT:irrelevant_path",
+      "capture": null
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.zhihu.com/explore",
+      "pageType": "unknown",
+      "title": "发现 - 知乎",
+      "outcome": "read",
+      "textChars": 4378,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "e422aa79b34e.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://en.wikipedia.org/wiki/Carbon_monoxide",
+      "pageType": "unknown",
+      "title": "Carbon monoxide - Wikipedia",
+      "outcome": "read",
+      "textChars": 18000,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "4d50a7e8cfbd.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://copilot.cloud.microsoft/",
+      "pageType": "unknown",
+      "title": "Copilot | AI chat for work",
+      "outcome": "read",
+      "textChars": 2503,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "df1b7cde3c03.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.zhihu.com/explore"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.zhihu.com/explore"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://en.wikipedia.org/wiki/Carbon_monoxide",
+        "https://copilot.cloud.microsoft/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://en.wikipedia.org/wiki/Carbon_monoxide",
+        "https://copilot.cloud.microsoft/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    }
+  ],
+  "entityOutcomes": [],
+  "remember": [],
+  "candidates": [],
+  "done": [
+    {
+      "kind": "done",
+      "status": "completed",
+      "candidates": 0,
+      "verified": 0,
+      "visited": 4,
+      "queries": 2,
+      "stoppingReason": "diminishing_returns",
+      "elapsedMs": 23403
+    }
+  ],
+  "persistenceSkipped": [
+    "ai_cache",
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "NO_QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "person",
+    "criteria": [
+      "role=founder",
+      "industry=SaaS"
+    ],
+    "clarify": [
+      "entity_location"
+    ],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_people(country,city_norm,role_norm)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "live-social:reddit-arctic-shift",
+          "partitions": [
+            "social(4)"
+          ],
+          "scanned": 4,
+          "matched": 4
+        }
+      ],
+      "rawCandidates": 0,
+      "postSpecFilter": 0,
+      "timings": {
+        "understanding_ms": 3462,
+        "stored_search_ms": 5955,
+        "research_ms": 26533,
+        "enrichment_ms": 4,
+        "qualification_ms": 317,
+        "total_ms": 36271
+      },
+      "researchable": 3,
+      "researched": 3,
+      "complete": 3,
+      "pendingEnrichment": 0,
+      "qualificationRejected": 3,
+      "qualified": 0,
+      "returned": 0,
+      "reason": "SOURCE_UNAVAILABLE"
+    },
+    "rowsReturned": 0,
+    "rows": [],
+    "diagnostics": [
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "direct-http",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "searxng",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      }
+    ]
+  }
+}

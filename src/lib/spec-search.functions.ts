@@ -12,6 +12,7 @@ import { z } from "zod";
 import { requireMyAuth } from "@/integrations/my-supabase/auth-middleware";
 import { extractSearchSpec } from "@/lib/search/search-spec-extract";
 import type { SearchSpec } from "@/lib/search/search-spec";
+import type { UnderstandingFrame } from "@/lib/understanding/frame";
 import { investorSectorMatches } from "@/lib/search/search-spec";
 import type { DbHitMeta } from "@/lib/canonical/read-parquet.server";
 import { personRoleMatches } from "@/lib/canonical/people.server";
@@ -376,12 +377,39 @@ export function businessModelMatches(rowText: string, model: string): boolean {
   return re.test(rowText);
 }
 
+function violatesExclusion(spec: SearchSpec, row: SpecRow): boolean {
+  for (const criterion of spec.criteria) {
+    if (!criterion.field.startsWith("exclude_")) continue;
+    const excluded = criterion.value.trim();
+    if (!excluded) continue;
+    const field = criterion.field.slice("exclude_".length);
+    if (field === "business_model") {
+      const rowText = `${row.title ?? ""} ${row.category ?? ""}`;
+      const modelPattern = BUSINESS_MODEL_SIGNALS[excluded.toLowerCase()];
+      if (modelPattern ? modelPattern.test(rowText) : like(rowText, excluded)) return true;
+    }
+    if (field === "category" && like(row.category ?? "", excluded)) return true;
+    if (field === "industry" && like(row.industry ?? row.category ?? "", excluded)) return true;
+    if (field === "funding_status" &&
+      (row.evidence?.some((e) => e.evidence_type === "funding") || /\b(?:recently\s+)?funded\b/i.test(row.detail ?? ""))) return true;
+  }
+  return false;
+}
+
 /** Result-correctness validation: every displayed row must satisfy the spec.
  *  Uses the row's OWN category/location fields with craft-aware matching
  *  (never raw title substring alone) — the DB reader already filtered, so
  *  this catches misassigned/empty rows. Fixed the bug where 50 fetched
  *  dentists were all rejected because clinic names lack the word "dentists". */
 export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
+  if (violatesExclusion(spec, row)) return false;
+  if ((spec.locations?.length ?? 0) > 1) return spec.locations!.some((place) =>
+    rowSatisfiesSpec({
+      ...spec,
+      locations: [place],
+      criteria: [...spec.criteria.filter((criterion) => criterion.field !== "location"),
+        { field: "location", value: place, stated: true, confidence: 1 }],
+    }, row));
   if (spec.entity === "person") {
     const role = fieldOf(spec, "role");
     const industry = fieldOf(spec, "industry");
@@ -508,6 +536,14 @@ const ROLE_WORD_RE =
  * gate only decides whether a candidate survives INTO research.
  */
 export function rowCouldSatisfySpec(spec: SearchSpec, row: SpecRow): boolean {
+  if (violatesExclusion(spec, row)) return false;
+  if ((spec.locations?.length ?? 0) > 1) return spec.locations!.some((place) =>
+    rowCouldSatisfySpec({
+      ...spec,
+      locations: [place],
+      criteria: [...spec.criteria.filter((criterion) => criterion.field !== "location"),
+        { field: "location", value: place, stated: true, confidence: 1 }],
+    }, row));
   if (spec.entity === "person") {
     const role = fieldOf(spec, "role");
     const industry = fieldOf(spec, "industry");
@@ -665,6 +701,8 @@ export interface SpecSearchResult {
   qualified_count: number;
   /** Off-topic domain boundary copy when the request is out of scope. */
   boundary_message?: string;
+  /** Candidate survival ledger: fates, reject reasons, streamed-vs-final reconciliation. */
+  candidateLedger?: import("@/lib/search/candidate-ledger").CandidateLedgerSummary;
   /** Internal stage accounting so an empty response has a factual cause. */
   retrievalTrace?: {
     sources: Array<{ source: string; partitions: string[]; scanned: number; matched: number }>;
@@ -689,6 +727,8 @@ export interface SpecSearchResult {
     /** Theorem-qualified rows after the final gate. */
     qualified?: number;
     returned: number;
+    /** Per-source health for this run; `summary` is safe to show the user. */
+    sourceHealth?: ReturnType<typeof import("@/lib/search/source-health").classifySourceHealth>;
     reason: "NO_DATA" | "NO_PARTITION" | "NO_INDEX_COVERAGE" | "NO_LOCATION_ROUTE" |
       "NO_CATEGORY_MATCH" | "NO_ROLE_MATCH" | "FILTERED_BY_SPEC" | "INCOMPLETE" |
       "FAILED_ENRICHMENT" | "FAILED_VERIFICATION" | "FAILED_QUALIFICATION" | "TIMEOUT" |
@@ -905,6 +945,17 @@ async function fetchS3Tier(
           category: c.category,
           location: c.location,
           opportunity: fieldOf(spec, "opportunity"),
+          // Same contract as stored business/people rows: the stored record
+          // is the evidence a delivered lead shows.
+          evidence: [makeEvidence({
+            source_url: c.website?.trim() || `db://companies/${encodeURIComponent(entity_id)}`,
+            source_type: "db",
+            excerpt: [c.company_name, c.category, c.location].filter(has).join(" · "),
+            evidence_type: "identity",
+            supports: "identity",
+            extraction_method: "stored_company_record",
+            subject: entity_id,
+          })],
         };
       }),
       meta: r.meta,
@@ -1000,6 +1051,15 @@ async function fetchS3Tier(
           url: v.website ?? v.linkedin,
           website_url: v.website,
           profile_url: v.linkedin,
+          evidence: [makeEvidence({
+            source_url: v.linkedin?.trim() || v.website?.trim() || `db://investors/${encodeURIComponent(entity_id)}`,
+            source_type: "db",
+            excerpt: [`${v.name ?? "?"} — ${v.role ?? "investor"} @ ${v.firm ?? "?"}`, rowSectors, rowStages, v.location_raw ?? v.location_city].filter(has).join(" · "),
+            evidence_type: "identity",
+            supports: "identity",
+            extraction_method: "stored_investor_record",
+            subject: entity_id,
+          })],
         };
       }),
       meta: r.meta,
@@ -1023,6 +1083,10 @@ export async function runSpecSearchCore(
     request_id?: string;
     /** Pre-compiled spec (job passes reuse the compiled thesis; skips understanding). */
     spec?: SearchSpec;
+    /** Pending clarification continues from this validated canonical frame. */
+    priorFrame?: UnderstandingFrame;
+    /** Internal OR-location branch; prevents recursive fanout. */
+    locationBranch?: boolean;
     /** Data-asset pass: engine-driven widening + candidate dedupe for job modes. */
     jobContext?: {
       poolTargetOverride?: number;
@@ -1040,6 +1104,17 @@ export async function runSpecSearchCore(
     request_id: opts.request_id,
   });
   const runStartedAt = Date.now();
+  // Candidate survival ledger: every funnel candidate ends in one explained
+  // fate, and every lead streamed while researching is reconciled with the
+  // final page. Bookkeeping only; it never changes delivery.
+  const { createCandidateLedger } = await import("@/lib/search/candidate-ledger");
+  const ledger = createCandidateLedger();
+  const browserProgress: SpecSearchDeps["browserProgress"] = deps.browserProgress
+    ? (event) => {
+        if (event.row) ledger.streamed(event.row);
+        deps.browserProgress!(event);
+      }
+    : undefined;
   let understandingDoneAt = runStartedAt;
   let liveDoneAt = runStartedAt;
   let enrichDoneAt = runStartedAt;
@@ -1109,8 +1184,12 @@ export async function runSpecSearchCore(
     hasMore: false,
     totalAvailable: null as number | null,
   };
-  const { understandSearchSpec, isActionableFrame } = await import("@/lib/understanding/to-search-spec");
-  const base = opts.spec ?? (await understandSearchSpec(query, answers, deps.signal));
+  const { understandSearchSpec, frameToSearchSpec, applyClarificationToFrame, isActionableFrame } = await import("@/lib/understanding/to-search-spec");
+  // World city gazetteer for understanding (real cities, one-edit typos).
+  if (!opts.spec) await (await import("@/lib/search/gazetteer.server")).ensureCityGazetteer();
+  const base = opts.spec ?? (opts.priorFrame
+    ? frameToSearchSpec(applyClarificationToFrame(opts.priorFrame, answers))
+    : await understandSearchSpec(query, answers, deps.signal));
   understandingDoneAt = Date.now();
   if (deps.signal?.aborted) return withRun({ spec: base, ...pageInfo }, 0, true);
   // Merge prior answers as stated criteria (multi-turn without session store).
@@ -1174,6 +1253,21 @@ export async function runSpecSearchCore(
   const { computeMissing } = await import("@/lib/search/search-spec");
   spec.missing = computeMissing(spec);
   spec.status = spec.missing.length ? "needs_clarification" : "ready_to_search";
+  if (spec.understanding) {
+    const { decideSpecClarification } = await import("@/lib/search/spec-clarification");
+    const question = decideSpecClarification(spec, opts.force);
+    if (question) {
+      spec.status = "needs_clarification";
+      return withRun({
+        spec,
+        questions: [question.question],
+        clarify: [question],
+        rows: [],
+        ...pageInfo,
+      } as unknown as Record<string, unknown>, 0, false);
+    }
+    spec.status = "ready_to_search";
+  }
   // Explicit user command ("Search" button): proceed with stated criteria even
   // when optional fields are still missing. Unknown entity still clarifies.
   const forcedReady = !!opts.force && spec.entity !== "unknown";
@@ -1182,7 +1276,7 @@ export async function runSpecSearchCore(
   // highest-information question instead of searching with arbitrary
   // assumptions. "Search with defaults" in the panel bypasses; an explicit
   // count in the query signals the user knows what they want.
-  if (spec.status === "ready_to_search") {
+  if (!spec.understanding && spec.status === "ready_to_search") {
     const { evaluateQueryReadiness } = await import("@/lib/search/query-readiness");
     const readiness = evaluateQueryReadiness({ spec, query, force: opts.force });
     if (!readiness.ready && readiness.question) {
@@ -1200,7 +1294,7 @@ export async function runSpecSearchCore(
   // once ready, an unstated mode blocks with exactly one question. The offer
   // question follows ONLY a selling answer, so just-looking never sees it.
   // Explicit "Search" (force) and investor/unknown entities bypass the gate.
-  if (!opts.force && !isActionableFrame(spec) && isDirectoryEntity(spec.entity) && spec.status === "ready_to_search") {
+  if (!spec.understanding && !opts.force && !isActionableFrame(spec) && isDirectoryEntity(spec.entity) && spec.status === "ready_to_search") {
     const modeCrit = criteria.find((c) => c.field === "mode");
     const offerCrit = criteria.find((c) => c.field === "offer");
     let mode = detectModeFromQuery(query);
@@ -1364,6 +1458,47 @@ export async function runSpecSearchCore(
       ...pageInfo,
       outcome: "NO_QUALIFIED_RESULTS",
     });
+  }
+  if (!opts.locationBranch && (spec.locations?.length ?? 0) > 1) {
+    const branchResults: SpecSearchResult[] = [];
+    for (const place of spec.locations!) {
+      const locationCriterion = { field: "location", value: place, stated: true, confidence: 1 };
+      const criteria = spec.criteria.filter((criterion) => ![
+        "location", "location_id", "location_kind", "location_country", "location_scope", "location_parents",
+      ].includes(criterion.field));
+      criteria.push(locationCriterion);
+      branchResults.push(await runSpecSearchCore(query, deps, limit + effOffset, {}, {
+        ...opts,
+        offset: 0,
+        priorFrame: undefined,
+        locationBranch: true,
+        spec: { ...spec, locations: [place], criteria },
+      }));
+      if (deps.signal?.aborted) break;
+    }
+    const unique = new Map<string, SpecRow>();
+    for (const result of branchResults) for (const row of result.rows) {
+      const key = row.entity_id ?? row.key ?? row.url ?? `${row.kind}:${row.title}:${row.location ?? ""}`;
+      if (!unique.has(key)) unique.set(key, row);
+    }
+    const all = [...unique.values()];
+    const rows = all.slice(effOffset, effOffset + limit);
+    const representative = branchResults.find((result) => result.rows.length > 0) ?? branchResults[0];
+    const { mergeCandidateLedgers } = await import("@/lib/search/candidate-ledger");
+    if (representative) return {
+      ...representative,
+      spec,
+      rows,
+      candidateLedger: mergeCandidateLedgers(branchResults.map((result) => result.candidateLedger), rows),
+      dbMeta: branchResults.flatMap((result) => result.dbMeta),
+      qualified_count: rows.length,
+      offset: effOffset,
+      limit,
+      hasMore: all.length > effOffset + limit || branchResults.some((result) => result.hasMore),
+      totalAvailable: branchResults.every((result) => result.totalAvailable !== null)
+        ? branchResults.reduce((sum, result) => sum + (result.totalAvailable ?? 0), 0)
+        : null,
+    };
   }
   // S3 + index readers reach node builtins (AWS SDK -> node:os/crypto), so they
   // load dynamically — a static import would pull them into the client bundle.
@@ -1968,7 +2103,7 @@ export async function runSpecSearchCore(
   const deadlineNow = () => deps.signal?.aborted === true && searchAbortCode(deps.signal) === "SEARCH_DEADLINE";
   // User-visible activity events (no reasoning — actions and counts only).
   const emitProgress = (action: string, source?: string, detail?: string, count?: number | string) =>
-    deps.browserProgress?.({ action, source, detail, count });
+    browserProgress?.({ action, source, detail, count });
   if (forceLiveDiscovery) {
     console.info("[spec-run] forced live discovery", { search_run_id: runIds.search_run_id });
   }
@@ -1986,18 +2121,20 @@ export async function runSpecSearchCore(
         ...(liveOpt ?? {}),
         searchRunId: runIds.search_run_id,
         signal: deps.signal,
-        onBrowserProgress: deps.browserProgress,
+        onBrowserProgress: browserProgress,
         ownerId: deps.ownerId,
         desiredCount: Math.min(candidatePoolTarget, 30),
         initialCandidates: [...completeRows, ...incompleteRows],
         // Verification order fix: stamp the Spec opportunity BEFORE judging
         // completeness, so a no-site candidate with structured absence + two
         // exact checks counts as verified and stops burning browser budget.
-        // Researchable spec match (hard contradictions only), not strict —
-        // unknown facts are what research is resolving.
+        // "Verified" streams the lead to the user, so it uses the same strict
+        // spec judge as final delivery: a candidate whose category/role is
+        // still unknown keeps researching instead of being announced (the
+        // lenient gate announced "Just Eat" for "marketing agencies").
         isVerified: (row) => {
           const prepared = sanitizeSpecRow(row, spec);
-          return rowCouldSatisfySpec(spec, prepared) && prepared.complete === true &&
+          return rowSatisfiesSpec(spec, prepared) && prepared.complete === true &&
             applyWhyMatchGate([prepared], spec, !!spec.signal_required).kept.length === 1;
         },
       });
@@ -2040,9 +2177,12 @@ export async function runSpecSearchCore(
         // Pre-research gate: drop only hard contradictions. Unknown
         // role/industry/location is researchable, not rejectable — the strict
         // rowSatisfiesSpec runs after enrichment, on the final split.
-        const liveSanitized = live.rows
-          .map((r) => sanitizeSpecRow(r, spec))
-          .filter((r) => rowCouldSatisfySpec(spec, r));
+        const liveSanitized: SpecRow[] = [];
+        for (const r of live.rows.map((row) => sanitizeSpecRow(row, spec))) {
+          if (rowCouldSatisfySpec(spec, r)) liveSanitized.push(r);
+          // A merge can surface a contradicting fact after a lead streamed.
+          else ledger.filtered(r);
+        }
         liveSpecMatchCount = liveSanitized.length;
         completeRows = [...completeRows, ...liveSanitized.filter((r) => r.complete !== false)];
         liveIncompleteRows = liveSanitized.filter((r) => r.complete === false);
@@ -2066,7 +2206,7 @@ export async function runSpecSearchCore(
             });
             const socialSanitized = social.rows
               .map((r) => sanitizeSpecRow(r, spec))
-              .filter((r) => rowCouldSatisfySpec(spec, r));
+              .filter((r) => rowCouldSatisfySpec(spec, r) || (ledger.filtered(r), false));
             completeRows = [
               ...completeRows,
               ...socialSanitized.filter((r) => r.complete !== false),
@@ -2207,10 +2347,25 @@ export async function runSpecSearchCore(
     }
   }
 
+  // Post-research judge: the strict split the pre-research gate defers to.
+  // Unknown category/role/industry/location was researchable; after research
+  // an unproven stated criterion is a miss, never a pass. Stored rows already
+  // met this at retrieval, so in practice it binds live candidates.
+  {
+    const judged: SpecRow[] = [];
+    for (const row of completeRows) {
+      if (rowSatisfiesSpec(spec, row)) judged.push(row);
+      else ledger.filtered(row, "UNPROVEN_CRITERION");
+    }
+    completeRows = judged;
+  }
+
   enrichDoneAt = Date.now();
   const qualificationInputCount = completeRows.length;
   const { qualifyLead } = await import("@/lib/search/qualify");
-  const rejectionSummary = completeRows.map((row) => ({ row, decision: qualifyLead(row, spec, row.evidence) }))
+  const decisions = completeRows.map((row) => ({ row, decision: qualifyLead(row, spec, row.evidence) }));
+  for (const { row, decision } of decisions) ledger.decided(row, decision);
+  const rejectionSummary = decisions
     .filter(({ decision }) => decision.disposition !== "qualified")
     .slice(0, 8).map(({ row, decision }) => ({ name: row.title, code: decision.reject_code, reason: decision.label }));
   if (rejectionSummary.length) console.info("[qualification-rejected]", JSON.stringify({ search_run_id: runIds.search_run_id, candidates: rejectionSummary }));
@@ -2310,6 +2465,16 @@ export async function runSpecSearchCore(
     }
   }
 
+  {
+    // Lead check said qualified, final why-match/signal gate did not keep it.
+    const identity = (row: SpecRow) => row.entity_id ?? row.key ?? row.title;
+    const kept = new Set(completeRows.map(identity));
+    for (const { row, decision } of decisions) {
+      if (decision.disposition === "qualified" && !kept.has(identity(row))) ledger.gated(row, spec.signal_required ? "SIGNAL_NOT_VERIFIED" : "WHY_MATCH_GATE");
+    }
+    for (const row of incompleteRows) ledger.incomplete(row);
+  }
+
   // Phase 1D: stamp VERIFIED + best-effort write-back (never blocks UI).
   if (!process.env.VITEST && completeRows.length) {
     try {
@@ -2366,6 +2531,7 @@ export async function runSpecSearchCore(
   // upsert-dedupe is the source of truth; this keeps pass results disjoint).
   if (opts.jobContext?.excludeCandidateKeys?.length) {
     const exclude = new Set(opts.jobContext.excludeCandidateKeys);
+    for (const row of completeRows) if (exclude.has(row.entity_id ?? row.key ?? "")) ledger.excluded(row);
     completeRows = completeRows.filter((r) => !exclude.has(r.entity_id ?? r.key ?? ""));
   }
 
@@ -2378,6 +2544,29 @@ export async function runSpecSearchCore(
     limit,
     fetchedHitCap,
   });
+  {
+    // The UI renders only what the QualifiedLead projection accepts; a row
+    // it refuses is a server→UI loss and must be explained, not vanish.
+    const { projectSpecRowsToQualifiedViews } = await import("@/lib/search/qualified-lead-view");
+    // Per row, so a namesake is never marked for another row's refusal.
+    const refused = new Map<SpecRow, string>();
+    for (const row of page) {
+      const code = projectSpecRowsToQualifiedViews({ rows: [row], spec, run: runIds }).rejected[0]?.reject_code;
+      if (code) refused.set(row, code);
+    }
+    for (const [row, code] of refused) ledger.decided(row, { disposition: "rejected", reject_code: `LEAD_VIEW_${code}` });
+    ledger.delivered(page.filter((row) => !refused.has(row)), completeRows.slice(pageBaseOffset + page.length));
+  }
+  const candidateLedger = ledger.summary();
+  if (candidateLedger.streamed || candidateLedger.counts.rejected || candidateLedger.counts.gated) {
+    console.info("[candidate-ledger]", JSON.stringify({
+      search_run_id: runIds.search_run_id,
+      counts: candidateLedger.counts,
+      rejectReasons: candidateLedger.rejectReasons,
+      streamed: candidateLedger.streamed,
+      streamedNotReturned: candidateLedger.streamedNotReturned.map((item) => `${item.title}:${item.fate}${item.reason ? `(${item.reason})` : ""}`),
+    }));
+  }
   const moreAvailableMessage =
     hasMore || incompleteRows.length > 0
       ? "There are more verified leads — want to see them?"
@@ -2465,6 +2654,7 @@ export async function runSpecSearchCore(
     qualified: completeRows.length,
     returned: page.length,
     reason: zeroReason,
+    sourceHealth: (await import("@/lib/search/source-health")).classifySourceHealth({ providers: providerAttempts, diagnostics: routeDiagnostics }),
   };
   if (typeof console !== "undefined") {
     console.info(
@@ -2512,6 +2702,7 @@ export async function runSpecSearchCore(
       retrievalTrace,
       executionPlan,
       providerAttempts,
+      candidateLedger,
     },
     page.length,
     deps.signal?.aborted === true && !deadlineNow(),
@@ -2535,14 +2726,27 @@ export const getScrapyBrowserState = createServerFn({ method: "POST" })
     actionCount: number;
     elapsedMs: number | null;
     screenshotDataUrl: string | null;
+    adapter: "playwright" | "cli" | "worker" | null;
+    controller: "agent" | "human";
+    retained: boolean;
+    /** Take control is offered only for live or kept-open worker sessions. */
+    canControl: boolean;
   }> => {
     const { readScrapyBrowserState } = await import("@/lib/search/scrapy-browser.server");
-    const state = readScrapyBrowserState(data.search_run_id, String(context?.userId ?? ""));
+    const ownerId = String(context?.userId ?? "");
+    let state = readScrapyBrowserState(data.search_run_id, ownerId);
     if (!state) {
-      return { active: false, status: null, currentUrl: null, currentTitle: null, currentAction: null, pagesVisited: 0, actionCount: 0, elapsedMs: null, screenshotDataUrl: null };
+      return { active: false, status: null, currentUrl: null, currentTitle: null, currentAction: null, pagesVisited: 0, actionCount: 0, elapsedMs: null, screenshotDataUrl: null,
+        adapter: null, controller: "agent", retained: false, canControl: false };
     }
-    let screenshotDataUrl: string | null = null;
-    if (state.lastScreenshotPath) {
+    if (state.adapter === "worker") {
+      // A person watching a kept-open or human-driven session sees live frames.
+      const { freshWorkerFrame } = await import("@/lib/search/scrapy-browser-control.server");
+      await freshWorkerFrame(state);
+      state = readScrapyBrowserState(data.search_run_id, ownerId) ?? state;
+    }
+    let screenshotDataUrl: string | null = state.lastScreenshotData ? `data:image/jpeg;base64,${state.lastScreenshotData}` : null;
+    if (!screenshotDataUrl && state.lastScreenshotPath) {
       try {
         const fs = await import("node:fs/promises");
         const stat = await fs.stat(state.lastScreenshotPath).catch(() => null);
@@ -2554,8 +2758,9 @@ export const getScrapyBrowserState = createServerFn({ method: "POST" })
         screenshotDataUrl = null;
       }
     }
+    const live = state.status === "active" || state.status === "starting" || state.status === "user_control";
     return {
-      active: state.status === "active" || state.status === "starting" || state.status === "user_control",
+      active: live,
       status: state.status,
       currentUrl: state.currentUrl || null,
       currentTitle: state.currentTitle || null,
@@ -2564,6 +2769,10 @@ export const getScrapyBrowserState = createServerFn({ method: "POST" })
       actionCount: state.actionCount,
       elapsedMs: Date.now() - state.startedAt,
       screenshotDataUrl,
+      adapter: state.adapter,
+      controller: state.controller,
+      retained: state.retained,
+      canControl: state.adapter === "worker" && (live || state.retained),
     };
   });
 
@@ -2589,6 +2798,7 @@ export const runSpecSearch = createServerFn({ method: "POST" })
         limit: z.number().int().min(1).max(100).optional().default(25),
         offset: z.number().int().min(0).optional().default(0),
         answers: z.record(z.string(), z.string()).optional().default({}),
+        prior_frame: z.unknown().optional(),
         force: z.boolean().optional().default(false),
         search_run_id: z.string().max(80).optional(),
         conversation_id: z.string().max(80).optional(),
@@ -2601,6 +2811,9 @@ export const runSpecSearch = createServerFn({ method: "POST" })
     const { getRequest } = await import("@tanstack/react-start/server");
     const runId = data.search_run_id;
     const ownerId = context.userId;
+    const priorFrame = data.prior_frame === undefined
+      ? undefined
+      : (await import("@/lib/understanding/frame")).UnderstandingFrameSchema.parse(data.prior_frame);
     const { beginRegisteredSearchRun } = await import("@/lib/search/search-run.server");
     // Beta-reality fix: a flat 120s deadline killed live people/company research
     // mid-flight (premature honest-looking zeros). Scale the budget with the
@@ -2616,6 +2829,7 @@ export const runSpecSearch = createServerFn({ method: "POST" })
         ownerId,
       }, data.limit, data.answers, {
         force: data.force,
+        priorFrame,
         offset: data.offset,
         search_run_id: runId,
         conversation_id: data.conversation_id,

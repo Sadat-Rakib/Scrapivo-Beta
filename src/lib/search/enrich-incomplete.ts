@@ -66,12 +66,15 @@ export async function enrichSpecRowFromSite(row: SpecRow, signal?: AbortSignal |
       }), controller.signal);
     throwIfAborted(signal);
     if (controller.signal.aborted) return row;
-    const email =
-      row.email ||
-      discovery.emails?.find((e) => e.email && (e as { verification?: { tier?: string } }).verification?.tier !== "invalid")
-        ?.email ||
-      null;
-    const phone = row.phone || discovery.phones?.[0]?.e164 || discovery.phones?.[0]?.phone || null;
+    // Only contacts attributable to THIS lead (see contact-attribution.ts):
+    // another employee's address or a privacy@ inbox is not the lead's email.
+    const { attributableEmail, attributablePhone } = await import("./contact-attribution");
+    // Observed addresses only: a pattern-derived guess ("origin: derived") was
+    // never published and must not be presented as the lead's email.
+    const email = row.email || attributableEmail(row,
+      (discovery.emails ?? []).filter((e) => e.email && e.origin === "harvested" &&
+        (e as { verification?: { tier?: string } }).verification?.tier !== "invalid").map((e) => e.email));
+    const phone = row.phone || attributablePhone(row, (discovery.phones ?? []).map((p) => p.e164 ?? p.phone));
     return { ...row, email: email ?? row.email, phone: phone ?? row.phone };
   } catch {
     throwIfAborted(signal);

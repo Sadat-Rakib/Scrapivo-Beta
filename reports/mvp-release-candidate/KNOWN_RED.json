@@ -1,0 +1,314 @@
+{
+  "frozen_at": "2026-09-30T00:08:13.966Z",
+  "head": "7805e75e452d925a6d88e3db880622fdb2f35207",
+  "basis": "active worktree at pass start (baseline B)",
+  "command": "vitest --run --exclude .kilo/** --maxWorkers=3",
+  "totals": {
+    "total": 1387,
+    "passed": 1317,
+    "failed": 59,
+    "skipped": 11
+  },
+  "failures": [
+    {
+      "file": "src/lib/__tests__/coverage-planned.test.ts",
+      "test": "coverage-planned retrieval (USE_COVERAGE_SELECTOR=true) uncovered geography (Dhaka): S3 serves after hot skip, provider disabled here",
+      "message": "AssertionError: expected [] to have a length of 1 but got +0"
+    },
+    {
+      "file": "src/lib/__tests__/coverage-planned.test.ts",
+      "test": "coverage-planned retrieval (USE_COVERAGE_SELECTOR=true) sufficient hot tier stops the search: S3 never called (no fanout)",
+      "message": "AssertionError: expected [] to have a length of 25 but got +0"
+    },
+    {
+      "file": "src/lib/__tests__/coverage-planned.test.ts",
+      "test": "coverage-planned retrieval (USE_COVERAGE_SELECTOR=true) thin hot tier falls through to S3 (bounded fallback, same budget)",
+      "message": "AssertionError: expected [] to have a length of 3 but got +0"
+    },
+    {
+      "file": "src/lib/__tests__/coverage-planned.test.ts",
+      "test": "coverage-planned retrieval (USE_COVERAGE_SELECTOR=true) flag off keeps the legacy order byte-identical",
+      "message": "AssertionError: expected [] to have a length of 2 but got +0"
+    },
+    {
+      "file": "src/lib/__tests__/mode-gate.test.ts",
+      "test": "mode gate in runSpecSearchCore bare SaaS founders asks intent, then location before retrieval",
+      "message": "AssertionError: expected 'needs_clarification' to be 'ready_to_search' // Object.is equality"
+    },
+    {
+      "file": "src/lib/__tests__/mode-gate.test.ts",
+      "test": "mode gate in runSpecSearchCore bare ready business query → exactly the mode question, zero retrieval",
+      "message": "AssertionError: expected 'needs_clarification' to be 'ready_to_search' // Object.is equality"
+    },
+    {
+      "file": "src/lib/__tests__/mode-gate.test.ts",
+      "test": "mode gate in runSpecSearchCore selling without offer → exactly the offer question",
+      "message": "AssertionError: expected [ { kind: 'business', …(32) } ] to deeply equal []"
+    },
+    {
+      "file": "src/lib/__tests__/mode-gate.test.ts",
+      "test": "mode gate in runSpecSearchCore mode answer naming the offering skips the offer round (site follow-up next)",
+      "message": "AssertionError: expected [ { kind: 'business', …(32) } ] to deeply equal []"
+    },
+    {
+      "file": "src/lib/__tests__/mode-gate.test.ts",
+      "test": "mode gate in runSpecSearchCore browsing-signal query is not gated (no unnecessary questions)",
+      "message": "AssertionError: expected [] to have a length of 1 but got +0"
+    },
+    {
+      "file": "src/lib/__tests__/offer-taxonomy.test.ts",
+      "test": "offering-aware gate 'without a website' query: zero questions, selling + offer inferred, rows filtered",
+      "message": "AssertionError: expected [ { id: 'entity_purpose', …(3) } ] to deeply equal []"
+    },
+    {
+      "file": "src/lib/__tests__/offer-taxonomy.test.ts",
+      "test": "offering-aware gate selling + website offer, no site pref → exactly the site follow-up",
+      "message": "AssertionError: expected 'entity_business_model' to be 'entity_site' // Object.is equality"
+    },
+    {
+      "file": "src/lib/__tests__/offer-taxonomy.test.ts",
+      "test": "offering-aware gate site=without answer filters to no-website rows",
+      "message": "AssertionError: expected [ { …(4) } ] to deeply equal []"
+    },
+    {
+      "file": "src/lib/__tests__/offer-taxonomy.test.ts",
+      "test": "offering-aware gate marketing offer → channel follow-up (pitch tailoring, no row filter)",
+      "message": "AssertionError: expected 'entity_business_model' to be 'entity_channel' // Object.is equality"
+    },
+    {
+      "file": "src/lib/__tests__/offer-taxonomy.test.ts",
+      "test": "offering-aware gate channel answer proceeds without filtering rows",
+      "message": "AssertionError: expected [ { kind: 'business', …(32) } ] to have a length of 2 but got 1"
+    },
+    {
+      "file": "src/lib/__tests__/offer-taxonomy.test.ts",
+      "test": "offering-aware gate person hiring queries never infer selling offers",
+      "message": "AssertionError: expected [ 'entity_industry' ] to include 'entity_offer'"
+    },
+    {
+      "file": "src/lib/__tests__/offer-taxonomy.test.ts",
+      "test": "offering-aware gate stale_site (design redesign angle) design offer, no site pref → design-worded site follow-up",
+      "message": "AssertionError: expected [] to have a length of 1 but got +0"
+    },
+    {
+      "file": "src/lib/__tests__/offer-taxonomy.test.ts",
+      "test": "offering-aware gate stale_site (design redesign angle) design + site=with → opportunity=stale_site derived, only thin-presence rows",
+      "message": "AssertionError: expected false to be true // Object.is equality"
+    },
+    {
+      "file": "src/lib/__tests__/offer-taxonomy.test.ts",
+      "test": "offering-aware gate stale_site (design redesign angle) design + site=without → no_website as before",
+      "message": "AssertionError: expected [ { …(4) } ] to deeply equal []"
+    },
+    {
+      "file": "src/lib/__tests__/offer-taxonomy.test.ts",
+      "test": "offering-aware gate force (Search with defaults) bypasses the gate unfiltered — client shows the chip",
+      "message": "AssertionError: expected [ { kind: 'business', …(32) } ] to have a length of 2 but got 1"
+    },
+    {
+      "file": "src/lib/__tests__/offer-taxonomy.test.ts",
+      "test": "offering-aware gate P3-shape intent hunt keeps its signal behavior (looking-signal, no gate)",
+      "message": "AssertionError: expected [ …(3) ] to deeply equal []"
+    },
+    {
+      "file": "src/lib/__tests__/pagination.test.ts",
+      "test": "pagination (S3 path) page 1: limit rows, hasMore true, echo offset/limit",
+      "message": "AssertionError: expected [] to have a length of 2 but got +0"
+    },
+    {
+      "file": "src/lib/__tests__/pagination.test.ts",
+      "test": "pagination (S3 path) middle page slices verified matches",
+      "message": "AssertionError: expected [] to deeply equal [ 'Pune Dental 2', 'Pune Dental 3' ]"
+    },
+    {
+      "file": "src/lib/__tests__/pagination.test.ts",
+      "test": "pagination (S3 path) last page: remainder rows, hasMore false",
+      "message": "AssertionError: expected [] to deeply equal [ 'Pune Dental 4' ]"
+    },
+    {
+      "file": "src/lib/__tests__/phone-safety.test.ts",
+      "test": "serve-time enforcement S3 business mapper suppresses mismatched phones with a flag",
+      "message": "AssertionError: expected [] to have a length of 1 but got +0"
+    },
+    {
+      "file": "src/lib/__tests__/spec-search.test.ts",
+      "test": "spec-first flow P1: SaaS founders NY → zero questions, validated rows",
+      "message": "AssertionError: expected 'needs_clarification' to be 'ready_to_search' // Object.is equality"
+    },
+    {
+      "file": "src/lib/__tests__/spec-search.test.ts",
+      "test": "spec-first flow indexed cutover (USE_INDEXED_SEARCH) flag on: index serves, S3 readers untouched",
+      "message": "AssertionError: expected \"vi.fn()\" to be called once, but got 0 times"
+    },
+    {
+      "file": "src/lib/__tests__/spec-search.test.ts",
+      "test": "spec-first flow indexed cutover (USE_INDEXED_SEARCH) flag on but index throws: falls back to S3",
+      "message": "AssertionError: expected \"vi.fn()\" to be called once, but got 0 times"
+    },
+    {
+      "file": "src/lib/__tests__/spec-search.test.ts",
+      "test": "spec-first flow indexed cutover (USE_INDEXED_SEARCH) registry-key invariant: keyless rows dropped + counted",
+      "message": "AssertionError: expected [] to have a length of 1 but got +0"
+    },
+    {
+      "file": "src/lib/__tests__/spec-search.test.ts",
+      "test": "spec-first flow indexed cutover (USE_INDEXED_SEARCH) explicit flag off: index never called",
+      "message": "TypeError: Cannot read properties of undefined (reading 'title')"
+    },
+    {
+      "file": "src/lib/__tests__/spec-search.test.ts",
+      "test": "spec-first flow business detail carries full geo + email for cards",
+      "message": "AssertionError: expected [] to have a length of 1 but got +0"
+    },
+    {
+      "file": "src/lib/__tests__/spec-search.test.ts",
+      "test": "spec-first flow keeps exact-location populated companies and reports stage counts",
+      "message": "AssertionError: expected [] to have a length of 1 but got +0"
+    },
+    {
+      "file": "src/lib/understanding/understanding.test.ts",
+      "test": "plain entity discovery \"cafes in San Francisco\" is executable without a question",
+      "message": "AssertionError: expected true to be false // Object.is equality"
+    },
+    {
+      "file": "src/lib/understanding/understanding.test.ts",
+      "test": "plain entity discovery \"coffee roasters near Copenhagen\" is executable without a question",
+      "message": "AssertionError: expected true to be false // Object.is equality"
+    },
+    {
+      "file": "src/lib/understanding/understanding.test.ts",
+      "test": "plain entity discovery \"law firms across Ontario\" is executable without a question",
+      "message": "AssertionError: expected true to be false // Object.is equality"
+    },
+    {
+      "file": "src/lib/understanding/understanding.test.ts",
+      "test": "plain entity discovery \"restaurants in Lisbon\" is executable without a question",
+      "message": "AssertionError: expected true to be false // Object.is equality"
+    },
+    {
+      "file": "src/lib/understanding/understanding.test.ts",
+      "test": "plain entity discovery \"marketing agencies in Bristol\" is executable without a question",
+      "message": "AssertionError: expected true to be false // Object.is equality"
+    },
+    {
+      "file": "src/lib/understanding/understanding.test.ts",
+      "test": "noun-phrase interpretation is open-world \"dental practices in Leeds\" reads as a business",
+      "message": "AssertionError: expected true to be false // Object.is equality"
+    },
+    {
+      "file": "src/lib/understanding/understanding.test.ts",
+      "test": "noun-phrase interpretation is open-world \"coffee roasters near Copenhagen\" reads as a business or company",
+      "message": "AssertionError: expected true to be false // Object.is equality"
+    },
+    {
+      "file": "src/lib/understanding/understanding.test.ts",
+      "test": "noun-phrase interpretation is open-world \"law firms across Ontario\" reads as a business or company",
+      "message": "AssertionError: expected true to be false // Object.is equality"
+    },
+    {
+      "file": "src/lib/understanding/understanding.test.ts",
+      "test": "noun-phrase interpretation is open-world \"heads of talent in Berlin\" reads as a person",
+      "message": "AssertionError: expected true to be false // Object.is equality"
+    },
+    {
+      "file": "src/lib/understanding/understanding.test.ts",
+      "test": "noun-phrase interpretation is open-world \"freelance copywriters in Dublin\" reads as a person",
+      "message": "AssertionError: expected true to be false // Object.is equality"
+    },
+    {
+      "file": "src/lib/understanding/understanding.test.ts",
+      "test": "a profession noun is both a person and a practice marks the ambiguity and does not ask about it",
+      "message": "AssertionError: expected true to be false // Object.is equality"
+    },
+    {
+      "file": "src/lib/understanding/understanding.test.ts",
+      "test": "a vertical on its own is not a target does not read the vertical's own word back as a head noun",
+      "message": "AssertionError: expected true to be false // Object.is equality"
+    },
+    {
+      "file": "src/lib/understanding/understanding.test.ts",
+      "test": "a vertical on its own is not a target accepts the vertical itself when it already names a kind",
+      "message": "AssertionError: expected true to be false // Object.is equality"
+    },
+    {
+      "file": "src/lib/understanding/understanding.test.ts",
+      "test": "a vertical on its own is not a target accepts a place as the bound for an unfamiliar trade",
+      "message": "AssertionError: expected true to be false // Object.is equality"
+    },
+    {
+      "file": "src/lib/understanding/understanding.test.ts",
+      "test": "a vertical on its own is not a target stays quiet once a head noun names the kind",
+      "message": "AssertionError: expected true to be false // Object.is equality"
+    },
+    {
+      "file": "src/lib/understanding/understanding.test.ts",
+      "test": "a vertical on its own is not a target stays quiet once anything else bounds the search",
+      "message": "AssertionError: expected true to be false // Object.is equality"
+    },
+    {
+      "file": "src/lib/search/__tests__/candidate-survival.test.ts",
+      "test": "candidate survival — founder qualification 5: 'may need help' is not buying intent; missing optional email does not reject a valid founder",
+      "message": "AssertionError: expected 'potential_match' to be 'qualified' // Object.is equality"
+    },
+    {
+      "file": "src/lib/search/__tests__/candidate-survival.test.ts",
+      "test": "candidate survival — deadline vs cancellation 10: hard deadline finalizes already-qualified candidates instead of returning zero",
+      "message": "AssertionError: expected 0 to be greater than or equal to 1"
+    },
+    {
+      "file": "src/lib/search/__tests__/entity-taxonomy.test.ts",
+      "test": "taxonomy extraction existing contracts unchanged: trades stay business, bare stays clarify",
+      "message": "AssertionError: expected [ 'location' ] to deeply equal [ 'category', 'location' ]"
+    },
+    {
+      "file": "src/lib/search/__tests__/jobs-spec-questions.test.ts",
+      "test": "thin job search offers refinements, rich search stays quiet stated slots are not re-asked on thin",
+      "message": "AssertionError: expected [ { id: 'entity_seniority', …(3) } ] to deeply equal []"
+    },
+    {
+      "file": "src/lib/search/__tests__/m4-entity-resolve.test.ts",
+      "test": "M4 — SPEC_SEARCH runtime resolved OSM business can qualify; provisional web cannot",
+      "message": "AssertionError: expected 0 to be greater than or equal to 1"
+    },
+    {
+      "file": "src/lib/search/__tests__/step2-resolver.test.ts",
+      "test": "Index-empty S3 fallthrough + throw safety index empty + location -> S3 rows used, both metas logged",
+      "message": "AssertionError: expected [] to have a length of 1 but got +0"
+    },
+    {
+      "file": "src/lib/search/__tests__/step2-resolver.test.ts",
+      "test": "Index-empty S3 fallthrough + throw safety index empty + S3 throws -> honest empty, no crash",
+      "message": "AssertionError: expected 'not_required' to be 'db_thin_gapfill_pending' // Object.is equality"
+    },
+    {
+      "file": "src/lib/search/__tests__/step2-resolver.test.ts",
+      "test": "Investor answers end to end (stubs) stage/sector/check asked, answered, filtered by row values",
+      "message": "AssertionError: expected 'needs_clarification' to be 'ready_to_search' // Object.is equality"
+    },
+    {
+      "file": "src/lib/search/__tests__/step2-resolver.test.ts",
+      "test": "Step 2.3 opportunity slot + investor phrasing no_website filters site rows on every engine",
+      "message": "AssertionError: expected [] to have a length of 1 but got +0"
+    },
+    {
+      "file": "src/lib/search/__tests__/step2-resolver.test.ts",
+      "test": "Step 2.4 mode + offer questions (Phase 1.3: owned by the mode gate) panel asks missing fields only — never mode/offer (gate asks those pre-retrieval)",
+      "message": "AssertionError: expected [ 'entity_location' ] to deeply equal [ Array(2) ]"
+    },
+    {
+      "file": "src/lib/search/__tests__/thin-ask.test.ts",
+      "test": "thin-ask end to end (stubs, no network) thin person search stays honest-empty without asking seniority",
+      "message": "AssertionError: expected [ { id: 'entity_industry', …(3) } ] to deeply equal []"
+    },
+    {
+      "file": "src/lib/search/__tests__/thin-ask.test.ts",
+      "test": "thin-ask end to end (stubs, no network) rich search stays quiet (no thin questions when rows found)",
+      "message": "AssertionError: expected [] to have a length of 1 but got +0"
+    },
+    {
+      "file": "Promotional Videos/motion-reel-kit/.claude/skills/motion-reel/engine/lib/motion.test.js",
+      "test": "<suite-level failure>",
+      "message": "No test suite found in file C:/Users/mirsa/OneDrive/Desktop/Scrapivo (2)/Promotional Videos/motion-reel-kit/.claude/skills/motion-reel/engine/lib/motion.test.js"
+    }
+  ]
+}

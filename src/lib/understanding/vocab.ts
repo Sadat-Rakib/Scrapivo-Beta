@@ -513,7 +513,7 @@ export const CONSTRAINT_FIELD_ALIASES: Record<string, string> = {
  * the wording around the field and the plural on it.
  */
 export const DELIVERABLE_FIELD_PATTERNS: ReadonlyArray<readonly [RegExp, string]> = [
-  [/\bphone(?:\s+numbers?)?\b/i, "phone"],
+  [/\bphone(?:\s+numbers?)?\b|\bnums\b/i, "phone"],
   [/\bemails?(?:\s+address(?:es)?)?\b/i, "email"],
   [/\bwebsites?\b/i, "website"],
   [/\baddress(?:es)?\b/i, "address"],
@@ -645,6 +645,7 @@ export const CLARIFICATION_REASONS = [
   "unreadable_relation",
   "missing_relation_object",
   "underspecified_scope",
+  "missing_purpose",
   "compound_parse_uncertain",
   "contradiction",
   "invalid_answer",

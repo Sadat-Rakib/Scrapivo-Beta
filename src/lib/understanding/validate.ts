@@ -368,7 +368,7 @@ function propagateCompoundProvenance(
         }
       }
       if (!sg.location.canonical) {
-        const geo = resolveCanonicalLocation(sg.location.value);
+        const geo = resolveCanonicalLocation(sg.location.value, { gazetteer: true, correctTypos: true });
         if (geo?.name) {
           sg.location.canonical = geo.name;
           if (geo.country_code) sg.location.country_code = geo.country_code;
@@ -521,6 +521,7 @@ function normalizeSemanticCore(
   }
 
   for (const slot of REHARVESTABLE) {
+    if (slot === "industry" && relation.type.value === "offers_service" && /\bbrands?\b/i.test(target.category?.value ?? "")) continue;
     const held = target[slot];
     const span = spanOf(held);
     if (!span) continue;
@@ -1154,6 +1155,9 @@ export function validateFrame(input: UnderstandingFrame): ValidationResult {
   // Spans that merely sit side by side ("seed-stage fintechs" -> stage
   // "seed-stage" + category "fintechs") contain nothing and are left alone.
   for (const slot of REHARVESTABLE) {
+    // A brand's sold product can also name its market: "brands selling
+    // skincare" needs the offer relation and skincare industry for retrieval.
+    if (slot === "industry" && frame.relation.type.value === "offers_service" && /\bbrands?\b/i.test(frame.target.category?.value ?? "")) continue;
     const held = frame.target[slot];
     const span = spanOf(held);
     if (!span) continue;
@@ -1556,10 +1560,14 @@ export function validateFrame(input: UnderstandingFrame): ValidationResult {
     }
     // Canonicalization is a best effort by design: an obscure town that the
     // resolver has never heard of stays exactly as the user typed it, with
-    // canonical null. Unknown places must not block understanding.
-    if (!frame.location.canonical) {
-      const geo = resolveCanonicalLocation(frame.location.value);
-      if (geo?.name) {
+    // canonical null. Unknown places must not block understanding. A model
+    // that merely echoed the typed span as "canonical" did not canonicalize.
+    // The world gazetteer (when the server registered one) resolves real
+    // cities and repairs a one-edit misspelling ("lipzig" -> Leipzig).
+    const echoed = !!frame.location.canonical && frame.location.canonical.trim().toLowerCase() === frame.location.value.trim().toLowerCase();
+    if (!frame.location.canonical || echoed) {
+      const geo = resolveCanonicalLocation(frame.location.value, { gazetteer: true, correctTypos: true });
+      if (geo?.name && (!echoed || geo.name !== frame.location.canonical || (geo.country_code && !frame.location.country_code))) {
         frame.location.canonical = geo.name;
         if (geo.country_code) frame.location.country_code = geo.country_code;
         repairs.push({
@@ -1651,6 +1659,9 @@ export function validateFrame(input: UnderstandingFrame): ValidationResult {
         path: "evidence.intent_signal_required",
       });
     }
+  }
+  if (relation === "investing_in" && /\b(?:actively|recent|recently|actual|current)\b/i.test(raw)) {
+    frame.evidence.intent_signal_required = true;
   }
 
   // — lacks_asset(website) is a constraint, not just a relation ——————————

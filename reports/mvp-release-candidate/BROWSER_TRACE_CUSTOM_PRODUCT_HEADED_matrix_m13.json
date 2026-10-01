@@ -1,0 +1,287 @@
+{
+  "runId": "trace-custom-product-1790792088295",
+  "query": "Remote senior frontend developer jobs",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 70814,
+  "error": null,
+  "audit": [],
+  "browser": {
+    "adapter": "worker",
+    "status": "completed",
+    "pagesVisited": 8,
+    "currentUrl": "https://ca.linkedin.com/jobs/remote-frontend-developer-jobs",
+    "retained": true,
+    "controller": "agent",
+    "sessionId": "3dc22047-b072-4803-aaa4-4779277023c3",
+    "frame": true
+  },
+  "runtime": [
+    {
+      "kind": "runtime",
+      "requested": "worker",
+      "used": "worker"
+    }
+  ],
+  "progressEvents": 26,
+  "streamedRows": [],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [
+    {
+      "kind": "search",
+      "query": "senior frontend developer job",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "senior frontend developer job",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "senior frontend developer remote job",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "senior frontend developer remote job",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://ca.linkedin.com/jobs/senior-frontend-developer-jobs",
+      "pageType": "job_board",
+      "title": "Senior Frontend Developer Jobs in Canada (2,000+ Open Roles) | LinkedIn",
+      "outcome": "read",
+      "textChars": 15230,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error openrouter:nex-agi/nex-n2.5-mini:free 404 (model_missing): {\"error\":{\"message\":\"This model is unavailable for free. The paid version is available now - use this; injected/not_called)",
+      "capture": "0bec20146270.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.ziprecruiter.com/Jobs/Senior-Frontend-Developer/--in-Alberta?lk=2cR3z4a0nyu8OMQMFOkJjQ&__cf_chl_rt_tk=Skiy1DdtzUBFpCgDa.hpEQntr6Be1lDxmC.90fpJQaU-1790792154-1.0.1.1-CTLwJKb2Y3tkMXuFLBMOWT_9fDBFcbFF6wQQMvB_dH0",
+      "pageType": "job_board",
+      "title": "Just a moment...",
+      "outcome": "read",
+      "textChars": 268,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error openrouter:nex-agi/nex-n2.5-mini:free 404 (model_missing): {\"error\":{\"message\":\"This model is unavailable for free. The paid version is available now - use this; injected/not_called)",
+      "capture": "9f5527aa4297.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.remoterocketship.com/ca/jobs/senior-frontend-developer/?page=1&sort=DateAdded&jobTitle=Frontend%2520Developer&seniority=senior&locations=Canada",
+      "pageType": "job_board",
+      "title": "Remote Senior Frontend Developer Jobs in Canada (CA$153K)",
+      "outcome": "read",
+      "textChars": 14420,
+      "structured": {
+        "jobs": 0,
+        "organization": "Remote Rocketship",
+        "emails": 1,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/breaker model unavailable cooldown; injected/not_called)",
+      "capture": "f2d3d71520bb.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://ca.linkedin.com/jobs/remote-frontend-developer-jobs",
+      "pageType": "job_board",
+      "title": "Remote Frontend Developer Jobs in Canada (1,000+ Open Roles) | LinkedIn",
+      "outcome": "read",
+      "textChars": 7639,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/breaker model unavailable cooldown; injected/not_called)",
+      "capture": "542cabf752cd.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://ca.linkedin.com/jobs/senior-frontend-developer-jobs",
+        "https://www.ziprecruiter.com/Jobs/Senior-Frontend-Developer/--in-Alberta?lk=2cR3z4a0nyu8OMQMFOkJjQ&__cf_chl_rt_tk=Skiy1DdtzUBFpCgDa.hpEQntr6Be1lDxmC.90fpJQaU-1790792154-1.0.1.1-CTLwJKb2Y3tkMXuFLBMOWT_9fDBFcbFF6wQQMvB_dH0"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "openrouter:nex-agi/nex-n2.5-mini:free 404 (model_missing): {\"error\":{\"message\":\"This model is unavailable for free. The paid version is available now - use this"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://ca.linkedin.com/jobs/senior-frontend-developer-jobs",
+        "https://www.ziprecruiter.com/Jobs/Senior-Frontend-Developer/--in-Alberta?lk=2cR3z4a0nyu8OMQMFOkJjQ&__cf_chl_rt_tk=Skiy1DdtzUBFpCgDa.hpEQntr6Be1lDxmC.90fpJQaU-1790792154-1.0.1.1-CTLwJKb2Y3tkMXuFLBMOWT_9fDBFcbFF6wQQMvB_dH0"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.remoterocketship.com/ca/jobs/senior-frontend-developer/?page=1&sort=DateAdded&jobTitle=Frontend%2520Developer&seniority=senior&locations=Canada",
+        "https://ca.linkedin.com/jobs/remote-frontend-developer-jobs"
+      ],
+      "extractor": "deterministic",
+      "llm": "breaker",
+      "entities": 0,
+      "detail": "model unavailable cooldown"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.remoterocketship.com/ca/jobs/senior-frontend-developer/?page=1&sort=DateAdded&jobTitle=Frontend%2520Developer&seniority=senior&locations=Canada",
+        "https://ca.linkedin.com/jobs/remote-frontend-developer-jobs"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    }
+  ],
+  "entityOutcomes": [],
+  "remember": [],
+  "candidates": [],
+  "done": [
+    {
+      "kind": "done",
+      "status": "completed",
+      "candidates": 0,
+      "verified": 0,
+      "visited": 4,
+      "queries": 2,
+      "stoppingReason": "diminishing_returns",
+      "elapsedMs": 30181
+    }
+  ],
+  "persistenceSkipped": [
+    "ai_cache",
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "NO_QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "job",
+    "criteria": [
+      "role=senior frontend developer",
+      "employment=remote",
+      "geo_scope=worldwide"
+    ],
+    "clarify": [
+      "entity_location",
+      "entity_seniority"
+    ],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "provider-jobs",
+          "partitions": [
+            "jobs-fleet(22/22 sources ok, 20 seeker-filtered)"
+          ],
+          "scanned": 4840,
+          "matched": 100
+        },
+        {
+          "source": "live-jobs",
+          "partitions": [
+            "live-gapfill(25)"
+          ],
+          "scanned": 25,
+          "matched": 25
+        }
+      ],
+      "rawCandidates": 125,
+      "postSpecFilter": 0,
+      "timings": {
+        "understanding_ms": 7668,
+        "stored_search_ms": 27678,
+        "research_ms": 32254,
+        "enrichment_ms": 2,
+        "qualification_ms": 297,
+        "total_ms": 67899
+      },
+      "researchable": 0,
+      "complete": 0,
+      "pendingEnrichment": 0,
+      "qualificationRejected": 0,
+      "qualified": 0,
+      "returned": 0,
+      "reason": "FILTERED_BY_SPEC",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "jobs-fleet",
+            "label": "Public source",
+            "state": "healthy",
+            "reason": "OK"
+          },
+          {
+            "source": "browser-live",
+            "label": "Public websites",
+            "state": "empty",
+            "reason": "NO_RESULTS"
+          }
+        ],
+        "degraded": false,
+        "summary": null
+      }
+    },
+    "rowsReturned": 0,
+    "rows": [],
+    "diagnostics": [],
+    "cancelledAtMs": null,
+    "returnedAtMs": 70813,
+    "candidateLedger": {
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 0,
+        "gated": 0,
+        "filtered": 25,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {},
+      "streamed": 0,
+      "streamedNotReturned": []
+    }
+  }
+}

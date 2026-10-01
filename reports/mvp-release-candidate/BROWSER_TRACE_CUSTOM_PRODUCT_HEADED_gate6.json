@@ -1,0 +1,1966 @@
+{
+  "runId": "trace-custom-product-1790738824294",
+  "query": "B2B SaaS founders with public contact details",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 122509,
+  "error": null,
+  "audit": [
+    {
+      "title": "Andrew Breen",
+      "checks": [
+        {
+          "method": "browser_observed_text",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        },
+        {
+          "method": "browser_named_founder_cohort",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        }
+      ],
+      "contactPage": "captured",
+      "email": null,
+      "phone": null
+    },
+    {
+      "title": "Alex Circei",
+      "checks": [
+        {
+          "method": "browser_observed_text",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        },
+        {
+          "method": "browser_named_founder_cohort",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        }
+      ],
+      "contactPage": "captured",
+      "email": null,
+      "phone": null
+    },
+    {
+      "title": "Garry Drummond",
+      "checks": [
+        {
+          "method": "browser_observed_text",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        },
+        {
+          "method": "browser_named_founder_cohort",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        }
+      ],
+      "contactPage": "captured",
+      "email": null,
+      "phone": null
+    },
+    {
+      "title": "Jennifer Dulski",
+      "checks": [
+        {
+          "method": "browser_observed_text",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        },
+        {
+          "method": "browser_named_founder_cohort",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        }
+      ],
+      "contactPage": "captured",
+      "email": null,
+      "phone": null
+    },
+    {
+      "title": "Amir Kaplan",
+      "checks": [
+        {
+          "method": "browser_observed_text",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        },
+        {
+          "method": "browser_named_founder_cohort",
+          "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "status": "ok",
+          "missing": []
+        }
+      ],
+      "contactPage": "captured",
+      "email": null,
+      "phone": null
+    }
+  ],
+  "browser": {
+    "adapter": "playwright",
+    "status": "cancelled",
+    "pagesVisited": 25,
+    "currentUrl": "https://www.postal.com/"
+  },
+  "progressEvents": 80,
+  "streamedRows": [
+    "Garry Drummond",
+    "Jennifer Dulski",
+    "Amir Kaplan"
+  ],
+  "searches": [
+    {
+      "kind": "search",
+      "query": "\"founder\" saas",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "\"founder\" saas",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 6,
+      "reason": "raw_links=7 unrelated=1"
+    },
+    {
+      "kind": "search",
+      "query": "Thrust Carbon official website",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "Thrust Carbon official website",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "Thrust Carbon contact",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "Thrust Carbon contact",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "Accend official website",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "Accend official website",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 6,
+      "reason": "raw_links=10 unrelated=3"
+    },
+    {
+      "kind": "search",
+      "query": "Accend contact",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "Accend contact",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 4,
+      "reason": "raw_links=10 unrelated=6"
+    },
+    {
+      "kind": "search",
+      "query": "LOCH Technologies official website",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "LOCH Technologies official website",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "Rising Team official website",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "Rising Team official website",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 9,
+      "reason": "raw_links=10 unrelated=1"
+    },
+    {
+      "kind": "search",
+      "query": "Mimo official website",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "Mimo official website",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 8,
+      "reason": "raw_links=10 unrelated=1"
+    },
+    {
+      "kind": "search",
+      "query": "Mimo contact",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "Mimo contact",
+      "via": "browser",
+      "status": "skipped",
+      "results": 0,
+      "reason": "browser_serp_budget"
+    },
+    {
+      "kind": "search",
+      "query": "Revalgo official website",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "Revalgo official website",
+      "via": "browser",
+      "status": "skipped",
+      "results": 0,
+      "reason": "browser_serp_budget"
+    },
+    {
+      "kind": "search",
+      "query": "Revalgo contact",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "Revalgo contact",
+      "via": "browser",
+      "status": "skipped",
+      "results": 0,
+      "reason": "browser_serp_budget"
+    },
+    {
+      "kind": "search",
+      "query": "Postal official website",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "Postal official website",
+      "via": "browser",
+      "status": "skipped",
+      "results": 0,
+      "reason": "browser_serp_budget"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "pageType": "list",
+      "title": "Top 25 B2B SaaS Founder List",
+      "outcome": "read",
+      "textChars": 3155,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "Andrew Breen",
+        "Alex Circei",
+        "Mark Corbett",
+        "Pranjal Daga",
+        "Garry Drummond",
+        "Jennifer Dulski",
+        "Henrik Grim",
+        "Ajay Kamble",
+        "Amir Kaplan",
+        "Erik Kostelnik"
+      ],
+      "why": "",
+      "capture": "9a86eab11d1b.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://saasclub.io/",
+      "pageType": "unknown",
+      "title": "SaaS Club: How Founders Grow Profitable SaaS Businesses | SaaS Club",
+      "outcome": "read",
+      "textChars": 3226,
+      "structured": {
+        "jobs": 0,
+        "organization": "SaaS Club",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "entities rejected: ",
+      "capture": "57c6a6b5cbe3.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://www.outshine.com/",
+      "pageType": null,
+      "title": "Outshine | Digital Marketing & Analytics Experts For B2B SaaS",
+      "outcome": "http_read",
+      "textChars": 4186,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "entities rejected: ENTITY_TYPE_MISMATCH/kind_unsupported_by_quotes",
+      "capture": "02d86d4030d1.json"
+    },
+    {
+      "origin": "contact_or_company_page",
+      "url": "https://www.outshine.com/contact",
+      "pageType": null,
+      "title": "Contact",
+      "outcome": "http_read",
+      "textChars": 1485,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "1f906c2a1245.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://waydev.co/",
+      "pageType": null,
+      "title": "Productivity Insights: SPACE Framework, DX and DORA metrics - Waydev",
+      "outcome": "http_read",
+      "textChars": 7508,
+      "structured": {
+        "jobs": 0,
+        "organization": "Waydev",
+        "emails": 1,
+        "phones": 1
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error groq:openai/gpt-oss-20b 400 (bad_request): {\"error\":{\"message\":\"Failed to generate JSON. Please adjust your prompt. See 'failed_generation' for more details.\",\"; injected/not_called)",
+      "capture": "e754128598c9.json"
+    },
+    {
+      "origin": "contact_or_company_page",
+      "url": "https://waydev.co/contact/",
+      "pageType": null,
+      "title": "Contact - Waydev",
+      "outcome": "http_read",
+      "textChars": 7884,
+      "structured": {
+        "jobs": 0,
+        "organization": "Waydev",
+        "emails": 1,
+        "phones": 1
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error groq:openai/gpt-oss-20b 400 (bad_request): {\"error\":{\"message\":\"Failed to generate JSON. Please adjust your prompt. See 'failed_generation' for more details.\",\"; injected/not_called)",
+      "capture": "8b3e3fb491bf.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://thrustcarbon.com/",
+      "pageType": "unknown",
+      "title": "Reduce Business Travel Emissions & Cost - Thrust Carbon",
+      "outcome": "read",
+      "textChars": 9596,
+      "structured": {
+        "jobs": 0,
+        "organization": "Thrust Carbon",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called; deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "2b1ebc0b3d96.json"
+    },
+    {
+      "origin": "seed",
+      "url": "https://thrustcarbon.com/",
+      "pageType": "unknown",
+      "title": "Reduce Business Travel Emissions & Cost - Thrust Carbon",
+      "outcome": "read",
+      "textChars": 9596,
+      "structured": {
+        "jobs": 0,
+        "organization": "Thrust Carbon",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called; deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "2b1ebc0b3d96.json"
+    },
+    {
+      "origin": "contact_or_company_page",
+      "url": "https://thrustcarbon.com/contact",
+      "pageType": null,
+      "title": null,
+      "outcome": "navigation_failed",
+      "textChars": 0,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "navigation_failed: http_404",
+      "capture": null
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://prospeo.io/c/thrust-carbon",
+      "pageType": "unknown",
+      "title": "Thrust Carbon Overview, Address & Contact",
+      "outcome": "read",
+      "textChars": 4706,
+      "structured": {
+        "jobs": 0,
+        "organization": "Thrust Carbon",
+        "emails": 0,
+        "phones": 1
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "Mark Corbett",
+        "Kit Aspen"
+      ],
+      "why": "",
+      "capture": "7d8112311aae.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://www.withaccend.com/",
+      "pageType": null,
+      "title": "Accend",
+      "outcome": "http_read",
+      "textChars": 10658,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "0bce60e28cb4.json"
+    },
+    {
+      "origin": "contact_or_company_page",
+      "url": "https://www.withaccend.com/book-a-demo",
+      "pageType": null,
+      "title": "Book a Demo",
+      "outcome": "http_read",
+      "textChars": 7077,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "b368b672c77c.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.accend.earth/",
+      "pageType": "unknown",
+      "title": "Accend | Home",
+      "outcome": "read",
+      "textChars": 3220,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called; deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "816dc1c4d70f.json"
+    },
+    {
+      "origin": "seed",
+      "url": "https://www.accend.earth/",
+      "pageType": "unknown",
+      "title": "Accend | Home",
+      "outcome": "read",
+      "textChars": 3220,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called; deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "816dc1c4d70f.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://loch.io/",
+      "pageType": "unknown",
+      "title": "LOCH Technologies | Leaders in Wireless Airspace Defense",
+      "outcome": "read",
+      "textChars": 6242,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called; deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "16e754abb890.json"
+    },
+    {
+      "origin": "seed",
+      "url": "https://loch.io/",
+      "pageType": "unknown",
+      "title": "LOCH Technologies | Leaders in Wireless Airspace Defense",
+      "outcome": "read",
+      "textChars": 6242,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called; deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "16e754abb890.json"
+    },
+    {
+      "origin": "contact_or_company_page",
+      "url": "https://loch.io/company/contact",
+      "pageType": null,
+      "title": "Contact Us",
+      "outcome": "http_read",
+      "textChars": 1547,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 1,
+        "phones": 1
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "Garry Drummond"
+      ],
+      "why": "",
+      "capture": "97d3302dd358.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://risingteam.com/",
+      "pageType": "unknown",
+      "title": "Rising Team | AI Leadership Personal Trainer",
+      "outcome": "read",
+      "textChars": 7630,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called; deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "0ca873a619f3.json"
+    },
+    {
+      "origin": "seed",
+      "url": "https://risingteam.com/",
+      "pageType": "unknown",
+      "title": "Rising Team | AI Leadership Personal Trainer",
+      "outcome": "read",
+      "textChars": 7630,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called; deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "0ca873a619f3.json"
+    },
+    {
+      "origin": "contact_or_company_page",
+      "url": "https://risingteam.com/contact",
+      "pageType": null,
+      "title": "Contact Rising Team | Get in Touch Today",
+      "outcome": "http_read",
+      "textChars": 2486,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "9864b7265baa.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://mimohq.com/",
+      "pageType": null,
+      "title": "Accountants recurring work, running on AI",
+      "outcome": "http_read",
+      "textChars": 3676,
+      "structured": {
+        "jobs": 0,
+        "organization": "Mimo",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "c1f585a8cd9b.json"
+    },
+    {
+      "origin": "contact_or_company_page",
+      "url": "https://mimohq.com/contact",
+      "pageType": null,
+      "title": null,
+      "outcome": "navigation_failed",
+      "textChars": 0,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "navigation_failed: http_404",
+      "capture": null
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://mimo.org/",
+      "pageType": "job_posting",
+      "title": "Learn to Code in Python, JavaScript, HTML, CSS, & more | Mimo",
+      "outcome": "read",
+      "textChars": 18000,
+      "structured": {
+        "jobs": 0,
+        "organization": "Mimo",
+        "emails": 1,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called; deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "5737115a6f90.json"
+    },
+    {
+      "origin": "seed",
+      "url": "https://mimo.org/",
+      "pageType": "job_posting",
+      "title": "Learn to Code in Python, JavaScript, HTML, CSS, & more | Mimo",
+      "outcome": "read",
+      "textChars": 18000,
+      "structured": {
+        "jobs": 0,
+        "organization": "Mimo",
+        "emails": 1,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called; deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "5737115a6f90.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://revalgo.ai/",
+      "pageType": null,
+      "title": "The Autopilot for Wholesale Distribution | Revalgo",
+      "outcome": "http_read",
+      "textChars": 9613,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 1,
+        "phones": 1
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called; deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "e01de50e9888.json"
+    },
+    {
+      "origin": "contact_or_company_page",
+      "url": "https://revalgo.ai/contact",
+      "pageType": null,
+      "title": null,
+      "outcome": "navigation_failed",
+      "textChars": 0,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "navigation_failed: http_404",
+      "capture": null
+    },
+    {
+      "origin": "seed",
+      "url": "https://revalgo.ai/",
+      "pageType": "unknown",
+      "title": "The Autopilot for Wholesale Distribution | Revalgo",
+      "outcome": "read",
+      "textChars": 8540,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called; deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "e01de50e9888.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://ifeelonline.com/",
+      "pageType": null,
+      "title": null,
+      "outcome": "thin",
+      "textChars": 15,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "thin: http_read",
+      "capture": "9745e10ac4da.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://ifeelonline.com/",
+      "pageType": "unknown",
+      "title": "Enterprise Mental Health Solutions: Reduce Absenteeism and Drive Lasting Change with ifeel » ifeel - EN",
+      "outcome": "read",
+      "textChars": 4898,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "9745e10ac4da.json"
+    },
+    {
+      "origin": "contact_or_company_page",
+      "url": "https://ifeelonline.com/contact/",
+      "pageType": null,
+      "title": "ifeel - Contact",
+      "outcome": "http_read",
+      "textChars": 2464,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "d42eb9ff7fb8.json"
+    },
+    {
+      "origin": "source_link",
+      "url": "https://www.postal.com/",
+      "pageType": null,
+      "title": "Postal  |  The Leading Intelligent Gifting Platform",
+      "outcome": "http_read",
+      "textChars": 9517,
+      "structured": {
+        "jobs": 0,
+        "organization": "Postal",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "346a5058bab6.json"
+    },
+    {
+      "origin": "contact_or_company_page",
+      "url": "https://www.postal.com/contact",
+      "pageType": null,
+      "title": null,
+      "outcome": "navigation_failed",
+      "textChars": 0,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "navigation_failed: http_404",
+      "capture": null
+    },
+    {
+      "origin": "seed",
+      "url": "https://www.postal.com/",
+      "pageType": "unknown",
+      "title": "Postal | The Leading Intelligent Gifting Platform",
+      "outcome": "read",
+      "textChars": 8001,
+      "structured": {
+        "jobs": 0,
+        "organization": "Postal",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "346a5058bab6.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.capchase.com/top-25-b2b-saas-founder-list",
+        "https://saasclub.io/"
+      ],
+      "extractor": "deterministic",
+      "llm": "not_called",
+      "entities": 10
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.capchase.com/top-25-b2b-saas-founder-list",
+        "https://saasclub.io/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 10
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.outshine.com/"
+      ],
+      "extractor": "llm",
+      "llm": "ok",
+      "entities": 1
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.outshine.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 1
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.outshine.com/contact"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.outshine.com/contact"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://waydev.co/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "groq:openai/gpt-oss-20b 400 (bad_request): {\"error\":{\"message\":\"Failed to generate JSON. Please adjust your prompt. See 'failed_generation' for more details.\",\""
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://waydev.co/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://waydev.co/contact/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "groq:openai/gpt-oss-20b 400 (bad_request): {\"error\":{\"message\":\"Failed to generate JSON. Please adjust your prompt. See 'failed_generation' for more details.\",\""
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://waydev.co/contact/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://thrustcarbon.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://thrustcarbon.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://thrustcarbon.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://thrustcarbon.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://prospeo.io/c/thrust-carbon"
+      ],
+      "extractor": "llm",
+      "llm": "ok",
+      "entities": 3
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://prospeo.io/c/thrust-carbon"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 3
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.withaccend.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.withaccend.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.withaccend.com/book-a-demo"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.withaccend.com/book-a-demo"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.accend.earth/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.accend.earth/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.accend.earth/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.accend.earth/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://loch.io/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://loch.io/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://loch.io/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://loch.io/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://loch.io/company/contact"
+      ],
+      "extractor": "llm",
+      "llm": "ok",
+      "entities": 1
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://loch.io/company/contact"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 1
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://risingteam.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://risingteam.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://risingteam.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://risingteam.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://risingteam.com/contact"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://risingteam.com/contact"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://mimohq.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://mimohq.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://mimo.org/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://mimo.org/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://mimo.org/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://mimo.org/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://revalgo.ai/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://revalgo.ai/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://revalgo.ai/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://revalgo.ai/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://ifeelonline.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://ifeelonline.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://ifeelonline.com/contact/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://ifeelonline.com/contact/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.postal.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.postal.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    }
+  ],
+  "entityOutcomes": [
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Andrew Breen",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Alex Circei",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Mark Corbett",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Pranjal Daga",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Garry Drummond",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Jennifer Dulski",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Henrik Grim",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Ajay Kamble",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Amir Kaplan",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+      "name": "Erik Kostelnik",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://www.outshine.com/",
+      "name": "Colin White",
+      "kind": "person",
+      "outcome": "rejected",
+      "reason": "ENTITY_TYPE_MISMATCH",
+      "detail": "kind_unsupported_by_quotes",
+      "dropped": [
+        "industry:quote_not_on_page",
+        "category:value_not_in_quote",
+        "location:quote_not_on_page",
+        "country:quote_not_on_page"
+      ]
+    },
+    {
+      "page": "https://prospeo.io/c/thrust-carbon",
+      "name": "Mark Corbett",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://prospeo.io/c/thrust-carbon",
+      "name": "Kit Aspen",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    },
+    {
+      "page": "https://prospeo.io/c/thrust-carbon",
+      "name": "Thrust Carbon",
+      "kind": "company",
+      "outcome": "rejected",
+      "reason": "ENTITY_TYPE_MISMATCH",
+      "detail": "kind_unsupported_by_quotes",
+      "dropped": [
+        "industry:not_subject_bound",
+        "category:not_subject_bound",
+        "phone:not_subject_bound"
+      ]
+    },
+    {
+      "page": "https://loch.io/company/contact",
+      "name": "Garry Drummond",
+      "kind": "person",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    }
+  ],
+  "remember": [
+    {
+      "kind": "remember",
+      "name": "Andrew Breen",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Alex Circei",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Mark Corbett",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Pranjal Daga",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Garry Drummond",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Jennifer Dulski",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Henrik Grim",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Ajay Kamble",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Amir Kaplan",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Erik Kostelnik",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Mark Corbett",
+      "rowKind": "person",
+      "outcome": "TARGET_MISMATCH",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Kit Aspen",
+      "rowKind": "person",
+      "outcome": "TARGET_MISMATCH",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Garry Drummond",
+      "rowKind": "person",
+      "outcome": "TARGET_MISMATCH",
+      "resolved": true
+    }
+  ],
+  "candidates": [
+    {
+      "kind": "candidate",
+      "name": "Andrew Breen",
+      "status": "verified",
+      "rejectCode": null,
+      "label": null,
+      "needs": [],
+      "visited": 2,
+      "queries": 0
+    },
+    {
+      "kind": "candidate",
+      "name": "Alex Circei",
+      "status": "verified",
+      "rejectCode": null,
+      "label": null,
+      "needs": [],
+      "visited": 2,
+      "queries": 0
+    },
+    {
+      "kind": "candidate",
+      "name": "Mark Corbett",
+      "status": "exhausted",
+      "rejectCode": "MISSING_QUERY_REQUIRED",
+      "label": "MISSING_QUERY_REQUIRED — missing query-required: contact",
+      "needs": [
+        "contact"
+      ],
+      "visited": 4,
+      "queries": 2
+    },
+    {
+      "kind": "candidate",
+      "name": "Pranjal Daga",
+      "status": "exhausted",
+      "rejectCode": "MISSING_QUERY_REQUIRED",
+      "label": "MISSING_QUERY_REQUIRED — missing query-required: contact",
+      "needs": [
+        "contact"
+      ],
+      "visited": 4,
+      "queries": 2
+    },
+    {
+      "kind": "candidate",
+      "name": "Garry Drummond",
+      "status": "verified",
+      "rejectCode": null,
+      "label": null,
+      "needs": [],
+      "visited": 3,
+      "queries": 1
+    },
+    {
+      "kind": "candidate",
+      "name": "Jennifer Dulski",
+      "status": "verified",
+      "rejectCode": null,
+      "label": null,
+      "needs": [],
+      "visited": 3,
+      "queries": 1
+    },
+    {
+      "kind": "candidate",
+      "name": "Henrik Grim",
+      "status": "exhausted",
+      "rejectCode": "MISSING_QUERY_REQUIRED",
+      "label": "MISSING_QUERY_REQUIRED — missing query-required: contact",
+      "needs": [
+        "contact"
+      ],
+      "visited": 4,
+      "queries": 2
+    },
+    {
+      "kind": "candidate",
+      "name": "Ajay Kamble",
+      "status": "exhausted",
+      "rejectCode": "MISSING_QUERY_REQUIRED",
+      "label": "MISSING_QUERY_REQUIRED — missing query-required: contact",
+      "needs": [
+        "contact"
+      ],
+      "visited": 3,
+      "queries": 2
+    },
+    {
+      "kind": "candidate",
+      "name": "Amir Kaplan",
+      "status": "verified",
+      "rejectCode": null,
+      "label": null,
+      "needs": [],
+      "visited": 2,
+      "queries": 0
+    }
+  ],
+  "done": [
+    {
+      "kind": "done",
+      "status": "timeout",
+      "candidates": 10,
+      "verified": 5,
+      "visited": 32,
+      "queries": 12,
+      "stoppingReason": "BROWSER_DISCOVERY_TIMEOUT",
+      "elapsedMs": 90001
+    }
+  ],
+  "persistenceSkipped": [
+    "ai_cache",
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "person",
+    "criteria": [
+      "role=founder",
+      "industry=saas",
+      "require_contact=true",
+      "required_field=contact"
+    ],
+    "clarify": [],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_people(country,city_norm,role_norm)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "live-browser",
+          "partitions": [
+            "live-gapfill(10)"
+          ],
+          "scanned": 10,
+          "matched": 10
+        }
+      ],
+      "rawCandidates": 10,
+      "postSpecFilter": 10,
+      "timings": {
+        "understanding_ms": 1676,
+        "stored_search_ms": 4920,
+        "research_ms": 90247,
+        "enrichment_ms": 21371,
+        "qualification_ms": 20,
+        "total_ms": 118234
+      },
+      "researchable": 10,
+      "researched": 10,
+      "complete": 10,
+      "pendingEnrichment": 0,
+      "qualificationRejected": 5,
+      "qualified": 5,
+      "returned": 5,
+      "reason": "RESULTS"
+    },
+    "rowsReturned": 5,
+    "rows": [
+      {
+        "title": "Andrew Breen",
+        "kind": "person",
+        "role": "Founder & CEO",
+        "company": "Outshine",
+        "location": null,
+        "website_url": "https://www.outshine.com",
+        "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+        "disposition": "qualified",
+        "why": "Identity · Andrew Breen\nFounder & CEO\nOutshine",
+        "email": null,
+        "phone": null,
+        "contact_page_url": "https://www.outshine.com/contact",
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "browser_observed_text",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Andrew Breen\nFounder & CEO\nOutshine"
+          },
+          {
+            "type": "identity",
+            "method": "browser_named_founder_cohort",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Top 25 B2B SaaS Founder List of 2024: Andrew Breen\nFounder & CEO\nOutshine"
+          }
+        ],
+        "provenance": {
+          "role": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "company": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "industry": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "contact_page_url": "browser_observed_text@https://www.outshine.com/contact"
+        }
+      },
+      {
+        "title": "Alex Circei",
+        "kind": "person",
+        "role": "CEO & Co-Founder",
+        "company": "Waydev",
+        "location": null,
+        "website_url": "https://waydev.co",
+        "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+        "disposition": "qualified",
+        "why": "Identity · Alex Circei\nCEO & Co-Founder\nWaydev",
+        "email": null,
+        "phone": null,
+        "contact_page_url": "https://waydev.co/contact/",
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "browser_observed_text",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Alex Circei\nCEO & Co-Founder\nWaydev"
+          },
+          {
+            "type": "identity",
+            "method": "browser_named_founder_cohort",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Top 25 B2B SaaS Founder List of 2024: Alex Circei\nCEO & Co-Founder\nWaydev"
+          }
+        ],
+        "provenance": {
+          "role": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "company": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "industry": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "contact_page_url": "browser_observed_text@https://waydev.co/contact/"
+        }
+      },
+      {
+        "title": "Garry Drummond",
+        "kind": "person",
+        "role": "CEO & Founder",
+        "company": "LOCH Technologies",
+        "location": null,
+        "website_url": "https://loch.io",
+        "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+        "disposition": "qualified",
+        "why": "Identity · Garry Drummond\nCEO & Founder\nLOCH Technologies",
+        "email": null,
+        "phone": null,
+        "contact_page_url": "https://loch.io/company/contact",
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "browser_observed_text",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Garry Drummond\nCEO & Founder\nLOCH Technologies"
+          },
+          {
+            "type": "identity",
+            "method": "browser_named_founder_cohort",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Top 25 B2B SaaS Founder List of 2024: Garry Drummond\nCEO & Founder\nLOCH Technologies"
+          }
+        ],
+        "provenance": {
+          "role": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "company": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "industry": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "website_url": "browser_observed_text@https://loch.io/",
+          "contact_page_url": "browser_observed_text@https://loch.io/company/contact"
+        }
+      },
+      {
+        "title": "Jennifer Dulski",
+        "kind": "person",
+        "role": "CEO & Founder",
+        "company": "Rising Team",
+        "location": null,
+        "website_url": "https://risingteam.com",
+        "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+        "disposition": "qualified",
+        "why": "Identity · Jennifer Dulski\nCEO & Founder\nRising Team",
+        "email": null,
+        "phone": null,
+        "contact_page_url": "https://risingteam.com/contact",
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "browser_observed_text",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Jennifer Dulski\nCEO & Founder\nRising Team"
+          },
+          {
+            "type": "identity",
+            "method": "browser_named_founder_cohort",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Top 25 B2B SaaS Founder List of 2024: Jennifer Dulski\nCEO & Founder\nRising Team"
+          }
+        ],
+        "provenance": {
+          "role": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "company": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "industry": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "website_url": "browser_observed_text@https://risingteam.com/",
+          "contact_page_url": "browser_observed_text@https://risingteam.com/contact"
+        }
+      },
+      {
+        "title": "Amir Kaplan",
+        "kind": "person",
+        "role": "Co-Founder & CEO",
+        "company": "ifeel",
+        "location": null,
+        "website_url": "https://ifeelonline.com",
+        "source_url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+        "disposition": "qualified",
+        "why": "Identity · Amir Kaplan\nCo-Founder & CEO\nifeel",
+        "email": null,
+        "phone": null,
+        "contact_page_url": "https://ifeelonline.com/contact/",
+        "profile_url": null,
+        "evidence": [
+          {
+            "type": "identity",
+            "method": "browser_observed_text",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Amir Kaplan\nCo-Founder & CEO\nifeel"
+          },
+          {
+            "type": "identity",
+            "method": "browser_named_founder_cohort",
+            "url": "https://www.capchase.com/top-25-b2b-saas-founder-list",
+            "excerpt": "Top 25 B2B SaaS Founder List of 2024: Amir Kaplan\nCo-Founder & CEO\nifeel"
+          }
+        ],
+        "provenance": {
+          "role": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "company": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "industry": "browser_observed_text@https://www.capchase.com/top-25-b2b-saas-founder-list",
+          "contact_page_url": "browser_observed_text@https://ifeelonline.com/contact/"
+        }
+      }
+    ],
+    "diagnostics": [
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "direct-http",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "searxng",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      }
+    ]
+  }
+}

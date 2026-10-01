@@ -1,0 +1,433 @@
+{
+  "runId": "trace-custom-product-1790792515366",
+  "query": "need some founders round vinlius tryna bring on localistaion manager ppl rn",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 54207,
+  "error": null,
+  "audit": [],
+  "browser": {
+    "adapter": "worker",
+    "status": "completed",
+    "pagesVisited": 10,
+    "currentUrl": "https://www.rockitvilnius.com/event-details/co-founders-wanted",
+    "retained": true,
+    "controller": "agent",
+    "sessionId": "4ad14ab1-ebe7-472b-8549-6e76f616ae68",
+    "frame": true
+  },
+  "runtime": [
+    {
+      "kind": "runtime",
+      "requested": "worker",
+      "used": "worker"
+    }
+  ],
+  "progressEvents": 43,
+  "streamedRows": [],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [
+    {
+      "kind": "search",
+      "query": "Einpix Vilnius official website",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "Einpix Vilnius official website",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "\"founder\" Vilnius",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "\"founder\" Vilnius",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 6,
+      "reason": "raw_links=9 unrelated=3"
+    },
+    {
+      "kind": "search",
+      "query": "\"co-founder\" Vilnius",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "\"co-founder\" Vilnius",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 6,
+      "reason": "raw_links=7 unrelated=1"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "candidate_research",
+      "url": "https://einpix.com/lt/",
+      "pageType": "unknown",
+      "title": "Lauko paslaugų valdymo programa servisui, techninei priežiūrai ir statybai | Einpix",
+      "outcome": "read",
+      "textChars": 9905,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1040s; injected/not_called; deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1030s; injected/not_called)",
+      "capture": "00a01329bc6e.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://einpix.com/lt/",
+      "pageType": "unknown",
+      "title": "Lauko paslaugų valdymo programa servisui, techninei priežiūrai ir statybai | Einpix",
+      "outcome": "read",
+      "textChars": 9905,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1040s; injected/not_called; deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1030s; injected/not_called)",
+      "capture": "00a01329bc6e.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://vilniusfounders.lt/",
+      "pageType": "unknown",
+      "title": "Vilnius Founders — Fundraising Help, Founder Events, and Startup Media",
+      "outcome": "read",
+      "textChars": 2341,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1015s; injected/not_called)",
+      "capture": "be423af58324.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://lt.linkedin.com/company/vilnius-founders",
+      "pageType": "job_posting",
+      "title": "Vilnius Founders | LinkedIn",
+      "outcome": "read",
+      "textChars": 18000,
+      "structured": {
+        "jobs": 0,
+        "organization": "Vilnius Founders",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1015s; injected/not_called)",
+      "capture": "7bf44e3353d7.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://foundersbase.com/find-cofounders/vilnius",
+      "pageType": "unknown",
+      "title": "Find a Co-Founder in Vilnius | Foundersbase",
+      "outcome": "read",
+      "textChars": 4205,
+      "structured": {
+        "jobs": 0,
+        "organization": "Foundersbase",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1008s; injected/not_called)",
+      "capture": "6e2185e90ff9.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.rockitvilnius.com/event-details/co-founders-wanted",
+      "pageType": "unknown",
+      "title": "Co-Founders Wanted! | Rockit",
+      "outcome": "read",
+      "textChars": 1423,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1008s; injected/not_called)",
+      "capture": "44b9d2f959d3.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://einpix.com/lt/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1040s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://einpix.com/lt/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://einpix.com/lt/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1030s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://einpix.com/lt/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://vilniusfounders.lt/",
+        "https://lt.linkedin.com/company/vilnius-founders"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1015s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://vilniusfounders.lt/",
+        "https://lt.linkedin.com/company/vilnius-founders"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://foundersbase.com/find-cofounders/vilnius",
+        "https://www.rockitvilnius.com/event-details/co-founders-wanted"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1008s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://foundersbase.com/find-cofounders/vilnius",
+        "https://www.rockitvilnius.com/event-details/co-founders-wanted"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    }
+  ],
+  "entityOutcomes": [],
+  "remember": [
+    {
+      "kind": "remember",
+      "name": "Darius Verseckas — Chief Marketing Officer, Co-founder @ HeavyFinance",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Arturas Baikstys — CEO & Co-Founder @ Einpix",
+      "rowKind": "person",
+      "outcome": "accepted",
+      "resolved": true
+    }
+  ],
+  "candidates": [
+    {
+      "kind": "candidate",
+      "name": "Darius Verseckas — Chief Marketing Officer, Co-founder @ HeavyFinance",
+      "status": "exhausted",
+      "rejectCode": "CLAIM_TYPE_MISMATCH",
+      "label": "CLAIM_TYPE_MISMATCH — claim_type identity not in [hiring, social_ask]",
+      "needs": [],
+      "visited": 0,
+      "queries": 0
+    },
+    {
+      "kind": "candidate",
+      "name": "Arturas Baikstys — CEO & Co-Founder @ Einpix",
+      "status": "exhausted",
+      "rejectCode": "CLAIM_TYPE_MISMATCH",
+      "label": "CLAIM_TYPE_MISMATCH — claim_type identity not in [hiring, social_ask]",
+      "needs": [],
+      "visited": 2,
+      "queries": 1
+    }
+  ],
+  "done": [
+    {
+      "kind": "done",
+      "status": "completed",
+      "candidates": 2,
+      "verified": 0,
+      "visited": 6,
+      "queries": 3,
+      "stoppingReason": "diminishing_returns",
+      "elapsedMs": 43985
+    }
+  ],
+  "persistenceSkipped": [
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "NO_QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "person",
+    "criteria": [
+      "role=founder",
+      "location=Vilnius",
+      "location_id=geo:city:vilnius",
+      "location_kind=city",
+      "location_country=LT",
+      "location_parents=geo:country:lt",
+      "requested_role=localistaion manager people"
+    ],
+    "clarify": [
+      "entity_industry"
+    ],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_people(country,city_norm,role_norm)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "s3-parquet",
+          "partitions": [
+            "processed/people_by_country/_part=lithuania/data_0.parquet",
+            "processed/people_by_country/_part=lithuania/data_1.parquet"
+          ],
+          "scanned": 266,
+          "matched": 6
+        },
+        {
+          "source": "live-browser",
+          "partitions": [
+            "live-gapfill(2)"
+          ],
+          "scanned": 2,
+          "matched": 2
+        }
+      ],
+      "rawCandidates": 8,
+      "postSpecFilter": 8,
+      "timings": {
+        "understanding_ms": 3938,
+        "stored_search_ms": 1953,
+        "research_ms": 45976,
+        "enrichment_ms": 3,
+        "qualification_ms": 435,
+        "total_ms": 52305
+      },
+      "researchable": 2,
+      "complete": 2,
+      "pendingEnrichment": 0,
+      "qualificationRejected": 2,
+      "qualified": 0,
+      "returned": 0,
+      "reason": "FAILED_QUALIFICATION",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "direct-http",
+            "label": "Public websites",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "searxng",
+            "label": "The web",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "browser-live",
+            "label": "Public websites",
+            "state": "healthy",
+            "reason": "OK"
+          }
+        ],
+        "degraded": true,
+        "summary": null
+      }
+    },
+    "rowsReturned": 0,
+    "rows": [],
+    "diagnostics": [
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "direct-http",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "searxng",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      }
+    ],
+    "cancelledAtMs": null,
+    "returnedAtMs": 54205,
+    "candidateLedger": {
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 2,
+        "gated": 0,
+        "filtered": 0,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {
+        "CLAIM_TYPE_MISMATCH": 2
+      },
+      "streamed": 0,
+      "streamedNotReturned": []
+    }
+  }
+}

@@ -645,6 +645,143 @@ function statedEntity(raw: string, scope: GeoEntity["scope"] = null): GeoEntity 
   };
 }
 
+// ── World gazetteer (server-injected) ───────────────────────────────────────
+// This module stays pure and client-safe: the GeoNames city list is loaded on
+// the server (gazetteer.server.ts) and registered here. Only callers that opt
+// in (query understanding) consult it; row qualification keeps the structural
+// overlay so candidate geography is judged exactly as before.
+export type GazetteerCity = { name: string; iso2: string };
+export interface CityGazetteer {
+  /** Every city with this exact name (canonical or long alias), most populous first. */
+  lookup(name: string): GazetteerCity[];
+  /** Closest city within one edit of a name that is NOT itself a city, or null. */
+  fuzzy(name: string): GazetteerCity | null;
+}
+let gazetteer: CityGazetteer | null = null;
+export function registerCityGazetteer(next: CityGazetteer | null): void {
+  gazetteer = next;
+}
+export function cityGazetteerRegistered(): boolean {
+  return gazetteer !== null;
+}
+/** Is this exactly the name of a city the registered world gazetteer knows? */
+export function knownCityName(name: string): boolean {
+  return !!gazetteer && gazetteer.lookup(name).length > 0;
+}
+export type ResolveLocationOptions = {
+  /** Consult the registered world gazetteer (query understanding only). */
+  gazetteer?: boolean;
+  /** Also repair a misspelled city against the gazetteer. */
+  correctTypos?: boolean;
+  /** ISO2 already established for this place (e.g. by typo repair); confirms a bare city name. */
+  countryHint?: string | null;
+};
+
+/**
+ * First-level regions, used ONLY to qualify a city ("Camrose, Alberta",
+ * "Austin TX"). Structural data like the country table; a region name alone
+ * never resolves to a location through this table.
+ */
+const ADMIN_REGION_ISO: Record<string, string> = Object.fromEntries([
+  ...["alberta", "british columbia", "manitoba", "new brunswick", "newfoundland and labrador", "newfoundland", "nova scotia", "ontario",
+    "prince edward island", "quebec", "saskatchewan", "northwest territories", "nunavut", "yukon"].map((name) => [name, "CA"]),
+  ...["alabama", "alaska", "arizona", "arkansas", "california", "colorado", "connecticut", "delaware", "florida", "georgia", "hawaii", "idaho",
+    "illinois", "indiana", "iowa", "kansas", "kentucky", "louisiana", "maine", "maryland", "massachusetts", "michigan", "minnesota",
+    "mississippi", "missouri", "montana", "nebraska", "nevada", "new hampshire", "new jersey", "new mexico", "new york state", "north carolina",
+    "north dakota", "ohio", "oklahoma", "oregon", "pennsylvania", "rhode island", "south carolina", "south dakota", "tennessee", "texas", "utah",
+    "vermont", "virginia", "washington state", "west virginia", "wisconsin", "wyoming"].map((name) => [name, "US"]),
+  ...["new south wales", "victoria", "queensland", "western australia", "south australia", "tasmania"].map((name) => [name, "AU"]),
+  ...["england", "scotland", "wales", "northern ireland"].map((name) => [name, "GB"]),
+]);
+/** Postal abbreviations: only after a comma ("Portland, OR"), never in a bare split. */
+const ADMIN_ABBR_ISO: Record<string, string> = Object.fromEntries([
+  ...["ab", "bc", "mb", "nb", "nl", "ns", "on", "pe", "qc", "sk", "nt", "nu", "yt"].map((code) => [code, "CA"]),
+  ...["al", "ak", "az", "ar", "ca", "co", "ct", "de", "fl", "ga", "hi", "id", "il", "in", "ia", "ks", "ky", "la", "me", "ma", "md", "mi", "mn", "ms", "mo",
+    "mt", "ne", "nv", "nh", "nj", "nm", "ny", "nc", "nd", "oh", "ok", "or", "pa", "ri", "sc", "sd", "tn", "tx", "ut", "vt", "va", "wa", "wv", "wi", "wy", "dc"].map((code) => [code, "US"]),
+  // WA/SA/NT are ambiguous with US/CA codes and are left out.
+  ...["nsw", "vic", "qld", "tas", "act"].map((code) => [code, "AU"]),
+]);
+
+/** Country or region qualifier ("Estonia", "UK", "Alberta") → its ISO2 / hierarchy node. */
+function qualifierOf(value: string, allowAbbreviation = true): { iso: string | null; hier: HierarchyDef | null } | null {
+  const key = norm(value);
+  if (!key) return null;
+  const hier = HIERARCHY_ALIAS.get(key) ?? null;
+  // Countries, then full region names, then (after a comma only) postal codes.
+  const iso = countryIsoOf(key) ?? (GEO_ALIAS[key] ? countryIsoOf(GEO_ALIAS[key]) : null) ?? ADMIN_REGION_ISO[key] ??
+    (allowAbbreviation && key.length <= 3 ? ADMIN_ABBR_ISO[key] ?? null : null);
+  return iso || hier ? { iso: iso ?? null, hier } : null;
+}
+
+/** Apply a qualifier to a city; null when the qualifier contradicts it ("Paris, Texas"). */
+function qualifyCity(ent: GeoEntity, qualifier: string | null): GeoEntity | null {
+  if (!qualifier) return ent;
+  const q = qualifierOf(qualifier);
+  if (!q) return ent;
+  const iso = q.iso ?? q.hier?.country_code ?? null;
+  if (iso && ent.country_code && ent.country_code !== iso) return null;
+  const parents = [
+    ...(q.hier ? [q.hier.id, ...q.hier.parent_ids] : []),
+    ...ent.parent_ids,
+    ...(iso ? [countryId(iso)] : []),
+  ];
+  return { ...ent, country_code: ent.country_code ?? iso, parent_ids: [...new Set(parents)] };
+}
+
+function gazetteerCityEntity(city: GazetteerCity, scope: GeoEntity["scope"], fuzzy: boolean): GeoEntity {
+  const base = cityEntity(city.name, scope);
+  const country = base.country_code ?? (city.iso2 ? city.iso2.toUpperCase() : null);
+  return {
+    ...base,
+    country_code: country,
+    parent_ids: [...new Set([...base.parent_ids, ...(country ? [countryId(country)] : [])])],
+    confidence: fuzzy ? 0.8 : 0.9,
+    resolution: fuzzy ? "provisional" : "resolved",
+  };
+}
+
+/** (city, qualifier) readings: "City, Region" as typed, else "City Region" with a lost comma. */
+function cityReadings(primary: string, qualifier: string | null): Array<{ city: string; qualifier: string | null }> {
+  const readings: Array<{ city: string; qualifier: string | null }> = [{ city: primary, qualifier }];
+  if (!qualifier) {
+    const words = primary.split(/\s+/).filter(Boolean);
+    for (let k = words.length - 1; k >= 1; k--) {
+      const tail = words.slice(k).join(" ");
+      if (qualifierOf(tail, false)) readings.push({ city: words.slice(0, k).join(" "), qualifier: tail });
+    }
+  }
+  return readings;
+}
+
+/**
+ * Gazetteer resolution, two narrow modes:
+ * - qualified: "Tallinn, Estonia", "Camrose Alberta", "Waterford, Ireland" —
+ *   the qualifier picks the same-named city in ITS country. A bare name is
+ *   never resolved here: "Bali" or "Cornwall" alone would be a town in the
+ *   wrong country, so an unqualified real name keeps its literal reading.
+ * - typo: a name that is no city at all, one edit from one ("lipzig").
+ * A contradicting qualifier keeps the literal place instead of inventing one.
+ */
+function resolveViaGazetteer(core: string, primary: string, qualifier: string | null, scope: GeoEntity["scope"], mode: "qualified" | "typo", countryHint?: string | null): GeoEntity | null {
+  if (!gazetteer) return null;
+  for (const reading of cityReadings(primary, qualifier)) {
+    if (mode === "qualified") {
+      // A typed qualifier decides; otherwise an upstream-established country
+      // (a repaired typo, a validated frame) may confirm a bare name.
+      const q = reading.qualifier ? qualifierOf(reading.qualifier) : null;
+      const iso = reading.qualifier ? q?.iso ?? q?.hier?.country_code ?? null : countryHint?.toUpperCase() ?? null;
+      if (!iso) continue;
+      const city = gazetteer.lookup(reading.city).find((item) => item.iso2 === iso);
+      if (city) return qualifyCity(gazetteerCityEntity(city, scope, false), reading.qualifier) ?? statedEntity(core, scope);
+      continue;
+    }
+    if (gazetteer.lookup(reading.city).length) return null; // a real name is not a typo
+    const city = gazetteer.fuzzy(reading.city);
+    if (city) return qualifyCity(gazetteerCityEntity(city, scope, true), reading.qualifier) ?? statedEntity(core, scope);
+  }
+  return null;
+}
+
 function parseScopePrefix(raw: string): {
   core: string;
   scope: GeoEntity["scope"];
@@ -667,7 +804,7 @@ function parseScopePrefix(raw: string): {
  * Resolve free-text location intent into a GeoEntity.
  * Prefer hierarchy → alias city → country → provisional stated.
  */
-export function resolveCanonicalLocation(raw: string): GeoEntity | null {
+export function resolveCanonicalLocation(raw: string, options: ResolveLocationOptions = {}): GeoEntity | null {
   const input = (raw ?? "").trim();
   if (!input) return null;
 
@@ -769,12 +906,23 @@ export function resolveCanonicalLocation(raw: string): GeoEntity | null {
     return ent;
   }
 
+  // A real city confirmed by its region beats a fuzzy guess from the overlay.
+  if (options.gazetteer) {
+    const qualified = resolveViaGazetteer(core, primary, qualifier, scope, "qualified", options.countryHint);
+    if (qualified) return qualified;
+  }
+
   if (tok.kind === "fuzzy" && tok.canonical) {
     return {
       ...cityEntity(tok.canonical, scope),
       confidence: tok.confidence,
       resolution: "provisional",
     };
+  }
+
+  if (options.gazetteer && options.correctTypos) {
+    const repaired = resolveViaGazetteer(core, primary, qualifier, scope, "typo");
+    if (repaired && repaired.kind === "city") return repaired;
   }
 
   const asCountry = COUNTRY_NAME_ISO[norm(primary)];

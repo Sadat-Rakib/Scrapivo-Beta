@@ -384,6 +384,10 @@ export async function persistVerifiedLiveRows(rows: SpecRow[]): Promise<PersistR
     keys: [],
   };
   if (!candidates.length) return result;
+  const { skipPersistence } = await import("@/lib/persistence-policy.server");
+  if (skipPersistence("canonical_live_rows")) {
+    return { ...result, attempted: 0, skipped: rows.length };
+  }
 
   const url = process.env.DATABASE_URL?.trim();
   try {

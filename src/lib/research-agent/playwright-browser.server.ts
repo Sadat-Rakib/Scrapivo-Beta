@@ -11,16 +11,18 @@
  * One search run owns one session/context. No anti-bot evasion: blocked or
  * challenged pages surface as friction and the caller moves on.
  */
-import type {
-  AgentBrowser,
-  BrowserObservation,
-  BrowserSession,
-  ExtractionSchema,
-  ExtractionResult,
-  PageSnapshot,
-  WaitCondition,
+import {
+  EXTRACT_ALL_SEPARATOR,
+  type AgentBrowser,
+  type BrowserObservation,
+  type BrowserSession,
+  type ExtractionSchema,
+  type ExtractionResult,
+  type PageSnapshot,
+  type WaitCondition,
 } from "./browser";
 import { scrapySessionAction, scrapySessionFinished, scrapySessionScreenshot, scrapySessionStarted } from "@/lib/search/scrapy-browser.server";
+import { frictionOf } from "./page-friction";
 import { throwIfAborted } from "@/lib/search/search-run";
 
 const TEXT_SLICE = 18_000;
@@ -48,16 +50,6 @@ async function getBrowser(headless: boolean): Promise<import("playwright-core").
       });
   }
   return browserPromise;
-}
-
-function frictionOf(title: string, text: string): PageSnapshot["friction"] {
-  const head = `${title} ${text.slice(0, 600)}`.toLowerCase();
-  const friction: PageSnapshot["friction"] = [];
-  if (/verify you are human|captcha|are you a robot/.test(head)) friction.push("CAPTCHA");
-  if (/sign in to continue|log in to continue|please log in|create an account to/.test(head)) friction.push("LOGIN_WALL");
-  if (/access denied|forbidden|you have been blocked/.test(head)) friction.push("ACCESS_BLOCK");
-  if (/too many requests|rate limit/.test(head)) friction.push("RATE_LIMIT");
-  return friction;
 }
 
 export class PlaywrightBrowserAdapter implements AgentBrowser {
@@ -197,6 +189,22 @@ export class PlaywrightBrowserAdapter implements AgentBrowser {
     return this.navigate(session, url);
   }
 
+  /**
+   * Organic result links only (e.g. `#b_results .b_algo h2 a`). Refs use the
+   * same `l<index>` numbering as snapshots, so `click(ref)` works on them.
+   */
+  async extractLinks(session: BrowserSession, selector: string, timeoutMs = 5000): Promise<PageSnapshot["links"]> {
+    this.check();
+    const page = this.page(session);
+    await page.waitForSelector(selector, { timeout: Math.max(0, Math.min(timeoutMs, 8_000)) }).catch(() => undefined);
+    return page.$$eval("a[href]", (anchors, sel) => anchors
+      .map((anchor, index) => ({ anchor: anchor as HTMLAnchorElement, index }))
+      .filter(({ anchor }) => { try { return anchor.matches(sel); } catch { return false; } })
+      .slice(0, 15)
+      .map(({ anchor, index }) => ({ ref: `l${index}`, name: (anchor.textContent ?? "").replace(/\s+/g, " ").trim().slice(0, 300), url: anchor.href }))
+      .filter((link) => /^https?:\/\//.test(link.url)), selector).catch(() => [] as PageSnapshot["links"]);
+  }
+
   async observe(session: BrowserSession): Promise<PageSnapshot> {
     return (await this.buildSnapshot(session, "Observing")).snapshot;
   }
@@ -265,6 +273,14 @@ export class PlaywrightBrowserAdapter implements AgentBrowser {
     const errors: string[] = [];
     for (const [name, field] of Object.entries(schema.fields)) {
       try {
+        const cap = Math.max(1, Math.min(field.maxChars ?? TEXT_SLICE, 500_000));
+        if (field.all && !field.attribute) {
+          // Every match (e.g. all JSON-LD blocks), joined by the separator.
+          const texts = await page.locator(field.selector).allTextContents().catch(() => [] as string[]);
+          const joined = texts.map((text) => text.trim()).filter(Boolean).join(EXTRACT_ALL_SEPARATOR);
+          values[name] = joined ? joined.slice(0, cap) : null;
+          continue;
+        }
         const locator = page.locator(field.selector).first();
         // innerText for visible text; script tags need textContent.
         let value = (await locator.innerText({ timeout: 4_000 }).catch(() => "")) ?? "";
@@ -272,7 +288,7 @@ export class PlaywrightBrowserAdapter implements AgentBrowser {
         if (field.attribute) {
           value = (await locator.getAttribute(field.attribute, { timeout: 2_000 })) ?? "";
         }
-        values[name] = value ? value.slice(0, TEXT_SLICE) : null;
+        values[name] = value ? value.slice(0, cap) : null;
       } catch (e) {
         errors.push(`${name}: ${e instanceof Error ? e.message : String(e)}`);
         values[name] = null;

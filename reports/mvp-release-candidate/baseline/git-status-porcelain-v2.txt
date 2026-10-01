@@ -1,0 +1,65 @@
+﻿1 .M N... 100644 100644 100644 9b675707e32acaf74569855662d96fa3d92dc3da 9b675707e32acaf74569855662d96fa3d92dc3da .kiro/specs/freehire-job-integration/tasks.md
+1 .M S.MU 160000 160000 160000 59718b25cb4834c4ced8e661c0bcbaf3ee2706f5 59718b25cb4834c4ced8e661c0bcbaf3ee2706f5 freehire
+1 .M N... 100644 100644 100644 b09fe5f443c5c36b9709eda816d685ab68ed4b30 b09fe5f443c5c36b9709eda816d685ab68ed4b30 src/components/discover/clarify-panel.tsx
+1 .M N... 100644 100644 100644 d2cff5f2fbb20fd7d04302ff3e986008b1a07cf4 d2cff5f2fbb20fd7d04302ff3e986008b1a07cf4 src/components/discover/discover-welcome-hero.tsx
+1 .M N... 100644 100644 100644 766d80a83af53f3575f2181dabdedfbf41466261 766d80a83af53f3575f2181dabdedfbf41466261 src/components/discover/entity-detail-panel.tsx
+1 .M N... 100644 100644 100644 f41042186cdea580dccd7a547689eced599351ed f41042186cdea580dccd7a547689eced599351ed src/components/discover/result-tabs.tsx
+1 .M N... 100644 100644 100644 3beedbfb225a21bf24305d11ad2516b458f71195 3beedbfb225a21bf24305d11ad2516b458f71195 src/components/discover/scrapy-browser.tsx
+1 .M N... 100644 100644 100644 ec5d9a51d9cd42412a62bd9aee0a417660a7e828 ec5d9a51d9cd42412a62bd9aee0a417660a7e828 src/components/lead-card.tsx
+1 .M N... 100644 100644 100644 3bb9d25f2857d6d875ca7726b0a19db3e48d120b 3bb9d25f2857d6d875ca7726b0a19db3e48d120b src/lib/research-agent/orchestrator.server.ts
+1 .M N... 100644 100644 100644 3559c81ccd395c03ee3dc00b9286dc307c26feb5 3559c81ccd395c03ee3dc00b9286dc307c26feb5 src/lib/search/activity-presenter.ts
+1 .M N... 100644 100644 100644 cec03bfb8f1a4eb9893664609400aa58b0ef4e1e cec03bfb8f1a4eb9893664609400aa58b0ef4e1e src/lib/search/browser-research.ts
+1 .M N... 100644 100644 100644 63df673b55db2342933fe9bd7b5630ba949f6061 63df673b55db2342933fe9bd7b5630ba949f6061 src/lib/search/canonical-contract.ts
+1 .M N... 100644 100644 100644 cea5ec8e28e1ee519eaf913938b7103a681cf696 cea5ec8e28e1ee519eaf913938b7103a681cf696 src/lib/search/clarifier.ts
+1 .M N... 100644 100644 100644 8eeefbfc626649df2172dd6718080bc4023d4a50 8eeefbfc626649df2172dd6718080bc4023d4a50 src/lib/search/qualified-lead-view.ts
+1 .M N... 100644 100644 100644 d8b988dee4908d0a4d2d2cadf8fc06a5ebab564b d8b988dee4908d0a4d2d2cadf8fc06a5ebab564b src/lib/search/search-spec.ts
+1 .M N... 100644 100644 100644 b6e4b45b2fe87e82f153f4b9dda2d934eeb5589e b6e4b45b2fe87e82f153f4b9dda2d934eeb5589e src/lib/search/source-plan.ts
+1 .M N... 100644 100644 100644 62a6a51b800b0718081d3052beadd1a6f082de94 62a6a51b800b0718081d3052beadd1a6f082de94 src/lib/spec-search.functions.ts
+1 .M N... 100644 100644 100644 42168a8bdc2cc64079166442501a0e0647f91291 42168a8bdc2cc64079166442501a0e0647f91291 src/lib/understanding/clarify-state.ts
+1 .M N... 100644 100644 100644 ace9873479337dc4eae43d50541ee3dd95339c2e ace9873479337dc4eae43d50541ee3dd95339c2e src/lib/understanding/extract.server.ts
+1 .M N... 100644 100644 100644 9f04d271d6e6c3088ecf40d30fdeb277bbb2e7af 9f04d271d6e6c3088ecf40d30fdeb277bbb2e7af src/lib/understanding/fallback.ts
+1 .M N... 100644 100644 100644 1dda5776ef2151066308fd6564d1898ad00c69f2 1dda5776ef2151066308fd6564d1898ad00c69f2 src/lib/understanding/frame.ts
+1 .M N... 100644 100644 100644 da1962cc0b84cfaa2acc5ba8e9b9a0b55fecbcb8 da1962cc0b84cfaa2acc5ba8e9b9a0b55fecbcb8 src/lib/understanding/lexicon.ts
+1 .M N... 100644 100644 100644 19a9a521e2df223e73d93472011036c97883d5d5 19a9a521e2df223e73d93472011036c97883d5d5 src/lib/understanding/to-search-spec.ts
+1 .M N... 100644 100644 100644 3fac8b0691380507f07c44a84e7667b669715c5f 3fac8b0691380507f07c44a84e7667b669715c5f src/lib/understanding/validate.ts
+1 .M N... 100644 100644 100644 8b936b4e892f4b98a56089390da23627df9ed34a 8b936b4e892f4b98a56089390da23627df9ed34a src/lib/understanding/vocab.ts
+1 .M N... 100644 100644 100644 94a7eec7f12b80dacaee7d7515e8f02cf70211d6 94a7eec7f12b80dacaee7d7515e8f02cf70211d6 src/routes/_authenticated/discover.tsx
+? .kilo/
+? Promotional Videos/
+? reports/core-forensic/
+? reports/core-pipeline-audit-git.txt
+? reports/core-pipeline-audit/
+? reports/gate2/browser-sessions/live-run_009b77f1-473376/
+? reports/gate2/browser-sessions/live-run_3dd4ae05-b47c11/
+? reports/gate2/browser-sessions/live-run_55a3093a-c023ed/
+? reports/gate2/browser-sessions/live-run_767e451d-7ec70d/
+? reports/gate2/browser-sessions/live-run_7a7cf8ae-991d02/
+? reports/gate2/browser-sessions/live-run_943c0035-1bb7de/
+? reports/gate2/browser-sessions/live-run_ac81e633-ade45c/
+? reports/gate2/browser-sessions/live-run_c51b4a5d-eb36d3/
+? reports/gate2/browser-sessions/live-run_dbe1e673-6b6606/
+? reports/gate2/browser-sessions/live-run_e391668c-4efc75/
+? reports/gate2/browser-sessions/live-run_f175c5e7-b3c364/
+? reports/gate2/browser-sessions/live-run_f3871037-15427b/
+? reports/mvp-implementation/
+? reports/mvp-input-forensic/
+? reports/mvp-release-candidate/
+? reports/understanding-forensic/
+? reports/understanding/gate1-2026-09-29T00-41-27-906Z-seed27491.cases.json
+? reports/understanding/gate1-2026-09-29T00-41-27-906Z-seed27491.md
+? reports/understanding/gate1-2026-09-29T00-41-36-276Z-seed27491.cases.json
+? reports/understanding/gate1-2026-09-29T00-41-36-276Z-seed27491.md
+? reports/understanding/gate1-2026-09-29T00-41-36-339Z-seed20260928.cases.json
+? reports/understanding/gate1-2026-09-29T00-41-36-339Z-seed20260928.md
+? reports/understanding/gate1-2026-09-29T01-11-58-439Z-seed27491.cases.json
+? reports/understanding/gate1-2026-09-29T01-11-58-439Z-seed27491.md
+? scrapivo-core-forensic.zip
+? src/components/discover/clarify-panel.test.tsx
+? src/lib/search/__tests__/exclusion-execution.test.ts
+? src/lib/search/__tests__/or-location-execution.test.ts
+? src/lib/search/__tests__/requested-output-execution.test.ts
+? src/lib/search/__tests__/spec-clarification.test.ts
+? src/lib/search/activity-presenter.test.ts
+? src/lib/search/spec-clarification.ts
+? src/lib/understanding/purpose.ts
+? src/lib/understanding/semantic-contract.test.ts

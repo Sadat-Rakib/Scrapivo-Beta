@@ -1,0 +1,929 @@
+{
+  "runId": "trace-custom-product-1790792328091",
+  "query": "Companies looking for a Shopify developer",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 95943,
+  "error": null,
+  "audit": [],
+  "browser": {
+    "adapter": "worker",
+    "status": "completed",
+    "pagesVisited": 23,
+    "currentUrl": "https://saunified.com/en",
+    "retained": true,
+    "controller": "agent",
+    "sessionId": "591d9f2c-c201-44b5-ab8f-e2aa2567e470",
+    "frame": true
+  },
+  "runtime": [
+    {
+      "kind": "runtime",
+      "requested": "worker",
+      "used": "worker"
+    }
+  ],
+  "progressEvents": 80,
+  "streamedRows": [],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [
+    {
+      "kind": "search",
+      "query": "S & A — Hardware, Industrial Manufacturing, Software needs shopify developer",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "S & A — Hardware, Industrial Manufacturing, Software needs shopify developer",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "S & A — Hardware, Industrial Manufacturing, Software careers",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "S & A — Hardware, Industrial Manufacturing, Software careers",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 9,
+      "reason": "raw_links=10 unrelated=1"
+    },
+    {
+      "kind": "search",
+      "query": "S & A Digital Technology — Animation, Architecture, Video Editing needs shopify developer",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "S & A Digital Technology — Animation, Architecture, Video Editing needs shopify developer",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 9,
+      "reason": "raw_links=10 unrelated=1"
+    },
+    {
+      "kind": "search",
+      "query": "S & A Digital Technology — Animation, Architecture, Video Editing careers",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "S & A Digital Technology — Animation, Architecture, Video Editing careers",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "S & A Group — Financial Services, Funerals, Insurance, Life Insurance needs shopify developer",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "S & A Group — Financial Services, Funerals, Insurance, Life Insurance needs shopify developer",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "S & A Supply — Retail, Shopping, Wholesale needs shopify developer",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "S & A Supply — Retail, Shopping, Wholesale needs shopify developer",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "S & A Unified Health Care — Elder Care, Health Care, Home Health Care, Medical needs shopify developer",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "seed",
+      "url": "http://www.sea-software.it",
+      "pageType": null,
+      "title": null,
+      "outcome": "navigation_failed",
+      "textChars": 0,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "navigation_failed: The page could not be loaded.",
+      "capture": null
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.shopify.com/ca/partners/directory",
+      "pageType": "unknown",
+      "title": "Hire Shopify Experts, Developers, Designers & Freelancers",
+      "outcome": "read",
+      "textChars": 3436,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1253s; injected/not_called; deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1232s; injected/not_called)",
+      "capture": "da8ab7ac1d29.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "http://www.saindustrial.ca/index.php",
+      "pageType": "unknown",
+      "title": "S&A Industrial Maintenance Ltd.",
+      "outcome": "read",
+      "textChars": 1306,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1243s; injected/not_called)",
+      "capture": "cd40e9a525ac.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.indeed.com/cmp/S&A",
+      "pageType": "job_board",
+      "title": "S&A Careers and Employment | Indeed.com",
+      "outcome": "read",
+      "textChars": 2761,
+      "structured": {
+        "jobs": 0,
+        "organization": "S&A",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1241s; injected/not_called)",
+      "capture": "e426aed6a894.json"
+    },
+    {
+      "origin": "seed",
+      "url": "https://www.sapluscg.com/",
+      "pageType": null,
+      "title": "S+A",
+      "outcome": "thin",
+      "textChars": 31,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "thin: under_100_chars",
+      "capture": null
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.shopify.com/partners/directory",
+      "pageType": null,
+      "title": null,
+      "outcome": "cached",
+      "textChars": 0,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "cached",
+      "capture": null
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://help.shopify.com/en/manual/partner-directory",
+      "pageType": "unknown",
+      "title": "Shopify Help Center | Partner Directory",
+      "outcome": "read",
+      "textChars": 816,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1230s; injected/not_called)",
+      "capture": "dc5d73c9843d.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.linkedin.com/company/s-&-a-digital-technology-ltd",
+      "pageType": "unknown",
+      "title": "S + A | LinkedIn",
+      "outcome": "read",
+      "textChars": 6147,
+      "structured": {
+        "jobs": 0,
+        "organization": "S + A",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1226s; injected/not_called)",
+      "capture": "92852db005e5.json"
+    },
+    {
+      "origin": "seed",
+      "url": "https://www.sagrouponline.com/",
+      "pageType": "unknown",
+      "title": "S&A Group",
+      "outcome": "read",
+      "textChars": 1666,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1224s; injected/not_called; deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1220s; injected/not_called)",
+      "capture": "a29392453675.json"
+    },
+    {
+      "origin": "contact_or_company_page",
+      "url": "https://www.sagrouponline.com/ourteam",
+      "pageType": "unknown",
+      "title": "Our Team — S&A Group",
+      "outcome": "read",
+      "textChars": 2565,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1222s; injected/not_called)",
+      "capture": "b1697a0953d8.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.sagrouponline.com/",
+      "pageType": "unknown",
+      "title": "S&A Group",
+      "outcome": "read",
+      "textChars": 1666,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1224s; injected/not_called; deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1220s; injected/not_called)",
+      "capture": "a29392453675.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.sagrouponline.com/additional-info",
+      "pageType": "unknown",
+      "title": "Additional Info — S&A Group",
+      "outcome": "read",
+      "textChars": 6812,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1210s; injected/not_called)",
+      "capture": "500cd2821873.json"
+    },
+    {
+      "origin": "seed",
+      "url": "https://www.sashowplace.com/",
+      "pageType": "unknown",
+      "title": "S & A Supply - Great-Barrington-Massachusetts",
+      "outcome": "read",
+      "textChars": 1458,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1205s; injected/not_called)",
+      "capture": "853ac8fe7551.json"
+    },
+    {
+      "origin": "contact_or_company_page",
+      "url": "https://www.sashowplace.com/pages/about",
+      "pageType": "unknown",
+      "title": "About - S & A Supply - Great-Barrington-Massachusetts",
+      "outcome": "read",
+      "textChars": 1955,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1202s; injected/not_called)",
+      "capture": "0a5be89ecf34.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://www.shopify.com/ca/solutions/b2b",
+      "pageType": "unknown",
+      "title": "B2B on Shopify Canada",
+      "outcome": "read",
+      "textChars": 10533,
+      "structured": null,
+      "candidateProduced": "YES",
+      "produced": [
+        "Cut development costs"
+      ],
+      "why": "",
+      "capture": "f77fdfdecc39.json"
+    },
+    {
+      "origin": "candidate_research",
+      "url": "https://wholesalehelper.io/blog/shopify-wholesale/",
+      "pageType": "unknown",
+      "title": "Shopify Wholesale Guide (2026): Pricing, Discounts, and B2B Setup",
+      "outcome": "read",
+      "textChars": 18000,
+      "structured": {
+        "jobs": 0,
+        "organization": "Wholesale Helper",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1188s; injected/not_called)",
+      "capture": "fca45ca8b9bc.json"
+    },
+    {
+      "origin": "seed",
+      "url": "https://saunified.com/en",
+      "pageType": "unknown",
+      "title": "S&A Unified Home Care",
+      "outcome": "read",
+      "textChars": 4433,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1186s; injected/not_called)",
+      "capture": "bee4b29bdd91.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.shopify.com/ca/partners/directory"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1253s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.shopify.com/ca/partners/directory"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "http://www.saindustrial.ca/index.php"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1243s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "http://www.saindustrial.ca/index.php"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.indeed.com/cmp/S&A"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1241s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.indeed.com/cmp/S&A"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.shopify.com/ca/partners/directory"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1232s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.shopify.com/ca/partners/directory"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://help.shopify.com/en/manual/partner-directory"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1230s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://help.shopify.com/en/manual/partner-directory"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.linkedin.com/company/s-&-a-digital-technology-ltd"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1226s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.linkedin.com/company/s-&-a-digital-technology-ltd"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.sagrouponline.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1224s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.sagrouponline.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.sagrouponline.com/ourteam"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1222s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.sagrouponline.com/ourteam"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.sagrouponline.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1220s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.sagrouponline.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.sagrouponline.com/additional-info"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1210s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.sagrouponline.com/additional-info"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.sashowplace.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1205s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.sashowplace.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.sashowplace.com/pages/about"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1202s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.sashowplace.com/pages/about"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.shopify.com/ca/solutions/b2b"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 1,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1198s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.shopify.com/ca/solutions/b2b"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 1
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://wholesalehelper.io/blog/shopify-wholesale/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1188s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://wholesalehelper.io/blog/shopify-wholesale/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://saunified.com/en"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1186s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://saunified.com/en"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    }
+  ],
+  "entityOutcomes": [
+    {
+      "page": "https://www.shopify.com/ca/solutions/b2b",
+      "name": "Cut development costs",
+      "kind": "company",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    }
+  ],
+  "remember": [
+    {
+      "kind": "remember",
+      "name": "S & A — Hardware, Industrial Manufacturing, Software",
+      "rowKind": "company",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "S & A Digital Technology — Animation, Architecture, Video Editing",
+      "rowKind": "company",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "S & A Group — Financial Services, Funerals, Insurance, Life Insurance",
+      "rowKind": "company",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "S & A Supply — Retail, Shopping, Wholesale",
+      "rowKind": "company",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "S & A Unified Health Care — Elder Care, Health Care, Home Health Care, Medical",
+      "rowKind": "company",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "S & B Distribution — Wholesale, Wine And Spirits, Winery",
+      "rowKind": "company",
+      "outcome": "accepted",
+      "resolved": true
+    },
+    {
+      "kind": "remember",
+      "name": "Cut development costs",
+      "rowKind": "company",
+      "outcome": "TARGET_MISMATCH",
+      "resolved": true
+    }
+  ],
+  "candidates": [
+    {
+      "kind": "candidate",
+      "name": "S & A — Hardware, Industrial Manufacturing, Software",
+      "status": "exhausted",
+      "rejectCode": "NO_CLAIM_EVIDENCE",
+      "label": "NO_CLAIM_EVIDENCE — signal_required but no evidence",
+      "needs": [
+        "signal"
+      ],
+      "visited": 4,
+      "queries": 2
+    },
+    {
+      "kind": "candidate",
+      "name": "S & A Digital Technology — Animation, Architecture, Video Editing",
+      "status": "exhausted",
+      "rejectCode": "NO_CLAIM_EVIDENCE",
+      "label": "NO_CLAIM_EVIDENCE — signal_required but no evidence",
+      "needs": [
+        "signal"
+      ],
+      "visited": 4,
+      "queries": 2
+    },
+    {
+      "kind": "candidate",
+      "name": "S & A Group — Financial Services, Funerals, Insurance, Life Insurance",
+      "status": "exhausted",
+      "rejectCode": "NO_CLAIM_EVIDENCE",
+      "label": "NO_CLAIM_EVIDENCE — signal_required but no evidence",
+      "needs": [
+        "signal"
+      ],
+      "visited": 4,
+      "queries": 1
+    },
+    {
+      "kind": "candidate",
+      "name": "S & A Supply — Retail, Shopping, Wholesale",
+      "status": "exhausted",
+      "rejectCode": "NO_CLAIM_EVIDENCE",
+      "label": "NO_CLAIM_EVIDENCE — signal_required but no evidence",
+      "needs": [
+        "signal"
+      ],
+      "visited": 4,
+      "queries": 1
+    }
+  ],
+  "done": [
+    {
+      "kind": "done",
+      "status": "timeout",
+      "candidates": 6,
+      "verified": 0,
+      "visited": 16,
+      "queries": 7,
+      "stoppingReason": "BROWSER_DISCOVERY_TIMEOUT",
+      "elapsedMs": 75008
+    }
+  ],
+  "persistenceSkipped": [
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "NO_QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "company",
+    "criteria": [
+      "requested_service=shopify developer"
+    ],
+    "clarify": [
+      "entity_location",
+      "entity_industry",
+      "entity_business_model"
+    ],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "s3-parquet",
+          "partitions": [
+            "processed/companies_by_initial/_part=s/data_0.parquet"
+          ],
+          "scanned": 11,
+          "matched": 11
+        },
+        {
+          "source": "live-browser",
+          "partitions": [
+            "live-gapfill(6)"
+          ],
+          "scanned": 6,
+          "matched": 6
+        }
+      ],
+      "rawCandidates": 17,
+      "postSpecFilter": 17,
+      "timings": {
+        "understanding_ms": 4539,
+        "stored_search_ms": 11685,
+        "research_ms": 76944,
+        "enrichment_ms": 4,
+        "qualification_ms": 422,
+        "total_ms": 93594
+      },
+      "researchable": 11,
+      "complete": 11,
+      "pendingEnrichment": 0,
+      "qualificationRejected": 11,
+      "qualified": 0,
+      "returned": 0,
+      "reason": "FAILED_QUALIFICATION",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "direct-http",
+            "label": "Public websites",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "searxng",
+            "label": "The web",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "browser-live",
+            "label": "Public websites",
+            "state": "healthy",
+            "reason": "OK"
+          }
+        ],
+        "degraded": true,
+        "summary": null
+      }
+    },
+    "rowsReturned": 0,
+    "rows": [],
+    "diagnostics": [
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "direct-http",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "searxng",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      }
+    ],
+    "cancelledAtMs": null,
+    "returnedAtMs": 95941,
+    "candidateLedger": {
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 11,
+        "gated": 0,
+        "filtered": 0,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {
+        "NO_CLAIM_EVIDENCE": 11
+      },
+      "streamed": 0,
+      "streamedNotReturned": []
+    }
+  }
+}

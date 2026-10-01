@@ -37,6 +37,21 @@ type ProgressRun = {
 const runs = new Map<string, ProgressRun>();
 const TTL_MS = 10 * 60_000;
 const MAX_EVENTS = 80;
+/** Streamed leads are results, not chatter: they outlive the activity cap. */
+const MAX_ROW_EVENTS = 200;
+
+/** Trim oldest activity first; lead rows are dropped only past their own cap. */
+function trimEvents(events: SearchBrowserProgressEvent[]): SearchBrowserProgressEvent[] {
+  const rows = events.filter((event) => event.row).length;
+  const activity = events.length - rows;
+  let dropActivity = Math.max(0, activity - MAX_EVENTS);
+  let dropRows = Math.max(0, rows - MAX_ROW_EVENTS);
+  if (!dropActivity && !dropRows) return events;
+  return events.filter((event) => {
+    if (event.row) return dropRows-- > 0 ? false : true;
+    return dropActivity-- > 0 ? false : true;
+  });
+}
 
 export function beginSearchBrowserProgress(runId: string, ownerId: string) {
   const now = Date.now();
@@ -60,7 +75,7 @@ export function publishSearchBrowserProgress(
   const run = runs.get(runId) ?? { ownerId, events: [], updatedAt: now, done: false };
   if (run.ownerId !== ownerId || run.done) return;
   run.events.push({ ...event, id: (run.events.at(-1)?.id ?? 0) + 1, at: new Date(now).toISOString() });
-  if (run.events.length > MAX_EVENTS) run.events.splice(0, run.events.length - MAX_EVENTS);
+  run.events = trimEvents(run.events);
   run.updatedAt = now;
   runs.set(runId, run);
 }

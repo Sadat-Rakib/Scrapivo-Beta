@@ -1,0 +1,302 @@
+{
+  "runId": "trace-custom-product-1790795682664",
+  "query": "Founders of B2B SaaS startups in Tallinn, Estonia who are hiring engineers right now, with public contact",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 32002,
+  "error": null,
+  "audit": [],
+  "browser": {
+    "adapter": "worker",
+    "status": "completed",
+    "pagesVisited": 7,
+    "currentUrl": "https://foundersbase.com/?__cf_chl_rt_tk=L92UOztHzfwK5C9UOGWKshsOTCsjp_v18prFEYyfbac-1790795708-1.0.1.1-jLRbaCHWn6Y3VaylunMN.vrYknD5vUmikKeNHMgMMGc",
+    "retained": true,
+    "controller": "agent",
+    "sessionId": "9de51aea-69e9-42b8-b18c-b8b36bfce7a3",
+    "frame": true
+  },
+  "runtime": [
+    {
+      "kind": "runtime",
+      "requested": "worker",
+      "used": "worker"
+    }
+  ],
+  "progressEvents": 22,
+  "streamedRows": [],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [
+    {
+      "kind": "search",
+      "query": "\"founder\" saas Tallinn",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "\"founder\" saas Tallinn",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 3,
+      "reason": "raw_links=5 unrelated=2"
+    },
+    {
+      "kind": "search",
+      "query": "\"co-founder\" saas Tallinn",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "\"co-founder\" saas Tallinn",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 6,
+      "reason": "raw_links=6 unrelated=0"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://alexbagri.com/",
+      "pageType": "unknown",
+      "title": "Alex Bagri — Full-Stack Developer & Entrepreneur | Tallinn, Estonia",
+      "outcome": "read",
+      "textChars": 1228,
+      "structured": {
+        "jobs": 0,
+        "organization": "Alex Bagri — Web Development",
+        "emails": 1,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~525s; injected/not_called)",
+      "capture": "9c8d00ac4622.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://ee.linkedin.com/in/serge-herkul",
+      "pageType": null,
+      "title": null,
+      "outcome": "navigation_failed",
+      "textChars": 0,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "navigation_failed: The page could not be read.",
+      "capture": null
+    },
+    {
+      "origin": "discovery",
+      "url": "https://foundersbase.com/find-cofounders/tallinn",
+      "pageType": "unknown",
+      "title": "Find a Co-Founder in Tallinn | Foundersbase",
+      "outcome": "read",
+      "textChars": 4476,
+      "structured": {
+        "jobs": 0,
+        "organization": "Foundersbase",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~521s; injected/not_called)",
+      "capture": "dfb8fc521266.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://foundersbase.com/?__cf_chl_rt_tk=L92UOztHzfwK5C9UOGWKshsOTCsjp_v18prFEYyfbac-1790795708-1.0.1.1-jLRbaCHWn6Y3VaylunMN.vrYknD5vUmikKeNHMgMMGc",
+      "pageType": "unknown",
+      "title": "Just a moment...",
+      "outcome": "read",
+      "textChars": 3763,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~521s; injected/not_called)",
+      "capture": "238205e14959.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://alexbagri.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~525s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://alexbagri.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://foundersbase.com/find-cofounders/tallinn",
+        "https://foundersbase.com/?__cf_chl_rt_tk=L92UOztHzfwK5C9UOGWKshsOTCsjp_v18prFEYyfbac-1790795708-1.0.1.1-jLRbaCHWn6Y3VaylunMN.vrYknD5vUmikKeNHMgMMGc"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~521s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://foundersbase.com/find-cofounders/tallinn",
+        "https://foundersbase.com/?__cf_chl_rt_tk=L92UOztHzfwK5C9UOGWKshsOTCsjp_v18prFEYyfbac-1790795708-1.0.1.1-jLRbaCHWn6Y3VaylunMN.vrYknD5vUmikKeNHMgMMGc"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    }
+  ],
+  "entityOutcomes": [],
+  "remember": [],
+  "candidates": [],
+  "done": [
+    {
+      "kind": "done",
+      "status": "completed",
+      "candidates": 0,
+      "verified": 0,
+      "visited": 4,
+      "queries": 2,
+      "stoppingReason": "diminishing_returns",
+      "elapsedMs": 12843
+    }
+  ],
+  "persistenceSkipped": [
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "NO_QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "person",
+    "criteria": [
+      "role=founder",
+      "industry=saas",
+      "company_stage=startup",
+      "location=Tallinn",
+      "location_id=geo:city:tallinn",
+      "location_kind=city",
+      "location_country=EE",
+      "location_parents=geo:country:ee",
+      "requested_role=engineer",
+      "require_contact=true",
+      "required_field=contact"
+    ],
+    "clarify": [],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_people(country,city_norm,role_norm)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "s3-parquet",
+          "partitions": [
+            "processed/people_by_country/_part=estonia/data_0.parquet",
+            "processed/people_by_country/_part=estonia/data_1.parquet"
+          ],
+          "scanned": 71,
+          "matched": 0
+        }
+      ],
+      "rawCandidates": 0,
+      "postSpecFilter": 0,
+      "timings": {
+        "understanding_ms": 2192,
+        "stored_search_ms": 2476,
+        "research_ms": 26159,
+        "enrichment_ms": 1,
+        "qualification_ms": 22,
+        "total_ms": 30850
+      },
+      "researchable": 0,
+      "complete": 0,
+      "pendingEnrichment": 0,
+      "qualificationRejected": 0,
+      "qualified": 0,
+      "returned": 0,
+      "reason": "SOURCE_UNAVAILABLE",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "direct-http",
+            "label": "Public websites",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "searxng",
+            "label": "The web",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "browser-live",
+            "label": "Public websites",
+            "state": "empty",
+            "reason": "NO_RESULTS"
+          }
+        ],
+        "degraded": true,
+        "summary": null
+      }
+    },
+    "rowsReturned": 0,
+    "rows": [],
+    "diagnostics": [
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "direct-http",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "searxng",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      }
+    ],
+    "cancelledAtMs": null,
+    "returnedAtMs": 32001,
+    "candidateLedger": {
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 0,
+        "gated": 0,
+        "filtered": 0,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {},
+      "streamed": 0,
+      "streamedNotReturned": []
+    }
+  }
+}

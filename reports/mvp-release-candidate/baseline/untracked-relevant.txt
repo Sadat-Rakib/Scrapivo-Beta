@@ -1,0 +1,9 @@
+﻿src/components/discover/clarify-panel.test.tsx
+src/lib/search/__tests__/exclusion-execution.test.ts
+src/lib/search/__tests__/or-location-execution.test.ts
+src/lib/search/__tests__/requested-output-execution.test.ts
+src/lib/search/__tests__/spec-clarification.test.ts
+src/lib/search/activity-presenter.test.ts
+src/lib/search/spec-clarification.ts
+src/lib/understanding/purpose.ts
+src/lib/understanding/semantic-contract.test.ts

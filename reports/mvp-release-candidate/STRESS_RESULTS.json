@@ -1,0 +1,4375 @@
+{
+  "seed": 27491,
+  "total": 100,
+  "mechanics_fixed": {
+    "fullyCorrect": 94,
+    "score": {
+      "extraction_crash": {
+        "pass": 100,
+        "total": 100
+      },
+      "entity": {
+        "pass": 45,
+        "total": 45
+      },
+      "relation": {
+        "pass": 61,
+        "total": 61
+      },
+      "spec_entity": {
+        "pass": 45,
+        "total": 45
+      },
+      "spec_preservation": {
+        "pass": 90,
+        "total": 90
+      },
+      "location": {
+        "pass": 83,
+        "total": 83
+      },
+      "spec_location": {
+        "pass": 79,
+        "total": 79
+      },
+      "clarification": {
+        "pass": 6,
+        "total": 12
+      },
+      "signal": {
+        "pass": 17,
+        "total": 17
+      },
+      "task": {
+        "pass": 2,
+        "total": 2
+      },
+      "mode": {
+        "pass": 10,
+        "total": 10
+      },
+      "negation": {
+        "pass": 9,
+        "total": 9
+      },
+      "filters": {
+        "pass": 6,
+        "total": 6
+      },
+      "contacts_outputs": {
+        "pass": 11,
+        "total": 11
+      },
+      "spec_required_fields": {
+        "pass": 11,
+        "total": 11
+      },
+      "subtype": {
+        "pass": 3,
+        "total": 3
+      },
+      "industry": {
+        "pass": 3,
+        "total": 3
+      },
+      "business_model": {
+        "pass": 2,
+        "total": 2
+      },
+      "social_freshness": {
+        "pass": 4,
+        "total": 4
+      },
+      "spec_business_model": {
+        "pass": 2,
+        "total": 2
+      },
+      "category": {
+        "pass": 3,
+        "total": 3
+      },
+      "goal_clarification": {
+        "pass": 4,
+        "total": 4
+      },
+      "no_website": {
+        "pass": 3,
+        "total": 3
+      },
+      "remote": {
+        "pass": 2,
+        "total": 2
+      },
+      "technology": {
+        "pass": 3,
+        "total": 3
+      },
+      "placeholder": {
+        "pass": 3,
+        "total": 3
+      },
+      "role": {
+        "pass": 3,
+        "total": 3
+      },
+      "salary": {
+        "pass": 2,
+        "total": 2
+      },
+      "multi_location": {
+        "pass": 3,
+        "total": 3
+      },
+      "has_website": {
+        "pass": 2,
+        "total": 2
+      }
+    },
+    "failing": [
+      {
+        "id": "h004a",
+        "failed": [
+          "clarification"
+        ],
+        "question": "entity_purpose",
+        "query": "grant writing agencies in Split"
+      },
+      {
+        "id": "h008a",
+        "failed": [
+          "clarification"
+        ],
+        "question": "entity_purpose",
+        "query": "waste haulage agencies in Hsinchu"
+      },
+      {
+        "id": "h010",
+        "failed": [
+          "clarification"
+        ],
+        "question": "entity_purpose",
+        "query": "seed libraries in Napier"
+      },
+      {
+        "id": "h011",
+        "failed": [
+          "clarification"
+        ],
+        "question": "entity_purpose",
+        "query": "prosthetics labs in Cebu"
+      },
+      {
+        "id": "c002a",
+        "failed": [
+          "clarification"
+        ],
+        "question": "entity_purpose",
+        "query": "voiceover agencies in Fayetteville rn"
+      },
+      {
+        "id": "c008a",
+        "failed": [
+          "clarification"
+        ],
+        "question": "entity_purpose",
+        "query": "fleet maintenance agncies in sfax"
+      }
+    ]
+  },
+  "policy_adjusted": {
+    "fullyCorrect": 100,
+    "score": {
+      "extraction_crash": {
+        "pass": 100,
+        "total": 100
+      },
+      "entity": {
+        "pass": 45,
+        "total": 45
+      },
+      "relation": {
+        "pass": 61,
+        "total": 61
+      },
+      "spec_entity": {
+        "pass": 45,
+        "total": 45
+      },
+      "spec_preservation": {
+        "pass": 90,
+        "total": 90
+      },
+      "location": {
+        "pass": 83,
+        "total": 83
+      },
+      "spec_location": {
+        "pass": 79,
+        "total": 79
+      },
+      "clarification": {
+        "pass": 12,
+        "total": 12
+      },
+      "clarification_id": {
+        "pass": 6,
+        "total": 6
+      },
+      "signal": {
+        "pass": 17,
+        "total": 17
+      },
+      "task": {
+        "pass": 2,
+        "total": 2
+      },
+      "mode": {
+        "pass": 10,
+        "total": 10
+      },
+      "negation": {
+        "pass": 9,
+        "total": 9
+      },
+      "filters": {
+        "pass": 6,
+        "total": 6
+      },
+      "contacts_outputs": {
+        "pass": 11,
+        "total": 11
+      },
+      "spec_required_fields": {
+        "pass": 11,
+        "total": 11
+      },
+      "subtype": {
+        "pass": 3,
+        "total": 3
+      },
+      "industry": {
+        "pass": 3,
+        "total": 3
+      },
+      "business_model": {
+        "pass": 2,
+        "total": 2
+      },
+      "social_freshness": {
+        "pass": 4,
+        "total": 4
+      },
+      "spec_business_model": {
+        "pass": 2,
+        "total": 2
+      },
+      "category": {
+        "pass": 3,
+        "total": 3
+      },
+      "goal_clarification": {
+        "pass": 4,
+        "total": 4
+      },
+      "no_website": {
+        "pass": 3,
+        "total": 3
+      },
+      "remote": {
+        "pass": 2,
+        "total": 2
+      },
+      "technology": {
+        "pass": 3,
+        "total": 3
+      },
+      "placeholder": {
+        "pass": 3,
+        "total": 3
+      },
+      "role": {
+        "pass": 3,
+        "total": 3
+      },
+      "salary": {
+        "pass": 2,
+        "total": 2
+      },
+      "multi_location": {
+        "pass": 3,
+        "total": 3
+      },
+      "has_website": {
+        "pass": 2,
+        "total": 2
+      }
+    },
+    "failing": [],
+    "overrides_applied": [
+      "h004a",
+      "h008a",
+      "h010",
+      "h011",
+      "c002a",
+      "c008a"
+    ]
+  },
+  "rows": [
+    {
+      "id": "h000a",
+      "family": "holdout",
+      "query": "millwrights looking for clients",
+      "checks": {
+        "entity": true,
+        "relation": true,
+        "spec_entity": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": null,
+      "frame": {
+        "entity": "person",
+        "locations": [],
+        "role": "millwrights",
+        "relation": "seeking_client",
+        "required_fields": [],
+        "objective": "prospecting"
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [],
+        "purpose": "prospecting",
+        "criteria": [
+          "role=millwright"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h000b",
+      "family": "holdout",
+      "query": "businesses looking for millwrights",
+      "checks": {
+        "entity": true,
+        "relation": true,
+        "spec_entity": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": null,
+      "frame": {
+        "entity": "business",
+        "locations": [],
+        "relation": "needs_service",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [],
+        "purpose": "prospecting",
+        "criteria": [
+          "requested_service=millwrights"
+        ],
+        "missing": [
+          "location"
+        ],
+        "status": "needs_clarification"
+      }
+    },
+    {
+      "id": "h002a",
+      "family": "holdout",
+      "query": "millwrights who serve board game cafés in Örebro",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "location": "Örebro",
+        "locations": [],
+        "role": "millwrights",
+        "relation": "offers_service",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "Örebro"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=millwright",
+          "location=Örebro",
+          "location_id=geo:stated:rebro",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h002b",
+      "family": "holdout",
+      "query": "board game cafés in Örebro who need a millwright",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": null,
+      "frame": {
+        "entity": "business",
+        "location": "Örebro",
+        "locations": [],
+        "category": "board game cafés",
+        "relation": "needs_service",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "Örebro"
+        ],
+        "purpose": "prospecting",
+        "criteria": [
+          "category=board game café",
+          "location=Örebro",
+          "location_id=geo:stated:rebro",
+          "location_kind=stated",
+          "requested_service=millwright"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h004a",
+      "family": "holdout",
+      "query": "grant writing agencies in Split",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "clarification": true,
+        "clarification_id": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "Split",
+        "locations": [],
+        "category": "grant writing agencies",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Split"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=grant writing agency",
+          "location=Split",
+          "location_id=geo:stated:split",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h004b",
+      "family": "holdout",
+      "query": "companies in Split needing grant writing",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "signal": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": null,
+      "frame": {
+        "entity": "company",
+        "location": "Split",
+        "locations": [],
+        "relation": "needs_service",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Split"
+        ],
+        "purpose": "prospecting",
+        "criteria": [
+          "location=Split",
+          "location_id=geo:stated:split",
+          "location_kind=stated",
+          "requested_service=grant writing"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h006a",
+      "family": "holdout",
+      "query": "companies in Dunedin hiring fractional CFOs",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "signal": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "Dunedin",
+        "locations": [],
+        "relation": "hiring",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Dunedin"
+        ],
+        "purpose": null,
+        "criteria": [
+          "location=Dunedin",
+          "location_id=geo:stated:dunedin",
+          "location_kind=stated",
+          "requested_role=fractional cfos"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h006b",
+      "family": "holdout",
+      "query": "fractional CFOs in Dunedin looking for work",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "relation": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "location": "Dunedin",
+        "locations": [],
+        "role": "fractional cfos",
+        "relation": "seeking_job",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "Dunedin"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=fractional cfo",
+          "location=Dunedin",
+          "location_id=geo:stated:dunedin",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h008a",
+      "family": "holdout",
+      "query": "waste haulage agencies in Hsinchu",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "clarification": true,
+        "clarification_id": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "Hsinchu",
+        "locations": [],
+        "category": "waste haulage agencies",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Hsinchu"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=waste haulage agency",
+          "location=Hsinchu",
+          "location_id=geo:stated:hsinchu",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h008b",
+      "family": "holdout",
+      "query": "companies in Hsinchu needing waste haulage",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "signal": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": null,
+      "frame": {
+        "entity": "company",
+        "location": "Hsinchu",
+        "locations": [],
+        "relation": "needs_service",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Hsinchu"
+        ],
+        "purpose": "prospecting",
+        "criteria": [
+          "location=Hsinchu",
+          "location_id=geo:stated:hsinchu",
+          "location_kind=stated",
+          "requested_service=waste haulage"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h010",
+      "family": "holdout",
+      "query": "seed libraries in Napier",
+      "checks": {
+        "task": true,
+        "location": true,
+        "mode": true,
+        "relation": true,
+        "clarification": true,
+        "clarification_id": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "organization",
+        "location": "Napier",
+        "locations": [],
+        "category": "seed libraries",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Napier"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=seed library",
+          "location=Napier",
+          "location_id=geo:stated:napier",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h011",
+      "family": "holdout",
+      "query": "prosthetics labs in Cebu",
+      "checks": {
+        "task": true,
+        "location": true,
+        "mode": true,
+        "relation": true,
+        "clarification": true,
+        "clarification_id": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "Cebu",
+        "locations": [],
+        "category": "prosthetics labs",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Cebu"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=prosthetics lab",
+          "location=Cebu",
+          "location_id=geo:stated:cebu",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h012",
+      "family": "holdout",
+      "query": "I need at least 15 mushroom farms in Vilnius",
+      "checks": {
+        "location": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "business",
+        "location": "Vilnius",
+        "locations": [],
+        "category": "mushroom farms",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "Vilnius"
+        ],
+        "purpose": null,
+        "criteria": [
+          "category=mushroom farm",
+          "location=Vilnius",
+          "location_id=geo:stated:vilnius",
+          "location_kind=stated",
+          "minimum_count=15"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h013",
+      "family": "holdout",
+      "query": "haulage companies in Aarhus with at least 100 employees, not agencies",
+      "checks": {
+        "location": true,
+        "negation": true,
+        "filters": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "Aarhus",
+        "locations": [],
+        "category": "haulage companies",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Aarhus"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=haulage company",
+          "location=Aarhus",
+          "location_id=geo:stated:aarhus",
+          "location_kind=stated",
+          "employee_count=100",
+          "exclude_category=agency"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h014",
+      "family": "holdout",
+      "query": "sports clubs in Gaborone that need grant writing",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "relation": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": null,
+      "frame": {
+        "entity": "organization",
+        "location": "Gaborone",
+        "locations": [],
+        "category": "sports clubs",
+        "relation": "needs_service",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Gaborone"
+        ],
+        "purpose": "prospecting",
+        "criteria": [
+          "industry=sports club",
+          "location=Gaborone",
+          "location_id=geo:stated:gaborone",
+          "location_kind=stated",
+          "requested_service=grant writing"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h015",
+      "family": "holdout",
+      "query": "cider houses in Dunedin with no online booking",
+      "checks": {
+        "location": true,
+        "mode": true,
+        "relation": true,
+        "signal": true,
+        "filters": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "business",
+        "location": "Dunedin",
+        "locations": [],
+        "category": "cidery",
+        "relation": "lacks_asset",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "Dunedin"
+        ],
+        "purpose": null,
+        "criteria": [
+          "category=cidery",
+          "location=Dunedin",
+          "location_id=geo:stated:dunedin",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h016",
+      "family": "holdout",
+      "query": "forestry companies in Boise with at least 10 employees, not agencies",
+      "checks": {
+        "location": true,
+        "negation": true,
+        "filters": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "Boise",
+        "locations": [],
+        "category": "forestry companies",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Boise"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=forestry company",
+          "location=Boise",
+          "location_id=geo:stated:boise",
+          "location_kind=stated",
+          "employee_count=10",
+          "exclude_category=agency"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h017",
+      "family": "holdout",
+      "query": "freelance AI safety researchers under $150/hour, excluding Pécs",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "negation": true,
+        "spec_entity": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "locations": [],
+        "industry": "ai",
+        "role": "freelance safety researchers",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [],
+        "purpose": null,
+        "criteria": [
+          "role=freelance safety researcher",
+          "industry=ai",
+          "hourly_rate=150",
+          "exclude_location=Pécs"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h018",
+      "family": "holdout",
+      "query": "Give me 25 bell foundries in Hamilton, phone number required, Instagram if possible, verify they are currently open, and output a table I can paste into Notion",
+      "checks": {
+        "location": true,
+        "contacts_outputs": true,
+        "spec_location": true,
+        "spec_required_fields": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "business",
+        "location": "Hamilton",
+        "locations": [],
+        "category": "bell foundries",
+        "relation": "none",
+        "required_fields": [
+          "name",
+          "phone",
+          "evidence"
+        ],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "Hamilton"
+        ],
+        "purpose": null,
+        "criteria": [
+          "category=bell foundry",
+          "location=Hamilton",
+          "location_id=geo:stated:hamilton",
+          "location_kind=stated",
+          "require_name=true",
+          "required_field=name",
+          "require_phone=true",
+          "required_field=phone",
+          "require_evidence=true",
+          "required_field=evidence",
+          "prefer_instagram=true",
+          "verify_phone_is_public=true",
+          "output_table=true",
+          "output_other=Notion-ready output",
+          "requested_count=25"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h019",
+      "family": "holdout",
+      "query": "I'm selling warehouse automation to small firms. Find me 100+ hydroponic farms in Timișoara that don't have a real website, phone required, socials if possible, verify they exist, and give me a table plus outreach drafts.",
+      "checks": {
+        "location": true,
+        "mode": true,
+        "relation": true,
+        "contacts_outputs": true,
+        "spec_location": true,
+        "spec_required_fields": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": null,
+      "frame": {
+        "entity": "business",
+        "location": "Timișoara",
+        "locations": [],
+        "category": "hydroponic farms",
+        "relation": "lacks_asset",
+        "required_fields": [
+          "name",
+          "phone",
+          "evidence"
+        ],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "Timișoara"
+        ],
+        "purpose": "prospecting",
+        "criteria": [
+          "category=hydroponic farm",
+          "location=Timișoara",
+          "location_id=geo:stated:timi-oara",
+          "location_kind=stated",
+          "opportunity=no_website",
+          "offer=warehouse automation",
+          "mode=selling",
+          "require_name=true",
+          "required_field=name",
+          "require_phone=true",
+          "required_field=phone",
+          "require_evidence=true",
+          "required_field=evidence",
+          "prefer_socials=true",
+          "verify_phone_is_public=true",
+          "verify_business_exists=true",
+          "output_table=true",
+          "output_outreach_drafts=true",
+          "minimum_count=100"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h020",
+      "family": "holdout",
+      "query": "precision fermentation startups in Cebu that raised funding recently",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "mode": true,
+        "relation": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "Cebu",
+        "locations": [],
+        "category": "precision fermentation startups",
+        "relation": "received_funding",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Cebu"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=precision fermentation startup",
+          "location=Cebu",
+          "location_id=geo:stated:cebu",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h021",
+      "family": "holdout",
+      "query": "firms in Kelowna that provide packaging design",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "signal": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "Kelowna",
+        "locations": [],
+        "relation": "offers_service",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Kelowna"
+        ],
+        "purpose": null,
+        "criteria": [
+          "location=Kelowna",
+          "location_id=geo:stated:kelowna",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h022",
+      "family": "holdout",
+      "query": "give me 20 taxidermists in Dunedin",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "location": "Dunedin",
+        "locations": [],
+        "role": "taxidermists",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "Dunedin"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=taxidermist",
+          "location=Dunedin",
+          "location_id=geo:stated:dunedin",
+          "location_kind=stated",
+          "requested_count=20"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h023",
+      "family": "holdout",
+      "query": "find prosthetics labs in Aberystwyth and also find taxidermists in Chattanooga",
+      "checks": {},
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "Aberystwyth",
+        "locations": [],
+        "category": "prosthetics labs",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Aberystwyth"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=prosthetics lab",
+          "location=Aberystwyth",
+          "location_id=geo:stated:aberystwyth",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h024",
+      "family": "holdout",
+      "query": "harbour pilots attending Interzoo",
+      "checks": {
+        "entity": true,
+        "relation": true,
+        "spec_entity": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "locations": [],
+        "role": "harbour pilots",
+        "relation": "attending_event",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [],
+        "purpose": null,
+        "criteria": [
+          "role=harbour pilot"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h025",
+      "family": "holdout",
+      "query": "companies that posted a millwright role in the last 2 months",
+      "checks": {
+        "location": true,
+        "relation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "locations": [],
+        "relation": "hiring",
+        "required_fields": [
+          "name",
+          "evidence"
+        ],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [],
+        "purpose": null,
+        "criteria": [
+          "requested_role=millwright role",
+          "content_topic=a millwright role in the last 2 months",
+          "needs_live=true",
+          "verify_last_social_post=true",
+          "require_name=true",
+          "required_field=name",
+          "require_evidence=true",
+          "required_field=evidence",
+          "verify_other=last social post date"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h026",
+      "family": "holdout",
+      "query": "agronomists in Wrocław hiring millwrights",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "mode": true,
+        "relation": true,
+        "signal": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "location": "Wrocław",
+        "locations": [],
+        "role": "agronomists",
+        "relation": "hiring",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "Wrocław"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=agronomist",
+          "location=Wrocław",
+          "location_id=geo:stated:wroc-aw",
+          "location_kind=stated",
+          "requested_role=millwrights"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h027",
+      "family": "holdout",
+      "query": "companies in Windhoek that need subtitling",
+      "checks": {
+        "location": true,
+        "mode": true,
+        "relation": true,
+        "signal": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": null,
+      "frame": {
+        "entity": "company",
+        "location": "Windhoek",
+        "locations": [],
+        "relation": "needs_service",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Windhoek"
+        ],
+        "purpose": "prospecting",
+        "criteria": [
+          "location=Windhoek",
+          "location_id=geo:stated:windhoek",
+          "location_kind=stated",
+          "requested_service=subtitling"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h028",
+      "family": "holdout",
+      "query": "port logistics",
+      "checks": {
+        "clarification": true
+      },
+      "failed": [],
+      "question": "entity_location",
+      "frame": {
+        "entity": "business",
+        "locations": [],
+        "category": "port logistics",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [],
+        "purpose": null,
+        "criteria": [
+          "category=port logistic"
+        ],
+        "missing": [
+          "location"
+        ],
+        "status": "needs_clarification"
+      }
+    },
+    {
+      "id": "h029",
+      "family": "holdout",
+      "query": "Give me 20 dive schools in Busan, phone number required, Instagram if possible, verify they are currently open, and output a table I can paste into Notion",
+      "checks": {
+        "location": true,
+        "contacts_outputs": true,
+        "spec_location": true,
+        "spec_required_fields": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "organization",
+        "location": "Busan",
+        "locations": [],
+        "category": "dive schools",
+        "relation": "none",
+        "required_fields": [
+          "name",
+          "phone",
+          "evidence"
+        ],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Busan"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=dive school",
+          "location=Busan",
+          "location_id=geo:stated:busan",
+          "location_kind=stated",
+          "require_name=true",
+          "required_field=name",
+          "require_phone=true",
+          "required_field=phone",
+          "require_evidence=true",
+          "required_field=evidence",
+          "prefer_instagram=true",
+          "verify_phone_is_public=true",
+          "output_table=true",
+          "output_other=Notion-ready output",
+          "requested_count=20"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h030",
+      "family": "holdout",
+      "query": "companies that posted a brand strategist role in the last 6 months",
+      "checks": {
+        "location": true,
+        "relation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "locations": [],
+        "relation": "hiring",
+        "required_fields": [
+          "name",
+          "evidence"
+        ],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [],
+        "purpose": null,
+        "criteria": [
+          "requested_role=brand strategist role",
+          "content_topic=a brand strategist role in the last 6 months",
+          "needs_live=true",
+          "verify_last_social_post=true",
+          "require_name=true",
+          "required_field=name",
+          "require_evidence=true",
+          "required_field=evidence",
+          "verify_other=last social post date"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h031",
+      "family": "holdout",
+      "query": "medical writers in Enschede looking for clients",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "relation": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": null,
+      "frame": {
+        "entity": "person",
+        "location": "Enschede",
+        "locations": [],
+        "role": "medical writers",
+        "relation": "seeking_client",
+        "required_fields": [],
+        "objective": "prospecting"
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "Enschede"
+        ],
+        "purpose": "prospecting",
+        "criteria": [
+          "role=medical writer",
+          "location=Enschede",
+          "location_id=geo:stated:enschede",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h032",
+      "family": "holdout",
+      "query": "find bell foundries in Chattanooga and also find board game cafés in Sfax",
+      "checks": {},
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "business",
+        "location": "Chattanooga",
+        "locations": [],
+        "category": "bell foundries",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "Chattanooga"
+        ],
+        "purpose": null,
+        "criteria": [
+          "category=bell foundry",
+          "location=Chattanooga",
+          "location_id=geo:stated:chattanooga",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h033",
+      "family": "holdout",
+      "query": "proptech startups in Brno that raised funding recently",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "mode": true,
+        "relation": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "Brno",
+        "locations": [],
+        "category": "proptech startups",
+        "relation": "received_funding",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Brno"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=proptech startup",
+          "location=Brno",
+          "location_id=geo:stated:brno",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h034",
+      "family": "holdout",
+      "query": "space",
+      "checks": {
+        "clarification": true
+      },
+      "failed": [],
+      "question": "entity",
+      "frame": {
+        "entity": "unknown",
+        "locations": [],
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "unknown",
+        "locations": [],
+        "purpose": null,
+        "criteria": [],
+        "missing": [
+          "entity"
+        ],
+        "status": "needs_clarification"
+      }
+    },
+    {
+      "id": "h035",
+      "family": "holdout",
+      "query": "Give me 100 hydroponic farms in Hsinchu, phone number required, Instagram if possible, verify they are currently open, and output a table I can paste into Notion",
+      "checks": {
+        "location": true,
+        "contacts_outputs": true,
+        "spec_location": true,
+        "spec_required_fields": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "business",
+        "location": "Hsinchu",
+        "locations": [],
+        "category": "hydroponic farms",
+        "relation": "none",
+        "required_fields": [
+          "name",
+          "phone",
+          "evidence"
+        ],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "Hsinchu"
+        ],
+        "purpose": null,
+        "criteria": [
+          "category=hydroponic farm",
+          "location=Hsinchu",
+          "location_id=geo:stated:hsinchu",
+          "location_kind=stated",
+          "require_name=true",
+          "required_field=name",
+          "require_phone=true",
+          "required_field=phone",
+          "require_evidence=true",
+          "required_field=evidence",
+          "prefer_instagram=true",
+          "verify_phone_is_public=true",
+          "output_table=true",
+          "output_other=Notion-ready output",
+          "requested_count=100"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h036",
+      "family": "holdout",
+      "query": "harbour pilots in Arequipa hiring arborists",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "mode": true,
+        "relation": true,
+        "signal": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "location": "Arequipa",
+        "locations": [],
+        "role": "harbour pilots",
+        "relation": "hiring",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "Arequipa"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=harbour pilot",
+          "location=Arequipa",
+          "location_id=geo:stated:arequipa",
+          "location_kind=stated",
+          "requested_role=arborists"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h037",
+      "family": "holdout",
+      "query": "prosthetists attending Interzoo",
+      "checks": {
+        "entity": true,
+        "relation": true,
+        "spec_entity": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "locations": [],
+        "role": "prosthetists",
+        "relation": "attending_event",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [],
+        "purpose": null,
+        "criteria": [
+          "role=prosthetist"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h038",
+      "family": "holdout",
+      "query": "companies in Tromsø that need ISO certification",
+      "checks": {
+        "location": true,
+        "mode": true,
+        "relation": true,
+        "signal": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": null,
+      "frame": {
+        "entity": "company",
+        "location": "Tromsø",
+        "locations": [],
+        "relation": "needs_service",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Tromsø"
+        ],
+        "purpose": "prospecting",
+        "criteria": [
+          "location=Tromsø",
+          "location_id=geo:stated:troms",
+          "location_kind=stated",
+          "requested_service=iso certification"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "h039",
+      "family": "holdout",
+      "query": "I need at least 25 roasteries in Braga",
+      "checks": {
+        "location": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "business",
+        "location": "Braga",
+        "locations": [],
+        "category": "roasteries",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "Braga"
+        ],
+        "purpose": null,
+        "criteria": [
+          "category=roastery",
+          "location=Braga",
+          "location_id=geo:stated:braga",
+          "location_kind=stated",
+          "minimum_count=25"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c000a",
+      "family": "chaos",
+      "query": "looking for compnies in enschede hiring actuarys",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "signal": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "enschede",
+        "locations": [],
+        "category": "compnies",
+        "relation": "hiring",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "enschede"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=compny",
+          "location=enschede",
+          "location_id=geo:stated:enschede",
+          "location_kind=stated",
+          "requested_role=actuarys"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c000b",
+      "family": "chaos",
+      "query": "help me find ACTUARYS IN ENSCHEDE LOOKING FOR WORK if poss",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "relation": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "location": "ENSCHEDE",
+        "locations": [],
+        "role": "actuarys",
+        "relation": "seeking_job",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "ENSCHEDE"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=actuary",
+          "location=ENSCHEDE",
+          "location_id=geo:stated:enschede",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c002a",
+      "family": "chaos",
+      "query": "voiceover agencies in Fayetteville rn",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "clarification": true,
+        "clarification_id": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "Fayetteville",
+        "locations": [],
+        "category": "voiceover agencies",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Fayetteville"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=voiceover agency",
+          "location=Fayetteville",
+          "location_id=geo:stated:fayetteville",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c002b",
+      "family": "chaos",
+      "query": "companies in fyetteville needing voiceover 🚀",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "signal": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": null,
+      "frame": {
+        "entity": "company",
+        "location": "fyetteville",
+        "locations": [],
+        "relation": "needs_service",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Fayetteville"
+        ],
+        "purpose": "prospecting",
+        "criteria": [
+          "location=Fayetteville",
+          "location_id=geo:city:fayetteville",
+          "location_kind=city",
+          "location_country=US",
+          "location_parents=geo:country:us",
+          "requested_service=voiceover"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c004a",
+      "family": "chaos",
+      "query": "hey COMPANIES IN AARHUS HIRRING ORTHODONTISTS pls",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "signal": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "AARHUS",
+        "locations": [],
+        "relation": "hiring",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "AARHUS"
+        ],
+        "purpose": null,
+        "criteria": [
+          "location=AARHUS",
+          "location_id=geo:stated:aarhus",
+          "location_kind=stated",
+          "requested_role=orthodontists"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c004b",
+      "family": "chaos",
+      "query": "orthodontists in Aarhus looking for work",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "relation": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "location": "Aarhus",
+        "locations": [],
+        "role": "orthodontists",
+        "relation": "seeking_job",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "Aarhus"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=orthodontist",
+          "location=Aarhus",
+          "location_id=geo:stated:aarhus",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c006a",
+      "family": "chaos",
+      "query": "yo investors funding aquaculture startups in Kelowna",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "investor",
+        "location": "Kelowna",
+        "locations": [],
+        "relation": "investing_in",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "investor",
+        "locations": [
+          "Kelowna"
+        ],
+        "purpose": null,
+        "criteria": [
+          "location=Kelowna",
+          "location_id=geo:stated:kelowna",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c006b",
+      "family": "chaos",
+      "query": "aquaculture startups in Kelowna raising money",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "relation": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "Kelowna",
+        "locations": [],
+        "category": "aquaculture startups",
+        "relation": "seeking_funding",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Kelowna"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=aquaculture startup",
+          "location=Kelowna",
+          "location_id=geo:stated:kelowna",
+          "location_kind=stated",
+          "funding_status=seeking"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c008a",
+      "family": "chaos",
+      "query": "fleet maintenance agncies in sfax",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "clarification": true,
+        "clarification_id": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "sfax",
+        "locations": [],
+        "category": "fleet maintenance agncies",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "sfax"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=fleet maintenance agncy",
+          "location=sfax",
+          "location_id=geo:stated:sfax",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c008b",
+      "family": "chaos",
+      "query": "ok so companies in sfax needing fleet maintenance",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "signal": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": null,
+      "frame": {
+        "entity": "company",
+        "location": "sfax",
+        "locations": [],
+        "relation": "needs_service",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "sfax"
+        ],
+        "purpose": "prospecting",
+        "criteria": [
+          "location=sfax",
+          "location_id=geo:stated:sfax",
+          "location_kind=stated",
+          "requested_service=fleet maintenance"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c010",
+      "family": "chaos",
+      "query": "need circular economy startups košice funded this yr + founders names if u can",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "relation": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "košice",
+        "locations": [],
+        "category": "circular economy startups",
+        "relation": "received_funding",
+        "required_fields": [
+          "name"
+        ],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "košice"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=circular economy startup",
+          "location=košice",
+          "location_id=geo:stated:ko-ice",
+          "location_kind=stated",
+          "require_name=true",
+          "required_field=name",
+          "prefer_owner_name=true"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c011",
+      "family": "chaos",
+      "query": "find me 20 board game cafés outsde gaborone, not chains, insta if possbile",
+      "checks": {
+        "location": true,
+        "negation": true,
+        "filters": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "business",
+        "location": "gaborone",
+        "locations": [],
+        "category": "board game cafés",
+        "relation": "none",
+        "required_fields": [
+          "name"
+        ],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "gaborone"
+        ],
+        "purpose": null,
+        "criteria": [
+          "category=board game café",
+          "location=gaborone",
+          "location_id=geo:stated:gaborone",
+          "location_kind=stated",
+          "exclude_category=chain",
+          "require_name=true",
+          "required_field=name",
+          "prefer_instagram=true",
+          "requested_count=20"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c012",
+      "family": "chaos",
+      "query": "need  mining startups leipzig funded  this yr + founders names if u can",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "relation": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "leipzig",
+        "locations": [],
+        "category": "mining startups",
+        "relation": "received_funding",
+        "required_fields": [
+          "name"
+        ],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "leipzig"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=mining startup",
+          "location=leipzig",
+          "location_id=geo:stated:leipzig",
+          "location_kind=stated",
+          "require_name=true",
+          "required_field=name",
+          "prefer_owner_name=true"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c013",
+      "family": "chaos",
+      "query": "need FARIRERS NAGOYA PLS thx?",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "location": "NAGOYA",
+        "locations": [],
+        "role": "farirers",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "NAGOYA"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=farirer",
+          "location=NAGOYA",
+          "location_id=geo:stated:nagoya",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c014",
+      "family": "chaos",
+      "query": "need proptech startups arequipa funded this yr + founders names if u can today",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "relation": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "arequipa",
+        "locations": [],
+        "category": "proptech startups",
+        "relation": "received_funding",
+        "required_fields": [
+          "name"
+        ],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "arequipa"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=proptech startup",
+          "location=arequipa",
+          "location_id=geo:stated:arequipa",
+          "location_kind=stated",
+          "require_name=true",
+          "required_field=name",
+          "prefer_owner_name=true"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c015",
+      "family": "chaos",
+      "query": "i want need some founders round daugavpils tryna bring on localisation manager ppl rn",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "relation": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "location": "daugavpils",
+        "locations": [],
+        "role": "founders",
+        "relation": "hiring",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "daugavpils"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=founder",
+          "location=daugavpils",
+          "location_id=geo:stated:daugavpils",
+          "location_kind=stated",
+          "requested_role=localisation manager people"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c016",
+      "family": "chaos",
+      "query": "need some founders round vinlius tryna bring on localistaion manager ppl rn",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "relation": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "location": "vinlius",
+        "locations": [],
+        "role": "founders",
+        "relation": "hiring",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "Vilnius"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=founder",
+          "location=Vilnius",
+          "location_id=geo:city:vilnius",
+          "location_kind=city",
+          "location_country=LT",
+          "location_parents=geo:country:lt",
+          "requested_role=localistaion manager people"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c017",
+      "family": "chaos",
+      "query": "prsthetics labs in swansea and also roasteries in swasea when u can",
+      "checks": {},
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "swansea",
+        "locations": [],
+        "category": "prsthetics labs",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "swansea"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=prsthetics lab",
+          "location=swansea",
+          "location_id=geo:stated:swansea",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c018",
+      "family": "chaos",
+      "query": "dive schools in windhoek and also chocolatiers in maribor",
+      "checks": {},
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "organization",
+        "location": "windhoek",
+        "locations": [],
+        "category": "dive schools",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "windhoek"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=dive school",
+          "location=windhoek",
+          "location_id=geo:stated:windhoek",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c019",
+      "family": "chaos",
+      "query": "WHO AROUND SFAX NEEDS SOMEONE FOR GRANT WRTING ASAP when u can",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": null,
+      "frame": {
+        "entity": "business",
+        "location": "SFAX",
+        "locations": [],
+        "relation": "needs_service",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "SFAX"
+        ],
+        "purpose": "prospecting",
+        "criteria": [
+          "location=SFAX",
+          "location_id=geo:stated:sfax",
+          "location_kind=stated",
+          "requested_service=grant wrting"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c020",
+      "family": "chaos",
+      "query": "need some  founders  round cebu tryna bring on tax barrister  ppl  rn as  many  as  u can",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "relation": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "location": "cebu",
+        "locations": [],
+        "role": "founders",
+        "relation": "hiring",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "cebu"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=founder",
+          "location=cebu",
+          "location_id=geo:stated:cebu",
+          "location_kind=stated",
+          "requested_role=tax barrister people"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c021",
+      "family": "chaos",
+      "query": "PIANO TUNERS IN AREQUIPA AND ALSO CIDER HOUSES IN CURITIBA",
+      "checks": {},
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "location": "AREQUIPA",
+        "locations": [],
+        "role": "piano tuners",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "AREQUIPA"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=piano tuner",
+          "location=AREQUIPA",
+          "location_id=geo:stated:arequipa",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c022",
+      "family": "chaos",
+      "query": "looking for who around ghent needs someone for warehouse automation asap",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity",
+      "frame": {
+        "entity": "unknown",
+        "location": "ghent",
+        "locations": [],
+        "relation": "needs_service",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "unknown",
+        "locations": [
+          "ghent"
+        ],
+        "purpose": "prospecting",
+        "criteria": [
+          "location=ghent",
+          "location_id=geo:stated:ghent",
+          "location_kind=stated",
+          "requested_service=warehouse automation"
+        ],
+        "missing": [
+          "entity"
+        ],
+        "status": "needs_clarification"
+      }
+    },
+    {
+      "id": "c023",
+      "family": "chaos",
+      "query": "need satellite imaging startups turku funded this yr + founders names if u can as many as u can",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "relation": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "turku",
+        "locations": [],
+        "category": "satellite imaging startups",
+        "relation": "received_funding",
+        "required_fields": [
+          "name"
+        ],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "turku"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=satellite imaging startup",
+          "location=turku",
+          "location_id=geo:stated:turku",
+          "location_kind=stated",
+          "require_name=true",
+          "required_field=name",
+          "prefer_owner_name=true"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c024",
+      "family": "chaos",
+      "query": "hi taxidermists aberystwyyth pls...",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "location": "aberystwyyth",
+        "locations": [],
+        "role": "taxidermists",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "Aberystwyth"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=taxidermist",
+          "location=Aberystwyth",
+          "location_id=geo:city:aberystwyth",
+          "location_kind=city",
+          "location_country=GB",
+          "location_parents=geo:country:gb"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c025",
+      "family": "chaos",
+      "query": "who around trois-rivières needs someone for drone surveying asap",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": null,
+      "frame": {
+        "entity": "business",
+        "location": "trois-rivières",
+        "locations": [],
+        "relation": "needs_service",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "trois-rivières"
+        ],
+        "purpose": "prospecting",
+        "criteria": [
+          "location=trois-rivières",
+          "location_id=geo:stated:trois-rivi-res",
+          "location_kind=stated",
+          "requested_service=drone surveying"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c026",
+      "family": "chaos",
+      "query": "find me 30 bell foundires outtside daugavpils, not chains, insta if possible today",
+      "checks": {
+        "location": true,
+        "negation": true,
+        "filters": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "business",
+        "location": "daugavpils",
+        "locations": [],
+        "category": "bell foundry",
+        "relation": "none",
+        "required_fields": [
+          "name"
+        ],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "daugavpils"
+        ],
+        "purpose": null,
+        "criteria": [
+          "category=bell foundry",
+          "location=daugavpils",
+          "location_id=geo:stated:daugavpils",
+          "location_kind=stated",
+          "exclude_category=chain",
+          "require_name=true",
+          "required_field=name",
+          "prefer_instagram=true",
+          "requested_count=30"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c027",
+      "family": "chaos",
+      "query": "any quilt shops near brno no prper  website n got phone? as  many  as  u can",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "business",
+        "location": "brno",
+        "locations": [],
+        "category": "quilt shops",
+        "relation": "lacks_asset",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "brno"
+        ],
+        "purpose": null,
+        "criteria": [
+          "category=quilt shop",
+          "location=brno",
+          "location_id=geo:stated:brno",
+          "location_kind=stated",
+          "opportunity=no_website"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c028",
+      "family": "chaos",
+      "query": "need some founders round maribor tryna bring on agronomist ppl rn",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "relation": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "location": "maribor",
+        "locations": [],
+        "role": "founders",
+        "relation": "hiring",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "maribor"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=founder",
+          "location=maribor",
+          "location_id=geo:stated:maribor",
+          "location_kind=stated",
+          "requested_role=agronomist people"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c029",
+      "family": "chaos",
+      "query": "sauas saskatoon pls",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "business",
+        "location": "saskatoon",
+        "locations": [],
+        "category": "sauas",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "saskatoon"
+        ],
+        "purpose": null,
+        "criteria": [
+          "category=saua",
+          "location=saskatoon",
+          "location_id=geo:stated:saskatoon",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c030",
+      "family": "chaos",
+      "query": "yo ok so i do trade show fabriication n im tryna find like cider houses around pereira that dont got a site, phone would b great, thx",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": null,
+      "frame": {
+        "entity": "business",
+        "location": "pereira",
+        "locations": [],
+        "category": "cidery",
+        "relation": "lacks_asset",
+        "required_fields": [
+          "name"
+        ],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "pereira"
+        ],
+        "purpose": "prospecting",
+        "criteria": [
+          "category=cidery",
+          "location=pereira",
+          "location_id=geo:stated:pereira",
+          "location_kind=stated",
+          "opportunity=no_website",
+          "offer=trade show fabriication",
+          "mode=selling",
+          "require_name=true",
+          "required_field=name",
+          "prefer_phone=true"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c031",
+      "family": "chaos",
+      "query": "find me 40 piano tuners outside geelong, not chains, insta if possible",
+      "checks": {
+        "location": true,
+        "negation": true,
+        "filters": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "location": "geelong",
+        "locations": [],
+        "role": "piano tuners",
+        "relation": "none",
+        "required_fields": [
+          "name"
+        ],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "geelong"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=piano tuner",
+          "location=geelong",
+          "location_id=geo:stated:geelong",
+          "location_kind=stated",
+          "exclude_category=chain",
+          "require_name=true",
+          "required_field=name",
+          "prefer_instagram=true",
+          "requested_count=40"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c032",
+      "family": "chaos",
+      "query": "prosthetics labs turku pls",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "turku",
+        "locations": [],
+        "category": "prosthetics labs",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "turku"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=prosthetics lab",
+          "location=turku",
+          "location_id=geo:stated:turku",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c033",
+      "family": "chaos",
+      "query": "need taxidermists in örebro and also taxidermists in aberystwyth",
+      "checks": {},
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "location": "örebro",
+        "locations": [],
+        "role": "taxidermists",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "örebro"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=taxidermist",
+          "location=örebro",
+          "location_id=geo:stated:rebro",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c034",
+      "family": "chaos",
+      "query": "looking for need some founders round swansea tryna bring on  luthier ppl  rn?",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "relation": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "location": "swansea",
+        "locations": [],
+        "role": "founders",
+        "relation": "hiring",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "swansea"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=founder",
+          "location=swansea",
+          "location_id=geo:stated:swansea",
+          "location_kind=stated",
+          "requested_role=luthier people"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c035",
+      "family": "chaos",
+      "query": "hi cobblers arequippa pls",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "business",
+        "location": "arequippa",
+        "locations": [],
+        "category": "cobblers",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "Arequipa"
+        ],
+        "purpose": null,
+        "criteria": [
+          "category=cobbler",
+          "location=Arequipa",
+          "location_id=geo:city:arequipa",
+          "location_kind=city",
+          "location_country=PE",
+          "location_parents=geo:country:pe"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c036",
+      "family": "chaos",
+      "query": "any  orthotics cliinics near lipzig no proper  website  n  got phone?",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "business",
+        "location": "lipzig",
+        "locations": [],
+        "category": "orthotics cliinics",
+        "relation": "lacks_asset",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "Leipzig"
+        ],
+        "purpose": null,
+        "criteria": [
+          "category=orthotics cliinic",
+          "location=Leipzig",
+          "location_id=geo:city:leipzig",
+          "location_kind=city",
+          "location_country=DE",
+          "location_parents=geo:country:de",
+          "opportunity=no_website"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c037",
+      "family": "chaos",
+      "query": "orthotiics  clinics waterford  pls",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "business",
+        "location": "waterford",
+        "locations": [],
+        "category": "orthotiics clinics",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "waterford"
+        ],
+        "purpose": null,
+        "criteria": [
+          "category=orthotiics clinic",
+          "location=waterford",
+          "location_id=geo:stated:waterford",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c038",
+      "family": "chaos",
+      "query": "any optometrists near saskatoon no proper website n got phone?",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "location": "saskatoon",
+        "locations": [],
+        "role": "optometrists",
+        "relation": "lacks_asset",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "saskatoon"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=optometrist",
+          "location=saskatoon",
+          "location_id=geo:stated:saskatoon",
+          "location_kind=stated",
+          "opportunity=no_website"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "c039",
+      "family": "chaos",
+      "query": "help me find any farriers near invernesss no proper website n got phone?",
+      "checks": {
+        "location": true,
+        "relation": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "location": "invernesss",
+        "locations": [],
+        "role": "farriers",
+        "relation": "lacks_asset",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "invernesss"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=farrier",
+          "location=invernesss",
+          "location_id=geo:stated:invernesss",
+          "location_kind=stated",
+          "opportunity=no_website"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "M01",
+      "family": "brand",
+      "query": "looking for d2c skincare guys around dhaka n bangladesh who r active online need emails nums socials and wanna see if they posted recently",
+      "checks": {
+        "entity": true,
+        "subtype": true,
+        "industry": true,
+        "location": true,
+        "business_model": true,
+        "contacts_outputs": true,
+        "social_freshness": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_business_model": true,
+        "spec_required_fields": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "Dhaka",
+        "locations": [],
+        "industry": "skincare",
+        "relation": "none",
+        "required_fields": [
+          "name",
+          "phone",
+          "email",
+          "socials",
+          "evidence"
+        ],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Dhaka"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=skincare",
+          "business_model=d2c",
+          "location=Dhaka",
+          "location_id=geo:city:dhaka",
+          "location_kind=city",
+          "location_country=BD",
+          "location_parents=geo:country:bd",
+          "needs_live=true",
+          "verify_last_social_post=true",
+          "require_name=true",
+          "required_field=name",
+          "require_phone=true",
+          "required_field=phone",
+          "require_email=true",
+          "required_field=email",
+          "require_socials=true",
+          "required_field=socials",
+          "require_evidence=true",
+          "required_field=evidence",
+          "verify_other=last social post date"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "M02",
+      "family": "local",
+      "query": "find plumbers in Austin",
+      "checks": {
+        "entity": true,
+        "category": true,
+        "location": true,
+        "goal_clarification": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "business",
+        "location": "Austin",
+        "locations": [],
+        "category": "plumbers",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "Austin"
+        ],
+        "purpose": null,
+        "criteria": [
+          "category=plumber",
+          "location=Austin",
+          "location_id=geo:city:austin",
+          "location_kind=city",
+          "location_country=US",
+          "location_parents=geo:country:us"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "M03",
+      "family": "local",
+      "query": "find plumbers in Austin that need website services",
+      "checks": {
+        "entity": true,
+        "category": true,
+        "location": true,
+        "relation": true,
+        "no_website": true,
+        "goal_clarification": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": null,
+      "frame": {
+        "entity": "business",
+        "location": "Austin",
+        "locations": [],
+        "category": "plumbers",
+        "relation": "needs_service",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "Austin"
+        ],
+        "purpose": "prospecting",
+        "criteria": [
+          "category=plumber",
+          "location=Austin",
+          "location_id=geo:city:austin",
+          "location_kind=city",
+          "location_country=US",
+          "location_parents=geo:country:us",
+          "requested_service=website services"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "M04",
+      "family": "local",
+      "query": "Camrose Alberta businesses with no website but active facebook or insta. phone and email please",
+      "checks": {
+        "entity": true,
+        "subtype": true,
+        "location": true,
+        "contacts_outputs": true,
+        "no_website": true,
+        "social_freshness": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_required_fields": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "business",
+        "location": "Camrose Alberta",
+        "locations": [],
+        "category": "camrose alberta businesses",
+        "relation": "lacks_asset",
+        "required_fields": [
+          "name",
+          "phone",
+          "email",
+          "evidence"
+        ],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "Camrose"
+        ],
+        "purpose": null,
+        "criteria": [
+          "category=camrose alberta business",
+          "location=Camrose",
+          "location_id=geo:city:camrose",
+          "location_kind=city",
+          "location_country=CA",
+          "location_parents=geo:country:ca",
+          "opportunity=no_website",
+          "needs_live=true",
+          "verify_last_social_post=true",
+          "require_name=true",
+          "required_field=name",
+          "require_phone=true",
+          "required_field=phone",
+          "require_email=true",
+          "required_field=email",
+          "require_evidence=true",
+          "required_field=evidence",
+          "verify_other=last social post date"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "M05",
+      "family": "investor",
+      "query": "need investors",
+      "checks": {
+        "entity": true,
+        "clarification": true,
+        "spec_entity": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "geography",
+      "frame": {
+        "entity": "investor",
+        "locations": [],
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "investor",
+        "locations": [],
+        "purpose": null,
+        "criteria": [],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "M06",
+      "family": "jobs",
+      "query": "remote react jobs paying this much",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "remote": true,
+        "technology": true,
+        "placeholder": true,
+        "clarification": true,
+        "spec_entity": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_salary",
+      "frame": {
+        "entity": "job",
+        "locations": [],
+        "category": "remote react jobs",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "job",
+        "locations": [],
+        "purpose": null,
+        "criteria": [
+          "role=react",
+          "industry=remote react job",
+          "technology=React",
+          "employment=remote",
+          "geo_scope=worldwide"
+        ],
+        "missing": [
+          "salary_min"
+        ],
+        "status": "needs_clarification"
+      }
+    },
+    {
+      "id": "M07",
+      "family": "founder",
+      "query": "startup founders around Tartu Estonia recently raised and hiring, at least this much revenue",
+      "checks": {
+        "entity": true,
+        "role": true,
+        "location": true,
+        "signal": true,
+        "placeholder": true,
+        "clarification": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_revenue",
+      "frame": {
+        "entity": "person",
+        "location": "Tartu Estonia",
+        "locations": [],
+        "role": "startup founders",
+        "relation": "hiring",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "Tartu"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=startup founder",
+          "location=Tartu",
+          "location_id=geo:city:tartu",
+          "location_kind=city",
+          "location_country=EE",
+          "location_parents=geo:country:ee"
+        ],
+        "missing": [
+          "revenue"
+        ],
+        "status": "needs_clarification"
+      }
+    },
+    {
+      "id": "M08",
+      "family": "investor",
+      "query": "pre seed AI angels across southeast asia actively writing checks of $100k to $250k",
+      "checks": {
+        "entity": true,
+        "subtype": true,
+        "industry": true,
+        "location": true,
+        "signal": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "investor",
+        "location": "southeast asia",
+        "locations": [],
+        "category": "pre seed ai angels",
+        "relation": "investing_in",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "investor",
+        "locations": [
+          "southeast asia"
+        ],
+        "purpose": null,
+        "criteria": [
+          "investor_sector=pre seed ai angel",
+          "location=southeast asia",
+          "location_id=geo:stated:southeast-asia",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "M09",
+      "family": "jobs",
+      "query": "Find remote startup jobs using React and TypeScript, hiring globally, paying at least $120,000 per year",
+      "checks": {
+        "entity": true,
+        "remote": true,
+        "technology": true,
+        "salary": true,
+        "spec_entity": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": null,
+      "frame": {
+        "entity": "job",
+        "locations": [],
+        "category": "remote startup jobs",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "job",
+        "locations": [],
+        "purpose": null,
+        "criteria": [
+          "role=startup",
+          "industry=remote startup job",
+          "technology=React, TypeScript",
+          "employment=remote",
+          "geo_scope=worldwide",
+          "salary_min=120000"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "M10",
+      "family": "brand",
+      "query": "D2C brands in Chattogram or Dhaka, not agencies, selling skincare",
+      "checks": {
+        "entity": true,
+        "industry": true,
+        "business_model": true,
+        "negation": true,
+        "multi_location": true,
+        "spec_entity": true,
+        "spec_business_model": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "Chattogram",
+        "locations": [
+          "Chattogram",
+          "Dhaka"
+        ],
+        "category": "d2c brands",
+        "industry": "skincare",
+        "relation": "offers_service",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Chattogram",
+          "Dhaka"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=skincare",
+          "business_model=d2c",
+          "location=Chattogram",
+          "location_id=geo:city:chattogram",
+          "location_kind=city",
+          "location_country=BD",
+          "location_parents=geo:country:bd",
+          "exclude_category=agency"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "M11",
+      "family": "local",
+      "query": "umm find cafes in Bandar Seri Begawan wait no make that Muscat, with websites",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "has_website": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "business",
+        "location": "Muscat",
+        "locations": [],
+        "category": "cafes",
+        "relation": "has_asset",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "Muscat"
+        ],
+        "purpose": null,
+        "criteria": [
+          "category=cafe",
+          "location=Muscat",
+          "location_id=geo:stated:muscat",
+          "location_kind=stated",
+          "website=true"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "M12",
+      "family": "people",
+      "query": "heads of growth at fintechs in Cluj-Napoca or Tbilisi, founder emails if public",
+      "checks": {
+        "entity": true,
+        "role": true,
+        "contacts_outputs": true,
+        "multi_location": true,
+        "spec_entity": true,
+        "spec_required_fields": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "location": "Cluj-Napoca",
+        "locations": [
+          "Cluj-Napoca",
+          "Tbilisi"
+        ],
+        "role": "heads of growth",
+        "relation": "none",
+        "required_fields": [
+          "name",
+          "email"
+        ],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "Cluj-Napoca",
+          "Tbilisi"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=head of growth",
+          "location=Cluj-Napoca",
+          "location_id=geo:stated:cluj-napoca",
+          "location_kind=stated",
+          "require_name=true",
+          "required_field=name",
+          "require_email=true",
+          "required_field=email"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "M13",
+      "family": "opportunity",
+      "query": "small firms near Kigali hiring marketers AND recently funded, exclude staffing agencies",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "signal": true,
+        "negation": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "company",
+        "location": "Kigali",
+        "locations": [],
+        "category": "small firms",
+        "relation": "received_funding",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Kigali"
+        ],
+        "purpose": null,
+        "criteria": [
+          "industry=small firm",
+          "location=Kigali",
+          "location_id=geo:stated:kigali",
+          "location_kind=stated",
+          "exclude_category=staffing agency"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "M14",
+      "family": "local",
+      "query": "gotta find physio clinics in Surabaya no site but posts this month need phone",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "contacts_outputs": true,
+        "no_website": true,
+        "social_freshness": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_required_fields": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "business",
+        "location": "Surabaya",
+        "locations": [],
+        "category": "gotta find physio clinics",
+        "relation": "lacks_asset",
+        "required_fields": [
+          "name",
+          "phone",
+          "evidence"
+        ],
+        "objective": null
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "Surabaya"
+        ],
+        "purpose": null,
+        "criteria": [
+          "category=gotta find physio clinic",
+          "location=Surabaya",
+          "location_id=geo:stated:surabaya",
+          "location_kind=stated",
+          "opportunity=no_website",
+          "needs_live=true",
+          "verify_last_social_post=true",
+          "require_name=true",
+          "required_field=name",
+          "require_phone=true",
+          "required_field=phone",
+          "require_evidence=true",
+          "required_field=evidence",
+          "verify_other=last social post date"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "M15",
+      "family": "jobs",
+      "query": "hybrid TypeScript roles in Porto paying at least €70,000",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "technology": true,
+        "salary": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": null,
+      "frame": {
+        "entity": "job",
+        "location": "Porto",
+        "locations": [],
+        "category": "hybrid typescript roles",
+        "relation": "none",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "job",
+        "locations": [
+          "Porto"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=hybrid typescript",
+          "industry=hybrid typescript role",
+          "technology=TypeScript",
+          "location=Porto",
+          "location_id=geo:stated:porto",
+          "location_kind=stated",
+          "salary_min=70000"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "M16",
+      "family": "investor",
+      "query": "investors in Cebu or Chiang Mai that back climate startups, check actual recent deals",
+      "checks": {
+        "entity": true,
+        "signal": true,
+        "multi_location": true,
+        "spec_entity": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "investor",
+        "location": "Cebu",
+        "locations": [
+          "Cebu",
+          "Chiang Mai"
+        ],
+        "relation": "investing_in",
+        "required_fields": [],
+        "objective": null
+      },
+      "spec": {
+        "entity": "investor",
+        "locations": [
+          "Cebu",
+          "Chiang Mai"
+        ],
+        "purpose": null,
+        "criteria": [
+          "location=Cebu",
+          "location_id=geo:stated:cebu",
+          "location_kind=stated"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "M17",
+      "family": "founder",
+      "query": "founders in Medellín raising seed, NOT already funded, get LinkedIn and work email",
+      "checks": {
+        "entity": true,
+        "role": true,
+        "location": true,
+        "negation": true,
+        "contacts_outputs": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_required_fields": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_purpose",
+      "frame": {
+        "entity": "person",
+        "location": "Medellín",
+        "locations": [],
+        "role": "founders",
+        "relation": "seeking_funding",
+        "required_fields": [
+          "name",
+          "email",
+          "linkedin",
+          "socials"
+        ],
+        "objective": null
+      },
+      "spec": {
+        "entity": "person",
+        "locations": [
+          "Medellín"
+        ],
+        "purpose": null,
+        "criteria": [
+          "role=founder",
+          "location=Medellín",
+          "location_id=geo:stated:medell-n",
+          "location_kind=stated",
+          "funding_status=seeking",
+          "exclude_funding_status=funded",
+          "require_name=true",
+          "required_field=name",
+          "require_email=true",
+          "required_field=email",
+          "require_linkedin=true",
+          "required_field=linkedin",
+          "require_socials=true",
+          "required_field=socials"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "M18",
+      "family": "brand",
+      "query": "companies like these around Pune doing marketing, around this size, all contact details",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "contacts_outputs": true,
+        "placeholder": true,
+        "clarification": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_required_fields": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": "entity_size",
+      "frame": {
+        "entity": "company",
+        "location": "Pune",
+        "locations": [],
+        "relation": "unknown",
+        "required_fields": [
+          "name",
+          "email",
+          "phone"
+        ],
+        "objective": null
+      },
+      "spec": {
+        "entity": "company",
+        "locations": [
+          "Pune"
+        ],
+        "purpose": null,
+        "criteria": [
+          "location=Pune",
+          "location_id=geo:city:pune",
+          "location_kind=city",
+          "location_country=IN",
+          "location_parents=geo:country:in",
+          "require_name=true",
+          "required_field=name",
+          "require_email=true",
+          "required_field=email",
+          "require_phone=true",
+          "required_field=phone",
+          "require_contact=true",
+          "required_field=contact"
+        ],
+        "missing": [
+          "employee_count"
+        ],
+        "status": "needs_clarification"
+      }
+    },
+    {
+      "id": "M19",
+      "family": "local",
+      "query": "research only: restaurants in Lusaka with websites, no outreach",
+      "checks": {
+        "entity": true,
+        "category": true,
+        "location": true,
+        "has_website": true,
+        "goal_clarification": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": null,
+      "frame": {
+        "entity": "business",
+        "location": "Lusaka",
+        "locations": [],
+        "category": "restaurants",
+        "relation": "has_asset",
+        "required_fields": [],
+        "objective": "research"
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "Lusaka"
+        ],
+        "purpose": "research",
+        "criteria": [
+          "category=restaurant",
+          "location=Lusaka",
+          "location_id=geo:stated:lusaka",
+          "location_kind=stated",
+          "website=true"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    },
+    {
+      "id": "M20",
+      "family": "opportunity",
+      "query": "I sell SEO. find active shops in Alberta that could use SEO help, verify last social post and emails",
+      "checks": {
+        "entity": true,
+        "location": true,
+        "contacts_outputs": true,
+        "social_freshness": true,
+        "goal_clarification": true,
+        "spec_entity": true,
+        "spec_location": true,
+        "spec_required_fields": true,
+        "spec_preservation": true
+      },
+      "failed": [],
+      "question": null,
+      "frame": {
+        "entity": "business",
+        "location": "Alberta",
+        "locations": [],
+        "category": "active shops",
+        "relation": "unknown",
+        "required_fields": [
+          "name",
+          "email",
+          "socials",
+          "evidence"
+        ],
+        "objective": "prospecting"
+      },
+      "spec": {
+        "entity": "business",
+        "locations": [
+          "Alberta"
+        ],
+        "purpose": "prospecting",
+        "criteria": [
+          "category=active shop",
+          "location=Alberta",
+          "location_id=geo:stated:alberta",
+          "location_kind=stated",
+          "offer=seo",
+          "mode=selling",
+          "needs_live=true",
+          "verify_last_social_post=true",
+          "require_name=true",
+          "required_field=name",
+          "require_email=true",
+          "required_field=email",
+          "require_socials=true",
+          "required_field=socials",
+          "require_evidence=true",
+          "required_field=evidence",
+          "verify_other=last social post date"
+        ],
+        "missing": [],
+        "status": "ready_to_search"
+      }
+    }
+  ]
+}

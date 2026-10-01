@@ -4,10 +4,14 @@
  * Atomic lease claims make multiple instances safe; "boot recovery" is
  * inherent — an expired lease is simply claimable again by any worker.
  */
+import { skipPersistence } from "@/lib/persistence-policy.server";
+
 let started = false;
 
 export function ensureJobWorkerStarted(): void {
   if (started) return;
+  // A local worker would claim and lease production search_jobs rows.
+  if (skipPersistence("search_jobs_worker")) return;
   started = true;
   void (async () => {
     const { runJobEngine } = await import("@/lib/jobs/job-engine.server");

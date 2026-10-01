@@ -24,7 +24,12 @@ export default defineConfig({
       },
     },
     optimizeDeps: {
-      exclude: ["browser-whisper"],
+      // playwright-core is server-only (reached by the dep scanner through the
+      // `import()`s inside serverFn handlers). Pre-bundling it for the browser
+      // fails on its optional chromium-bidi requires, and a failed optimizer run
+      // leaves every /node_modules/.vite/deps request hanging, so dev renders a
+      // blank page. It never runs client-side, so skip it.
+      exclude: ["browser-whisper", "playwright-core"],
     },
     build: {
       rollupOptions: {

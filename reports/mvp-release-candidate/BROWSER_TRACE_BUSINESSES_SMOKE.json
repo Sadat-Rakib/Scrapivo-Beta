@@ -1,0 +1,192 @@
+{
+  "runId": "trace-businesses-smoke-1790728496451",
+  "query": "Restaurants in Calgary, Alberta with official websites",
+  "which": "businesses",
+  "mode": "smoke",
+  "durationMs": 29951,
+  "error": null,
+  "browser": {
+    "adapter": "playwright",
+    "status": "completed",
+    "pagesVisited": 10,
+    "currentUrl": "https://www.tripadvisor.ca/Restaurants-g181808-zfp58-Airdrie_Alberta.html"
+  },
+  "progressEvents": 26,
+  "streamedRows": [],
+  "searches": [
+    {
+      "kind": "search",
+      "query": "restaurant Calgary",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "restaurant Calgary",
+      "via": "duckduckgo",
+      "status": "empty",
+      "results": 0,
+      "reason": "raw_links=1"
+    },
+    {
+      "kind": "search",
+      "query": "restaurant Calgary",
+      "via": "bing",
+      "status": "ok",
+      "results": 15,
+      "reason": "raw_links=48"
+    },
+    {
+      "kind": "search",
+      "query": "restaurant business Calgary",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "restaurant business Calgary",
+      "via": "duckduckgo",
+      "status": "empty",
+      "results": 0,
+      "reason": "raw_links=1"
+    },
+    {
+      "kind": "search",
+      "query": "restaurant business Calgary",
+      "via": "bing",
+      "status": "ok",
+      "results": 15,
+      "reason": "raw_links=48"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://www.tripadvisor.ca/Restaurants-g181808-Airdrie_Alberta.html",
+      "pageType": "unknown",
+      "title": "tripadvisor.ca",
+      "outcome": "read",
+      "textChars": 401,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "3ad30a195809.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.restaurantji.com/ab/airdrie/",
+      "pageType": "list",
+      "title": "THE 30 BEST Restaurants in Airdrie - With Menus, Reviews, Photos - Updated September 2026",
+      "outcome": "read",
+      "textChars": 18000,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "eb7df18d6904.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.yelp.ca/search?cflt=restaurants&find_loc=Airdrie%2C+AB",
+      "pageType": "unknown",
+      "title": "yelp.ca",
+      "outcome": "read",
+      "textChars": 458,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "ddeedc5427c8.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.tripadvisor.ca/Restaurants-g181808-zfp58-Airdrie_Alberta.html",
+      "pageType": "unknown",
+      "title": "tripadvisor.ca",
+      "outcome": "read",
+      "textChars": 401,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "0d253267294a.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.tripadvisor.ca/Restaurants-g181808-Airdrie_Alberta.html",
+        "https://www.restaurantji.com/ab/airdrie/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.tripadvisor.ca/Restaurants-g181808-Airdrie_Alberta.html",
+        "https://www.restaurantji.com/ab/airdrie/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.yelp.ca/search?cflt=restaurants&find_loc=Airdrie%2C+AB",
+        "https://www.tripadvisor.ca/Restaurants-g181808-zfp58-Airdrie_Alberta.html"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.yelp.ca/search?cflt=restaurants&find_loc=Airdrie%2C+AB",
+        "https://www.tripadvisor.ca/Restaurants-g181808-zfp58-Airdrie_Alberta.html"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    }
+  ],
+  "entityOutcomes": [],
+  "remember": [],
+  "candidates": [],
+  "done": [
+    {
+      "kind": "done",
+      "status": "completed",
+      "candidates": 0,
+      "verified": 0,
+      "visited": 4,
+      "queries": 2,
+      "stoppingReason": "search_budget_reached",
+      "elapsedMs": 29927
+    }
+  ],
+  "persistenceSkipped": [
+    "ai_cache"
+  ],
+  "result": {
+    "mode": "smoke",
+    "rowsReturned": 0,
+    "rows": []
+  }
+}

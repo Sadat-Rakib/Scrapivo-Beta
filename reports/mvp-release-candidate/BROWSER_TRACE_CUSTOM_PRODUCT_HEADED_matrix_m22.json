@@ -1,0 +1,301 @@
+{
+  "runId": "trace-custom-product-1790792699844",
+  "query": "Law firms in Ontario",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 303131,
+  "error": null,
+  "audit": [],
+  "browser": {
+    "adapter": "worker",
+    "status": "completed",
+    "pagesVisited": 6,
+    "currentUrl": "https://innlaws.ca/blog/start-a-law-firm-ontario/",
+    "retained": true,
+    "controller": "agent",
+    "sessionId": "927bc752-20ca-4410-aefc-864e47dee3e6",
+    "frame": true
+  },
+  "runtime": [
+    {
+      "kind": "runtime",
+      "requested": "worker",
+      "used": "worker"
+    }
+  ],
+  "progressEvents": 23,
+  "streamedRows": [],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [
+    {
+      "kind": "search",
+      "query": "law firm company Ontario",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "law firm company Ontario",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "law firm startup Ontario",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "law firm startup Ontario",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://www.bestlawfirms.com/canada/ontario",
+      "pageType": "list",
+      "title": "Best Ontario Law Firms",
+      "outcome": "read",
+      "textChars": 18000,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~603s; injected/not_called)",
+      "capture": "3209ef1b5c3d.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://directory.lawonline.ca/on/",
+      "pageType": "unknown",
+      "title": "Ontario Lawyer Directory: Lawyers & Law Firms by Region | LawOnline",
+      "outcome": "read",
+      "textChars": 3895,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~603s; injected/not_called)",
+      "capture": "da385ea1e2dc.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.oba.org/summary-starting-up-a-law-firm-in-ontario/",
+      "pageType": "unknown",
+      "title": "Summary – Starting-up a Law Firm in Ontario | Ontario Bar Association",
+      "outcome": "read",
+      "textChars": 1785,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~587s; injected/not_called)",
+      "capture": "8418bc4e4a24.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://innlaws.ca/blog/start-a-law-firm-ontario/",
+      "pageType": "article",
+      "title": "How to start a law firm in Ontario in 2026 | Inn Laws",
+      "outcome": "read",
+      "textChars": 8164,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~587s; injected/not_called)",
+      "capture": "b3ed149f76b7.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.bestlawfirms.com/canada/ontario",
+        "https://directory.lawonline.ca/on/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~603s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.bestlawfirms.com/canada/ontario",
+        "https://directory.lawonline.ca/on/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.oba.org/summary-starting-up-a-law-firm-in-ontario/",
+        "https://innlaws.ca/blog/start-a-law-firm-ontario/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~587s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.oba.org/summary-starting-up-a-law-firm-in-ontario/",
+        "https://innlaws.ca/blog/start-a-law-firm-ontario/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    }
+  ],
+  "entityOutcomes": [],
+  "remember": [],
+  "candidates": [],
+  "done": [
+    {
+      "kind": "done",
+      "status": "completed",
+      "candidates": 0,
+      "verified": 0,
+      "visited": 4,
+      "queries": 2,
+      "stoppingReason": "diminishing_returns",
+      "elapsedMs": 70208
+    }
+  ],
+  "persistenceSkipped": [
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "NO_QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "company",
+    "criteria": [
+      "industry=law firm",
+      "location=Ontario",
+      "location_id=geo:admin:ontario",
+      "location_kind=admin",
+      "location_country=CA",
+      "location_parents=geo:country:ca"
+    ],
+    "clarify": [
+      "entity_business_model"
+    ],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_companies(country,city_norm)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "s3-parquet",
+          "partitions": [
+            "processed/companies_by_initial/ (size-ordered, 8 largest)",
+            "processed/companies_by_initial/ (widened +102 shard(s))"
+          ],
+          "scanned": 1602141,
+          "matched": 0
+        }
+      ],
+      "rawCandidates": 0,
+      "postSpecFilter": 0,
+      "timings": {
+        "understanding_ms": 3982,
+        "stored_search_ms": 211557,
+        "research_ms": 70954,
+        "enrichment_ms": 5,
+        "qualification_ms": 4931,
+        "total_ms": 291429
+      },
+      "researchable": 0,
+      "complete": 0,
+      "pendingEnrichment": 0,
+      "qualificationRejected": 0,
+      "qualified": 0,
+      "returned": 0,
+      "reason": "SOURCE_UNAVAILABLE",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "direct-http",
+            "label": "Public websites",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "searxng",
+            "label": "The web",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "browser-live",
+            "label": "Public websites",
+            "state": "empty",
+            "reason": "NO_RESULTS"
+          }
+        ],
+        "degraded": true,
+        "summary": null
+      }
+    },
+    "rowsReturned": 0,
+    "rows": [],
+    "diagnostics": [
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "direct-http",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "searxng",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      }
+    ],
+    "cancelledAtMs": null,
+    "returnedAtMs": 303129,
+    "candidateLedger": {
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 0,
+        "gated": 0,
+        "filtered": 0,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {},
+      "streamed": 0,
+      "streamedNotReturned": []
+    }
+  }
+}

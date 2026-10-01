@@ -1,0 +1,241 @@
+{
+  "runId": "trace-custom-product-1790791135942",
+  "query": "Cybersecurity companies in Austin hiring engineers",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 108360,
+  "error": null,
+  "audit": [],
+  "browser": {
+    "adapter": "worker",
+    "status": "completed",
+    "pagesVisited": 3,
+    "currentUrl": "https://www.builtinaustin.com/articles/austin-cybersecurity-companies",
+    "retained": true,
+    "controller": "agent",
+    "sessionId": "d1b029b3-9eae-4d14-9961-3c585644495d",
+    "frame": true
+  },
+  "runtime": [
+    {
+      "kind": "runtime",
+      "requested": "worker",
+      "used": "worker"
+    }
+  ],
+  "progressEvents": 13,
+  "streamedRows": [],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [
+    {
+      "kind": "search",
+      "query": "cybersecurity company company Austin",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "cybersecurity company company Austin",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://www.f6s.com/companies/cyber-security/united-states/texas/austin/co",
+      "pageType": "unknown",
+      "title": "Checking your browser",
+      "outcome": "read",
+      "textChars": 1018,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error openrouter:nex-agi/nex-n2.5-mini:free 404 (model_missing): {\"error\":{\"message\":\"This model is unavailable for free. The paid version is available now - use this)",
+      "capture": "a252f9f5a134.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.builtinaustin.com/articles/austin-cybersecurity-companies",
+      "pageType": "job_posting",
+      "title": "12 Cybersecurity Companies in Austin to Know | Built In Austin",
+      "outcome": "read",
+      "textChars": 9899,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error openrouter:nex-agi/nex-n2.5-mini:free 404 (model_missing): {\"error\":{\"message\":\"This model is unavailable for free. The paid version is available now - use this)",
+      "capture": "03f90d9a9089.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.f6s.com/companies/cyber-security/united-states/texas/austin/co",
+        "https://www.builtinaustin.com/articles/austin-cybersecurity-companies"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "openrouter:nex-agi/nex-n2.5-mini:free 404 (model_missing): {\"error\":{\"message\":\"This model is unavailable for free. The paid version is available now - use this"
+    }
+  ],
+  "entityOutcomes": [],
+  "remember": [],
+  "candidates": [],
+  "done": [
+    {
+      "kind": "done",
+      "status": "timeout",
+      "candidates": 0,
+      "verified": 0,
+      "visited": 2,
+      "queries": 1,
+      "stoppingReason": "BROWSER_DISCOVERY_TIMEOUT",
+      "elapsedMs": 75138
+    }
+  ],
+  "persistenceSkipped": [
+    "ai_cache",
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "NO_QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "company",
+    "criteria": [
+      "industry=cybersecurity company",
+      "location=Austin",
+      "location_id=geo:city:austin",
+      "location_kind=city",
+      "location_country=US",
+      "location_parents=geo:country:us",
+      "requested_role=engineer"
+    ],
+    "clarify": [
+      "entity_business_model"
+    ],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_companies(country,city_norm)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "live-social:reddit-arctic-shift",
+          "partitions": [
+            "social(1)"
+          ],
+          "scanned": 1,
+          "matched": 1
+        }
+      ],
+      "rawCandidates": 0,
+      "postSpecFilter": 0,
+      "timings": {
+        "understanding_ms": 15968,
+        "stored_search_ms": 5508,
+        "research_ms": 83060,
+        "enrichment_ms": 7,
+        "qualification_ms": 280,
+        "total_ms": 104823
+      },
+      "researchable": 1,
+      "researched": 1,
+      "complete": 0,
+      "pendingEnrichment": 0,
+      "qualificationRejected": 0,
+      "qualified": 0,
+      "returned": 0,
+      "reason": "TIMEOUT",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "direct-http",
+            "label": "Public websites",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "searxng",
+            "label": "The web",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "browser-live",
+            "label": "Public websites",
+            "state": "degraded",
+            "reason": "TIMEOUT"
+          },
+          {
+            "source": "s3-parquet",
+            "label": "Available records",
+            "state": "degraded",
+            "reason": "TIMEOUT"
+          }
+        ],
+        "degraded": true,
+        "summary": "Some sources could not be searched this time (Public websites, The web, Available records), so results may be incomplete."
+      }
+    },
+    "rowsReturned": 0,
+    "rows": [],
+    "diagnostics": [
+      {
+        "code": "SOURCE_ERROR",
+        "source": "s3-parquet",
+        "detail": "tier timeout: s3-parquet after 5000ms"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "direct-http",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "searxng",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_ERROR",
+        "source": "browser-live",
+        "detail": "BROWSER_DISCOVERY_TIMEOUT"
+      }
+    ],
+    "cancelledAtMs": null,
+    "returnedAtMs": 108356,
+    "candidateLedger": {
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 0,
+        "gated": 0,
+        "filtered": 1,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {},
+      "streamed": 0,
+      "streamedNotReturned": []
+    }
+  }
+}

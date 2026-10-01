@@ -56,8 +56,8 @@ export function ClarifyPanel({ questions, refinement, onApply, onDismiss, disabl
   };
 
   return (
-    <div className="space-y-3 rounded-2xl border border-primary/25 bg-primary/5 p-4">
-      <div className="flex items-start justify-between gap-2">
+    <div className="flex max-h-[65dvh] min-h-0 flex-col gap-3 overflow-hidden rounded-2xl border border-primary/25 bg-primary/5 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:max-h-none sm:overflow-visible">
+      <div className="flex shrink-0 items-start justify-between gap-2">
         <div className="flex items-center gap-1.5 text-xs font-medium text-primary">
           <Sparkles className="size-3.5" />
           Narrow this down
@@ -79,7 +79,7 @@ export function ClarifyPanel({ questions, refinement, onApply, onDismiss, disabl
         aria-valuenow={step + 1}
         aria-valuemin={1}
         aria-valuemax={questions.length}
-        className="h-1 w-full overflow-hidden rounded-full bg-primary/10"
+        className="h-1 w-full shrink-0 overflow-hidden rounded-full bg-primary/10"
       >
         <div
           className="h-full rounded-full bg-primary transition-all"
@@ -88,14 +88,14 @@ export function ClarifyPanel({ questions, refinement, onApply, onDismiss, disabl
       </div>
 
       {refinement && step === 0 ? (
-        <p className="text-[11px] text-muted-foreground">
+        <p className="shrink-0 text-[11px] text-muted-foreground">
           Right now we assumed: <span className="text-foreground/80">{refinement}</span>
         </p>
       ) : null}
 
-      <p className="text-sm font-medium">{q.question}</p>
+      <p className="shrink-0 text-sm font-medium">{q.question}</p>
 
-      <div className="space-y-1.5">
+      <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto overscroll-contain pr-1 sm:overflow-visible">
         {q.options.map((o) => (
           <button
             key={o.id}
@@ -143,7 +143,7 @@ export function ClarifyPanel({ questions, refinement, onApply, onDismiss, disabl
         ) : null}
       </div>
 
-      <div className="flex items-center justify-between gap-2 pt-1">
+      <div className="flex shrink-0 items-center justify-between gap-2 border-t border-border/60 bg-card/80 pt-2">
         <button
           onClick={() => {
             setOtherText("");

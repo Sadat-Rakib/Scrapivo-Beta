@@ -1,0 +1,262 @@
+{
+  "runId": "trace-custom-product-1790790931613",
+  "query": "CTOs at logistics companies in Toronto",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 48880,
+  "error": null,
+  "audit": [],
+  "browser": {
+    "adapter": "worker",
+    "status": "completed",
+    "pagesVisited": 5,
+    "currentUrl": "https://www.bing.com/search?q=site%3Alinkedin.com%2Fin%20cto%20logistics%20Toronto",
+    "retained": true,
+    "controller": "agent",
+    "sessionId": "3f5e87a2-c6a9-4517-a042-4cd4bc721a6b",
+    "frame": true
+  },
+  "runtime": [
+    {
+      "kind": "runtime",
+      "requested": "worker",
+      "used": "worker"
+    }
+  ],
+  "progressEvents": 15,
+  "streamedRows": [],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [
+    {
+      "kind": "search",
+      "query": "cto logistics Toronto",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "cto logistics Toronto",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 10,
+      "reason": "raw_links=10 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "site:linkedin.com/in cto logistics Toronto",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "site:linkedin.com/in cto logistics Toronto",
+      "via": "duckduckgo",
+      "status": "empty",
+      "results": 0,
+      "reason": "raw_links=0 unrelated=0"
+    },
+    {
+      "kind": "search",
+      "query": "site:linkedin.com/in cto logistics Toronto",
+      "via": "bing",
+      "status": "empty",
+      "results": 0,
+      "reason": "raw_links=10 unrelated=9"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://ctonet.com/company/",
+      "pageType": "unknown",
+      "title": "Company - CTO Global Logistics",
+      "outcome": "read",
+      "textChars": 627,
+      "structured": {
+        "jobs": 0,
+        "organization": "CTO Global Logistics",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "03c657cdf894.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://ctonet.com/",
+      "pageType": "unknown",
+      "title": "CTO Global Logistics",
+      "outcome": "read",
+      "textChars": 6652,
+      "structured": {
+        "jobs": 0,
+        "organization": "CTO Global Logistics",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/empty unparsed_or_empty(15 chars); injected/not_called)",
+      "capture": "222ba9966f26.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://ctonet.com/company/",
+        "https://ctonet.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "empty",
+      "entities": 0,
+      "detail": "unparsed_or_empty(15 chars)"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://ctonet.com/company/",
+        "https://ctonet.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    }
+  ],
+  "entityOutcomes": [],
+  "remember": [],
+  "candidates": [],
+  "done": [
+    {
+      "kind": "done",
+      "status": "completed",
+      "candidates": 0,
+      "verified": 0,
+      "visited": 2,
+      "queries": 2,
+      "stoppingReason": "diminishing_returns",
+      "elapsedMs": 34550
+    }
+  ],
+  "persistenceSkipped": [
+    "ai_cache",
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "NO_QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "person",
+    "criteria": [
+      "role=cto",
+      "industry=logistics",
+      "location=Toronto",
+      "location_id=geo:city:toronto",
+      "location_kind=city",
+      "location_country=CA",
+      "location_parents=geo:admin:ontario,geo:country:ca,geo:metro:gta"
+    ],
+    "clarify": [],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_people(country,city_norm,role_norm)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "s3-parquet",
+          "partitions": [
+            "processed/people_by_country/_part=canada/data_0.parquet",
+            "processed/people_by_country/_part=canada/data_1.parquet"
+          ],
+          "scanned": 16904,
+          "matched": 0
+        }
+      ],
+      "rawCandidates": 0,
+      "postSpecFilter": 0,
+      "timings": {
+        "understanding_ms": 4929,
+        "stored_search_ms": 4482,
+        "research_ms": 34767,
+        "enrichment_ms": 2,
+        "qualification_ms": 330,
+        "total_ms": 44510
+      },
+      "researchable": 0,
+      "complete": 0,
+      "pendingEnrichment": 0,
+      "qualificationRejected": 0,
+      "qualified": 0,
+      "returned": 0,
+      "reason": "SOURCE_UNAVAILABLE",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "direct-http",
+            "label": "Public websites",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "searxng",
+            "label": "The web",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "browser-live",
+            "label": "Public websites",
+            "state": "empty",
+            "reason": "NO_RESULTS"
+          }
+        ],
+        "degraded": true,
+        "summary": null
+      }
+    },
+    "rowsReturned": 0,
+    "rows": [],
+    "diagnostics": [
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "direct-http",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "searxng",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      }
+    ],
+    "cancelledAtMs": null,
+    "returnedAtMs": 48879,
+    "candidateLedger": {
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 0,
+        "gated": 0,
+        "filtered": 0,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {},
+      "streamed": 0,
+      "streamedNotReturned": []
+    }
+  }
+}

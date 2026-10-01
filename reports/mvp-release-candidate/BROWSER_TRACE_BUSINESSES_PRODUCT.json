@@ -1,0 +1,491 @@
+{
+  "runId": "trace-businesses-product-1790728235397",
+  "query": "Restaurants in Calgary, Alberta with official websites",
+  "which": "businesses",
+  "mode": "product",
+  "durationMs": 79201,
+  "error": null,
+  "browser": null,
+  "progressEvents": 6,
+  "streamedRows": [],
+  "searches": [],
+  "pages": [],
+  "extracts": [],
+  "entityOutcomes": [],
+  "remember": [],
+  "candidates": [],
+  "done": [],
+  "persistenceSkipped": [
+    "ai_cache",
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "business",
+    "criteria": [
+      "category=restaurant",
+      "location=Calgary",
+      "location_id=geo:city:calgary",
+      "location_kind=city",
+      "location_country=CA",
+      "location_parents=geo:country:ca",
+      "website=true"
+    ],
+    "clarify": [],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_businesses(country,city_norm,category)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "s3-parquet",
+          "partitions": [
+            "processed/local-businesses/by_country/ca.parquet",
+            "(exact=11 nearby=0 for \"Calgary\")"
+          ],
+          "scanned": 215848,
+          "matched": 11
+        },
+        {
+          "source": "live-osm",
+          "partitions": [
+            "live-gapfill(124)"
+          ],
+          "scanned": 124,
+          "matched": 124
+        }
+      ],
+      "rawCandidates": 135,
+      "postSpecFilter": 111,
+      "timings": {
+        "understanding_ms": 1393,
+        "stored_search_ms": 35112,
+        "research_ms": 9741,
+        "enrichment_ms": 31523,
+        "qualification_ms": 22,
+        "total_ms": 77791
+      },
+      "researchable": 100,
+      "researched": 100,
+      "complete": 56,
+      "pendingEnrichment": 54,
+      "qualificationRejected": 0,
+      "qualified": 56,
+      "returned": 10,
+      "reason": "RESULTS"
+    },
+    "rowsReturned": 10,
+    "rows": [
+      {
+        "title": "Sakana Grill",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Calgary, AB",
+        "website_url": "http://www.sakanagrill.ca",
+        "source_url": "db://businesses/a687dac0-d17d-4859-9c3f-2b780f95cbfd",
+        "disposition": "qualified",
+        "why": "Identity · Sakana Grill · sushi_restaurant · Calgary, AB · phone +14032901118"
+      },
+      {
+        "title": "Deepam Dosa",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Calgary, AB",
+        "website_url": "https://deepamdosa.online/",
+        "source_url": "db://businesses/6c6ac3a3-1b63-440d-88b1-f358c0e29a3c",
+        "disposition": "qualified",
+        "why": "Identity · Deepam Dosa · indian_restaurant · Calgary, AB · phone +14032182902"
+      },
+      {
+        "title": "Maharajah East Indian Restaurant",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Calgary, AB",
+        "website_url": "http://maharajahrestaurant.com/",
+        "source_url": "db://businesses/87e3f69b-306f-40ca-a57d-9405094b7b6f",
+        "disposition": "qualified",
+        "why": "Identity · Maharajah East Indian Restaurant · restaurant · Calgary, AB · phone +14032460080"
+      },
+      {
+        "title": "Primal Grounds Cafe",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Calgary, AB",
+        "website_url": "http://primalsoupcompany.com",
+        "source_url": "db://businesses/c37ae1f6-f5e0-4e6e-92c4-ffff26b30709",
+        "disposition": "qualified",
+        "why": "Identity · Primal Grounds Cafe · restaurant · Calgary, AB · phone +14034545282"
+      },
+      {
+        "title": "Boston Pizza",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Calgary, AB",
+        "website_url": "https://bostonpizza.com/richmond-road",
+        "source_url": "db://businesses/6f9c4c78-0012-4070-a79b-f838611547ca",
+        "disposition": "qualified",
+        "why": "Identity · Boston Pizza · restaurant · Calgary, AB · phone +14032404422"
+      },
+      {
+        "title": "Golden Bell Richmond",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Calgary, AB",
+        "website_url": "http://www.goldenbellrichmond.ca/",
+        "source_url": "db://businesses/00bf1e42-941f-4d5a-bbde-5a1f3087ea90",
+        "disposition": "qualified",
+        "why": "Identity · Golden Bell Richmond · restaurant · Calgary, AB · phone +14032404048"
+      },
+      {
+        "title": "Jerusalem Shawarma",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Calgary, AB",
+        "website_url": "http://jerusalemshawarma.net",
+        "source_url": "db://businesses/dba62a10-14e7-4959-b16b-69f0ac6df541",
+        "disposition": "qualified",
+        "why": "Identity · Jerusalem Shawarma · mediterranean_restaurant · Calgary, AB · phone +14032497693"
+      },
+      {
+        "title": "KFC",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Calgary, AB",
+        "website_url": "http://www.kfc.ca",
+        "source_url": "db://businesses/6bf26e11-d35a-4315-b520-6c17d2b0db28",
+        "disposition": "qualified",
+        "why": "Identity · KFC · fast_food_restaurant · Calgary, AB"
+      },
+      {
+        "title": "Biryani Inn",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Calgary, AB",
+        "website_url": null,
+        "source_url": "db://businesses/9d5b2cfd-01bb-4786-af78-aba6e4c904ad",
+        "disposition": "qualified",
+        "why": "Identity · Biryani Inn · indian_restaurant · Calgary, AB · phone +15878891405"
+      },
+      {
+        "title": "Ruth's Chris Steak House",
+        "kind": "business",
+        "role": null,
+        "company": null,
+        "location": "Calgary, AB",
+        "website_url": null,
+        "source_url": "db://businesses/a6f9c4d3-9212-439c-8b38-22e10b1a3568",
+        "disposition": "qualified",
+        "why": "Identity · Ruth's Chris Steak House · restaurant · Calgary, AB · phone +14032463636"
+      }
+    ],
+    "diagnostics": [
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "enrich:registry-identity",
+        "detail": "official_destination_source_unavailable"
+      }
+    ]
+  }
+}

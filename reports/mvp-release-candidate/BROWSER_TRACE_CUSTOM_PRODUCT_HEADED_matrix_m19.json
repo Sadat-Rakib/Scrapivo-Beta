@@ -1,0 +1,295 @@
+{
+  "runId": "trace-custom-product-1790792424697",
+  "query": "hi cobblers arequippa pls",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 89894,
+  "error": null,
+  "audit": [],
+  "browser": {
+    "adapter": "worker",
+    "status": "completed",
+    "pagesVisited": 7,
+    "currentUrl": "https://www.cybo.com/PE/arequipa",
+    "retained": true,
+    "controller": "agent",
+    "sessionId": "f3fb5062-f333-4bc2-95d8-ec163191fc3f",
+    "frame": true
+  },
+  "runtime": [
+    {
+      "kind": "runtime",
+      "requested": "worker",
+      "used": "worker"
+    }
+  ],
+  "progressEvents": 23,
+  "streamedRows": [],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [
+    {
+      "kind": "search",
+      "query": "cobbler Arequipa",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "cobbler Arequipa",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 9,
+      "reason": "raw_links=10 unrelated=1"
+    },
+    {
+      "kind": "search",
+      "query": "cobbler business Arequipa",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "cobbler business Arequipa",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 9,
+      "reason": "raw_links=10 unrelated=1"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://www.facebook.com/marketplace/item/1562222782294125/",
+      "pageType": "unknown",
+      "title": "Facebook",
+      "outcome": "read",
+      "textChars": 238,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1091s; injected/not_called)",
+      "capture": "e7e6e05edc97.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.instagram.com/cobbler_cafe/",
+      "pageType": "unknown",
+      "title": "Cobbler Café (@cobbler_cafe) • Instagram photos and videos",
+      "outcome": "read",
+      "textChars": 18000,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1091s; injected/not_called)",
+      "capture": "8348689491eb.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://cobblersnw.com/",
+      "pageType": "unknown",
+      "title": "Cobblers NW – Quality Craftsmanship",
+      "outcome": "read",
+      "textChars": 4902,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1079s; injected/not_called)",
+      "capture": "759a7ddbede3.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.cybo.com/PE/arequipa",
+      "pageType": null,
+      "title": "Quick security check",
+      "outcome": "thin",
+      "textChars": 62,
+      "structured": null,
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "thin: under_100_chars",
+      "capture": null
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.facebook.com/marketplace/item/1562222782294125/",
+        "https://www.instagram.com/cobbler_cafe/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1091s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://www.facebook.com/marketplace/item/1562222782294125/",
+        "https://www.instagram.com/cobbler_cafe/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://cobblersnw.com/"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "All 6 provider(s) for \"extract\" are rate-limited or cooling down; next free in ~1079s"
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://cobblersnw.com/"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    }
+  ],
+  "entityOutcomes": [],
+  "remember": [],
+  "candidates": [],
+  "done": [
+    {
+      "kind": "done",
+      "status": "completed",
+      "candidates": 0,
+      "verified": 0,
+      "visited": 4,
+      "queries": 2,
+      "stoppingReason": "diminishing_returns",
+      "elapsedMs": 40140
+    }
+  ],
+  "persistenceSkipped": [
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "NO_QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "business",
+    "criteria": [
+      "category=cobbler",
+      "location=Arequipa",
+      "location_id=geo:city:arequipa",
+      "location_kind=city",
+      "location_country=PE",
+      "location_parents=geo:country:pe"
+    ],
+    "clarify": [
+      "entity_business_model"
+    ],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_businesses(country,city_norm,category)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "s3-parquet",
+          "partitions": [
+            "processed/local-businesses/by_country/pe.parquet",
+            "(exact=0 nearby=0 for \"Arequipa\")"
+          ],
+          "scanned": 130000,
+          "matched": 0
+        }
+      ],
+      "rawCandidates": 0,
+      "postSpecFilter": 0,
+      "timings": {
+        "understanding_ms": 3110,
+        "stored_search_ms": 10354,
+        "research_ms": 74831,
+        "enrichment_ms": 3,
+        "qualification_ms": 216,
+        "total_ms": 88514
+      },
+      "researchable": 0,
+      "complete": 0,
+      "pendingEnrichment": 0,
+      "qualificationRejected": 0,
+      "qualified": 0,
+      "returned": 0,
+      "reason": "SOURCE_UNAVAILABLE",
+      "sourceHealth": {
+        "sources": [
+          {
+            "source": "osm-local",
+            "label": "Public source",
+            "state": "empty",
+            "reason": "NO_RESULTS"
+          },
+          {
+            "source": "direct-http",
+            "label": "Public websites",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "searxng",
+            "label": "The web",
+            "state": "unavailable",
+            "reason": "UNREACHABLE"
+          },
+          {
+            "source": "browser-live",
+            "label": "Public websites",
+            "state": "empty",
+            "reason": "NO_RESULTS"
+          }
+        ],
+        "degraded": true,
+        "summary": null
+      }
+    },
+    "rowsReturned": 0,
+    "rows": [],
+    "diagnostics": [
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "direct-http",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "searxng",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      }
+    ],
+    "cancelledAtMs": null,
+    "returnedAtMs": 89893,
+    "candidateLedger": {
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 0,
+        "gated": 0,
+        "filtered": 0,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {},
+      "streamed": 0,
+      "streamedNotReturned": []
+    }
+  }
+}

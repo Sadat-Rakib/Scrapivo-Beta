@@ -108,7 +108,13 @@ function fundingRow(entity_id: string): SpecRow {
   } as SpecRow;
 }
 
+// Live DB round-trip writes (and then deletes) test:ql:* rows in whatever
+// Supabase project `.env` points at — a production-backed project here. It
+// must never run by default: opt in explicitly, and never while the local
+// no-persist guard is active (MVP RC pass, test-contract fix).
 const hasEnv =
+  process.env.SCRAPIVO_ALLOW_LIVE_DB_TESTS === "true" &&
+  process.env.SCRAPIVO_LOCAL_NO_PERSIST !== "true" &&
   !!process.env.MY_SUPABASE_URL?.trim() &&
   !!process.env.MY_SUPABASE_SERVICE_ROLE_KEY?.trim();
 

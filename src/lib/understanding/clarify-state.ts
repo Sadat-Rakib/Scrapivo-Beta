@@ -18,6 +18,7 @@
 import { resolveCanonicalLocation } from "@/lib/search/location-resolver";
 import type { UnderstandingFrame } from "./frame";
 import { openValue } from "./frame";
+import { purposeFromFrame, repairExplicitPurpose } from "./purpose";
 import { classifyHead, narrowsTarget, RELATION_SIGNAL_RE } from "./lexicon";
 import {
   canonicalize,
@@ -41,6 +42,7 @@ import {
 export const BLOCKING_FIELDS = [
   "target.entity_type",
   "target.scope",
+  "user_context.objective",
   "relation.type",
   "relation.object",
   "relation.direction",
@@ -141,6 +143,13 @@ export function blockers(state: ClarificationState): Blocker[] {
   // blocks, because that is the case where half a request would be discarded.
   if (frame.compound.is_compound && frame.compound.subgoals.length < 2 && unanswered("compound.split")) {
     out.push({ field: "compound.split", reason: "compound_parse_uncertain" });
+  }
+
+  if (out.length === 0 && hasScope(frame) &&
+      ["person", "company", "business", "investor"].includes(frame.target.entity_type.value) &&
+      !purposeFromFrame(frame) && !frame.user_context.objective?.value &&
+      unanswered("user_context.objective")) {
+    out.push({ field: "user_context.objective", reason: "missing_purpose" });
   }
 
   // Last, and only when nothing above blocks: understood but unrunnable.
@@ -301,6 +310,12 @@ export function nextQuestion(state: ClarificationState): Question | null {
         options: [],
       };
     }
+    case "user_context.objective":
+      return {
+        field,
+        question: "What are you trying to do with these results?",
+        options: ["Research", "Find prospects", "Recruit", "Find partners"],
+      };
     case "relation.object": {
       const rel = state.frame.relation.type.value;
       const verb =
@@ -398,6 +413,12 @@ export function patchFrame(
     note = "empty answer — field marked answered so it is not repeated";
   } else {
     switch (field) {
+      case "user_context.objective": {
+        frame.user_context.objective = openValue(answer, answer, null, 1);
+        applied = true;
+        note = `purpose recorded from the user's answer`;
+        break;
+      }
       case "target.entity_type": {
         const t = interpretEntityType(answer);
         if (t) {
@@ -570,8 +591,8 @@ function clarificationBlock(state: ClarificationState): UnderstandingFrame["clar
 /** Refresh the clarification block without answering anything — used right
  *  after extraction so the frame reports the same thing the state machine does. */
 export function syncClarification(frame: UnderstandingFrame): UnderstandingFrame {
-  const out = structuredClone(frame);
-  out.clarification = clarificationBlock(initState(frame));
+  const out = repairExplicitPurpose(structuredClone(frame));
+  out.clarification = clarificationBlock(initState(out));
   return out;
 }
 

@@ -56,8 +56,16 @@ export interface BrowserSession {
   lastSnapshot: PageSnapshot | null;
 }
 
+/** Joins several matches when an extraction field sets `all: true`. */
+export const EXTRACT_ALL_SEPARATOR = "\u001E";
+
 export interface ExtractionSchema {
-  fields: Record<string, { selector: string; attribute?: string | null }>;
+  /**
+   * `all` returns every match joined by EXTRACT_ALL_SEPARATOR (adapters that
+   * cannot do this return the first match). `maxChars` raises the per-field cap
+   * for large structured payloads such as JSON-LD lists.
+   */
+  fields: Record<string, { selector: string; attribute?: string | null; all?: boolean; maxChars?: number }>;
 }
 
 export interface ExtractionResult {
@@ -91,6 +99,17 @@ export interface AgentBrowser {
   waitFor(session: BrowserSession, condition: WaitCondition): Promise<BrowserObservation>;
   extract(session: BrowserSession, schema: ExtractionSchema): Promise<ExtractionResult>;
   extractLinks?(session: BrowserSession, selector: string, timeoutMs?: number): Promise<PageSnapshot["links"]>;
+  /** Structured, ref-based actions (worker runtime). No generic script evaluation. */
+  key?(session: BrowserSession, key: string): Promise<BrowserObservation>;
+  back?(session: BrowserSession): Promise<BrowserObservation>;
+  forward?(session: BrowserSession): Promise<BrowserObservation>;
   screenshot(session: BrowserSession): Promise<string>;
-  close(session: BrowserSession): Promise<void>;
+  /**
+   * `outcome` says why the run ended: a completed run (including one that
+   * stopped at its time budget with results) may keep a retaining runtime's
+   * browser open for viewing; a cancelled run never does.
+   */
+  close(session: BrowserSession, outcome?: BrowserCloseOutcome): Promise<void>;
 }
+
+export type BrowserCloseOutcome = "completed" | "cancelled";

@@ -34,6 +34,8 @@ export async function getCached(key: string): Promise<string | null> {
 
 export async function putCached(key: string, task: string, response: string): Promise<void> {
   try {
+    const { skipPersistence } = await import("@/lib/persistence-policy.server");
+    if (skipPersistence("ai_cache")) return;
     const { getAdmin } = await import("@/integrations/my-supabase/admin.server");
     await getAdmin()
       .from("ai_cache")

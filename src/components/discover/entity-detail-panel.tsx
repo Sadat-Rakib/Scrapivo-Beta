@@ -6,7 +6,9 @@ import type { CompanyRow, LocalBusinessRow, PersonRow } from "@/lib/search/lead-
 import type { ResolvedContactInfo } from "@/components/discover/result-tabs";
 import { TIER_LABEL, type EvidenceObject } from "@/lib/intent/evidence";
 import { ensureHttpUrl } from "@/lib/search/site-url";
+import { websiteStatus } from "@/lib/search/website-status";
 import { fixMojibake } from "@/lib/encoding";
+import { publicSourceLabel } from "@/lib/search/activity-presenter";
 // getWebsiteBio is a serverFn — TanStack Start replaces the import with a
 // client stub, so this value import is safe. The type import is the same module.
 import { getWebsiteBio, type WebsiteBio } from "@/lib/search/website-bio.server";
@@ -252,6 +254,17 @@ export function EntityDetailPanel({
                 location string as a fake "bio" — location already has its
                 own row above. No site → no About row, never filler. */}
             <WebsiteBioRow website={b.website} />
+            {(() => {
+              const status = websiteStatus(b);
+              return status.state === "has_website" ? null : (
+                <Row label="Website">
+                  <div className="space-y-0.5">
+                    <span className="text-sm">{status.label}</span>
+                    {status.proof && <p className="text-xs text-muted-foreground">{fixMojibake(status.proof)}</p>}
+                  </div>
+                </Row>
+              );
+            })()}
             {!!b.opportunity_tags?.length && (
               <Row label="Opportunity">
                 <div className="flex flex-wrap gap-1.5 pt-0.5">
@@ -273,7 +286,8 @@ export function EntityDetailPanel({
             {c.latest_signal && (
               <Row label="Latest">
                 <span className="inline-flex items-center gap-1 text-sm">
-                  <Clock className="size-3.5 text-muted-foreground" /> {fixMojibake(c.latest_signal)}
+                  <Clock className="size-3.5 text-muted-foreground" />{" "}
+                  {fixMojibake(c.latest_signal)}
                 </span>
               </Row>
             )}
@@ -288,7 +302,10 @@ export function EntityDetailPanel({
             {c.platforms?.length > 0 && (
               <Row label="Seen on">
                 <span className="text-sm text-muted-foreground">
-                  {c.platforms.slice(0, 6).join(" · ")}
+                  {c.platforms
+                    .slice(0, 6)
+                    .map((source) => publicSourceLabel(source, c.sample_url))
+                    .join(" · ")}
                   {c.signal_count > 1 ? ` · ${c.signal_count} signals` : ""}
                 </span>
               </Row>
@@ -313,7 +330,12 @@ export function EntityDetailPanel({
             {(p.platform || p.posted_at_relative) && (
               <Row label="Source">
                 <span className="text-sm text-muted-foreground">
-                  {[p.platform, p.posted_at_relative].filter(Boolean).join(" · ")}
+                  {[
+                    p.platform ? publicSourceLabel(p.platform, p.sample_url) : null,
+                    p.posted_at_relative,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
                   {p.signal_count > 1 ? ` · ${p.signal_count} signals` : ""}
                 </span>
               </Row>
@@ -321,7 +343,8 @@ export function EntityDetailPanel({
             {p.location_hint && (
               <Row label="Location">
                 <span className="inline-flex items-center gap-1 text-sm">
-                  <MapPin className="size-3.5 text-muted-foreground" /> {fixMojibake(p.location_hint)}
+                  <MapPin className="size-3.5 text-muted-foreground" />{" "}
+                  {fixMojibake(p.location_hint)}
                 </span>
               </Row>
             )}
@@ -461,7 +484,7 @@ export function EntityDetailPanel({
                   <p className="text-xs text-foreground/80">{ev.reason}</p>
                   <p className="text-[11px] text-muted-foreground line-clamp-2">“{ev.excerpt}”</p>
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-muted-foreground">
-                    <span>{ev.source}</span>
+                    <span>{publicSourceLabel(ev.source, ev.url)}</span>
                     {ev.publishedAt ? (
                       <span>{new Date(ev.publishedAt).toLocaleDateString()}</span>
                     ) : null}
@@ -524,7 +547,9 @@ export function EntityDetailPanel({
             >
               <div className="flex items-center gap-2 text-[10px] text-muted-foreground mb-1">
                 <FileText className="size-3" />
-                <span className="truncate">{l.platform_label ?? l.platform ?? "Signal"}</span>
+                <span className="truncate">
+                  {publicSourceLabel(l.platform_label ?? l.platform, l.full_post_url)}
+                </span>
                 {l.posted_at_relative ? (
                   <span className="ml-auto shrink-0">{l.posted_at_relative}</span>
                 ) : null}

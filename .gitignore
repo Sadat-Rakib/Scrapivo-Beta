@@ -22,6 +22,9 @@ dist-ssr
 .env.*
 !.env.example
 
+# Local authenticated browser session for UI acceptance (never commit)
+.auth/
+
 # Private keys / certificates â€” never commit these
 *.key
 *.pem
@@ -48,7 +51,7 @@ dist-ssr
 *.sln
 *.sw?
 
-# Giant local datasets — exceed GitHub 100MB file limit; keep out of git
+# Giant local datasets ï¿½ exceed GitHub 100MB file limit; keep out of git
 data/BasicCompanyDataAsOneFile.zip
 data/pipeline.duckdb
 data/local_businesses_*.jsonl

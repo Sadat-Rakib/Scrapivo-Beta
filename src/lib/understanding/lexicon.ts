@@ -187,7 +187,7 @@ export const CLAUSE_STOP_TOKENS: ReadonlySet<string> = new Set([
   "raised", "raising", "raise", "funded", "funding", "posted", "posting",
   "accredited", "certified", "licensed", "registered", "listed", "rated",
   "built", "powered", "running", "run", "doing", "does", "do", "done",
-  "interested", "ready", "shopping", "after", "open",
+  "interested", "ready", "shopping", "after", "open", "paying", "actively",
   // negation / possession
   "with", "without", "no", "not", "non", "none", "lacking", "lack", "lacks",
   "missing", "excluding", "except", "excluded", "skip", "avoid", "only", "just",
@@ -905,6 +905,12 @@ export function classifyHead(
   // not a trade. Answered before the suffix backstops because those read shape
   // alone and would send "growth pros" to a business on `-th`-style accidents.
   if (droppedTransparent) {
+    // "D2C skincare guys" names brands colloquially. The business-model cue
+    // is stronger than the weak human head; a role phrase such as "dev guys"
+    // continues to mean people.
+    if (/\b(?:d2c|direct[- ]to[- ]consumer)\b/i.test(cleaned)) {
+      return { kind: "company", head: last, ambiguous: false, confidence: 0.75, modifiers, industry: last };
+    }
     return { kind: "person", head: last, ambiguous: false, confidence: 0.6, modifiers, industry };
   }
 

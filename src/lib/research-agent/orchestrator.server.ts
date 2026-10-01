@@ -167,7 +167,11 @@ function requiredValue(row: SpecRow, field: string): boolean {
   const value = field.toLowerCase().replace(/[\s-]+/g, "_");
   if (value === "email") return !!row.email;
   if (value === "phone" || value === "phone_number") return !!row.phone;
-  if (value === "website" || value === "url") return !!row.url;
+  if (value === "website") return !!row.website_url;
+  if (value === "url") return !!row.url;
+  if (value === "socials" || value === "social" || value === "social_profiles") {
+    return !!row.evidence?.some((item) => item.source_type === "social" && !!item.source_url);
+  }
   if (value === "contact" || value === "public_contact" || value === "contact_channel") return !!(row.email || row.phone || row.url);
   if (value === "location" || value === "geography") return !!(row.location || row.country);
   if (value === "role" || value === "title") return !!(row.title && row.detail);

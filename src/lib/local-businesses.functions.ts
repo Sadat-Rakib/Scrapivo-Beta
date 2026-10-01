@@ -414,10 +414,12 @@ export const runLocalBusinessSearch = createServerFn({ method: "POST" })
     ];
 
     // Owner runs unlimited searches — never tick the daily counter.
-    if (!isOwnerEmail(context.user.email)) {
+    // Local acceptance runs skip quota/history writes (ignored in production).
+    const { skipPersistence } = await import("@/lib/persistence-policy.server");
+    if (!isOwnerEmail(context.user.email) && !skipPersistence("profiles")) {
       await supabase.from("profiles").update({ searches_used: used + 1 }).eq("id", userId);
     }
-    await supabase.from("search_history").insert({
+    if (!skipPersistence("search_history")) await supabase.from("search_history").insert({
       user_id: userId,
       query: `local: ${category} in ${location}`,
       results_count: businesses.length,

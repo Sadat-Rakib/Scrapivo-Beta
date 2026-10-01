@@ -13,6 +13,8 @@ import { requireMyAuth } from "@/integrations/my-supabase/auth-middleware";
 import type { Json } from "@/integrations/supabase/types";
 
 export const MAX_TURNS = 50;
+/** Process-local transcripts used only while local no-persist is active. */
+const localTranscripts = new Map<string, TranscriptTurn[]>();
 /** Payload guard: transcripts stay well under POST/JSONB limits. */
 const MAX_PAYLOAD_BYTES = 900_000;
 
@@ -127,6 +129,13 @@ export const saveTranscript = createServerFn({ method: "POST" })
       sources_searched: ["discover-transcript"],
       transcript: turns,
     };
+    // Local acceptance runs keep transcripts in process memory instead of
+    // writing search_history (ignored in production; see persistence-policy).
+    const { skipPersistence } = await import("@/lib/persistence-policy.server");
+    if (skipPersistence("search_history")) {
+      localTranscripts.set(`${context.userId}|${data.conversationId}`, turns);
+      return { ok: true };
+    }
     const { error } = await context.supabase
       .from("search_history")
       .upsert(payload, { onConflict: "conversation_id" });
@@ -151,6 +160,8 @@ export const getTranscript = createServerFn({ method: "GET" })
     z.object({ conversationId: z.string().min(1).max(120) }).parse(d),
   )
   .handler(async ({ data, context }): Promise<{ turns: TranscriptTurn[] }> => {
+    const local = localTranscripts.get(`${context.userId}|${data.conversationId}`);
+    if (local) return { turns: sanitizeTurns(local) };
     // User-scoped read: RLS plus explicit user_id match (defense in depth;
     // conversation ids are unguessable but never solely relied upon).
     const { data: row, error } = await context.supabase

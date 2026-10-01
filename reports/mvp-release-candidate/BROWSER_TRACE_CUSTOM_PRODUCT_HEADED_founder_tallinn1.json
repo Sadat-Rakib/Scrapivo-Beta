@@ -1,0 +1,309 @@
+{
+  "runId": "trace-custom-product-1790772196549",
+  "query": "Founders of B2B SaaS startups in Tallinn, Estonia who are hiring engineers right now, with public contact",
+  "which": "custom",
+  "mode": "product",
+  "durationMs": 27049,
+  "error": null,
+  "audit": [],
+  "browser": {
+    "adapter": "worker",
+    "status": "completed",
+    "pagesVisited": 9,
+    "currentUrl": "https://join.com/companies/startupwiseguys/16751344-startup-co-founder-b2b",
+    "retained": true,
+    "controller": "agent",
+    "sessionId": "981295b1-0d7f-4e89-9c71-91b7a19dc9c4",
+    "frame": true
+  },
+  "runtime": [
+    {
+      "kind": "runtime",
+      "requested": "worker",
+      "used": "worker"
+    }
+  ],
+  "progressEvents": 25,
+  "streamedRows": [],
+  "streamedAfterCancel": null,
+  "eventsAfterCancel": null,
+  "searches": [
+    {
+      "kind": "search",
+      "query": "\"founder\" B2B SaaS Tallinn",
+      "via": "structured",
+      "status": "unavailable",
+      "results": 0,
+      "reason": "SEARXNG_UNREACHABLE: fetch failed"
+    },
+    {
+      "kind": "search",
+      "query": "\"founder\" B2B SaaS Tallinn",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 3,
+      "reason": "raw_links=5 unrelated=2"
+    },
+    {
+      "kind": "search",
+      "query": "\"co-founder\" B2B SaaS Tallinn",
+      "via": "structured",
+      "status": "skipped",
+      "results": 0,
+      "reason": "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN"
+    },
+    {
+      "kind": "search",
+      "query": "\"co-founder\" B2B SaaS Tallinn",
+      "via": "duckduckgo",
+      "status": "ok",
+      "results": 5,
+      "reason": "raw_links=6 unrelated=1"
+    }
+  ],
+  "pages": [
+    {
+      "origin": "discovery",
+      "url": "https://relocationstrategy.net/",
+      "pageType": "unknown",
+      "title": "Relocation Strategy — Residency for EU Founders",
+      "outcome": "read",
+      "textChars": 3722,
+      "structured": {
+        "jobs": 0,
+        "organization": "Relocation Strategy",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error groq:openai/gpt-oss-20b 400 (bad_request): {\"error\":{\"message\":\"Failed to generate JSON. Please adjust your prompt. See 'failed_generation' for more details.\",\"; injected/not_called)",
+      "capture": "9685373707d4.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://www.vcbacked.co/directory/cities/industry/tallinn-estonia/software",
+      "pageType": "aggregator",
+      "title": "83 Recently Funded Software Startups in Tallinn (September 2026) | VCBacked",
+      "outcome": "read",
+      "textChars": 9674,
+      "structured": {
+        "jobs": 0,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "extractor empty (deterministic/error groq:openai/gpt-oss-20b 400 (bad_request): {\"error\":{\"message\":\"Failed to generate JSON. Please adjust your prompt. See 'failed_generation' for more details.\",\"; injected/not_called)",
+      "capture": "9a9d668471f8.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://foundersbase.com/find-cofounders/tallinn",
+      "pageType": "unknown",
+      "title": "Find a Co-Founder in Tallinn | Foundersbase",
+      "outcome": "read",
+      "textChars": 4476,
+      "structured": {
+        "jobs": 0,
+        "organization": "Foundersbase",
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "NO",
+      "produced": [],
+      "why": "entities rejected: ",
+      "capture": "dfb8fc521266.json"
+    },
+    {
+      "origin": "discovery",
+      "url": "https://join.com/companies/startupwiseguys/16751344-startup-co-founder-b2b",
+      "pageType": "unknown",
+      "title": "Startup Wise Guys (Remote): Startup Co-Founder B2B",
+      "outcome": "read",
+      "textChars": 3545,
+      "structured": {
+        "jobs": 1,
+        "organization": null,
+        "emails": 0,
+        "phones": 0
+      },
+      "candidateProduced": "YES",
+      "produced": [
+        "Startup Wise Guys"
+      ],
+      "why": "",
+      "capture": "a736b0fc2d9f.json"
+    }
+  ],
+  "extracts": [
+    {
+      "kind": "extract",
+      "pages": [
+        "https://relocationstrategy.net/",
+        "https://www.vcbacked.co/directory/cities/industry/tallinn-estonia/software"
+      ],
+      "extractor": "deterministic",
+      "llm": "error",
+      "entities": 0,
+      "detail": "groq:openai/gpt-oss-20b 400 (bad_request): {\"error\":{\"message\":\"Failed to generate JSON. Please adjust your prompt. See 'failed_generation' for more details.\",\""
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://relocationstrategy.net/",
+        "https://www.vcbacked.co/directory/cities/industry/tallinn-estonia/software"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 0
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://foundersbase.com/find-cofounders/tallinn",
+        "https://join.com/companies/startupwiseguys/16751344-startup-co-founder-b2b"
+      ],
+      "extractor": "llm",
+      "llm": "ok",
+      "entities": 1
+    },
+    {
+      "kind": "extract",
+      "pages": [
+        "https://foundersbase.com/find-cofounders/tallinn",
+        "https://join.com/companies/startupwiseguys/16751344-startup-co-founder-b2b"
+      ],
+      "extractor": "injected",
+      "llm": "not_called",
+      "entities": 1
+    }
+  ],
+  "entityOutcomes": [
+    {
+      "page": "https://join.com/companies/startupwiseguys/16751344-startup-co-founder-b2b",
+      "name": "Startup Wise Guys",
+      "kind": "company",
+      "outcome": "row",
+      "reason": null,
+      "detail": null,
+      "dropped": []
+    }
+  ],
+  "remember": [
+    {
+      "kind": "remember",
+      "name": "Startup Wise Guys",
+      "rowKind": "company",
+      "outcome": "ENTITY_TYPE_MISMATCH",
+      "resolved": true
+    }
+  ],
+  "candidates": [],
+  "done": [
+    {
+      "kind": "done",
+      "status": "completed",
+      "candidates": 0,
+      "verified": 0,
+      "visited": 4,
+      "queries": 2,
+      "stoppingReason": "diminishing_returns",
+      "elapsedMs": 15662
+    }
+  ],
+  "persistenceSkipped": [
+    "ai_cache",
+    "source_yield_stats"
+  ],
+  "result": {
+    "mode": "product",
+    "outcome": "NO_QUALIFIED_RESULTS",
+    "status": "ready_to_search",
+    "entity": "person",
+    "criteria": [
+      "role=founder",
+      "industry=B2B SaaS",
+      "company_stage=startup",
+      "location=Tallinn",
+      "location_id=geo:city:tallinn",
+      "location_kind=city",
+      "location_country=EE",
+      "location_parents=geo:country:ee",
+      "requested_role=engineer",
+      "require_contact=true",
+      "required_field=contact"
+    ],
+    "clarify": [],
+    "liveDiscovery": "completed",
+    "retrievalTrace": {
+      "sources": [
+        {
+          "source": "pg-index",
+          "partitions": [
+            "idx_people(country,city_norm,role_norm)"
+          ],
+          "scanned": 0,
+          "matched": 0
+        },
+        {
+          "source": "s3-parquet",
+          "partitions": [
+            "processed/people_by_country/_part=estonia/data_0.parquet",
+            "processed/people_by_country/_part=estonia/data_1.parquet"
+          ],
+          "scanned": 71,
+          "matched": 0
+        }
+      ],
+      "rawCandidates": 0,
+      "postSpecFilter": 0,
+      "timings": {
+        "understanding_ms": 3031,
+        "stored_search_ms": 2495,
+        "research_ms": 20546,
+        "enrichment_ms": 1,
+        "qualification_ms": 79,
+        "total_ms": 26152
+      },
+      "researchable": 0,
+      "complete": 0,
+      "pendingEnrichment": 0,
+      "qualificationRejected": 0,
+      "qualified": 0,
+      "returned": 0,
+      "reason": "SOURCE_UNAVAILABLE"
+    },
+    "rowsReturned": 0,
+    "rows": [],
+    "diagnostics": [
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "direct-http",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      },
+      {
+        "code": "SOURCE_UNAVAILABLE",
+        "source": "searxng",
+        "detail": "SEARXNG_UNREACHABLE: fetch failed"
+      }
+    ],
+    "cancelledAtMs": null,
+    "returnedAtMs": 27049,
+    "candidateLedger": {
+      "counts": {
+        "returned": 0,
+        "qualified_more": 0,
+        "rejected": 0,
+        "gated": 0,
+        "incomplete": 0,
+        "excluded": 0,
+        "unaccounted": 0
+      },
+      "rejectReasons": {},
+      "streamed": 0,
+      "streamedNotReturned": []
+    }
+  }
+}
