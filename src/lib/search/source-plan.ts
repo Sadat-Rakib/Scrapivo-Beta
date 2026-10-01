@@ -357,6 +357,35 @@ function discoveryTerms(spec: SearchSpec): string[] {
   ]);
 }
 
+/**
+ * E2E-C8: a discovery query built from filler alone ("startup", "company")
+ * burns live-browser budget on junk and answers nothing. A query earns a slot
+ * only when it carries request-specific terms and at least two of them (or one
+ * quoted phrase). The signal/topic terms are seeded FIRST so a request like
+ * "people looking for a web designer" gapsfills with the ask, not "startup".
+ */
+const GENERIC_FILLER = new Set([
+  "startup", "startups", "company", "companies", "business", "businesses",
+  "people", "person", "find", "leads", "looking", "needs",
+]);
+
+function substantiveQuery(q: string): boolean {
+  const quoted = /"[^"]+"/.test(q);
+  const meat = q
+    .replace(/"[^"]*"/g, " ")
+    .split(/[^a-z0-9]+/i)
+    .filter((w) => w && !GENERIC_FILLER.has(w.toLowerCase()));
+  return meat.length >= 2 || (meat.length >= 1 && quoted);
+}
+
+function keepSubstantive(queries: Array<string | null>): string[] {
+  return uniq(
+    queries
+      .map((q) => (q ?? "").trim())
+      .filter((q) => q && substantiveQuery(q)),
+  );
+}
+
 export function buildResearchPlan(
   spec: SearchSpec,
   opts?: { desiredCount?: number },
@@ -368,6 +397,7 @@ export function buildResearchPlan(
   const model = fieldOf(spec, "business_model");
   const requestedRole = fieldOf(spec, "requested_role");
   const requestedService = fieldOf(spec, "requested_service");
+  const requestedProduct = fieldOf(spec, "requested_product");
   const funding = fieldOf(spec, "funding_status");
   const category = fieldOf(spec, "category") ?? fieldOf(spec, "industry");
   const noWebsite = fieldOf(spec, "opportunity") === "no_website";
@@ -376,19 +406,20 @@ export function buildResearchPlan(
   let discoveryQueries: string[];
   if (spec.entity === "person") {
     const roles = roleTerms(role);
-    discoveryQueries = uniq([
+    discoveryQueries = keepSubstantive([
       ...topics.map((topic) => [role, location, `"${topic.replace(/"/g, "")}"`].filter(Boolean).join(" ")),
+      ...[requestedService, requestedProduct].filter(Boolean).map((want) => [`"looking for" "${want}"`, location].filter(Boolean).join(" ")),
       ...roles.map((r) => [r, industry, model, location].filter(Boolean).join(" ")),
       ...roles.map((r) => ['site:linkedin.com/in', r, industry, location].filter(Boolean).join(" ")),
-      [role, industry, "startup", location].filter(Boolean).join(" "),
+      [role, industry, location].filter(Boolean).join(" "),
     ]);
   } else if (spec.entity === "company") {
-    discoveryQueries = uniq([
-      [industry, model, "company", location].filter(Boolean).join(" "),
-      [industry, model, "startup", location].filter(Boolean).join(" "),
+    discoveryQueries = keepSubstantive([
+      [industry, model, location].filter(Boolean).join(" "),
       funding ? [industry, "funded startup", location].filter(Boolean).join(" ") : null,
       requestedRole ? [industry, "hiring", requestedRole, location].filter(Boolean).join(" ") : null,
       requestedService ? [industry, "needs", requestedService, location].filter(Boolean).join(" ") : null,
+      ...topics.map((topic) => [`"${topic.replace(/"/g, "")}"`, location].filter(Boolean).join(" ")),
     ]);
   } else if (spec.entity === "business") {
     discoveryQueries = uniq([

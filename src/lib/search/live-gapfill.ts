@@ -602,7 +602,13 @@ async function runSourceGapfill(
         continue;
       }
       try {
-        const q = buildResearchPlan(spec, { desiredCount: deps.desiredCount }).discoveryQueries[0] ?? "";
+        const webPlan = buildResearchPlan(spec, { desiredCount: deps.desiredCount });
+        // E2E-C8 observability: the exact query variants gapfill will spend
+        // live-browser budget on, for post-run debugging.
+        if (typeof console !== "undefined") {
+          console.info("[gapfill-queries]", JSON.stringify(webPlan.discoveryQueries.slice(0, 6)));
+        }
+        const q = webPlan.discoveryQueries[0] ?? "";
         const entity =
           spec.entity === "business" ||
           spec.entity === "company" ||
