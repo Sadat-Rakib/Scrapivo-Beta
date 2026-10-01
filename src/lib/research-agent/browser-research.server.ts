@@ -17,6 +17,7 @@ import {
   type StaticPageRead,
 } from "./candidate-acquisition.server";
 import { detectOperationalStatus, operationalStatusAccepted, statusEvidence } from "./operational-status";
+import { resolveNavigationPolicy } from "@/lib/search/browser-policy.server";
 import {
   classifyPageRelevance,
   PAGE_LEVEL_STOP_VERDICTS,
@@ -627,6 +628,11 @@ export async function researchCandidatesWithBrowser(args: {
   const pacedFetch = pacedStaticFetch(args.fetchPage);
   const counters = { pages: 0, actions: 0, screenshots: 0 };
   let sessionCounter = 0;
+  // Workstream E: the run's whole page budget comes from the central policy —
+  // when it is spent, remaining candidates are recorded as skipped (with why)
+  // instead of wandering into ever more pages.
+  const policy = resolveNavigationPolicy();
+  let runPagesLeft = policy.maxPagesPerRun;
 
   const workOne = async (candidate: ResearchCandidate): Promise<ResearchCandidate> => {
     try {
@@ -652,6 +658,7 @@ export async function researchCandidatesWithBrowser(args: {
           return candidate;
         } finally {
           counters.pages += session.counters.pages;
+          runPagesLeft -= session.counters.pages;
           counters.actions += session.counters.actions;
           counters.screenshots += session.counters.screenshots;
           await args.browser.close(session);
@@ -722,6 +729,17 @@ export async function researchCandidatesWithBrowser(args: {
         }));
         return { ...candidate, state: "UNRESOLVED", rejectionReason: "source_degraded" };
       }
+      // Run page budget (Workstream E): a spent budget is recorded, not
+      // silently wandered past.
+      if (runPagesLeft <= 0) {
+        emit(researchEvent({
+          sessionId: args.sessionId, type: "SOURCE_DEGRADED", phase: "BROWSER",
+          internal: { code: "RUN_PAGE_BUDGET_EXHAUSTED", candidateId: candidate.id, url },
+          domain: host,
+          message: "This search reached its page budget; some sources were left unchecked.",
+        }));
+        return { ...candidate, state: "UNRESOLVED", rejectionReason: "run_page_budget_exhausted" };
+      }
 
       // HTTP-first acquisition policy (paced per host).
       let working = candidate;
@@ -732,6 +750,7 @@ export async function researchCandidatesWithBrowser(args: {
       if (acquired.read) {
         // Static page carried sufficient evidence — browser never called.
         counters.pages += 1;
+        runPagesLeft -= 1;
         return working;
       }
 
@@ -781,6 +800,7 @@ export async function researchCandidatesWithBrowser(args: {
         return verified;
       } finally {
         counters.pages += session.counters.pages;
+        runPagesLeft -= session.counters.pages;
         counters.actions += session.counters.actions;
         counters.screenshots += session.counters.screenshots;
         await args.browser.close(session);

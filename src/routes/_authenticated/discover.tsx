@@ -2251,9 +2251,9 @@ function DiscoverPage() {
                           Try these related searches:
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          {suggestions.map((s) => (
+                          {suggestions.map((s, si) => (
                             <button
-                              key={s}
+                              key={`${s}-${si}`}
                               type="button"
                               onClick={() => void beginSearch(s)}
                               className="inline-flex items-center px-3 py-1.5 rounded-full border border-border hover:bg-accent text-foreground text-xs"
