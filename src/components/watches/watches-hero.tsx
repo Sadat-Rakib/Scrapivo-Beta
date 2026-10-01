@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AnimatePresence, motion } from "framer-motion";
-import { Bell, Check, Play, Trash2, X, ArrowRight } from "lucide-react";
+import { Bell, Check, Pause, Play, Trash2, X, ArrowRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { HeroVideo } from "@/components/hero-video";
@@ -13,6 +13,7 @@ import {
   deleteSignalWatch,
   listSignalWatches,
   runSignalWatch,
+  setSignalWatchPaused,
   type CampaignIcp,
 } from "@/lib/campaigns.functions";
 
@@ -39,6 +40,7 @@ function SavedWatchesDrawer({ open, onOpenChange }: { open: boolean; onOpenChang
   const list = useServerFn(listSignalWatches);
   const remove = useServerFn(deleteSignalWatch);
   const runOne = useServerFn(runSignalWatch);
+  const setPaused = useServerFn(setSignalWatchPaused);
   const getJob = useServerFn(getSearchJob);
   const projectsQ = useQuery({ queryKey: ["projects-list"], queryFn: () => listProjects() });
   const projectName = (id: string | null | undefined) =>
@@ -105,6 +107,16 @@ function SavedWatchesDrawer({ open, onOpenChange }: { open: boolean; onOpenChang
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const pauseMut = useMutation({
+    mutationFn: ({ id, paused }: { id: string; paused: boolean }) =>
+      setPaused({ data: { id, paused } }),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["signal-watches"] });
+      toast.success(res.paused ? "Watch paused — scheduled runs skip it" : "Watch resumed");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="bg-[#0a0a0b] text-white overflow-y-auto">
@@ -147,6 +159,11 @@ function SavedWatchesDrawer({ open, onOpenChange }: { open: boolean; onOpenChang
                     >
                       {changeMode === "new_signal" ? "new signal" : "new entity"}
                     </span>
+                    {icp.paused ? (
+                      <span className="rounded-full px-2 py-0.5 border border-white/25 text-white/70 bg-white/10">
+                        paused
+                      </span>
+                    ) : null}
                     {channels.map((c) => (
                       <span
                         key={c}
@@ -167,6 +184,18 @@ function SavedWatchesDrawer({ open, onOpenChange }: { open: boolean; onOpenChang
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    disabled={pauseMut.isPending}
+                    onClick={() =>
+                      pauseMut.mutate({ id: w.id, paused: !icp.paused })
+                    }
+                    className="glass-pill px-3 py-1.5 text-xs font-medium text-white/80 hover:text-white flex items-center gap-1.5"
+                    title={icp.paused ? "Resume scheduled runs" : "Pause scheduled runs"}
+                  >
+                    {icp.paused ? <Play className="size-3.5" /> : <Pause className="size-3.5" />}
+                    <span>{icp.paused ? "Resume" : "Pause"}</span>
+                  </button>
                   <button
                     type="button"
                     disabled={runMut.isPending || running}

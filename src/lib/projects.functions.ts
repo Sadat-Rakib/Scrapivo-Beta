@@ -80,6 +80,7 @@ export const listProjects = createServerFn({ method: "GET" })
       .from("projects")
       .select("*")
       .eq("user_id", context.userId)
+      .neq("status", "archived")
       .order("created_at", { ascending: true });
     if (error) {
       if (MISSING_TABLE_RE.test(error.message)) {
@@ -147,6 +148,26 @@ export const updateProject = createServerFn({ method: "POST" })
       .from("projects")
       .update({ ...patch, updated_at: new Date().toISOString() })
       .eq("id", id)
+      .eq("user_id", context.userId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/**
+ * Delete a project as a SOFT ARCHIVE — the status column exists in code usage
+ * (Project type + projects_ext migration, default 'active'), so archived rows
+ * stay recoverable instead of cascading away ICPs/lists/saved searches.
+ * Hidden from listProjects / getProjectsOverview. Owner-scoped like
+ * updateProject (id + user_id in one filter).
+ */
+export const deleteProject = createServerFn({ method: "POST" })
+  .middleware([requireMyAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("projects")
+      .update({ status: "archived", is_active: false, updated_at: new Date().toISOString() })
+      .eq("id", data.id)
       .eq("user_id", context.userId);
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -267,6 +288,7 @@ export const getProjectsOverview = createServerFn({ method: "GET" })
       .from("projects")
       .select("*")
       .eq("user_id", userId)
+      .neq("status", "archived")
       .order("created_at", { ascending: true });
     if (projRes.error) {
       if (MISSING_TABLE_RE.test(projRes.error.message)) {

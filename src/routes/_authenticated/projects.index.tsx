@@ -3,8 +3,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
-import { FolderKanban, Plus } from "lucide-react";
-import { getProjectsOverview, createProject } from "@/lib/projects.functions";
+import { FolderKanban, Plus, Trash2 } from "lucide-react";
+import { deleteProject, getProjectsOverview, createProject } from "@/lib/projects.functions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -38,6 +38,7 @@ function ProjectsPage() {
   const qc = useQueryClient();
   const getOverview = useServerFn(getProjectsOverview);
   const create = useServerFn(createProject);
+  const remove = useServerFn(deleteProject);
   const q = useQuery({ queryKey: ["projects-overview"], queryFn: () => getOverview() });
   const [dialogOpen, setDialogOpen] = useState(false);
   const [name, setName] = useState("");
@@ -63,6 +64,31 @@ function ProjectsPage() {
       void qc.invalidateQueries({ queryKey: ["projects"] });
     },
     onError: (e: Error) => toast.error(e.message),
+  });
+
+  // Optimistic delete: drop the card from the cache immediately, roll back on
+  // error, then re-sync with the server (the row is soft-archived there).
+  const delMut = useMutation({
+    mutationFn: (id: string) => remove({ data: { id } }),
+    onMutate: async (id: string) => {
+      await qc.cancelQueries({ queryKey: ["projects-overview"] });
+      const prev = qc.getQueryData(["projects-overview"]);
+      qc.setQueryData(["projects-overview"], (old: unknown) => {
+        const o = old as { projects: OverviewProject[]; needs_migration: boolean } | undefined;
+        if (!o) return old;
+        return { ...o, projects: o.projects.filter((p) => p.id !== id) };
+      });
+      return { prev };
+    },
+    onError: (e: Error, _id: string, ctx: { prev: unknown } | undefined) => {
+      if (ctx?.prev) qc.setQueryData(["projects-overview"], ctx.prev);
+      toast.error(e.message);
+    },
+    onSuccess: () => {
+      toast.success("Project deleted");
+      void qc.invalidateQueries({ queryKey: ["projects-overview"] });
+      void qc.invalidateQueries({ queryKey: ["projects"] });
+    },
   });
 
   const projects = ((q.data?.projects ?? []) as unknown) as OverviewProject[];
@@ -140,24 +166,47 @@ function ProjectsPage() {
         </Dialog>
 
         {projects.map((p) => (
-          <Link
+          <div
             key={p.id}
-            to="/projects/$projectId"
-            params={{ projectId: p.id }}
-            className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 min-h-[9rem] flex flex-col justify-between hover:border-white/25 hover:bg-white/[0.07] transition-colors"
+            className="relative rounded-2xl border border-white/10 bg-white/[0.04] p-5 min-h-[9rem] flex flex-col justify-between hover:border-white/25 hover:bg-white/[0.07] transition-colors"
           >
-            <div>
+            <Link
+              to="/projects/$projectId"
+              params={{ projectId: p.id }}
+              className="absolute inset-0 z-0"
+              aria-label={`Open ${p.name}`}
+            >
+              <span className="sr-only">{p.name}</span>
+            </Link>
+            <div className="relative">
               <div className="text-sm font-semibold truncate">{p.name}</div>
               {p.description ? (
                 <p className="text-[11px] text-white/50 mt-1 line-clamp-2">{p.description}</p>
               ) : null}
             </div>
-            <div className="flex gap-3 text-[10px] text-white/50 mt-3">
+            <div className="relative flex gap-3 text-[10px] text-white/50 mt-3">
               <span>{p.stats.prospects} prospects</span>
               <span>{p.stats.lists} lists</span>
               <span>{p.stats.savedSearches} saved searches</span>
             </div>
-          </Link>
+            <button
+              type="button"
+              onClick={() => {
+                if (
+                  window.confirm(
+                    `Delete "${p.name}"? Its lists, saved searches and stats stay archived with it.`,
+                  )
+                ) {
+                  delMut.mutate(p.id);
+                }
+              }}
+              disabled={delMut.isPending}
+              aria-label={`Delete ${p.name}`}
+              className="absolute top-3 right-3 z-10 p-1.5 rounded-lg text-white/40 hover:text-rose-400 hover:bg-white/10 transition-colors"
+            >
+              <Trash2 className="size-3.5" />
+            </button>
+          </div>
         ))}
       </div>
 

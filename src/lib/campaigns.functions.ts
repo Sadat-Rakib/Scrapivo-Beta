@@ -132,6 +132,35 @@ export const deleteSignalWatch = createServerFn({ method: "POST" })
   });
 
 // ---------------------------------------------------------------------------
+// setSignalWatchPaused — pause/resume WITHOUT a schema change: the flag lives
+// in the icp jsonb the scheduler already reads (WatchIcp.paused). watchIsDue
+// returns false for paused watches, so the cron and run-due paths skip them.
+// Manual "Run now" stays allowed (explicit user action).
+// ---------------------------------------------------------------------------
+
+export const setSignalWatchPaused = createServerFn({ method: "POST" })
+  .middleware([requireMyAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid(), paused: z.boolean() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { data: camp, error } = await context.supabase
+      .from("campaigns")
+      .select("id, icp")
+      .eq("id", data.id)
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!camp) throw new Error("Watch not found");
+    const icp = { ...((camp.icp as WatchIcp) || {}), paused: data.paused };
+    const { error: updErr } = await context.supabase
+      .from("campaigns")
+      .update({ icp })
+      .eq("id", data.id)
+      .eq("user_id", context.userId);
+    if (updErr) throw new Error(updErr.message);
+    return { ok: true, paused: data.paused };
+  });
+
+// ---------------------------------------------------------------------------
 // runSignalWatch — manual "Run now": enqueue ONE watch job (idempotent slot).
 // Free-plan gate kept; no quota charge — one watch run IS one job.
 // ---------------------------------------------------------------------------

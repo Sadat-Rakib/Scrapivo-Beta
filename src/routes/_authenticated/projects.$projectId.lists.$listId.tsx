@@ -1,10 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ChevronLeft, ChevronLeft as PageLeft, ChevronRight as PageRight, Trash2 } from "lucide-react";
-import { listListItems, removeListItem } from "@/lib/projects.functions";
+import { deleteList, listListItems, removeListItem } from "@/lib/projects.functions";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/projects/$projectId/lists/$listId")({
@@ -27,8 +27,10 @@ const PAGE_SIZE = 25;
 function ListDetailPage() {
   const { projectId, listId } = Route.useParams();
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const getItems = useServerFn(listListItems);
   const remove = useServerFn(removeListItem);
+  const removeList = useServerFn(deleteList);
   const [page, setPage] = useState(0);
 
   const q = useQuery({
@@ -41,6 +43,17 @@ function ListDetailPage() {
     onSuccess: () => {
       toast.success("Removed");
       void qc.invalidateQueries({ queryKey: ["list-items", listId] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const delListMut = useMutation({
+    mutationFn: () => removeList({ data: { project_id: projectId, id: listId } }),
+    onSuccess: () => {
+      toast.success("List deleted");
+      void qc.invalidateQueries({ queryKey: ["project-lists", projectId] });
+      void qc.invalidateQueries({ queryKey: ["project", projectId] });
+      void navigate({ to: "/projects/$projectId", params: { projectId } });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -61,7 +74,19 @@ function ListDetailPage() {
 
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold tracking-tight">List</h1>
-        <span className="text-[11px] text-white/40">{total} item(s)</span>
+        <div className="flex items-center gap-3">
+          <span className="text-[11px] text-white/40">{total} item(s)</span>
+          <button
+            type="button"
+            onClick={() => {
+              if (window.confirm("Delete this list and all its items?")) delListMut.mutate();
+            }}
+            disabled={delListMut.isPending}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-white/50 hover:text-rose-400 hover:border-rose-500/30 transition-colors"
+          >
+            <Trash2 className="size-3.5" /> Delete list
+          </button>
+        </div>
       </div>
 
       {q.isLoading ? (

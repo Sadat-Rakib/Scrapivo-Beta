@@ -39,6 +39,9 @@ export type WatchSchedule = "daily" | "weekly";
 /** icp jsonb fields WS5 owns (legacy fields ride along untouched). */
 export interface WatchIcp {
   schedule?: WatchSchedule;
+  /** Pause flag (no schema change — lives in the icp jsonb). A paused watch
+   *  is never due: the cron and run-due paths skip it via watchIsDue. */
+  paused?: boolean;
   last_scheduled_at?: string | null;
   last_job_id?: string | null;
   last_run_at?: string | null;
@@ -78,6 +81,8 @@ export function watchIsDue(watch: {
   icp: WatchIcp | null;
   last_run_at?: string | null;
 }, now: Date = new Date()): boolean {
+  // Paused watches are never due — the single gate for cron + run-due paths.
+  if (watch.icp?.paused === true) return false;
   const schedule = watch.icp?.schedule ?? "daily";
   const last = watch.icp?.last_scheduled_at ?? watch.icp?.last_run_at ?? watch.last_run_at ?? null;
   if (!last) return true;

@@ -6,9 +6,10 @@ import {
   listSignalWatches,
   runDueSignalWatches,
   runSignalWatch,
+  setSignalWatchPaused,
   type CampaignIcp,
 } from "@/lib/campaigns.functions";
-import { Bell, Play, Trash2, RefreshCw } from "lucide-react";
+import { Bell, Pause, Play, Trash2, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -32,6 +33,7 @@ export function LegacyWatchesPanel() {
   const remove = useServerFn(deleteSignalWatch);
   const runOne = useServerFn(runSignalWatch);
   const runDue = useServerFn(runDueSignalWatches);
+  const setPaused = useServerFn(setSignalWatchPaused);
 
   const [newQuery, setNewQuery] = useState("");
   const [schedule, setSchedule] = useState<"daily" | "weekly">("daily");
@@ -88,6 +90,16 @@ export function LegacyWatchesPanel() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["signal-watches"] });
       toast.success("Watch removed");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const pauseMut = useMutation({
+    mutationFn: ({ id, paused }: { id: string; paused: boolean }) =>
+      setPaused({ data: { id, paused } }),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["signal-watches"] });
+      toast.success(res.paused ? "Watch paused — scheduled runs skip it" : "Watch resumed");
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -173,7 +185,14 @@ export function LegacyWatchesPanel() {
               className="liquid-glass rounded-xl p-4 flex items-center justify-between gap-4 hover:bg-white/[0.03] transition-all"
             >
               <div className="min-w-0">
-                <div className="text-sm font-semibold text-white truncate">{w.name || w.query}</div>
+                <div className="text-sm font-semibold text-white truncate">
+                  {w.name || w.query}
+                  {icp.paused ? (
+                    <span className="ml-2 text-[10px] rounded-full border border-white/25 text-white/70 bg-white/10 px-2 py-0.5 align-middle">
+                      paused
+                    </span>
+                  ) : null}
+                </div>
                 <div className="text-xs text-white/50 mt-0.5">
                   {icp.schedule || "daily"}
                   {icp.signal_family ? ` · ${icp.signal_family}` : ""}
@@ -182,6 +201,16 @@ export function LegacyWatchesPanel() {
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  disabled={pauseMut.isPending}
+                  onClick={() => pauseMut.mutate({ id: w.id, paused: !icp.paused })}
+                  className="glass-pill px-3 py-1.5 text-xs font-medium text-white/80 hover:text-white flex items-center gap-1.5"
+                  title={icp.paused ? "Resume scheduled runs" : "Pause scheduled runs"}
+                >
+                  {icp.paused ? <Play className="size-3.5" /> : <Pause className="size-3.5" />}
+                  <span>{icp.paused ? "Resume" : "Pause"}</span>
+                </button>
                 <button
                   type="button"
                   disabled={runMut.isPending}

@@ -251,6 +251,7 @@ import {
   fingerprintFor,
   processWatchJob,
   processCompletedWatchJobs,
+  runDueWatchesForAllUsers,
   scheduleSlotFor,
   watchIsDue,
 } from "../watch-scheduler.server";
@@ -303,6 +304,53 @@ describe("scheduleSlotFor + watchIsDue", () => {
     expect(watchIsDue({ icp: { last_scheduled_at: hoursAgo(25) } })).toBe(true);
     expect(watchIsDue({ icp: { schedule: "weekly", last_scheduled_at: hoursAgo(24 * 6) } })).toBe(false);
     expect(watchIsDue({ icp: { schedule: "weekly", last_scheduled_at: hoursAgo(24 * 8) } })).toBe(true);
+  });
+
+  it("a paused watch is never due — even past its schedule window", () => {
+    const hoursAgo = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString();
+    expect(watchIsDue({ icp: { paused: true } })).toBe(false);
+    expect(watchIsDue({ icp: { paused: true, last_scheduled_at: hoursAgo(24 * 30) } })).toBe(false);
+    // Resuming (paused: false / absent) restores the normal gate.
+    expect(watchIsDue({ icp: { paused: false, last_scheduled_at: hoursAgo(25) } })).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Cron — due watches for ALL users (paused skip is the E2E-C16 gate)
+// ---------------------------------------------------------------------------
+
+describe("runDueWatchesForAllUsers", () => {
+  it("enqueues one job per due watch and stamps last_scheduled_at", async () => {
+    await seedWatch();
+    await seedWatch({ id: "00000000-0000-4000-8000-000000000011" });
+    const res = await runDueWatchesForAllUsers(sharedClient as unknown as SupabaseClient);
+    expect(res.ran).toBe(2);
+    expect(sharedClient.tables.search_jobs).toHaveLength(2);
+    for (const camp of sharedClient.tables.campaigns!) {
+      expect((camp.icp as Row).last_scheduled_at).toBe(scheduleSlotFor());
+    }
+  });
+
+  it("a paused watch is skipped by the cron — no job, no due-run", async () => {
+    await seedWatch({ icp: { paused: true } });
+    await seedWatch({ id: "00000000-0000-4000-8000-000000000011", icp: {} });
+    const res = await runDueWatchesForAllUsers(sharedClient as unknown as SupabaseClient);
+    expect(res.ran).toBe(1);
+    const jobs = sharedClient.tables.search_jobs!;
+    expect(jobs).toHaveLength(1);
+    expect(jobs[0].watch_id).toBe("00000000-0000-4000-8000-000000000011");
+  });
+
+  it("a deleted watch leaves no orphan due-run — only existing rows iterate", async () => {
+    await seedWatch();
+    const res = await runDueWatchesForAllUsers(sharedClient as unknown as SupabaseClient);
+    expect(res.ran).toBe(1);
+    // The watch row is removed; the next cron tick has nothing to iterate.
+    await sharedClient.from("campaigns").delete().eq("id", "00000000-0000-4000-8000-000000000010");
+    const again = await runDueWatchesForAllUsers(sharedClient as unknown as SupabaseClient);
+    expect(again.ran).toBe(0);
+    // The existing job for the old slot stays idempotent — no new one appears.
+    expect(sharedClient.tables.search_jobs).toHaveLength(1);
   });
 });
 

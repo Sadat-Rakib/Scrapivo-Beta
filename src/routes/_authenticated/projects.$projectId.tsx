@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
@@ -11,17 +11,21 @@ import {
   Radar,
   Search,
   Target,
+  Trash2,
 } from "lucide-react";
 import {
   getProject,
   updateProjectContextFn,
   upsertIcp,
   setDefaultIcpFn,
+  deleteIcp,
   saveSearch,
   listSavedSearches,
+  deleteSavedSearch,
   createList,
   listLists,
   listProjectActivity,
+  deleteProject,
 } from "@/lib/projects.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,8 +58,10 @@ type SavedSearchRow = { id: string; name: string; created_at: string };
 function ProjectDetailPage() {
   const { projectId } = Route.useParams();
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const get = useServerFn(getProject);
   const saveCtx = useServerFn(updateProjectContextFn);
+  const remove = useServerFn(deleteProject);
   const q = useQuery({
     queryKey: ["project", projectId],
     queryFn: () => get({ data: { id: projectId } }),
@@ -113,6 +119,17 @@ function ProjectDetailPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const delMut = useMutation({
+    mutationFn: () => remove({ data: { id: projectId } }),
+    onSuccess: () => {
+      toast.success("Project deleted");
+      void qc.invalidateQueries({ queryKey: ["projects-overview"] });
+      void qc.invalidateQueries({ queryKey: ["projects"] });
+      void navigate({ to: "/projects" });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   if (q.isLoading) {
     return <div className="p-8 text-sm text-white/50">Loading project…</div>;
   }
@@ -129,11 +146,25 @@ function ProjectDetailPage() {
         <ChevronLeft className="size-3.5" /> All projects
       </Link>
 
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">{project.name}</h1>
-        {project.description ? (
-          <p className="text-xs text-white/60 mt-1">{project.description}</p>
-        ) : null}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">{project.name}</h1>
+          {project.description ? (
+            <p className="text-xs text-white/60 mt-1">{project.description}</p>
+          ) : null}
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            if (window.confirm(`Delete "${project.name}"? Its ICPs, lists and saved searches stay archived with it.`)) {
+              delMut.mutate();
+            }
+          }}
+          disabled={delMut.isPending}
+          className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-white/50 hover:text-rose-400 hover:border-rose-500/30 transition-colors shrink-0"
+        >
+          <Trash2 className="size-3.5" /> Delete project
+        </button>
       </div>
 
       {/* Quick actions — flows without backing routes yet are disabled with a
@@ -287,6 +318,7 @@ function IcpsTab({ projectId, icps }: { projectId: string; icps: IcpRow[] }) {
   const qc = useQueryClient();
   const add = useServerFn(upsertIcp);
   const setDefault = useServerFn(setDefaultIcpFn);
+  const remove = useServerFn(deleteIcp);
   const [name, setName] = useState("");
 
   const addMut = useMutation({
@@ -304,6 +336,15 @@ function IcpsTab({ projectId, icps }: { projectId: string; icps: IcpRow[] }) {
       setDefault({ data: { project_id: projectId, icp_id: icpId } }),
     onSuccess: () => {
       toast.success("Default ICP set");
+      void qc.invalidateQueries({ queryKey: ["project", projectId] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const delMut = useMutation({
+    mutationFn: (icpId: string) => remove({ data: { project_id: projectId, id: icpId } }),
+    onSuccess: () => {
+      toast.success("ICP deleted");
       void qc.invalidateQueries({ queryKey: ["project", projectId] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -347,15 +388,28 @@ function IcpsTab({ projectId, icps }: { projectId: string; icps: IcpRow[] }) {
                   </span>
                 ) : null}
               </span>
-              {!icp.is_default && (
+              <div className="flex items-center gap-3 shrink-0">
+                {!icp.is_default && (
+                  <button
+                    type="button"
+                    onClick={() => defMut.mutate(icp.id)}
+                    className="text-[10px] text-white/50 hover:text-white"
+                  >
+                    Set default
+                  </button>
+                )}
                 <button
                   type="button"
-                  onClick={() => defMut.mutate(icp.id)}
-                  className="text-[10px] text-white/50 hover:text-white"
+                  onClick={() => {
+                    if (window.confirm(`Delete ICP "${icp.name}"?`)) delMut.mutate(icp.id);
+                  }}
+                  disabled={delMut.isPending}
+                  aria-label={`Delete ${icp.name}`}
+                  className="p-1.5 rounded-lg text-white/40 hover:text-rose-400 hover:bg-white/10 transition-colors"
                 >
-                  Set default
+                  <Trash2 className="size-3.5" />
                 </button>
-              )}
+              </div>
             </li>
           ))}
         </ul>
@@ -368,6 +422,7 @@ function SavedSearchesTab({ projectId }: { projectId: string }) {
   const qc = useQueryClient();
   const add = useServerFn(saveSearch);
   const list = useServerFn(listSavedSearches);
+  const remove = useServerFn(deleteSavedSearch);
   const [name, setName] = useState("");
   const q = useQuery({
     queryKey: ["project-saved-searches", projectId],
@@ -388,6 +443,16 @@ function SavedSearchesTab({ projectId }: { projectId: string }) {
       setName("");
       toast.success("Search saved");
       void qc.invalidateQueries({ queryKey: ["project-saved-searches", projectId] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const delMut = useMutation({
+    mutationFn: (id: string) => remove({ data: { project_id: projectId, id } }),
+    onSuccess: () => {
+      toast.success("Saved search deleted");
+      void qc.invalidateQueries({ queryKey: ["project-saved-searches", projectId] });
+      void qc.invalidateQueries({ queryKey: ["project", projectId] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -417,9 +482,20 @@ function SavedSearchesTab({ projectId }: { projectId: string }) {
           {savedSearches.map((s) => (
             <li
               key={s.id}
-              className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-xs"
+              className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-xs"
             >
-              {s.name}
+              <span className="min-w-0 truncate">{s.name}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.confirm(`Delete saved search "${s.name}"?`)) delMut.mutate(s.id);
+                }}
+                disabled={delMut.isPending}
+                aria-label={`Delete ${s.name}`}
+                className="p-1.5 rounded-lg text-white/40 hover:text-rose-400 hover:bg-white/10 transition-colors shrink-0"
+              >
+                <Trash2 className="size-3.5" />
+              </button>
             </li>
           ))}
         </ul>
