@@ -62,6 +62,43 @@ export function zeroResultsNarrative(
 }
 
 /**
+ * E2E-C9: an honest zero must say WHERE the search stopped, including the
+ * candidates that surfaced but failed the requested criteria. The base
+ * narrative covers the retrieval funnel; the candidate ledger adds the
+ * "found but not proven" story the funnel numbers cannot express. Internal
+ * stage names never leak — only what the user can act on.
+ */
+export function enrichZeroNarrative(
+  base: string | null,
+  ledger?: {
+    counts?: Record<string, number>;
+    streamedNotReturned?: Array<{ fate: string; reason?: string | null }>;
+  } | null,
+): string | null {
+  const parts: string[] = [];
+  if (base) parts.push(base);
+  if (ledger) {
+    const dropped = ledger.streamedNotReturned ?? [];
+    const unproven = dropped.filter(
+      (s) => s.reason === "UNPROVEN_CRITERION" || s.reason === "SIGNAL_NOT_VERIFIED",
+    ).length;
+    if (unproven > 0) {
+      parts.push(
+        `${unproven} candidate${unproven === 1 ? "" : "s"} looked promising but did not prove the requested details — such as public contact information or the signal you asked for.`,
+      );
+    } else if (dropped.length > 0) {
+      parts.push(
+        `${dropped.length} candidate${dropped.length === 1 ? "" : "s"} surfaced while researching but did not match your criteria.`,
+      );
+    }
+    if (!base && (ledger.counts?.gated ?? 0) > 0) {
+      parts.push("Candidates were found, but they could not be verified with the sources available right now.");
+    }
+  }
+  return parts.length > 0 ? parts.join(" ") : null;
+}
+
+/**
  * @param superseded — cancel happened because the user launched another search.
  */
 export function outcomeUi(
