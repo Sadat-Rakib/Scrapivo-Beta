@@ -409,6 +409,19 @@ export function frameToSearchSpec(input: UnderstandingFrame): SearchSpec {
 }
 
 /** Apply a dialog answer to the prior frame, without extracting the original request again. */
+
+/**
+ * E2E-C3: an answer closes the question it answered — recorded in the frame's
+ * clarification block so the state machine (which seeds from it) never asks
+ * the same field again, even when the answer's axis differs from the blocker's
+ * preferred one (a location answering a where-or-what-kind scope question).
+ */
+function markAnswered(frame: UnderstandingFrame, field: string, answer: string): void {
+  const block = frame.clarification;
+  block.answered = { ...(block.answered ?? {}), [field]: answer.slice(0, 300) };
+  if (!block.asked?.includes(field)) block.asked = [...(block.asked ?? []), field];
+}
+
 export function applyClarificationToFrame(input: UnderstandingFrame, answers: Record<string, string>): UnderstandingFrame {
   let frame = structuredClone(input);
   for (const [key, rawAnswer] of Object.entries(answers)) {
@@ -422,6 +435,16 @@ export function applyClarificationToFrame(input: UnderstandingFrame, answers: Re
     if (canonical === 'purpose' || canonical === 'mode') {
       const purpose = /\b(?:sell|selling|prospect(?:ing)?|outreach)\b/i.test(answer) ? 'prospecting' : /\b(?:recruit|hire)\b/i.test(answer) ? 'recruiting' : /\bpartner\b/i.test(answer) ? 'partnership' : 'research';
       frame.user_context.objective = openValue(purpose, answer, purpose, 1);
+      markAnswered(frame, 'user_context.objective', answer);
+      continue;
+    }
+    if (canonical === 'geo_scope' || /^(worldwide|global|globally|everywhere|anywhere|international)$/i.test(answer)) {
+      // The panel's Global/Worldwide choice arrives as geo_scope=worldwide
+      // (or a bare worldwide answer): record the where-axis as answered and
+      // carry the scope as a constraint, never as a fabricated place.
+      frame.constraints = frame.constraints.filter((c) => c.field !== 'geo_scope');
+      frame.constraints.push({ field: 'geo_scope', operator: 'eq', value: 'worldwide', raw: answer, confidence: 1, negated: false, unit: null });
+      markAnswered(frame, 'target.scope', answer);
       continue;
     }
     if (canonical === 'location') {
@@ -430,18 +453,28 @@ export function applyClarificationToFrame(input: UnderstandingFrame, answers: Re
         country_code: geo?.country_code ?? null, canonical: geo?.resolution === 'resolved' ? geo.name : null, confidence: 1 };
       frame.location = location;
       frame.locations = [location];
+      markAnswered(frame, 'target.scope', answer);
       continue;
     }
     if (canonical === 'category' || canonical === 'industry' || canonical === 'investor_sector' || canonical === 'role') {
       const targetField = canonical === 'investor_sector' ? 'industry' : canonical;
       frame.target[targetField] = openValue(answer, answer, null, 1);
+      // A kind answer closes the what-axis of the scope question.
+      markAnswered(frame, 'target.scope', answer);
       continue;
     }
     if (canonical === 'offer') {
       frame.user_context.selling ??= { service: null, product: null };
       frame.user_context.selling.service = openValue(answer, answer, null, 1);
       frame.user_context.objective ??= openValue('prospecting', answer, 'prospecting', 1);
+      markAnswered(frame, 'user_context.objective', answer);
       continue;
+    }
+    // Any other named slot (investor_stage, investor_check, opportunity, site,
+    // channel, …) is an optional refinement: record it so nothing re-asks it,
+    // then let the amount branch handle numeric fields.
+    if (!['salary_min', 'revenue', 'employee_count', 'amount'].includes(canonical.replace(/^unresolved\./, ''))) {
+      markAnswered(frame, canonical.replace(/^unresolved\./, ''), answer);
     }
     const field = canonical.replace(/^unresolved\./, '');
     if (frame.unresolved.some((u) => u.field === field) || ['salary_min', 'revenue', 'employee_count', 'amount'].includes(field)) {

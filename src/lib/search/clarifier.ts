@@ -1107,6 +1107,11 @@ export function jobRefinementQuestions(spec: {
 }): ClarifyQuestion[] {
   if (spec.entity !== "job") return [];
   const has = (f: string) => spec.criteria.some((c) => c.field === f && c.value.trim().length > 0);
+  // The extractor folds "senior frontend developer" into role verbatim; a
+  // seniority word inside the role IS a stated seniority — asking again made
+  // the thin-ask re-ask a slot the user already gave.
+  const roleValue = spec.criteria.find((c) => c.field === "role")?.value.toLowerCase() ?? "";
+  const roleStatesSeniority = /\b(junior|senior|lead|principal|staff|head|chief|entry[- ]?level|mid[- ]?level)\b/.test(roleValue);
   const out: ClarifyQuestion[] = [];
   if (!has("location")) {
     out.push({
@@ -1116,7 +1121,7 @@ export function jobRefinementQuestions(spec: {
       allowOther: true,
     });
   }
-  if (!has("seniority")) {
+  if (!has("seniority") && !roleStatesSeniority) {
     out.push({
       id: "entity_seniority",
       question: "What seniority level (e.g. junior, senior, lead, principal)?",
