@@ -127,8 +127,9 @@ export interface TheoremCandidate {
   page_type?: PageType | null;
   /** Optional salary etc. for query-required checks. */
   fields?: Record<string, string | number | boolean | null | undefined>;
-  /** Field-level provenance when the caller carries it (verified contact gate). */
-  field_provenance?: Record<string, { verification_status?: string | null } | undefined> | null;
+  /** Field-level provenance when the caller carries it (verified contact gate).
+   *  Loosely typed: producers stamp richer FieldProvenance shapes. */
+  field_provenance?: Record<string, unknown> | null;
   evidence?: Evidence[] | ClaimEvidence[] | null;
 }
 
