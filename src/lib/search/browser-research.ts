@@ -9,15 +9,23 @@ export type ResearchStatus = "discovered" | "researching" | "ready_for_qualifica
 
 const requested = (spec: SearchSpec, field: string) => spec.criteria.some((criterion) => criterion.field === field);
 
+/**
+ * A contact need is satisfied only by a genuinely observed channel: an email
+ * or phone on the row, or a contact page whose provenance is verified. A bare
+ * or merely discovered contact_page_url is a guess, never a satisfied need.
+ */
+const contactSatisfied = (row: SpecRow) => !!row.email || !!row.phone || (!!row.contact_page_url &&
+  (row.field_provenance?.contact_page_url as Record<string, unknown> | undefined)?.verification_status === "verified");
+
 /** The next browser action follows the current qualification result and the user's required fields. */
 export function computeResearchNeeds(row: SpecRow, spec: SearchSpec, qualification: Qualification): ResearchNeed[] {
   const destination = row.kind === "person" ? row.profile_url ?? row.website_url : row.kind === "job" ? row.apply_url : row.website_url;
   const incomplete = missingRequiredFields({ ...row, url: destination ?? null });
-  const wantsPublicContact = /public contact details?/i.test(spec.raw_query) && !row.email && !row.phone && !row.contact_page_url;
+  const wantsPublicContact = /public contact details?/i.test(spec.raw_query) && !contactSatisfied(row);
   const required = queryRequiredFields(spec);
   const missingRequested = required.some((field) =>
     (field === "email" && !row.email) || (field === "phone" && !row.phone) ||
-    (field === "contact" && !row.email && !row.phone && !row.contact_page_url) ||
+    (field === "contact" && !contactSatisfied(row)) ||
     (field === "website" && !row.website_url) ||
     (field === "socials" && !row.evidence?.some((item) => item.source_type === "social" && !!item.source_url)));
   if (qualification.disposition === "qualified" && incomplete.length === 0 && !wantsPublicContact && !missingRequested) return [];
@@ -36,13 +44,13 @@ export function computeResearchNeeds(row: SpecRow, spec: SearchSpec, qualificati
   else if (!row.website_url && !requested(spec, "opportunity")) add("website");
   if (requested(spec, "opportunity") && spec.criteria.some((criterion) => criterion.field === "opportunity" && criterion.value === "no_website") && !row.website_url) add("no_website_verification");
   if (required.some((field) => (field === "email" && !row.email) || (field === "phone" && !row.phone) ||
-      (field === "contact" && !row.email && !row.phone && !row.contact_page_url)) || wantsPublicContact) add("contact");
+      (field === "contact" && !contactSatisfied(row))) || wantsPublicContact) add("contact");
   if (required.includes("website") && !row.website_url) add("website");
   if (required.includes("socials") && !row.evidence?.some((item) => item.source_type === "social" && !!item.source_url)) add("social");
   if (requested(spec, "content_topic") && qualification.reject_code === "NO_CLAIM_EVIDENCE") add("topic");
   if (spec.signal_required && ["NO_CLAIM_EVIDENCE", "CLAIM_NOT_SUBJECT_BOUND"].includes(qualification.reject_code ?? "")) add("signal");
   if (qualification.reject_code === "MISSING_QUERY_REQUIRED") for (const field of required) {
-    if (field === "email" || field === "phone" || field === "contact") add("contact");
+    if ((field === "email" && !row.email) || (field === "phone" && !row.phone) || (field === "contact" && !contactSatisfied(row))) add("contact");
     else if (field === "url") add(row.kind === "person" ? "profile" : "website");
   }
   if (qualification.reject_code === "NO_CLAIM_EVIDENCE" && needs.length === 0 && requested(spec, "opportunity")) add("no_website_verification");

@@ -127,6 +127,8 @@ export interface TheoremCandidate {
   page_type?: PageType | null;
   /** Optional salary etc. for query-required checks. */
   fields?: Record<string, string | number | boolean | null | undefined>;
+  /** Field-level provenance when the caller carries it (verified contact gate). */
+  field_provenance?: Record<string, { verification_status?: string | null } | undefined> | null;
   evidence?: Evidence[] | ClaimEvidence[] | null;
 }
 
@@ -405,8 +407,16 @@ export function evaluateQualifiedLeadTheorem(
   if (qFields.includes("website") && !(typeof f.website_url === "string" && f.website_url.trim())) {
     missing.push("website");
   }
-  if (qFields.includes("contact") && ![f.email, f.phone, f.contact_page_url].some((value) => typeof value === "string" && value.trim())) {
-    missing.push("contact");
+  if (qFields.includes("contact")) {
+    // Contact is satisfied only by genuinely observed evidence: an email or
+    // phone on the row, a contact page whose provenance is verified, or a
+    // contact evidence item. A bare contact_page_url is a guess, not a lead.
+    const contactPageVerified = typeof f.contact_page_url === "string" && !!f.contact_page_url.trim() &&
+      (candidate.field_provenance?.contact_page_url as Record<string, unknown> | undefined)?.verification_status === "verified";
+    const hasContactEvidence = candidate.evidence?.some((item) => "evidence_type" in item && item.evidence_type === "contact") ?? false;
+    if (![f.email, f.phone].some((value) => typeof value === "string" && value.trim()) && !contactPageVerified && !hasContactEvidence) {
+      missing.push("contact");
+    }
   }
   if (qFields.includes("socials") && !candidate.evidence?.some((item) =>
     ("source_type" in item && item.source_type === "social" && !!item.source_url) ||

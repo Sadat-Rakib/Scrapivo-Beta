@@ -23,7 +23,8 @@ const pages: Record<string, { title: string; text: string; links?: PageSnapshot[
   },
   "https://acme.test/contact": {
     title: "Contact Acme",
-    text: "Contact Acme. Get in touch with our team about pricing, onboarding or support. Offices in Toronto, Ontario.",
+    // E2E-C5: a qualifying contact page must actually show a public channel.
+    text: "Contact Acme. Get in touch with our team about pricing, onboarding or support. Email hello@acme.test or call +1 416 555 0100. Offices in Toronto, Ontario.",
   },
 };
 
@@ -68,9 +69,14 @@ describe("HARD GATE: first browser row end to end", () => {
     const identity = row!.evidence?.find((item) => item.evidence_type === "identity" && item.source_url === LIST);
     expect(identity?.excerpt).toContain("Amina Carter");
     expect(pages[LIST].text).toContain(identity!.excerpt!.split("\n")[0]);
-    // No fabricated contact: nothing on these pages names Amina's email or phone.
+    // No fabricated personal contact: the observed channel is Acme's public
+    // one, and a person never inherits the company switchboard.
     expect(row!.email ?? null).toBeNull();
     expect(row!.phone ?? null).toBeNull();
+    // The observed contact page is verified provenance backed by real evidence.
+    const provenance = (row as { field_provenance?: Record<string, { verification_status?: string }> }).field_provenance?.contact_page_url;
+    expect(provenance?.verification_status).toBe("verified");
+    expect(row!.evidence?.some((item) => item.evidence_type === "contact" && item.source_url === "https://acme.test/contact")).toBe(true);
     // The streamed row is the same lead that reached the final page, and it
     // streams exactly once.
     expect(streamed.map((item) => item.key)).toContain(row!.key);

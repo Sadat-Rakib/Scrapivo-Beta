@@ -126,6 +126,9 @@ export function theoremCandidateFromRow(
       website_url: r.website_url ?? null,
       contact_page_url: r.contact_page_url ?? null,
     },
+    // Field provenance rides along so the contact gate can tell a verified
+    // contact page from a merely discovered URL (E2E-C5).
+    field_provenance: r.field_provenance,
     evidence: evidence ?? r.evidence ?? [],
   };
 }

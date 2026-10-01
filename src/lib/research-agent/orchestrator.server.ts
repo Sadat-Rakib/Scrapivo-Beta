@@ -172,7 +172,10 @@ function requiredValue(row: SpecRow, field: string): boolean {
   if (value === "socials" || value === "social" || value === "social_profiles") {
     return !!row.evidence?.some((item) => item.source_type === "social" && !!item.source_url);
   }
-  if (value === "contact" || value === "public_contact" || value === "contact_channel") return !!(row.email || row.phone || row.url);
+  if (value === "contact" || value === "public_contact" || value === "contact_channel") {
+    // E2E-C5 contract: a generic page URL never proves a public contact channel.
+    return !!(row.email || row.phone || row.contact_page_url);
+  }
   if (value === "location" || value === "geography") return !!(row.location || row.country);
   if (value === "role" || value === "title") return !!(row.title && row.detail);
   if (value === "company" || value === "employer") return !!(row.employer || row.detail);

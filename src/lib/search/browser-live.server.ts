@@ -67,6 +67,27 @@ function withProvenance<T extends Evidence>(evidence: T, page: BrowserObservedPa
     }),
   };
 }
+const CONTACT_EMAIL_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+/;
+const CONTACT_PHONE_RE = /\+?\d[\d ().-]{7,}\d/;
+
+/**
+ * Qualifying contact content is a public channel actually shown on the page —
+ * a bare "Contact us" heading (or a merely guessed /contact URL) proves
+ * nothing. Returns the first observed email/phone plus a short real excerpt
+ * of the page text around it; never fabricates.
+ */
+function observedContactDetail(page: BrowserObservedPage): { email: string | null; phone: string | null; excerpt: string } | null {
+  const text = page.text.replace(/\s+/g, " ").trim().slice(0, 6000);
+  const email = CONTACT_EMAIL_RE.exec(text)?.[0] ?? page.structured?.emails[0] ?? null;
+  const phone = CONTACT_PHONE_RE.exec(text)?.[0] ?? page.structured?.phones[0] ?? null;
+  if (!email && !phone) return null;
+  const anchor = email ? text.indexOf(email) : phone ? text.indexOf(phone) : -1;
+  const excerpt = anchor >= 0
+    ? text.slice(Math.max(0, anchor - 40), Math.min(text.length, anchor + 80)).trim()
+    : (email ?? phone)!;
+  return { email, phone, excerpt };
+}
+
 /**
  * Lifecycle trace (diagnostic only). Every place discovery can lose evidence
  * reports here; the default is a no-op, so behavior never depends on it.
@@ -1123,14 +1144,37 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
           if (value) {
             // A contact page must be one: the site's own /contact route that
             // renders contact content, never a 404 template or a demo form.
+            // A guessed URL alone is not a contact channel: the route only
+            // qualifies when an email or phone is actually observed on it.
             const notFound = /\b(?:404|page not found|not be found|doesn['’]t exist|does not exist|nothing (?:was )?found)\b/i.test(`${value.page.title} ${value.page.text.slice(0, 600)}`);
             const contactContent = /\b(?:contact|get in touch|reach us|email us|call us|send (?:us )?a message|support@|hello@|info@|@[a-z0-9-]+\.[a-z]{2,}|\+?\d[\d ().-]{7,}\d)\b/i.test(value.page.text.slice(0, 6000));
-            if (/\/contact(?:\/|$|\?)/i.test(new URL(value.page.url).pathname) && new URL(value.page.url).hostname === baseHost && !notFound && contactContent) {
+            const isContactRoute = /\/contact(?:\/|$|\?)/i.test(new URL(value.page.url).pathname) && new URL(value.page.url).hostname === baseHost;
+            const observed = isContactRoute && !notFound ? observedContactDetail(value.page) : null;
+            if (observed) {
+              const finalUrl = value.page.url;
+              candidate.row.contact_page_url = finalUrl;
+              candidate.row.field_provenance = { ...candidate.row.field_provenance, contact_page_url: {
+                value: finalUrl, source: "browser_observed_text", source_url: finalUrl,
+                observed_at: new Date().toISOString(), confidence: 0.85, verification_status: "verified",
+              } as NonNullable<SpecRow["field_provenance"]>["contact_page_url"] };
+              // Field evidence, not a self-proving URL: the excerpt is the
+              // real page text around the observed contact detail.
+              candidate.row = { ...candidate.row, evidence: [...(candidate.row.evidence ?? []), withProvenance(makeEvidence({
+                source_url: finalUrl, source_type: "web", evidence_type: "contact", supports: "other",
+                subject: candidate.row.entity_id ?? candidate.row.key ?? finalUrl,
+                excerpt: observed.excerpt, confidence: 0.85,
+                extraction_method: "browser_observed_contact_page", observed_at: new Date().toISOString(),
+              }), value.page)] };
+              progress("Found public contact", new URL(finalUrl).hostname, candidate.row.title);
+            } else if (isContactRoute && !notFound && contactContent) {
+              // A real contact route with no observed channel: keep the URL as
+              // discovered provenance only — it never satisfies the contact
+              // requirement, so research continues elsewhere.
               candidate.row.contact_page_url = value.page.url;
               candidate.row.field_provenance = { ...candidate.row.field_provenance, contact_page_url: {
                 value: value.page.url, source: "browser_observed_text", source_url: value.page.url,
-                observed_at: new Date().toISOString(), confidence: 0.85,
-              } };
+                observed_at: new Date().toISOString(), confidence: 0.6, verification_status: "discovered",
+              } as NonNullable<SpecRow["field_provenance"]>["contact_page_url"] };
             }
             await extract([value.page], undefined, candidate);
           }
