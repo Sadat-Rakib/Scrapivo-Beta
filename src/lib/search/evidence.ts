@@ -157,9 +157,15 @@ export function whyMatchFromEvidence(evidence: Evidence[] | null | undefined): s
         ? `Social ask · “${excerpt}”${host ? ` · ${host}` : ""}`
         : "Social demand evidence on file";
     case "contact":
-      return "Contact details harvested from site";
+      return excerpt
+        ? `Contact details observed · “${excerpt}”${host ? ` · ${host}` : ""}`
+        : "Contact details harvested from site";
     case "identity":
-      return excerpt ? `Identity · ${excerpt}` : host ? `Identity · ${host}` : null;
+      // E2E-C12: a stored record restating who someone is provenance, not a
+      // reason. Returning it as the why-match made every delivered row claim
+      // "evidence" that was just the row's own fields echoed back. Return null
+      // so callers fall through to the criteria-based why_match.
+      return null;
     default:
       return excerpt ? excerpt : host ? `Evidence · ${host}` : null;
   }
