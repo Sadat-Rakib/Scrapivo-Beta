@@ -69,6 +69,19 @@ function nameNeedleFor(skill: string): string {
   return "";
 }
 
+/** Widen-pass name variants: same trade, more synonym forms of the SAME
+ *  constraint (PRD §35) — never a different skill or a larger area. */
+function nameNeedlesForWiden(skill: string): string {
+  const base = nameNeedleFor(skill);
+  const s = (skill || "").toLowerCase();
+  if (/\broof/.test(s)) return "roof|roofer|roofing";
+  if (/\bplumb/.test(s)) return "plumb|plumber|plumbing";
+  if (/\belectric/.test(s)) return "electric|electrician|electrical";
+  if (/account/.test(s)) return "account|accountant|accounting|bookkeep";
+  if (/law|attorney|legal/.test(s)) return "law|attorney|legal|lawyer";
+  return base;
+}
+
 /** Broad fallback tags must not turn an arbitrary POI into a plumber. */
 export function osmTradeCategory(skill: string, tag: string, name: string): string | null {
   if (!/\bplumb/.test(skill.toLowerCase())) return tag;
@@ -218,7 +231,7 @@ async function overpass(query: string): Promise<any[]> {
 /** Tag-only query — fast and reliable. NEVER mix name-regex statements into
  *  the same union: Overpass's planner turns `name~"x",i` + around into a
  *  multi-minute scan that returns 0 elements (verified against 2 mirrors). */
-function tagQuery(tags: string[], lat: number, lon: number, radiusM: number): string {
+function tagQuery(tags: string[], lat: number, lon: number, radiusM: number, outCount = 150): string {
   const tagFilter = tags
     .flatMap((t) => [`nwr[${t}](around:${radiusM},${lat},${lon});`])
     .join("\n  ");
@@ -227,7 +240,7 @@ function tagQuery(tags: string[], lat: number, lon: number, radiusM: number): st
 (
   ${tagFilter}
 );
-out center 150;
+out center ${outCount};
 `;
 }
 
@@ -243,6 +256,19 @@ out center 60;
 `;
 }
 
+/**
+ * Split an OSM contact tag into individual values. The OSM wiki standard for
+ * multi-value lists is `;`-separated ("+1 905-555-1234;+1 905-555-5678");
+ * without splitting, downstream consumers see one mangled multi-number string.
+ */
+export function splitOsmContactValues(raw: string | undefined | null): string[] {
+  if (!raw) return [];
+  return raw
+    .split(";")
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0);
+}
+
 export function elementsToLeads(elements: any[], loc: string, skill: string, cap: number): SourceLead[] {
   const out: SourceLead[] = [];
   const seen = new Set<string>();
@@ -251,7 +277,14 @@ export function elementsToLeads(elements: any[], loc: string, skill: string, cap
     const name = (tagsMap.name || "").trim();
     if (!name || name.length < 2) continue;
     if (isClosedOsmTags(tagsMap)) continue;
-    const websiteRaw = (tagsMap.website || tagsMap["contact:website"] || "").trim();
+    const websiteRaw = (
+      tagsMap.website ||
+      tagsMap["contact:website"] ||
+      // `url` is the OSM general-website fallback; isRealBusinessWebsite
+      // still vetoes directory/social hosts below.
+      tagsMap.url ||
+      ""
+    ).trim();
     const website = isRealBusinessWebsite(
       websiteRaw ? (websiteRaw.startsWith("http") ? websiteRaw : `https://${websiteRaw}`) : "",
     )
@@ -259,7 +292,12 @@ export function elementsToLeads(elements: any[], loc: string, skill: string, cap
         ? websiteRaw
         : `https://${websiteRaw}`
       : undefined;
-    const phone = (tagsMap.phone || tagsMap["contact:phone"] || "").trim();
+    const phoneList = [
+      ...splitOsmContactValues(tagsMap.phone),
+      ...splitOsmContactValues(tagsMap["contact:phone"]),
+      ...splitOsmContactValues(tagsMap["contact:mobile"]),
+    ];
+    const phone = phoneList[0] ?? "";
     const email = (tagsMap.email || tagsMap["contact:email"] || "").trim();
     const rawCategory =
       tagsMap.craft ||
@@ -304,7 +342,7 @@ export function elementsToLeads(elements: any[], loc: string, skill: string, cap
       match_reasons: [`${category} near ${loc}`],
       why_match: address || `${name} — ${category} in ${loc}`,
       emails: email ? [email] : undefined,
-      phones: phone ? [phone] : undefined,
+      phones: phoneList.length ? phoneList : undefined,
       address: address || undefined,
     } as SourceLead);
 
@@ -313,34 +351,44 @@ export function elementsToLeads(elements: any[], loc: string, skill: string, cap
   return out;
 }
 
+/** Options for one OSM acquisition round. `widen` deepens the sweep of the
+ *  SAME constraints (PRD §35): forced 25km tag pass, synonym name sweep,
+ *  higher capture cap. Never changes skill, tags, or the location area. */
+export type OsmSearchOptions = { widen?: boolean };
+
 async function searchAroundCity(
   skill: string,
   locLabel: string,
   lat: number,
   lon: number,
   deadlineMs = 55_000,
+  opts: OsmSearchOptions = {},
 ): Promise<SourceLead[]> {
+  const widen = opts.widen === true;
+  const cap = widen ? 300 : 150;
   const tags = craftTags(skill);
-  const needle = nameNeedleFor(skill);
+  const needle = widen ? nameNeedlesForWiden(skill) : nameNeedleFor(skill);
   const start = Date.now();
   // Try smaller radius first (12km)
-  let leads = elementsToLeads(await overpass(tagQuery(tags, lat, lon, 12_000)), locLabel, skill, 150);
+  let leads = elementsToLeads(await overpass(tagQuery(tags, lat, lon, 12_000, cap)), locLabel, skill, cap);
   // If insufficient results, expand to 25km — but never blow the wall-clock.
-  if (leads.length < 15 && Date.now() - start < deadlineMs * 0.45) {
+  // Widen passes always take the 25km sweep (deeper pages of the same area).
+  if ((leads.length < 15 || widen) && Date.now() - start < deadlineMs * 0.45) {
     leads = elementsToLeads(
-      await overpass(tagQuery(tags, lat, lon, 25_000)),
+      await overpass(tagQuery(tags, lat, lon, 25_000, cap)),
       locLabel,
       skill,
-      150,
+      cap,
     );
   }
-  // Still thin → separately-timeboxed name-regex sweep at 25km.
-  if (leads.length < 10 && needle && Date.now() - start < deadlineMs * 0.75) {
+  // Still thin → separately-timeboxed name-regex sweep at 25km. Widen passes
+  // run the synonym name sweep even when the tag sweep looked healthy.
+  if ((leads.length < 10 || widen) && needle && Date.now() - start < deadlineMs * 0.75) {
     const extra = await Promise.race([
       overpass(nameQuery(needle, lat, lon, 25_000)),
       new Promise<any[]>((r) => setTimeout(() => r([]), 18_000)),
     ]);
-    const merged = [...elementsToLeads(extra, locLabel, skill, 60), ...leads];
+    const merged = [...elementsToLeads(extra, locLabel, skill, widen ? 120 : 60), ...leads];
     const seen = new Set<string>();
     leads = merged.filter((l) => {
       const k = (l.author || l.title).toLowerCase();
@@ -358,6 +406,7 @@ async function searchAroundCity(
 export async function searchOsmLocalBusinesses(
   qx: ExpandedQueries,
   place: string,
+  opts: OsmSearchOptions = {},
 ): Promise<SourceLead[]> {
   const skill = (qx.skill || qx.role || "").trim();
   const loc = normalizeLocalLocation(place || "");
@@ -370,7 +419,7 @@ export async function searchOsmLocalBusinesses(
       cities.map(async (city) => {
         const hit = await geocodeNominatimPoint(`${city}, ${loc}`);
         if (!hit || isBroadAdmin(hit)) return [] as SourceLead[];
-        return searchAroundCity(skill, `${city}, ${loc}`, hit.lat, hit.lon);
+        return searchAroundCity(skill, `${city}, ${loc}`, hit.lat, hit.lon, 55_000, opts);
       }),
     );
     const merged: SourceLead[] = [];
@@ -400,7 +449,7 @@ export async function searchOsmLocalBusinesses(
       cities.map(async (city) => {
         const cityHit = await geocodeNominatimPoint(`${city}, ${loc}`);
         if (!cityHit || isBroadAdmin(cityHit)) return [] as SourceLead[];
-        return searchAroundCity(skill, `${city}, ${loc}`, cityHit.lat, cityHit.lon);
+        return searchAroundCity(skill, `${city}, ${loc}`, cityHit.lat, cityHit.lon, 55_000, opts);
       }),
     );
     const merged: SourceLead[] = [];
@@ -416,7 +465,7 @@ export async function searchOsmLocalBusinesses(
     return merged.slice(0, 100);
   }
 
-  const out = await searchAroundCity(skill, loc, hit.lat, hit.lon);
+  const out = await searchAroundCity(skill, loc, hit.lat, hit.lon, 55_000, opts);
   if (out.length) console.info(`[osm-local] ${out.length} businesses near ${loc} for ${skill}`);
   return out;
 }

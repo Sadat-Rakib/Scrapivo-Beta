@@ -3,6 +3,18 @@ import "./lib/error-capture";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 
+// PRD §16: one-shot SearXNG reachability log per app-server instance. This
+// entry has no dedicated init hook — module top-level is the closest — so run
+// it fire-and-forget here, guarded by a globalThis flag so HMR reloads and
+// multiple module evaluations only ever log once per process.
+const searxngPreflightKey = Symbol.for("scrapivo.searxng_preflight_done");
+if (!(globalThis as Record<symbol, unknown>)[searxngPreflightKey]) {
+  (globalThis as Record<symbol, unknown>)[searxngPreflightKey] = true;
+  void import("./browser-worker/searxng-preflight.server")
+    .then((m) => m.runSearxngStartupPreflight())
+    .catch(() => {});
+}
+
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
 };

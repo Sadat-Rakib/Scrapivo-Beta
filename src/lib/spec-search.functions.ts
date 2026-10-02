@@ -703,6 +703,14 @@ export interface SpecSearchResult {
   boundary_message?: string;
   /** Candidate survival ledger: fates, reject reasons, streamed-vs-final reconciliation. */
   candidateLedger?: import("@/lib/search/candidate-ledger").CandidateLedgerSummary;
+  /** Bounded widening (PRD §33-37): widen passes run AFTER the first
+   *  acquisition round (interactive path only). */
+  widenPasses?: number;
+  /** Why the widening loop stopped — honest partial-success accounting. */
+  widening?: {
+    passes: number;
+    outcome: import("@/lib/search/widening").WidenStopOutcome;
+  };
   /** Internal stage accounting so an empty response has a factual cause. */
   retrievalTrace?: {
     sources: Array<{ source: string; partitions: string[]; scanned: number; matched: number }>;
@@ -729,6 +737,14 @@ export interface SpecSearchResult {
     returned: number;
     /** Per-source health for this run; `summary` is safe to show the user. */
     sourceHealth?: ReturnType<typeof import("@/lib/search/source-health").classifySourceHealth>;
+    /** Full per-provider diagnostics (PRD §15) — dev-surfaced, always recorded. */
+    providers?: import("@/lib/search/source-plan").ProviderDiagnostic[];
+    /** Bounded widening accounting (PRD §33-37). */
+    widenPasses?: number;
+    widening?: {
+      passes: number;
+      outcome: import("@/lib/search/widening").WidenStopOutcome;
+    };
     reason: "NO_DATA" | "NO_PARTITION" | "NO_INDEX_COVERAGE" | "NO_LOCATION_ROUTE" |
       "NO_CATEGORY_MATCH" | "NO_ROLE_MATCH" | "FILTERED_BY_SPEC" | "INCOMPLETE" |
       "FAILED_ENRICHMENT" | "FAILED_VERIFICATION" | "FAILED_QUALIFICATION" | "TIMEOUT" |
@@ -1109,9 +1125,15 @@ export async function runSpecSearchCore(
   // final page. Bookkeeping only; it never changes delivery.
   const { createCandidateLedger } = await import("@/lib/search/candidate-ledger");
   const ledger = createCandidateLedger();
+  // Keys already streamed to the user. Widen passes (PRD §33-37) must never
+  // re-stream a known lead: progressive delivery stays first-once.
+  const streamedKeys = new Set<string>();
   const browserProgress: SpecSearchDeps["browserProgress"] = deps.browserProgress
     ? (event) => {
-        if (event.row) ledger.streamed(event.row);
+        if (event.row) {
+          ledger.streamed(event.row);
+          if (event.row.key) streamedKeys.add(event.row.key);
+        }
         deps.browserProgress!(event);
       }
     : undefined;
@@ -2271,6 +2293,186 @@ export async function runSpecSearchCore(
     }
   }
 
+  // Bounded widening (PRD §33-37): keep acquiring until delivered (or
+  // qualified-ready) >= the requested target, coverage is genuinely exhausted
+  // (job-engine rule: COVERAGE_EMPTY_PASSES consecutive zero-new-candidate
+  // passes), or the run budget ends. Semantics come from the shared widening
+  // helper — the job engine's frozen math, not a competing state machine
+  // (PRD §6). Widen moves (PRD §35): more query variants of the SAME
+  // constraints, additional public sources, deeper result pages — never a
+  // loosened user constraint. Rows keep streaming as they verify.
+  let widenPasses = 0;
+  let emptyWidenPasses = 0;
+  let widenOutcome: import("@/lib/search/widening").WidenStopOutcome = "NOT_REQUIRED";
+  if (liveOpt !== null && !opts.jobContext && !deadlineHit && !deps.signal?.aborted) {
+    const { widenStopDecision, widenDesiredCount, MAX_WIDEN_PASSES } = await import("@/lib/search/widening");
+    const identityOf = (row: SpecRow) => row.entity_id ?? row.key ?? "";
+    const seenKeys = new Set<string>();
+    for (const r of [...completeRows, ...incompleteRows, ...liveIncompleteRows]) {
+      const k = identityOf(r);
+      if (k) seenKeys.add(k);
+    }
+    // Mirror of the registered run budget (search-run.server) using the SAME
+    // scaled formula the route registered this run with — a mirror that
+    // disagreed with the real clock would mis-time every widening decision.
+    let runBudgetMs = 120_000;
+    try {
+      const { scaledRunBudgetMs } = await import("@/lib/search/search-run.server");
+      runBudgetMs = scaledRunBudgetMs(requestedTarget);
+    } catch {
+      // non-node runtime: rely on the abort signal alone
+    }
+    while (true) {
+      if (deps.signal?.aborted) {
+        if (deadlineNow()) deadlineHit = true;
+        widenOutcome = "DEADLINE";
+        break;
+      }
+      const budgetRemainingMs = runBudgetMs - (Date.now() - runStartedAt);
+      // Widen metric must predict DELIVERY: the strict final gate (why-match /
+      // deep-signal + the disposition filter) runs only AFTER this loop, so a
+      // row the pre-gate keeps can still be dropped — counting it would
+      // overestimate progress and stop widening early (P04 regression:
+      // gate-kept-but-unqualified rows masked a 0-delivery run).
+      const qualifiedReadyNow = applyWhyMatchGate(completeRows, spec, !!spec.signal_required).kept
+        .filter((r) => r.disposition === "qualified").length;
+      const decision = widenStopDecision({
+        qualifiedCount: qualifiedReadyNow,
+        target: requestedTarget,
+        widenPasses,
+        emptyWidenPasses,
+        deadlineHit,
+        cancelled: false,
+        budgetRemainingMs,
+      });
+      if (decision !== "CONTINUE") {
+        widenOutcome = decision;
+        break;
+      }
+      // Never start a pass we cannot finish. W1: the FIRST widen pass keeps a
+      // flat 60s carve-out — the initial gapfill has already burned real time,
+      // so a percentage headroom of a mostly-spent budget would block the very
+      // first pass; later passes need the full quarter of the budget for
+      // enrichment, qualification and finalization of what we already hold.
+      const minPassHeadroomMs = widenPasses === 0 ? 60_000 : runBudgetMs * 0.25;
+      if (budgetRemainingMs < minPassHeadroomMs) {
+        widenOutcome = "DEADLINE";
+        break;
+      }
+      try {
+        throwIfAborted(deps.signal);
+        const widenPassNumber = widenPasses + 1;
+        emitProgress(
+          "Widening the search",
+          "widening",
+          `pass ${widenPassNumber} of ${MAX_WIDEN_PASSES}`,
+        );
+        const { runLiveGapfill } = await import("@/lib/search/live-gapfill");
+        const live = await runLiveGapfill(spec, {
+          ...(liveOpt ?? {}),
+          searchRunId: runIds.search_run_id,
+          signal: deps.signal,
+          // Widen passes keep the activity feed but never re-stream a lead
+          // that an earlier pass already delivered to the stream.
+          onBrowserProgress: browserProgress
+            ? (event) => {
+                const k = event.row?.key;
+                if (event.row && k && streamedKeys.has(k)) {
+                  browserProgress({ ...event, row: undefined });
+                  return;
+                }
+                browserProgress(event);
+              }
+            : undefined,
+          ownerId: deps.ownerId,
+          // Deeper pages + more research per pass (doubles, bounded by pool).
+          desiredCount: widenDesiredCount({
+            widenPass: widenPassNumber,
+            baseDesiredCount: 30,
+            poolTarget: candidatePoolTarget,
+          }),
+          initialCandidates: [...completeRows, ...incompleteRows, ...liveIncompleteRows],
+          isVerified: (row) => {
+            const prepared = sanitizeSpecRow(row, spec);
+            return rowSatisfiesSpec(spec, prepared) && prepared.complete === true &&
+              applyWhyMatchGate([prepared], spec, !!spec.signal_required).kept.length === 1;
+          },
+          widen: true,
+          widenPass: widenPassNumber,
+        });
+        widenPasses = widenPassNumber;
+        providerAttempts = [...providerAttempts, ...(live.diagnostics ?? [])];
+        if (!process.env.VITEST && live.diagnostics?.length) {
+          void import("@/lib/search/source-yield.server")
+            .then(({ drainProviderDiagnostics }) =>
+              drainProviderDiagnostics(live.diagnostics ?? [], {
+                queryFamily: spec.signal_required ? "signal" : "general",
+                entityType: spec.entity,
+              }),
+            )
+            .catch(() => {});
+        }
+        if (live.rows.length) {
+          liveCandidateCount += live.rows.length;
+          dbMeta.push({
+            dbHit: true,
+            engine: live.engine,
+            partitionsRead: [`live-gapfill(widen ${widenPassNumber})`],
+            rowsScanned: live.scanned,
+            rowsReturned: live.rows.length,
+          });
+          let newCount = 0;
+          for (const r of live.rows.map((row) => sanitizeSpecRow(row, spec))) {
+            if (rowCouldSatisfySpec(spec, r)) {
+              const k = identityOf(r);
+              const isNew = !!k && !seenKeys.has(k);
+              if (isNew) {
+                seenKeys.add(k);
+                newCount++;
+                ledger.retrieved(r);
+              }
+              if (r.complete === false) liveIncompleteRows.push(r);
+              else completeRows.push(r);
+            } else {
+              // A widen round must not re-enter known contradictions either.
+              const k = identityOf(r);
+              if (k && !seenKeys.has(k)) {
+                seenKeys.add(k);
+                ledger.filtered(r);
+              }
+            }
+          }
+          liveDiscovery = "completed";
+          emptyWidenPasses = newCount === 0 ? emptyWidenPasses + 1 : 0;
+          emitProgress(
+            "Widen pass complete",
+            live.engine,
+            undefined,
+            `${newCount} new candidates`,
+          );
+        } else {
+          emptyWidenPasses += 1;
+        }
+      } catch (e) {
+        if (deadlineNow()) {
+          deadlineHit = true;
+          widenOutcome = "DEADLINE";
+          console.warn(
+            "[deadline] widen pass stopped at hard deadline; finalizing accumulated candidates",
+          );
+          break;
+        }
+        if (e instanceof Error && e.message === "SEARCH_CANCELLED") {
+          widenOutcome = "DEADLINE";
+          break;
+        }
+        console.warn("[widen] pass failed:", e instanceof Error ? e.message : e);
+        // A failed provider pass is non-productive; two in a row exhaust.
+        emptyWidenPasses += 1;
+      }
+    }
+  }
+
   liveDoneAt = Date.now();
   // Browser candidates may need the same completeness enrichment as DB rows.
   // A deadline that fired mid-browser (which returned its rows anyway) must
@@ -2588,17 +2790,6 @@ export async function runSpecSearchCore(
     ledger.delivered(page.filter((row) => !refused.has(row)), completeRows.slice(pageBaseOffset + page.length));
   }
   const candidateLedger = ledger.summary();
-  if (candidateLedger.streamed || candidateLedger.counts.rejected || candidateLedger.counts.gated) {
-    console.info("[candidate-ledger]", JSON.stringify({
-      search_run_id: runIds.search_run_id,
-      counts: candidateLedger.counts,
-      // C6 invariant: every retrieved candidate must carry exactly one fate.
-      accounting: candidateLedger.accounting,
-      rejectReasons: candidateLedger.rejectReasons,
-      streamed: candidateLedger.streamed,
-      streamedNotReturned: candidateLedger.streamedNotReturned.map((item) => `${item.title}:${item.fate}${item.reason ? `(${item.reason})` : ""}`),
-    }));
-  }
   const moreAvailableMessage =
     page.length > 0 && (hasMore || incompleteRows.length > 0)
       ? "There are more verified leads — want to see them?"
@@ -2688,7 +2879,59 @@ export async function runSpecSearchCore(
     returned: page.length,
     reason: zeroReason,
     sourceHealth: (await import("@/lib/search/source-health")).classifySourceHealth({ providers: providerAttempts, diagnostics: routeDiagnostics }),
+    // Full per-provider diagnostics (PRD §15): recorded on every run, surfaced
+    // in the dev funnel dump below.
+    providers: providerAttempts.length ? providerAttempts : undefined,
+    widenPasses: widenPasses || undefined,
+    widening: { passes: widenPasses, outcome: widenOutcome },
   };
+  // DEV funnel dump (PRD §14/§44/§65): the full candidate funnel in one line —
+  // raw discovered → deduped → relevant → enriched → qualified → verified →
+  // delivered, reject reasons, and per-source attempted/succeeded/degraded.
+  // Gated behind a dev flag; production logs stay clean.
+  if (process.env.NODE_ENV !== "production" || process.env.SCRAPIVO_DEBUG_FUNNEL === "1") {
+    if ((candidateLedger.accounting?.retrieved ?? 0) > 0) {
+      const verifiedCount = completeRows.filter((r) => r.verification_status === "verified").length;
+      console.info(
+        "[candidate-ledger] " +
+          JSON.stringify({
+            search_run_id: runIds.search_run_id,
+            funnel: {
+              raw_discovered: rawCandidateCount,
+              parsed: rawCandidateCount, // structured sources yield parsed rows directly
+              deduped: candidateLedger.accounting?.retrieved ?? null,
+              relevant: postSpecFilterCount,
+              enriched: researchedCount || qualificationInputCount,
+              qualified: completeRows.length,
+              verified: verifiedCount,
+              delivered: page.length,
+              pending_enrichment: incompleteRows.length,
+            },
+            // C6 invariant: every retrieved candidate must carry exactly one fate.
+            counts: candidateLedger.counts,
+            accounting: candidateLedger.accounting,
+            rejectReasons: candidateLedger.rejectReasons,
+            incompleteReasons: candidateLedger.incompleteReasons,
+            streamed: candidateLedger.streamed,
+            streamedNotReturned: candidateLedger.streamedNotReturned.map((item) => `${item.title}:${item.fate}${item.reason ? `(${item.reason})` : ""}`),
+            perSource: providerAttempts.map((d) => ({
+              provider: d.provider,
+              attempted: d.attempted,
+              succeeded: d.succeeded,
+              degraded: d.outcome === "SOURCE_ERROR" || d.outcome === "SOURCE_UNAVAILABLE" || !!d.error,
+              artifacts: d.artifactsFound,
+              qualified: d.qualified,
+              latency_ms: d.latencyMs ?? null,
+              queries: d.queries ?? null,
+              outcome: d.outcome ?? null,
+              error: d.error ?? null,
+            })),
+            widening: { passes: widenPasses, outcome: widenOutcome },
+            timings: retrievalTrace.timings,
+          }),
+      );
+    }
+  }
   if (typeof console !== "undefined") {
     console.info(
       "[spec-run] " +
@@ -2710,6 +2953,8 @@ export async function runSpecSearchCore(
           liveDiscovery,
           deadline: deadlineHit || undefined,
           retrievalTrace,
+          widenPasses: widenPasses || undefined,
+          widening: { passes: widenPasses, outcome: widenOutcome },
           search_run_id: runIds.search_run_id,
           outcome: fin.outcome,
         }),
@@ -2736,6 +2981,8 @@ export async function runSpecSearchCore(
       executionPlan,
       providerAttempts,
       candidateLedger,
+      widenPasses: widenPasses || undefined,
+      widening: { passes: widenPasses, outcome: widenOutcome },
     },
     page.length,
     deps.signal?.aborted === true && !deadlineNow(),
@@ -2850,12 +3097,16 @@ export const runSpecSearch = createServerFn({ method: "POST" })
     const priorFrame = data.prior_frame === undefined
       ? undefined
       : (await import("@/lib/understanding/frame")).UnderstandingFrameSchema.parse(data.prior_frame);
-    const { beginRegisteredSearchRun } = await import("@/lib/search/search-run.server");
+    const { beginRegisteredSearchRun, scaledRunBudgetMs } = await import("@/lib/search/search-run.server");
     // Beta-reality fix: a flat 120s deadline killed live people/company research
     // mid-flight (premature honest-looking zeros). Scale the budget with the
     // requested target; the absolute cap lives in search-run.server.
-    const requested = Number.isFinite(data.limit) ? Math.max(1, Math.min(100, Number(data.limit))) : 10;
-    const registered = runId ? beginRegisteredSearchRun({ ownerId, runId, conversationId: data.conversation_id, signal: getRequest().signal, maxRunMs: 120_000 + requested * 20_000 }) : undefined;
+    // W1: UI-typed queries default to the PRD §33 target so the budget cannot
+    // expire before the first widen pass (data.limit is absent for typed
+    // queries — the "Find 20" lives in the query text, parsed by understanding).
+    const requested = Number.isFinite(data.limit) ? Math.max(1, Math.min(100, Number(data.limit))) : 25;
+    const budget = scaledRunBudgetMs(requested);
+    const registered = runId ? beginRegisteredSearchRun({ ownerId, runId, conversationId: data.conversation_id, signal: getRequest().signal, maxRunMs: budget }) : undefined;
     const { beginSearchBrowserProgress, publishSearchBrowserProgress, finishSearchBrowserProgress } = await import("@/lib/search/search-browser-progress.server");
     if (runId) beginSearchBrowserProgress(runId, ownerId);
     try {

@@ -122,6 +122,11 @@ createServer(async (req, res) => {
   } catch (error) {
     send(res, 400, { error: error instanceof Error ? error.message : "WORKER_ERROR" });
   }
-}).listen(port, "127.0.0.1", () =>
-  console.log(JSON.stringify({ event: "research_worker_started", port })),
-);
+}).listen(port, "127.0.0.1", () => {
+  console.log(JSON.stringify({ event: "research_worker_started", port }));
+  // PRD §16: one-shot SearXNG reachability log. Fire-and-forget — it must
+  // never block or break worker startup, so the import itself is guarded.
+  void import("../browser-worker/searxng-preflight.server")
+    .then((m) => m.runSearxngStartupPreflight())
+    .catch(() => {});
+});

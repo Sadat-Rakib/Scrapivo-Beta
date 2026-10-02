@@ -109,3 +109,24 @@ export function beginRegisteredSearchRun(args: {
     },
   };
 }
+
+/**
+ * Mirror of beginRegisteredSearchRun's budget formula for callers that need
+ * to know how much wall-time a run will get BEFORE it starts (the bounded
+ * widening loop must not begin acquisition work it cannot finish). Same
+ * clamp: 5s floor, adaptive ceiling.
+ */
+export function estimatedRunBudgetMs(maxRunMs?: number): number {
+  return Math.min(Math.max(5_000, maxRunMs ?? MAX_RUN_MS), MAX_ADAPTIVE_RUN_MS);
+}
+
+/** Wall-time reserve so the bounded widening loop (PRD §35) gets a real
+ * slice: stored-path verification of the initial pool commonly consumes the
+ * acquisition-scaled budget, and without a reserved slice widening never
+ * starts (W1 acceptance: 449s of per-row browsing left no room in a 520s
+ * budget). One formula for the registered deadline and the widen-loop's
+ * pre-flight mirror so the two can never drift apart. */
+const WIDEN_RESERVE_MS = 120_000;
+export function scaledRunBudgetMs(requested: number): number {
+  return estimatedRunBudgetMs(120_000 + Math.max(0, requested) * 20_000 + WIDEN_RESERVE_MS);
+}

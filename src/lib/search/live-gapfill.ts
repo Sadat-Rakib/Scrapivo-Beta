@@ -53,7 +53,9 @@ export type LiveGapfillDeps = {
   initialCandidates?: SpecRow[];
   isVerified?: (row: SpecRow) => boolean;
   /** OSM / local businesses live search. Null skips. */
-  osm?: ((query: string, location: string, category: string) => Promise<SpecRow[]>) | null;
+  osm?:
+    | ((query: string, location: string, category: string, opts?: { widen?: boolean }) => Promise<SpecRow[]>)
+    | null;
   /** Jobs fleet. Null skips. */
   jobs?: ((query: string, location?: string) => Promise<SpecRow[]>) | null;
   /** Web/SERP directory discovery for company/person (and business fallback). */
@@ -63,10 +65,19 @@ export type LiveGapfillDeps = {
         location: string | null,
         entity: string,
         spec?: SearchSpec,
+        opts?: { widen?: boolean },
       ) => Promise<SpecRow[]>)
     | null;
   /** M3: abort in-flight provider work when signalled. */
   signal?: AbortSignal | null;
+  /**
+   * Bounded widening (PRD §33-37): when true, this acquisition round deepens
+   * the SAME constraints — more query variants, additional public sources,
+   * deeper result pages. Never loosens a user constraint.
+   */
+  widen?: boolean;
+  /** 1-based widen pass number (diagnostics + scaling only). */
+  widenPass?: number;
 };
 
 function fieldOf(spec: SearchSpec, f: string): string | null {
@@ -100,6 +111,7 @@ async function defaultOsm(
   query: string,
   location: string,
   category: string,
+  opts?: { widen?: boolean },
 ): Promise<SpecRow[]> {
   const { searchOsmLocalBusinesses } = await import("./osm-local-businesses.server");
   const { checkPhone } = await import("./phone-safety");
@@ -123,6 +135,7 @@ async function defaultOsm(
       negativeSignals: [],
     },
     location,
+    { widen: opts?.widen === true },
   );
   return leads.map((l, i) => {
     const tag = (l.match_reasons?.[0] ?? "").split(" near ")[0] || category;
@@ -132,7 +145,13 @@ async function defaultOsm(
         .replace(/[^a-z0-9]+/g, "-")
         .slice(0, 48) || `row-${i}`;
     const contact = l as unknown as { phones?: string[]; emails?: string[] };
-    const phone = checkPhone(contact.phones?.[0], "");
+    // First phone candidate that survives the country/validity check — a
+    // source may list several (semicolon lists) and some may be unusable.
+    let checked = { phone: null as string | null, status: "unverifiable" as import("./phone-safety").PhoneStatus };
+    for (const candidate of contact.phones ?? []) {
+      checked = checkPhone(candidate, "");
+      if (checked.phone) break;
+    }
     const why =
       l.match_reasons?.[0] ||
       (l.full_post_url ? `Listed on OpenStreetMap near ${location}` : null);
@@ -148,8 +167,8 @@ async function defaultOsm(
       title: l.title ?? "?",
       detail: [l.address, location].filter(has).join(", "),
       email: contact.emails?.[0] ?? null,
-      phone: phone.phone,
-      phoneStatus: phone.status,
+      phone: checked.phone,
+      phoneStatus: checked.status,
       url: l.full_post_url ?? null,
       website_url: l.full_post_url ?? null,
       source_url: (l as typeof l & { source_record_url?: string }).source_record_url ?? null,
@@ -165,7 +184,7 @@ async function defaultOsm(
       evidence: [{
         source_url: (l as typeof l & { source_record_url?: string }).source_record_url ?? `osm:${entity_id}`,
         source_type: "osm" as const,
-        excerpt: [l.title, tag, location, phone.phone ? `phone ${phone.phone}` : null].filter(Boolean).join(" · "),
+        excerpt: [l.title, tag, location, checked.phone ? `phone ${checked.phone}` : null].filter(Boolean).join(" · "),
         observed_at: new Date().toISOString(),
         evidence_type: "identity" as const,
         supports: "identity" as const,
@@ -206,9 +225,12 @@ async function defaultWeb(
   location: string | null,
   entity: string,
   spec?: SearchSpec,
+  opts?: { widen?: boolean },
 ): Promise<SpecRow[]> {
   const { discoverWebFreeFirst } = await import("./provider-ladder");
-  const plan = spec ? buildResearchPlan(spec, { desiredCount: 10 }) : null;
+  const plan = spec
+    ? buildResearchPlan(spec, { desiredCount: opts?.widen ? 20 : 10, widen: opts?.widen })
+    : null;
   const queries = plan?.discoveryQueries.length ? plan.discoveryQueries : [query.trim()].filter(Boolean);
   if (!queries.length) return [];
   const { results } = await discoverWebFreeFirst({
@@ -220,7 +242,7 @@ async function defaultWeb(
   });
   // Kind starts neutral — M4 resolution sets entity type from the page,
   // never from Spec.entity / query-kind inheritance.
-  return results.slice(0, 15).map((r, i) => {
+  return results.slice(0, opts?.widen ? 30 : 15).map((r, i) => {
     const title = (r.title || "").trim() || "Web result";
     const url = r.url || null;
     const snippet = (r.content || "").slice(0, 180);
@@ -448,10 +470,19 @@ async function runSourceGapfill(
   const role = fieldOf(spec, "role");
   const model = fieldOf(spec, "business_model");
   const web = deps.web === null ? null : (deps.web ?? defaultWeb);
+  // Widening (PRD §35): a widen round tries ADDITIONAL public sources of the
+  // same constraints instead of stopping at the first provider with rows.
+  const widen = deps.widen === true;
+  const stopOnFirstSuccess = !widen;
 
   const requirements = deriveCoverageRequirements(spec);
   const plan = buildSourcePlan(spec, requirements, { desiredCount: deps.desiredCount });
   const diagnostics: ProviderDiagnostic[] = [];
+  // Widening can run several primary providers in one round; merged rows keep
+  // provider order (first source first). Non-widen rounds return immediately.
+  let widenedRows: SpecRow[] = [];
+  let widenedEngineParts: string[] = [];
+  let widenedScanned = 0;
 
   const record = (
     provider: SourceProviderId | string,
@@ -502,24 +533,32 @@ async function runSourceGapfill(
         const osmLocation = geo?.kind === "metro"
           ? geo.member_ids.find((id) => id.startsWith("geo:city:"))?.slice("geo:city:".length) ?? location
           : location;
-        const rows = await osm(spec.raw_query, osmLocation, category);
+        const osmStartedAt = Date.now();
+        const rows = await osm(spec.raw_query, osmLocation, category, { widen });
         record("osm-local", {
           attempted: true,
           succeeded: true,
           artifactsFound: rows.length,
           role: "primary",
           costTier: 1,
+          latencyMs: Date.now() - osmStartedAt,
         });
         deps.onBrowserProgress?.({ action: "Searching OpenStreetMap", source: "osm", detail: osmLocation });
         if (rows.length) {
           deps.onBrowserProgress?.({ action: "Found local businesses", source: "osm", count: rows.length });
-          return {
-            rows,
-            engine: "live-osm",
-            scanned: rows.length,
-            plan,
-            diagnostics,
-          };
+          if (stopOnFirstSuccess) {
+            return {
+              rows,
+              engine: "live-osm",
+              scanned: rows.length,
+              plan,
+              diagnostics,
+            };
+          }
+          // Widen round: keep the OSM rows and continue to additional sources.
+          widenedRows = [...widenedRows, ...rows];
+          widenedEngineParts.push("live-osm");
+          widenedScanned += rows.length;
         }
       } catch (e) {
         record("osm-local", {
@@ -551,6 +590,7 @@ async function runSourceGapfill(
         continue;
       }
       try {
+        const jobsStartedAt = Date.now();
         const rows = await jobs(role ?? category ?? spec.raw_query, location ?? undefined);
         record("jobs-fleet", {
           attempted: true,
@@ -558,6 +598,7 @@ async function runSourceGapfill(
           artifactsFound: rows.length,
           role: "primary",
           costTier: 1,
+          latencyMs: Date.now() - jobsStartedAt,
         });
         deps.onBrowserProgress?.({ action: "Found job postings", source: "jobs", count: rows.length });
         return {
@@ -602,11 +643,11 @@ async function runSourceGapfill(
         continue;
       }
       try {
-        const webPlan = buildResearchPlan(spec, { desiredCount: deps.desiredCount });
+        const webPlan = buildResearchPlan(spec, { desiredCount: deps.desiredCount, widen });
         // E2E-C8 observability: the exact query variants gapfill will spend
         // live-browser budget on, for post-run debugging.
         if (typeof console !== "undefined") {
-          console.info("[gapfill-queries]", JSON.stringify(webPlan.discoveryQueries.slice(0, 6)));
+          console.info("[gapfill-queries]", JSON.stringify(webPlan.discoveryQueries.slice(0, widen ? 10 : 6)));
         }
         const q = webPlan.discoveryQueries[0] ?? "";
         const entity =
@@ -615,23 +656,33 @@ async function runSourceGapfill(
           spec.entity === "person"
             ? spec.entity
             : "company";
-        const rows = await web(q, location, entity, spec);
+        const webStartedAt = Date.now();
+        const rows = await web(q, location, entity, spec, { widen });
         record(step.providerId, {
           attempted: true,
           succeeded: true,
           artifactsFound: rows.length,
           role: "primary",
           costTier: step.costTier,
+          latencyMs: Date.now() - webStartedAt,
+          queries: webPlan.discoveryQueries.length,
+          pages: webPlan.stoppingRules.maxPages,
         });
         deps.onBrowserProgress?.({ action: "Found web candidates", source: "web", count: rows.length });
         if (rows.length) {
-          return {
-            rows,
-            engine: "live-web",
-            scanned: rows.length,
-            plan,
-            diagnostics,
-          };
+          if (stopOnFirstSuccess) {
+            return {
+              rows,
+              engine: "live-web",
+              scanned: rows.length,
+              plan,
+              diagnostics,
+            };
+          }
+          // Widen round: merge web rows with any earlier source's rows.
+          widenedRows = [...widenedRows, ...rows];
+          widenedEngineParts.push("live-web");
+          widenedScanned += rows.length;
         }
       } catch (e) {
         const code =
@@ -682,6 +733,15 @@ async function runSourceGapfill(
     costTier: 7,
   });
 
+  if (widenedRows.length) {
+    return {
+      rows: widenedRows,
+      engine: widenedEngineParts.join("+"),
+      scanned: widenedScanned,
+      plan,
+      diagnostics,
+    };
+  }
   return { rows: [], engine: "live-none", scanned: 0, plan, diagnostics };
 }
 
@@ -746,12 +806,14 @@ export async function runLiveGapfill(
     // Leave time for final enrichment/qualification before the 120s run abort.
     timeoutMs: spec.entity === "company" ? 75_000 : 90_000,
   };
+  const browserStartedAt = Date.now();
   const browserResult = shouldBrowse
     ? await Promise.resolve(browser(spec, browserOptions)).then(
         (value) => ({ status: "fulfilled" as const, value }),
         (reason) => ({ status: "rejected" as const, reason }),
       )
     : ({ status: "fulfilled" as const, value: [] as SpecRow[] });
+  const browserLatencyMs = Date.now() - browserStartedAt;
   // Keep browser rows on the hard deadline: the research is already paid
   // for, and the caller finalizes whatever qualifies. Only a real
   // cancellation stops delivery here.
@@ -781,6 +843,9 @@ export async function runLiveGapfill(
     artifactsFound: browserRows.length,
     entitiesResolved: 0,
     qualified: 0,
+    latencyMs: shouldBrowse ? browserLatencyMs : undefined,
+    queries: researchPlan.discoveryQueries.length,
+    pages: researchPlan.stoppingRules.maxPages,
     ...(browserResult.status === "rejected" ? {
       outcome: "SOURCE_ERROR" as const,
       error: browserResult.reason instanceof Error ? browserResult.reason.message : String(browserResult.reason),

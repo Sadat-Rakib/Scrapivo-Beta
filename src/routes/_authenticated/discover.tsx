@@ -2334,8 +2334,8 @@ function DiscoverPage() {
           )}
         </div>
 
-        <div className="px-4 md:px-6 pb-4 md:pb-6 pt-2">
-          <div className="max-w-3xl mx-auto" data-tour="composer">
+        <div className="flex min-h-0 flex-col px-4 md:px-6 pb-4 md:pb-6 pt-2">
+          <div className="max-w-3xl mx-auto w-full" data-tour="composer">
             {/* WS3: project chips above the composer — hidden when the user
                 has no projects; clicking opens the project page. */}
             <ProjectChipsRow />
@@ -2451,9 +2451,12 @@ function DiscoverPage() {
               <StreamedReconciliationNote items={streamedMissing} />
             )}
             {/* Clarifying questions as an attached dropdown above the input —
-                never inside the results flow. Collapsible; reopens per round. */}
+                never inside the results flow. Collapsible; reopens per round.
+                BUG-09 (PRD §30–31): the open body is self-bounded (max-h + its
+                own scroll) so a long question set can never push the composer
+                off a 1366×768-class footer. */}
             {clarifyQs.length > 0 && planDone && !runSearchMut.isPending && !specPending && (
-              <div className="mb-2 rounded-2xl border border-primary/25 bg-card shadow-xl">
+              <div className="mb-2 flex flex-col overflow-hidden rounded-2xl border border-primary/25 bg-card shadow-xl">
                 <button
                   type="button"
                   onClick={() => setQuestionsOpen((o) => !o)}
@@ -2473,7 +2476,7 @@ function DiscoverPage() {
                   )}
                 </button>
                 {questionsOpen && (
-                  <div className="px-4 pb-4">
+                  <div className="max-h-[40vh] min-h-0 overflow-y-auto overscroll-contain px-4 pb-4">
                     <ClarifyPanel
                       questions={clarifyQs}
                       refinement={defaultSummary || refinement}

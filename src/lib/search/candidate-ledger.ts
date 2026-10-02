@@ -54,6 +54,8 @@ export type CandidateLedgerSummary = {
   counts: Record<CandidateFate, number>;
   /** Reject code → count for `rejected`. */
   rejectReasons: Record<string, number>;
+  /** Missing-field signature → count for `incomplete` (e.g. contact_or_site). */
+  incompleteReasons: Record<string, number>;
   streamed: number;
   /** Streamed leads that are not on the delivered page, each with its fate. */
   streamedNotReturned: StreamedReconciliation[];
@@ -170,9 +172,11 @@ export function createCandidateLedger() {
     summary(): CandidateLedgerSummary {
       const counts = Object.fromEntries(FATES.map((fate) => [fate, 0])) as Record<CandidateFate, number>;
       const rejectReasons: Record<string, number> = {};
+      const incompleteReasons: Record<string, number> = {};
       for (const entry of entries) {
         counts[entry.fate] += 1;
         if (entry.fate === "rejected" && entry.reason) rejectReasons[entry.reason] = (rejectReasons[entry.reason] ?? 0) + 1;
+        if (entry.fate === "incomplete" && entry.reason) incompleteReasons[entry.reason] = (incompleteReasons[entry.reason] ?? 0) + 1;
       }
       const streamed = entries.filter((entry) => entry.streamed);
       const retrieved = entries.length;
@@ -184,6 +188,7 @@ export function createCandidateLedger() {
       return {
         counts,
         rejectReasons,
+        incompleteReasons,
         streamed: streamed.length,
         streamedNotReturned: streamed.filter((entry) => entry.fate !== "returned")
           .map(({ key, title, fate, reason }) => ({ key, title, fate, reason })),
@@ -201,7 +206,11 @@ export function mergeCandidateLedgers(summaries: Array<CandidateLedgerSummary | 
   if (!present.length) return undefined;
   const counts = Object.fromEntries(FATES.map((fate) => [fate, present.reduce((sum, summary) => sum + (summary.counts[fate] ?? 0), 0)])) as Record<CandidateFate, number>;
   const rejectReasons: Record<string, number> = {};
-  for (const summary of present) for (const [code, count] of Object.entries(summary.rejectReasons)) rejectReasons[code] = (rejectReasons[code] ?? 0) + count;
+  const incompleteReasons: Record<string, number> = {};
+  for (const summary of present) {
+    for (const [code, count] of Object.entries(summary.rejectReasons)) rejectReasons[code] = (rejectReasons[code] ?? 0) + count;
+    for (const [code, count] of Object.entries(summary.incompleteReasons ?? {})) incompleteReasons[code] = (incompleteReasons[code] ?? 0) + count;
+  }
   const deliveredIds = new Set(delivered.flatMap(identities));
   const seen = new Set<string>();
   const streamedNotReturned = present.flatMap((summary) => summary.streamedNotReturned).filter((item) => {
@@ -220,7 +229,7 @@ export function mergeCandidateLedgers(summaries: Array<CandidateLedgerSummary | 
       }
     : undefined;
   if (accounting) accounting.ok = accounting.retrieved === accounting.fated && accounting.unaccounted === 0;
-  return { counts, rejectReasons, streamed: present.reduce((sum, summary) => sum + summary.streamed, 0), streamedNotReturned, accounting };
+  return { counts, rejectReasons, incompleteReasons, streamed: present.reduce((sum, summary) => sum + summary.streamed, 0), streamedNotReturned, accounting };
 }
 
 /** Short, user-facing explanation for a streamed lead missing from the final list. */

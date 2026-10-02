@@ -81,6 +81,16 @@ export interface ProviderDiagnostic {
   error?: string | null;
   /** Typed provider-level outcome (diagnostic unless all capable failed). */
   outcome?: SearchOutcomeCode | null;
+  /** Observed wall-time of the provider attempt (PRD §15 diagnostics). */
+  latencyMs?: number;
+  /** Query variants the provider actually spent (PRD §15). */
+  queries?: number;
+  /** Result pages fetched (PRD §15), when the provider reports them. */
+  pages?: number;
+  /** Anti-bot challenge encountered (PRD §15). */
+  challenge?: boolean;
+  /** Retries spent (PRD §15). */
+  retries?: number;
 }
 
 export function deriveCoverageRequirements(spec: SearchSpec): CoverageRequirements {
@@ -388,7 +398,7 @@ function keepSubstantive(queries: Array<string | null>): string[] {
 
 export function buildResearchPlan(
   spec: SearchSpec,
-  opts?: { desiredCount?: number },
+  opts?: { desiredCount?: number; /** Widen round: more query variants of the SAME constraints + deeper pages. */ widen?: boolean },
 ): ResearchPlan {
   const desiredCount = Math.max(1, opts?.desiredCount ?? 10);
   const location = usefulLocation(spec);
@@ -464,14 +474,19 @@ export function buildResearchPlan(
     "identity_evidence",
   ]);
 
+  // Widening (PRD §35): a widen round activates MORE query variants of the
+  // SAME constraints (the plan already generates them; the base cap keeps
+  // most unspent) and deeper result pages. Constraints themselves never move.
+  const queryCap = opts?.widen ? 10 : 6;
+  const pageCap = opts?.widen ? 90 : 60;
   return {
     discoveryQueries,
     requiredFields,
     desiredCount,
     stoppingRules: {
-      maxQueries: Math.min(6, Math.max(3, discoveryQueries.length)),
-      maxPages: Math.max(12, Math.min(60, desiredCount * 4)),
-      maxCandidates: Math.min(60, Math.max(desiredCount * 2, 20)),
+      maxQueries: Math.min(queryCap, Math.max(3, discoveryQueries.length)),
+      maxPages: Math.max(12, Math.min(pageCap, desiredCount * 4)),
+      maxCandidates: Math.min(opts?.widen ? 120 : 60, Math.max(desiredCount * 2, 20)),
       maxNoProgressQueries: 2,
     },
   };
