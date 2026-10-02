@@ -1,0 +1,89 @@
+{
+  "id": "T2",
+  "query": "Find 15 freight forwarding companies in Tbilisi, Georgia with a website and public contact number",
+  "category": "company",
+  "viewport": "desktop",
+  "startedAt": "2026-10-02T19:37:23.853Z",
+  "main": {
+    "query": "Find 15 freight forwarding companies in Tbilisi, Georgia with a website and public contact number",
+    "clarify": [
+      {
+        "question": "What are you trying to do with these results?",
+        "chosen": "Find prospects",
+        "t": 95
+      }
+    ],
+    "streamed": [],
+    "activity": [],
+    "bubbleVerbatim": true,
+    "runningAt": 47,
+    "clarifyAt": 95,
+    "clarifyRepeats": 0,
+    "durationS": 4801,
+    "firstStreamS": null,
+    "timedOut": true,
+    "header": null,
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": ""
+  },
+  "server": {
+    "runId": null,
+    "specRuns": 0,
+    "spec": null,
+    "ledger": null,
+    "runtime": [],
+    "browserDone": [],
+    "searches": 0,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": []
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
+    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
+    "error: Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
+    "error: TypeError: Failed to fetch\n    at http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:12921:23\n    at _handleRequest2 (http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:13229:20)\n    at _request (http://localhost:8080/node_modules/.vite/d",
+    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
+    "error: TypeError: Failed to fetch\n    at http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:12921:23\n    at _handleRequest2 (http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:13229:20)\n    at _request (http://localhost:8080/node_modules/.vite/d",
+    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
+    "error: TypeError: Failed to fetch\n    at http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:12921:23\n    at _handleRequest2 (http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:13229:20)\n    at _request (http://localhost:8080/node_modules/.vite/d",
+    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
+    "error: TypeError: Failed to fetch\n    at http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:12921:23\n    at _handleRequest2 (http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:13229:20)\n    at _request (http://localhost:8080/node_modules/.vite/d",
+    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
+    "error: TypeError: Failed to fetch\n    at http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:12921:23\n    at _handleRequest2 (http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:13229:20)\n    at _request (http://localhost:8080/node_modules/.vite/d",
+    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
+    "error: TypeError: Failed to fetch\n    at http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:12921:23\n    at _handleRequest2 (http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:13229:20)\n    at _request (http://localhost:8080/node_modules/.vite/d",
+    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 16,
+      "event": "a: submitted"
+    },
+    {
+      "t": 63,
+      "event": "a: running"
+    },
+    {
+      "t": 111,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 4817,
+      "event": "a: TIMEOUT"
+    }
+  ],
+  "screenshots": [
+    "ui/T2-a-1-clarify.jpg",
+    "ui/T2-a-6-final.jpg"
+  ],
+  "durationS": 4853,
+  "responseBytes": 8446
+}

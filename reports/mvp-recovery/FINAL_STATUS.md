@@ -107,16 +107,31 @@ Funnel stage definitions: `reports/mvp-recovery/PIPELINE_MAP.md` §5–§10; led
 
 ## MVP VERDICT
 
-**NOT READY — the Windhoek forensic split is ANSWERED; the remaining gap is acquisition supply, now precisely located.**
+**NOT READY FOR USER LOCAL TESTING — final acceptance battery executed 2026-10-02; three P1 gaps remain, each evidence-located.**
 
-**The 149 accounted for, per the PRD's requested format (instrumented rerun, `run` in `evidence/runs/W2.json`):**
-`337 raw OSM artifacts (fallback office=company sweep across 3 widening passes) → 188 unique after dedupe → 188 rejected_category → 0 relevant → 0 enriched → 0 verified → 0 delivered. Ledger closes: unaccounted 0, every rejection named.`
+### Acceptance battery (six PRD V2 queries through the real UI; `evidence/runs/{W2,T2,C2,B2,D2,N2}.json`, funnel lines in `logs/dev-live.log`)
 
-- **What the 149 are:** real OSM `office=company`/`shop=yes` POIs in Windhoek — the acquisition tag vocabulary had no solar/photovoltaic mapping, so the adapter fell back to a generic company sweep; none carry a solar category or name. Manual evidence that widening engaged (passes visible) is confirmed: widening ran to `COVERAGE_EXHAUSTED` in every reproduction.
-- **The split (PRD's three hypotheses):** hypothesis 2 — acquisition. NOT the qualifier (its rejections are correct and now carry reasons) and NOT delivery/merge (nothing reached either; ledger unaccounted 0).
-- **Instrumentation fix landed:** before `0406d24`, 149 rows died with `rejectReasons: {}`; now every pre-research rejection books its dimension (`rejected_category` etc.) in the ledger summary and dev dump.
-- **Remaining open gap:** browser-live emitted 0 candidates across 9 queries/3 passes for Windhoek solar — with SearXNG down, the browser is the only supply route for this query, and nothing converted. Decode the browser trace (envelope worker/trace arrays) to find the failing stage: SERP link-selection, page extraction, or empty SERPs.
-- **Exact next fixes:** (1) browser 0-emission trace autopsy for Windhoek/Tbilisi/Cebu; (2) failover — when the specific-tag OSM query is empty, book the office=company fallback as low-yield instead of flooding the funnel, and give browser/web passes the budget; (3) redundant clarify ("What should they be doing?" for "doing solar installation around Windhoek") — understanding must carry the activity into the spec before clarification; (4) composer stop button + worker takeover handshake (P1s).
-- **Re-grade after:** the six acceptance queries from PRD V2 pass through the real UI.
+| Query | settled | raw | unique | relevant | delivered | stage attribution |
+|---|---|---|---|---|---|---|
+| W2 solar installers Windhoek | yes (639s) | 337 | 188 | 0 | 0 | OSM fallback pool `rejected_category` ×188 (correct); browser: entities extracted → normalization rejections now counted |
+| T2 freight forwarders Tbilisi | **NO — 81 min hang** | — | — | — | 0 | **P1: run deadline did not propagate** — post-clarify await outlived the 540s budget (`[source-yield] fetch failed` in window) |
+| C2 wedding photographers Cebu | yes (498s) | — | — | 0 | 0 | browser: 9 entities extracted → **NORMALIZATION_REJECTED** (person-kind vocabulary: photographer quotes lack person tokens); pass 2 `EXTRACTION_EMPTY` on linkedin cap |
+| B2 construction Banja Luka | yes (527s) | 93 | 51 | 0 | 0 | OSM fallback `rejected_category` ×51 (correct); browser: 2-3 pages → **EXTRACTION_EMPTY** |
+| D2 manufacturing Da Nang | yes (534s) | — | — | 0 | 0 | browser: 3-4 pages → **EXTRACTION_EMPTY** (LLM extractor returned 0 on visited pages; provider quota a candidate cause) |
+| N2 informal solar Windhoek | **NO — 672s, not settled** | — | — | — | — | **P1: same hang family as T2**; Phase 9 parser fix reverted after 16 corpus regressions (skipped tests pin the gap, `informal-activity.test.ts`) |
 
-Prior reference: READY (local MVP baseline) at `reports/full-e2e-validation/FINAL_STATUS.md` — superseded by manual QA evidence per PRD V2.
+### What passed
+- Ledger conservation held on every settled run: `unaccounted: 0`, all rejections named (`rejected_category`/normalization reasons).
+- Browser funnel instrumentation works end-to-end: every zero names its stage (NORMALIZATION_REJECTED / EXTRACTION_EMPTY / cap counts per query).
+- Composer Stop control landed (submit button becomes Stop, floating pill removed) — **not yet proven by a live X01 cancel run**.
+- Takeover handshake proven: 35/35 across session-manager/worker-adapter/scrapy-challenge/scrapy-browser (exclusive hand-off, resume from fresh snapshot, no reads after cancel, no cross-owner access).
+- Phase 9 deterministic shapes: "companies/businesses/who does X" resolve entity+activity — the informal "anyone doing X" parser fix was reverted after 16 corpus regressions and is pinned as a skipped test.
+
+### Remaining P1 blockers (in order)
+1. **Deadline propagation (T2/N2 hangs):** an await after the clarify round outlives the run budget — audit post-clarify awaits (source-yield fetch, enrichment, model calls) for missing signal checks; add a harness-side per-case watchdog.
+2. **Person-kind normalization vocabulary** (C2): person entities need org/trade evidence acceptance like businesses got (Phase 1).
+3. **EXTRACTION_EMPTY on B2/D2:** decode the extractor path (provider quota vs page quality) before judging acquisition.
+4. **Phase 9 informal shapes:** needs a parser session that captures the do-verb tail at the relation reader without the shared token set.
+5. **X01 cancel proof with the composer Stop** + the full acceptance re-run.
+
+Previous reference: READY (local MVP baseline) at `reports/full-e2e-validation/FINAL_STATUS.md` — superseded by this battery's evidence.
