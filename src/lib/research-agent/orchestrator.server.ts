@@ -4,6 +4,7 @@ import type { SearchSpec } from "@/lib/search/search-spec";
 import { rowSatisfiesSpec, type SpecRow } from "@/lib/spec-search.functions";
 import { detectOperationalStatus } from "./operational-status";
 import { researchEvent } from "./events";
+import { searchAbortCode } from "@/lib/search/search-run";
 import type {
   FieldEvidence,
   ResearchBudgets,
@@ -524,11 +525,27 @@ export class ResearchOrchestrator {
         }
       }
     } catch (error) {
-      if (args.signal?.aborted || (error instanceof Error && error.message === "SEARCH_CANCELLED")) {
+      // Distinguish a real user stop from a run deadline: manual QA showed
+      // budget/deadline aborts rendered as "Scrapy CANCELLED" (false
+      // user-cancel UX, PRD V2 P0). The worker adapter preserves the abort
+      // reason, so SEARCH_DEADLINE arrives here as its own error, and the
+      // signal's abort code names the reason when the error is generic.
+      const message = error instanceof Error ? error.message : String(error);
+      const abortReason = args.signal?.aborted ? searchAbortCode(args.signal) : null;
+      const deadline = message === "SEARCH_DEADLINE" || abortReason === "SEARCH_DEADLINE";
+      const userCancelled =
+        !deadline &&
+        (abortReason === "SEARCH_CANCELLED" || message === "SEARCH_CANCELLED");
+      if (deadline || userCancelled) {
         cancelled = true;
-        emit(researchEvent({ sessionId, type: "CANCELLED", phase: "DELIVERY" }));
+        emit(researchEvent({
+          sessionId,
+          type: deadline ? "SOURCE_FAILED" : "CANCELLED",
+          phase: "DELIVERY",
+          internal: deadline ? { error: "run deadline reached" } : undefined,
+        }));
       } else {
-        emit(researchEvent({ sessionId, type: "SOURCE_FAILED", phase: "LIVE_SEARCH", internal: { error: error instanceof Error ? error.message : String(error) } }));
+        emit(researchEvent({ sessionId, type: "SOURCE_FAILED", phase: "LIVE_SEARCH", internal: { error: message } }));
         throw error;
       }
     }

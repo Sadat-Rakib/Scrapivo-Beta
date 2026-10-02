@@ -23,6 +23,7 @@ import type {
   PageSnapshot,
   WaitCondition,
 } from "./browser";
+import { searchAbortCode } from "@/lib/search/search-run";
 import { BrowserWorkerError, callBrowserWorker } from "./browser-worker-client.server";
 import {
   scrapySessionAction,
@@ -72,7 +73,18 @@ export class WorkerBrowserAdapter implements AgentBrowser {
           await new Promise((resolve) => setTimeout(resolve, HUMAN_CONTROL_POLL_MS));
           continue;
         }
-        if (error instanceof BrowserWorkerError && error.code === "CANCELLED") throw new Error("SEARCH_CANCELLED");
+        if (error instanceof BrowserWorkerError && error.code === "CANCELLED") {
+          // The worker collapses every abort into CANCELLED; the app-side
+          // signal knows the real reason (user stop vs run deadline vs
+          // widening hand-off). Preserve it — manual QA showed deadline
+          // stops rendered as "Scrapy CANCELLED" (false user-cancel UX).
+          if (this.signal?.aborted) {
+            const reason = searchAbortCode(this.signal);
+            if (reason === "SEARCH_DEADLINE") throw new Error("SEARCH_DEADLINE");
+            if (reason === "SEARCH_STALE_RUN") throw new Error("SEARCH_STALE_RUN");
+          }
+          throw new Error("SEARCH_CANCELLED");
+        }
         throw error;
       }
     }
