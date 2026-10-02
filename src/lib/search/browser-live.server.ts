@@ -389,7 +389,11 @@ function kindSupported(kind: SpecRow["kind"], quote: string): boolean {
   const patterns: Record<SpecRow["kind"], RegExp> = {
     person: /\b(founder|co.?founder|ceo|cto|president|engineer|developer|director|partner|owner|writer|copywriter|designer|consultant|freelancer|she|he|his|her)\b/i,
     company: /\b(company|startup|software|saas|platform|inc\.?|ltd\.?|corporation|business|founded)\b/i,
-    business: /\b(business|plumb\w*|dent\w*|clinic|restaurant|salon|store|shop|service\w*|repair\w*|contractor\w*|cafe|catering|electric\w*)\b/i,
+    // Trade words must mirror the acquisition vocabulary (craftTags): a solar
+    // directory page legitimately describes businesses as "solar", "PV",
+    // "installation" — without these, every extracted entity died
+    // ENTITY_TYPE_MISMATCH (Windhoek funnel: 9 extracted → 0 normalized).
+    business: /\b(business|solar|photovoltaic|\bpv\b|panel\w*|install\w*|energy|construct\w*|contractor\w*|builder\w*|build\w*|engineer\w*|consult\w*|plumb\w*|dent\w*|clinic|restaurant|salon|store|shop|service\w*|repair\w*|cafe|catering|electric\w*|photograph\w*|studio|freight|forward\w*|logistic\w*|manufactur\w*|supplier|wholesale|export\w*|agenc\w*|compan\w*)\b/i,
     investor: /\b(invest\w*|venture|fund|capital|backing|portfolio)\b/i,
     job: /\b(job|hiring|apply|position|salary|employment|career|vacancy)\b/i,
   };

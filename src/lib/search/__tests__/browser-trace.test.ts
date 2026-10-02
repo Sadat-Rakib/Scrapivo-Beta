@@ -96,3 +96,14 @@ describe("browser lifecycle trace", () => {
     expect(seen).toContain("page:blocked");
   });
 });
+
+it("accepts a solar-installation business card — trade vocabulary covers the entity-kind gate (Windhoek regression)", () => {
+  const { events, onTrace } = collect();
+  const solarText = "SolarTech Namibia installs photovoltaic systems. Solar panel installation and maintenance in Windhoek, Namibia — SolarTech Namibia serves homes and businesses across Namibia.";
+  const rows = browserEntitiesToRows([
+    { page: 0, kind: "business", name: "SolarTech Namibia", identityQuote: solarText,
+      fields: { category: { value: "solar installer", quote: solarText }, location: { value: "Windhoek", quote: solarText } } },
+  ], [{ ...page, text: solarText }], onTrace);
+  expect(rows.map((row) => row.title)).toEqual(["SolarTech Namibia"]);
+  expect(events).not.toContainEqual(expect.objectContaining({ kind: "entity", outcome: "rejected", reason: "ENTITY_TYPE_MISMATCH" }));
+});
