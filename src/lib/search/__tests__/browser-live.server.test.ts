@@ -107,3 +107,52 @@ describe("per-query discovery funnel (WS1 instrumentation)", () => {
     expect(f.stage).toBe("SEARCH_EMPTY");
   });
 });
+
+describe("staged page allocation (PRD Phase 3 — cap starvation fix)", () => {
+  it("prefers direct sites over directories and visits 4 links, not 2", async () => {
+    const funnels: BrowserQueryFunnel[] = [];
+    const navigated: string[] = [];
+    const hosts = ["yelp.com", "publisher1.test", "publisher2.test", "publisher3.test", "publisher4.test", "publisher5.test", "publisher6.test", "publisher7.test", "publisher8.test", "publisher9.test"];
+    const pageFor = (host: string, i: number): PageSnapshot => ({
+      url: `https://${host}/list-${i}`, title: `SaaS founders ${i}`, pageType: "entity_detail", headings: [],
+      visibleRelevantText: `SaaS founders directory ${i}. Dana Vance is the founder of Acme ${i}, a software-as-a-service company in Toronto.`,
+      links: [], interactiveElements: [], selectedFilters: [], loadingState: "complete", friction: [],
+    });
+    const b = browser();
+    const serp: PageSnapshot = { url: "https://duckduckgo.com/html/?q=x", title: "SaaS founders", pageType: "search_results", headings: [], visibleRelevantText: "results", links: hosts.map((h, i) => ({ ref: `l${i}`, name: `SaaS founders — result ${i}`, url: `https://${h}/list-${i}` })), interactiveElements: [], selectedFilters: [], loadingState: "complete", friction: [] };
+    b.search = vi.fn(async () => ({ snapshot: serp, action: "search", verified: true }));
+    let lastHostIndex = 0;
+    b.navigate = vi.fn(async (...args: unknown[]) => {
+      const u = args.map((a) => {
+        if (typeof a === "string") return a;
+        if (a && typeof a === "object" && "url" in (a as Record<string, unknown>)) return String((a as Record<string, unknown>).url);
+        return "";
+      }).find((v) => v && !v.includes("duckduckgo")) ?? "";
+      lastHostIndex = Math.max(0, hosts.findIndex((h) => u.includes(h)));
+      navigated.push(hosts[lastHostIndex]);
+      return { snapshot: pageFor(hosts[lastHostIndex], lastHostIndex), action: "navigate", verified: true };
+    });
+    b.extract = vi.fn(async () => {
+      const i = lastHostIndex;
+      const name = `Dana Vance ${i}`;
+      const quote = `SaaS founders directory ${i}. ${name} is the founder of Acme, a software-as-a-service company in Toronto.`;
+      return { values: { body: quote }, sourceUrl: `https://${hosts[i]}/list-${i}`, observedAt: "", errors: [] };
+    });
+    const rows = await discoverWithBrowser(spec, { browser: b, discoveryQueries: ["SaaS founders"], isVerified: (row) => !!row.company,
+      extractEntities: async (pages) => pages.map((p, i) => {
+        const name = `Dana Vance ${hosts.findIndex((h) => p.url.includes(h))}`;
+        const quote = `SaaS founders directory ${hosts.findIndex((h) => p.url.includes(h))}. ${name} is the founder of Acme, a software-as-a-service company in Toronto.`;
+        return { page: i, kind: "person" as const, name, identityQuote: quote, fields: { role: { value: "founder", quote }, company: { value: "Acme", quote } } };
+      }),
+      onQueryFunnel: (funnel) => funnels.push(funnel) });
+    const f = funnels[0];
+    console.log("FUNNEL_DEBUG", JSON.stringify(f));
+    expect(f.pagesScheduled).toBe(4);
+    expect(f.pagesNavigated).toBe(4);
+    expect(f.linkRejections.cap).toBe(6);
+    // Direct sites fill the first three slots; the directory gets one, last.
+    expect(navigated.slice(0, 3).every((h) => !h.includes("yelp"))).toBe(true);
+    expect(navigated[3]).toContain("yelp");
+    expect(rows.length).toBeGreaterThanOrEqual(1);
+  });
+});

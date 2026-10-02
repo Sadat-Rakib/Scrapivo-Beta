@@ -385,6 +385,26 @@ function serpResultShares(query: string, title: string | undefined, url: string)
 }
 const SERP_CHALLENGE = /captcha|complete the following challenge|confirm this search was made by a human|bots use duckduckgo too|unusual traffic|verify you are (?:a )?human/i;
 
+/** Known directory/aggregator hosts — used ONLY for staged page allocation
+ *  (direct sites get scheduling priority; directories still get a slot).
+ *  Not a blocklist. */
+const DIRECTORY_HOSTS = [
+  "yelp.com", "yellowpages.com", "contractors1000.com", "enfsolar.com", "thrillist.com",
+  "bobvila.com", "houzz.com", "angi.com", "angieslist.com", "thumbtack.com", "zoominfo.com",
+  "linkedin.com", "facebook.com", "instagram.com", "trustpilot.com", "bbb.org", "wikipedia.org",
+  "crunchbase.com", "bloomberg.com", "glassdoor.com", "indeed.com", "buildzoom.com", "porch.com",
+];
+
+/** Directory/aggregator classification for staged scheduling. */
+function isDirectoryHost(url: string): boolean {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "");
+    return DIRECTORY_HOSTS.some((d) => host === d || host.endsWith("." + d));
+  } catch {
+    return true; // unparseable: treat as directory-class (lower priority)
+  }
+}
+
 function kindSupported(kind: SpecRow["kind"], quote: string): boolean {
   const patterns: Record<SpecRow["kind"], RegExp> = {
     person: /\b(founder|co.?founder|ceo|cto|president|engineer|developer|director|partner|owner|writer|copywriter|designer|consultant|freelancer|she|he|his|her)\b/i,
@@ -1613,7 +1633,13 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
         const sunk = triaged.length - triageSurvivors.length;
         if (sunk) { f.linksRejected += sunk; f.linkRejections.triage = (f.linkRejections.triage ?? 0) + sunk; }
       }
-      const ranked = triageSurvivors.slice(0, 2);
+      // Staged page allocation (PRD Phase 3): classify links (direct first-party
+      // site vs directory/aggregator) and prefer direct sites — a directory is
+      // still visited, but never crowds out direct candidates. The flat cap of
+      // 2 starved real sites ranked 3-10 (Windhoek funnel: cap 7-8 of 10).
+      const directRanked = triageSurvivors.filter((item) => !isDirectoryHost(item.url));
+      const directoryRanked = triageSurvivors.filter((item) => isDirectoryHost(item.url));
+      const ranked = [...directRanked.slice(0, 3), ...directoryRanked.slice(0, 1)];
       {
         const capped = triageSurvivors.length - ranked.length;
         if (capped) { f.linksRejected += capped; f.linkRejections.cap = (f.linkRejections.cap ?? 0) + capped; }
