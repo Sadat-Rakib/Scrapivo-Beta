@@ -23,6 +23,10 @@ Branch `rc/mvp-local-testing-baseline` · baseline HEAD `d10892d` · verdict: **
 | pagination (hasMore/message require delivered rows) | 8/8 (2 baseline-red fixtures repaired — 3 known-reds retired) |
 | thinking-steps (render-phase onDone regression) | 6/6 (new component test) |
 | browser-trace (lifecycle traces, modernized fixture) | 5/5 |
+| widening (interactive-path bounded widening: stop decision, 2-empty-pass exhaustion, target-reached stop, shared job-engine math, constraints-never-loosened integration) | 9/9 |
+| osm-contact-extraction (multi-value phone lists, contact:mobile, url fallback, first-surviving-phone) | 7/7 |
+| searxng-preflight (startup health check: healthy/unhealthy/skipped, endpoint redaction) | 4/4 |
+| clarify-panel (long question set renders in bounded scrollable container — BUG-09) | extended, green |
 | discovery + triage wiring | 13/13 |
 | m9 verification + m11 UI run + m6/m8/m10 theorem callers | 19 + 17 + 58 green |
 | src/components (C7 key/button fixes + profile/auth) | 12/12 |

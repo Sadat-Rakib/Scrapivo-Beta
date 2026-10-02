@@ -29,7 +29,14 @@ Ledgers: reports/final-stabilization/{DEFECT_STATUS,TEST_RESULTS}.md · reports/
 - `.kiro/freehire` spec stale `[~]` markers reset to `[ ]` and committed — the spec is explicitly a separate, not-started workstream (needs Docker/Meilisearch live + its own sessions; not completable "properly" inside this sprint).
 - Gates re-verified after the sweep: typecheck 43 frozen, vt NEW_FAILURES=0, L05 green.
 
+## MVP-recovery pass (Oct 2, after the "finish everything" sweep)
+- PRD recon: P0–P7 already met with evidence; gaps were widening, BUG-09 letter, SearXNG preflight, dev funnel diagnostics, and the PRD-mandated `reports/mvp-recovery/` artifacts.
+- Landed `a70d148`: bounded interactive widening (shared job-engine semantics, ≤3 passes, constraints never loosened), OSM contact extraction (multi-value phones, `contact:mobile`, `url` fallback — **L05 live 1 → 34 delivered**), delivery-predicting widen metric, `scaledRunBudgetMs` widening reserve + first-pass floor, BUG-09 scroll fix, SearXNG startup preflight (worker+app), dev-gated funnel dump with perSource diagnostics.
+- `reports/mvp-recovery/` created: PIPELINE_MAP.md (real path, file:line-cited), ROOT_CAUSE_REPORT.md (9 PRD questions), FINAL_STATUS.md (§63 format).
+- **OPEN (the one named blocker, see mvp-recovery/FINAL_STATUS.md MVP VERDICT):** widen loop does not engage when the initial acquisition falters (W1: stored 0 → yelp bot-wall → NO_QUALIFIED_RESULTS, no widen pass); SSR console is not observable in this dev setup, so the next fix is progress-registry widening events + an initial-phase/ widening budget split.
+- **Incident note:** a stray `git checkout -- spec-search.functions.ts` during a watcher test wiped the uncommitted widening wiring; it was fully re-applied from the implementation agent's record and committed (`a70d148`). Lesson applied: commit immediately after verification, never leave large uncommitted work.
+
 ## Next step (next session)
-- Push/PR when ready; main untouched.
-- Optional: wire BrowserNavigationPolicy into browser-live once the yield question is decided; C12 claim-aware evidence; address Radix a11y warnings.
-- FreeHire job-integration spec (.kiro/specs/freehire-job-integration/tasks.md, sections 2–21) is a separate, essentially-not-started workstream — scoped OUT of this sprint deliberately.
+1. Widen-loop live engagement (the named blocker above) → rerun W1 + a people-query at target 20 → then re-grade BUG-05.
+2. Docker up → SearXNG end-to-end (BUG-08 re-grade).
+3. FreeHire spec (sections 2–21) remains a separate, not-started workstream.

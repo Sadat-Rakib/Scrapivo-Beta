@@ -3,62 +3,42 @@
   "query": "SaaS founders with public contact details",
   "category": "founder",
   "viewport": "desktop",
-  "startedAt": "2026-10-01T22:51:04.205Z",
+  "startedAt": "2026-10-02T06:56:19.086Z",
   "main": {
     "query": "SaaS founders with public contact details",
     "clarify": [
       {
         "question": "What are you trying to do with these results?",
         "chosen": "Find prospects",
-        "t": 94
+        "t": 2
       }
     ],
-    "streamed": [
-      "Alex Circei"
-    ],
+    "streamed": [],
     "activity": [
-      "Checked available records · Available records · 0",
-      "Searching the web · The web · Thrust Carbon official website",
-      "Found possible leads · The web · 10 links",
-      "Opening result · thrustcarbon.com",
-      "Show all activity (12)",
-      "✓",
-      "Alex Circei",
-      "1 verified while researching…",
-      "Found company website · thrustcarbon.com",
-      "Found possible leads · 10 candidates; 1 verified",
-      "Reading page · thrustcarbon.com",
-      "Reading page · thrustcarbon.com · 9596 characters",
-      "Checked public sources · Public source · 10"
+      "Checked available records · Available records · 0"
     ],
     "bubbleVerbatim": true,
-    "runningAt": 47,
-    "clarifyAt": 94,
+    "clarifyAt": 2,
     "clarifyRepeats": 0,
-    "pill": "Scrapy is browsing · Public source · 8 pages · 00:20",
-    "miniBrowserAt": 185,
+    "runningAt": 10,
+    "pill": "Scrapy browser session · capchase.com · 3 pages · 00:28",
+    "miniBrowserAt": 102,
     "viewingOnly": true,
     "settled": true,
-    "durationS": 421,
-    "firstStreamS": 184,
+    "durationS": 288,
+    "firstStreamS": null,
     "header": {
       "query": "SaaS founders with public contact details",
-      "count": 1
+      "count": 0
     },
-    "leadCards": [
-      "capchase.com | Alex Circei | Alex Circei CEO & Co-Founder Waydev View Bio"
-    ],
-    "businessCards": [
-      "capchase.com | Alex Circei | Alex Circei CEO & Co-Founder Waydev View Bio"
-    ],
+    "leadCards": [],
+    "businessCards": [],
     "zeroText": null,
     "reconciliation": null,
     "viewingOnlyFinal": true,
-    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nSaaS founders with public contact details\nResults for \"SaaS founders with public contact details\" · 1 results\nWatch signal\nCards\nLists\nClear\nFold (1 results)\ncapchase.com\nAlex Circei\nAlex Circei CEO & Co-Founder Waydev View Bio\nScrapy\nCANCELLED\nthrustcarbon.com\nExtracting\n· Reduce Business Travel Emissions & Cost - Thrust Carbon\n11 pages\n21 actions\n00:29\nOpen original\nViewing only. Taking control needs the browser worker.\n9 leads seen while researching aren't in this list\nAndrew Breen · missing a detail you asked for\nMark Corbett · missing a detail you asked for\nPranjal Daga · still missing required details\nGarry Drummond · still missing required details\nJennifer Dulski · still missing required details\nand 4 more\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nF"
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n02/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nSaaS founders with public contact details\nExpand (1 results)\nRoofers in Mississauga with phone numbers\nExpand (34 results)\nSaaS founders with public contact details\nResults for \"SaaS founders with public contact details\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\nSome sources could not be searched this time (Public websites, The web), so results may be incomplete. The sources that answered returned no candidates for this query.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nScrapy\nCANCELLED\ncapchase.com\nOpening result\n· Customer stories and reviews | Capchase\n3 pages\n5 actions\n00:28\nOpen original\nViewing only. Taking control needs the browser worker.\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n7 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n7 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n7 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n7 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n7 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n7 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n7 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n7 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n7 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n7 days ago\nFi"
   },
-  "detail": "Person | Alex Circei | Open original | Pipeline stage | Saved | Contacted | Replied | Won | Lost | Ignored | Alex Circei | CEO & Co-Founder | Waydev | View Bio | Why this matches | Alex Circei CEO & Co-Founder Waydev View Bio | Verify contact | Resolve contact | Deep enrich | AI research brief | Run research | Activity | No activity yet. | Notes | AI outreach | Research & draft",
-  "savedTitle": "capchase.com",
-  "saveToasts": [],
+  "save": "no Save lead button",
   "server": {
     "runId": null,
     "specRuns": 0,
@@ -72,48 +52,40 @@
     "aiRouter": []
   },
   "worker": [],
-  "toasts": [],
+  "toasts": [
+    "No leads passed verification for this search. Try broadening criteria or refining the query."
+  ],
   "console": [
-    "info: [ui-projection] server=1 projected=1 rejected=0 codes={}"
+    "info: [ui-projection] server=0 projected=0 rejected=0 codes={}"
   ],
   "pageErrors": [],
   "timeline": [
     {
-      "t": 10,
+      "t": 6,
       "event": "a: submitted"
     },
     {
-      "t": 57,
-      "event": "a: running"
-    },
-    {
-      "t": 104,
+      "t": 8,
       "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
     },
     {
-      "t": 195,
-      "event": "a: streamed rows visible"
+      "t": 16,
+      "event": "a: running"
     },
     {
-      "t": 196,
-      "event": "a: mini-browser (Scrapy is browsing · Public source · 8 pages · 00:20)"
+      "t": 110,
+      "event": "a: mini-browser (Scrapy browser session · capchase.com · 3 pages · 00:28)"
     },
     {
-      "t": 431,
+      "t": 294,
       "event": "a: settled"
-    },
-    {
-      "t": 441,
-      "event": "save lead clicked"
     }
   ],
   "screenshots": [
     "ui/P04-a-1-clarify.jpg",
-    "ui/P04-a-2-streamed.jpg",
     "ui/P04-a-3-mini-browser.jpg",
-    "ui/P04-a-6-final.jpg",
-    "ui/P04-a-7-detail.jpg"
+    "ui/P04-a-6-final.jpg"
   ],
-  "durationS": 445,
-  "responseBytes": 27491
+  "durationS": 300,
+  "responseBytes": 19005
 }

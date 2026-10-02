@@ -3,61 +3,91 @@
   "query": "Roofers in Mississauga with phone numbers",
   "category": "local",
   "viewport": "m375",
-  "startedAt": "2026-10-02T00:41:25.066Z",
+  "startedAt": "2026-10-02T06:40:18.444Z",
   "main": {
     "query": "Roofers in Mississauga with phone numbers",
     "clarify": [
       {
         "question": "What are you trying to do with these results?",
         "chosen": "Find prospects",
-        "t": 94
+        "t": 2
       }
     ],
     "streamed": [
-      "Detail Roofing · detail@detailroof.ca"
+      "Mkroots · +1 647-375-5597",
+      "Toronto Flower School · +1-905-271-4438",
+      "Pharma Docs · +1-905-891-2345",
+      "Galypso Stone · +1-416-400-0392"
     ],
     "activity": [
-      "Checked available records · Available records · 0",
-      "Working · Public business sources · Mississauga",
+      "Checked available records · Available records · 146",
       "Found local businesses · Public business sources · 146",
+      "Checked public sources · Public business sources · 146",
+      "Widening the search · Public source · pass 1 of 3",
+      "Show all activity (5)",
+      "Working · Public business sources · Mississauga",
+      "Widening the search · Public source · pass 2 of 3",
+      "Show all activity (7)",
+      "Found local businesses · Public business sources · 293",
+      "Show all activity (9)",
+      "Lead verified · Galypso Stone",
       "Searching the web · The web · roofer Mississauga",
+      "Show all activity (12)",
+      "✓",
+      "Mkroots · +1 647-375-5597",
+      "Toronto Flower School · +1-905-271-4438",
+      "Pharma Docs · +1-905-891-2345",
+      "Galypso Stone · +1-416-400-0392",
+      "5 verified while researching…",
       "Found possible leads · The web · 10 links",
       "Opening result · mississaugaroofers.ca",
-      "Show all activity (9)",
-      "✓",
-      "Detail Roofing · detail@detailroof.ca",
-      "1 verified while researching…",
+      "4 verified while researching…",
       "Reading page · mississaugaroofers.ca",
-      "Reading page · mississaugaroofers.ca · 12876 characters",
+      "Reading page · mississaugaroofers.ca · 12872 characters",
       "Opening result · proscore.ca",
-      "Show all activity (12)",
+      "3 verified while researching…",
+      "2 verified while researching…",
       "Candidate found · Perfect Choice Roofing Mississauga",
       "Candidate found · Toronto Roofes ltd"
     ],
     "bubbleVerbatim": true,
-    "runningAt": 47,
-    "clarifyAt": 94,
+    "clarifyAt": 2,
     "clarifyRepeats": 0,
-    "pill": "Scrapy is browsing · Public source · 1 pages · 00:02",
-    "miniBrowserAt": 200,
+    "runningAt": 27,
+    "pill": "Scrapy is browsing · Public source · 1 pages · 00:03",
+    "miniBrowserAt": 231,
     "viewingOnly": true,
     "settled": true,
-    "durationS": 443,
-    "firstStreamS": 198,
+    "durationS": 471,
+    "firstStreamS": 227,
     "header": {
       "query": "Roofers in Mississauga with phone numbers",
-      "count": 1
+      "count": 34
     },
     "leadCards": [],
     "businessCards": [
-      "Detail Roofing | roofer | Local | Mississauga | Email | Message | Website | +1-905-230-2969 | detail@detailroof.ca"
+      "Retisoft Inc | roofer | Local | Mississauga | Email | Message | No website on record (not verified) | +1-416-521-9720 | elizabethr@retisoft.ca",
+      "Pulsus Group Inc | roofer | Local | Mississauga | Email | Message | No website on record (not verified) | +1-905-829-4770",
+      "FEA Training Consultants | roofer | Local | Mississauga | Email | Message | No website on record (not verified) | +1-905-990-0094",
+      "Active Engines Performance Machines | roofer | Local | Mississauga | Email | Message | No website on record (not verified) | +1-905-855-1244",
+      "Tedlo | roofer | Local | Mississauga | Email | Message | No website on record (not verified) | +1-905-690-1300",
+      "Golden Touch Building Maintenance Inc | roofer | Local | Mississauga | Email | Message | No website on record (not verified) | +1-416-234-1736",
+      "Kinvest Management Corporation | roofer | Local | Mississauga | Email | Message | No website on record (not verified) | +1-416-252-3111",
+      "Contempo Studio | roofer | Local | Mississauga | Email | Message | No website on record (not verified) | +1-416-836-1042",
+      "City Professional Trades | roofer | Local | Mississauga | Email | Message | No website on record (not verified) | +1-416-838-3970",
+      "Goodfella Stone | roofer | Local | Mississauga | Email | Message | No website on record (not verified) | +1-416-546-7146",
+      "Ott Legal | roofer | Local | Mississauga | Email | Message | No website on record (not verified) | +1-416-503-3934",
+      "Brian T. Fletcher Construction Co. | roofer | Local | Mississauga | Email | Message | No website on record (not verified) | +1 4166267746",
+      "Progressive Industrial Fluids Ltd. | roofer | Local | Mississauga | Email | Message | No website on record (not verified) | +1-905-602-5247",
+      "Starshot | roofer | Local | Mississauga | Email | Message | No website on record (not verified) | +1-416-503-8362",
+      "The Best Connection Inc. | roofer | Local | Mississauga | Email | Message | No website on record (not verified) | +1-905-212-7004"
     ],
     "zeroText": null,
     "reconciliation": null,
     "viewingOnlyFinal": true,
-    "finalTextSample": "Scrapivo\nRoofers in Mississauga with phone numbers\nResults for \"Roofers in Mississauga with phone numbers\" · 1 results\nWatch signal\nCards\nLists\nClear\nFold (1 results)\nDetail Roofing\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nWebsite\n+1-905-230-2969\ndetail@detailroof.ca\nScrapy\nCANCELLED\nproscore.ca\nExtracting\n· Roofers in Mississauga You Can Actually Trust | ProScore\n4 pages\n7 actions\n00:29\nOpen original\nViewing only. Taking control needs the browser worker.\n31 leads seen while researching aren't in this list\nMississauga Roofers · did not match every part of your request\nMonarchy Roofing · still missing required details\nGentech Roofing · still missing required details\nRoyal Roofing · still missing required details\nHomeVision Roofing & Siding · still missing required details\nand 26 more\nMode\nThinker"
+    "finalTextSample": "Scrapivo\nSaaS founders with public contact details\nExpand (1 results)\nRoofers in Mississauga with phone numbers\nResults for \"Roofers in Mississauga with phone numbers\" · 34 results\nWatch signal\nCards\nLists\nClear\nFold (34 results)\nRetisoft Inc\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1-416-521-9720\nelizabethr@retisoft.ca\nPulsus Group Inc\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1-905-829-4770\nFEA Training Consultants\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1-905-990-0094\nActive Engines Performance Machines\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1-905-855-1244\nTedlo\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1-905-690-1300\nGolden Touch Building Maintenance Inc\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1-416-234-1736\nKinvest Management Corporation\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1-416-252-3111\nContempo Studio\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1-416-836-1042\nCity Professional Trades\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1-416-838-3970\nGoodfella Stone\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1-416-546-7146\nOtt Legal\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1-416-503-3934\nBrian T. Fletcher Construction Co.\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1 4166267746\nProgressive Industrial Fluids Ltd.\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1-905-602-5247\nStarshot\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1-416-503-8362\nThe Best Connection Inc.\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1-905-212-7004\nBuckler Aquatics Limited\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1-905-499-0151\nSkyrock Construction\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1-647-204-0982\njonathan@skyrockconstruction.com\nATF Forklifts\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1-855-547-5556\nHuis Desgn Studio\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1-647-206-9655\nLighting Innovation + Design Inc\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1-905-273-3111\nNew Era Print Solutions\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1-905-564-0442\nMotion Industries Inc\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1-905-695-7878\nKombatLink\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo website on record (not verified)\n+1-800-563-0143\nsales@kombatlink.com\nHiSO\nroofer\nLocal\n\nMississauga\n\nEmail\nMessage\nNo we"
   },
-  "detail": "Close | Details | Detail Roofing | roofer | Category | roofer | Location | Mississauga | Opportunity | has website | Social | Website | Email | detail@detailroof.ca | Number | +1-905-230-2969 | Generate email | Generate message",
+  "detail": "Close | Details | Retisoft Inc | roofer | Category | roofer | Location | Mississauga | Website | No website on record (not verified) | Email | elizabethr@retisoft.ca | Number | +1-416-521-9720 | Generate email | Generate message",
   "server": {
     "runId": null,
     "specRuns": 0,
@@ -71,34 +101,36 @@
     "aiRouter": []
   },
   "worker": [],
-  "toasts": [],
+  "toasts": [
+    "No leads passed verification for this search. Try broadening criteria or refining the query."
+  ],
   "console": [
-    "info: [ui-projection] server=1 projected=1 rejected=0 codes={}"
+    "info: [ui-projection] server=34 projected=34 rejected=0 codes={}"
   ],
   "pageErrors": [],
   "timeline": [
     {
-      "t": 9,
+      "t": 4,
       "event": "a: submitted"
     },
     {
-      "t": 56,
-      "event": "a: running"
-    },
-    {
-      "t": 103,
+      "t": 6,
       "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
     },
     {
-      "t": 206,
+      "t": 31,
+      "event": "a: running"
+    },
+    {
+      "t": 230,
       "event": "a: streamed rows visible"
     },
     {
-      "t": 210,
-      "event": "a: mini-browser (Scrapy is browsing · Public source · 1 pages · 00:02)"
+      "t": 236,
+      "event": "a: mini-browser (Scrapy is browsing · Public source · 1 pages · 00:03)"
     },
     {
-      "t": 451,
+      "t": 475,
       "event": "a: settled"
     }
   ],
@@ -109,6 +141,6 @@
     "ui/L05-a-6-final.jpg",
     "ui/L05-a-7-detail.jpg"
   ],
-  "durationS": 461,
-  "responseBytes": 35776
+  "durationS": 485,
+  "responseBytes": 89041
 }
