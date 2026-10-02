@@ -298,7 +298,7 @@ async function runCase(c: Case) {
     if (c.save) {
       const save = page.locator('button[aria-label="Save lead"]').first();
       if (await visible(save)) {
-        result.savedTitle = ((await page.locator("[role=button].lead-card-hover").first().innerText().catch(() => "")).split("\n").find((l) => l.trim().length > 2 && !/^(Person|Company|Job|hot|warm|Verified|Checked|Unverified)$/i.test(l.trim())) ?? "").slice(0, 120);
+        result.savedTitle = ((await page.locator("[role=button].lead-card-hover").first().innerText().catch(() => "")).split("\n").find((l) => l.trim().length > 2 && !/^(Person|Company|Job|hot|warm|Verified|Checked|Unverified)$/i.test(l.trim()) && !/^[a-z0-9-]+\.(com|ca|io|co|net|org|dev|ai)(\/|$)/i.test(l.trim())) ?? "").slice(0, 120);
         await save.click(); await page.waitForTimeout(4_000);
         result.saveToasts = [...toasts].slice(-3);
         mark("save lead clicked");

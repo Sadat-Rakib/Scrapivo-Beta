@@ -29,8 +29,8 @@ Details: `reports/final-stabilization/DEFECT_STATUS.md`, `reports/final-stabiliz
 
 - Docker down all run → SearXNG :8888 unreachable → discovery falls back to in-engine search; source health reports degraded; HONEST_ZERO is frequent.
 - Free LLM quotas exhausted earlier on Oct 1 → provider-ladder fallbacks, clarify can take ~60 s.
-- Delivered-row depth on live local queries is thin (e.g. L05 city-wide query → 1 qualified row); `phoneStatus: "unverifiable"` on OSM-sourced rows; lead-card first-line is the source domain (cosmetic, `savedTitle` extraction quirk — the saved lead itself is correct).
-- Pre-existing Radix `DialogContent requires a DialogTitle` a11y warnings on L05 (2×) — cosmetic, ledgered, not blocking.
+- Delivered-row depth on live local queries is thin (e.g. L05 city-wide query → 1 qualified row); `phoneStatus: "unverifiable"` on OSM-sourced rows.
+- ~~Radix `DialogContent requires a DialogTitle` a11y warnings~~ — FIXED (sr-only titles on the three untitled sheets; L05 rerun shows 0 warnings, behavior unchanged). The `savedTitle` first-line quirk in the QA harness (evidence labeling only, product unaffected) also fixed.
 
 ## Hygiene
 

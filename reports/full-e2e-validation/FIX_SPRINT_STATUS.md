@@ -22,7 +22,12 @@ Ledgers: reports/final-stabilization/{DEFECT_STATUS,TEST_RESULTS}.md · reports/
 ## Failed / not done
 - BrowserNavigationPolicy NOT wired into browser-live — DEFERRED WITH REASON (yield cut vs inert clamp; nav-loop restructure risk). Ledgered in DEFECT_STATUS.md.
 - C12 claim-aware evidence beyond contact — deferred (C5 covers trust-critical path).
-- Radix DialogTitle a11y warnings on L05 (2×) — cosmetic, ledgered, not blocking.
+
+## Tail-end sweep (Oct 2, "finish everything remaining")
+- Radix DialogTitle a11y warnings (L05 2×): FIXED — sr-only titles on the three untitled sheets (app-shell navigation + chat history, discover mobile detail). L05 live rerun: 0 warnings, behavior unchanged (settled, 1 delivered).
+- qa-run `savedTitle` domain-line quirk: FIXED (evidence labeling only).
+- `.kiro/freehire` spec stale `[~]` markers reset to `[ ]` and committed — the spec is explicitly a separate, not-started workstream (needs Docker/Meilisearch live + its own sessions; not completable "properly" inside this sprint).
+- Gates re-verified after the sweep: typecheck 43 frozen, vt NEW_FAILURES=0, L05 green.
 
 ## Next step (next session)
 - Push/PR when ready; main untouched.

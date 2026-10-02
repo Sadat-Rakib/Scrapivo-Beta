@@ -44,7 +44,7 @@ This implementation plan converts the FreeHire job integration design into a ser
     - Verify running ingestion twice with same input produces no duplicates
     - Verify second run updates existing records (jobs_updated > 0)
 
-- [~] 2. Checkpoint - Phase 1 Verification Complete
+- [ ] 2. Checkpoint - Phase 1 Verification Complete
   - Verify Docker Compose starts without errors
   - Verify PostgreSQL and Meilisearch are healthy
   - Verify FreeHire ingestion completes successfully with live data
@@ -52,14 +52,14 @@ This implementation plan converts the FreeHire job integration design into a ser
   - Ensure all Phase 1 tests pass, ask the user if questions arise
 
 - [ ] 3. Canonical Job Model and Schema Reconciliation
-  - [~] 3.1 Audit FreeHire schema and define canonical model
+  - [ ] 3.1 Audit FreeHire schema and define canonical model
     - Review FreeHire's existing PostgreSQL schema
     - Create TypeScript interface CanonicalJob in src/lib/jobs/canonical-model.ts
     - Include all required fields: id, source, sources, source_job_id, dedupe_id, company_id, company_name, company_domain, title, description, url, location, cities, countries, regions, work_mode, employment_type, seniority, role, category, skills, domains, company_type, relocation, english_level, salary_min, salary_max, salary_currency, posted_at, updated_at, expires_at, is_active, created_at
     - Create mapping function mapScrapivoToCanonical to convert existing JobPosting type
     - _Requirements: 3.1, 3.2, 3.3_
 
-  - [~] 3.2 Extend PostgreSQL schema if necessary
+  - [ ] 3.2 Extend PostgreSQL schema if necessary
     - Compare CanonicalJob fields with FreeHire schema
     - Create ALTER TABLE migrations for missing fields only if semantically different
     - Document field mappings between Scrapivo and FreeHire schemas
@@ -78,20 +78,20 @@ This implementation plan converts the FreeHire job integration design into a ser
     - _Requirements: 3.1_
 
 - [ ] 4. Deduplication Engine Implementation
-  - [~] 4.1 Implement deterministic deduplication
+  - [ ] 4.1 Implement deterministic deduplication
     - Create src/lib/jobs/deduplication.ts
     - Implement computeDedupeId function using SHA256 hash
     - Implement normalization functions: normalizeDomain, normalizeTitle, normalizeLocation
     - Add city alias mappings for common abbreviations
     - _Requirements: 4.1_
 
-  - [~] 4.2 Implement fuzzy deduplication
+  - [ ] 4.2 Implement fuzzy deduplication
     - Install rapidfuzz library
     - Implement fuzzyMatchScore function using token_sort_ratio
     - Implement shouldMerge function with 0.85 similarity threshold
     - _Requirements: 4.3, 4.4_
 
-  - [~] 4.3 Implement job record merge logic
+  - [ ] 4.3 Implement job record merge logic
     - Create merge strategy preferring ATS sources over aggregators
     - Implement source provenance preservation in sources array
     - Implement timestamp preservation (earliest posted_at, latest updated_at)
@@ -126,7 +126,7 @@ This implementation plan converts the FreeHire job integration design into a ser
     - Test shouldMerge boundary conditions
 
 - [ ] 5. Multi-Tier Source Integration
-  - [~] 5.1 Implement Tier 2 ATS adapters
+  - [ ] 5.1 Implement Tier 2 ATS adapters
     - Create src/lib/jobs/tier2-adapters.ts
     - Implement Greenhouse adapter: https://boards-api.greenhouse.io/v1/boards/{company}/jobs
     - Implement Lever adapter: https://api.lever.co/v0/postings/{company}?mode=json
@@ -135,7 +135,7 @@ This implementation plan converts the FreeHire job integration design into a ser
     - Each adapter should parse source-specific JSON to CanonicalJob model
     - _Requirements: 5.3, 5.4, 5.5, 5.6, 5.7_
 
-  - [~] 5.2 Implement Tier 3 JobSpy worker
+  - [ ] 5.2 Implement Tier 3 JobSpy worker
     - Create src/workers/jobspy-worker.ts
     - Integrate JobSpy Python library via child process or microservice
     - Implement scheduled fetch for LinkedIn, Indeed, Glassdoor
@@ -143,7 +143,7 @@ This implementation plan converts the FreeHire job integration design into a ser
     - Implement isolation so JobSpy failures don't impact Tier 1/2 ingestion
     - _Requirements: 5.8, 5.9_
 
-  - [~] 5.3 Implement ingestion error handling and metrics
+  - [ ] 5.3 Implement ingestion error handling and metrics
     - Create src/lib/jobs/ingestion-error-handler.ts
     - Implement error classification (network, parse, validation, database)
     - Record errors in ingestion_runs table with job_url, error_type, message, stack_trace
@@ -166,26 +166,26 @@ This implementation plan converts the FreeHire job integration design into a ser
     - Test error handling for malformed responses
     - Test pagination for SmartRecruiters adapter
 
-- [~] 6. Checkpoint - Multi-Source Ingestion Working
+- [ ] 6. Checkpoint - Multi-Source Ingestion Working
   - Verify Tier 2 adapters can fetch and normalize jobs
   - Verify JobSpy worker runs without blocking main ingestion
   - Verify errors are logged and other sources continue processing
   - Ensure all tests pass, ask the user if questions arise
 
 - [ ] 7. PostgreSQL Integration and Meilisearch Configuration
-  - [~] 7.1 Configure database connection pooling
+  - [ ] 7.1 Configure database connection pooling
     - Set up PostgreSQL client with connection pool (min: 5, max: 20)
     - Implement connection health checks on startup
     - Implement error handling for connection limit exceeded
     - _Requirements: 6.5, 6.6, 6.7, 6.8_
 
-  - [~] 7.2 Implement PostgreSQL-first write ordering
+  - [ ] 7.2 Implement PostgreSQL-first write ordering
     - Ensure all job writes commit to PostgreSQL before Meilisearch indexing
     - Implement async Meilisearch indexing with 5-second timeout
     - Log warnings if indexing exceeds timeout
     - _Requirements: 6.1, 6.2, 2.4, 2.5_
 
-  - [~] 7.3 Configure Meilisearch index settings
+  - [ ] 7.3 Configure Meilisearch index settings
     - Reuse FreeHire's Meilisearch configuration
     - Set searchableAttributes: title, description, company_name, location, cities, countries, skills, domains, role, category
     - Set filterableAttributes: collections, regions, work_mode, role, category, ai_archetype, seniority, skills, domains, company_type, countries, cities, relocation, employment_type, english_level, salary_min, salary_max, salary_currency, is_active
@@ -193,7 +193,7 @@ This implementation plan converts the FreeHire job integration design into a ser
     - Configure synonyms for common skill abbreviations
     - _Requirements: 7.1, 7.2, 7.3, 7.9_
 
-  - [~] 7.4 Implement Meilisearch index rebuild function
+  - [ ] 7.4 Implement Meilisearch index rebuild function
     - Create function to rebuild entire Meilisearch index from PostgreSQL
     - Filter for active jobs only (is_active = true)
     - _Requirements: 6.3, 6.4_
@@ -209,7 +209,7 @@ This implementation plan converts the FreeHire job integration design into a ser
     - Verify rebuilt index contains all and only active jobs from PostgreSQL
 
 - [ ] 8. Meilisearch Query Adapter Implementation
-  - [~] 8.1 Create Meilisearch query adapter
+  - [ ] 8.1 Create Meilisearch query adapter
     - Create src/lib/jobs/meilisearch-adapter.ts
     - Implement searchJobs function converting JobSearchFilters to Meilisearch query
     - Implement buildFilterString to translate Scrapivo filters
@@ -217,12 +217,12 @@ This implementation plan converts the FreeHire job integration design into a ser
     - Return jobs, total, facets, page, pageSize
     - _Requirements: 7.4, 7.5, 7.6, 7.8_
 
-  - [~] 8.2 Implement pagination and facet aggregation
+  - [ ] 8.2 Implement pagination and facet aggregation
     - Enforce page size limits (min: 10, max: 100)
     - Return facet counts for work_mode, seniority, employment_type, countries, regions, company_type
     - _Requirements: 7.6, 7.7, 7.8_
 
-  - [~] 8.3 Implement search error handling with graceful degradation
+  - [ ] 8.3 Implement search error handling with graceful degradation
     - Create src/lib/jobs/search-error-handler.ts
     - Fall back to PostgreSQL queries if Meilisearch unavailable
     - Return empty result set with error message for invalid queries
@@ -245,13 +245,13 @@ This implementation plan converts the FreeHire job integration design into a ser
     - Test response time requirements (<200ms for queries under 50 chars)
 
 - [ ] 9. Profile Matching Engine - Deterministic Scoring
-  - [~] 9.1 Create user profile data model
+  - [ ] 9.1 Create user profile data model
     - Create src/lib/profile/types.ts
     - Define UserProfile interface with skills, experience_years, seniority, quotas, notification preferences
     - Define NotificationChannel interface
     - _Requirements: 9.1_
 
-  - [~] 9.2 Implement deterministic match score computation
+  - [ ] 9.2 Implement deterministic match score computation
     - Create src/lib/matching/deterministic-matcher.ts
     - Implement computeMatch function returning MatchResult
     - Compute skills_have as exact intersection (case-insensitive)
@@ -260,7 +260,7 @@ This implementation plan converts the FreeHire job integration design into a ser
     - Compute match_percentage using formula: ((h + 0.5 * c) / r) * 100
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6_
 
-  - [~] 9.3 Add skill synonym mappings
+  - [ ] 9.3 Add skill synonym mappings
     - Define SKILL_SYNONYMS dictionary for common abbreviations
     - Support js/javascript, ts/typescript, py/python, k8s/kubernetes, etc.
     - _Requirements: 9.3_
@@ -297,21 +297,21 @@ This implementation plan converts the FreeHire job integration design into a ser
     - Test edge cases (empty profile, no required skills, 100% match)
 
 - [ ] 10. Profile Matching Engine - Deep Analysis (Optional LLM)
-  - [~] 10.1 Implement deep match analysis with LLM
+  - [ ] 10.1 Implement deep match analysis with LLM
     - Create src/lib/matching/deep-matcher.ts
     - Implement computeDeepMatch function returning DeepMatchResult
     - Construct LLM prompt with candidate profile and job description
     - Cache results by (profile_id, job_id) combination with 30-day TTL
     - _Requirements: 10.1, 10.2, 10.3, 10.4_
 
-  - [~] 10.2 Implement deep match quota management
+  - [ ] 10.2 Implement deep match quota management
     - Check user quota before calling LLM
     - Reject requests if quota exhausted
     - Decrement quota after successful analysis
     - Return cached results without consuming quota
     - _Requirements: 10.5, 10.6, 10.7_
 
-  - [~] 10.3 Implement LLM error handling
+  - [ ] 10.3 Implement LLM error handling
     - Create src/lib/matching/match-error-handler.ts
     - Handle quota exhaustion with friendly error message
     - Fall back to deterministic match if LLM unavailable
@@ -335,14 +335,14 @@ This implementation plan converts the FreeHire job integration design into a ser
     - Test quota enforcement logic
     - Test error handling for LLM unavailability
 
-- [~] 11. Checkpoint - Profile Matching Complete
+- [ ] 11. Checkpoint - Profile Matching Complete
   - Verify deterministic match scores are computed correctly
   - Verify deep match analysis works with LLM (if configured)
   - Verify quota enforcement prevents overuse
   - Ensure all matching tests pass, ask the user if questions arise
 
 - [ ] 12. Email Generation Service
-  - [~] 12.1 Implement personalized email generation
+  - [ ] 12.1 Implement personalized email generation
     - Create src/lib/email/email-generator.ts
     - Accept inputs: candidate profile, job description, company context
     - Ground all statements in supplied candidate data
@@ -356,24 +356,24 @@ This implementation plan converts the FreeHire job integration design into a ser
     - Test handling of missing profile fields
 
 - [ ] 13. Notification System Implementation
-  - [~] 13.1 Create notification service
+  - [ ] 13.1 Create notification service
     - Create src/lib/notifications/notification-service.ts
     - Support Telegram, Discord, Email, Slack, WhatsApp channels
     - Send notifications for new jobs matching saved search criteria
     - Include job title, company, location, match percentage, direct link
     - _Requirements: 15.1, 15.2, 15.3_
 
-  - [~] 13.2 Implement notification rate limiting
+  - [ ] 13.2 Implement notification rate limiting
     - Enforce max 10 notifications per user per hour
     - Track notification counts per user per time window
     - _Requirements: 15.4, 15.5_
 
-  - [~] 13.3 Implement notification retry logic
+  - [ ] 13.3 Implement notification retry logic
     - Retry failed notifications up to 3 times with exponential backoff (1s, 2s, 4s)
     - Log all failures
     - _Requirements: 15.6, 15.8_
 
-  - [~] 13.4 Implement notification preferences management
+  - [ ] 13.4 Implement notification preferences management
     - Create UI for managing notification channels
     - Allow users to enable/disable channels
     - Provide notification history view
@@ -405,30 +405,30 @@ This implementation plan converts the FreeHire job integration design into a ser
     - Test retry logic with simulated failures
 
 - [ ] 14. Frontend Integration with Scrapivo UI
-  - [~] 14.1 Migrate job search to Meilisearch queries
+  - [ ] 14.1 Migrate job search to Meilisearch queries
     - Update src/routes/_authenticated/jobs.tsx
     - Replace in-memory filtering with Meilisearch queries via TanStack server functions
     - Preserve existing UI components and layout
     - _Requirements: 12.1, 12.2, 19.2, 19.3_
 
-  - [~] 14.2 Implement match sidebar component
+  - [ ] 14.2 Implement match sidebar component
     - Display match percentage, skills_have, skills_close, skills_missing
     - Add "Analyze Match" button for deep analysis
     - Show deep match results (compatibility_score, reasoning, strengths, gaps, recommendations)
     - _Requirements: 12.5, 9.7_
 
-  - [~] 14.3 Implement job detail view
+  - [ ] 14.3 Implement job detail view
     - Display full job description with company, location, salary, requirements
     - Show source badge indicating data provenance
     - Integrate match sidebar
     - _Requirements: 12.4_
 
-  - [~] 14.4 Implement bookmarking functionality
+  - [ ] 14.4 Implement bookmarking functionality
     - Allow users to save jobs for later review
     - Display bookmarked jobs in separate view
     - _Requirements: 12.6_
 
-  - [~] 14.5 Update job card display
+  - [ ] 14.5 Update job card display
     - Show title, company, location, work_mode, seniority, salary, source badge
     - Display match percentage if user has profile
     - _Requirements: 12.3_
@@ -444,7 +444,7 @@ This implementation plan converts the FreeHire job integration design into a ser
     - Test match sidebar display
     - Test responsive design on mobile and desktop
 
-- [~] 15. Checkpoint - Frontend Integration Complete
+- [ ] 15. Checkpoint - Frontend Integration Complete
   - Verify search UI works with Meilisearch queries
   - Verify job details display correctly
   - Verify match sidebar shows accurate scores
@@ -452,19 +452,19 @@ This implementation plan converts the FreeHire job integration design into a ser
   - Ensure all tests pass, ask the user if questions arise
 
 - [ ] 16. Migration from In-Memory to Persistent Storage
-  - [~] 16.1 Refactor job registry to use PostgreSQL
+  - [ ] 16.1 Refactor job registry to use PostgreSQL
     - Remove in-memory job arrays from src/lib/jobs/registry.ts
     - Replace with PostgreSQL queries
     - Remove dedupeJobs function (rely on database-level deduplication)
     - _Requirements: 19.1, 19.4_
 
-  - [~] 16.2 Update existing job source adapters
+  - [ ] 16.2 Update existing job source adapters
     - Refactor adapters to write to PostgreSQL instead of returning arrays
     - Ensure adapters call deduplication logic
     - Ensure adapters record ingestion run metadata
     - _Requirements: 19.6, 19.8_
 
-  - [~] 16.3 Preserve backward compatibility
+  - [ ] 16.3 Preserve backward compatibility
     - Maintain JobPosting TypeScript interface
     - Maintain JobSearchFilters interface
     - _Requirements: 19.5, 19.8_
@@ -496,21 +496,21 @@ This implementation plan converts the FreeHire job integration design into a ser
     - Verify parse(serialize(job)) == job for all valid canonical jobs from SmartRecruiters
 
 - [ ] 18. Data Retention and Privacy Implementation
-  - [~] 18.1 Implement data retention policy
+  - [ ] 18.1 Implement data retention policy
     - Create job archival process for records inactive > 90 days
     - Create separate archive table for historical data
     - _Requirements: 20.1, 20.2_
 
-  - [~] 18.2 Implement encryption for sensitive fields
+  - [ ] 18.2 Implement encryption for sensitive fields
     - Encrypt user profile sensitive fields (email, contact details, API keys)
     - Use TLS for data transmission between services
     - _Requirements: 20.3, 20.4_
 
-  - [~] 18.3 Implement data export API
+  - [ ] 18.3 Implement data export API
     - Allow users to download all profile, search history, bookmarks, notifications
     - _Requirements: 20.5_
 
-  - [~] 18.4 Implement account deletion
+  - [ ] 18.4 Implement account deletion
     - Remove all user data within 30 days of deletion request
     - Delete profile, search history, bookmarks, notification preferences, cached matches
     - _Requirements: 20.6_
@@ -536,18 +536,18 @@ This implementation plan converts the FreeHire job integration design into a ser
     - Verify all user data is removed after deletion
 
 - [ ] 19. Ingestion Observability and Monitoring
-  - [~] 19.1 Implement ingestion run metrics tracking
+  - [ ] 19.1 Implement ingestion run metrics tracking
     - Record started_at, completed_at, duration for each run
     - Track jobs_seen, jobs_created, jobs_updated, jobs_deactivated, jobs_failed
     - Capture errors with stack traces in errors field
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7_
 
-  - [~] 19.2 Implement stale job auto-deactivation
+  - [ ] 19.2 Implement stale job auto-deactivation
     - Check job age against source-specific refresh interval
     - Automatically mark stale jobs inactive
     - _Requirements: 8.10_
 
-  - [~] 19.3 Create ingestion status API endpoint
+  - [ ] 19.3 Create ingestion status API endpoint
     - Return most recent ingestion run status for each source
     - Include metrics and error details
     - _Requirements: 8.9_
@@ -568,29 +568,29 @@ This implementation plan converts the FreeHire job integration design into a ser
     - Test ingestion status API response format
 
 - [ ] 20. Final Integration and End-to-End Testing
-  - [~] 20.1 Integration testing for complete workflow
+  - [ ] 20.1 Integration testing for complete workflow
     - Test job ingestion from source to PostgreSQL to Meilisearch to UI
     - Test profile matching with deterministic and deep analysis
     - Test notification delivery for matched jobs
     - Test email generation for applications
 
-  - [~] 20.2 Performance testing
+  - [ ] 20.2 Performance testing
     - Verify search response times <200ms for typical queries
     - Verify Meilisearch indexing completes within 5 seconds
     - Verify connection pool handles concurrent requests
 
-  - [~] 20.3 Error recovery testing
+  - [ ] 20.3 Error recovery testing
     - Test graceful degradation when Meilisearch unavailable
     - Test ingestion continues when one source fails
     - Test notification retry logic with simulated failures
 
-  - [~] 20.4 Documentation and deployment guide
+  - [ ] 20.4 Documentation and deployment guide
     - Document Docker Compose setup for Windows
     - Document environment variable configuration
     - Document ingestion scheduling and monitoring
     - Document API endpoints and TypeScript interfaces
 
-- [~] 21. Final Checkpoint - Project Complete
+- [ ] 21. Final Checkpoint - Project Complete
   - All Phase 1 verification criteria met
   - All ingestion tiers operational (FreeHire, Tier 2, Tier 3)
   - Profile matching and email generation working
