@@ -75,7 +75,7 @@ import type { ClarifyQuestion, ClarifyAnswers } from "@/lib/search/clarifier";
 import { resolveSearchVertical } from "@/lib/search/vertical";
 import { friendlyErrorText } from "@/lib/friendly-error";
 import { type ChatTurn } from "@/components/discover/scrapy-chat-panel";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -2581,6 +2581,7 @@ function DiscoverPage() {
         }}
       >
         <SheetContent side="right" className="p-0 w-full sm:max-w-md bg-card overflow-y-auto">
+          <SheetTitle className="sr-only">Details</SheetTitle>
           {selected ? (
             <LeadDetailPanel
               lead={selected}

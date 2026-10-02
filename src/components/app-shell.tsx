@@ -25,7 +25,7 @@ import {
 import { mySupabase } from "@/integrations/my-supabase/client";
 import { getRemainingSearches } from "@/lib/search.functions";
 import { Progress } from "@/components/ui/progress";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ChatHistoryPanel } from "@/components/discover/chat-history-panel";
 
 const LOGO_SRC =
@@ -348,6 +348,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </button>
               </SheetTrigger>
               <SheetContent side="left" className="p-0 w-64 bg-[#0a0a0b] border-r border-white/10">
+                <SheetTitle className="sr-only">Navigation</SheetTitle>
                 {renderLeftSidebarContent(false)}
               </SheetContent>
             </Sheet>
@@ -403,6 +404,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   side="right"
                   className="p-0 w-80 bg-[#0a0a0b] border-l border-white/10"
                 >
+                  <SheetTitle className="sr-only">Chat history</SheetTitle>
                   <ChatHistoryPanel />
                 </SheetContent>
               </Sheet>
