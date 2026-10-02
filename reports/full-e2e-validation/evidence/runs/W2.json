@@ -1,0 +1,99 @@
+{
+  "id": "W2",
+  "query": "Find 12 solar panel installers in Windhoek, Namibia with public phone numbers",
+  "category": "local",
+  "viewport": "desktop",
+  "startedAt": "2026-10-02T15:52:42.512Z",
+  "main": {
+    "query": "Find 12 solar panel installers in Windhoek, Namibia with public phone numbers",
+    "clarify": [
+      {
+        "question": "What are you trying to do with these results?",
+        "chosen": "Find prospects",
+        "t": 94
+      }
+    ],
+    "streamed": [],
+    "activity": [
+      "Checked available records · Available records · 0",
+      "Working · Public business sources · Windhoek, Namibia",
+      "Found local businesses · Public business sources · 149",
+      "Reading page · contractors1000.com · 704 characters",
+      "Checked public sources · Public business sources · 149",
+      "Widening the search · Public source · pass 1 of 3",
+      "Show all activity (12)",
+      "Found local businesses · Public business sources · 188",
+      "Found possible leads · Public source · 10 links",
+      "Opening result · enfsolar.com",
+      "Widen pass complete · Public business sources · 0 new candidates",
+      "Widening the search · Public source · pass 2 of 3"
+    ],
+    "bubbleVerbatim": true,
+    "runningAt": 47,
+    "clarifyAt": 94,
+    "clarifyRepeats": 0,
+    "pill": "Scrapy is browsing · contractors1000.com · 4 pages · 00:27",
+    "miniBrowserAt": 191,
+    "viewingOnly": true,
+    "settled": true,
+    "durationS": 612,
+    "firstStreamS": null,
+    "header": {
+      "query": "Find 12 solar panel installers in Windhoek, Namibia with public phone numbers",
+      "count": 0
+    },
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": true,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n02/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nFind 12 solar panel installers in Windhoek, Namibia with public phone numbers\nResults for \"Find 12 solar panel installers in Windhoek, Namibia with public phone numbers\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\n337 candidates were found, but none matched the requested criteria.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nScrapy\nCANCELLED\ncontractors1000.com\nExtracting\n· Just a moment...\n4 pages\n7 actions\n00:29\nOpen original\nViewing only. Taking control needs the browser worker.\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n7 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n7 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n7 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n7 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n7 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n7 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n7 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n7 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n7 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n7 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n7 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n7 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n7 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n7 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n7 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n7 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n7 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n7 days ago\nFind SaaS founders globally who may need help with AI automat"
+  },
+  "server": {
+    "runId": null,
+    "specRuns": 0,
+    "spec": null,
+    "ledger": null,
+    "runtime": [],
+    "browserDone": [],
+    "searches": 0,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": []
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "info: [ui-projection] server=0 projected=0 rejected=0 codes={}"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 8,
+      "event": "a: submitted"
+    },
+    {
+      "t": 55,
+      "event": "a: running"
+    },
+    {
+      "t": 102,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 200,
+      "event": "a: mini-browser (Scrapy is browsing · contractors1000.com · 4 pages · 00:27)"
+    },
+    {
+      "t": 619,
+      "event": "a: settled"
+    }
+  ],
+  "screenshots": [
+    "ui/W2-a-1-clarify.jpg",
+    "ui/W2-a-3-mini-browser.jpg",
+    "ui/W2-a-6-final.jpg"
+  ],
+  "durationS": 625,
+  "responseBytes": 28694
+}

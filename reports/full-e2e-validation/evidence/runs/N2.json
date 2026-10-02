@@ -1,0 +1,94 @@
+{
+  "id": "N2",
+  "query": "anyone doing solar installation around Windhoek? get me as many decent ones as you can with numbers",
+  "category": "local",
+  "viewport": "desktop",
+  "startedAt": "2026-10-02T15:38:16.934Z",
+  "main": {
+    "query": "anyone doing solar installation around Windhoek? get me as many decent ones as you can with numbers",
+    "clarify": [
+      {
+        "question": "What are you looking for — people, companies, local businesses, or investors?",
+        "chosen": "Search with defaults",
+        "t": 95
+      }
+    ],
+    "streamed": [],
+    "activity": [
+      "Checked available records · Available records · 0",
+      "Reading page · britannica.com · 8019 characters",
+      "Opening result · windhoekcc.org.na",
+      "Widening the search · Public source · pass 1 of 3",
+      "Show all activity (9)",
+      "Widening the search · Public source · pass 2 of 3",
+      "Show all activity (12)"
+    ],
+    "bubbleVerbatim": true,
+    "runningAt": 47,
+    "clarifyAt": 94,
+    "clarifyRepeats": 0,
+    "pill": "Scrapy browser session · britannica.com · 3 pages · 00:30",
+    "miniBrowserAt": 189,
+    "viewingOnly": true,
+    "settled": true,
+    "durationS": 563,
+    "firstStreamS": null,
+    "header": {
+      "query": "anyone doing solar installation around Windhoek? get me as many decent ones as you can with numbers",
+      "count": 0
+    },
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": true,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n02/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nFind 12 solar panel installers in Windhoek, Namibia with public phone numbers\nExpand (0 results)\nanyone doing solar installation around Windhoek? get me as many decent ones as you can with numbers\nExpand (0 results)\nFind 12 solar panel installers in Windhoek, Namibia with public phone numbers\nExpand (0 results)\nanyone doing solar installation around Windhoek? get me as many decent ones as you can with numbers\nResults for \"anyone doing solar installation around Windhoek? get me as many decent ones as you can with numbers\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\nSome sources could not be searched this time (Public websites), so results may be incomplete. The sources that answered returned no candidates for this query.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nScrapy\nCANCELLED\nbritannica.com\nOpening result\n· Video Browse Homepage | Britannica\n3 pages\n5 actions\n00:30\nOpen original\nViewing only. Taking control needs the browser worker.\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n7 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n7 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n7 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n7 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n7 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n7 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n7 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n7 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n7 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n7 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n7 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n7 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results"
+  },
+  "server": {
+    "runId": null,
+    "specRuns": 0,
+    "spec": null,
+    "ledger": null,
+    "runtime": [],
+    "browserDone": [],
+    "searches": 0,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": []
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "info: [ui-projection] server=0 projected=0 rejected=0 codes={}"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 5,
+      "event": "a: submitted"
+    },
+    {
+      "t": 52,
+      "event": "a: running"
+    },
+    {
+      "t": 99,
+      "event": "a: clarify \"What are you looking for — people, companies, local business\" -> Search with defaults"
+    },
+    {
+      "t": 195,
+      "event": "a: mini-browser (Scrapy browser session · britannica.com · 3 pages · 00:30)"
+    },
+    {
+      "t": 568,
+      "event": "a: settled"
+    }
+  ],
+  "screenshots": [
+    "ui/N2-a-1-clarify.jpg",
+    "ui/N2-a-3-mini-browser.jpg",
+    "ui/N2-a-6-final.jpg"
+  ],
+  "durationS": 574,
+  "responseBytes": 23530
+}

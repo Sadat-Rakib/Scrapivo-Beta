@@ -1,0 +1,8 @@
+[
+  { "id": "W2", "category": "local", "query": "Find 12 solar panel installers in Windhoek, Namibia with public phone numbers", "viewport": "desktop" },
+  { "id": "T2", "category": "company", "query": "Find 15 freight forwarding companies in Tbilisi, Georgia with a website and public contact number", "viewport": "desktop" },
+  { "id": "C2", "category": "person", "query": "Find 15 wedding photographers in Cebu, Philippines with phone numbers or WhatsApp contacts", "viewport": "desktop" },
+  { "id": "B2", "category": "local", "query": "Find 20 construction companies in Banja Luka, Bosnia and Herzegovina with public phone numbers", "viewport": "desktop" },
+  { "id": "D2", "category": "company", "query": "need maybe 20 manufacturing businesses somewhere around da nang that actually export stuff, don't give me random directories", "viewport": "desktop" },
+  { "id": "N2", "category": "local", "query": "anyone doing solar installation around Windhoek? get me as many decent ones as you can with numbers", "viewport": "desktop" }
+]

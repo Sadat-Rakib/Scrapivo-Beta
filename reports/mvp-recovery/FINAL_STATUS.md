@@ -107,9 +107,16 @@ Funnel stage definitions: `reports/mvp-recovery/PIPELINE_MAP.md` §5–§10; led
 
 ## MVP VERDICT
 
-**NOT READY — one named blocker remains.**
+**NOT READY — the Windhoek forensic split is ANSWERED; the remaining gap is acquisition supply, now precisely located.**
 
-- **Exact remaining blocker:** the interactive widening loop does not engage on live runs whose initial acquisition falters (W1): stored retrieval returns 0, the live browser path burns the window on a bot-walled directory (yelp) with zero emissions, and the run finalizes `NO_QUALIFIED_RESULTS` without any widen pass — while the identical loop is proven green in integration tests with injected adapters.
-- **Exact reproduction:** `node node_modules/tsx/dist/cli.mjs reports/full-e2e-validation/tools/qa-run.mts reports/full-e2e-validation/evidence/acceptance-widen-suite.json` (fresh dev server) → W1 settles 0-delivered, no `widening` outcome in the payload.
-- **Exact next fix:** make widening observable and reachable on the live path — (1) emit the widen-gate decision (`liveOpt/deadlineHit/jobContext/qualifiedReadyNow/budgetRemainingMs`) as a progress-registry event (SSR `console.info` does not reach the dev-server log in this setup — probes confirmed), (2) split the run budget so the initial acquisition phase gets `total − WIDEN_RESERVE_MS` and the widen loop owns the reserve, (3) route local-entity faltering to OSM/web passes instead of re-treading bot-walled directories. Then rerun W1 (expect ≥ 1 widen pass) and a people-query at target 20.
-- Everything else in the PRD's acceptance list is green with evidence; the user-facing statement is true today for local-business searches (L05: describe → understand → 0 clarify → real sources → 34 verified leads → clean finish) and not yet guaranteed for people/company searches.
+**The 149 accounted for, per the PRD's requested format (instrumented rerun, `run` in `evidence/runs/W2.json`):**
+`337 raw OSM artifacts (fallback office=company sweep across 3 widening passes) → 188 unique after dedupe → 188 rejected_category → 0 relevant → 0 enriched → 0 verified → 0 delivered. Ledger closes: unaccounted 0, every rejection named.`
+
+- **What the 149 are:** real OSM `office=company`/`shop=yes` POIs in Windhoek — the acquisition tag vocabulary had no solar/photovoltaic mapping, so the adapter fell back to a generic company sweep; none carry a solar category or name. Manual evidence that widening engaged (passes visible) is confirmed: widening ran to `COVERAGE_EXHAUSTED` in every reproduction.
+- **The split (PRD's three hypotheses):** hypothesis 2 — acquisition. NOT the qualifier (its rejections are correct and now carry reasons) and NOT delivery/merge (nothing reached either; ledger unaccounted 0).
+- **Instrumentation fix landed:** before `0406d24`, 149 rows died with `rejectReasons: {}`; now every pre-research rejection books its dimension (`rejected_category` etc.) in the ledger summary and dev dump.
+- **Remaining open gap:** browser-live emitted 0 candidates across 9 queries/3 passes for Windhoek solar — with SearXNG down, the browser is the only supply route for this query, and nothing converted. Decode the browser trace (envelope worker/trace arrays) to find the failing stage: SERP link-selection, page extraction, or empty SERPs.
+- **Exact next fixes:** (1) browser 0-emission trace autopsy for Windhoek/Tbilisi/Cebu; (2) failover — when the specific-tag OSM query is empty, book the office=company fallback as low-yield instead of flooding the funnel, and give browser/web passes the budget; (3) redundant clarify ("What should they be doing?" for "doing solar installation around Windhoek") — understanding must carry the activity into the spec before clarification; (4) composer stop button + worker takeover handshake (P1s).
+- **Re-grade after:** the six acceptance queries from PRD V2 pass through the real UI.
+
+Prior reference: READY (local MVP baseline) at `reports/full-e2e-validation/FINAL_STATUS.md` — superseded by manual QA evidence per PRD V2.
