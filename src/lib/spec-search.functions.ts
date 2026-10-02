@@ -2442,7 +2442,8 @@ export async function runSpecSearchCore(
           });
           let newCount = 0;
           for (const r of live.rows.map((row) => sanitizeSpecRow(row, spec))) {
-            if (rowCouldSatisfySpec(spec, r)) {
+            const rejectReason = rowSatisfyRejectReason(spec, r);
+            if (!rejectReason) {
               const k = identityOf(r);
               const isNew = !!k && !seenKeys.has(k);
               if (isNew) {
@@ -2457,7 +2458,7 @@ export async function runSpecSearchCore(
               const k = identityOf(r);
               if (k && !seenKeys.has(k)) {
                 seenKeys.add(k);
-                ledger.filtered(r);
+                ledger.filtered(r, rejectReason);
               }
             }
           }
