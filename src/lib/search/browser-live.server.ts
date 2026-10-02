@@ -107,6 +107,82 @@ export type BrowserTraceEvent =
   | { kind: "candidate"; name: string; status: string; rejectCode?: string | null; label?: string | null; needs: string[]; visited: number; queries: number }
   | { kind: "done"; status: string; candidates: number; verified: number; visited: number; queries: number; stoppingReason: string; elapsedMs: number }
   | { kind: "runtime"; requested: string; used: string; reason?: string };
+
+/** Named funnel stage for a zero: the first transition that lost everything. */
+export type BrowserQueryFunnelStage =
+  | "SEARCH_EMPTY" | "SEARCH_BLOCKED" | "SERP_PARSE_EMPTY" | "LINK_FILTER_DROPPED"
+  | "NAVIGATION_FAILED" | "PAGE_CHALLENGE" | "PAGE_UNSUPPORTED" | "EXTRACTION_EMPTY"
+  | "NORMALIZATION_REJECTED" | "CANDIDATE_EMISSION_FAILED" | "OK";
+
+/**
+ * Per-search-query funnel counters (WS1 instrumentation, counts only).
+ * Accumulated across one discovery pass: every zero is attributable to the
+ * named `stage`, backed by the preceding counts. Diagnostics only — nothing
+ * in discovery depends on it.
+ */
+export type BrowserQueryFunnel = {
+  query: string;
+  passNumber: number;
+  /** Last SERP engine attempted: "searxng" | "duckduckgo" | "bing" | "none". */
+  engine: string;
+  /** SERP attempts that reached an engine. */
+  serpRequested: number;
+  serpOk: number;
+  serpEmpty: number;
+  /** SERP attempts blocked or challenged (browser engines). */
+  serpBlocked: number;
+  /** SERP attempts that never reached an engine (provider down, engine error). */
+  serpErrors: number;
+  /** Raw links seen on SERP(s) for this query. */
+  linksObserved: number;
+  linksAccepted: number;
+  linksRejected: number;
+  linkRejections: Partial<Record<"triage" | "non_navigable" | "private_network" | "dedupe" | "cap", number>>;
+  pagesScheduled: number;
+  /** Pages whose content was actually acquired (read, http_read or cache hit). */
+  pagesNavigated: number;
+  navFailed: number;
+  /** Pages blocked/challenged after navigation. */
+  pagesBlocked: number;
+  /** Pages unusable for extraction (login wall, thin, irrelevant, unsafe). */
+  pagesUnsupported: number;
+  /** Pages an extraction was actually attempted on. */
+  pagesExtractable: number;
+  extractionEmpty: number;
+  entitiesExtracted: number;
+  /** Rows produced by normalization (structured + browserEntitiesToRows). */
+  normalizedRows: number;
+  /** Candidates actually emitted via the row/event channel (first sighting). */
+  emittedRows: number;
+  elapsedMs: number;
+  stage: BrowserQueryFunnelStage;
+};
+
+/** First-failure classification: serp → links → pages → extraction → emission. */
+export function classifyFunnelStage(f: BrowserQueryFunnel): BrowserQueryFunnelStage {
+  if (f.emittedRows > 0) return "OK";
+  if (f.serpRequested === 0 && f.serpErrors === 0) return "SEARCH_BLOCKED";
+  if (f.serpOk === 0) {
+    if (f.serpBlocked > 0) return "SEARCH_BLOCKED";
+    if (f.serpEmpty > 0) return "SEARCH_EMPTY";
+    return "SEARCH_BLOCKED";
+  }
+  if (f.linksObserved === 0) return "SERP_PARSE_EMPTY";
+  if (f.pagesScheduled === 0) {
+    const unresolvable = (f.linkRejections.non_navigable ?? 0) + (f.linkRejections.private_network ?? 0);
+    return f.linksRejected > 0 && unresolvable >= f.linksRejected ? "SERP_PARSE_EMPTY" : "LINK_FILTER_DROPPED";
+  }
+  if (f.pagesNavigated === 0) {
+    if (f.pagesBlocked > 0) return "PAGE_CHALLENGE";
+    if (f.pagesUnsupported > 0 && f.navFailed === 0) return "PAGE_UNSUPPORTED";
+    return "NAVIGATION_FAILED";
+  }
+  if (f.pagesExtractable === 0 || (f.entitiesExtracted === 0 && f.normalizedRows === 0 && f.extractionEmpty > 0)) return "EXTRACTION_EMPTY";
+  if (f.entitiesExtracted > 0 && f.normalizedRows === 0) return "NORMALIZATION_REJECTED";
+  if (f.normalizedRows > 0 && f.emittedRows === 0) return "CANDIDATE_EMISSION_FAILED";
+  return "OK";
+}
+
 export type BrowserDiscoveryOptions = {
   searchRunId?: string;
   ownerId?: string;
@@ -121,10 +197,12 @@ export type BrowserDiscoveryOptions = {
   desiredCount?: number;
   isVerified?: (row: SpecRow) => boolean;
   onCandidateMemory?: (candidates: BrowserCandidateMemory[]) => void;
-  onProgress?: (event: { action: string; source?: string; detail?: string; count?: number | string; row?: import("@/lib/search/search-browser-progress.server").StreamedLead }) => void;
+  onProgress?: (event: { action: string; source?: string; detail?: string; count?: number | string; row?: import("@/lib/search/search-browser-progress.server").StreamedLead; funnel?: BrowserQueryFunnel }) => void;
   extractEntities?: (pages: BrowserObservedPage[], spec: SearchSpec, trace?: (event: BrowserTraceEvent) => void) => Promise<BrowserExtractedEntity[]>;
   /** Diagnostic lifecycle hook; no-op by default. */
   onTrace?: (event: BrowserTraceEvent) => void;
+  /** Called once per discovery query when its funnel closes (diagnostics only). */
+  onQueryFunnel?: (funnel: BrowserQueryFunnel) => void;
 };
 
 export type BrowserCandidateMemory = {
@@ -683,6 +761,51 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
   const log = (fields: Record<string, unknown>) => console.log(`[browser-live] ${JSON.stringify({ run, ...fields })}`);
   // Diagnostics must never change or break discovery.
   const trace = (event: BrowserTraceEvent) => { try { options.onTrace?.(event); } catch { /* ignore */ } };
+  // WS1 funnel instrumentation: per-query counters. Opened per discovery pass
+  // (or lazily for seed/research searches), closed at the pass boundary with a
+  // dev-gated console line, a progress event and the onQueryFunnel callback.
+  let activeFunnel: { funnel: BrowserQueryFunnel; startedAt: number } | null = null;
+  const openFunnel = (query: string, passNumber: number): BrowserQueryFunnel => {
+    const funnel: BrowserQueryFunnel = {
+      query, passNumber, engine: "none",
+      serpRequested: 0, serpOk: 0, serpEmpty: 0, serpBlocked: 0, serpErrors: 0,
+      linksObserved: 0, linksAccepted: 0, linksRejected: 0, linkRejections: {},
+      pagesScheduled: 0, pagesNavigated: 0, navFailed: 0, pagesBlocked: 0, pagesUnsupported: 0,
+      pagesExtractable: 0, extractionEmpty: 0, entitiesExtracted: 0, normalizedRows: 0, emittedRows: 0,
+      elapsedMs: 0, stage: "OK",
+    };
+    activeFunnel = { funnel, startedAt: Date.now() };
+    return funnel;
+  };
+  /** The funnel accumulating for the current pass; lazily opened for searches outside a discovery pass. */
+  const funnel = (query?: string): BrowserQueryFunnel => {
+    if (!activeFunnel) openFunnel(query ?? "(seed_research)", 0);
+    return activeFunnel!.funnel;
+  };
+  const rejectLink = (reason: keyof NonNullable<BrowserQueryFunnel["linkRejections"]>) => {
+    const f = funnel();
+    f.linksRejected++;
+    f.linkRejections[reason] = (f.linkRejections[reason] ?? 0) + 1;
+  };
+  const linkScheduled = () => {
+    const f = activeFunnel?.funnel;
+    if (f) { f.linksAccepted++; f.pagesScheduled++; }
+  };
+  const closeFunnel = () => {
+    const active = activeFunnel;
+    if (!active) return;
+    activeFunnel = null;
+    const f = active.funnel;
+    f.elapsedMs = Date.now() - active.startedAt;
+    f.stage = classifyFunnelStage(f);
+    try {
+      if (process.env.NODE_ENV !== "production" || process.env.SCRAPIVO_DEBUG_FUNNEL === "1") {
+        console.log(`[browser-funnel] ${JSON.stringify({ ...f, pass: f.passNumber })}`);
+      }
+    } catch { /* ignore */ }
+    try { options.onQueryFunnel?.({ ...f }); } catch { /* ignore */ }
+    try { options.onProgress?.({ action: "Query funnel", source: f.engine, detail: f.stage, count: f.emittedRows, funnel: { ...f } }); } catch { /* ignore */ }
+  };
   const isVerified = options.isVerified ?? ((row: SpecRow) => qualifyLead(row, spec, row.evidence).disposition === "qualified");
   // Progressive results, two honest stages (E2E-C10): the first sighting of a
   // candidate is announced as found/provisional — the UI must never see
@@ -692,6 +815,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
   const verifiedSeen = new Set<string>();
   const foundSeen = new Set<string>();
   const rowEvent = (candidate: BrowserCandidateMemory, rowStatus: "provisional" | "verified") => {
+    if (rowStatus === "provisional") { const f = activeFunnel?.funnel; if (f) f.emittedRows++; }
     const row = candidate.row;
     options.onProgress?.({
       action: rowStatus === "verified" ? "Candidate verified" : "Candidate found",
@@ -774,6 +898,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
     if (searchCache.has(query)) { trace({ kind: "search", query, via: "cache", status: "cached", results: searchCache.get(query)!.length }); return searchCache.get(query)!; }
     if (queriesRun.size >= 42) { trace({ kind: "search", query, via: "budget", status: "skipped", results: 0, reason: "query_budget" }); return []; }
     queriesRun.add(query);
+    const f = funnel(query);
     try {
       if (emptyStructuredSearches >= 2 && !spec.criteria.some((criterion) => criterion.field === "opportunity" && criterion.value === "no_website")) throw new Error("STRUCTURED_SEARCH_EMPTY_FOR_RUN");
       // Unavailable once in this run means unavailable for the run: never
@@ -782,6 +907,10 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       progress("Searching candidates", "SearXNG", query);
       const found = await bounded(discoverWebFreeFirst({ queries: [query], maxQueries: 1, timeRange: "", sourceKey: "browser-research", operation: "browser-research-url-discovery", signal: controller.signal }));
       trace({ kind: "search", query, via: found.provider_used, status: found.results.length ? "ok" : "empty", results: found.results.length });
+      f.serpRequested++;
+      f.engine = "searxng";
+      f.linksObserved += found.results.length;
+      if (found.results.length) f.serpOk++; else f.serpEmpty++;
       emptyStructuredSearches = found.results.length ? 0 : emptyStructuredSearches + 1;
       if (found.results.length) checkedQueries.add(query);
       accessibleSearch = true;
@@ -792,7 +921,8 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       }
       const urls = [...new Map(found.results.flatMap((result) => {
         const url = destination(result.url, result.url);
-        return url ? [[url, { url, ref: "", title: result.title }] as const] : [];
+        if (!url) { rejectLink(publicUrl(result.url) ? "non_navigable" : "private_network"); return []; }
+        return [[url, { url, ref: "", title: result.title }] as const];
       })).values()].sort((a, b) => {
         if (!candidate) return 0;
         const name = normalized(candidate.row.kind === "person" ? candidate.row.company ?? candidate.row.title : candidate.row.title).replace(/\s+/g, "");
@@ -810,6 +940,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       const message = error instanceof Error ? error.message : String(error);
       const skippedForRun = message === "STRUCTURED_SEARCH_EMPTY_FOR_RUN" || message === "STRUCTURED_SEARCH_UNAVAILABLE_FOR_RUN";
       if (!skippedForRun && (error as Error & { code?: string })?.code === "SOURCE_UNAVAILABLE") structuredUnavailable = true;
+      if (!skippedForRun) f.serpErrors++;
       trace({ kind: "search", query, via: "structured", status: skippedForRun ? "skipped" : "unavailable", results: 0, reason: message.slice(0, 120) });
       if (!skippedForRun) log({ source: "searxng", action: "search", status: "unavailable" });
     }
@@ -821,21 +952,26 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       try {
         check();
         progress("Searching the web", engine, query);
+        f.engine = engine;
+        f.serpRequested++;
         const observation = await bounded(engine === "duckduckgo" ? browser.search(session!, query) : browser.navigate(session!, `https://www.bing.com/search?q=${encodeURIComponent(query)}`));
-        if (blocked(observation.snapshot)) { blockedEngines.add(engine); trace({ kind: "search", query, via: engine, status: "blocked", results: 0, reason: observation.snapshot.friction.join(",") || observation.snapshot.pageType }); log({ source: engine, status: "restricted" }); continue; }
+        if (blocked(observation.snapshot)) { blockedEngines.add(engine); f.serpBlocked++; trace({ kind: "search", query, via: engine, status: "blocked", results: 0, reason: observation.snapshot.friction.join(",") || observation.snapshot.pageType }); log({ source: engine, status: "restricted" }); continue; }
         // Challenge pages are not always flagged as friction; read the page text too.
         const body = browser.extractLinks ? await bounded(browser.extract(session!, { fields: { body: { selector: "body" } } })) : null;
         if (SERP_CHALLENGE.test(`${observation.snapshot.title} ${observation.snapshot.visibleRelevantText.slice(0, 1500)} ${(body?.values.body ?? "").slice(0, 1500)}`)) {
           blockedEngines.add(engine);
+          f.serpBlocked++;
           trace({ kind: "search", query, via: engine, status: "blocked", results: 0, reason: "challenge_page" });
           continue;
         }
         accessibleSearch = true;
         checkedQueries.add(query);
         const links = browser.extractLinks ? await bounded(browser.extractLinks(session!, engine === "duckduckgo" ? '[data-testid="result-title-a"], a.result__a' : '#b_results .b_algo h2 a', 5000)) : observation.snapshot.links;
+        f.linksObserved += links.length;
         const unwrapped = [...new Map(links.flatMap((link) => {
           const url = link.url ? destination(link.url, observation.snapshot.url) : null;
-          return url ? [[url, { url, ref: link.ref, title: link.name }] as const] : [];
+          if (!url) { rejectLink(!link.url || publicUrl(link.url) ? "non_navigable" : "private_network"); return []; }
+          return [[url, { url, ref: link.ref, title: link.name }] as const];
         })).values()];
         const gated = unwrapped.filter((link) => serpResultShares(query, link.title, link.url));
         // Token overlap is a degraded-SERP heuristic, not the engine's ranking:
@@ -846,11 +982,15 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
         // run. Candidate research keeps the strict gate: a probe for a known
         // entity must not wander onto term-unrelated pages.
         const output = gated.length || candidate ? gated : unwrapped;
+        const triageDropped = output === gated ? unwrapped.length - gated.length : 0;
+        if (triageDropped) { f.linksRejected += triageDropped; f.linkRejections.triage = (f.linkRejections.triage ?? 0) + triageDropped; }
         trace({ kind: "search", query, via: engine, status: output.length ? "ok" : "empty", results: output.length, reason: `raw_links=${links.length} gated=${gated.length}` });
         log({ source: engine, action: "search", query, resultLinks: output.length });
-        if (output.length) { searchCache.set(query, output); progress("Found search results", engine, `${output.length} links`); return output; }
+        if (output.length) { f.serpOk++; searchCache.set(query, output); progress("Found search results", engine, `${output.length} links`); return output; }
+        f.serpEmpty++;
       } catch (error) {
         check();
+        f.serpErrors++;
         trace({ kind: "search", query, via: engine, status: "failed", results: 0, reason: String(error instanceof Error ? error.message : error).slice(0, 120) });
         log({ source: engine, status: "failed" });
       }
@@ -861,8 +1001,16 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
   const readPage = async (link: Link, candidate?: BrowserCandidateMemory, allowHttpFallback = false, origin = "discovery") => {
     check();
     if (candidate && !candidate.visitedUrls.includes(link.url)) candidate.visitedUrls.push(link.url);
-    const pageTrace = (outcome: Extract<BrowserTraceEvent, { kind: "page" }>["outcome"], extra: Partial<Extract<BrowserTraceEvent, { kind: "page" }>> = {}) =>
+    const pageTrace = (outcome: Extract<BrowserTraceEvent, { kind: "page" }>["outcome"], extra: Partial<Extract<BrowserTraceEvent, { kind: "page" }>> = {}) => {
       trace({ kind: "page", origin, requestedUrl: link.url, outcome, ...extra });
+      const f = activeFunnel?.funnel;
+      if (!f) return;
+      if (outcome === "read" || outcome === "http_read" || outcome === "cached") f.pagesNavigated++;
+      else if (outcome === "navigation_failed") f.navFailed++;
+      else if (outcome === "blocked") f.pagesBlocked++;
+      else if (outcome === "unsafe" || outcome === "irrelevant" || outcome === "thin") f.pagesUnsupported++;
+      else if (outcome === "budget") rejectLink(extra.reason === "already_visited" ? "dedupe" : "cap");
+    };
     const summarize = (facts?: StructuredPageFacts) => facts && { jobs: facts.jobs.length, organization: facts.organizationName, emails: facts.emails.length, phones: facts.phones.length };
     // Acquisition provenance carried onto every evidence item from this page.
     // The browser session id stays in provenance only, never in evidence ids.
@@ -1057,10 +1205,13 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
   };
   const extract = async (pages: BrowserObservedPage[], query?: string, candidate?: BrowserCandidateMemory) => {
     if (!pages.length) return;
+    const f = activeFunnel?.funnel;
+    if (f) f.pagesExtractable += pages.length;
     try {
       // Literal JSON-LD listings first: deterministic, quotable, free. When a
       // page already yields several, the model is not asked about it.
       const structuredRows = structuredBusinessRows(pages, spec, trace);
+      if (f) f.normalizedRows += structuredRows.length;
       if (structuredRows.length) remember(structuredRows, query, candidate);
       const structuredPages = new Set(structuredRows.map((row) => row.source_url));
       const modelPages = pages.filter((page) => structuredRows.filter((row) => row.source_url === page.url).length < 3);
@@ -1072,11 +1223,18 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       pages = modelPages;
       const entities = await bounded((options.extractEntities ?? extractEntities)(pages, spec, trace));
       check();
+      if (f) { if (entities.length) f.entitiesExtracted += entities.length; else f.extractionEmpty++; }
       if (options.extractEntities) trace({ kind: "extract", pages: pages.map((page) => page.url), extractor: "injected", llm: "not_called", entities: entities.length });
-      remember(browserEntitiesToRows(entities, pages, trace), query, candidate);
-      if (spec.entity === "job") remember(structuredJobRows(pages), query, candidate);
+      const normalized = browserEntitiesToRows(entities, pages, trace);
+      if (f) f.normalizedRows += normalized.length;
+      remember(normalized, query, candidate);
+      if (spec.entity === "job") {
+        const jobRows = structuredJobRows(pages);
+        if (f) f.normalizedRows += jobRows.length;
+        remember(jobRows, query, candidate);
+      }
       progress("Extracted candidates", undefined, `${memory.length} candidates; ${verifiedCount()} verified`);
-    } catch (error) { check(); extractionError = error; log({ action: "extract", status: "failed" }); }
+    } catch (error) { check(); if (f) f.extractionEmpty++; extractionError = error; log({ action: "extract", status: "failed" }); }
   };
   const research = async (candidate: BrowserCandidateMemory) => {
     refresh(candidate);
@@ -1220,8 +1378,20 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       progress(checkingAbsence ? "Verifying website absence" : candidate.needs.includes("website") || candidate.needs.includes("profile") ? "Resolving official website" : "Researching required detail", undefined, query);
       const results = await search(query, candidate);
       let inspectedThisCheck = 0;
-      for (const link of results.filter((item) => !candidate.visitedUrls.includes(item.url)).slice(0, 2)) {
+      const researchEligible = results.filter((item) => !candidate.visitedUrls.includes(item.url));
+      {
+        const deduped = results.length - researchEligible.length;
+        const capped = Math.max(0, researchEligible.length - 2);
+        const f = activeFunnel?.funnel;
+        if (f && (deduped || capped)) {
+          f.linksRejected += deduped + capped;
+          if (deduped) f.linkRejections.dedupe = (f.linkRejections.dedupe ?? 0) + deduped;
+          if (capped) f.linkRejections.cap = (f.linkRejections.cap ?? 0) + capped;
+        }
+      }
+      for (const link of researchEligible.slice(0, 2)) {
         if (candidate.visitedUrls.length >= 4 || limitReached()) break;
+        linkScheduled();
         const value = await readPage(link, candidate, false, "candidate_research");
         if (!value) continue;
         mergeStructuredContacts(candidate, value.page);
@@ -1383,10 +1553,12 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
     }
     let noProgress = 0;
     const queries = [...new Set(options.discoveryQueries ?? plan.discoveryQueries)];
-    for (const query of queries.slice(0, 6)) {
+    for (const [passIndex, query] of queries.slice(0, 6).entries()) {
       check();
       if (verifiedCount() >= plan.desiredCount) { stoppingReason = "verified_target_reached"; break; }
       if (limitReached()) { stoppingReason = "search_budget_reached"; break; }
+      closeFunnel();
+      const f = openFunnel(query, passIndex + 1);
       const before = memory.length;
       const results = await search(query);
       const pages: BrowserObservedPage[] = [];
@@ -1398,18 +1570,33 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       // negatives (score <= -50); a zero-overlap title is not evidence of
       // irrelevance and must never silently drop the result.
       const unseen = results.filter((item) => !visited.has(item.url));
+      {
+        const deduped = results.length - unseen.length;
+        if (deduped) { f.linksRejected += deduped; f.linkRejections.dedupe = (f.linkRejections.dedupe ?? 0) + deduped; }
+      }
       const criterion = (field: string) => spec.criteria.find((c) => c.field === field)?.value ?? null;
-      const ranked = triageSerpResults(
+      const triaged = triageSerpResults(
         unseen.map((item) => ({ url: item.url, title: item.title ?? "", snippet: null })),
         {
           query,
           locationTerms: [criterion("location"), criterion("geo_scope")].filter(Boolean) as string[],
           signalTerms: [criterion("requested_service"), criterion("requested_product"), criterion("content_topic"), criterion("requested_role")].filter(Boolean) as string[],
         },
-      ).filter((item) => item.score > -50).slice(0, 2);
+      );
+      const triageSurvivors = triaged.filter((item) => item.score > -50);
+      {
+        const sunk = triaged.length - triageSurvivors.length;
+        if (sunk) { f.linksRejected += sunk; f.linkRejections.triage = (f.linkRejections.triage ?? 0) + sunk; }
+      }
+      const ranked = triageSurvivors.slice(0, 2);
+      {
+        const capped = triageSurvivors.length - ranked.length;
+        if (capped) { f.linksRejected += capped; f.linkRejections.cap = (f.linkRejections.cap ?? 0) + capped; }
+      }
       for (const rankedItem of ranked) {
         const link = unseen.find((item) => item.url === rankedItem.url);
         if (!link) continue;
+        linkScheduled();
         const value = await readPage(link, undefined, false, "discovery");
         if (value) pages.push(value.page);
       }
@@ -1420,6 +1607,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
         await research(candidate);
         if (verifiedCount() >= plan.desiredCount) break;
       }
+      closeFunnel();
       noProgress = memory.length === before ? noProgress + 1 : 0;
       if (noProgress >= plan.stoppingRules.maxNoProgressQueries) { stoppingReason = "diminishing_returns"; break; }
     }
@@ -1456,6 +1644,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
     throw Object.assign(failure, { code: controller.signal.aborted ? "SOURCE_UNAVAILABLE" : (failure as Error & { code?: string }).code ?? "SOURCE_ERROR" });
   } finally {
     clearTimeout(timer);
+    closeFunnel();
     options.signal?.removeEventListener("abort", abort);
     options.onCandidateMemory?.(memory);
     // Only a user cancel is a cancellation; a time budget or run deadline

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import type { AgentBrowser, PageSnapshot } from "@/lib/research-agent/browser";
 import type { SearchSpec } from "../search-spec";
-import { discoverWithBrowser, type BrowserExtractedEntity } from "../browser-live.server";
+import { discoverWithBrowser, type BrowserExtractedEntity, type BrowserQueryFunnel } from "../browser-live.server";
 
 const spec: SearchSpec = { entity: "person", raw_query: "SaaS founders", criteria: [{ field: "role", value: "founder", stated: true, confidence: 1 }],
   missing: [], signal_required: false, signal_types: [], signal_recency: null, status: "ready_to_search" };
@@ -52,5 +52,58 @@ describe("progressive row streaming stages", () => {
       extractEntities: async () => [person("Amina Carter", "Acme")],
       onProgress: (event) => { if (event.row) events.push({ action: event.action, title: event.row.title }); } });
     expect(events).toEqual([{ action: "Candidate found", title: "Amina Carter" }]);
+  });
+});
+
+describe("per-query discovery funnel (WS1 instrumentation)", () => {
+  it("counts every stage for a productive query: serp, links, navigation, extraction, emission", async () => {
+    const funnels: BrowserQueryFunnel[] = [];
+    const progressFunnels: Array<string | undefined> = [];
+    const rows = await discoverWithBrowser(spec, { browser: browser(), discoveryQueries: ["SaaS founders"], isVerified: (row) => !!row.company,
+      extractEntities: async () => [person("Amina Carter", "Acme"), person("Ben Okafor", "Ledgerly")],
+      onQueryFunnel: (funnel) => funnels.push(funnel),
+      onProgress: (event) => { if (event.funnel) progressFunnels.push(event.funnel.stage); } });
+    expect(rows).toHaveLength(2);
+    // One closed funnel per discovery query, carried on both channels.
+    expect(funnels).toHaveLength(1);
+    expect(progressFunnels).toEqual(["OK"]);
+    const f = funnels[0];
+    expect(f.query).toBe("SaaS founders");
+    expect(f.passNumber).toBe(1);
+    expect(f.engine).toBe("duckduckgo");
+    expect(f.serpOk).toBe(1);
+    expect(f.serpBlocked).toBe(0);
+    expect(f.linksObserved).toBe(1);
+    expect(f.linksAccepted).toBe(1);
+    expect(f.linksRejected).toBe(0);
+    expect(f.pagesScheduled).toBe(1);
+    expect(f.pagesNavigated).toBe(1);
+    expect(f.navFailed).toBe(0);
+    expect(f.pagesExtractable).toBe(1);
+    expect(f.extractionEmpty).toBe(0);
+    expect(f.entitiesExtracted).toBe(2);
+    expect(f.normalizedRows).toBe(2);
+    expect(f.emittedRows).toBe(2);
+    expect(f.stage).toBe("OK");
+    expect(f.elapsedMs).toBeGreaterThanOrEqual(0);
+  });
+
+  it("classifies an empty SERP as SEARCH_EMPTY with serpEmpty counted", async () => {
+    const funnels: BrowserQueryFunnel[] = [];
+    const b = browser();
+    const emptySerp: PageSnapshot = { url: "https://duckduckgo.com/html/?q=x", title: "SaaS founders", pageType: "search_results", headings: [], visibleRelevantText: "No results", links: [], interactiveElements: [], selectedFilters: [], loadingState: "complete", friction: [] };
+    b.search = vi.fn(async () => ({ snapshot: emptySerp, action: "search", verified: true }));
+    b.navigate = vi.fn(async () => { throw new Error("BING_UNREACHABLE"); });
+    const rows = await discoverWithBrowser(spec, { browser: b, discoveryQueries: ["SaaS founders"], extractEntities: async () => [],
+      onQueryFunnel: (funnel) => funnels.push(funnel) });
+    expect(rows).toHaveLength(0);
+    expect(funnels).toHaveLength(1);
+    const f = funnels[0];
+    expect(f.serpEmpty).toBe(1);
+    expect(f.serpOk).toBe(0);
+    expect(f.serpBlocked).toBe(0);
+    expect(f.linksObserved).toBe(0);
+    expect(f.emittedRows).toBe(0);
+    expect(f.stage).toBe("SEARCH_EMPTY");
   });
 });

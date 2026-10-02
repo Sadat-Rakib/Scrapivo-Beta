@@ -43,7 +43,7 @@ export type LiveGapfillResult = {
 
 export type LiveGapfillDeps = {
   /** Injectable browser discovery; production always uses the browser adapter. */
-  browser?: ((spec: SearchSpec, options: { searchRunId?: string; signal?: AbortSignal | null; onProgress?: (event: { action: string; source?: string; detail?: string }) => void; researchPlan?: ReturnType<typeof buildResearchPlan>; initialCandidates?: SpecRow[]; desiredCount?: number; isVerified?: (row: SpecRow) => boolean; timeoutMs?: number; onTrace?: (event: import("./browser-live.server").BrowserTraceEvent) => void }) => Promise<SpecRow[]>) | null;
+  browser?: ((spec: SearchSpec, options: { searchRunId?: string; signal?: AbortSignal | null; onProgress?: (event: { action: string; source?: string; detail?: string }) => void; researchPlan?: ReturnType<typeof buildResearchPlan>; initialCandidates?: SpecRow[]; desiredCount?: number; isVerified?: (row: SpecRow) => boolean; timeoutMs?: number; onTrace?: (event: import("./browser-live.server").BrowserTraceEvent) => void; onQueryFunnel?: (funnel: import("./browser-live.server").BrowserQueryFunnel) => void }) => Promise<SpecRow[]>) | null;
   searchRunId?: string;
   ownerId?: string;
   onBrowserProgress?: (event: { action: string; source?: string; detail?: string; count?: number | string; row?: import("@/lib/search/search-browser-progress.server").StreamedLead }) => void;
@@ -793,12 +793,15 @@ export async function runLiveGapfill(
         .slice(0, Math.min(20, Math.max(15, desiredCount * 2)))
     : initialCandidates.filter(researchable).slice(0, 6);
   const researchPlan = buildResearchPlan(spec, { desiredCount });
+  // WS1 per-query funnel accounting, attached to the browser-live diagnostic.
+  const browserQueryFunnels: import("./browser-live.server").BrowserQueryFunnel[] = [];
   const browserOptions = {
     ...(deps.searchRunId ? { searchRunId: deps.searchRunId } : {}),
     ...(deps.ownerId ? { ownerId: deps.ownerId } : {}),
     ...(deps.signal ? { signal: deps.signal } : {}),
     ...(deps.onBrowserProgress ? { onProgress: deps.onBrowserProgress } : {}),
     ...(deps.onBrowserTrace ? { onTrace: deps.onBrowserTrace } : {}),
+    onQueryFunnel: (funnel: import("./browser-live.server").BrowserQueryFunnel) => { browserQueryFunnels.push(funnel); },
     researchPlan,
     initialCandidates: browserSeeds,
     desiredCount,
@@ -846,6 +849,7 @@ export async function runLiveGapfill(
     latencyMs: shouldBrowse ? browserLatencyMs : undefined,
     queries: researchPlan.discoveryQueries.length,
     pages: researchPlan.stoppingRules.maxPages,
+    ...(browserQueryFunnels.length ? { queryFunnel: browserQueryFunnels } : {}),
     ...(browserResult.status === "rejected" ? {
       outcome: "SOURCE_ERROR" as const,
       error: browserResult.reason instanceof Error ? browserResult.reason.message : String(browserResult.reason),

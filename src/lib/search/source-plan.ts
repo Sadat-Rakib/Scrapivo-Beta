@@ -91,6 +91,8 @@ export interface ProviderDiagnostic {
   challenge?: boolean;
   /** Retries spent (PRD §15). */
   retries?: number;
+  /** Per-query browser discovery funnel (WS1 zero-classification); browser-live only. */
+  queryFunnel?: import("./browser-live.server").BrowserQueryFunnel[];
 }
 
 export function deriveCoverageRequirements(spec: SearchSpec): CoverageRequirements {
