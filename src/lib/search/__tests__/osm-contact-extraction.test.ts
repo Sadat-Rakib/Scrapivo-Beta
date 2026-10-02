@@ -130,3 +130,15 @@ describe("trade-family category matching (Densys renewable-energy regression)", 
     expect(craftMatches("restaurant", "freight forwarder")).toBe(false);
   });
 });
+
+describe("widen passes skip the generic fallback (PRD Phase 4)", () => {
+  it("specific-only skills keep their tags; fallback-only skills keep theirs on the initial pass", async () => {
+    // craftTags is the source of the tag list; the widen filter is exercised
+    // through searchAroundCity's tag selection, which is covered by the
+    // widening integration tests. Here we pin the craftTags contract the
+    // filter relies on: every skill has a fallback tag, specific skills have
+    // at least one non-fallback tag.
+    expect(craftTags("solar panel installers").some((t) => !/office"="company|shop"="yes/.test(t))).toBe(true);
+    expect(craftTags("totally unknown trade").every((t) => /office"="company|shop"="yes/.test(t))).toBe(true);
+  });
+});

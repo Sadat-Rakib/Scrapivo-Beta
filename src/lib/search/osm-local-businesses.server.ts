@@ -387,7 +387,15 @@ async function searchAroundCity(
 ): Promise<SourceLead[]> {
   const widen = opts.widen === true;
   const cap = widen ? 300 : 150;
-  const tags = craftTags(skill);
+  const allTags = craftTags(skill);
+  // Widen passes re-run only the SPECIFIC trade tags (PRD Phase 4): the
+  // generic office=company fallback already had its one bounded shot on the
+  // initial pass — re-sweeping it on every widen pass just re-floods the
+  // funnel with the same irrelevant POIs (Windhoek pass 2: 188 artifacts).
+  const fallbackTags = allTags.filter((t) => /office"="company|shop"="yes/.test(t));
+  const tags = widen && fallbackTags.length < allTags.length
+    ? allTags.filter((t) => !fallbackTags.includes(t))
+    : allTags;
   const needle = widen ? nameNeedlesForWiden(skill) : nameNeedleFor(skill);
   const start = Date.now();
   // Try smaller radius first (12km)
