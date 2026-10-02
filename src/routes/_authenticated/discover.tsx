@@ -583,6 +583,11 @@ function DiscoverPage() {
   // so runSearchMut.isPending never fires on this path. Without this the UI
   // looks dead during the S3 scan then pops results "out of blue".
   const [specPending, setSpecPending] = useState(false);
+  // Current-run in-flight flag: set SYNCHRONOUSLY at submit (and when a
+  // chat-initiated search is merely scheduled) so no async gap — 200 ms
+  // deferred beginSearch included — can render the zero banner or fire a
+  // zero toast while the current run is still understanding/searching.
+  const [runInFlight, setRunInFlight] = useState(false);
   const [browserProgressRun, setBrowserProgressRun] = useState<string | null>(null);
   type StreamedLead = import("@/lib/search/search-browser-progress.server").StreamedLead;
   const [browserProgressEvents, setBrowserProgressEvents] = useState<Array<{ id: number; action: string; source?: string; detail?: string; count?: number | string; row?: StreamedLead }>>([]);
@@ -672,6 +677,7 @@ function DiscoverPage() {
     pendingTurnAnswersRef.current = merged;
     // M11: abort prior run + mint identity before any UI mutation.
     const session = getSearchSession();
+    setRunInFlight(true);
     const { run, signal } = session.begin({
       conversation_id: getConversationId(),
       turn_id: turnId,
@@ -917,6 +923,7 @@ function DiscoverPage() {
       // must not hide the newer search's spinner.
       if (session.activeRunId === run.search_run_id) {
         setSpecPending(false);
+        setRunInFlight(false);
       }
     }
   };
@@ -1412,6 +1419,7 @@ function DiscoverPage() {
         // Through beginSearch, so a search Scrapy starts from the chat gets the
         // same clarifier a typed one does. Calling the mutation directly here
         // was a second way to reach results with the questions skipped.
+        setRunInFlight(true);
         setTimeout(() => void beginSearch(q), 200);
       }
     },
@@ -1499,6 +1507,7 @@ function DiscoverPage() {
     setBrowserProgressEvents([]);
     setStreamedMissing([]);
     setSpecPending(false);
+    setRunInFlight(false);
   };
   const clearWorkspace = () => {
     stopSearch();
@@ -2279,6 +2288,7 @@ function DiscoverPage() {
                   the search had even run. No results box while clarifying. */}
               {!runSearchMut.isPending &&
                 !specPending &&
+                !runInFlight &&
                 clarifyQs.length === 0 &&
                 !turns[turns.length - 1]?.results &&
                 activeQuery &&
