@@ -2381,21 +2381,11 @@ function DiscoverPage() {
                   compact={planDone}
                   onDone={() => setPlanDone(true)}
                 />
-                {/* E2E-C14: the stop control is viewport-anchored on purpose.
-                    The old inline button sat under live narration/activity that
-                    re-renders every poll, so it never sat still long enough for
-                    a click to land (45s actionability timeout during browsing).
-                    The floating control holds one position during understanding,
-                    browsing and streaming and is the single stop affordance. */}
-                {specPending && (
-                  <button
-                    type="button"
-                    onClick={stopSearch}
-                    className="fixed bottom-24 right-4 z-50 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-lg hover:bg-muted sm:bottom-4"
-                  >
-                    Stop search
-                  </button>
-                )}
+                {/* E2E-C14 stop control: the composer button is now the single
+                    stop affordance (PRD V2 WS5) — it sits in the stable footer,
+                    holds one position during browsing and is always clickable.
+                    The old floating pill is removed; the accessible name
+                    "Stop search" is preserved for the cancel harness. */}
                 {browserProgressEvents.length > 0 && (
                   <div className={`mt-2 border-t border-border pt-2 space-y-1 ${activityExpanded ? "max-h-44 overflow-y-auto" : ""}`} aria-live="polite" aria-label="Live research activity">
                     {(activityExpanded
@@ -2551,6 +2541,7 @@ function DiscoverPage() {
                 if (m === "chat") setChatOpen(true);
               }}
               onSubmit={onSubmit}
+              onStop={stopSearch}
               pending={pending}
               tier={tier}
               onTierChange={setTier}

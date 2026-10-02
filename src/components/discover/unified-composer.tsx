@@ -2,6 +2,7 @@ import { useRef, useImperativeHandle, forwardRef, useState, useEffect } from "re
 import { createPortal } from "react-dom";
 import {
   ArrowUp,
+  Square,
   Loader2,
   Plus,
   Brain,
@@ -32,6 +33,9 @@ type Props = {
   mode: ComposerMode;
   onModeChange: (m: ComposerMode) => void;
   onSubmit: () => void;
+  /** While pending, the submit button becomes Stop (PRD V2 WS5): the composer
+   *  is the single stop affordance — stable, reachable, always clickable. */
+  onStop?: () => void;
   pending: boolean;
   maxChars?: number;
   /** Legacy: the Search/Chat toggle UI was removed (Mode + Thinker replace it).
@@ -218,6 +222,7 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
     onModeChange,
     onSubmit,
     pending,
+  onStop,
     maxChars = 3000,
     tier = "scrapy",
     onTierChange,
@@ -501,15 +506,27 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
           />
         </span>
 
-        {/* Submit */}
-        <button
-          onClick={submit}
-          disabled={pending || !value.trim()}
-          aria-label="Send"
-          className="size-9 rounded-full bg-white text-black flex items-center justify-center hover:bg-white/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all shrink-0 shadow-[0_4px_16px_rgba(255,255,255,0.25)]"
-        >
-          {pending ? <Loader2 className="size-4 animate-spin" /> : <ArrowUp className="size-4" />}
-        </button>
+        {/* Submit — becomes Stop while a run is active (PRD V2 WS5). */}
+        {pending && onStop ? (
+          <button
+            type="button"
+            onClick={onStop}
+            aria-label="Stop search"
+            title="Stop search"
+            className="size-9 rounded-full bg-foreground text-background flex items-center justify-center hover:opacity-90 transition-all shrink-0 shadow-[0_4px_16px_rgba(255,255,255,0.25)]"
+          >
+            <Square className="size-3.5 fill-current" />
+          </button>
+        ) : (
+          <button
+            onClick={submit}
+            disabled={pending || !value.trim()}
+            aria-label="Send"
+            className="size-9 rounded-full bg-white text-black flex items-center justify-center hover:bg-white/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all shrink-0 shadow-[0_4px_16px_rgba(255,255,255,0.25)]"
+          >
+            {pending ? <Loader2 className="size-4 animate-spin" /> : <ArrowUp className="size-4" />}
+          </button>
+        )}
       </div>
     </div>
   );
