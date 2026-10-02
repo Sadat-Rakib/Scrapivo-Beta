@@ -3,7 +3,7 @@
   "query": "Find 12 solar panel installers in Windhoek, Namibia with public phone numbers",
   "category": "local",
   "viewport": "desktop",
-  "startedAt": "2026-10-02T15:52:42.512Z",
+  "startedAt": "2026-10-02T17:47:13.293Z",
   "main": {
     "query": "Find 12 solar panel installers in Windhoek, Namibia with public phone numbers",
     "clarify": [
@@ -16,23 +16,25 @@
     "streamed": [],
     "activity": [
       "Checked available records · Available records · 0",
-      "Working · Public business sources · Windhoek, Namibia",
+      "Working · Public business sources · Windhoek Namibia",
       "Found local businesses · Public business sources · 149",
-      "Reading page · contractors1000.com · 704 characters",
+      "Query funnel · The web · 0",
       "Checked public sources · Public business sources · 149",
       "Widening the search · Public source · pass 1 of 3",
       "Show all activity (12)",
       "Found local businesses · Public business sources · 188",
-      "Found possible leads · Public source · 10 links",
-      "Opening result · enfsolar.com",
+      "Reading page · wikinam.org",
+      "Reading page · wikinam.org · 12861 characters",
+      "Opening result · engineering10.com",
       "Widen pass complete · Public business sources · 0 new candidates",
-      "Widening the search · Public source · pass 2 of 3"
+      "Widening the search · Public source · pass 2 of 3",
+      "Reading page · wikinam.org · 13111 characters"
     ],
     "bubbleVerbatim": true,
     "runningAt": 47,
     "clarifyAt": 94,
     "clarifyRepeats": 0,
-    "pill": "Scrapy is browsing · contractors1000.com · 4 pages · 00:27",
+    "pill": "Scrapy is browsing · contractors1000.com · 4 pages · 00:26",
     "miniBrowserAt": 191,
     "viewingOnly": true,
     "settled": true,
@@ -77,15 +79,15 @@
       "event": "a: running"
     },
     {
-      "t": 102,
+      "t": 103,
       "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
     },
     {
-      "t": 200,
-      "event": "a: mini-browser (Scrapy is browsing · contractors1000.com · 4 pages · 00:27)"
+      "t": 201,
+      "event": "a: mini-browser (Scrapy is browsing · contractors1000.com · 4 pages · 00:26)"
     },
     {
-      "t": 619,
+      "t": 620,
       "event": "a: settled"
     }
   ],
@@ -94,6 +96,6 @@
     "ui/W2-a-3-mini-browser.jpg",
     "ui/W2-a-6-final.jpg"
   ],
-  "durationS": 625,
-  "responseBytes": 28694
+  "durationS": 626,
+  "responseBytes": 33920
 }
