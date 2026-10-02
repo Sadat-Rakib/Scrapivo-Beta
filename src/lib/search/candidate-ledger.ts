@@ -175,7 +175,11 @@ export function createCandidateLedger() {
       const incompleteReasons: Record<string, number> = {};
       for (const entry of entries) {
         counts[entry.fate] += 1;
-        if (entry.fate === "rejected" && entry.reason) rejectReasons[entry.reason] = (rejectReasons[entry.reason] ?? 0) + 1;
+        // Filtered rows carry their rejection dimension too (rejected_category
+        // / rejected_location / …) — the Windhoek autopsy showed 149 filtered
+        // rows with rejectReasons {} because only fate "rejected" was tallied.
+        if ((entry.fate === "rejected" || entry.fate === "filtered") && entry.reason)
+          rejectReasons[entry.reason] = (rejectReasons[entry.reason] ?? 0) + 1;
         if (entry.fate === "incomplete" && entry.reason) incompleteReasons[entry.reason] = (incompleteReasons[entry.reason] ?? 0) + 1;
       }
       const streamed = entries.filter((entry) => entry.streamed);

@@ -535,15 +535,25 @@ const ROLE_WORD_RE =
  * establish. Strict rowSatisfiesSpec stays the post-research judge; this
  * gate only decides whether a candidate survives INTO research.
  */
-export function rowCouldSatisfySpec(spec: SearchSpec, row: SpecRow): boolean {
-  if (violatesExclusion(spec, row)) return false;
-  if ((spec.locations?.length ?? 0) > 1) return spec.locations!.some((place) =>
-    rowCouldSatisfySpec({
-      ...spec,
-      locations: [place],
-      criteria: [...spec.criteria.filter((criterion) => criterion.field !== "location"),
-        { field: "location", value: place, stated: true, confidence: 1 }],
-    }, row));
+/**
+ * Why a row cannot satisfy the spec at the pre-research gate — null when it
+ * still could. Same decisions rowCouldSatisfySpec has always made; the reason
+ * only feeds the ledger so rejection buckets are explorable (Windhoek manual
+ * QA: 149 rows filtered with rejectReasons {} — invisible losses).
+ */
+export function rowSatisfyRejectReason(spec: SearchSpec, row: SpecRow): string | null {
+  if (violatesExclusion(spec, row)) return "rejected_exclusion";
+  if ((spec.locations?.length ?? 0) > 1) {
+    for (const place of spec.locations!) {
+      if (!rowSatisfyRejectReason({
+        ...spec,
+        locations: [place],
+        criteria: [...spec.criteria.filter((criterion) => criterion.field !== "location"),
+          { field: "location", value: place, stated: true, confidence: 1 }],
+      }, row)) return null;
+    }
+    return "rejected_location";
+  }
   if (spec.entity === "person") {
     const role = fieldOf(spec, "role");
     const industry = fieldOf(spec, "industry");
@@ -552,7 +562,7 @@ export function rowCouldSatisfySpec(spec: SearchSpec, row: SpecRow): boolean {
       const explicitRole =
         (row.role && row.role.trim()) ||
         (row.title && ROLE_WORD_RE.test(row.title) ? row.title : null);
-      if (explicitRole && !personRoleMatches(explicitRole, role)) return false;
+      if (explicitRole && !personRoleMatches(explicitRole, role)) return "rejected_role";
     }
     if (
       industry &&
@@ -561,10 +571,10 @@ export function rowCouldSatisfySpec(spec: SearchSpec, row: SpecRow): boolean {
       !like(row.industry, industry) &&
       !(/^saas$/i.test(industry) && /software[ -]as[ -]a[ -]service/i.test(row.industry))
     )
-      return false;
+      return "rejected_industry";
     if (location && (row.location || row.country) && !locationOk(row.country, row.location, "", location))
-      return false;
-    return true;
+      return "rejected_location";
+    return null;
   }
   if (spec.entity === "business") {
     const cat = fieldOf(spec, "category");
@@ -577,10 +587,10 @@ export function rowCouldSatisfySpec(spec: SearchSpec, row: SpecRow): boolean {
       !like(row.title, cat) &&
       !like(row.detail, cat)
     )
-      return false;
+      return "rejected_category";
     if (location && (row.location || row.country) && !locationOk(row.country, row.location, "", location))
-      return false;
-    return true;
+      return "rejected_location";
+    return null;
   }
   if (spec.entity === "company") {
     const cat = fieldOf(spec, "category") ?? fieldOf(spec, "industry");
@@ -593,14 +603,18 @@ export function rowCouldSatisfySpec(spec: SearchSpec, row: SpecRow): boolean {
       !companyCategoryMatches(row.detail, cat) &&
       !like(row.title, cat)
     )
-      return false;
+      return "rejected_category";
     if (location && (row.location || row.country) && !locationOk(row.country, row.location, "", location))
-      return false;
-    return true;
+      return "rejected_location";
+    return null;
   }
   // investor/job rows are structured enough that strict validation is the
   // contradiction judge; no researchable-unknown gap has been shown there.
-  return rowSatisfiesSpec(spec, row);
+  return rowSatisfiesSpec(spec, row) ? null : "rejected_spec";
+}
+
+export function rowCouldSatisfySpec(spec: SearchSpec, row: SpecRow): boolean {
+  return rowSatisfyRejectReason(spec, row) === null;
 }
 
 /**
@@ -2209,12 +2223,14 @@ export async function runSpecSearchCore(
         });
         // Pre-research gate: drop only hard contradictions. Unknown
         // role/industry/location is researchable, not rejectable — the strict
-        // rowSatisfiesSpec runs after enrichment, on the final split.
+        // rowSatisfiesSpec runs after enrichment, on the final split. The
+        // failing dimension is booked so rejection buckets stay explorable.
         const liveSanitized: SpecRow[] = [];
         for (const r of live.rows.map((row) => sanitizeSpecRow(row, spec))) {
-          if (rowCouldSatisfySpec(spec, r)) liveSanitized.push(r);
+          const rejectReason = rowSatisfyRejectReason(spec, r);
+          if (!rejectReason) liveSanitized.push(r);
           // A merge can surface a contradicting fact after a lead streamed.
-          else ledger.filtered(r);
+          else ledger.filtered(r, rejectReason);
         }
         liveSpecMatchCount = liveSanitized.length;
         completeRows = [...completeRows, ...liveSanitized.filter((r) => r.complete !== false)];
@@ -2237,9 +2253,12 @@ export async function runSpecSearchCore(
               rowsScanned: social.rows.length,
               rowsReturned: social.rows.length,
             });
-            const socialSanitized = social.rows
-              .map((r) => sanitizeSpecRow(r, spec))
-              .filter((r) => rowCouldSatisfySpec(spec, r) || (ledger.filtered(r), false));
+            const socialSanitized: SpecRow[] = [];
+            for (const r of social.rows.map((row) => sanitizeSpecRow(row, spec))) {
+              const rejectReason = rowSatisfyRejectReason(spec, r);
+              if (!rejectReason) socialSanitized.push(r);
+              else ledger.filtered(r, rejectReason);
+            }
             completeRows = [
               ...completeRows,
               ...socialSanitized.filter((r) => r.complete !== false),

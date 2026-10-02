@@ -5,7 +5,7 @@
  * elementsToLeads. The qualification gate itself is never touched here.
  */
 import { describe, expect, it } from "vitest";
-import { elementsToLeads, splitOsmContactValues } from "../osm-local-businesses.server";
+import { craftTags, elementsToLeads, nameNeedleFor, splitOsmContactValues } from "../osm-local-businesses.server";
 
 type El = { type: string; id: number; tags: Record<string, string> };
 
@@ -93,5 +93,29 @@ describe("elementsToLeads contact extraction", () => {
       },
     }], "Mississauga", "roofers", 10);
     expect(lead[0].full_post_url).toBe("https://first.example");
+  });
+});
+
+describe("acquisition vocabulary for the V2 manual-QA trades", () => {
+  it("maps solar/photovoltaic skills to solar-specific OSM tags, not the generic office dump", () => {
+    const tags = craftTags("solar panel installer");
+    expect(tags).toContain('"craft"="photovoltaic"');
+    expect(tags).not.toEqual(['"office"="company"', '"shop"="yes"']);
+    expect(nameNeedleFor("solar panel installer")).toMatch(/solar/);
+  });
+
+  it("maps construction, photographer and freight-forwarding skills (Banja Luka / Cebu / Tbilisi classes)", () => {
+    expect(craftTags("construction companies")).toContain('"office"="construction_company"');
+    expect(nameNeedleFor("construction companies")).toMatch(/construct/);
+    expect(craftTags("wedding photographers")).toContain('"shop"="photo"');
+    expect(nameNeedleFor("wedding photographers")).toMatch(/photo/);
+    expect(craftTags("freight forwarding companies")).toContain('"office"="forwarding_agent"');
+    expect(nameNeedleFor("freight forwarding companies")).toMatch(/freight|forward/);
+  });
+
+  it("keeps the existing mappings intact (no regressions)", () => {
+    expect(craftTags("roofers")).toContain('"craft"="roofer"');
+    expect(craftTags("plumbers")).toContain('"craft"="plumber"');
+    expect(nameNeedleFor("roofers")).toBe("roof");
   });
 });

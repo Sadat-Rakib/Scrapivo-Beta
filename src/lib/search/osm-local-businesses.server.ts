@@ -28,13 +28,30 @@ const OVERPASS_MIRRORS = [
  *  in uptime/latency; probing dead ones costs seconds per query). */
 let preferredOverpass = 0;
 
-function craftTags(skill: string): string[] {
+export function craftTags(skill: string): string[] {
   const s = (skill || "").toLowerCase();
   if (/dentist|dental|ortho/.test(s))
     return ['"amenity"="dentist"', '"healthcare"="dentist"', '"amenity"="clinic"'];
   if (/\bplumb/.test(s)) return ['"craft"="plumber"', '"shop"="hardware"', '"office"="company"'];
   if (/\broof/.test(s)) return ['"craft"="roofer"', '"office"="company"'];
   if (/\belectric/.test(s)) return ['"craft"="electrician"', '"office"="company"'];
+  if (/solar|photovoltaic|\bpv\b/.test(s)) {
+    return ['"craft"="photovoltaic"', '"shop"="solar"', '"craft"="electrician"', '"office"="company"'];
+  }
+  if (/construct|builder|contract|renovat|civil/.test(s)) {
+    return [
+      '"craft"="builder"',
+      '"office"="construction_company"',
+      '"craft"="carpenter"',
+      '"office"="company"',
+    ];
+  }
+  if (/photograph|photo|fotograf|studio/.test(s)) {
+    return ['"shop"="photo"', '"craft"="photographer"', '"office"="company"'];
+  }
+  if (/freight|forward|logistic|shipping|sped/.test(s)) {
+    return ['"office"="forwarding_agent"', '"office"="logistics"', '"office"="company"'];
+  }
   if (/\bhvac|heating|cooling|air.?cond/.test(s)) {
     return [
       '"craft"="hvac"',
@@ -55,11 +72,15 @@ function craftTags(skill: string): string[] {
   return ['"office"="company"', '"shop"="yes"'];
 }
 
-function nameNeedleFor(skill: string): string {
+export function nameNeedleFor(skill: string): string {
   const s = (skill || "").toLowerCase();
   if (/\bplumb/.test(s)) return "plumb";
   if (/\broof/.test(s)) return "roof";
   if (/\belectric/.test(s)) return "electric";
+  if (/solar|photovoltaic|\bpv\b/.test(s)) return "solar|photovoltaic|pv|energy";
+  if (/construct|builder|contract|renovat|civil/.test(s)) return "construct|build|contract|civil";
+  if (/photograph|photo|fotograf|studio/.test(s)) return "photo|fotograf|studio";
+  if (/freight|forward|logistic|shipping|sped/.test(s)) return "freight|forward|logistic|sped|transport";
   if (/\bhvac|heating|cooling|air.?cond/.test(s)) return "hvac|heating|cooling|air.?cond|climate";
   if (/dentist|dental/.test(s)) return "dentist|dental";
   if (/law|attorney|legal/.test(s)) return "law|attorney|legal";

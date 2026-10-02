@@ -229,3 +229,17 @@ describe("interactive widening loop (runSpecSearchCore)", () => {
     expect(calls.filter((c) => c.widen).length).toBe(passes);
   }, 30_000);
 });
+
+describe("rejection-reason booking (Windhoek 149 autopsy)", () => {
+  it("rows rejected by the pre-research gate carry their failing dimension into rejectReasons", async () => {
+    const { createCandidateLedger } = await import("../candidate-ledger");
+    const ledger = createCandidateLedger();
+    const row = { key: "k1", entity_id: "k1", title: "Generic Trading CC", category: "company", location: "Windhoek" } as never;
+    ledger.retrieved(row);
+    ledger.filtered(row, "rejected_category");
+    const summary = ledger.summary();
+    expect(summary.counts.filtered).toBe(1);
+    expect(summary.rejectReasons).toEqual({ rejected_category: 1 });
+    expect(summary.accounting?.unaccounted ?? 0).toBe(0);
+  });
+});
