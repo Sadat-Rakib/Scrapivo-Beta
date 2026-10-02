@@ -119,3 +119,14 @@ describe("acquisition vocabulary for the V2 manual-QA trades", () => {
     expect(nameNeedleFor("roofers")).toBe("roof");
   });
 });
+
+describe("trade-family category matching (Densys renewable-energy regression)", () => {
+  it("matches observed super-categories to requested trades without loosening constraints", async () => {
+    const { craftMatches } = await import("@/lib/canonical/businesses.server");
+    expect(craftMatches("renewable energy", "solar panel installer")).toBe(true);
+    expect(craftMatches("wedding photographer", "photographer")).toBe(true);
+    expect(craftMatches("construction company", "construction companies")).toBe(true);
+    expect(craftMatches("baker", "solar panel installer")).toBe(false);
+    expect(craftMatches("restaurant", "freight forwarder")).toBe(false);
+  });
+});

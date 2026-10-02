@@ -230,7 +230,34 @@ export function craftMatches(a: unknown, b: unknown): boolean {
   if (typeof a !== "string" || typeof b !== "string") return false;
   // Only the literal word ("clinics" → clinic rows), never its alias target.
   if (BROADENING_QUERY_WORDS.has(a.toLowerCase().trim())) return singularCraft(plainCraft(a)) === singularCraft(plainCraft(b));
-  return looseCraftEqual(canonCraft(a), canonCraft(b));
+  if (looseCraftEqual(canonCraft(a), canonCraft(b))) return true;
+  // Trade families: "renewable energy" vs "solar panel installer" is not a
+  // hard contradiction — it is researchable (the pre-research gate drops only
+  // contradictions; the strict post-research gate judges on evidence). Two
+  // crafts that name the same trade family pass this gate.
+  const fa = tradeFamilyOf(a);
+  return !!fa && fa === tradeFamilyOf(b);
+}
+
+/** Trade keywords → family. A category string mentioning a family keyword
+ *  (solar, freight, photograph, …) belongs to that trade for gate matching. */
+const TRADE_FAMILIES: Array<[RegExp, string]> = [
+  [/solar|photovoltaic|\bpv\b|renewable/i, "solar"],
+  [/construct|builder|building|contract|civil|renovat/i, "construction"],
+  [/photograph|photograf|\bphoto\b|studio/i, "photography"],
+  [/freight|forward|logistic|shipping|sped/i, "freight"],
+  [/\bplumb/i, "plumbing"],
+  [/\broof/i, "roofing"],
+  [/electric/i, "electrical"],
+  [/hvac|heating|cooling|air conditioning/i, "hvac"],
+  [/dentist|dental/i, "dental"],
+];
+
+function tradeFamilyOf(craft: unknown): string | null {
+  if (typeof craft !== "string") return null;
+  const s = craft.toLowerCase();
+  for (const [pattern, family] of TRADE_FAMILIES) if (pattern.test(s)) return family;
+  return null;
 }
 
 export async function searchBusinessesDB(q: {
