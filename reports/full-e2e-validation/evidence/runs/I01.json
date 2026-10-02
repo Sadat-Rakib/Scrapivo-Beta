@@ -3,162 +3,95 @@
   "query": "People looking for a web designer",
   "category": "intent",
   "viewport": "desktop",
-  "startedAt": "2026-10-01T11:25:22.802Z",
-  "fatal": "page.waitForTimeout: Target page, context or browser has been closed",
-  "server": {
-    "runId": "run_8bedc3b7",
-    "specRuns": 4,
-    "spec": {
+  "startedAt": "2026-10-01T23:19:08.308Z",
+  "main": {
+    "query": "People looking for a web designer",
+    "clarify": [
+      {
+        "question": "Which location should I focus on (city, region, or country)?",
+        "chosen": "Skip",
+        "t": 110
+      },
+      {
+        "question": "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?",
+        "chosen": "Search with defaults",
+        "t": 112
+      }
+    ],
+    "streamed": [],
+    "activity": [
+      "Checked available records · Available records · 51"
+    ],
+    "bubbleVerbatim": true,
+    "runningAt": 14,
+    "pill": "Scrapy browser session · ca.linkedin.com · 6 pages · 00:12",
+    "miniBrowserAt": 106,
+    "viewingOnly": true,
+    "clarifyAt": 110,
+    "clarifyRepeats": 0,
+    "settled": true,
+    "durationS": 402,
+    "firstStreamS": null,
+    "header": {
       "query": "People looking for a web designer",
-      "entity": "person",
-      "status": "ready_to_search",
-      "outcome": "NO_QUALIFIED_RESULTS",
-      "criteria": [
-        "requested_service=web designer"
-      ],
-      "retrieved": 57,
-      "returned": 0,
-      "qualified": 0,
-      "rejected": 0,
-      "pendingEnrichment": 0,
-      "liveDiscovery": "completed",
-      "signalRequired": true,
-      "reason": "FAILED_QUALIFICATION",
-      "timings": {
-        "understanding_ms": 1,
-        "stored_search_ms": 9605,
-        "research_ms": 25961,
-        "enrichment_ms": 2,
-        "qualification_ms": 216,
-        "total_ms": 35785
-      },
-      "sources": [
-        "s3-parquet:51/51",
-        "live-browser:6/6"
-      ],
-      "funnel": {
-        "raw": 57,
-        "postSpec": 57,
-        "complete": 51,
-        "qualRejected": 51,
-        "qualified": 0
-      },
-      "sourceHealth": {
-        "summary": null,
-        "sources": [
-          "Public websites:unavailable",
-          "The web:unavailable",
-          "Public websites:healthy"
-        ]
-      }
+      "count": 0
     },
-    "ledger": {
-      "search_run_id": "run_8bedc3b7",
-      "counts": {
-        "returned": 0,
-        "qualified_more": 0,
-        "rejected": 51,
-        "gated": 0,
-        "filtered": 0,
-        "incomplete": 0,
-        "excluded": 0,
-        "unaccounted": 0
-      },
-      "rejectReasons": {
-        "CLAIM_TYPE_MISMATCH": 51
-      },
-      "streamed": 0,
-      "streamedNotReturned": []
-    },
-    "runtime": [
-      {
-        "requested": "worker",
-        "used": "worker",
-        "reason": null
-      }
-    ],
-    "browserDone": [
-      {
-        "status": "completed",
-        "reason": "diminishing_returns",
-        "candidates": 6,
-        "researched": 0,
-        "verified": 0,
-        "visited": 4,
-        "elapsedMs": 21616
-      }
-    ],
-    "searches": 3,
-    "qualRejected": [
-      "Linda Simmons — Owner @ PLAYRITE, LLC: CLAIM_TYPE_MISMATCH",
-      "Grant Leishman — CEO and Founder @ GrowUp Greenwalls: CLAIM_TYPE_MISMATCH",
-      "Becky Hobbs — Co-Founder & COO @ OLarry: CLAIM_TYPE_MISMATCH",
-      "Mark Gatz — Owner @ SERVPRO of Gilbert, Chandler South & Ahwatukee/S. Tempe (FirePit Holdings Corp): CLAIM_TYPE_MISMATCH",
-      "Michael Lishewski — VP Business Development and Co-Founder @ Xecutive Recruitment Inc.: CLAIM_TYPE_MISMATCH",
-      "Edward Dooling — CEO and Co-Founder @ Vanguard Healthcare Staffing: CLAIM_TYPE_MISMATCH",
-      "Ashok Seetharaman — CoFounder & CIO / CPO @ Bono Network: CLAIM_TYPE_MISMATCH",
-      "Madhu Nalamothu — CEO @ HL Solutions LLC: CLAIM_TYPE_MISMATCH"
-    ],
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": true,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nSaaS founders with public contact details\nExpand (1 results)\nWeb designers in New York\nExpand (0 results)\nPeople looking for a web designer\nExpand (0 results)\nWeb designers in New York\nExpand (0 results)\nPeople looking for a web designer\nResults for \"People looking for a web designer\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\n51 candidates were checked, but none passed verification. Try broadening criteria or removing a constraint.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nScrapy\nCOMPLETED\nca.linkedin.com\nExtracting\n· Seedbox Technologies is looking for a great Web Designer. | Jinbee AHN\n6 pages\n11 actions\n00:12\nOpen original\nViewing only. Taking control needs the browser worker.\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without"
+  },
+  "server": {
+    "runId": null,
+    "specRuns": 0,
+    "spec": null,
+    "ledger": null,
+    "runtime": [],
+    "browserDone": [],
+    "searches": 0,
+    "qualRejected": [],
     "errors": [],
     "aiRouter": []
   },
   "worker": [],
   "toasts": [],
   "console": [
-    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps"
+    "info: [ui-projection] server=0 projected=0 rejected=0 codes={}"
   ],
   "pageErrors": [],
   "timeline": [
     {
-      "t": 4,
+      "t": 5,
       "event": "a: submitted"
     },
     {
-      "t": 14,
+      "t": 18,
       "event": "a: running"
     },
     {
-      "t": 61,
-      "event": "a: mini-browser (Scrapy browser kept open · reddit.com · 7 pages · 00:40)"
+      "t": 112,
+      "event": "a: mini-browser (Scrapy browser session · ca.linkedin.com · 6 pages · 00:12)"
     },
     {
-      "t": 63,
+      "t": 114,
       "event": "a: clarify \"Which location should I focus on (city, region, or country)?\" -> Skip"
     },
     {
-      "t": 65,
+      "t": 117,
       "event": "a: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
     },
     {
-      "t": 123,
-      "event": "a: clarify \"Which location should I focus on (city, region, or country)?\" -> Skip"
-    },
-    {
-      "t": 125,
-      "event": "a: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
-    },
-    {
-      "t": 182,
-      "event": "a: clarify \"Which location should I focus on (city, region, or country)?\" -> Skip"
-    },
-    {
-      "t": 184,
-      "event": "a: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
-    },
-    {
-      "t": 1816,
-      "event": "a: TIMEOUT"
-    },
-    {
-      "t": 1816,
-      "event": "fatal: page.waitForTimeout: Target page, context or browser has been closed"
+      "t": 406,
+      "event": "a: settled"
     }
   ],
   "screenshots": [
     "ui/I01-a-3-mini-browser.jpg",
     "ui/I01-a-1-clarify.jpg",
-    "ui/I01-fatal.jpg"
+    "ui/I01-a-6-final.jpg"
   ],
-  "durationS": 1816,
-  "responseBytes": 17984
+  "durationS": 412,
+  "responseBytes": 18181
 }

@@ -3,7 +3,7 @@
   "query": "find startup founders worldwide building fintech",
   "category": "messy",
   "viewport": "desktop",
-  "startedAt": "2026-10-01T14:12:54.187Z",
+  "startedAt": "2026-10-01T21:22:13.465Z",
   "main": {
     "query": "find startup founders worldwide building fintech",
     "clarify": [
@@ -11,21 +11,6 @@
         "question": "What are you trying to do with these results?",
         "chosen": "Find prospects",
         "t": 3
-      },
-      {
-        "question": "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?",
-        "chosen": "Search with defaults",
-        "t": 69
-      },
-      {
-        "question": "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?",
-        "chosen": "Search with defaults",
-        "t": 132
-      },
-      {
-        "question": "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?",
-        "chosen": "Search with defaults",
-        "t": 197
       }
     ],
     "streamed": [],
@@ -33,145 +18,65 @@
       "Checked available records · Available records · 0"
     ],
     "bubbleVerbatim": true,
-    "clarifyAt": 3,
-    "clarifyRepeats": 3,
-    "runningAt": 20,
-    "pill": "Scrapy browser kept open · cofoundex.com · 8 pages · 00:40",
-    "miniBrowserAt": 65,
+    "clarifyAt": 2,
+    "clarifyRepeats": 0,
+    "runningAt": 8,
+    "pill": "Scrapy browser kept open · us.foundersbase.com · 7 pages · 00:39",
+    "miniBrowserAt": 53,
     "viewingOnly": false,
-    "clarifyStuck": true,
-    "durationS": 260,
+    "settled": true,
+    "durationS": 239,
     "firstStreamS": null,
-    "timedOut": true,
-    "header": null,
+    "header": {
+      "query": "find startup founders worldwide building fintech",
+      "count": 0
+    },
     "leadCards": [],
     "businessCards": [],
     "zeroText": null,
     "reconciliation": null,
     "viewingOnlyFinal": false,
-    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nDentists in Calgary with websites\nExpand (50 results)\nMarketing agencies in Vancouver\nRoofers in Mississauga with phone numbers\nExpand (1 results)\nCopywriters in Toronto\nExpand (1 results)\nFractional CMOs in Canada\nExpand (1 results)\nWeb designers in New York\nRecruiters hiring software engineers\nSales consultants in London\nFounders complaining about lead generation\nExpand (50 results)\nBusinesses saying they need a new website\nPeople looking for an SEO agency\nCybersecurity companies in Ottawa with websites\nAI startups in Montreal hiring engineers\nPre-seed investors in Canada investing in SaaS\nExpand (0 results)\nBusinesses saying they need a new website\nAngel investors in Toronto for healthtech startups\nExpand (0 results)\nRemote frontend developer jobs\nExpand (4 results)\nData engineer jobs in Berlin with salary\nyo find me saas founders canada need sales help email if possible\nExpand (0 results)\nneed dentists portland phone number\nExpand (41 results)\nfind startup founders worldwide building fintech\nUnderstanding: people\nReading page · cofoundex.com · 11761 characters\nFound possible leads · 0 candidates; 0 verified\nChecked contact details · Public contact details · 0 candidates\nShow all activity (12)\nScrapy\nKEPT OPEN\ncofoundex.com\nOpening result\n· Find Your Perfect Co-Founder | CoFoundex - #1 Matching Platform\n8 pages\n8 actions\n00:45\nOpen original\nTake control\nClose browser\nNarrow this down1 question\nNarrow this down\nQuestion 1 of 1\n\nAny particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?\n\nSaaS\nSoftware companies\nFintech\nFinancial tech\nHealthcare\nHealth companies\nUse\nSearch with defaults\nSearch\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better webs"
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nPeople looking for a web designer\nExpand (0 results)\nFounders complaining about lead generation\nExpand (0 results)\nfind startup founders worldwide building fintech\nResults for \"find startup founders worldwide building fintech\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\nScrapy\nKEPT OPEN\nus.foundersbase.com\nOpening result\n· Find a Co-Founder in USA | Foundersbase\n7 pages\n7 actions\n03:47\nOpen original\nTake control\nClose browser\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n10 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n"
   },
   "server": {
-    "runId": "run_ef268925",
-    "specRuns": 4,
-    "spec": {
-      "query": "find startup founders worldwide building fintech",
-      "entity": "person",
-      "status": "ready_to_search",
-      "outcome": "NO_QUALIFIED_RESULTS",
-      "criteria": [
-        "role=startup founder",
-        "location=worldwide building fintech",
-        "location_id=geo:stated:worldwide-building-fintech",
-        "location_kind=stated",
-        "purpose=prospecting"
-      ],
-      "retrieved": 0,
-      "returned": 0,
-      "qualified": 0,
-      "rejected": 0,
-      "pendingEnrichment": 0,
-      "liveDiscovery": "completed",
-      "signalRequired": false,
-      "reason": "SOURCE_UNAVAILABLE",
-      "timings": {
-        "understanding_ms": 3,
-        "stored_search_ms": 15182,
-        "research_ms": 30207,
-        "enrichment_ms": 0,
-        "qualification_ms": 1,
-        "total_ms": 45393
-      },
-      "sources": [
-        "pg-index:0/0",
-        "s3-parquet:290605/0"
-      ],
-      "funnel": {
-        "raw": 0,
-        "postSpec": 0,
-        "complete": 0,
-        "qualRejected": 0,
-        "qualified": 0
-      },
-      "sourceHealth": {
-        "summary": "Some sources could not be searched this time (Available records), so results may be incomplete.",
-        "sources": [
-          "Public websites:unavailable",
-          "The web:unavailable",
-          "Public websites:empty",
-          "Available records:unavailable"
-        ]
-      }
-    },
+    "runId": null,
+    "specRuns": 0,
+    "spec": null,
     "ledger": null,
-    "runtime": [
-      {
-        "requested": "worker",
-        "used": "worker",
-        "reason": null
-      }
-    ],
-    "browserDone": [
-      {
-        "status": "completed",
-        "reason": "diminishing_returns",
-        "candidates": 0,
-        "researched": 0,
-        "verified": 0,
-        "visited": 4,
-        "elapsedMs": 29937
-      }
-    ],
-    "searches": 3,
+    "runtime": [],
+    "browserDone": [],
+    "searches": 0,
     "qualRejected": [],
     "errors": [],
-    "aiRouter": [
-      "[ai-router] groq:openai/gpt-oss-120b daily quota exhausted; held",
-      "[ai-router] groq:openai/gpt-oss-20b daily quota exhausted; held"
-    ]
+    "aiRouter": []
   },
   "worker": [],
   "toasts": [],
   "console": [
-    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps"
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps",
+    "info: [ui-projection] server=0 projected=0 rejected=0 codes={}"
   ],
   "pageErrors": [],
   "timeline": [
     {
-      "t": 5,
+      "t": 4,
       "event": "a: submitted"
     },
     {
-      "t": 8,
+      "t": 7,
       "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
     },
     {
-      "t": 24,
+      "t": 12,
       "event": "a: running"
     },
     {
-      "t": 71,
-      "event": "a: mini-browser (Scrapy browser kept open · cofoundex.com · 8 pages · 00:40)"
+      "t": 59,
+      "event": "a: mini-browser (Scrapy browser kept open · us.foundersbase.com · 7 pages · 00:39)"
     },
     {
-      "t": 74,
-      "event": "a: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
-    },
-    {
-      "t": 137,
-      "event": "a: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
-    },
-    {
-      "t": 201,
-      "event": "a: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
-    },
-    {
-      "t": 264,
-      "event": "a: clarify dead-loop (same question re-asked 3x, no search start)"
-    },
-    {
-      "t": 264,
-      "event": "a: TIMEOUT"
+      "t": 243,
+      "event": "a: settled"
     }
   ],
   "screenshots": [
@@ -179,6 +84,6 @@
     "ui/M03-a-3-mini-browser.jpg",
     "ui/M03-a-6-final.jpg"
   ],
-  "durationS": 271,
-  "responseBytes": 19955
+  "durationS": 249,
+  "responseBytes": 18168
 }

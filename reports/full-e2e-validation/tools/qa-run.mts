@@ -205,9 +205,20 @@ async function runCase(c: Case) {
         (opts.cancel === "streaming" && names.length > 0));
       if (cancelNow) {
         const streamedAtCancel = r.streamed.length;
-        await page.getByRole("button", { name: /^Stop search$/i }).first().click();
-        mark(`${label}: STOP clicked (${opts.cancel})`);
-        r.cancel = { stage: opts.cancel, at: Math.round((Date.now() - t0) / 1000), streamedAtCancel };
+        // Harness fix (final-stabilization): the stop click raced the run's
+        // settle — the button can unmount between the visibility probe and the
+        // click, and a plain click then waits the full action timeout on a
+        // vanished locator. Re-check at click time with a bounded timeout and
+        // record a settle-race honestly instead of failing the case.
+        const stopBtn = page.getByRole("button", { name: /^Stop search$/i }).first();
+        if (await stopBtn.isVisible().catch(() => false)) {
+          await stopBtn.click({ timeout: 10_000 });
+          mark(`${label}: STOP clicked (${opts.cancel})`);
+          r.cancel = { stage: opts.cancel, at: Math.round((Date.now() - t0) / 1000), streamedAtCancel };
+        } else {
+          mark(`${label}: stop raced the settle (button unmounted before click)`);
+          r.cancel = { stage: opts.cancel, raced_settle: true, at: Math.round((Date.now() - t0) / 1000), streamedAtCancel };
+        }
         const stopped = await page.getByRole("button", { name: /^Stop search$/i }).first().waitFor({ state: "hidden", timeout: 30_000 }).then(() => true).catch(() => false);
         r.cancel.stopButtonGoneWithin30s = stopped;
         await page.waitForTimeout(25_000);
@@ -229,7 +240,7 @@ async function runCase(c: Case) {
     const finalText = await page.locator("body").innerText().catch(() => "");
     const header = finalText.match(/Results for "([^"]*)"\s*·\s*(\d+) results?/);
     r.header = header ? { query: header[1], count: Number(header[2]) } : null;
-    r.leadCards = (await page.locator("button.lead-card-hover").allInnerTexts().catch(() => [])).slice(0, 15).map((t) => t.replace(/\n+/g, " | ").slice(0, 400));
+    r.leadCards = (await page.locator("[role=button].lead-card-hover").allInnerTexts().catch(() => [])).slice(0, 15).map((t) => t.replace(/\n+/g, " | ").slice(0, 400));
     r.businessCards = (await page.locator("div.w-full.p-4.rounded-xl.border-border.bg-card").allInnerTexts().catch(() => [])).slice(0, 15).map((t) => t.replace(/\n+/g, " | ").slice(0, 400));
     r.zeroText = (finalText.match(/(No (?:verified matches|local businesses) found[^\n]*\n?[^\n]*)/) ?? [])[1] ?? null;
     r.reconciliation = (finalText.match(/([^\n]*(?:streamed|verified while researching)[^\n]*didn[^\n]*|[^\n]*not in the final[^\n]*)/i) ?? [])[1] ?? null;
@@ -254,7 +265,7 @@ async function runCase(c: Case) {
     result.main = await searchOnce(c.query, "a", { cancel: c.cancel, takeover: c.takeover });
     // Detail panel for the first result (evidence / Why match inspection).
     if (c.detail !== false && !c.cancel) {
-      const card = (await page.locator("button.lead-card-hover").count()) ? page.locator("button.lead-card-hover").first()
+      const card = (await page.locator("[role=button].lead-card-hover").count()) ? page.locator("[role=button].lead-card-hover").first()
         : page.locator("div.w-full.p-4.rounded-xl.border-border.bg-card > button").first();
       if (await visible(card)) {
         await card.click().catch(() => undefined);
@@ -287,7 +298,7 @@ async function runCase(c: Case) {
     if (c.save) {
       const save = page.locator('button[aria-label="Save lead"]').first();
       if (await visible(save)) {
-        result.savedTitle = ((await page.locator("button.lead-card-hover").first().innerText().catch(() => "")).split("\n").find((l) => l.trim().length > 2 && !/^(Person|Company|Job|hot|warm|Verified|Checked|Unverified)$/i.test(l.trim())) ?? "").slice(0, 120);
+        result.savedTitle = ((await page.locator("[role=button].lead-card-hover").first().innerText().catch(() => "")).split("\n").find((l) => l.trim().length > 2 && !/^(Person|Company|Job|hot|warm|Verified|Checked|Unverified)$/i.test(l.trim())) ?? "").slice(0, 120);
         await save.click(); await page.waitForTimeout(4_000);
         result.saveToasts = [...toasts].slice(-3);
         mark("save lead clicked");

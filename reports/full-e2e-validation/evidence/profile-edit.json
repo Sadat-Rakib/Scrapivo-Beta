@@ -1,8 +1,8 @@
 {
-  "tag": "E2E_QA_1790866703196",
+  "tag": "E2E_QA_1790890875672",
   "before": "",
   "saveToast": "Settings saved",
-  "afterReload": "not persisted (empty)",
+  "afterReload": "QA value persisted",
   "restoreToast": "Settings saved",
   "restored": true
 }

@@ -1,5 +1,5 @@
 {
-  "startedAt": "2026-10-01T15:00:06.136Z",
+  "startedAt": "2026-10-02T00:26:18.087Z",
   "watches": {
     "url": "/watches",
     "hasWatchUI": true,
@@ -7,6 +7,26 @@
     "hasDeleteControl": false,
     "deleteLabels": [],
     "sample": "Scrapivo | Home | Projects | Watches | Saved | Guides | SUPPORT & ACCOUNT | Help | 0/5 | 01/10/2026 | E | e2e.scrapivo.test.001@gmail.com | Manage account | WATCHES | New chat | Signal Watch | Click the watch. Tell it what to look for and when. | Enter | Chat History | Find 10 SaaS founders globally who may need help with AI automation. | 0 results | · | 6 days ago | Find 10 plumbers in Austin with no website. Include their public phone numbers and emails when available. | 0 results | · | 6 days ago | Find 10 plumbers in Austin with no website. Include their public phone numbers and emails when available. | 0 results | · | 6 days ago | Find HVAC compan"
+  },
+  "watchLifecycle": {
+    "query": "QA E2E watch probe — UX designers in Toronto",
+    "hasCreateEntry": true,
+    "createdToast": [
+      "Signal watch saved"
+    ],
+    "createdConfirm": true,
+    "rowVisible": true,
+    "hasPauseControl": true,
+    "pausedToast": [
+      "Watch paused — scheduled runs skip it"
+    ],
+    "pausedToggled": true,
+    "hasDeleteControl": true,
+    "deletedToast": [
+      "Watch removed"
+    ],
+    "deleted": true,
+    "goneAfterReload": true
   },
   "authPageUrl": "/discover",
   "authFailure": {

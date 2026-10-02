@@ -1,15 +1,15 @@
 {
-  "tag": "E2E_QA_1790866629986",
-  "startedAt": "2026-10-01T14:57:09.987Z",
-  "savedName": "Andrew Breen",
+  "tag": "E2E_QA_1790895527397",
+  "startedAt": "2026-10-01T22:58:47.398Z",
+  "savedName": "Alex Circei",
   "savedCountAtStart": 1,
   "savedTitlesAtStart": [
-    "capchase.com | Andrew Breen | Identity · Andrew Breen Founder & CEO Outshine | ·"
+    "capchase.com | Alex Circei | Alex Circei CEO & Co-Founder Waydev View Bio | · 0 "
   ],
   "savedCountAfterCleanup": 0,
   "profileOriginalWasEmpty": true,
   "projectsDeleteControl": 0,
-  "watchesText": "Close\nSaved watches\nPlumbers in Edmonton with public contact details\ndaily\n· last 0 new · never run\nnew entity\nin_app\nRun",
+  "watchesText": "Close\nSaved watches\nPlumbers in Edmonton with public contact details\ndaily\n· last 0 new · never run\nnew entity\nin_app\nPause\nRun",
   "steps": [
     {
       "step": "P04 saved lead is listed on /saved",
@@ -31,7 +31,7 @@
     },
     {
       "step": "profile edit persists across reload",
-      "ok": false
+      "ok": true
     },
     {
       "step": "profile field restored to its original value",
@@ -42,5 +42,5 @@
       "ok": true
     }
   ],
-  "finishedAt": "2026-10-01T14:58:18.013Z"
+  "finishedAt": "2026-10-01T22:59:52.757Z"
 }

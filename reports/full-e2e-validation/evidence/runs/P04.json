@@ -3,210 +3,107 @@
   "query": "SaaS founders with public contact details",
   "category": "founder",
   "viewport": "desktop",
-  "startedAt": "2026-10-01T05:35:32.916Z",
+  "startedAt": "2026-10-01T22:51:04.205Z",
   "main": {
     "query": "SaaS founders with public contact details",
     "clarify": [
       {
         "question": "What are you trying to do with these results?",
         "chosen": "Find prospects",
-        "t": 65
+        "t": 94
       }
     ],
     "streamed": [
-      "Andrew Breen",
       "Alex Circei"
     ],
     "activity": [
       "Checked available records · Available records · 0",
-      "Researching · 3/10",
-      "Checking company website · Thrust Carbon official website",
       "Searching the web · The web · Thrust Carbon official website",
+      "Found possible leads · The web · 10 links",
+      "Opening result · thrustcarbon.com",
       "Show all activity (12)",
       "✓",
       "Alex Circei",
       "1 verified while researching…",
-      "Found possible leads · The web · 10 links",
-      "Opening result · thrustcarbon.com",
-      "Reading page · thrustcarbon.com",
       "Found company website · thrustcarbon.com",
-      "Found possible leads · 10 candidates; 2 verified",
-      "Checking contact details · thrustcarbon.com",
-      "Researching required detail · Thrust Carbon contact",
-      "Searching the web · The web · Thrust Carbon contact",
-      "Found possible leads · The web · 6 links",
-      "Opening result · accend.earth",
+      "Found possible leads · 10 candidates; 1 verified",
+      "Reading page · thrustcarbon.com",
+      "Reading page · thrustcarbon.com · 9596 characters",
       "Checked public sources · Public source · 10"
     ],
     "bubbleVerbatim": true,
-    "runningAt": 32,
-    "clarifyAt": 64,
-    "pill": "Scrapy is browsing · capchase.com · 4 pages · 00:08",
-    "miniBrowserAt": 85,
-    "viewingOnly": false,
+    "runningAt": 47,
+    "clarifyAt": 94,
+    "clarifyRepeats": 0,
+    "pill": "Scrapy is browsing · Public source · 8 pages · 00:20",
+    "miniBrowserAt": 185,
+    "viewingOnly": true,
     "settled": true,
-    "durationS": 331,
-    "firstStreamS": 85,
+    "durationS": 421,
+    "firstStreamS": 184,
     "header": {
       "query": "SaaS founders with public contact details",
-      "count": 2
+      "count": 1
     },
     "leadCards": [
-      "capchase.com | Andrew Breen | Identity · Andrew Breen Founder & CEO Outshine",
-      "capchase.com | Alex Circei | Identity · Alex Circei CEO & Co-Founder Waydev"
+      "capchase.com | Alex Circei | Alex Circei CEO & Co-Founder Waydev View Bio"
     ],
-    "businessCards": [],
+    "businessCards": [
+      "capchase.com | Alex Circei | Alex Circei CEO & Co-Founder Waydev View Bio"
+    ],
     "zeroText": null,
     "reconciliation": null,
-    "viewingOnlyFinal": false,
-    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n30/09/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nSaaS founders with public contact details\nResults for \"SaaS founders with public contact details\" · 2 results\nWatch signal\nCards\nLists\nClear\nFold (2 results)\ncapchase.com\nAndrew Breen\nIdentity · Andrew Breen Founder & CEO Outshine\ncapchase.com\nAlex Circei\nIdentity · Alex Circei CEO & Co-Founder Waydev\nScrapy\nKEPT OPEN\nPublic source\nOpening result\n10 pages\n10 actions\n04:11\nOpen original\nTake control\nClose browser\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n5 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n5 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n5 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n5 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n5 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n5 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n10 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founder"
+    "viewingOnlyFinal": true,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nSaaS founders with public contact details\nResults for \"SaaS founders with public contact details\" · 1 results\nWatch signal\nCards\nLists\nClear\nFold (1 results)\ncapchase.com\nAlex Circei\nAlex Circei CEO & Co-Founder Waydev View Bio\nScrapy\nCANCELLED\nthrustcarbon.com\nExtracting\n· Reduce Business Travel Emissions & Cost - Thrust Carbon\n11 pages\n21 actions\n00:29\nOpen original\nViewing only. Taking control needs the browser worker.\n9 leads seen while researching aren't in this list\nAndrew Breen · missing a detail you asked for\nMark Corbett · missing a detail you asked for\nPranjal Daga · still missing required details\nGarry Drummond · still missing required details\nJennifer Dulski · still missing required details\nand 4 more\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nF"
   },
-  "detail": "Person | Andrew Breen | Open original | Pipeline stage | Saved | Contacted | Replied | Won | Lost | Ignored | Identity · Andrew Breen | Founder & CEO | Outshine | Why this matches | Identity · Andrew Breen Founder & CEO Outshine | Verify contact | Resolve contact | Deep enrich | AI research brief | Run research | Activity | Save this lead to start an activity log. | Notes | AI outreach | Research & draft",
+  "detail": "Person | Alex Circei | Open original | Pipeline stage | Saved | Contacted | Replied | Won | Lost | Ignored | Alex Circei | CEO & Co-Founder | Waydev | View Bio | Why this matches | Alex Circei CEO & Co-Founder Waydev View Bio | Verify contact | Resolve contact | Deep enrich | AI research brief | Run research | Activity | No activity yet. | Notes | AI outreach | Research & draft",
   "savedTitle": "capchase.com",
   "saveToasts": [],
   "server": {
-    "runId": "run_7646d4fa",
-    "specRuns": 1,
-    "spec": {
-      "query": "SaaS founders with public contact details",
-      "entity": "person",
-      "status": "ready_to_search",
-      "outcome": "QUALIFIED_RESULTS",
-      "criteria": [
-        "role=founder",
-        "industry=SaaS",
-        "require_contact=true",
-        "required_field=contact",
-        "purpose=prospecting"
-      ],
-      "retrieved": 10,
-      "returned": 2,
-      "qualified": 2,
-      "rejected": 0,
-      "pendingEnrichment": 6,
-      "liveDiscovery": "completed",
-      "signalRequired": false,
-      "reason": "RESULTS",
-      "timings": {
-        "understanding_ms": 28,
-        "stored_search_ms": 5902,
-        "research_ms": 92996,
-        "enrichment_ms": 17330,
-        "qualification_ms": 138,
-        "total_ms": 116394
-      },
-      "sources": [
-        "pg-index:0/0",
-        "live-browser:10/10"
-      ],
-      "funnel": {
-        "raw": 10,
-        "postSpec": 10,
-        "researched": 10,
-        "complete": 4,
-        "qualRejected": 2,
-        "qualified": 2
-      },
-      "sourceHealth": {
-        "summary": "Some sources could not be searched this time (Public source), so results may be incomplete.",
-        "sources": [
-          "Public websites:unavailable",
-          "The web:unavailable",
-          "Public websites:healthy",
-          "Public source:unavailable"
-        ]
-      }
-    },
-    "ledger": {
-      "search_run_id": "run_7646d4fa",
-      "counts": {
-        "returned": 2,
-        "qualified_more": 0,
-        "rejected": 2,
-        "gated": 0,
-        "filtered": 0,
-        "incomplete": 6,
-        "excluded": 0,
-        "unaccounted": 0
-      },
-      "rejectReasons": {
-        "MISSING_QUERY_REQUIRED": 2
-      },
-      "streamed": 2,
-      "streamedNotReturned": []
-    },
-    "runtime": [
-      {
-        "requested": "worker",
-        "used": "worker",
-        "reason": null
-      }
-    ],
-    "browserDone": [
-      {
-        "status": "partial",
-        "reason": "timeout",
-        "candidates": 10,
-        "researched": 4,
-        "verified": 2,
-        "elapsedMs": 90029
-      }
-    ],
-    "searches": 5,
-    "qualRejected": [
-      "Mark Corbett: MISSING_QUERY_REQUIRED",
-      "Pranjal Daga: MISSING_QUERY_REQUIRED"
-    ],
+    "runId": null,
+    "specRuns": 0,
+    "spec": null,
+    "ledger": null,
+    "runtime": [],
+    "browserDone": [],
+    "searches": 0,
+    "qualRejected": [],
     "errors": [],
-    "aiRouter": [
-      "[ai-router] groq:openai/gpt-oss-20b daily quota exhausted; held"
-    ]
+    "aiRouter": []
   },
   "worker": [],
   "toasts": [],
   "console": [
-    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps",
-    "info: [ui-projection] server=2 projected=2 rejected=0 codes={}",
-    "error: Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. https://www.capchase.com/top-25-b2",
-    "error: In HTML, %s cannot be a descendant of <%s>.\nThis will cause a hydration error.%s <button> button \n\n  ...\n    <Lazy>\n      <DiscoverRoute>\n        <DiscoverPage>\n          <div className=\"h-full fle...\">\n            <div className=\"flex-1 min...\">\n              <div ref={{...}} className=\"flex-1 min.",
-    "error: <%s> cannot contain a nested %s.\nSee this log for the ancestor stack trace. button <button>",
-    "error: Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. https://www.capchase.com/top-25-b2",
-    "error: Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. https://www.capchase.com/top-25-b2",
-    "error: Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. https://www.capchase.com/top-25-b2",
-    "error: Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. https://www.capchase.com/top-25-b2"
+    "info: [ui-projection] server=1 projected=1 rejected=0 codes={}"
   ],
   "pageErrors": [],
   "timeline": [
     {
-      "t": 7,
-      "event": "skipped project setup"
-    },
-    {
-      "t": 8,
+      "t": 10,
       "event": "a: submitted"
     },
     {
-      "t": 40,
+      "t": 57,
       "event": "a: running"
     },
     {
-      "t": 73,
+      "t": 104,
       "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
     },
     {
-      "t": 93,
+      "t": 195,
       "event": "a: streamed rows visible"
     },
     {
-      "t": 95,
-      "event": "a: mini-browser (Scrapy is browsing · capchase.com · 4 pages · 00:08)"
+      "t": 196,
+      "event": "a: mini-browser (Scrapy is browsing · Public source · 8 pages · 00:20)"
     },
     {
-      "t": 339,
+      "t": 431,
       "event": "a: settled"
     },
     {
-      "t": 351,
+      "t": 441,
       "event": "save lead clicked"
     }
   ],
@@ -217,6 +114,6 @@
     "ui/P04-a-6-final.jpg",
     "ui/P04-a-7-detail.jpg"
   ],
-  "durationS": 355,
-  "responseBytes": 29296
+  "durationS": 445,
+  "responseBytes": 27491
 }

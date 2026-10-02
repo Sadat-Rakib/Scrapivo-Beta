@@ -1,9 +1,9 @@
 {
-  "startedAt": "2026-10-01T15:02:12.533Z",
+  "startedAt": "2026-10-01T21:42:05.001Z",
   "steps": [
     {
       "s": "logout_clicked",
-      "ok": false
+      "ok": true
     },
     {
       "s": "after_logout_url",
@@ -15,7 +15,7 @@
     },
     {
       "s": "wrong_password_error_useful",
-      "ok": false
+      "ok": true
     },
     {
       "s": "relogin_reaches_discover",
@@ -28,8 +28,8 @@
   ],
   "wrongPassword": {
     "stillOnAuth": true,
-    "errorVisible": false,
-    "errorText": "",
+    "errorVisible": true,
+    "errorText": "Email or password is incorrect.",
     "leakCheck": false
   }
 }

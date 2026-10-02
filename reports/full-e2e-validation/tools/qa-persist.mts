@@ -22,8 +22,8 @@ const context = await browser.newContext({ storageState: STATE, viewport: { widt
 const page = await context.newPage();
 const shot = (name: string) => page.screenshot({ path: `${ROOT}/ui/persist-${name}.jpg`, type: "jpeg", quality: 55, mask: EMAIL ? [page.getByText(EMAIL)] : [] }).catch(() => undefined);
 const go = async (path: string) => { await page.goto(`${BASE}${path}`, { waitUntil: "domcontentloaded", timeout: 90_000 }); await page.waitForTimeout(5_000); };
-const cards = async () => (await page.locator("button.lead-card-hover").allInnerTexts().catch(() => [])).map((t) => t.replace(/\n+/g, " | "));
-const qaCard = () => page.locator("button.lead-card-hover", { hasText: savedName }).first();
+const cards = async () => (await page.locator("[role=button].lead-card-hover").allInnerTexts().catch(() => [])).map((t) => t.replace(/\n+/g, " | "));
+const qaCard = () => page.locator("[role=button].lead-card-hover", { hasText: savedName }).first();
 
 try {
   // Saved lead created by P04 (one "Save lead" click on the first result).

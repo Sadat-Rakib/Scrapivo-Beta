@@ -1,0 +1,20 @@
+﻿{
+    "tag":  "fix-final",
+    "started":  "2026-10-01T14:44:25",
+    "branch":  "rc/mvp-local-testing-baseline",
+    "head":  "8e6ee50abf84562e079c721d129e5dc0e46d8aa1",
+    "vt":  "total=1624 passed=1555 failed=54 skipped=15 files=165 knownRedHit=54 NEW_FAILURES=0",
+    "vtNewFailures":  [
+
+                      ],
+    "vtSecs":  44,
+    "typecheck":  "{\"errors\":43,\"baseline\":43,\"groupsAboveBaseline\":[]}",
+    "typecheckSecs":  18,
+    "buildExit":  0,
+    "buildSecs":  108,
+    "buildErrors":  [
+
+                    ],
+    "bundleScan":  "{\"files\":69,\"patternHits\":[0,0,0,0,0],\"secretsChecked\":29,\"secretHitKeys\":[]}",
+    "finished":  "2026-10-01T14:47:15"
+}

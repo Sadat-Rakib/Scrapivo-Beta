@@ -3,7 +3,7 @@
   "query": "Bakeries in Halifax with phone numbers",
   "category": "isolation",
   "viewport": "desktop",
-  "startedAt": "2026-10-01T14:45:50.523Z",
+  "startedAt": "2026-10-01T21:30:29.358Z",
   "main": {
     "query": "Bakeries in Halifax with phone numbers",
     "clarify": [
@@ -11,45 +11,35 @@
         "question": "What are you trying to do with these results?",
         "chosen": "Find prospects",
         "t": 3
-      },
-      {
-        "question": "Any particular business model (agency, brand, D2C, B2B, B2C), or all?",
-        "chosen": "Search with defaults",
-        "t": 83
-      },
-      {
-        "question": "Any particular business model (agency, brand, D2C, B2B, B2C), or all?",
-        "chosen": "Search with defaults",
-        "t": 147
-      },
-      {
-        "question": "Any particular business model (agency, brand, D2C, B2B, B2C), or all?",
-        "chosen": "Search with defaults",
-        "t": 227
       }
     ],
     "streamed": [],
     "activity": [
-      "Checked available records · Available records · 0"
+      "Checked available records · Available records · 0",
+      "Reading page · thebreadloungebakery.square.site",
+      "Opening result · lfbakeryhalifax.com",
+      "Show all activity (9)"
     ],
     "bubbleVerbatim": true,
-    "clarifyAt": 3,
-    "clarifyRepeats": 3,
-    "runningAt": 33,
-    "pill": "Scrapy browser kept open · yelp.ca · 7 pages · 00:36",
-    "miniBrowserAt": 79,
+    "clarifyAt": 2,
+    "clarifyRepeats": 0,
+    "runningAt": 38,
+    "pill": "Scrapy is browsing · thebreadloungebakery.square.site · 3 pages · 00:08",
+    "miniBrowserAt": 83,
     "viewingOnly": false,
-    "clarifyStuck": true,
-    "durationS": 307,
+    "settled": true,
+    "durationS": 316,
     "firstStreamS": null,
-    "timedOut": true,
-    "header": null,
+    "header": {
+      "query": "Bakeries in Halifax with phone numbers",
+      "count": 0
+    },
     "leadCards": [],
     "businessCards": [],
     "zeroText": null,
     "reconciliation": null,
     "viewingOnlyFinal": false,
-    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nDentists in Calgary with websites\nExpand (50 results)\nMarketing agencies in Vancouver\nRoofers in Mississauga with phone numbers\nExpand (1 results)\nCopywriters in Toronto\nExpand (1 results)\nFractional CMOs in Canada\nExpand (1 results)\nWeb designers in New York\nRecruiters hiring software engineers\nSales consultants in London\nFounders complaining about lead generation\nExpand (50 results)\nBusinesses saying they need a new website\nPeople looking for an SEO agency\nCybersecurity companies in Ottawa with websites\nAI startups in Montreal hiring engineers\nPre-seed investors in Canada investing in SaaS\nExpand (0 results)\nBusinesses saying they need a new website\nAngel investors in Toronto for healthtech startups\nExpand (0 results)\nRemote frontend developer jobs\nExpand (4 results)\nData engineer jobs in Berlin with salary\nyo find me saas founders canada need sales help email if possible\nExpand (0 results)\nneed dentists portland phone number\nExpand (41 results)\nfind startup founders worldwide building fintech\ncopywriters toronto email\nhvac gta phone\nsaas founders public contact details\nExpand (4 results)\nWeb designers in Chicago\nSaaS founders in Austin with public emails\nExpand (0 results)\nhvac gta phone\nB2B SaaS founders with public contact details\nDentists in Boise\nBakeries in Halifax with phone numbers\nUnderstanding: businesses\nReading page · yelp.ca · 484 characters\nFound possible leads · 0 candidates; 0 verified\nChecked contact details · Public contact details · 0 candidates\nShow all activity (12)\nScrapy\nKEPT OPEN\nyelp.ca\nOpening result\n· yelp.ca\n7 pages\n7 actions\n00:43\nOpen original\nTake control\nClose browser\nNarrow this down1 question\nNarrow this down\nQuestion 1 of 1\n\nAny particular business model (agency, brand, D2C, B2B, B2C), or all?\n\nAgency\nService agencies\nBrand\nProduct brands\nD2C\nDirect-to-consumer\nB2B\nSelling to businesses\nB2C\nSelling to consumers\nUse\nSearch with defaults\nSearch\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 resul"
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nPeople looking for a web designer\nExpand (0 results)\nFounders complaining about lead generation\nExpand (0 results)\nfind startup founders worldwide building fintech\nExpand (0 results)\nhvac gta phone\nExpand (0 results)\nBakeries in Halifax with phone numbers\nResults for \"Bakeries in Halifax with phone numbers\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\nScrapy\nKEPT OPEN\ngingerbreadhausbakery.com\nOpening result\n· Contact - Gingerbread Haus Bakery\n10 pages\n10 actions\n04:00\nOpen original\nTake control\nClose browser\n1 lead seen while researching isn't in this list\nThe Cookie Lady · did not match every part of your request\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonto"
   },
   "afterNewChat": {
     "textarea": "",
@@ -61,54 +51,37 @@
       {
         "question": "What are you trying to do with these results?",
         "chosen": "Find prospects",
-        "t": 3
-      },
-      {
-        "question": "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?",
-        "chosen": "Search with defaults",
-        "t": 56
-      },
-      {
-        "question": "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?",
-        "chosen": "Search with defaults",
-        "t": 107
-      },
-      {
-        "question": "Any particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?",
-        "chosen": "Search with defaults",
-        "t": 204
+        "t": 2
       }
     ],
     "streamed": [],
     "activity": [
-      "Checked available records · Available records · 0",
-      "Reading page · copywritercollective.com",
-      "Reading page · copywritercollective.com · 5882 characters",
-      "Opening result · debrastuart.com",
-      "Show all activity (12)"
+      "Checked available records · Available records · 0"
     ],
     "bubbleVerbatim": true,
     "clarifyAt": 2,
-    "clarifyRepeats": 3,
+    "clarifyRepeats": 0,
     "runningAt": 8,
-    "clarifyStuck": true,
-    "durationS": 254,
+    "settled": true,
+    "durationS": 238,
     "firstStreamS": null,
-    "timedOut": true,
-    "header": null,
+    "header": {
+      "query": "Copywriters in Toronto",
+      "count": 0
+    },
     "leadCards": [],
     "businessCards": [],
     "zeroText": null,
     "reconciliation": null,
     "viewingOnlyFinal": false,
-    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nCopywriters in Toronto\nUnderstanding: people\nSearching the web · The web · site:linkedin.com/in copywriter Toronto\nSearching the web · Public source · site:linkedin.com/in copywriter Toronto\nChecked contact details · Public contact details · 0 candidates\nShow all activity (12)\nScrapy\nKEPT OPEN\nbing.com\nOpening result\n· site:linkedin.com/in copywriter Toronto - Search\n5 pages\n5 actions\n00:45\nOpen original\nTake control\nClose browser\nNarrow this down1 question\nNarrow this down\nQuestion 1 of 1\n\nAny particular industry (e.g. SaaS, Fintech, Healthcare), or all industries?\n\nSaaS\nSoftware companies\nFintech\nFinancial tech\nHealthcare\nHealth companies\nUse\nSearch with defaults\nSearch\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n"
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nCopywriters in Toronto\nResults for \"Copywriters in Toronto\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\nScrapy\nKEPT OPEN\nbing.com\nOpening result\n· site:linkedin.com/in copywriter Toronto - Search\n5 pages\n5 actions\n03:48\nOpen original\nTake control\nClose browser\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n10 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0"
   },
   "afterBack": {
     "url": "/discover",
-    "header": null
+    "header": "Copywriters in Toronto"
   },
   "afterReload": {
-    "url": "/discover?fresh=1790866264828",
+    "url": "/discover?fresh=1790890552043",
     "header": null,
     "runningAgain": false
   },
@@ -116,241 +89,74 @@
     "header": null
   },
   "server": {
-    "runId": "run_88497884",
-    "specRuns": 8,
-    "spec": {
-      "query": "Bakeries in Halifax with phone numbers",
-      "entity": "business",
-      "status": "ready_to_search",
-      "outcome": "NO_QUALIFIED_RESULTS",
-      "criteria": [
-        "category=bakery",
-        "location=Halifax",
-        "location_id=geo:stated:halifax",
-        "location_kind=stated",
-        "require_name=true",
-        "required_field=name",
-        "require_phone=true",
-        "required_field=phone",
-        "purpose=prospecting"
-      ],
-      "retrieved": 0,
-      "returned": 0,
-      "qualified": 0,
-      "rejected": 0,
-      "pendingEnrichment": 0,
-      "liveDiscovery": "completed",
-      "signalRequired": false,
-      "reason": "SOURCE_UNAVAILABLE",
-      "timings": {
-        "understanding_ms": 1,
-        "stored_search_ms": 32472,
-        "research_ms": 24823,
-        "enrichment_ms": 0,
-        "qualification_ms": 1,
-        "total_ms": 57297
-      },
-      "sources": [
-        "pg-index:0/0",
-        "s3-parquet:400000/0"
-      ],
-      "funnel": {
-        "raw": 0,
-        "postSpec": 0,
-        "complete": 0,
-        "qualRejected": 0,
-        "qualified": 0
-      },
-      "sourceHealth": {
-        "summary": "Some sources could not be searched this time (Available records), so results may be incomplete.",
-        "sources": [
-          "Public source:empty",
-          "Public websites:unavailable",
-          "The web:unavailable",
-          "Public websites:empty",
-          "Available records:unavailable"
-        ]
-      }
-    },
+    "runId": null,
+    "specRuns": 0,
+    "spec": null,
     "ledger": null,
-    "runtime": [
-      {
-        "requested": "worker",
-        "used": "worker",
-        "reason": null
-      }
-    ],
-    "browserDone": [
-      {
-        "status": "completed",
-        "reason": "diminishing_returns",
-        "candidates": 0,
-        "researched": 0,
-        "verified": 0,
-        "visited": 4,
-        "elapsedMs": 23532
-      }
-    ],
-    "searches": 3,
+    "runtime": [],
+    "browserDone": [],
+    "searches": 0,
     "qualRejected": [],
     "errors": [],
-    "aiRouter": [
-      "[ai-router] groq:openai/gpt-oss-120b daily quota exhausted; held"
-    ]
+    "aiRouter": []
   },
   "serverSecond": {
-    "runId": "run_a62f57ff",
-    "specRuns": 8,
-    "spec": {
-      "query": "Copywriters in Toronto",
-      "entity": "person",
-      "status": "ready_to_search",
-      "outcome": "NO_QUALIFIED_RESULTS",
-      "criteria": [
-        "role=copywriter",
-        "location=Toronto",
-        "location_id=geo:city:toronto",
-        "location_kind=city",
-        "location_country=CA",
-        "location_parents=geo:admin:ontario,geo:country:ca,geo:metro:gta",
-        "purpose=prospecting"
-      ],
-      "retrieved": 0,
-      "returned": 0,
-      "qualified": 0,
-      "rejected": 0,
-      "pendingEnrichment": 0,
-      "liveDiscovery": "completed",
-      "signalRequired": false,
-      "reason": "SOURCE_UNAVAILABLE",
-      "timings": {
-        "understanding_ms": 1,
-        "stored_search_ms": 2181,
-        "research_ms": 30145,
-        "enrichment_ms": 0,
-        "qualification_ms": 1,
-        "total_ms": 32328
-      },
-      "sources": [
-        "pg-index:0/0",
-        "s3-parquet:16904/0"
-      ],
-      "funnel": {
-        "raw": 0,
-        "postSpec": 0,
-        "complete": 0,
-        "qualRejected": 0,
-        "qualified": 0
-      },
-      "sourceHealth": {
-        "summary": null,
-        "sources": [
-          "Public websites:unavailable",
-          "The web:unavailable",
-          "Public websites:empty"
-        ]
-      }
-    },
+    "runId": null,
+    "specRuns": 0,
+    "spec": null,
     "ledger": null,
-    "runtime": [
-      {
-        "requested": "worker",
-        "used": "worker",
-        "reason": null
-      }
-    ],
-    "browserDone": [
-      {
-        "status": "completed",
-        "reason": "diminishing_returns",
-        "candidates": 0,
-        "researched": 0,
-        "verified": 0,
-        "visited": 2,
-        "elapsedMs": 30015
-      }
-    ],
-    "searches": 4,
+    "runtime": [],
+    "browserDone": [],
+    "searches": 0,
     "qualRejected": [],
     "errors": [],
-    "aiRouter": [
-      "[ai-router] groq:openai/gpt-oss-120b daily quota exhausted; held"
-    ]
+    "aiRouter": []
   },
   "worker": [],
   "toasts": [],
   "console": [
-    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps"
+    "error: Can't perform a React state update on a component that hasn't mounted yet. This indicates that you have a side-effect in your render function that asynchronously tries to update the component. Move this work to useEffect instead.",
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps",
+    "info: [ui-projection] server=0 projected=0 rejected=0 codes={}",
+    "info: [ui-projection] server=0 projected=0 rejected=0 codes={}"
   ],
   "pageErrors": [],
   "timeline": [
     {
-      "t": 5,
+      "t": 4,
       "event": "a: submitted"
     },
     {
-      "t": 8,
+      "t": 7,
       "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
     },
     {
-      "t": 38,
+      "t": 42,
       "event": "a: running"
     },
     {
-      "t": 85,
-      "event": "a: mini-browser (Scrapy browser kept open · yelp.ca · 7 pages · 00:36)"
-    },
-    {
-      "t": 88,
-      "event": "a: clarify \"Any particular business model (agency, brand, D2C, B2B, B2C)\" -> Search with defaults"
-    },
-    {
-      "t": 152,
-      "event": "a: clarify \"Any particular business model (agency, brand, D2C, B2B, B2C)\" -> Search with defaults"
-    },
-    {
-      "t": 231,
-      "event": "a: clarify \"Any particular business model (agency, brand, D2C, B2B, B2C)\" -> Search with defaults"
-    },
-    {
-      "t": 312,
-      "event": "a: clarify dead-loop (same question re-asked 3x, no search start)"
-    },
-    {
-      "t": 312,
-      "event": "a: TIMEOUT"
-    },
-    {
-      "t": 318,
-      "event": "b: submitted"
+      "t": 89,
+      "event": "a: mini-browser (Scrapy is browsing · thebreadloungebakery.square.site · 3 pages · 00:08)"
     },
     {
       "t": 320,
-      "event": "b: clarify \"What are you trying to do with these results?\" -> Find prospects"
+      "event": "a: settled"
     },
     {
       "t": 326,
+      "event": "b: submitted"
+    },
+    {
+      "t": 329,
+      "event": "b: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 334,
       "event": "b: running"
     },
     {
-      "t": 374,
-      "event": "b: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
-    },
-    {
-      "t": 424,
-      "event": "b: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
-    },
-    {
-      "t": 522,
-      "event": "b: clarify \"Any particular industry (e.g. SaaS, Fintech, Healthcare), or\" -> Search with defaults"
-    },
-    {
-      "t": 572,
-      "event": "b: clarify dead-loop (same question re-asked 3x, no search start)"
-    },
-    {
-      "t": 572,
-      "event": "b: TIMEOUT"
+      "t": 564,
+      "event": "b: settled"
     }
   ],
   "screenshots": [
@@ -363,6 +169,6 @@
     "ui/S01-c-back.jpg",
     "ui/S01-c-reload.jpg"
   ],
-  "durationS": 598,
-  "responseBytes": 23416
+  "durationS": 589,
+  "responseBytes": 24350
 }

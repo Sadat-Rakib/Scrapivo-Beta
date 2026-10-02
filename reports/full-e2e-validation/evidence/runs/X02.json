@@ -3,93 +3,95 @@
   "query": "SaaS founders in Austin with public emails",
   "category": "cancel",
   "viewport": "desktop",
-  "startedAt": "2026-10-01T14:33:04.680Z",
-  "fatal": "locator.click: Timeout 45000ms exceeded.",
-  "server": {
-    "runId": "run_26a3be73",
-    "specRuns": 1,
-    "spec": {
-      "query": "SaaS founders in Austin with public emails",
-      "entity": "person",
-      "status": "ready_to_search",
-      "outcome": "NO_QUALIFIED_RESULTS",
-      "criteria": [
-        "role=founder",
-        "industry=saas",
-        "location=Austin",
-        "location_id=geo:city:austin",
-        "location_kind=city",
-        "location_country=US",
-        "location_parents=geo:country:us",
-        "require_name=true",
-        "required_field=name",
-        "require_email=true",
-        "required_field=email",
-        "purpose=prospecting"
-      ],
-      "retrieved": 0,
-      "returned": 0,
-      "qualified": 0,
-      "rejected": 0,
-      "pendingEnrichment": 0,
-      "liveDiscovery": "completed",
-      "signalRequired": false,
-      "reason": "SOURCE_UNAVAILABLE",
-      "timings": {
-        "understanding_ms": 1,
-        "stored_search_ms": 12941,
-        "research_ms": 16434,
-        "enrichment_ms": 1,
-        "qualification_ms": 0,
-        "total_ms": 29377
-      },
-      "sources": [
-        "pg-index:0/0",
-        "s3-parquet:351216/0"
-      ],
-      "funnel": {
-        "raw": 0,
-        "postSpec": 0,
-        "complete": 0,
-        "qualRejected": 0,
-        "qualified": 0
-      },
-      "sourceHealth": {
-        "summary": null,
-        "sources": [
-          "Public websites:unavailable",
-          "The web:unavailable",
-          "Public websites:empty"
-        ]
+  "startedAt": "2026-10-01T19:20:02.959Z",
+  "main": {
+    "query": "SaaS founders in Austin with public emails",
+    "clarify": [
+      {
+        "question": "What are you trying to do with these results?",
+        "chosen": "Find prospects",
+        "t": 3
       }
+    ],
+    "streamed": [],
+    "activity": [
+      "Checked available records · Available records · 0"
+    ],
+    "bubbleVerbatim": true,
+    "clarifyAt": 3,
+    "clarifyRepeats": 0,
+    "runningAt": 16,
+    "pill": "Scrapy is browsing · Public source · 14 pages · 00:43",
+    "miniBrowserAt": 62,
+    "viewingOnly": false,
+    "cancel": {
+      "stage": "browsing",
+      "at": 63,
+      "streamedAtCancel": 0,
+      "stopButtonGoneWithin30s": true,
+      "streamedAfter25s": 0,
+      "bodyAfter": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nWeb designers in Chicago Bakeries in Halifax\nSaaS founders in Austin with public emails\nNo verified matches found for \"SaaS founders in Austin with public emails\" yet.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nTry a broader search\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New "
     },
+    "durationS": 134,
+    "firstStreamS": null,
+    "header": null,
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": "No verified matches found for \"SaaS founders in Austin with public emails\" yet.\nTry broadening the search — remove a constraint, add a location, or search without a filter.",
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nWeb designers in Chicago Bakeries in Halifax\nSaaS founders in Austin with public emails\nNo verified matches found for \"SaaS founders in Austin with public emails\" yet.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nTry a broader search\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n10 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automati"
+  },
+  "followUp": {
+    "query": "Plumbers in Denver",
+    "clarify": [
+      {
+        "question": "What are you trying to do with these results?",
+        "chosen": "Find prospects",
+        "t": 2
+      }
+    ],
+    "streamed": [],
+    "activity": [
+      "Checked available records · Available records · 0"
+    ],
+    "bubbleVerbatim": true,
+    "clarifyAt": 2,
+    "clarifyRepeats": 0,
+    "runningAt": 22,
+    "cancel": {
+      "stage": "early",
+      "at": 68,
+      "streamedAtCancel": 0,
+      "stopButtonGoneWithin30s": true,
+      "streamedAfter25s": 0,
+      "bodyAfter": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nWeb designers in Chicago Bakeries in Halifax\nSaaS founders in Austin with public emails\nPlumbers in Denver\nNo verified matches found for \"Plumbers in Denver\" yet.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nTry a broader search\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York "
+    },
+    "durationS": 138,
+    "firstStreamS": null,
+    "header": null,
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": "No verified matches found for \"Plumbers in Denver\" yet.\nTry broadening the search — remove a constraint, add a location, or search without a filter.",
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n01/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nWeb designers in Chicago Bakeries in Halifax\nSaaS founders in Austin with public emails\nPlumbers in Denver\nNo verified matches found for \"Plumbers in Denver\" yet.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nTry a broader search\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n10 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n6 days ago\nFind SaaS founders globally who may need help with AI automation.\n0"
+  },
+  "server": {
+    "runId": null,
+    "specRuns": 0,
+    "spec": null,
     "ledger": null,
-    "runtime": [
-      {
-        "requested": "worker",
-        "used": "worker",
-        "reason": null
-      }
-    ],
-    "browserDone": [
-      {
-        "status": "completed",
-        "reason": "diminishing_returns",
-        "candidates": 0,
-        "researched": 0,
-        "verified": 0,
-        "visited": 4,
-        "elapsedMs": 16279
-      }
-    ],
-    "searches": 3,
+    "runtime": [],
+    "browserDone": [],
+    "searches": 0,
     "qualRejected": [],
     "errors": [],
     "aiRouter": []
   },
   "serverFollowUp": {
     "runId": null,
-    "specRuns": 1,
+    "specRuns": 0,
     "spec": null,
     "ledger": null,
     "runtime": [],
@@ -102,8 +104,7 @@
   "worker": [],
   "toasts": [],
   "console": [
-    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps",
-    "info: [ui-projection] server=0 projected=0 rejected=0 codes={}"
+    "error: Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render DiscoverPage ThinkingSteps ThinkingSteps"
   ],
   "pageErrors": [],
   "timeline": [
@@ -116,23 +117,43 @@
       "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
     },
     {
-      "t": 20,
+      "t": 21,
       "event": "a: running"
     },
     {
       "t": 67,
-      "event": "a: mini-browser (Scrapy browser kept open · linkedin.com · 8 pages · 00:42)"
+      "event": "a: mini-browser (Scrapy is browsing · Public source · 14 pages · 00:43)"
     },
     {
-      "t": 112,
-      "event": "fatal: locator.click: Timeout 45000ms exceeded."
+      "t": 67,
+      "event": "a: STOP clicked (browsing)"
+    },
+    {
+      "t": 140,
+      "event": "b: submitted"
+    },
+    {
+      "t": 142,
+      "event": "b: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 162,
+      "event": "b: running"
+    },
+    {
+      "t": 207,
+      "event": "b: STOP clicked (early)"
     }
   ],
   "screenshots": [
     "ui/X02-a-1-clarify.jpg",
     "ui/X02-a-3-mini-browser.jpg",
-    "ui/X02-fatal.jpg"
+    "ui/X02-a-5-after-cancel.jpg",
+    "ui/X02-a-6-final.jpg",
+    "ui/X02-b-1-clarify.jpg",
+    "ui/X02-b-5-after-cancel.jpg",
+    "ui/X02-b-6-final.jpg"
   ],
-  "durationS": 116,
-  "responseBytes": 19987
+  "durationS": 284,
+  "responseBytes": 8330
 }

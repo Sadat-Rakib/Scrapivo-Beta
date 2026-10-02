@@ -104,3 +104,26 @@ Working defect ledger. Candidates get promoted to confirmed defects only with re
 - Groq `openai/gpt-oss-20b` daily quota exhausted 01:25 Oct 1 → provider ladder fallbacks, slow (~60 s) clarify.
 - Windows commit-limit OOM (errno=1455) on default-heap build → use 4 GB heap flag.
 - Kiro's P01/L01/C01 FATAL rows + laneA/laneC `browser.newContext: Target page, context or browser has been closed`: parallel-lane harness killed browsers (Ctrl+C), not proven product behavior. Continuation reruns decide.
+
+## FINAL STATUS (Oct 2, after final stabilization sprint) — every defect above closed
+
+| Defect | Resolution | Evidence |
+|---|---|---|
+| E2E-C1 | FIXED — profile upsert + missing-row throw; sender_name written | qa-profile-edit: "QA value persisted" across reload, restored:true |
+| E2E-C2 | FIXED — save/read path verified end-to-end | qa-persist 7/7: P04 lead listed on /saved, notes persist across reload, deleted via UI, 0 left |
+| E2E-C3 | FIXED — dead-loop gone (all reruns settle); force still asks explicit unresolved amounts; thin-ask-on-outcome renders zero chrome | M05/S01/I01/R03 reruns: clarifyRepeats=0, settled=true; spec-clarification 6/6 |
+| E2E-C3-related UI defect ("more verified leads" promise at 0 results) | FIXED — hasMore/message require delivered rows | I01/I02/R03 fresh runs: moreAvailableMessage absent, no "Show more" affordance at zero |
+| E2E-C4/C7 | FIXED — nested button, keys, ThinkingSteps render-phase setState | 0 setState/duplicate-key console errors in I01/R03 reruns; thinking-steps.test.tsx |
+| E2E-C5 | FIXED — contacts backed by observed contact-page excerpts | P04: waydev.co/contact + loch.io/company/contact excerpts, source_url ≠ identity source |
+| E2E-C6 | FIXED — ledger closes exactly, merge-absorbed rows ledgered | L05 {retrieved:148, fated:148, unaccounted:0, ok:true}; P04 unaccounted:0 |
+| E2E-C8 | FIXED — substantive gapfill queries + SERP gate starvation fallback | m7-source-routing 36/36; browser-live evidence-boundary tests green |
+| E2E-C9 | FIXED — enriched zero narrative incl. mobile + thin-ask path | P02 mobile: "1 lead seen while researching isn't in this list…"; R03 reconciliation rendered |
+| E2E-C10 | FIXED — two-stage streaming, per-row ledger trail, no post-cancel echoes | L05 streamed==delivered==1; worker-adapter cancel test green |
+| E2E-C11 | FIXED — intent signal required and enforced | I02: signal_required true → honest zero (was 50 wrong rows) |
+| E2E-C12 | PARTIAL / DEFERRED WITH REASON — claim-aware evidence beyond contact | C5 gate covers trust-critical path |
+| E2E-C13 | FIXED — activity verbs stop place spans | M03: worldwide + fintech parsed, no glued place |
+| E2E-C14 | FIXED — floating Stop + verified cancel plumbing | X01/X02 reruns: stop gone ≤30s, no post-cancel rows |
+| E2E-C15 | FIXED — inline wrong-password error | qa-auth-lifecycle: wrong_password_error_useful true |
+| E2E-C16 | FIXED — project/ICP/list deletes wired; watch pause + delete | live probe: create→Pause→delete→gone after reload; qa-persist watches dialog shows Pause/Run |
+
+Verdict: **READY (local MVP baseline)** — see FINAL_STATUS.md. Remaining known limits are environmental (SearXNG down, LLM quotas) or the C12 deferral above.
