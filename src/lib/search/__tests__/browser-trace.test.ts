@@ -107,3 +107,24 @@ it("accepts a solar-installation business card — trade vocabulary covers the e
   expect(rows.map((row) => row.title)).toEqual(["SolarTech Namibia"]);
   expect(events).not.toContainEqual(expect.objectContaining({ kind: "entity", outcome: "rejected", reason: "ENTITY_TYPE_MISMATCH" }));
 });
+
+it("survives an unseen trade when org fields prove the entity is a business (Phase 1)", () => {
+  const { events, onTrace } = collect();
+  const orgText = "Nebula Drone Services offers aerial surveying across Namibia. Contact Nebula Drone Services at their Windhoek office, phone +264 61 300 100.";
+  const rows = browserEntitiesToRows([
+    { page: 0, kind: "business", name: "Nebula Drone Services", identityQuote: orgText,
+      fields: { phone: { value: "+264 61 300 100", quote: orgText }, location: { value: "Windhoek", quote: orgText } } },
+  ], [{ ...page, text: orgText }], onTrace);
+  expect(rows.map((row) => row.title)).toEqual(["Nebula Drone Services"]);
+  expect(events).not.toContainEqual(expect.objectContaining({ kind: "entity", outcome: "rejected", reason: "ENTITY_TYPE_MISMATCH" }));
+});
+
+it("still rejects a person-kind entity with no org fields and no person signals (Phase 1)", () => {
+  const { events, onTrace } = collect();
+  const odd = "Xylo Quench operates somewhere and does unnamed things for clients around the region.";
+  const rows = browserEntitiesToRows([
+    { page: 0, kind: "person", name: "Xylo Quench", identityQuote: odd },
+  ], [{ ...page, text: odd }], onTrace);
+  expect(rows).toEqual([]);
+  expect(events).toContainEqual(expect.objectContaining({ kind: "entity", outcome: "rejected", reason: "ENTITY_TYPE_MISMATCH" }));
+});

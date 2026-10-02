@@ -455,9 +455,19 @@ export function browserEntitiesToRows(
       if (!fields.company) { fields.company = cardCompany; quotes.company = cardQuote; }
     }
     if (!kindSupported(entity.kind, [entity.identityQuote, ...Object.values(quotes)].join(" "))) {
-      onTrace?.({ kind: "entity", pageUrl: page.url, name: entity.name.slice(0, 120), entityKind: entity.kind, outcome: "rejected",
-        reason: "ENTITY_TYPE_MISMATCH", detail: "kind_unsupported_by_quotes", droppedFields });
-      continue;
+      // Entity type and trade are separate dimensions (PRD Phase 1): a
+      // business must not become unsupported merely because its trade word is
+      // missing from the quotes. Organization fields (website/phone/contact/
+      // category) are structural proof of a business — accept it and let the
+      // industry/trade dimension be judged by the relevance gates.
+      const orgFieldKeys = ["website", "phone", "email", "category", "industry", "location", "address"];
+      const hasOrgField =
+        entity.kind === "business" && Object.keys(entity.fields ?? {}).some((k) => orgFieldKeys.includes(k));
+      if (!hasOrgField) {
+        onTrace?.({ kind: "entity", pageUrl: page.url, name: entity.name.slice(0, 120), entityKind: entity.kind, outcome: "rejected",
+          reason: "ENTITY_TYPE_MISMATCH", detail: "kind_unsupported_by_quotes", droppedFields });
+        continue;
+      }
     }
     onTrace?.({ kind: "entity", pageUrl: page.url, name: entity.name.slice(0, 120), entityKind: entity.kind, outcome: "row", droppedFields });
     // A named founder card inside an explicitly labeled SaaS-founder cohort is
