@@ -152,6 +152,9 @@ export type BrowserQueryFunnel = {
   entitiesExtracted: number;
   /** Rows produced by normalization (structured + browserEntitiesToRows). */
   normalizedRows: number;
+  /** Why extracted entities died at normalization, by named reason
+   *  (MISSING_IDENTITY, PROVENANCE_INCOMPLETE, LIST_PAGE_AS_ENTITY, …). */
+  normalizationRejections: Record<string, number>;
   /** Candidates actually emitted via the row/event channel (first sighting). */
   emittedRows: number;
   elapsedMs: number;
@@ -771,7 +774,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       serpRequested: 0, serpOk: 0, serpEmpty: 0, serpBlocked: 0, serpErrors: 0,
       linksObserved: 0, linksAccepted: 0, linksRejected: 0, linkRejections: {},
       pagesScheduled: 0, pagesNavigated: 0, navFailed: 0, pagesBlocked: 0, pagesUnsupported: 0,
-      pagesExtractable: 0, extractionEmpty: 0, entitiesExtracted: 0, normalizedRows: 0, emittedRows: 0,
+      pagesExtractable: 0, extractionEmpty: 0, entitiesExtracted: 0, normalizedRows: 0, normalizationRejections: {} as Record<string, number>, emittedRows: 0,
       elapsedMs: 0, stage: "OK",
     };
     activeFunnel = { funnel, startedAt: Date.now() };
@@ -1225,7 +1228,15 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       check();
       if (f) { if (entities.length) f.entitiesExtracted += entities.length; else f.extractionEmpty++; }
       if (options.extractEntities) trace({ kind: "extract", pages: pages.map((page) => page.url), extractor: "injected", llm: "not_called", entities: entities.length });
-      const normalized = browserEntitiesToRows(entities, pages, trace);
+      const normalized = browserEntitiesToRows(entities, pages, (event) => {
+        // Count why extracted entities died at normalization — the Windhoek
+        // funnel showed entitiesExtracted 8 → normalizedRows 0 with no reason.
+        if (event.kind === "entity" && event.outcome === "rejected" && f) {
+          const reason = String(event.reason ?? "UNKNOWN");
+          f.normalizationRejections[reason] = (f.normalizationRejections[reason] ?? 0) + 1;
+        }
+        trace(event);
+      });
       if (f) f.normalizedRows += normalized.length;
       remember(normalized, query, candidate);
       if (spec.entity === "job") {
