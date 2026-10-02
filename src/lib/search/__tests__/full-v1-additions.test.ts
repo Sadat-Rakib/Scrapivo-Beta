@@ -3,7 +3,7 @@
  */
 import { describe, expect, it } from "vitest";
 import { extractStructuredFacts, factsFromJsonLdText } from "../page-structured";
-import { zeroResultsNarrative } from "../outcome-ui";
+import { enrichZeroNarrative, zeroResultsNarrative } from "../outcome-ui";
 
 const JOB_PAGE = `
 <html><head>
@@ -99,5 +99,55 @@ describe("zeroResultsNarrative", () => {
   it("handles a true discovery zero", () => {
     expect(zeroResultsNarrative({ rawCandidates: 0, postSpecFilter: 0, complete: 0, pendingEnrichment: 0, qualificationRejected: 0, returned: 0, reason: "NO_DATA" })).toBeTruthy();
     expect(zeroResultsNarrative(null)).toBeNull();
+  });
+});
+
+describe("enrichZeroNarrative", () => {
+  it("tells the found-but-unproven story from the candidate ledger", () => {
+    const narrative = enrichZeroNarrative("3 candidates were found, but none matched the requested criteria.", {
+      counts: { rejected: 3, gated: 1 },
+      streamedNotReturned: [
+        { fate: "gated", reason: "SIGNAL_NOT_VERIFIED" },
+        { fate: "rejected", reason: "UNPROVEN_CRITERION" },
+        { fate: "rejected", reason: "MISSING_QUERY_REQUIRED" },
+      ],
+    });
+    expect(narrative).toContain("3 candidates were found, but none matched the requested criteria.");
+    expect(narrative).toContain("2 candidates looked promising but did not prove the requested details");
+    expect(narrative).not.toContain("surfaced while researching");
+  });
+
+  it("counts a single unproven candidate in the singular", () => {
+    const narrative = enrichZeroNarrative(null, {
+      counts: {},
+      streamedNotReturned: [{ fate: "gated", reason: "UNPROVEN_CRITERION" }],
+    });
+    expect(narrative).toContain("1 candidate looked promising but did not prove the requested details");
+  });
+
+  it("keeps the source-health sentence of the base narrative", () => {
+    const base = zeroResultsNarrative({
+      rawCandidates: 0, postSpecFilter: 0, complete: 0, pendingEnrichment: 0,
+      qualificationRejected: 0, reason: "NO_DATA",
+      sourceHealth: { summary: "2 sources were unreachable." },
+    });
+    const narrative = enrichZeroNarrative(base, { counts: {}, streamedNotReturned: [] });
+    expect(narrative).toContain("2 sources were unreachable.");
+    expect(narrative).toContain("returned no candidates for this query");
+  });
+
+  it("falls back to the verification story when only the ledger gate count stands", () => {
+    expect(enrichZeroNarrative(null, { counts: { gated: 2 }, streamedNotReturned: [] }))
+      .toContain("could not be verified with the sources available");
+  });
+
+  it("reports plain non-matches and degrades gracefully when nothing is known", () => {
+    expect(enrichZeroNarrative(null, {
+      counts: {},
+      streamedNotReturned: [{ fate: "rejected", reason: "MISSING_QUERY_REQUIRED" }],
+    })).toContain("1 candidate surfaced while researching but did not match your criteria.");
+    expect(enrichZeroNarrative(null, null)).toBeNull();
+    expect(enrichZeroNarrative(null, {})).toBeNull();
+    expect(enrichZeroNarrative("Only the base.", null)).toBe("Only the base.");
   });
 });

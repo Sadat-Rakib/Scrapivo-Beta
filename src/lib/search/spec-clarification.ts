@@ -16,13 +16,13 @@ const purposeQuestion = (): ClarifyQuestion => ({
 
 /** One decision for the active SPEC path. Optional refinements never block it.
  *
- * `force` (Skip / "Search with defaults") always means PROCEED: no question
- * blocks execution, ever. Criteria left unresolved stay on the spec and fail
- * qualification honestly — an honest zero, not another round of the same
- * question. */
+ * `force` (Skip / "Search with defaults") means PROCEED past scope/relation
+ * and optional-slot questions — but an explicit unresolved AMOUNT (salary,
+ * size, revenue) still blocks: proceeding would mean searching a number
+ * nobody stated, and that is a real question, not a clarify dead-loop. Other
+ * criteria left unresolved stay on the spec and fail qualification honestly —
+ * an honest zero, not another round of the same question. */
 export function decideSpecClarification(spec: SearchSpec, force = false): ClarifyQuestion | null {
-  if (force) return null;
-
   const unresolved = spec.unresolved?.[0];
   if (unresolved) {
     const kinds: Record<string, { id: ClarifyQuestionId; question: string }> = {
@@ -30,12 +30,12 @@ export function decideSpecClarification(spec: SearchSpec, force = false): Clarif
       employee_count: { id: "entity_size", question: "What company size do you mean?" },
       revenue: { id: "entity_revenue", question: "What revenue amount do you mean?" },
     };
-    const kind = kinds[unresolved.field] ?? {
-      id: "entity_scope" as ClarifyQuestionId,
-      question: `What value do you mean by “${unresolved.raw}”?`,
-    };
-    return { id: kind.id, question: kind.question, options: [], allowOther: true };
+    const amount = kinds[unresolved.field];
+    if (amount) return { id: amount.id, question: amount.question, options: [], allowOther: true };
+    if (force) return null;
+    return { id: "entity_scope" as ClarifyQuestionId, question: `What value do you mean by “${unresolved.raw}”?`, options: [], allowOther: true };
   }
+  if (force) return null;
 
   const frameQuestion = spec.understanding?.clarification;
   if (frameQuestion?.needed && frameQuestion.question) {

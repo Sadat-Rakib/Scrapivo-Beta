@@ -56,6 +56,7 @@ export function ThinkingSteps({
   onDone?: () => void;
 }) {
   const lines = thinkingLines(input);
+  const lineCount = lines.length;
   const [revealed, setRevealed] = useState(1);
   useEffect(() => {
     setRevealed(1);
@@ -63,25 +64,27 @@ export function ThinkingSteps({
       typeof window !== "undefined" &&
       window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
     ) {
-      setRevealed(lines.length);
-      onDone?.();
+      setRevealed(lineCount);
       return;
     }
+    // Purity (Defect C): the reveal updater must never fire onDone. Updaters
+    // are re-run during render — calling a parent setState from inside one
+    // logged "Cannot update a component (`DiscoverPage ThinkingSteps`) while
+    // rendering a different component (`ThinkingSteps`)" and, on the first
+    // mount, "Can't perform a React state update on a component that hasn't
+    // mounted yet". onDone now derives from committed `revealed` state below.
     const t = window.setInterval(() => {
-      setRevealed((r) => {
-        if (r >= lines.length) {
-          window.clearInterval(t);
-          return r;
-        }
-        const next = r + 1;
-        if (next >= 2) onDone?.();
-        if (next >= lines.length) window.clearInterval(t);
-        return next;
-      });
+      setRevealed((r) => (r >= lineCount ? r : r + 1));
     }, REVEAL_MS);
     return () => window.clearInterval(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- re-run per query via key
   }, [inputKey]);
+  // Parent notification stays out of render: a committed-state effect.
+  useEffect(() => {
+    if (revealed >= 2) onDone?.();
+    // onDone is a fresh parent closure per render; fire on reveal progress only.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [revealed]);
 
   if (compact) {
     return (

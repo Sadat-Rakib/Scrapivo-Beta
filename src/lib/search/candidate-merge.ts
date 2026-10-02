@@ -1,4 +1,5 @@
 import type { SpecRow } from "@/lib/spec-search.functions";
+import type { LedgerRow } from "./candidate-ledger";
 
 const normalize = (value: string | null | undefined) => (value ?? "").toLowerCase()
   .normalize("NFKC").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
@@ -50,6 +51,17 @@ export type MergeDuplicateResult = SpecRow[] & { mergeReport?: MergedDuplicate[]
 
 const rowKey = (row: SpecRow): string =>
   row.key ?? row.entity_id ?? normalize(row.title).replace(/\s+/g, "-") ?? "";
+
+/** C6: resolve merge-report keys back to the pre-merge rows, so the caller can
+ *  book every absorbed duplicate against its survivor in the candidate ledger.
+ *  Keys fall back to bare ids when the pre-merge row is no longer at hand. */
+export function mergeReportPairs(input: SpecRow[], report: MergedDuplicate[]): Array<{ absorbed: LedgerRow; survivor: LedgerRow }> {
+  const byKey = new Map(input.map((row) => [rowKey(row), row] as const));
+  return report.map(({ mergedKey, keptKey }) => ({
+    absorbed: byKey.get(mergedKey) ?? { key: mergedKey },
+    survivor: byKey.get(keptKey) ?? { key: keptKey },
+  }));
+}
 
 /** Merge only shared entity identifiers; preserve sources and subject binding. */
 export function mergeDuplicateCandidates(input: SpecRow[]): MergeDuplicateResult {

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { mergeDuplicateCandidates } from "../candidate-merge";
+import { mergeDuplicateCandidates, mergeReportPairs } from "../candidate-merge";
+import { createCandidateLedger } from "../candidate-ledger";
 import type { SpecRow } from "@/lib/spec-search.functions";
 
 const person = (patch: Partial<SpecRow>): SpecRow => ({ kind: "person", title: "Ada Example", detail: "Founder at Example",
@@ -46,5 +47,24 @@ describe("candidate entity merging", () => {
     const unmerged = mergeDuplicateCandidates([person({ key: "solo" })]);
     expect(unmerged).toHaveLength(1);
     expect(unmerged.mergeReport).toEqual([]);
+  });
+
+  // C6: the production funnel books mergeReportPairs(...) into the ledger, so
+  // a dropped duplicate stays visible as `absorbed` instead of vanishing.
+  it("funnels the merge report into the ledger so absorbed duplicates stay visible", () => {
+    const input: SpecRow[] = [
+      { kind: "company", title: "Example", detail: "", url: "https://www.example.test/?utm_source=x", page_type: "entity_page" },
+      { kind: "company", title: "Example Inc", detail: "", url: "https://example.test", page_type: "entity_page", phone: "+14165550100" },
+    ];
+    const merged = mergeDuplicateCandidates(input);
+    expect(merged).toHaveLength(1);
+    expect(merged.mergeReport).toEqual([{ mergedKey: "example", keptKey: "example-inc" }]);
+    const ledger = createCandidateLedger();
+    for (const { absorbed, survivor } of mergeReportPairs(input, merged.mergeReport ?? [])) ledger.merged(absorbed, survivor);
+    for (const row of merged) ledger.retrieved(row);
+    ledger.delivered(merged, []);
+    const summary = ledger.summary();
+    expect(summary.counts).toMatchObject({ returned: 1, absorbed: 1, unaccounted: 0 });
+    expect(summary.accounting).toEqual({ retrieved: 2, fated: 2, unaccounted: 0, ok: true });
   });
 });

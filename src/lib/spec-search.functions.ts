@@ -42,7 +42,7 @@ import { missingRequiredFields } from "@/lib/search/completeness";
 import { formatPlace, markSoftDuplicates } from "@/lib/search/format-place";
 import { makeEvidence } from "@/lib/search/evidence";
 import type { Evidence } from "@/lib/search/evidence";
-import { mergeDuplicateCandidates } from "@/lib/search/candidate-merge";
+import { mergeDuplicateCandidates, mergeReportPairs } from "@/lib/search/candidate-merge";
 import { normalizeRole } from "@/lib/search/search-spec-extract";
 // NOTE: provider modules stay behind dynamic import() at their use sites.
 // This file is statically imported by client routes, and the provider
@@ -1494,7 +1494,12 @@ export async function runSpecSearchCore(
       qualified_count: rows.length,
       offset: effOffset,
       limit,
-      hasMore: all.length > effOffset + limit || branchResults.some((result) => result.hasMore),
+      // Zero-delivery contract (Defect A): an empty delivered page promises nothing.
+      hasMore: rows.length > 0 && (all.length > effOffset + limit || branchResults.some((result) => result.hasMore)),
+      moreAvailableMessage:
+        rows.length > 0
+          ? branchResults.find((result) => result.moreAvailableMessage)?.moreAvailableMessage ?? null
+          : null,
       totalAvailable: branchResults.every((result) => result.totalAvailable !== null)
         ? branchResults.reduce((sum, result) => sum + (result.totalAvailable ?? 0), 0)
         : null,
@@ -2028,7 +2033,10 @@ export async function runSpecSearchCore(
   try {
     throwIfAborted(deps.signal);
     const { enrichCandidatesForSpec } = await import("@/lib/search/enrichment-run");
-    const known = mergeDuplicateCandidates([...completeRows, ...incompleteRows]);
+    const knownInput = [...completeRows, ...incompleteRows];
+    const known = mergeDuplicateCandidates(knownInput);
+    // C6: duplicates dropped by the merge are ledgered as absorbed, not lost.
+    for (const { absorbed, survivor } of mergeReportPairs(knownInput, known.mergeReport ?? [])) ledger.merged(absorbed, survivor);
     // C6 accounting: every row entering the funnel gets booked, so
     // summary().accounting can prove retrieved === fated (unaccounted: 0).
     for (const row of known) ledger.retrieved(row);
@@ -2281,7 +2289,12 @@ export async function runSpecSearchCore(
   incompleteRows = [...incompleteRows, ...liveIncompleteRows];
 
   // DB and live providers can discover the same canonical entity.
-  completeRows = mergeDuplicateCandidates(completeRows).map((r) => {
+  const preMergeComplete = completeRows;
+  const mergedComplete = mergeDuplicateCandidates(preMergeComplete);
+  // C6: ledger every duplicate the merge absorbed — the survivor alone must
+  // not hide the rows it folded in.
+  for (const { absorbed, survivor } of mergeReportPairs(preMergeComplete, mergedComplete.mergeReport ?? [])) ledger.merged(absorbed, survivor);
+  completeRows = mergedComplete.map((r) => {
     ledger.retrieved(r);
     return sanitizeSpecRow(r, spec);
   });
@@ -2302,7 +2315,12 @@ export async function runSpecSearchCore(
       throwIfAborted(deps.signal);
       const { enrichCandidatesForSpec } = await import("@/lib/search/enrichment-run");
       const knownRows = completeRows.filter((row) => enrichedDbKeys.has(row.entity_id ?? row.key ?? ""));
-      const researchable = mergeDuplicateCandidates([...completeRows, ...incompleteRows]).filter(
+      const poolInput = [...completeRows, ...incompleteRows];
+      const pool = mergeDuplicateCandidates(poolInput);
+      // C6: ledger duplicates the pool merge absorbed (report lives on the
+      // unfiltered array — filter() would drop it).
+      for (const { absorbed, survivor } of mergeReportPairs(poolInput, pool.mergeReport ?? [])) ledger.merged(absorbed, survivor);
+      const researchable = pool.filter(
         (row) => !enrichedDbKeys.has(row.entity_id ?? row.key ?? ""),
       );
       for (const row of researchable) ledger.retrieved(row);
@@ -2546,11 +2564,16 @@ export async function runSpecSearchCore(
   // slice the page here, after validation + opportunity + key filters, so
   // every page holds verified matches only. hasMore is exact (fetch-cap hit
   // or validated overflow) — the result set itself has no ceiling.
-  const { page, hasMore } = applyPage(completeRows, {
+  const { page, hasMore: fetchedHasMore } = applyPage(completeRows, {
     offset: pageBaseOffset,
     limit,
     fetchedHitCap,
   });
+  // Zero-delivery contract (E2E Defect A, I01/I02/R03): when nothing was
+  // returned to the user, the payload must not promise more — no "Show more"
+  // affordance under 0 results, no "more verified leads" message. When at
+  // least one row is delivered, the exact pagination signal is kept as-is.
+  const hasMore = page.length > 0 && fetchedHasMore;
   {
     // The UI renders only what the QualifiedLead projection accepts; a row
     // it refuses is a server→UI loss and must be explained, not vanish.
@@ -2577,7 +2600,7 @@ export async function runSpecSearchCore(
     }));
   }
   const moreAvailableMessage =
-    hasMore || incompleteRows.length > 0
+    page.length > 0 && (hasMore || incompleteRows.length > 0)
       ? "There are more verified leads — want to see them?"
       : null;
   // Thin-ask (Phase 3 jobs, Phase 5 general): a ready spec whose retrieval

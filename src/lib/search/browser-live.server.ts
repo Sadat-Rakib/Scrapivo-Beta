@@ -137,6 +137,8 @@ export type BrowserCandidateMemory = {
   lastQualification?: ReturnType<typeof qualifyLead>;
   status: ResearchStatus;
   verificationStatus: "discovered" | "verified" | "unresolved";
+  /** Caller-supplied seed the browser has not observed anything for yet. */
+  unobserved?: boolean;
 };
 
 let extractionModelUnavailableUntil = 0;
@@ -713,7 +715,12 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
   const announceVerified = (candidate: BrowserCandidateMemory) => {
     if (controller.signal.aborted) return;
     const stageKey = `${candidate.row.entity_id ?? ""}|${(candidate.row.title ?? "").toLowerCase()}`;
-    if (!foundSeen.has(stageKey)) {
+    // A caller-supplied seed the browser has not observed anything for is not
+    // a sighting: it is never announced as found (a cancelled run must
+    // deliver no rows at all, and the UI must never be told the run found
+    // something no page showed). An observed merge or extraction clears the
+    // flag and the normal two-stage stream applies from then on.
+    if (!candidate.unobserved && !foundSeen.has(stageKey)) {
       foundSeen.add(stageKey);
       progress("Candidate found", undefined, candidate.row.title);
       rowEvent(candidate, "provisional");
@@ -733,7 +740,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
     candidate.verificationStatus = candidate.status === "verified" ? "verified" : "discovered";
     announceVerified(candidate);
   };
-  const remember = (rows: SpecRow[], query?: string, target?: BrowserCandidateMemory) => {
+  const remember = (rows: SpecRow[], query?: string, target?: BrowserCandidateMemory, observed = true) => {
     for (const row of rows) {
       const note = (outcome: Extract<BrowserTraceEvent, { kind: "remember" }>["outcome"]) =>
         trace({ kind: "remember", name: String(row.title ?? "").slice(0, 120), rowKind: row.kind, outcome, resolved: row.entity_resolved });
@@ -744,12 +751,14 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       const previous = target ?? memory.find((item) => sameCandidate(item.row, row));
       if (previous) {
         previous.row = mergeCandidate(previous.row, row);
+        // Observed evidence merged into a seed makes it a sighting.
+        if (observed) previous.unobserved = false;
         if (query && !previous.queriesRun.includes(query)) previous.queriesRun.push(query);
         refresh(previous);
         note("merged");
       } else if (memory.length < maxCandidates) {
         // Research mutates candidate rows; never mutate the caller's objects.
-        const candidate: BrowserCandidateMemory = { row: { ...row }, missing: [], needs: [], visitedUrls: [], queriesRun: [], attempts: 0, status: "discovered", verificationStatus: "discovered" };
+        const candidate: BrowserCandidateMemory = { row: { ...row }, missing: [], needs: [], visitedUrls: [], queriesRun: [], attempts: 0, status: "discovered", verificationStatus: "discovered", unobserved: !observed || undefined };
         refresh(candidate);
         memory.push(candidate);
         note("accepted");
@@ -828,8 +837,16 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
           const url = link.url ? destination(link.url, observation.snapshot.url) : null;
           return url ? [[url, { url, ref: link.ref, title: link.name }] as const] : [];
         })).values()];
-        const output = unwrapped.filter((link) => serpResultShares(query, link.title, link.url));
-        trace({ kind: "search", query, via: engine, status: output.length ? "ok" : "empty", results: output.length, reason: `raw_links=${links.length} unrelated=${unwrapped.length - output.length}` });
+        const gated = unwrapped.filter((link) => serpResultShares(query, link.title, link.url));
+        // Token overlap is a degraded-SERP heuristic, not the engine's ranking:
+        // an organic result's title often shares no query token ("Acme team"
+        // for "SaaS founders in Canada"). In DISCOVERY the engine's organic
+        // links are the only lead source, so a gate that would discard every
+        // one of them keeps the engine-ranked links instead of starving the
+        // run. Candidate research keeps the strict gate: a probe for a known
+        // entity must not wander onto term-unrelated pages.
+        const output = gated.length || candidate ? gated : unwrapped;
+        trace({ kind: "search", query, via: engine, status: output.length ? "ok" : "empty", results: output.length, reason: `raw_links=${links.length} gated=${gated.length}` });
         log({ source: engine, action: "search", query, resultLinks: output.length });
         if (output.length) { searchCache.set(query, output); progress("Found search results", engine, `${output.length} links`); return output; }
       } catch (error) {
@@ -1333,7 +1350,10 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
         (spec.entity === "company" && /\btoronto\b/i.test(row.title) ? 1 : 0);
       return score(b) - score(a);
     }).slice(0, 3);
-    remember([...initial.filter((row) => row.entity_resolved !== false), ...rankedSources]);
+    // Seeds enter memory silently: they are the caller's own input, not a
+    // browser sighting, so they stream nothing until a page observation
+    // merges into them (or they verify on their own stated evidence).
+    remember([...initial.filter((row) => row.entity_resolved !== false), ...rankedSources], undefined, undefined, false);
     log({ action: "seed", supplied: initial.length, accepted: memory.length, resolved: memory.filter((item) => item.row.entity_resolved).length });
     const initiallyResearched = new Set<BrowserCandidateMemory>();
     let sourcePagesResearched = 0;
@@ -1372,8 +1392,11 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       const pages: BrowserObservedPage[] = [];
       // PASS A: triage results BEFORE spending navigations (Workstream G) —
       // the best-scoring share of the page budget goes to relevant,
-      // first-party-looking sources; contamination and zero-overlap sinks are
-      // skipped without a navigation.
+      // first-party-looking sources, and contamination/unnavigable sinks are
+      // skipped without a navigation. These links already passed the SERP
+      // relevance gate in search(), so triage ORDERS them and sinks only hard
+      // negatives (score <= -50); a zero-overlap title is not evidence of
+      // irrelevance and must never silently drop the result.
       const unseen = results.filter((item) => !visited.has(item.url));
       const criterion = (field: string) => spec.criteria.find((c) => c.field === field)?.value ?? null;
       const ranked = triageSerpResults(
@@ -1383,7 +1406,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
           locationTerms: [criterion("location"), criterion("geo_scope")].filter(Boolean) as string[],
           signalTerms: [criterion("requested_service"), criterion("requested_product"), criterion("content_topic"), criterion("requested_role")].filter(Boolean) as string[],
         },
-      ).filter((item) => item.accept).slice(0, 2);
+      ).filter((item) => item.score > -50).slice(0, 2);
       for (const rankedItem of ranked) {
         const link = unseen.find((item) => item.url === rankedItem.url);
         if (!link) continue;

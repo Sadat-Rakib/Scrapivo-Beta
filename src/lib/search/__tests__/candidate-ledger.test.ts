@@ -86,6 +86,39 @@ describe("candidate ledger", () => {
   });
 });
 
+// C6: candidate merge must not drop rows between the funnel stages — every
+// absorbed duplicate is ledgered against its survivor instead of vanishing.
+describe("candidate ledger merge accounting", () => {
+  it("keeps duplicates a merge absorbed visible, so accounting reconciles", () => {
+    const ledger = createCandidateLedger();
+    // Titles differ enough that ledger identity alone would not bind them —
+    // exactly the gap `merged()` closes.
+    ledger.streamed({ key: "browser:9", entity_id: "browser:9", title: "Nadia Rahim", company: "Rahim Legal" });
+    ledger.merged(
+      { key: "browser:9", entity_id: "browser:9", title: "Nadia Rahim", company: "Rahim Legal" },
+      { key: "db:9", entity_id: "db:9", title: "Nadia Rahim LLB", company: "Rahim Legal PC" },
+    );
+    ledger.merged({ key: "db:2", title: "Nadia R." }, { key: "db:9", entity_id: "db:9", title: "Nadia Rahim LLB", company: "Rahim Legal PC" });
+    ledger.retrieved({ key: "db:9", entity_id: "db:9", title: "Nadia Rahim LLB", company: "Rahim Legal PC" });
+    ledger.delivered([{ key: "db:9", entity_id: "db:9", title: "Nadia Rahim LLB", company: "Rahim Legal PC" }], []);
+    const summary = ledger.summary();
+    expect(summary.counts).toMatchObject({ returned: 1, absorbed: 2, unaccounted: 0 });
+    expect(summary.accounting).toEqual({ retrieved: 3, fated: 3, unaccounted: 0, ok: true });
+  });
+
+  it("reports an absorbed streamed lead as merged, not unaccounted", () => {
+    const ledger = createCandidateLedger();
+    ledger.streamed({ key: "browser:ben", entity_id: "browser:ben", title: "Ben Okafor" });
+    ledger.merged({ key: "browser:ben", entity_id: "browser:ben", title: "Ben Okafor" }, { key: "db:ben", title: "Ben Okafor" });
+    const summary = ledger.summary();
+    expect(summary.counts.unaccounted).toBe(0);
+    expect(summary.streamedNotReturned).toEqual([
+      { key: "browser:ben", title: "Ben Okafor", fate: "absorbed", reason: "merged into db:ben" },
+    ]);
+    expect(streamedFateLabel({ fate: "absorbed", reason: "merged into db:ben" })).toBe("merged with a duplicate lead");
+  });
+});
+
 // Real server core: two founders verify and stream while researching, but the
 // page holds one. The second must be reported "on the next page", not vanish.
 const LIST = "https://publisher.test/top-25-b2b-saas-founder-list";

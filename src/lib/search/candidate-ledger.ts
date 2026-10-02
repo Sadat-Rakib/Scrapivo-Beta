@@ -22,6 +22,8 @@ export type CandidateFate =
   | "incomplete"
   /** Held back because an earlier pass of the same job already delivered it. */
   | "excluded"
+  /** Folded into a duplicate survivor by candidate merge (C6); the survivor carries its fate. */
+  | "absorbed"
   /** Streamed while researching, never seen again by the funnel. */
   | "unaccounted";
 
@@ -58,9 +60,10 @@ export type CandidateLedgerSummary = {
   accounting?: CandidateAccounting;
 };
 
-const FATES: CandidateFate[] = ["returned", "qualified_more", "rejected", "gated", "filtered", "incomplete", "excluded", "unaccounted"];
-// Later stages win, except that nothing downgrades a delivered row.
-const RANK: Record<CandidateFate, number> = { unaccounted: 0, incomplete: 1, filtered: 2, rejected: 3, gated: 4, excluded: 5, qualified_more: 6, returned: 7 };
+const FATES: CandidateFate[] = ["returned", "qualified_more", "rejected", "gated", "filtered", "incomplete", "excluded", "absorbed", "unaccounted"];
+// Later stages win, except that nothing downgrades a delivered row. `absorbed`
+// sits with `unaccounted`: any real fate booked later overrides it.
+const RANK: Record<CandidateFate, number> = { unaccounted: 0, absorbed: 0, incomplete: 1, filtered: 2, rejected: 3, gated: 4, excluded: 5, qualified_more: 6, returned: 7 };
 
 const norm = (value: string | null | undefined) => (value ?? "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 
@@ -136,6 +139,14 @@ export function createCandidateLedger() {
           if (!entry.ids.includes(id)) entry.ids.push(id);
         }
       }
+    },
+    /** C6: a duplicate folded into a survivor by mergeDuplicateCandidates.
+     *  The absorbed row keeps its own ledgered fate (`absorbed`) instead of
+     *  vanishing between stages; the survivor carries the real fate, and any
+     *  later booking on the same identity still wins over `absorbed`. */
+    merged(absorbed: LedgerRow, survivor: LedgerRow) {
+      const into = survivor.key ?? survivor.entity_id ?? norm(survivor.title);
+      upsert(absorbed, "absorbed", into ? `merged into ${into}` : "merged into a duplicate");
     },
     /** Final lead-check decision for a complete candidate. */
     decided(row: LedgerRow, decision: { disposition: string; reject_code?: string | null }) {
@@ -221,6 +232,7 @@ export function streamedFateLabel(item: Pick<StreamedReconciliation, "fate" | "r
     case "filtered": return "did not match every part of your request";
     case "incomplete": return "still missing required details";
     case "excluded": return "already delivered earlier";
+    case "absorbed": return "merged with a duplicate lead";
     case "unaccounted": return "could not be confirmed";
     default: return "not in the final list";
   }

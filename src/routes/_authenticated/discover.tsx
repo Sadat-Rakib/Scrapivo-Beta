@@ -734,11 +734,49 @@ function DiscoverPage() {
         setClarifyQs(res.clarify);
         setPendingQuery(query);
         setActiveQuery(query);
-        setZeroNarrative(
-          thinAsk && res.outcome === "NO_QUALIFIED_RESULTS"
-            ? enrichZeroNarrative(zeroResultsNarrative(res.retrievalTrace), res.candidateLedger)
-            : null,
-        );
+        if (res.outcome) {
+          // R03 (Defect B): a COMPLETED zero run that carries a thin-ask must
+          // still land the zero screen — never a bare bubble + questions limbo
+          // that regresses toward the greeting. Attach the empty result set to
+          // the turn (renders the "Results for · 0 results" header + narrative),
+          // surface the streamed reconciliation, and keep pagination honest
+          // (zero delivered → no Show more). The questions remain offered as a
+          // refinement panel above the composer.
+          setLeads([]);
+          setCompanies([]);
+          setPeople([]);
+          setLocalRows([]);
+          setTurns((prev) =>
+            prev.map((t) =>
+              t.id === turnId
+                ? { ...t, results: { leads: [], companies: [], people: [], local: [] } }
+                : t,
+            ),
+          );
+          specOffsetRef.current[turnId] = offset + res.rows.length;
+          setSpecHasMore(false);
+          setStreamedMissing(
+            (res.candidateLedger?.streamedNotReturned ?? []).map((item) => ({
+              key: item.key,
+              title: item.title,
+              label: streamedFateLabel(item),
+            })),
+          );
+          setZeroNarrative(
+            res.outcome === "NO_QUALIFIED_RESULTS"
+              ? enrichZeroNarrative(zeroResultsNarrative(res.retrievalTrace), res.candidateLedger)
+              : null,
+          );
+          if (turnId === pendingTurnIdRef.current) {
+            const zeroOutcome = outcomeUi(res.outcome, {
+              superseded: session.wasSuperseded(res.search_run_id),
+              detail: res.boundary_message ?? zeroResultsNarrative(res.retrievalTrace) ?? res.retrievalTrace?.sourceHealth?.summary ?? null,
+            });
+            if (shouldSurfaceOutcome(zeroOutcome)) toast.info(zeroOutcome.message!);
+          }
+        } else {
+          setZeroNarrative(null);
+        }
         session.settle(res);
         return;
       }
@@ -2155,6 +2193,26 @@ function DiscoverPage() {
                             </button>
                           </div>
                           {renderResultSections(t.results, t.filter ?? null)}
+                          {/* Turn-owned honest zero (Defect B): a settled turn
+                              with an empty result set must say WHERE the search
+                              stopped (enriched zero narrative), not just show a
+                              bare "· 0 results" header. */}
+                          {isLast &&
+                            t.results.leads.length === 0 &&
+                            t.results.companies.length === 0 &&
+                            t.results.people.length === 0 &&
+                            t.results.local.length === 0 && (
+                              <div className="rounded-xl border border-border bg-card p-6 text-sm text-muted-foreground space-y-3">
+                                <div className="text-foreground font-medium">
+                                  {zeroNarrative
+                                    ? zeroNarrative
+                                    : `No verified matches found for "${displaySearchLabel(t.text)}" yet.`}
+                                </div>
+                                <div>
+                                  Try broadening the search — remove a constraint, add a location, or search without a filter.
+                                </div>
+                              </div>
+                            )}
                         </>
                       ) : (
                         <button
