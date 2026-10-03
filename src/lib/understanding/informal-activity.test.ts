@@ -5,13 +5,7 @@ import { frameToSearchSpec } from "./to-search-spec";
 /** PRD V2 Phase 9: informal do-verb shapes must resolve the activity into the
  *  spec BEFORE clarification evaluation — no "what should they be doing?" for
  *  an activity the user already stated. */
-// KNOWN-OPEN (PRD V2 Phase 9): the deterministic parser consumes the
-// "doing X" tail before the category capture can use it, and a naive
-// do-verb addition to the shared ACTIVITY_VERB_TOKENS set regresses 16
-// place-span/corpus tests. Needs a parser session where the tail is
-// captured at the relation reader. Evidence: N2 manual run asked the
-// ENTITY question for this shape (evidence/runs/N2.json).
-describe.skip("informal activity shapes resolve before clarification", () => {
+describe("informal activity shapes resolve before clarification", () => {
   const cases: Array<{ query: string; entity: string; activity: string; location: string }> = [
     { query: "anyone doing solar installation around Windhoek? get me as many decent ones as you can with numbers", entity: "business", activity: "solar installation", location: "Windhoek" },
     { query: "companies doing solar installation in Windhoek", entity: "company", activity: "solar installation", location: "Windhoek" },

@@ -2771,7 +2771,34 @@ export function extractFrameDeterministic(
   }
 
   // 11. Task + mode.
-  const relType = frame.relation.type.value as RelationType;
+  let relType = frame.relation.type.value as RelationType;
+  // 11a. Activity capture (PRD V2 Phase 4 / P1-D): "companies doing solar
+  // installation in Windhoek" — when the relation wording is a do/offer/provide
+  // verb the deterministic reader cannot classify, its OBJECT is the requested
+  // trade, not a mystery to clarify about. Implemented at the relation
+  // evaluation ONLY (never in the shared ACTIVITY_VERB_TOKENS set — that
+  // regressed place-span parsing; see SEARCH_EXECUTION_MAP.md P1-D).
+  if ((relType === "unknown" || relType === "offers_service" || relType === "none") &&
+      !frame.target.category && !frame.target.industry &&
+      ["business", "company", "organization", "unknown"].includes(frame.target.entity_type.value)) {
+    const activityMatch = /\b(?:doing|does|do|offering|offers|offer|providing|provides|provide|making|makes|make|running|runs|run)\s+((?:[a-z][a-z'-]*\s+){0,2}[a-z][a-z'-]*)\s*(?:\?|[.,;]|$|\s+(?:in|near|around|across|with|for)\b)/i.exec(frame.input.normalized);
+    const activity = activityMatch?.[1]?.trim();
+    const vague = !activity || /^(that|this|it|them|the same|something|stuff)\b/i.test(activity);
+    const locValue = frame.location?.value?.toLowerCase() ?? null;
+    if (activity && !vague && !(locValue && activity.toLowerCase().includes(locValue))) {
+      frame.target.category = openValue(activity.toLowerCase(), activityMatch![0].trim(), null, 0.7);
+      if (frame.target.entity_type.value === "unknown") {
+        frame.target.entity_type = { value: "business", raw: "anyone doing " + activity, confidence: 0.7 };
+        notes.push('"anyone doing X" reads as a business target (PRD V2 Phase 4)');
+      }
+      notes.push('activity "' + activity + '" read as the target category (PRD V2 Phase 4)');
+      if (relType === "unknown") {
+        // The wording described the target's trade, not a relationship.
+        frame.relation.type = { value: "none", raw: "activity wording", confidence: 0.7 };
+        relType = "none";
+      }
+    }
+  }
   const mode = prospectingModeFor(relType, entity, frame.relation.label);
   frame.prospecting_mode = { value: mode.mode, raw: null, confidence: mode.confidence };
 
