@@ -1361,6 +1361,49 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
         }
         if (done()) break;
       }
+      // Search-based official-domain discovery (Final-MVP PRD Phase B): slug
+      // guessing is only the cheap early attempt. When it failed to resolve a
+      // site, ask the search engine for the candidate's own web presence and
+      // verify the top non-directory result before attaching it.
+      if (!candidate.row.website_url && !candidate.row.profile_url && companyName && !limitReached()) {
+        const locValue = spec.criteria.find((c) => c.field === "location")?.value ?? candidate.row.location ?? null;
+        const domainQuery = [`"${companyName.replace(/"/g, "")}"`, locValue ? `"${locValue}"` : null, "contact"].filter(Boolean).join(" ");
+        if (!candidate.queriesRun.includes(domainQuery)) {
+          candidate.queriesRun.push(domainQuery);
+          progress("Searching for official website", undefined, companyName);
+          const results = await search(domainQuery, candidate);
+          const candidates = results
+            .filter((item) => !isDirectoryHost(item.url) && !candidate.visitedUrls.includes(item.url))
+            .slice(0, 1);
+          for (const link of candidates) {
+            if (candidate.visitedUrls.length >= 4 || limitReached()) break;
+            const value = await readPage({ url: link.url, ref: "" }, candidate, true, "domain_discovery");
+            if (!value) continue;
+            const synthetic: BrowserExtractedEntity = { page: 0, kind: candidate.row.kind, name: candidate.row.title, identityQuote: candidate.row.title };
+            const resolved = entityDestination(value.page, synthetic, companyName);
+            if (!resolved.website_url) continue;
+            candidate.row = { ...candidate.row, ...resolved };
+            progress("Official website discovered", new URL(value.page.url).hostname, candidate.row.title);
+            await extract([value.page], undefined, candidate);
+            refresh(candidate);
+            if (done()) break;
+            const site = candidate.row.website_url?.replace(/\/+$/, "");
+            const hasContact = !!candidate.row.phone || !!candidate.row.email;
+            if (site && !hasContact && candidate.visitedUrls.length < 4 && !limitReached()) {
+              for (const path of ["/contact", "/contact-us"]) {
+                const contactUrl = `${site}${path}`;
+                if (candidate.visitedUrls.includes(contactUrl)) continue;
+                const contactPage = await readPage({ url: contactUrl, ref: link.url }, candidate, true, "first_party_contact");
+                if (!contactPage) continue;
+                await extract([contactPage.page], undefined, candidate);
+                refresh(candidate);
+                break;
+              }
+            }
+            break;
+          }
+        }
+      }
     };
     while (candidate.attempts < 2 && candidate.queriesRun.length < 2 && candidate.visitedUrls.length < 4 && !limitReached()) {
       check();
