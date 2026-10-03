@@ -1341,6 +1341,25 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
         await extract([value.page], undefined, candidate);
         refresh(candidate);
         if (done()) break;
+        // Contact discovery pass 2 (PRD Final-MVP Phase D): a small business
+        // lists its phone on its CONTACT page, not its homepage. When the
+        // resolved site has not yielded a phone/email yet, spend one bounded
+        // read on its contact surface before giving up on this candidate.
+        const site = candidate.row.website_url?.replace(/\/+$/, "");
+        const hasContact = !!candidate.row.phone || !!candidate.row.email;
+        if (site && !hasContact && candidate.visitedUrls.length < 4 && !limitReached()) {
+          for (const path of ["/contact", "/contact-us"]) {
+            const contactUrl = `${site}${path}`;
+            if (candidate.visitedUrls.includes(contactUrl)) continue;
+            const contactPage = await readPage({ url: contactUrl, ref: value.page.url }, candidate, true, "first_party_contact");
+            if (!contactPage) continue;
+            const contactEntity: BrowserExtractedEntity = { page: 0, kind: candidate.row.kind, name: candidate.row.title, identityQuote: candidate.row.title };
+            await extract([contactPage.page], undefined, candidate);
+            refresh(candidate);
+            break;
+          }
+        }
+        if (done()) break;
       }
     };
     while (candidate.attempts < 2 && candidate.queriesRun.length < 2 && candidate.visitedUrls.length < 4 && !limitReached()) {
