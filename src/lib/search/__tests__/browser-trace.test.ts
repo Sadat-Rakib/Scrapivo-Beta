@@ -128,3 +128,28 @@ it("still rejects a person-kind entity with no org fields and no person signals 
   expect(rows).toEqual([]);
   expect(events).toContainEqual(expect.objectContaining({ kind: "entity", outcome: "rejected", reason: "ENTITY_TYPE_MISMATCH" }));
 });
+
+describe("person-card normalization fallback (PRD Phase 2 — C2)", () => {
+  const card = "Dana Villanueva is the wedding photographer behind Dana Villanueva Photography in Cebu, covering weddings across Cebu and Bohol.";
+
+  it("a Cebu wedding-photographer person card normalizes to a person row", () => {
+    const { events, onTrace } = collect();
+    const rows = browserEntitiesToRows([
+      { page: 0, kind: "person", name: "Dana Villanueva", identityQuote: card,
+        fields: { role: { value: "wedding photographer", quote: card }, location: { value: "Cebu", quote: card } } },
+    ], [{ ...page, text: card }], onTrace);
+    expect(rows.map((row) => row.title)).toEqual(["Dana Villanueva"]);
+    expect(rows[0].kind).toBe("person");
+    expect(events).not.toContainEqual(expect.objectContaining({ kind: "entity", outcome: "rejected", reason: "ENTITY_TYPE_MISMATCH" }));
+  });
+
+  it("a person entity without person tokens or structural person evidence stays rejected", () => {
+    const { events, onTrace } = collect();
+    const odd = "Xylo Quench operates somewhere and does unnamed things for clients around the region.";
+    const rows = browserEntitiesToRows([
+      { page: 0, kind: "person", name: "Xylo Quench", identityQuote: odd },
+    ], [{ ...page, text: odd }], onTrace);
+    expect(rows).toEqual([]);
+    expect(events).toContainEqual(expect.objectContaining({ kind: "entity", outcome: "rejected", reason: "ENTITY_TYPE_MISMATCH" }));
+  });
+});

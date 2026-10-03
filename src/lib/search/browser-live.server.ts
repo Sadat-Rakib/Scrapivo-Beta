@@ -487,7 +487,16 @@ export function browserEntitiesToRows(
       const orgFieldKeys = ["website", "phone", "email", "category", "industry", "location", "address"];
       const hasOrgField =
         entity.kind === "business" && Object.keys(entity.fields ?? {}).some((k) => orgFieldKeys.includes(k));
-      if (!hasOrgField) {
+      // Person cards (PRD Phase 2): role/company fields bound to the named
+      // subject are structural proof of a person even when no person token
+      // ("founder", "CEO", ...) appears verbatim — e.g. wedding photographers
+      // listed as "Name — wedding photographer, Cebu" (C2 evidence).
+      const personCard =
+        entity.kind === "person" &&
+        typeof entity.fields?.role?.value === "string" &&
+        entity.fields.role.value.trim().length > 2 &&
+        (!!entity.fields?.company?.value || !!entity.fields?.location?.value);
+      if (!hasOrgField && !personCard) {
         onTrace?.({ kind: "entity", pageUrl: page.url, name: entity.name.slice(0, 120), entityKind: entity.kind, outcome: "rejected",
           reason: "ENTITY_TYPE_MISMATCH", detail: "kind_unsupported_by_quotes", droppedFields });
         continue;
