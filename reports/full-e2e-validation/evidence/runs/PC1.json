@@ -1,0 +1,96 @@
+{
+  "id": "PC1",
+  "query": "Find 5 plumbers in Calgary with public phone numbers.",
+  "category": "local",
+  "viewport": "desktop",
+  "startedAt": "2026-10-03T14:36:09.247Z",
+  "main": {
+    "query": "Find 5 plumbers in Calgary with public phone numbers.",
+    "clarify": [
+      {
+        "question": "What are you trying to do with these results?",
+        "chosen": "Find prospects",
+        "t": 95
+      }
+    ],
+    "streamed": [],
+    "activity": [],
+    "bubbleVerbatim": true,
+    "runningAt": 47,
+    "clarifyAt": 95,
+    "clarifyRepeats": 0,
+    "settled": true,
+    "durationS": 372,
+    "firstStreamS": null,
+    "header": {
+      "query": "Find 5 plumbers in Calgary with public phone numbers.",
+      "count": 50
+    },
+    "leadCards": [],
+    "businessCards": [
+      "John The Plumber | plumber | Local | Calgary, AB | Email | Message | Website | +15878851541",
+      "Scandia Mechanical Svc | plumber | Local | Calgary, AB | Email | Message | Website | +14032498282 | info@scandiamechanical.ca",
+      "Comfort Union | plumber | Local | Calgary, AB | Email | Message | Website | +14033997903 | service@comfortunion.com",
+      "ProStar Plumbing & Heating | plumber | Local | Calgary, AB | Email | Message | Website | +14032507232",
+      "Home Tech Comfort Service | plumber | Local | Calgary, AB | Email | Message | Website | +15873303042",
+      "Royal Flush Kitchen & Bath Boutique | plumber | Local | Calgary, AB | Email | Message | Website | +14032282934",
+      "Papa Grant Mechanical | plumber | Local | Calgary, AB | Email | Message | Website | +14039926324",
+      "Superior Plumbing | plumber | Local | Calgary, AB | Email | Message | Website | +14034779754",
+      "Harper's Plumbing | plumber | Local | Calgary, AB | Email | Message | Website | +15872161755",
+      "N'Sink Plumbing Services Ltd | plumber | Local | Calgary, AB | Email | Message | Website | +14033867465",
+      "Tiptop Plumbing & Heating | plumber | Local | Calgary, AB | Email | Message | Website | +14039312900",
+      "ERM Plumbing & Heating | plumber | Local | Calgary, AB | Email | Message | Website | +14039787385",
+      "Randolph Stucco Repair Ltd | plumber | Local | Calgary, AB | Email | Message | Website | +14036064694",
+      "Clear Pipes Ltd | plumber | Local | Calgary, AB | Email | Message | Website | +14038500812",
+      "Cuthbert Plumbing & Heating | plumber | Local | Calgary, AB | Email | Message | Website | +14038637149"
+    ],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": false,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n03/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nWeb designers in Chicago Bakeries in Halifax\nExpand (0 results)\nFind 12 solar panel installers in Windhoek, Namibia with public phone numbers\nExpand (0 results)\nFind 15 freight forwarding companies in Tbilisi, Georgia with a website and public contact number\nExpand (0 results)\nFind 15 wedding photographers in Cebu, Philippines with phone numbers or WhatsApp contacts\nExpand (0 results)\nFind 20 construction companies in Banja Luka, Bosnia and Herzegovina with public phone numbers\nExpand (0 results)\nneed maybe 20 manufacturing businesses somewhere around da nang that actually export stuff, don't give me random directories\nExpand (0 results)\nanyone doing solar installation around Windhoek? get me as many decent ones as you can with numbers\nExpand (0 results)\nSaaS founders in Austin with public emails\nExpand (0 results)\nPlumbers in Denver\nExpand (0 results)\nFind 5 plumbers in Calgary with public phone numbers.\nResults for \"Find 5 plumbers in Calgary with public phone numbers.\" · 50 results\nShow more\nWatch signal\nCards\nLists\nClear\nFold (50 results)\nJohn The Plumber\nplumber\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+15878851541\nScandia Mechanical Svc\nplumber\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14032498282\ninfo@scandiamechanical.ca\nComfort Union\nplumber\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14033997903\nservice@comfortunion.com\nProStar Plumbing & Heating\nplumber\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14032507232\nHome Tech Comfort Service\nplumber\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+15873303042\nRoyal Flush Kitchen & Bath Boutique\nplumber\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14032282934\nPapa Grant Mechanical\nplumber\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14039926324\nSuperior Plumbing\nplumber\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14034779754\nHarper's Plumbing\nplumber\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+15872161755\nN'Sink Plumbing Services Ltd\nplumber\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14033867465\nTiptop Plumbing & Heating\nplumber\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14039312900\nERM Plumbing & Heating\nplumber\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14039787385\nRandolph Stucco Repair Ltd\nplumber\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14036064694\nClear Pipes Ltd\nplumber\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14038500812\nCuthbert Plumbing & Heating\nplumber\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14038637149\nCrowfoot Plumbing\nplumber\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14032881081\nBlack Hills Plumbing\nplumber\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14038373890\nWolseley\nplumber\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14032390564\nWhat The Flush Plumbing Services\nplumber\nLocal\n\ncalgary, AB\n\nEmail\nMessage\nWebsite\n+15879694194\nBootsma Heating & Air Conditioning LTD.\nplumber\nLocal\n\nCalgary, AB\n\nEmail\nMessage\nWebsite\n+14032088989\nPro-Plumb Mech"
+  },
+  "detail": "John The Plumber | plumber · Calgary | Category | plumber | Location | Calgary, AB | Opportunity | has website | Social | Website | Number | +15878851541 | Generate email | Generate message",
+  "server": {
+    "runId": null,
+    "specRuns": 0,
+    "spec": null,
+    "ledger": null,
+    "runtime": [],
+    "browserDone": [],
+    "searches": 0,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": []
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "info: [ui-projection] server=50 projected=50 rejected=0 codes={}"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 6,
+      "event": "a: submitted"
+    },
+    {
+      "t": 53,
+      "event": "a: running"
+    },
+    {
+      "t": 100,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 377,
+      "event": "a: settled"
+    }
+  ],
+  "screenshots": [
+    "ui/PC1-a-1-clarify.jpg",
+    "ui/PC1-a-6-final.jpg",
+    "ui/PC1-a-7-detail.jpg"
+  ],
+  "durationS": 388,
+  "responseBytes": 113230
+}

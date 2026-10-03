@@ -1,0 +1,5 @@
+[
+  { "id": "PC1", "category": "local", "query": "Find 5 plumbers in Calgary with public phone numbers.", "viewport": "desktop" },
+  { "id": "PC3", "category": "local", "query": "Find 5 local businesses in Calgary with a public phone number and website.", "viewport": "desktop" },
+  { "id": "PC2", "category": "company", "query": "Find SaaS companies currently hiring Account Executives in Toronto.", "viewport": "desktop" }
+]
