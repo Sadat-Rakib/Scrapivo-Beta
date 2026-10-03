@@ -3,7 +3,7 @@
   "query": "Find 12 solar panel installers in Windhoek, Namibia with public phone numbers",
   "category": "local",
   "viewport": "desktop",
-  "startedAt": "2026-10-02T17:47:13.293Z",
+  "startedAt": "2026-10-03T11:53:47.055Z",
   "main": {
     "query": "Find 12 solar panel installers in Windhoek, Namibia with public phone numbers",
     "clarify": [
@@ -16,25 +16,23 @@
     "streamed": [],
     "activity": [
       "Checked available records · Available records · 0",
-      "Working · Public business sources · Windhoek Namibia",
+      "Working · Public business sources · Windhoek, Namibia",
       "Found local businesses · Public business sources · 149",
-      "Query funnel · The web · 0",
-      "Checked public sources · Public business sources · 149",
+      "Query funnel · The web · 9",
+      "Checked public sources · Public source · 158",
       "Widening the search · Public source · pass 1 of 3",
       "Show all activity (12)",
-      "Found local businesses · Public business sources · 188",
-      "Reading page · wikinam.org",
-      "Reading page · wikinam.org · 12861 characters",
-      "Opening result · engineering10.com",
-      "Widen pass complete · Public business sources · 0 new candidates",
-      "Widening the search · Public source · pass 2 of 3",
-      "Reading page · wikinam.org · 13111 characters"
+      "Searching the web · The web · Soltec contact",
+      "Found possible leads · The web · 8 links",
+      "Opening result · soltec.com",
+      "Widen pass complete · Public source · 0 new candidates",
+      "Widening the search · Public source · pass 2 of 3"
     ],
     "bubbleVerbatim": true,
     "runningAt": 47,
     "clarifyAt": 94,
     "clarifyRepeats": 0,
-    "pill": "Scrapy is browsing · contractors1000.com · 4 pages · 00:26",
+    "pill": "Scrapy browser session · soltec.com.na · 10 pages · 00:28",
     "miniBrowserAt": 191,
     "viewingOnly": true,
     "settled": true,
@@ -49,7 +47,7 @@
     "zeroText": null,
     "reconciliation": null,
     "viewingOnlyFinal": true,
-    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n02/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nFind 12 solar panel installers in Windhoek, Namibia with public phone numbers\nResults for \"Find 12 solar panel installers in Windhoek, Namibia with public phone numbers\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\n337 candidates were found, but none matched the requested criteria.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nScrapy\nCANCELLED\ncontractors1000.com\nExtracting\n· Just a moment...\n4 pages\n7 actions\n00:29\nOpen original\nViewing only. Taking control needs the browser worker.\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n7 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n7 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n7 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n7 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n7 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n7 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n7 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n7 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n7 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n7 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n7 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n7 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n7 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n7 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n7 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n7 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n7 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n7 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n7 days ago\nFind SaaS founders globally who may need help with AI automat"
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n03/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nWeb designers in Chicago Bakeries in Halifax\nExpand (0 results)\nFind 12 solar panel installers in Windhoek, Namibia with public phone numbers\nResults for \"Find 12 solar panel installers in Windhoek, Namibia with public phone numbers\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\n7 candidates were found, but their public details could not be verified in the time available. 1 candidate looked promising but did not prove the requested details — such as public contact information or the signal you asked for.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nScrapy\nCANCELLED\nsoltec.com.na\nExtracting\n· SolTec\n10 pages\n17 actions\n00:28\nOpen original\nViewing only. Taking control needs the browser worker.\n9 leads seen while researching aren't in this list\nDensys Renewable Energy · did not match every part of your request\nSoltec · did not match every part of your request\nOrujaveze Solar · still missing required details\nSiemens · still missing required details\nDerken Enterprises · still missing required details\nand 4 more\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n8 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater To"
   },
   "server": {
     "runId": null,
@@ -71,23 +69,23 @@
   "pageErrors": [],
   "timeline": [
     {
-      "t": 8,
+      "t": 4,
       "event": "a: submitted"
     },
     {
-      "t": 55,
+      "t": 51,
       "event": "a: running"
     },
     {
-      "t": 103,
+      "t": 98,
       "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
     },
     {
-      "t": 201,
-      "event": "a: mini-browser (Scrapy is browsing · contractors1000.com · 4 pages · 00:26)"
+      "t": 196,
+      "event": "a: mini-browser (Scrapy browser session · soltec.com.na · 10 pages · 00:28)"
     },
     {
-      "t": 620,
+      "t": 616,
       "event": "a: settled"
     }
   ],
@@ -96,6 +94,6 @@
     "ui/W2-a-3-mini-browser.jpg",
     "ui/W2-a-6-final.jpg"
   ],
-  "durationS": 626,
-  "responseBytes": 33920
+  "durationS": 622,
+  "responseBytes": 35303
 }

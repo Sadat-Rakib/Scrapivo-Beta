@@ -3,23 +3,57 @@
   "query": "anyone doing solar installation around Windhoek? get me as many decent ones as you can with numbers",
   "category": "local",
   "viewport": "desktop",
-  "startedAt": "2026-10-02T22:27:50.326Z",
+  "startedAt": "2026-10-03T12:46:17.415Z",
   "main": {
     "query": "anyone doing solar installation around Windhoek? get me as many decent ones as you can with numbers",
-    "clarify": [],
-    "streamed": [],
-    "activity": [],
+    "clarify": [
+      {
+        "question": "What are you trying to do with these results?",
+        "chosen": "Find prospects",
+        "t": 3
+      }
+    ],
+    "streamed": [
+      "Densys Renewable Energy · +264837010100"
+    ],
+    "activity": [
+      "Checked available records · Available records · 0",
+      "Working · Public business sources · Windhoek",
+      "Candidate found · Sun Technics",
+      "Found possible leads · 9 candidates; 1 verified",
+      "Researching · 1/9",
+      "Show all activity (12)",
+      "Checked public sources · Public source · 9",
+      "Widening the search · Public source · pass 1 of 3",
+      "Found possible leads · 6 candidates; 0 verified",
+      "Checking company website · orujavezesolar.com · Orujaveze Solar",
+      "Opening result · orujavezesolar.com",
+      "Widen pass complete · Public source · 0 new candidates",
+      "Widening the search · Public source · pass 2 of 3",
+      "Opening result · namibiayp.com",
+      "Reading page · namibiayp.com",
+      "Reading page · namibiayp.com · 2398 characters"
+    ],
     "bubbleVerbatim": true,
-    "durationS": 608,
-    "firstStreamS": null,
-    "timedOut": true,
-    "header": null,
+    "clarifyAt": 2,
+    "clarifyRepeats": 0,
+    "runningAt": 9,
+    "pill": "Scrapy is browsing · namibiayp.com · 7 pages · 00:21",
+    "miniBrowserAt": 96,
+    "viewingOnly": true,
+    "settled": true,
+    "durationS": 518,
+    "firstStreamS": 96,
+    "header": {
+      "query": "anyone doing solar installation around Windhoek? get me as many decent ones as you can with numbers",
+      "count": 0
+    },
     "leadCards": [],
     "businessCards": [],
     "zeroText": null,
     "reconciliation": null,
-    "viewingOnlyFinal": false,
-    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\nS\nAccount\nManage account\nHOME\nNew chat\nHey 👋 I'm Scrapy. What are you looking for today?\nFind investors\nFind founders\nFind companies\nFind jobs\nFind local businesses\nMode\nThinker\nChat History\nNo searches yet. Run your first search.\nCreate new chat"
+    "viewingOnlyFinal": true,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n03/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nWeb designers in Chicago Bakeries in Halifax\nExpand (0 results)\nFind 12 solar panel installers in Windhoek, Namibia with public phone numbers\nExpand (0 results)\nFind 15 freight forwarding companies in Tbilisi, Georgia with a website and public contact number\nExpand (0 results)\nFind 15 wedding photographers in Cebu, Philippines with phone numbers or WhatsApp contacts\nExpand (0 results)\nFind 20 construction companies in Banja Luka, Bosnia and Herzegovina with public phone numbers\nExpand (0 results)\nneed maybe 20 manufacturing businesses somewhere around da nang that actually export stuff, don't give me random directories\nExpand (0 results)\nanyone doing solar installation around Windhoek? get me as many decent ones as you can with numbers\nResults for \"anyone doing solar installation around Windhoek? get me as many decent ones as you can with numbers\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\n7 candidates were found, but their public details could not be verified in the time available. 1 candidate looked promising but did not prove the requested details — such as public contact information or the signal you asked for.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nScrapy\nCANCELLED\nfacebook.com\nExtracting\n· Sunrise Solar Solutions CC | Windhoek\n8 pages\n13 actions\n00:29\nOpen original\nViewing only. Taking control needs the browser worker.\n9 leads seen while researching aren't in this list\nDensys Renewable Energy · did not match every part of your request\nSoltec · did not match every part of your request\nOrujaveze Solar · still missing required details\nSiemens · still missing required details\nDerken Enterprises · still missing required details\nand 4 more\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n8 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n"
   },
   "server": {
     "runId": null,
@@ -34,37 +68,45 @@
     "aiRouter": []
   },
   "worker": [],
-  "toasts": [],
+  "toasts": [
+    "No leads passed verification for this search. Try broadening criteria or refining the query."
+  ],
   "console": [
-    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
-    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
-    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
-    "error: TypeError: Failed to fetch\n    at http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:12921:23\n    at _handleRequest2 (http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:13229:20)\n    at _request (http://localhost:8080/node_modules/.vite/d",
-    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
-    "error: TypeError: Failed to fetch\n    at http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:12921:23\n    at _handleRequest2 (http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:13229:20)\n    at _request (http://localhost:8080/node_modules/.vite/d",
-    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
-    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
-    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
-    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
-    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
-    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
-    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
-    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
-    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED"
+    "info: [ui-projection] server=0 projected=0 rejected=0 codes={}"
   ],
   "pageErrors": [],
   "timeline": [
     {
-      "t": 58,
+      "t": 5,
       "event": "a: submitted"
     },
     {
-      "t": 666,
-      "event": "a: TIMEOUT"
+      "t": 7,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 13,
+      "event": "a: running"
+    },
+    {
+      "t": 101,
+      "event": "a: streamed rows visible"
+    },
+    {
+      "t": 103,
+      "event": "a: mini-browser (Scrapy is browsing · namibiayp.com · 7 pages · 00:21)"
+    },
+    {
+      "t": 522,
+      "event": "a: settled"
     }
   ],
   "screenshots": [
+    "ui/N2-a-1-clarify.jpg",
+    "ui/N2-a-2-streamed.jpg",
+    "ui/N2-a-3-mini-browser.jpg",
     "ui/N2-a-6-final.jpg"
   ],
-  "durationS": 672
+  "durationS": 529,
+  "responseBytes": 36920
 }

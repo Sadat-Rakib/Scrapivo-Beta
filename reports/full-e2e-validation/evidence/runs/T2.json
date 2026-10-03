@@ -3,32 +3,53 @@
   "query": "Find 15 freight forwarding companies in Tbilisi, Georgia with a website and public contact number",
   "category": "company",
   "viewport": "desktop",
-  "startedAt": "2026-10-02T19:37:23.853Z",
+  "startedAt": "2026-10-03T12:04:09.078Z",
   "main": {
     "query": "Find 15 freight forwarding companies in Tbilisi, Georgia with a website and public contact number",
     "clarify": [
       {
         "question": "What are you trying to do with these results?",
         "chosen": "Find prospects",
-        "t": 95
+        "t": 2
       }
     ],
     "streamed": [],
-    "activity": [],
+    "activity": [
+      "Checked available records · Available records · 0",
+      "Found possible leads · 5 candidates; 0 verified",
+      "Researching · 1/5",
+      "Opening result · cargolinked.com",
+      "Show all activity (12)",
+      "Query funnel · The web · 5",
+      "Checked public sources · Public source · 5",
+      "Widening the search · Public source · pass 1 of 3",
+      "Query funnel · The web · 0",
+      "Widen pass complete · Public source · 0 new candidates",
+      "Widening the search · Public source · pass 2 of 3",
+      "Query funnel · The web · 1",
+      "Widen pass complete · Public source · 1 new candidates",
+      "Widening the search · Public source · pass 3 of 3"
+    ],
     "bubbleVerbatim": true,
-    "runningAt": 47,
-    "clarifyAt": 95,
+    "clarifyAt": 2,
     "clarifyRepeats": 0,
-    "durationS": 4801,
+    "runningAt": 49,
+    "pill": "Scrapy is browsing · cargodirectoryworld.com · 5 pages · 00:04",
+    "miniBrowserAt": 233,
+    "viewingOnly": true,
+    "settled": true,
+    "durationS": 654,
     "firstStreamS": null,
-    "timedOut": true,
-    "header": null,
+    "header": {
+      "query": "Find 15 freight forwarding companies in Tbilisi, Georgia with a website and public contact number",
+      "count": 0
+    },
     "leadCards": [],
     "businessCards": [],
     "zeroText": null,
     "reconciliation": null,
-    "viewingOnlyFinal": false,
-    "finalTextSample": ""
+    "viewingOnlyFinal": true,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n03/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nWeb designers in Chicago Bakeries in Halifax\nExpand (0 results)\nFind 12 solar panel installers in Windhoek, Namibia with public phone numbers\nExpand (0 results)\nFind 15 freight forwarding companies in Tbilisi, Georgia with a website and public contact number\nResults for \"Find 15 freight forwarding companies in Tbilisi, Georgia with a website and public contact number\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\n1 candidates were found, but their public details could not be verified in the time available. 1 candidate looked promising but did not prove the requested details — such as public contact information or the signal you asked for.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nScrapy\nCANCELLED\ncargoyellowpages.com\nOpening result\n· TBILISI - GEORGIA, Freight Forwarders Cargo Agents Transports Logistics\n10 pages\n17 actions\n00:16\nOpen original\nViewing only. Taking control needs the browser worker.\n6 leads seen while researching aren't in this list\nACE Forwarding LTD · did not match every part of your request\nAGONTA LTD · did not match every part of your request\nAutologistics LTD · did not match every part of your request\nCargo Market Ltd · did not match every part of your request\nCargomarket Ltd · did not match every part of your request\nand 1 more\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n8 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in th"
   },
   "server": {
     "runId": null,
@@ -43,47 +64,40 @@
     "aiRouter": []
   },
   "worker": [],
-  "toasts": [],
+  "toasts": [
+    "No leads passed verification for this search. Try broadening criteria or refining the query."
+  ],
   "console": [
-    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
-    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
-    "error: Failed to load resource: net::ERR_NAME_NOT_RESOLVED",
-    "error: TypeError: Failed to fetch\n    at http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:12921:23\n    at _handleRequest2 (http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:13229:20)\n    at _request (http://localhost:8080/node_modules/.vite/d",
-    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
-    "error: TypeError: Failed to fetch\n    at http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:12921:23\n    at _handleRequest2 (http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:13229:20)\n    at _request (http://localhost:8080/node_modules/.vite/d",
-    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
-    "error: TypeError: Failed to fetch\n    at http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:12921:23\n    at _handleRequest2 (http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:13229:20)\n    at _request (http://localhost:8080/node_modules/.vite/d",
-    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
-    "error: TypeError: Failed to fetch\n    at http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:12921:23\n    at _handleRequest2 (http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:13229:20)\n    at _request (http://localhost:8080/node_modules/.vite/d",
-    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
-    "error: TypeError: Failed to fetch\n    at http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:12921:23\n    at _handleRequest2 (http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:13229:20)\n    at _request (http://localhost:8080/node_modules/.vite/d",
-    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED",
-    "error: TypeError: Failed to fetch\n    at http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:12921:23\n    at _handleRequest2 (http://localhost:8080/node_modules/.vite/deps/@supabase_supabase-js.js?v=a18372ab:13229:20)\n    at _request (http://localhost:8080/node_modules/.vite/d",
-    "error: Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED"
+    "info: [ui-projection] server=0 projected=0 rejected=0 codes={}"
   ],
   "pageErrors": [],
   "timeline": [
     {
-      "t": 16,
+      "t": 4,
       "event": "a: submitted"
     },
     {
-      "t": 63,
-      "event": "a: running"
-    },
-    {
-      "t": 111,
+      "t": 6,
       "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
     },
     {
-      "t": 4817,
-      "event": "a: TIMEOUT"
+      "t": 53,
+      "event": "a: running"
+    },
+    {
+      "t": 239,
+      "event": "a: mini-browser (Scrapy is browsing · cargodirectoryworld.com · 5 pages · 00:04)"
+    },
+    {
+      "t": 658,
+      "event": "a: settled"
     }
   ],
   "screenshots": [
     "ui/T2-a-1-clarify.jpg",
+    "ui/T2-a-3-mini-browser.jpg",
     "ui/T2-a-6-final.jpg"
   ],
-  "durationS": 4853,
-  "responseBytes": 8446
+  "durationS": 664,
+  "responseBytes": 43185
 }

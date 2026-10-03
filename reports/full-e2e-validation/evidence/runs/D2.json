@@ -3,40 +3,37 @@
   "query": "need maybe 20 manufacturing businesses somewhere around da nang that actually export stuff, don't give me random directories",
   "category": "company",
   "viewport": "desktop",
-  "startedAt": "2026-10-03T10:14:46.629Z",
+  "startedAt": "2026-10-03T12:35:03.870Z",
   "main": {
     "query": "need maybe 20 manufacturing businesses somewhere around da nang that actually export stuff, don't give me random directories",
     "clarify": [
       {
         "question": "What are you trying to do with these results?",
         "chosen": "Find prospects",
-        "t": 3
+        "t": 95
       }
     ],
     "streamed": [],
     "activity": [
       "Checked available records · Available records · 0",
       "Working · Public business sources · Da Nang",
-      "Found local businesses · Public business sources · 42",
       "Query funnel · The web · 0",
-      "Checked public sources · Public business sources · 42",
       "Widening the search · Public source · pass 1 of 3",
       "Show all activity (12)",
-      "Found local businesses · Public business sources · 51",
-      "Widen pass complete · Public business sources · 0 new candidates",
+      "Widen pass complete · Public source · 7 new candidates",
       "Widening the search · Public source · pass 2 of 3",
-      "Reading page · the-shiv.com · 13989 characters",
-      "Opening result · dnb.com"
+      "Widen pass complete · Public source · 0 new candidates",
+      "Widening the search · Public source · pass 3 of 3"
     ],
     "bubbleVerbatim": true,
-    "clarifyAt": 2,
+    "runningAt": 47,
+    "clarifyAt": 94,
     "clarifyRepeats": 0,
-    "runningAt": 11,
-    "pill": "Scrapy is browsing · dnb.com · 6 pages · 00:24",
-    "miniBrowserAt": 103,
+    "pill": "Scrapy browser session · yellowpages.com.vn · 10 pages · 00:29",
+    "miniBrowserAt": 195,
     "viewingOnly": true,
     "settled": true,
-    "durationS": 571,
+    "durationS": 663,
     "firstStreamS": null,
     "header": {
       "query": "need maybe 20 manufacturing businesses somewhere around da nang that actually export stuff, don't give me random directories",
@@ -47,7 +44,7 @@
     "zeroText": null,
     "reconciliation": null,
     "viewingOnlyFinal": true,
-    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n03/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nFind 20 construction companies in Banja Luka, Bosnia and Herzegovina with public phone numbers\nExpand (0 results)\nneed maybe 20 manufacturing businesses somewhere around da nang that actually export stuff, don't give me random directories\nResults for \"need maybe 20 manufacturing businesses somewhere around da nang that actually export stuff, don't give me random directories\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\n93 candidates were found, but none matched the requested criteria.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nScrapy\nCANCELLED\nzoominfo.com\nExtracting\n· Find Verified Company Profiles by Industry & Location | ZoomInfo\n7 pages\n12 actions\n00:29\nOpen original\nViewing only. Taking control needs the browser worker.\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n8 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n8 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n8 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n8 days ag"
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n03/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nWeb designers in Chicago Bakeries in Halifax\nExpand (0 results)\nFind 12 solar panel installers in Windhoek, Namibia with public phone numbers\nExpand (0 results)\nFind 15 freight forwarding companies in Tbilisi, Georgia with a website and public contact number\nExpand (0 results)\nFind 15 wedding photographers in Cebu, Philippines with phone numbers or WhatsApp contacts\nExpand (0 results)\nFind 20 construction companies in Banja Luka, Bosnia and Herzegovina with public phone numbers\nExpand (0 results)\nneed maybe 20 manufacturing businesses somewhere around da nang that actually export stuff, don't give me random directories\nResults for \"need maybe 20 manufacturing businesses somewhere around da nang that actually export stuff, don't give me random directories\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\n19 candidates were found, but none matched the requested criteria. 7 candidates surfaced while researching but did not match your criteria.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nScrapy\nCANCELLED\nyellowpages.com.vn\nOpening result\n· 337 Verified manufacturing Suppliers in da nang city | Yellow Pages Vietnam\n10 pages\n16 actions\n00:29\nOpen original\nViewing only. Taking control needs the browser worker.\n7 leads seen while researching aren't in this list\nPBP company · still missing required details\nGildden Paint Production And Trading Company Limited · still missing required details\nVIETFORM GARMENT CO., LTD · still missing required details\nThanh Phuc Company Limited · still missing required details\nHiep Nghia Trading Service & Production Company Limited · still missing required details\nand 2 more\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n8 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n8 days ago\nFind HVAC companies in the Great"
   },
   "server": {
     "runId": null,
@@ -62,32 +59,30 @@
     "aiRouter": []
   },
   "worker": [],
-  "toasts": [
-    "No leads passed verification for this search. Try broadening criteria or refining the query."
-  ],
+  "toasts": [],
   "console": [
     "info: [ui-projection] server=0 projected=0 rejected=0 codes={}"
   ],
   "pageErrors": [],
   "timeline": [
     {
-      "t": 5,
+      "t": 4,
       "event": "a: submitted"
     },
     {
-      "t": 7,
-      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
-    },
-    {
-      "t": 15,
+      "t": 51,
       "event": "a: running"
     },
     {
-      "t": 109,
-      "event": "a: mini-browser (Scrapy is browsing · dnb.com · 6 pages · 00:24)"
+      "t": 99,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
     },
     {
-      "t": 576,
+      "t": 201,
+      "event": "a: mini-browser (Scrapy browser session · yellowpages.com.vn · 10 pages · 00:29)"
+    },
+    {
+      "t": 667,
       "event": "a: settled"
     }
   ],
@@ -96,6 +91,6 @@
     "ui/D2-a-3-mini-browser.jpg",
     "ui/D2-a-6-final.jpg"
   ],
-  "durationS": 582,
-  "responseBytes": 33936
+  "durationS": 673,
+  "responseBytes": 42280
 }

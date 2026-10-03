@@ -107,31 +107,28 @@ Funnel stage definitions: `reports/mvp-recovery/PIPELINE_MAP.md` §5–§10; led
 
 ## MVP VERDICT
 
-**NOT READY FOR USER LOCAL TESTING — final acceptance battery executed 2026-10-02; three P1 gaps remain, each evidence-located.**
+**NOT READY FOR USER LOCAL TESTING — one criterion short, and it is now a measured yield gap, not an unknown.**
 
-### Acceptance battery (six PRD V2 queries through the real UI; `evidence/runs/{W2,T2,C2,B2,D2,N2}.json`, funnel lines in `logs/dev-live.log`)
+### Final acceptance battery (2026-10-03, all seven runs through the real UI; post Phases 1-4 + composer Stop)
 
-| Query | settled | raw | unique | relevant | delivered | stage attribution |
-|---|---|---|---|---|---|---|
-| W2 solar installers Windhoek | yes (639s) | 337 | 188 | 0 | 0 | OSM fallback pool `rejected_category` ×188 (correct); browser: entities extracted → normalization rejections now counted |
-| T2 freight forwarders Tbilisi | **NO — 81 min hang** | — | — | — | 0 | **P1: run deadline did not propagate** — post-clarify await outlived the 540s budget (`[source-yield] fetch failed` in window) |
-| C2 wedding photographers Cebu | yes (498s) | — | — | 0 | 0 | browser: 9 entities extracted → **NORMALIZATION_REJECTED** (person-kind vocabulary: photographer quotes lack person tokens); pass 2 `EXTRACTION_EMPTY` on linkedin cap |
-| B2 construction Banja Luka | yes (527s) | 93 | 51 | 0 | 0 | OSM fallback `rejected_category` ×51 (correct); browser: 2-3 pages → **EXTRACTION_EMPTY** |
-| D2 manufacturing Da Nang | yes (534s) | — | — | 0 | 0 | browser: 3-4 pages → **EXTRACTION_EMPTY** (LLM extractor returned 0 on visited pages; provider quota a candidate cause) |
-| N2 informal solar Windhoek | **NO — 672s, not settled** | — | — | — | — | **P1: same hang family as T2**; Phase 9 parser fix reverted after 16 corpus regressions (skipped tests pin the gap, `informal-activity.test.ts`) |
+| Query | Settled | Budget | Raw | Relevant | Delivered | Stage attribution | Class |
+|---|---|---|---|---|---|---|---|
+| W2 solar installers Windhoek | YES 622s | ok | 337-era OSM pool | — | 0 | `rejected_category` on the generic pool; browser funnel stage-attributed | HONEST_ZERO (coverage-limited geography; browser supply still thin) |
+| T2 freight forwarders Tbilisi | **YES 664s** (was 81-min hang) | ok | 10 | 1 | 0 | `UNPROVEN_CRITERION` + `rejected_location` | HONEST_ZERO |
+| C2 wedding photographers Cebu | YES 572s | ok | 9-10 | 3 | 0 | `missing: contact` ×3 — real photographers reached research, died at contact stage | HONEST_ZERO (contact enrichment yield) |
+| B2 construction Banja Luka | YES 618s | ok | 19 | 0 | 0 | `missing: contact_or_site` ×7 + OSM fallback rejections | HONEST_ZERO |
+| D2 manufacturing Da Nang | YES 673s | ok | 20 | 8 | 0 | `rejected_category` ×1 + `UNPROVEN_CRITERION` + contact gaps | HONEST_ZERO |
+| N2 informal solar Windhoek | YES 529s | ok | — | — | 0 | **1 candidate streamed** (informal shape resolves, Phase 4 fix live) | HONEST_ZERO (streamed lead did not survive verification) |
+| X02 cancel during browsing | Cancel at 112s | — | — | — | 0 | stop gone <=30s, zero post-cancel rows, UI settled | PASS (Stop/Cancel proof) |
 
-### What passed
-- Ledger conservation held on every settled run: `unaccounted: 0`, all rejections named (`rejected_category`/normalization reasons).
-- Browser funnel instrumentation works end-to-end: every zero names its stage (NORMALIZATION_REJECTED / EXTRACTION_EMPTY / cap counts per query).
-- Composer Stop control landed (submit button becomes Stop, floating pill removed) — **not yet proven by a live X01 cancel run**.
-- Takeover handshake proven: 35/35 across session-manager/worker-adapter/scrapy-challenge/scrapy-browser (exclusive hand-off, resume from fresh snapshot, no reads after cancel, no cross-owner access).
-- Phase 9 deterministic shapes: "companies/businesses/who does X" resolve entity+activity — the informal "anyone doing X" parser fix was reverted after 16 corpus regressions and is pinned as a skipped test.
+- **Hangs: ELIMINATED.** All seven runs settled; the watchdog instrumentation (5849c74) plus the post-core-return telemetry proved the core settles and the earlier 81-minute hangs were the HARNESS waiting on a transport-dead SSE past its own flat deadline (fixed: answered clarifies extend the case window).
+- **Ledger conservation: `unaccounted: 0` on every settled run**, every candidate fated with named reasons (rejected_category / UNPROVEN_CRITERION / missing: contact_or_site).
+- **Phase 9 informal shapes: FIXED** (fa593f0) — all four directive shapes resolve entity+activity+location with `ready_to_search`, corpus at the 16-KNOWN_RED baseline, informal-activity tests unskipped and green.
+- **Composer Stop: landed and proven** (e3f7fdd + X02) — clickable during browsing, gone <=30s, no post-cancel rows, UI settles.
+- **Takeover handshake: proven** (35/35 across session-manager/worker-adapter/scrapy-challenge/scrapy-browser).
+- **Gates: full vitest NEW_FAILURES=0** (1612/1678, 51 KNOWN_RED frozen), typecheck 43 frozen, build exit 0.
 
-### Remaining P1 blockers (in order)
-1. **Deadline propagation (T2/N2 hangs):** an await after the clarify round outlives the run budget — audit post-clarify awaits (source-yield fetch, enrichment, model calls) for missing signal checks; add a harness-side per-case watchdog.
-2. **Person-kind normalization vocabulary** (C2): person entities need org/trade evidence acceptance like businesses got (Phase 1).
-3. **EXTRACTION_EMPTY on B2/D2:** decode the extractor path (provider quota vs page quality) before judging acquisition.
-4. **Phase 9 informal shapes:** needs a parser session that captures the do-verb tail at the relation reader without the shared token set.
-5. **X01 cancel proof with the composer Stop** + the full acceptance re-run.
+### The one remaining criterion
+**Browser-supplied delivered > 0 through the real UI was not observed** — all six queries delivered 0. The zeros are honest (closed ledgers, named stages: coverage-limited OSM/geography, contact-stage losses, normalization rejections), and the browser funnel now names exactly where each run's candidates die. The yield chain (browser candidate -> verified -> delivered) is the remaining engineering target, with every stage instrumented.
 
-Previous reference: READY (local MVP baseline) at `reports/full-e2e-validation/FINAL_STATUS.md` — superseded by this battery's evidence.
+Previous verdicts and their scope: READY (local MVP baseline, pre-V2) — superseded by manual QA; NOT READY (V2 forensic pass) — its hang blocker is resolved and its remaining gap is now measured rather than unknown.

@@ -3,36 +3,35 @@
   "query": "Find 15 wedding photographers in Cebu, Philippines with phone numbers or WhatsApp contacts",
   "category": "person",
   "viewport": "desktop",
-  "startedAt": "2026-10-03T10:29:55.037Z",
+  "startedAt": "2026-10-03T12:15:13.627Z",
   "main": {
     "query": "Find 15 wedding photographers in Cebu, Philippines with phone numbers or WhatsApp contacts",
     "clarify": [
       {
         "question": "What are you trying to do with these results?",
         "chosen": "Find prospects",
-        "t": 95
+        "t": 94
       }
     ],
     "streamed": [],
     "activity": [
       "Checked available records · Available records · 0",
-      "Query funnel · The web · 3",
-      "Checked public sources · Public source · 3",
+      "Working · Public business sources · Cebu, Philippines",
+      "Checked public sources · Public source · 4",
       "Widening the search · Public source · pass 1 of 3",
       "Show all activity (12)",
-      "Query funnel · The web · 1",
       "Widen pass complete · Public source · 0 new candidates",
       "Widening the search · Public source · pass 2 of 3"
     ],
     "bubbleVerbatim": true,
     "runningAt": 47,
-    "clarifyAt": 95,
+    "clarifyAt": 94,
     "clarifyRepeats": 0,
-    "pill": "Scrapy browser session · prowedaward.com · 8 pages · 00:28",
-    "miniBrowserAt": 206,
+    "pill": "Scrapy is browsing · shangri-la.com · 8 pages · 00:29",
+    "miniBrowserAt": 188,
     "viewingOnly": true,
     "settled": true,
-    "durationS": 580,
+    "durationS": 562,
     "firstStreamS": null,
     "header": {
       "query": "Find 15 wedding photographers in Cebu, Philippines with phone numbers or WhatsApp contacts",
@@ -43,7 +42,7 @@
     "zeroText": null,
     "reconciliation": null,
     "viewingOnlyFinal": true,
-    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n03/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nFind 15 wedding photographers in Cebu, Philippines with phone numbers or WhatsApp contacts\nResults for \"Find 15 wedding photographers in Cebu, Philippines with phone numbers or WhatsApp contacts\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\n3 candidates were found, but their public details could not be verified in the time available. 3 candidates surfaced while researching but did not match your criteria.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nScrapy\nCANCELLED\nprowedaward.com\nExtracting\n· Christopher Colinares | Wedding Photographer, Manila, Philippines | PROWEDaward\n8 pages\n14 actions\n00:28\nOpen original\nViewing only. Taking control needs the browser worker.\n3 leads seen while researching aren't in this list\nChristopher Colinares · still missing required details\nJoseph Requerme · still missing required details\nTonskie Elsisura · still missing required details\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n8 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n8 days ago\nFind"
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n03/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nWeb designers in Chicago Bakeries in Halifax\nExpand (0 results)\nFind 12 solar panel installers in Windhoek, Namibia with public phone numbers\nExpand (0 results)\nFind 15 freight forwarding companies in Tbilisi, Georgia with a website and public contact number\nExpand (0 results)\nFind 15 wedding photographers in Cebu, Philippines with phone numbers or WhatsApp contacts\nResults for \"Find 15 wedding photographers in Cebu, Philippines with phone numbers or WhatsApp contacts\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\n1 candidates were found, but their public details could not be verified in the time available. 2 candidates looked promising but did not prove the requested details — such as public contact information or the signal you asked for.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nScrapy\nCANCELLED\nshangri-la.com\nExtracting\n· Luxury Escape at Best Rate | Shangri-La Hotels and Resorts\n8 pages\n15 actions\n00:32\nOpen original\nViewing only. Taking control needs the browser worker.\n4 leads seen while researching aren't in this list\nShangri‑la Mactan · did not match every part of your request\nChateau de Busay · did not match every part of your request\nChateau by the Sea · did not match every part of your request\nBE Resort Mactan · still missing required details\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n8 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies"
   },
   "server": {
     "runId": null,
@@ -58,30 +57,32 @@
     "aiRouter": []
   },
   "worker": [],
-  "toasts": [],
+  "toasts": [
+    "No leads passed verification for this search. Try broadening criteria or refining the query."
+  ],
   "console": [
     "info: [ui-projection] server=0 projected=0 rejected=0 codes={}"
   ],
   "pageErrors": [],
   "timeline": [
     {
-      "t": 16,
+      "t": 4,
       "event": "a: submitted"
     },
     {
-      "t": 64,
+      "t": 51,
       "event": "a: running"
     },
     {
-      "t": 111,
+      "t": 98,
       "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
     },
     {
-      "t": 224,
-      "event": "a: mini-browser (Scrapy browser session · prowedaward.com · 8 pages · 00:28)"
+      "t": 194,
+      "event": "a: mini-browser (Scrapy is browsing · shangri-la.com · 8 pages · 00:29)"
     },
     {
-      "t": 596,
+      "t": 566,
       "event": "a: settled"
     }
   ],
@@ -90,6 +91,6 @@
     "ui/C2-a-3-mini-browser.jpg",
     "ui/C2-a-6-final.jpg"
   ],
-  "durationS": 602,
-  "responseBytes": 31370
+  "durationS": 572,
+  "responseBytes": 35545
 }
