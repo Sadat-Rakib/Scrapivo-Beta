@@ -123,7 +123,10 @@ async function runCase(c: Case) {
     let sawPending = false, quiet = 0, firstStreamT: number | null = null, sawMini = false, answered = 0;
     const activity = new Set<string>();
     const maxIter = Math.round(((c.maxMin ?? Number(process.env.QA_MAX_MIN ?? 9)) * 60) / 2);
-    const deadline = t0 + (c.maxMin ?? Number(process.env.QA_MAX_MIN ?? 9)) * 60_000;
+    // Each answered clarify buys its own window (PRD V2 Phase 3): T2 spent
+    // 230s in clarification + 389s searching — the flat 9-minute deadline
+    // expired seconds before the run settled, recording a false unsettled.
+    let deadline = t0 + (c.maxMin ?? Number(process.env.QA_MAX_MIN ?? 9)) * 60_000;
     for (let i = 0; i < maxIter && !page.isClosed() && Date.now() < deadline; i++) {
       await page.waitForTimeout(2_000);
       for (const t of await page.locator("[data-sonner-toast]").allInnerTexts().catch(() => [])) if (t.trim()) toasts.add(t.replace(/\s+/g, " ").trim().slice(0, 240));
@@ -147,6 +150,7 @@ async function runCase(c: Case) {
         await target.first().click().catch(() => undefined);
         if (chosen === "?") { r.clarifyUnanswerable = (r.clarifyUnanswerable ?? 0) + 1; if (r.clarifyUnanswerable >= 3) { mark(`${label}: clarify stuck (no answerable control)`); r.clarifyStuck = true; break; } }
         answered++;
+        deadline += 120_000;
         r.clarify.push({ question: question.slice(0, 160), chosen, t: Math.round((Date.now() - t0) / 1000) });
         mark(`${label}: clarify "${question.slice(0, 60)}" -> ${chosen}`);
         continue;
