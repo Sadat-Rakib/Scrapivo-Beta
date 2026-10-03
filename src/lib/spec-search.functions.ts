@@ -11,6 +11,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireMyAuth } from "@/integrations/my-supabase/auth-middleware";
 import { extractSearchSpec } from "@/lib/search/search-spec-extract";
+import { startRunWatchdog } from "@/lib/search/run-watchdog";
+import { scaledRunBudgetMs } from "@/lib/search/search-run.server";
 import type { SearchSpec } from "@/lib/search/search-spec";
 import type { UnderstandingFrame } from "@/lib/understanding/frame";
 import { investorSectorMatches } from "@/lib/search/search-spec";
@@ -1134,6 +1136,13 @@ export async function runSpecSearchCore(
     request_id: opts.request_id,
   });
   const runStartedAt = Date.now();
+  // Run watchdog stage tracking (PRD V2 Phase 3 / P1-A): the stage name is
+  // what the watchdog reports when the run overruns its budget, so a hung
+  // await names itself instead of vanishing into "not settled".
+  let currentStage = "understanding";
+  const setStage = (stage: string) => {
+    currentStage = stage;
+  };
   // Candidate survival ledger: every funnel candidate ends in one explained
   // fate, and every lead streamed while researching is reconciled with the
   // final page. Bookkeeping only; it never changes delivery.
@@ -2091,9 +2100,25 @@ export async function runSpecSearchCore(
   }
   let liveDiscovery: SpecSearchResult["liveDiscovery"] =
     completeRows.length === 0 ? "db_thin_gapfill_pending" : "not_required";
+  setStage("stored_search");
   const { applyWhyMatchGate } = await import("@/lib/search/live-gapfill");
   const qualifiedDbCount = applyWhyMatchGate(completeRows, spec, !!spec.signal_required).kept.length;
   const requestedTarget = pageBaseOffset + limit;
+  // Independent watchdog (PRD V2 Phase 3 / P1-A): T2 hung 81 minutes past its
+  // budget invisibly. This timer does not trust the run to check in — every
+  // tick past the budget it names the current stage. Diagnostics only.
+  const runWatchdog = startRunWatchdog({
+    runId: runIds.search_run_id,
+    budgetMs: scaledRunBudgetMs(requestedTarget),
+    getStage: () => currentStage,
+    isAborted: () => deps.signal?.aborted
+      ? { aborted: true, reason: searchAbortCode(deps.signal) }
+      : { aborted: false, reason: null },
+    onEvent: (event) => {
+      console.warn("[run-watchdog]", JSON.stringify(event));
+      browserProgress?.({ action: "Still working", source: "watchdog", detail: `${event.stage} · ${Math.round(event.elapsedMs / 1000)}s elapsed` });
+    },
+  });
   // Volume engine (Phase 1): discovery should BROADLY oversample the request.
   // The user's N is the delivery bar, not the discovery bar — research/enrich
   // sits between broad discovery and strict qualification.
@@ -2164,6 +2189,7 @@ export async function runSpecSearchCore(
     emitProgress("Stored search complete", "database", undefined, kept.length);
     try {
       const { runLiveGapfill } = await import("@/lib/search/live-gapfill");
+      setStage("live_gapfill");
       const live = await runLiveGapfill(spec, {
         ...(liveOpt ?? {}),
         searchRunId: runIds.search_run_id,
@@ -2387,6 +2413,7 @@ export async function runSpecSearchCore(
           `pass ${widenPassNumber} of ${MAX_WIDEN_PASSES}`,
         );
         const { runLiveGapfill } = await import("@/lib/search/live-gapfill");
+        setStage("widening");
         const live = await runLiveGapfill(spec, {
           ...(liveOpt ?? {}),
           searchRunId: runIds.search_run_id,
@@ -2533,7 +2560,8 @@ export async function runSpecSearchCore(
   let researchableCount = 0;
   let researchedCount = 0;
   if (!deadlineHit) {
-    try {
+    setStage("enrichment");
+  try {
       throwIfAborted(deps.signal);
       const { enrichCandidatesForSpec } = await import("@/lib/search/enrichment-run");
       const knownRows = completeRows.filter((row) => enrichedDbKeys.has(row.entity_id ?? row.key ?? ""));
@@ -2594,6 +2622,7 @@ export async function runSpecSearchCore(
     }
   }
 
+  setStage("qualification");
   // Post-research judge: the strict split the pre-research gate defers to.
   // Unknown category/role/industry/location was researchable; after research
   // an unproven stated criterion is a miss, never a pass. Stored rows already
@@ -2807,6 +2836,7 @@ export async function runSpecSearchCore(
       if (code) refused.set(row, code);
     }
     for (const [row, code] of refused) ledger.decided(row, { disposition: "rejected", reject_code: `LEAD_VIEW_${code}` });
+    setStage("delivery");
     ledger.delivered(page.filter((row) => !refused.has(row)), completeRows.slice(pageBaseOffset + page.length));
   }
   const candidateLedger = ledger.summary();
