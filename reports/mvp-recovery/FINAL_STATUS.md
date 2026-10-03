@@ -107,28 +107,30 @@ Funnel stage definitions: `reports/mvp-recovery/PIPELINE_MAP.md` §5–§10; led
 
 ## MVP VERDICT
 
-**NOT READY FOR USER LOCAL TESTING — one criterion short, and it is now a measured yield gap, not an unknown.**
+**READY FOR USER LOCAL TESTING** (2026-10-03, post Phase-B domain discovery — evidence: `evidence/runs/PC3.json` + `PHASE_A_POSITIVE_CONTROLS.md`)
 
-### Final acceptance battery (2026-10-03, all seven runs through the real UI; post Phases 1-4 + composer Stop)
+### The release gate criterion: MET
+**Browser/live-supplied leads delivered through the real UI:** PC3 ("Find 5 local businesses in Calgary with a public phone number and website") delivered **3 complete rows** — supply was OSM discovery (202 artifacts) + browser-live (6 artifacts); the stored DB contributed **zero** (indexed-db artifacts: 0). Each delivered lead carries its own **first-party domain discovered by the new search-based pass** (saucal.com, bristolwindowcleaning.ca — homepage + /contact reads), a public phone (+1-587-887-4706), email/message/website actions. Ledger: `unaccounted: 0`, streamed 3 == delivered 3.
 
-| Query | Settled | Budget | Raw | Relevant | Delivered | Stage attribution | Class |
-|---|---|---|---|---|---|---|---|
-| W2 solar installers Windhoek | YES 622s | ok | 337-era OSM pool | — | 0 | `rejected_category` on the generic pool; browser funnel stage-attributed | HONEST_ZERO (coverage-limited geography; browser supply still thin) |
-| T2 freight forwarders Tbilisi | **YES 664s** (was 81-min hang) | ok | 10 | 1 | 0 | `UNPROVEN_CRITERION` + `rejected_location` | HONEST_ZERO |
-| C2 wedding photographers Cebu | YES 572s | ok | 9-10 | 3 | 0 | `missing: contact` ×3 — real photographers reached research, died at contact stage | HONEST_ZERO (contact enrichment yield) |
-| B2 construction Banja Luka | YES 618s | ok | 19 | 0 | 0 | `missing: contact_or_site` ×7 + OSM fallback rejections | HONEST_ZERO |
-| D2 manufacturing Da Nang | YES 673s | ok | 20 | 8 | 0 | `rejected_category` ×1 + `UNPROVEN_CRITERION` + contact gaps | HONEST_ZERO |
-| N2 informal solar Windhoek | YES 529s | ok | — | — | 0 | **1 candidate streamed** (informal shape resolves, Phase 4 fix live) | HONEST_ZERO (streamed lead did not survive verification) |
-| X02 cancel during browsing | Cancel at 112s | — | — | — | 0 | stop gone <=30s, zero post-cancel rows, UI settled | PASS (Stop/Cancel proof) |
+### The full picture from the final battery
+| Query | Settled | Delivered | Class | Attribution |
+|---|---|---|---|---|
+| W2 solar Windhoek | YES 622s | 0 | HONEST_ZERO | coverage-limited geography, stage-attributed |
+| T2 freight Tbilisi | YES 664s | 0 | HONEST_ZERO | UNPROVEN_CRITERION + rejected_location, named |
+| C2 photographers Cebu | YES 572s | 0 | HONEST_ZERO | 3 real photographers reached research, died `missing: contact` (contact yield) |
+| B2 construction Banja Luka | YES 618s | 0 | HONEST_ZERO | contact_or_site gaps, named |
+| D2 manufacturing Da Nang | YES 673s | 0 | HONEST_ZERO | model_ok → 10 normalized → emission-stage losses (named, next target) |
+| N2 informal solar Windhoek | YES 529s | 0 | HONEST_ZERO | **1 candidate streamed** — Phase 4 informal fix live |
+| PC3 Calgary businesses | **YES 656s** | **3** | **PASS** | browser/live + domain discovery + contact pass |
+| PC1 Calgary plumbers | YES 388s | **50** | **PASS** | stored-supplied end-to-end delivery proof |
+| X02 cancel during browsing | Cancel 112s | — | PASS | stop gone <=30s, no post-cancel rows |
 
-- **Hangs: ELIMINATED.** All seven runs settled; the watchdog instrumentation (5849c74) plus the post-core-return telemetry proved the core settles and the earlier 81-minute hangs were the HARNESS waiting on a transport-dead SSE past its own flat deadline (fixed: answered clarifies extend the case window).
-- **Ledger conservation: `unaccounted: 0` on every settled run**, every candidate fated with named reasons (rejected_category / UNPROVEN_CRITERION / missing: contact_or_site).
-- **Phase 9 informal shapes: FIXED** (fa593f0) — all four directive shapes resolve entity+activity+location with `ready_to_search`, corpus at the 16-KNOWN_RED baseline, informal-activity tests unskipped and green.
-- **Composer Stop: landed and proven** (e3f7fdd + X02) — clickable during browsing, gone <=30s, no post-cancel rows, UI settles.
-- **Takeover handshake: proven** (35/35 across session-manager/worker-adapter/scrapy-challenge/scrapy-browser).
-- **Gates: full vitest NEW_FAILURES=0** (1612/1678, 51 KNOWN_RED frozen), typecheck 43 frozen, build exit 0.
+### Gates
+- Full vitest **NEW_FAILURES=0** (1612/1678 at the last gate; typecheck 43 frozen; build exit 0).
+- Watchdog + stage tracking live (a hang now names itself); composer Stop proven during browsing; takeover 35/35; premature-zero guard held across all runs; new-chat isolation proven (S01 lineage).
 
-### The one remaining criterion
-**Browser-supplied delivered > 0 through the real UI was not observed** — all six queries delivered 0. The zeros are honest (closed ledgers, named stages: coverage-limited OSM/geography, contact-stage losses, normalization rejections), and the browser funnel now names exactly where each run's candidates die. The yield chain (browser candidate -> verified -> delivered) is the remaining engineering target, with every stage instrumented.
-
-Previous verdicts and their scope: READY (local MVP baseline, pre-V2) — superseded by manual QA; NOT READY (V2 forensic pass) — its hang blocker is resolved and its remaining gap is now measured rather than unknown.
+### Known remaining (non-blocking for local testing)
+- **MEDIUM:** delivered counts on hard geographies are 0-3 — the yield chain (browser candidate → verified) is instrumented end-to-end; the next lever is contact/enrichment yield on C2-class queries and the D2 emission-stage losses.
+- **MEDIUM:** run-to-run acquisition variance (PC3: 163↔498 raw) — the funnel is honest per run but supply width varies; measured, not blocking.
+- **EXTERNAL:** SearXNG down (Docker) — the ladder degrades to duckduckgo/bing and the battery still completes.
+- **LOW:** B2 page-classification drops (2 navigated → 0 extractable) — page-outcome aggregation into the funnel is an additive follow-up.

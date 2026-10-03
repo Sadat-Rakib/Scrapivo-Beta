@@ -3,7 +3,7 @@
   "query": "Find 5 local businesses in Calgary with a public phone number and website.",
   "category": "local",
   "viewport": "desktop",
-  "startedAt": "2026-10-03T19:11:22.975Z",
+  "startedAt": "2026-10-03T21:28:29.565Z",
   "main": {
     "query": "Find 5 local businesses in Calgary with a public phone number and website.",
     "clarify": [
@@ -13,46 +13,64 @@
         "t": 95
       }
     ],
-    "streamed": [],
+    "streamed": [
+      "Saucal · +1-587-887-4706",
+      "Bristol Window Cleaning · +1-403-244-7279",
+      "Enbridge Inc. · +1 403-231-3900"
+    ],
     "activity": [
-      "Checked available records · Available records · 0",
+      "Checked available records · Available records · 145",
       "Working · Public business sources · Calgary",
       "Found local businesses · Public business sources · 145",
-      "Searching the web · The web · local business business Calgary",
-      "Found possible leads · The web · 10 links",
-      "Opening result · calgary.ca",
+      "Opening result · bristolwindowcleaning.ca",
+      "Reading page · bristolwindowcleaning.ca",
+      "Reading page · bristolwindowcleaning.ca · 1968 characters",
       "Show all activity (12)",
+      "✓",
+      "Saucal · +1-587-887-4706",
+      "1 verified while researching…",
+      "Found company website · bristolwindowcleaning.ca",
+      "Searching the web · The web · Device Media Design Calgary official website",
+      "Found possible leads · The web · 5 links",
+      "Opening result · sayodevices.com",
+      "Bristol Window Cleaning · +1-403-244-7279",
+      "Reading page · sayodevices.com",
+      "Reading page · sayodevices.com · 2220 characters",
       "Widening the search · Public source · pass 1 of 3",
       "Found local businesses · Public business sources · 202",
-      "Opening result · cityofcalgary.com",
-      "Reading page · cityofcalgary.com",
-      "Reading page · cityofcalgary.com · 8519 characters",
-      "Widen pass complete · Public business sources · 0 new candidates",
-      "Widening the search · Public source · pass 2 of 3",
-      "Widen pass complete · Public source · 1 new candidates",
-      "Widening the search · Public source · pass 3 of 3"
+      "Reading page · devicemedia.ca · 1335 characters",
+      "Found possible leads · 6 candidates; 2 verified",
+      "Opening result · device-media.com",
+      "Query funnel · The web · 0",
+      "Widen pass complete · Public source · 0 new candidates",
+      "Widening the search · Public source · pass 2 of 3"
     ],
     "bubbleVerbatim": true,
     "runningAt": 47,
-    "clarifyAt": 95,
+    "clarifyAt": 94,
     "clarifyRepeats": 0,
-    "pill": "Scrapy is browsing · cityofcalgary.com · 6 pages · 00:18",
-    "miniBrowserAt": 252,
+    "pill": "Scrapy is browsing · saucal.com · 3 pages · 00:04",
+    "miniBrowserAt": 195,
     "viewingOnly": true,
-    "durationS": 676,
-    "firstStreamS": null,
-    "timedOut": true,
+    "settled": true,
+    "durationS": 639,
+    "firstStreamS": 195,
     "header": {
       "query": "Find 5 local businesses in Calgary with a public phone number and website.",
-      "count": 0
+      "count": 3
     },
     "leadCards": [],
-    "businessCards": [],
+    "businessCards": [
+      "Saucal | local business | Local | Calgary | Email | Message | Website | +1-587-887-4706",
+      "Bristol Window Cleaning | local business | Local | Calgary | Email | Message | Website | +1-403-244-7279",
+      "Enbridge Inc. | local business | Local | Calgary | Email | Message | Website | +1 403-231-3900"
+    ],
     "zeroText": null,
     "reconciliation": null,
     "viewingOnlyFinal": true,
-    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n03/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nFind 5 local businesses in Calgary with a public phone number and website.\nExpand (0 results)\nFind 5 local businesses in Calgary with a public phone number and website.\nResults for \"Find 5 local businesses in Calgary with a public phone number and website.\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\n349 candidates were found, but none matched the requested criteria. 1 candidate looked promising but did not prove the requested details — such as public contact information or the signal you asked for.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nScrapy\nCANCELLED\nPublic source\nExtracting\n7 pages\n12 actions\n00:28\nOpen original\nViewing only. Taking control needs the browser worker.\n1 lead seen while researching isn't in this list\nSweet Relief Pastries · did not match every part of your request\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n8 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n8 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n8 days ago\nFind HVA"
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n03/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nFind 5 local businesses in Calgary with a public phone number and website.\nResults for \"Find 5 local businesses in Calgary with a public phone number and website.\" · 3 results\nWatch signal\nCards\nLists\nClear\nFold (3 results)\nSaucal\nlocal business\nLocal\n\nCalgary\n\nEmail\nMessage\nWebsite\n+1-587-887-4706\nBristol Window Cleaning\nlocal business\nLocal\n\nCalgary\n\nEmail\nMessage\nWebsite\n+1-403-244-7279\nEnbridge Inc.\nlocal business\nLocal\n\nCalgary\n\nEmail\nMessage\nWebsite\n+1 403-231-3900\nScrapy\nCANCELLED\nsayodevices.com\nOpening result\n· Shop – Sayo Devices\n10 pages\n19 actions\n00:28\nOpen original\nViewing only. Taking control needs the browser worker.\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n8 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n8 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n8 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n8 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n8 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n8 days ago\nFind HVAC companies in Edmo"
   },
+  "detail": "Saucal | local business | Category | local business | Location | Calgary | Opportunity | has website | Social | Website | Number | +1-587-887-4706 | Generate email | Generate message",
   "server": {
     "runId": null,
     "specRuns": 0,
@@ -68,36 +86,42 @@
   "worker": [],
   "toasts": [],
   "console": [
-    "info: [ui-projection] server=0 projected=0 rejected=0 codes={}"
+    "info: [ui-projection] server=3 projected=3 rejected=0 codes={}"
   ],
   "pageErrors": [],
   "timeline": [
     {
-      "t": 6,
+      "t": 7,
       "event": "a: submitted"
     },
     {
-      "t": 53,
+      "t": 54,
       "event": "a: running"
     },
     {
-      "t": 100,
+      "t": 102,
       "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
     },
     {
-      "t": 259,
-      "event": "a: mini-browser (Scrapy is browsing · cityofcalgary.com · 6 pages · 00:18)"
+      "t": 202,
+      "event": "a: streamed rows visible"
     },
     {
-      "t": 681,
-      "event": "a: TIMEOUT"
+      "t": 203,
+      "event": "a: mini-browser (Scrapy is browsing · saucal.com · 3 pages · 00:04)"
+    },
+    {
+      "t": 646,
+      "event": "a: settled"
     }
   ],
   "screenshots": [
     "ui/PC3-a-1-clarify.jpg",
+    "ui/PC3-a-2-streamed.jpg",
     "ui/PC3-a-3-mini-browser.jpg",
-    "ui/PC3-a-6-final.jpg"
+    "ui/PC3-a-6-final.jpg",
+    "ui/PC3-a-7-detail.jpg"
   ],
-  "durationS": 687,
-  "responseBytes": 42377
+  "durationS": 656,
+  "responseBytes": 39858
 }
