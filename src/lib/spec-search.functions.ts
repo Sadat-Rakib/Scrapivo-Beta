@@ -3160,7 +3160,8 @@ export const runSpecSearch = createServerFn({ method: "POST" })
     const { beginSearchBrowserProgress, publishSearchBrowserProgress, finishSearchBrowserProgress } = await import("@/lib/search/search-browser-progress.server");
     if (runId) beginSearchBrowserProgress(runId, ownerId);
     try {
-      return await runSpecSearchCore(data.query, {
+      const coreStartedAt = Date.now();
+      const coreResult = await runSpecSearchCore(data.query, {
         signal: registered?.signal ?? getRequest().signal,
         browserProgress: runId ? (event) => publishSearchBrowserProgress(runId, ownerId, event) : undefined,
         ownerId,
@@ -3173,6 +3174,13 @@ export const runSpecSearch = createServerFn({ method: "POST" })
         turn_id: data.turn_id,
         request_id: data.request_id,
       });
+      // P1-A evidence (PRD V2 Phase 3): T2's run hung AFTER the core returned —
+      // the watchdog showed stage "delivery" with the signal already aborted.
+      // This line proves whether the core itself settled; if it prints while
+      // the client never sees an outcome, the hang is below product code
+      // (framework response write to a disconnected SSE client).
+      console.info("[spec-run] core returned", JSON.stringify({ search_run_id: runId, elapsedMs: Date.now() - coreStartedAt, outcome: coreResult.outcome }));
+      return coreResult;
     } finally {
       registered?.finish();
       if (runId) finishSearchBrowserProgress(runId, ownerId);
