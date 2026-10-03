@@ -156,3 +156,33 @@ describe("staged page allocation (PRD Phase 3 — cap starvation fix)", () => {
     expect(rows.length).toBeGreaterThanOrEqual(1);
   });
 });
+
+describe("extraction cause telemetry (PRD Phase 1 — P1-C)", () => {
+  it("a throwing extractor increments extractor_failed, distinguishable from a clean empty", async () => {
+    const funnels: BrowserQueryFunnel[] = [];
+    const b = browser();
+    // Extraction failures propagate to the caller (evidence-boundary contract)
+    // — the funnel still records the cause before the rejection.
+    await expect(discoverWithBrowser(spec, { browser: b, discoveryQueries: ["SaaS founders"], isVerified: () => false,
+      extractEntities: async () => { throw new Error("provider quota exhausted"); },
+      onQueryFunnel: (funnel) => funnels.push(funnel) })).rejects.toThrow("provider quota exhausted");
+    const f = funnels[0];
+    expect(f.extractionEmpty).toBeGreaterThanOrEqual(1);
+    expect(f.extractionCauses.extractor_failed).toBeGreaterThanOrEqual(1);
+    expect(f.extractionCauses.model_empty_or_unparsed).toBeUndefined();
+    expect(f.stage).toBe("EXTRACTION_EMPTY");
+  });
+
+  it("a clean empty extractor stays distinguishable from a failure", async () => {
+    const funnels: BrowserQueryFunnel[] = [];
+    const b = browser();
+    const rows = await discoverWithBrowser(spec, { browser: b, discoveryQueries: ["SaaS founders"], isVerified: () => false,
+      extractEntities: async () => [],
+      onQueryFunnel: (funnel) => funnels.push(funnel) });
+    expect(rows).toEqual([]);
+    const f = funnels[0];
+    expect(f.extractionEmpty).toBeGreaterThanOrEqual(1);
+    expect(f.extractionCauses.extractor_failed).toBeUndefined();
+    expect(f.stage).toBe("EXTRACTION_EMPTY");
+  });
+});

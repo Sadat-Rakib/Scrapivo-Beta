@@ -150,6 +150,10 @@ export type BrowserQueryFunnel = {
   pagesExtractable: number;
   extractionEmpty: number;
   entitiesExtracted: number;
+  /** Why extraction produced nothing (PRD Phase 1): keyed by cause —
+   *  deterministic_empty, model_empty_or_unparsed, breaker, model_ok,
+   *  extractor_failed — from the extractor's own report discriminator. */
+  extractionCauses: Record<string, number>;
   /** Rows produced by normalization (structured + browserEntitiesToRows). */
   normalizedRows: number;
   /** Why extracted entities died at normalization, by named reason
@@ -808,7 +812,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
       serpRequested: 0, serpOk: 0, serpEmpty: 0, serpBlocked: 0, serpErrors: 0,
       linksObserved: 0, linksAccepted: 0, linksRejected: 0, linkRejections: {},
       pagesScheduled: 0, pagesNavigated: 0, navFailed: 0, pagesBlocked: 0, pagesUnsupported: 0,
-      pagesExtractable: 0, extractionEmpty: 0, entitiesExtracted: 0, normalizedRows: 0, normalizationRejections: {} as Record<string, number>, emittedRows: 0,
+      pagesExtractable: 0, extractionEmpty: 0, entitiesExtracted: 0, extractionCauses: {} as Record<string, number>, normalizedRows: 0, normalizationRejections: {} as Record<string, number>, emittedRows: 0,
       elapsedMs: 0, stage: "OK",
     };
     activeFunnel = { funnel, startedAt: Date.now() };
@@ -1258,7 +1262,19 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
         return;
       }
       pages = modelPages;
-      const entities = await bounded((options.extractEntities ?? extractEntities)(pages, spec, trace));
+      const entities = await bounded((options.extractEntities ?? extractEntities)(pages, spec, (event) => {
+        // PRD Phase 1: extraction causes must not collapse — the extractor's
+        // own report() discriminator names why it produced nothing.
+        if (event.kind === "extract" && f) {
+          const cause = event.llm === "empty" ? "model_empty_or_unparsed"
+            : event.llm === "breaker" ? "breaker"
+            : event.extractor === "deterministic" && event.llm === "not_called" ? (event.entities ? "deterministic_ok" : "deterministic_empty")
+            : event.llm === "ok" ? "model_ok"
+            : `extractor_${event.extractor}`;
+          f.extractionCauses[cause] = (f.extractionCauses[cause] ?? 0) + 1;
+        }
+        trace(event);
+      }));
       check();
       if (f) { if (entities.length) f.entitiesExtracted += entities.length; else f.extractionEmpty++; }
       if (options.extractEntities) trace({ kind: "extract", pages: pages.map((page) => page.url), extractor: "injected", llm: "not_called", entities: entities.length });
@@ -1279,7 +1295,11 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
         remember(jobRows, query, candidate);
       }
       progress("Extracted candidates", undefined, `${memory.length} candidates; ${verifiedCount()} verified`);
-    } catch (error) { check(); if (f) f.extractionEmpty++; extractionError = error; log({ action: "extract", status: "failed" }); }
+    } catch (error) {
+      check();
+      if (f) { f.extractionEmpty++; f.extractionCauses.extractor_failed = (f.extractionCauses.extractor_failed ?? 0) + 1; }
+      extractionError = error; log({ action: "extract", status: "failed" });
+    }
   };
   const research = async (candidate: BrowserCandidateMemory) => {
     refresh(candidate);
