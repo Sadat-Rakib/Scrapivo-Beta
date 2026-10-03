@@ -16,3 +16,10 @@ raw 2 → 1 → relevant 0 → `UNPROVEN_CRITERION`. The loss is ACQUISITION WID
 
 ## Funnel conversion (PRD §16) — PC1 as the healthy reference
 discovered 51 → parsed 51 → deduped 50 → relevant 51 → enriched 50 → qualified 50 → delivered 50 (100% conversion once candidates carry the required evidence — the machinery is proven; the gap is candidate SUPPLY for live queries, i.e. domain/contact discovery and signal query width).
+
+## Phase B verification run (2026-10-03, second PC3 rerun) — NEW FINDING: acquisition variance
+- Same query, same code: raw **349** (was 163) → deduped 203 → **relevant 0** (was 5) → settled=false at 687s.
+- The live acquisition crop (OSM + browser mix) varies run-to-run; this run's pool missed the stored Calgary rows entirely and died at the category gate.
+- Implication: before tuning domain discovery further, the ACQUISITION layer needs determinism/coverage work — the funnel variance (163→349 raw, 5→0 relevant) dominates the domain-discovery yield question.
+- Phase B status: the query builder already emits `"<name>" <location> official website` / `"<name>" contact` shapes when candidate.missing fires (source-plan.ts:497); verification of their live effect is blocked by this acquisition variance — stabilize acquisition sampling first.
+- Ledger: unaccounted 0 (conservation holds).

@@ -3,7 +3,7 @@
   "query": "Find 5 local businesses in Calgary with a public phone number and website.",
   "category": "local",
   "viewport": "desktop",
-  "startedAt": "2026-10-03T15:12:26.349Z",
+  "startedAt": "2026-10-03T19:11:22.975Z",
   "main": {
     "query": "Find 5 local businesses in Calgary with a public phone number and website.",
     "clarify": [
@@ -18,30 +18,30 @@
       "Checked available records · Available records · 0",
       "Working · Public business sources · Calgary",
       "Found local businesses · Public business sources · 145",
-      "Reading page · alberta-local.ca",
-      "Reading page · alberta-local.ca · 4330 characters",
-      "Opening result · cityofcalgary.com",
+      "Searching the web · The web · local business business Calgary",
+      "Found possible leads · The web · 10 links",
+      "Opening result · calgary.ca",
       "Show all activity (12)",
-      "Checked public sources · Public source · 154",
       "Widening the search · Public source · pass 1 of 3",
-      "Found company website · fridaysocks.com",
-      "Found possible leads · 5 candidates; 0 verified",
-      "Opening result · fridaysocks.com",
-      "Widen pass complete · Public source · 0 new candidates",
+      "Found local businesses · Public business sources · 202",
+      "Opening result · cityofcalgary.com",
+      "Reading page · cityofcalgary.com",
+      "Reading page · cityofcalgary.com · 8519 characters",
+      "Widen pass complete · Public business sources · 0 new candidates",
       "Widening the search · Public source · pass 2 of 3",
-      "Searching the web · The web · Friday Sock Co. contact",
-      "Found possible leads · The web · 10 links"
+      "Widen pass complete · Public source · 1 new candidates",
+      "Widening the search · Public source · pass 3 of 3"
     ],
     "bubbleVerbatim": true,
+    "runningAt": 47,
     "clarifyAt": 95,
     "clarifyRepeats": 0,
-    "runningAt": 133,
-    "pill": "Scrapy is browsing · calgarycorporatechallenge.com · 3 pages · 00:04",
-    "miniBrowserAt": 226,
+    "pill": "Scrapy is browsing · cityofcalgary.com · 6 pages · 00:18",
+    "miniBrowserAt": 252,
     "viewingOnly": true,
-    "settled": true,
-    "durationS": 648,
+    "durationS": 676,
     "firstStreamS": null,
+    "timedOut": true,
     "header": {
       "query": "Find 5 local businesses in Calgary with a public phone number and website.",
       "count": 0
@@ -51,7 +51,7 @@
     "zeroText": null,
     "reconciliation": null,
     "viewingOnlyFinal": true,
-    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n03/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nFind 5 local businesses in Calgary with a public phone number and website.\nResults for \"Find 5 local businesses in Calgary with a public phone number and website.\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\n3 candidates were found, but their public details could not be verified in the time available. 2 candidates looked promising but did not prove the requested details — such as public contact information or the signal you asked for.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nScrapy\nCANCELLED\nlocallaundry.ca\nExtracting\n· Local Laundry - Responsibly Made in Canada\n8 pages\n14 actions\n00:27\nOpen original\nViewing only. Taking control needs the browser worker.\n9 leads seen while researching aren't in this list\nFriday Sock Co. · did not match every part of your request\nThe Livery Shop · did not match every part of your request\nLocal Laundry · did not match every part of your request\nThe Know Show Trivia Company · still missing required details\nRegal Cat Cafe · did not match every part of your request\nand 4 more\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n8 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greate"
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n03/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nFind 5 local businesses in Calgary with a public phone number and website.\nExpand (0 results)\nFind 5 local businesses in Calgary with a public phone number and website.\nResults for \"Find 5 local businesses in Calgary with a public phone number and website.\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\n349 candidates were found, but none matched the requested criteria. 1 candidate looked promising but did not prove the requested details — such as public contact information or the signal you asked for.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nScrapy\nCANCELLED\nPublic source\nExtracting\n7 pages\n12 actions\n00:28\nOpen original\nViewing only. Taking control needs the browser worker.\n1 lead seen while researching isn't in this list\nSweet Relief Pastries · did not match every part of your request\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n8 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n8 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n8 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n8 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n8 days ago\nFind HVA"
   },
   "server": {
     "runId": null,
@@ -73,24 +73,24 @@
   "pageErrors": [],
   "timeline": [
     {
-      "t": 19,
+      "t": 6,
       "event": "a: submitted"
     },
     {
-      "t": 114,
-      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
-    },
-    {
-      "t": 152,
+      "t": 53,
       "event": "a: running"
     },
     {
-      "t": 247,
-      "event": "a: mini-browser (Scrapy is browsing · calgarycorporatechallenge.com · 3 pages · 00:04)"
+      "t": 100,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
     },
     {
-      "t": 667,
-      "event": "a: settled"
+      "t": 259,
+      "event": "a: mini-browser (Scrapy is browsing · cityofcalgary.com · 6 pages · 00:18)"
+    },
+    {
+      "t": 681,
+      "event": "a: TIMEOUT"
     }
   ],
   "screenshots": [
@@ -98,6 +98,6 @@
     "ui/PC3-a-3-mini-browser.jpg",
     "ui/PC3-a-6-final.jpg"
   ],
-  "durationS": 673,
-  "responseBytes": 35463
+  "durationS": 687,
+  "responseBytes": 42377
 }
