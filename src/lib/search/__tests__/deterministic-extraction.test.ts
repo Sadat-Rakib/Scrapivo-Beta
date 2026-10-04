@@ -20,7 +20,7 @@ const businessSpec: SearchSpec = {
 const page = (url: string, title: string, text: string): BrowserObservedPage =>
   ({ url, title, text, structured: { emails: [], phones: [] } } as unknown as BrowserObservedPage);
 
-describe.skip("deterministic local-entity extraction (no extraction LLM)", () => {
+describe("deterministic local-entity extraction (no extraction LLM)", () => {
   it("rainbowfishphoto-style first-party page yields a business candidate with contacts", async () => {
     const pages = [page("https://rainbowfishphoto.com/", "Wedding Photographer in Cebu | Rainbowfish Photo",
       "Rainbowfish Photo is a wedding photographer in Cebu, Philippines.\nWe document weddings across Cebu and Bohol.\nCall +63 32 555 1234 or email hello@rainbowfishphoto.com to book your date.")];

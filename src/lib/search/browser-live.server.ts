@@ -604,6 +604,13 @@ export async function extractEntities(
   };
   const observedFallback = (): BrowserExtractedEntity[] => {
     const found: BrowserExtractedEntity[] = [];
+    // Business/local queries use the generalized deterministic extractor
+    // (PRD Final-MVP Phase 1): first-party entity pages and list/directory
+    // pages both yield provisional candidates — the requested category is the
+    // trade anchor, no SaaS-only vocabulary, no LLM required.
+    if (spec.entity === "business" || spec.entity === "company") {
+      return deterministicLocalEntities(pages, spec);
+    }
     for (const [pageIndex, page] of pages.entries()) {
       if (spec.entity === "person") {
         const cards = /(?:^|\n)[ \t]*([A-Z][\p{L}'-]+(?:[ \t]+[A-Z][\p{L}'-]+){1,3})[ \t]*\n[ \t]*((?:Co-)?Founder(?:[ \t]*&[ \t]*(?:Co-)?CEO)?|CEO[ \t]*&[ \t]*(?:Co-)?Founder)[ \t]*\n[ \t]*([^\n]{2,80})[ \t]*\n[ \t]*View Bio/giu;
@@ -622,24 +629,31 @@ export async function extractEntities(
             fields: { role: { value: role.trim(), quote: quote.trim() }, company: { value: company.trim(), quote: quote.trim() } } });
           if (found.length >= 10) return found;
         }
-      } else if (spec.entity === "company") {
-        const sentences = /(?:^|\n)[ \t]*([A-Z][\p{L}0-9&.'-]*(?:[ \t]+[A-Z][\p{L}0-9&.'-]*){0,3})[ \t]+((?:is[ \t]+(?:a|an|the)|builds?|develops?|provides?|offers?|founded|headquartered|based)\b[^\n]{0,220}\b(?:SaaS|software|platform)\b[^\n]{0,120})/giu;
-        const cards = /(?:^|\n)[ \t]*(?:\d{1,2}[.)][ \t]*)?([A-Z][\p{L}0-9&.'-]*(?:[ \t]+[A-Z][\p{L}0-9&.'-]*){0,3})[ \t]*(?:\n|[ \t]+[—–:-][ \t]+)([^\n]{10,240}\b(?:SaaS|software|platform)\b[^\n]{0,240})/giu;
-        for (const match of [...page.text.matchAll(cards), ...page.text.matchAll(sentences)]) {
-          const [quote, name, description] = match;
-          if (/^(?:The|Top|Best|Toronto|SaaS|Software|About|Contact)$/i.test(name.trim()) || taxonomyLabel(name)) continue;
-          if (!/\b(?:is\s+(?:a|an|the)|builds?|develops?|provides?|offers?|founded|headquartered|based)\b/i.test(description)) continue;
-          if (found.some((item) => normalized(item.name) === normalized(name))) continue;
-          const fields: BrowserExtractedEntity["fields"] = {};
-          if (/\bSaaS\b|software[ -]as[ -]a[ -]service/i.test(description)) fields.industry = { value: "SaaS", quote: quote.trim() };
-          if (/\bToronto\b/i.test(description)) fields.location = { value: "Toronto", quote: quote.trim() };
-          found.push({ page: pageIndex, kind: "company", name: name.trim(), identityQuote: quote.trim(), fields });
-          if (found.length >= 10) return found;
+        // Generalized person cards (PRD Final-MVP Phase 1): "Name \n <trade
+        // role> \n <detail>" — the role line must carry the requested
+        // activity/category tokens so any visible trade becomes a provisional
+        // candidate, not just founders/CEOs.
+        const roleTokens = (spec.criteria.find((c) => c.field === "category")?.value ?? spec.criteria.find((c) => c.field === "role")?.value ?? "")
+          .toLowerCase().split(/[^a-z0-9]+/).filter((t) => t.length > 2);
+        if (roleTokens.length) {
+          const lineList = page.text.split(/\n+/).map((l) => l.trim());
+          for (let i = 0; i < lineList.length - 1; i++) {
+            const nameLine = lineList[i];
+            const roleLine = lineList[i + 1] ?? "";
+            if (!/^[A-Z][\p{L}'-]+(?:[ \t]+[A-Z][\p{L}'-]+){1,3}$/u.test(nameLine)) continue;
+            if (!roleTokens.some((t) => roleLine.toLowerCase().includes(t))) continue;
+            if (/^(?:home|about|contact|team|gallery|pricing|blog|read more|view|menu)$/i.test(roleLine)) continue;
+            if (found.some((item) => normalized(item.name) === normalized(nameLine))) continue;
+            found.push({ page: pageIndex, kind: "person", name: nameLine, identityQuote: `${nameLine}\n${roleLine}`.trim(),
+              fields: { role: { value: roleLine, quote: `${nameLine}\n${roleLine}`.trim() } } });
+            if (found.length >= 10) return found;
+          }
         }
       }
     }
     return found;
   };
+
   const fallback = observedFallback();
   if (fallback.length >= 3) return report("deterministic", "not_called", fallback);
   if (Date.now() < extractionModelUnavailableUntil) return report("deterministic", "breaker", fallback, "model unavailable cooldown");
@@ -677,6 +691,106 @@ export async function extractEntities(
     return report("deterministic", /timeout|timed out|abort/i.test(message) ? "timeout" : "error", observedFallback(), message.slice(0, 160));
   }
 }
+
+/**
+ * Generalized deterministic business/service extraction (PRD Final-MVP Phase 1).
+ * Two page classes, no LLM, no fixed trade vocabulary — the requested category
+ * supplies the trade anchor and the page supplies the evidence:
+ *
+ *  1. First-party single-entity page (rainbowfishphoto.com-style): the site
+ *     itself is the entity. The page title/hostname/text must visibly carry a
+ *     requested-category token; the brand name comes from the title (the
+ *     segment that does not restate the trade), contacts from the literal page.
+ *  2. List/directory page: repeated name blocks with trade/contact context
+ *     become one provisional candidate per block. The directory itself is
+ *     never the entity.
+ *
+ * Candidates are provisional at discovery time — they carry category/location
+ * hints and observed contacts, and die later only at the relevance/strict gates.
+ */
+function deterministicLocalEntities(pages: BrowserObservedPage[], spec: SearchSpec): BrowserExtractedEntity[] {
+  const category = spec.criteria.find((c) => c.field === "category")?.value ?? "";
+  const categoryTokens = category.toLowerCase().split(/[^a-z0-9]+/).filter((t) => t.length > 2);
+  if (!categoryTokens.length) return [];
+  const hasTrade = (line: string) => categoryTokens.some((t) => line.toLowerCase().includes(t));
+  const locValue = spec.criteria.find((c) => c.field === "location")?.value ?? "";
+  const NAV = /^(home|about|contact|services?|team|gallery|pricing|blog|read more|view more|learn more|menu|book now|get in touch|our work|portfolio|testimonials|faq|news|shop|store|login|sign up|subscribe|next|previous|share|tweet|email|phone|address|location|website|follow us|search)$/i;
+  const isNameLike = (line: string) => {
+    const t = line.trim();
+    return t.length >= 3 && t.length <= 80 && !NAV.test(t) && /[A-Za-z]/.test(t) &&
+      (t === t.toUpperCase() ? t.split(/\s+/).length <= 5 : /^[A-Z0-9]/.test(t));
+  };
+  const out: BrowserExtractedEntity[] = [];
+  const seenNames = new Set<string>();
+
+  for (const [pageIndex, page] of pages.entries()) {
+    const host = (() => { try { return new URL(page.url).hostname.replace(/^www\./, ""); } catch { return ""; } })();
+    const isDirectory = isDirectoryHost(page.url);
+    const lines = page.text.split(/\n+/).map((l) => l.trim()).filter(Boolean);
+
+    // Mode 1 — first-party single-entity page: a non-directory host whose
+    // title or text visibly carries the requested trade.
+    if (!isDirectory) {
+      const tradeEvidence = hasTrade(page.title) || lines.some((l) => hasTrade(l));
+      if (tradeEvidence) {
+        const brandFromTitle = (page.title || "").split(/\s*[|\u2013\u2014-]\s*/).map((seg) => seg.trim())
+          .filter((seg) => seg.length >= 3 && !categoryTokens.some((t) => seg.toLowerCase().includes(t)));
+        const name = (page.structured?.organizationName ?? brandFromTitle[brandFromTitle.length - 1] ?? host).replace(/\s+/g, " ").trim();
+        const nameKey = name.toLowerCase();
+        if (name && nameKey.length >= 3 && !NAV.test(name) && !seenNames.has(nameKey)
+            && lines.filter((l) => isNameLike(l) && hasTrade(l) && l.split(/\s+/).length <= 5).length < 2) {
+          const quoteLine = lines.find((l) => hasTrade(l) && l.length >= 15)
+            ?? lines.find((l) => l.toLowerCase().includes(nameKey.split(" ")[0]) && l.length >= 15)
+            ?? `${name} \u2014 ${category}`;
+          const contacts = observedContactDetail(page);
+          const fields: BrowserExtractedEntity["fields"] = {
+            category: { value: category, quote: quoteLine },
+          };
+          if (locValue && page.text.toLowerCase().includes(locValue.toLowerCase()))
+            fields.location = { value: locValue, quote: quoteLine };
+          if (contacts?.phone) fields.phone = { value: contacts.phone, quote: contacts.excerpt };
+          if (contacts?.email) fields.email = { value: contacts.email, quote: contacts.excerpt };
+          if (page.structured?.phones[0] && !fields.phone)
+            fields.phone = { value: page.structured.phones[0], quote: quoteLine };
+          out.push({ page: pageIndex, kind: spec.entity === "company" ? "company" : "business", name, identityQuote: quoteLine, fields });
+          seenNames.add(nameKey);
+          continue;
+        }
+      }
+    }
+
+    // Mode 2 — list/directory blocks: repeated name-like lines with trade or
+    // contact context in the adjacent line. The directory is never the entity.
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (!isNameLike(line)) continue;
+      const nameKey = line.toLowerCase();
+      if (seenNames.has(nameKey)) continue;
+      if (categoryTokens.some((t) => nameKey.includes(t)) && line.split(/\s+/).length <= 3 && !isDirectory) continue;
+      const nextLine = lines[i + 1] ?? "";
+      if (line.split(/\s+/).length > 5) continue;
+      if (nextLine.split(/\s+/).length < line.split(/\s+/).length) continue;
+      const block = `${line} ${nextLine}`;
+      const tradeHere = hasTrade(block) || hasTrade(page.title);
+      const contactHere = /\+?\d[\d ().-]{7,}\d/.test(block) || /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i.test(block);
+      if (!tradeHere && !contactHere && !isDirectory) continue;
+      if (!hasTrade(block) && !hasTrade(page.title) && !isDirectory) continue;
+      const fields: BrowserExtractedEntity["fields"] = { category: { value: category, quote: block.trim().slice(0, 200) } };
+      const phoneMatch = /\+?\d[\d ().-]{7,}\d/.exec(block);
+      const emailMatch = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i.exec(block);
+      if (phoneMatch) fields.phone = { value: phoneMatch[0], quote: block.trim().slice(0, 200) };
+      if (emailMatch) fields.email = { value: emailMatch[0], quote: block.trim().slice(0, 200) };
+      if (locValue && block.toLowerCase().includes(locValue.toLowerCase()))
+        fields.location = { value: locValue, quote: block.trim().slice(0, 200) };
+      out.push({ page: pageIndex, kind: spec.entity === "company" ? "company" : "business", name: line, identityQuote: block.trim().slice(0, 200), fields });
+      seenNames.add(nameKey);
+      i++; // consume the detail line so it cannot become the next name
+      if (out.length >= 10) return out;
+    }
+  }
+  return out;
+}
+
 
 function plausibleFirstPartyDomains(name: string): string[] {
   const slug = normalized(name).replace(/\b(?:inc|llc|ltd|limited|corp|corporation)\b/g, "").replace(/\s+/g, "");
