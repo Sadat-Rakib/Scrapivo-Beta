@@ -1,0 +1,98 @@
+{
+  "id": "HO1",
+  "query": "Find 10 HVAC companies in Toronto with a website and phone number",
+  "category": "local",
+  "viewport": "desktop",
+  "startedAt": "2026-10-04T09:57:36.143Z",
+  "main": {
+    "query": "Find 10 HVAC companies in Toronto with a website and phone number",
+    "clarify": [
+      {
+        "question": "What are you trying to do with these results?",
+        "chosen": "Find prospects",
+        "t": 95
+      }
+    ],
+    "streamed": [],
+    "activity": [
+      "Checked available records · Available records · 0",
+      "Opening result · yelp.ca",
+      "Query funnel · The web · 0",
+      "Widening the search · Public source · pass 1 of 3",
+      "Show all activity (10)",
+      "Reading page · reliancehomecomfort.com",
+      "Reading page · reliancehomecomfort.com · 10081 characters",
+      "Opening result · hvactorontohomes.ca",
+      "Show all activity (12)",
+      "Opening result · furnaceprices.ca",
+      "Widening the search · Public source · pass 2 of 3"
+    ],
+    "bubbleVerbatim": true,
+    "runningAt": 47,
+    "clarifyAt": 94,
+    "clarifyRepeats": 0,
+    "pill": "Scrapy browser session · hvactrust.ca · 2 pages · 00:14",
+    "miniBrowserAt": 193,
+    "viewingOnly": true,
+    "settled": true,
+    "durationS": 520,
+    "firstStreamS": null,
+    "header": {
+      "query": "Find 10 HVAC companies in Toronto with a website and phone number",
+      "count": 0
+    },
+    "leadCards": [],
+    "businessCards": [],
+    "zeroText": null,
+    "reconciliation": null,
+    "viewingOnlyFinal": true,
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n04/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nFind 10 HVAC companies in Toronto with a website and phone number\nResults for \"Find 10 HVAC companies in Toronto with a website and phone number\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\nSome sources could not be searched this time (Public websites, The web, Available records), so results may be incomplete. The sources that answered returned no candidates for this query.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nScrapy\nCANCELLED\nhvactrust.ca\nExtracting\n· HVAC Toronto | Installation, Repair & Maintenance Experts\n2 pages\n4 actions\n00:14\nOpen original\nViewing only. Taking control needs the browser worker.\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n8 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n9 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n9 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n9 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n9 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n9 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n9 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n9 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n9 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n9 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n9 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n9 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n9 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n9 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n9 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n9 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n9 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n9 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n9 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n9 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n9 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n9 days ago\nFind HVAC companies in Edmonton.\n0 results\n·"
+  },
+  "server": {
+    "runId": null,
+    "specRuns": 0,
+    "spec": null,
+    "ledger": null,
+    "runtime": [],
+    "browserDone": [],
+    "searches": 0,
+    "qualRejected": [],
+    "errors": [],
+    "aiRouter": []
+  },
+  "worker": [],
+  "toasts": [],
+  "console": [
+    "info: [ui-projection] server=0 projected=0 rejected=0 codes={}"
+  ],
+  "pageErrors": [],
+  "timeline": [
+    {
+      "t": 8,
+      "event": "a: submitted"
+    },
+    {
+      "t": 56,
+      "event": "a: running"
+    },
+    {
+      "t": 103,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
+    },
+    {
+      "t": 203,
+      "event": "a: mini-browser (Scrapy browser session · hvactrust.ca · 2 pages · 00:14)"
+    },
+    {
+      "t": 528,
+      "event": "a: settled"
+    }
+  ],
+  "screenshots": [
+    "ui/HO1-a-1-clarify.jpg",
+    "ui/HO1-a-3-mini-browser.jpg",
+    "ui/HO1-a-6-final.jpg"
+  ],
+  "durationS": 534,
+  "responseBytes": 32413
+}

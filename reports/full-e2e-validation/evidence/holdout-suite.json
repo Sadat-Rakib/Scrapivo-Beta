@@ -1,0 +1,4 @@
+[
+  { "id": "HO1", "category": "local", "query": "Find 10 HVAC companies in Toronto with a website and phone number", "viewport": "desktop" },
+  { "id": "HO2", "category": "local", "query": "Find 5 wedding photographers in Cebu with public contact information", "viewport": "desktop" }
+]
