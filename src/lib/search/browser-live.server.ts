@@ -1803,7 +1803,7 @@ export async function discoverWithBrowser(spec: SearchSpec, options: BrowserDisc
     }
     let noProgress = 0;
     const queries = [...new Set(options.discoveryQueries ?? plan.discoveryQueries)];
-    for (const [passIndex, query] of queries.slice(0, 6).entries()) {
+    for (const [passIndex, query] of queries.slice(0, Math.min(10, plan.stoppingRules.maxQueries || 6)).entries()) {
       check();
       if (verifiedCount() >= plan.desiredCount) { stoppingReason = "verified_target_reached"; break; }
       if (limitReached()) { stoppingReason = "search_budget_reached"; break; }

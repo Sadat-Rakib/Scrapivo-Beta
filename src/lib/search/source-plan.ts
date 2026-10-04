@@ -434,10 +434,17 @@ export function buildResearchPlan(
       ...topics.map((topic) => [`"${topic.replace(/"/g, "")}"`, location].filter(Boolean).join(" ")),
     ]);
   } else if (spec.entity === "business") {
+    // Universal business query families (PRD: general planner): every
+    // variant derives from the user's own category string — no trade
+    // vocabulary, no benchmark terms.
+    const base = [category, location].filter(Boolean).join(" ");
     discoveryQueries = uniq([
-      [category, location].filter(Boolean).join(" "),
-      [category, "business", location].filter(Boolean).join(" "),
+      base,
+      [category, "companies", location].filter(Boolean).join(" "),
+      [category, "services", location].filter(Boolean).join(" "),
+      [category, "directory", location].filter(Boolean).join(" "),
       [category, noWebsite ? '"no website"' : "contact", location].filter(Boolean).join(" "),
+      [category, "near", location].filter(Boolean).join(" "),
     ]);
   } else if (spec.entity === "job") {
     discoveryQueries = uniq([
