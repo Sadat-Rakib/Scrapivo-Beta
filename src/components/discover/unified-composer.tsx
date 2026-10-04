@@ -314,7 +314,7 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
                     : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
                 const { error: derUploadError } = await mySupabase.storage
                   .from("attachments")
-                  .upload(`${userId}/${derId}-${d.name}`, d.blob, { upsert: true });
+                  .upload(`${userId}/${id}-derived-${derId}-${d.name}`, d.blob, { upsert: true });
                 if (derUploadError) throw derUploadError;
                 const derReg = await registerAttachmentDerivative({
                   data: {
