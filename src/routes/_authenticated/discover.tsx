@@ -2207,6 +2207,7 @@ function DiscoverPage() {
                               stopped (enriched zero narrative), not just show a
                               bare "· 0 results" header. */}
                           {isLast &&
+                            !runInFlight &&
                             t.results.leads.length === 0 &&
                             t.results.companies.length === 0 &&
                             t.results.people.length === 0 &&
