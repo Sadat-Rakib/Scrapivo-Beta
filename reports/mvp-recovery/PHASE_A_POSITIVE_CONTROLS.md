@@ -23,3 +23,9 @@ discovered 51 → parsed 51 → deduped 50 → relevant 51 → enriched 50 → q
 - Implication: before tuning domain discovery further, the ACQUISITION layer needs determinism/coverage work — the funnel variance (163→349 raw, 5→0 relevant) dominates the domain-discovery yield question.
 - Phase B status: the query builder already emits `"<name>" <location> official website` / `"<name>" contact` shapes when candidate.missing fires (source-plan.ts:497); verification of their live effect is blocked by this acquisition variance — stabilize acquisition sampling first.
 - Ledger: unaccounted 0 (conservation holds).
+
+## Session close (2026-10-03) — Failure A/B fixed; deterministic extraction rebuild queued
+- Failure A (premature zero): FIXED — root cause was the per-turn zero card (discover.tsx:2213) lacking a run-settled guard; b525473 gates it on runInFlight.
+- Failure B (unexplained CANCELLED): FIXED — root cause was worker-browser close() classifying by the bare aborted boolean (worker-browser.server.ts:210); 22e2de4 attributes by abort reason (only SEARCH_CANCELLED cancels).
+- Phase 1 (deterministic local-entity extraction): implementation attempted in-browser-live.server.ts but the scripted edits escape-corrupted the file twice; browser-live.server.ts was reverted to HEAD (efff08d state — Phase B intact). The five directive fixtures are preserved as skipped tests (deterministic-extraction.test.ts, 4b21039) with the full intended implementation spec in SEARCH_EXECUTION_MAP.md + this session's probe outputs. NEXT SESSION: rebuild deterministicLocalEntities by writing it with the Write tool (never scripted heredocs — they corrupt \s/\n/\b escapes), wire into observedFallback's business branch, unskip the fixtures.
+- Failure B follow-up: session.server.ts:126 and scrapy-browser.server.ts still classify by bare booleans.
