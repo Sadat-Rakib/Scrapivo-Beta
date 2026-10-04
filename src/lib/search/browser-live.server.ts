@@ -492,11 +492,13 @@ export function browserEntitiesToRows(
       // subject are structural proof of a person even when no person token
       // ("founder", "CEO", ...) appears verbatim — e.g. wedding photographers
       // listed as "Name — wedding photographer, Cebu" (C2 evidence).
+      // A subject-bound role field IS structural person evidence (PRD
+      // Final-MVP Phase 1): the deterministic person-card layer binds the
+      // role to the named subject before it reaches this gate.
       const personCard =
         entity.kind === "person" &&
         typeof entity.fields?.role?.value === "string" &&
-        entity.fields.role.value.trim().length > 2 &&
-        (!!entity.fields?.company?.value || !!entity.fields?.location?.value);
+        entity.fields.role.value.trim().length > 2;
       if (!hasOrgField && !personCard) {
         onTrace?.({ kind: "entity", pageUrl: page.url, name: entity.name.slice(0, 120), entityKind: entity.kind, outcome: "rejected",
           reason: "ENTITY_TYPE_MISMATCH", detail: "kind_unsupported_by_quotes", droppedFields });
