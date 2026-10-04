@@ -3,35 +3,36 @@
   "query": "Find 5 wedding photographers in Cebu with public contact information",
   "category": "local",
   "viewport": "desktop",
-  "startedAt": "2026-10-04T10:06:30.612Z",
+  "startedAt": "2026-10-04T11:05:46.889Z",
   "main": {
     "query": "Find 5 wedding photographers in Cebu with public contact information",
     "clarify": [
       {
         "question": "What are you trying to do with these results?",
         "chosen": "Find prospects",
-        "t": 3
+        "t": 94
       }
     ],
     "streamed": [],
     "activity": [
       "Checked available records · Available records · 0",
-      "Opening result · josephrequermephoto.com",
-      "Query funnel · The web · 0",
+      "Query funnel · Public source · 6",
+      "Checked public sources · Public source · 6",
       "Widening the search · Public source · pass 1 of 3",
       "Show all activity (12)",
-      "Opening result · rainbowfishphoto.com",
+      "Query funnel · The web · 0",
+      "Widen pass complete · Public source · 0 new candidates",
       "Widening the search · Public source · pass 2 of 3"
     ],
     "bubbleVerbatim": true,
-    "clarifyAt": 2,
+    "runningAt": 47,
+    "clarifyAt": 94,
     "clarifyRepeats": 0,
-    "runningAt": 19,
-    "pill": "Scrapy browser session · rainbowfishphoto.com · 5 pages · 00:29",
-    "miniBrowserAt": 111,
+    "pill": "Scrapy browser session · wezoree.com · 10 pages · 00:30",
+    "miniBrowserAt": 204,
     "viewingOnly": true,
     "settled": true,
-    "durationS": 485,
+    "durationS": 577,
     "firstStreamS": null,
     "header": {
       "query": "Find 5 wedding photographers in Cebu with public contact information",
@@ -42,7 +43,7 @@
     "zeroText": null,
     "reconciliation": null,
     "viewingOnlyFinal": true,
-    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n04/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nFind 10 HVAC companies in Toronto with a website and phone number\nExpand (0 results)\nFind 5 wedding photographers in Cebu with public contact information\nResults for \"Find 5 wedding photographers in Cebu with public contact information\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\nSome sources could not be searched this time (Public websites, The web, Available records), so results may be incomplete. The sources that answered returned no candidates for this query.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nScrapy\nCANCELLED\nrainbowfishphoto.com\nOpening result\n· Wedding Photographer in Cebu | Rainbowfish Photo\n5 pages\n8 actions\n00:29\nOpen original\nViewing only. Taking control needs the browser worker.\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n9 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n9 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n9 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n9 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n9 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n9 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n9 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n9 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n9 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n9 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n9 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n9 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n9 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n9 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n9 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n9 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n9 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n9 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n9 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n9 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n9 days ago\nFind HVAC businesses in Edmonton without websites.\n0 results\n·\n9 days ago\nFind HVAC businesses in "
+    "finalTextSample": "Scrapivo\nHome\nProjects\nWatches\nSaved\nGuides\nSUPPORT & ACCOUNT\nHelp\n0/5\n04/10/2026\nE\ne2e.scrapivo.test.001@gmail.com\nManage account\nHOME\nNew chat\nFind 5 wedding photographers in Cebu with public contact information\nResults for \"Find 5 wedding photographers in Cebu with public contact information\" · 0 results\nWatch signal\nCards\nLists\nClear\nFold (0 results)\n2 candidates were found, but their public details could not be verified in the time available. 6 candidates surfaced while researching but did not match your criteria.\nTry broadening the search — remove a constraint, add a location, or search without a filter.\nScrapy\nCANCELLED\nwezoree.com\nExtracting\n· Love Notes Wedding Photographer in Lake Como, Rome ❤️ Portfolio\n10 pages\n17 actions\n00:30\nOpen original\nViewing only. Taking control needs the browser worker.\n6 leads seen while researching aren't in this list\nREAD MORE LOVE NOTES · did not match every part of your request\nBASED IN PHILIPPINES · still missing required details\nCEBU WEDDING PHOTOGRAPHER · still missing required details\nSTUNNING SAME-DAY-EDIT SLIDESHOWS · did not match every part of your request\nPHOTOGRAPHER REVIEWS · did not match every part of your request\nand 1 more\nMode\nThinker\nChat History\nFind 10 SaaS founders globally who may need help with AI automation.\n0 results\n·\n9 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n9 days ago\nFind 10 plumbers in Austin with no website. Include their public phone numbers and emails when available.\n0 results\n·\n9 days ago\nFind HVAC companies in Edmonton.\n0 results\n·\n9 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n9 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n9 days ago\nFind SaaS founders globally who may need help with AI automation.\n0 results\n·\n9 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n9 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n9 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n9 days ago\nFind remote AI automation jobs in Canada.\n0 results\n·\n9 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n9 days ago\nFind copywriters in New York who talk about AI content or AI slop.\n0 results\n·\n9 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n9 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n9 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n9 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n9 days ago\nFind HVAC companies in the Greater Toronto Area that could need a better website or automation.\n0 results\n·\n9 days ago\nFind HVAC companies in the Greater Toronto Area that could need a b"
   },
   "server": {
     "runId": null,
@@ -57,32 +58,30 @@
     "aiRouter": []
   },
   "worker": [],
-  "toasts": [
-    "No leads passed verification for this search. Try broadening criteria or refining the query."
-  ],
+  "toasts": [],
   "console": [
     "info: [ui-projection] server=0 projected=0 rejected=0 codes={}"
   ],
   "pageErrors": [],
   "timeline": [
     {
-      "t": 5,
+      "t": 7,
       "event": "a: submitted"
     },
     {
-      "t": 7,
-      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
-    },
-    {
-      "t": 24,
+      "t": 54,
       "event": "a: running"
     },
     {
-      "t": 117,
-      "event": "a: mini-browser (Scrapy browser session · rainbowfishphoto.com · 5 pages · 00:29)"
+      "t": 101,
+      "event": "a: clarify \"What are you trying to do with these results?\" -> Find prospects"
     },
     {
-      "t": 490,
+      "t": 212,
+      "event": "a: mini-browser (Scrapy browser session · wezoree.com · 10 pages · 00:30)"
+    },
+    {
+      "t": 584,
       "event": "a: settled"
     }
   ],
@@ -91,6 +90,6 @@
     "ui/HO2-a-3-mini-browser.jpg",
     "ui/HO2-a-6-final.jpg"
   ],
-  "durationS": 496,
-  "responseBytes": 28686
+  "durationS": 590,
+  "responseBytes": 31688
 }
