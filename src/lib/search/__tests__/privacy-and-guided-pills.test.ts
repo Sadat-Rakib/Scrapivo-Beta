@@ -59,16 +59,41 @@ describe("guided pills", () => {
     expect(Object.values(GUIDED_SEARCH_TEXT)).toEqual(["investors", "founders", "companies", "jobs", "local businesses"]);
   });
 
-  it("a bare category asks a scoping question and searches nothing", async () => {
-    const fail = vi.fn(async () => { throw new Error("no search may run for a bare category"); });
+  it("guided pills: bare entity nouns clarify and search nothing; runnable kinds search honestly", async () => {
+    const fail = vi.fn(async () => { throw new Error("no search may run for a bare entity noun"); });
+    // Stage 1 policy: a bare entity NOUN ("investors") narrows nothing and
+    // asks its one scope question; a runnable KIND ("founders" — a role,
+    // "local businesses"/"companies" — head-noun kinds) searches honestly
+    // (zero rows without a place) and never asks the removed purpose question.
+    const clarifies = new Set(["investors", "companies", "jobs"]);
+    const searches = new Set(["founders", "local businesses"]);
+    const zeroReaders = {
+      people: vi.fn(async () => ({ rows: [], meta: { dbHit: false, engine: "none", partitionsRead: [], rowsScanned: 0, rowsReturned: 0 } })),
+      businesses: vi.fn(async () => ({ rows: [], meta: { dbHit: false, engine: "none", partitionsRead: [], rowsScanned: 0, rowsReturned: 0 } })),
+      investors: vi.fn(async () => ({ rows: [], meta: { dbHit: false, engine: "none", partitionsRead: [], rowsScanned: 0, rowsReturned: 0 } })),
+      providerJobs: vi.fn(async () => ({ rows: [], meta: { dbHit: false, engine: "none", partitionsRead: [], rowsScanned: 0, rowsReturned: 0 } })),
+      index: null,
+      liveGapfill: { osm: null, web: null, jobs: null, browser: vi.fn(async () => [] as never[]) },
+    };
     for (const text of Object.values(GUIDED_SEARCH_TEXT)) {
-      const res = await runSpecSearchCore(text, {
-        people: fail as never, companies: fail as never, businesses: fail as never, investors: fail as never, providerJobs: fail as never,
-        index: null, liveGapfill: { osm: null, web: null, jobs: null, browser: fail as never },
-      }, 10, {});
-      expect(res.rows, text).toEqual([]);
-      expect(res.clarify.length, text).toBeGreaterThan(0);
-      expect(res.clarify[0]!.question, text).toMatch(/\?/);
+      if (clarifies.has(text)) {
+        const res = await runSpecSearchCore(text, {
+          people: fail as never, companies: fail as never, businesses: fail as never, investors: fail as never, providerJobs: fail as never,
+          index: null, liveGapfill: { osm: null, web: null, jobs: null, browser: fail as never },
+        }, 10, {});
+        expect(res.rows, text).toEqual([]);
+        expect(res.clarify.length, text).toBeGreaterThan(0);
+        expect(res.clarify[0]!.question, text).toMatch(/\?/);
+        expect(res.outcome, text).toBeUndefined();
+      } else {
+        expect(searches.has(text), text).toBe(true);
+        const res = await runSpecSearchCore(text, zeroReaders, 10, {});
+        expect(res.spec.status, text).toBe("ready_to_search");
+        expect(res.rows, text).toEqual([]);
+        // A completed zero run (outcome present) — any clarify here is the
+        // advisory thin-ask, never a blocking purpose question.
+        expect(res.outcome, text).toBeDefined();
+      }
     }
     expect(fail).not.toHaveBeenCalled();
   });

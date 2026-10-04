@@ -105,12 +105,30 @@ describe("spec-first flow", () => {
     expect(res.rows).toHaveLength(1);
   });
 
-  it("without force, partial answers re-ask only still-missing fields", async () => {
+  it("without force, a runnable partial answer searches; a bare ask still clarifies", async () => {
+    // Stage 1 policy: purpose is never a blocker, and a stated KIND (category
+    // = plumbers) is scope — so the frame is runnable and the search runs
+    // honestly (zero rows without a location) instead of re-asking.
+    const zeroDeps = {
+      people: vi.fn(async () => ({ rows: [], meta: { dbHit: false, engine: "none", partitionsRead: [], rowsScanned: 0, rowsReturned: 0 } })),
+      businesses: vi.fn(async () => ({ rows: [], meta: { dbHit: false, engine: "none", partitionsRead: [], rowsScanned: 0, rowsReturned: 0 } })),
+      index: null,
+    };
     const res = await runSpecSearchCore(
-      "yo find me businesses rn", {}, 25, { category: "plumbers" },
+      "yo find me businesses rn", zeroDeps, 25, { category: "plumbers" },
     );
-    expect(res.spec.status).toBe("needs_clarification");
-    expect(res.spec.missing).toEqual(["location"]);
+    expect(res.spec.status).toBe("ready_to_search");
+    expect(res.rows).toHaveLength(0);
+    // A completed zero run may carry advisory thin-ask refinements; what
+    // matters is that a real search ran (outcome present) and no blocking
+    // purpose question was asked.
+    expect(res.outcome).toBeDefined();
+    // Without any answer, the bare ask still asks its one highest-information
+    // question (scope), with NO terminal outcome (P0).
+    const bare = await runSpecSearchCore("yo find me businesses rn", {}, 25, {});
+    expect(bare.spec.status).toBe("needs_clarification");
+    expect(bare.clarify.length).toBeGreaterThan(0);
+    expect(bare.outcome).toBeUndefined();
   });
 
   it("extractor finds location without 'in' + new crafts/cities", () => {
