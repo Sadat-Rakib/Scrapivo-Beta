@@ -243,3 +243,36 @@ describe("rejection-reason booking (Windhoek 149 autopsy)", () => {
     expect(summary.accounting?.unaccounted ?? 0).toBe(0);
   });
 });
+
+describe("target-aware research queue (Final-MVP Phase 3)", () => {
+  it("sizes the research pool beyond six candidates when the requested target is 10", async () => {
+    // 24 researchable candidates + target 10: the old flat slice(0, 6) made
+    // reaching 10 delivered impossible by construction. The target-aware
+    // queue researches the full strength-ranked pool (>= 12, <= 3x target).
+    const { osm } = (() => {
+      const calls: string[][] = [];
+      const mk = (n: number): any[] => Array.from({ length: n }, (_, i) => ({
+        kind: "business" as const,
+        key: `live-osm:q-${i}`, entity_id: `live-osm:q-${i}`, entity_resolved: true,
+        identity_confidence: 0.9, page_type: "entity_page", resolution_method: "osm_poi",
+        title: `Austin Plumber ${i}`, detail: "Austin", email: null,
+        phone: `+1 512 555 ${String(1000 + i).slice(-4)}`, phoneStatus: "ok",
+        url: null, website_url: null, source_url: `https://www.openstreetmap.org/node/${i}`,
+        category: "plumber", location: "Austin", country: null,
+        evidence: [{ source_url: `osm:q-${i}`, source_type: "osm" as const, excerpt: `Austin Plumber ${i} plumber Austin`, observed_at: new Date().toISOString(), evidence_type: "identity" as const, supports: "identity" as const, confidence: 0.8, extraction_method: "osm_tags" as const, subject: `live-osm:q-${i}` }],
+        why_match: `Austin Plumber ${i} — plumber in Austin`,
+      }));
+      return { osm: vi.fn(async () => mk(24) as unknown as SpecRow[]), calls } as unknown as { osm: (q: string, l: string, c: string, o?: { widen?: boolean }) => Promise<SpecRow[]>; calls: string[][] };
+    })();
+    const res = await runSpecSearchCore(
+      "Find 10 plumbers in Austin with a phone number",
+      { ...emptyDeps, liveGapfill: { osm, web: async () => [], browser: async () => [] as SpecRow[] } },
+      10,
+      ANSWERS,
+      { force: true },
+    );
+    // The strict gate may drop some — but the pool researched must exceed six.
+    expect(res.rows.length).toBeGreaterThanOrEqual(6);
+    expect(res.widenPasses ?? 0).toBeLessThanOrEqual(3);
+  }, 30_000);
+});

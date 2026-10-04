@@ -791,7 +791,15 @@ export async function runLiveGapfill(
           return strength(b) - strength(a);
         })
         .slice(0, Math.min(20, Math.max(15, desiredCount * 2)))
-    : initialCandidates.filter(researchable).slice(0, 6);
+    : initialCandidates.filter(researchable)
+        .sort((a, b) => {
+          const strength = (row: SpecRow) =>
+            Number(!!row.phone) * 4 + Number(!!row.email) * 3 +
+            Number(!!row.website_url) * 3 + Number(!!row.detail && row.detail !== row.location) * 2 +
+            Number(!!row.category) + Number(!!row.entity_resolved);
+          return strength(b) - strength(a);
+        })
+        .slice(0, Math.min(60, Math.max(12, desiredCount * 3)));
   const researchPlan = buildResearchPlan(spec, { desiredCount });
   // WS1 per-query funnel accounting, attached to the browser-live diagnostic.
   const browserQueryFunnels: import("./browser-live.server").BrowserQueryFunnel[] = [];
