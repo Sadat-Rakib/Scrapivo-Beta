@@ -21,6 +21,7 @@ import { extractStructuredFacts, factsFromJsonLdText, type StructuredPageFacts }
 import { normalizeDomain, normalizeEntityName, isFirstPartyEntityHost } from "./entity-resolve";
 import { buildResearchPlan, buildCandidateResearchQueries } from "./source-plan";
 import { triageSerpResults } from "./serp-triage.server";
+import { tradeFamiliesOf } from "@/lib/canonical/businesses.server";
 import { qualifyLead } from "./qualify";
 import { isDeadlineAbort } from "./search-run";
 import { computeResearchNeeds, researchStatus, type ResearchNeed, type ResearchStatus } from "./browser-research";
@@ -708,11 +709,19 @@ export async function extractEntities(
  * Candidates are provisional at discovery time — they carry category/location
  * hints and observed contacts, and die later only at the relevance/strict gates.
  */
-function deterministicLocalEntities(pages: BrowserObservedPage[], spec: SearchSpec): BrowserExtractedEntity[] {
+export function deterministicLocalEntities(pages: BrowserObservedPage[], spec: SearchSpec): BrowserExtractedEntity[] {
   const category = spec.criteria.find((c) => c.field === "category")?.value ?? "";
   const categoryTokens = category.toLowerCase().split(/[^a-z0-9]+/).filter((t) => t.length > 2);
   if (!categoryTokens.length) return [];
-  const hasTrade = (line: string) => categoryTokens.some((t) => line.toLowerCase().includes(t));
+  // Semantic trade matching (PRD V2 §12/§19): literal category tokens are
+  // hints; a line belongs to the same trade when its own words name that
+  // family ("heating and cooling" vs "HVAC"). Family comes from the
+  // canonical map — no per-trade vocabulary here.
+  const categoryFamilies = tradeFamiliesOf(category);
+  const hasTrade = (line: string) =>
+    categoryTokens.some((t) => line.toLowerCase().includes(t)) ||
+    (categoryFamilies.length > 0 &&
+      tradeFamiliesOf(line).some((f) => categoryFamilies.includes(f)));
   const locValue = spec.criteria.find((c) => c.field === "location")?.value ?? "";
   const NAV = /^(home|about|contact|services?|team|gallery|pricing|blog|read more|view more|learn more|menu|book now|get in touch|our work|portfolio|testimonials|faq|news|shop|store|login|sign up|subscribe|next|previous|share|tweet|email|phone|address|location|website|follow us|search)$/i;
   const isNameLike = (line: string) => {

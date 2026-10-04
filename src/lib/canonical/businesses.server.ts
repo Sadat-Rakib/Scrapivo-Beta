@@ -253,6 +253,12 @@ const TRADE_FAMILIES: Array<[RegExp, string]> = [
   [/dentist|dental/i, "dental"],
 ];
 
+export function tradeFamiliesOf(craft: unknown): string[] {
+  if (typeof craft !== "string") return [];
+  const lower = craft.toLowerCase();
+  return TRADE_FAMILIES.filter(([pattern]) => pattern.test(lower)).map(([, family]) => family);
+}
+
 function tradeFamilyOf(craft: unknown): string | null {
   if (typeof craft !== "string") return null;
   const s = craft.toLowerCase();

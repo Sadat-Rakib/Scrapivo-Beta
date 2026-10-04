@@ -80,3 +80,33 @@ describe("deterministic local-entity extraction (no extraction LLM)", () => {
     expect(entities).toEqual([]);
   });
 });
+
+describe("semantic trade matching (PRD V2 §12/§19 — synonym pages)", () => {
+  const hvacSpec: SearchSpec = { ...businessSpec, criteria: [
+    { field: "category", value: "HVAC", stated: true, confidence: 1 },
+    { field: "location", value: "Toronto", stated: true, confidence: 1 },
+  ] };
+
+  it("a heating-and-cooling page with no literal 'HVAC' token still yields a candidate", async () => {
+    const pages = [page("https://comforthvac.ca/", "Comfort Heating & Cooling — Toronto",
+      "Comfort Heating and Cooling serves Toronto with furnace installation, air conditioning repair and maintenance.\nFamily owned since 1998.\nPhone: +1 416 555 0177.")];
+    const entities = await extractEntities(pages, hvacSpec);
+    expect(entities.length).toBeGreaterThanOrEqual(1);
+    expect(entities[0].kind).toBe("business");
+    expect(entities[0].fields?.phone?.value).toContain("416");
+  });
+
+  it("an air-conditioning contractor page matches an HVAC request via family", async () => {
+    const pages = [page("https://coolairtoronto.test/", "Cool Air — Air Conditioning Contractor Toronto",
+      "Cool Air is an air conditioning contractor serving Toronto.\nEmergency service available.\nCall +1 416 555 0199.")];
+    const entities = await extractEntities(pages, hvacSpec);
+    expect(entities.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("an unrelated page still yields nothing (family must match both sides)", async () => {
+    const pages = [page("https://bakery.test/", "Fresh Bakery Toronto",
+      "Fresh Bakery bakes artisan bread and pastries for Toronto cafes.")];
+    const entities = await extractEntities(pages, hvacSpec);
+    expect(entities).toEqual([]);
+  });
+});
