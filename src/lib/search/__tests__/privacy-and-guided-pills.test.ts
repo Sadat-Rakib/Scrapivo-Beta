@@ -87,7 +87,7 @@ describe("guided pills", () => {
         expect(res.outcome, text).toBeUndefined();
       } else {
         expect(searches.has(text), text).toBe(true);
-        const res = await runSpecSearchCore(text, zeroReaders, 10, {});
+        const res = await runSpecSearchCore(text, zeroReaders as never, 10, {});
         expect(res.spec.status, text).toBe("ready_to_search");
         expect(res.rows, text).toEqual([]);
         // A completed zero run (outcome present) — any clarify here is the
