@@ -18,8 +18,9 @@
 import { resolveCanonicalLocation } from "@/lib/search/location-resolver";
 import type { UnderstandingFrame } from "./frame";
 import { openValue } from "./frame";
-import { purposeFromFrame, repairExplicitPurpose } from "./purpose";
+import { repairExplicitPurpose } from "./purpose";
 import { classifyHead, narrowsTarget, RELATION_SIGNAL_RE } from "./lexicon";
+import type { ResolvedInputContext, SourceFact, Stage1Decision } from "./input-envelope";
 import {
   canonicalize,
   isDirection,
@@ -156,12 +157,11 @@ export function blockers(state: ClarificationState): Blocker[] {
     out.push({ field: "compound.split", reason: "compound_parse_uncertain" });
   }
 
-  if (out.length === 0 && hasScope(frame) &&
-      ["person", "company", "business", "investor"].includes(frame.target.entity_type.value) &&
-      !purposeFromFrame(frame) && !frame.user_context.objective?.value &&
-      unanswered("user_context.objective")) {
-    out.push({ field: "user_context.objective", reason: "missing_purpose" });
-  }
+  // PURPOSE IS DELIBERATELY NOT A BLOCKER (Stage 1 policy): the intent is
+  // inferred from the frame (selling/hiring/relation wording) and only asked
+  // about — via the materiality path below — when two materially different
+  // interpretations genuinely remain. "Find plumbers in Austin" searches
+  // immediately; a generic purpose question is friction, not clarity.
 
   // Last, and only when nothing above blocks: understood but unrunnable.
   // "find businesses" — a real request, missing the one thing that would make
@@ -321,12 +321,6 @@ export function nextQuestion(state: ClarificationState): Question | null {
         options: [],
       };
     }
-    case "user_context.objective":
-      return {
-        field,
-        question: "What are you trying to do with these results?",
-        options: ["Research", "Find prospects", "Recruit", "Find partners"],
-      };
     case "relation.object": {
       const rel = state.frame.relation.type.value;
       const verb =
@@ -614,6 +608,152 @@ export function syncClarification(frame: UnderstandingFrame): UnderstandingFrame
   const out = repairExplicitPurpose(structuredClone(frame));
   out.clarification = clarificationBlock(initState(out));
   return out;
+}
+
+// ── THE Stage-1 decision authority ────────────────────────────────────────
+
+/** Explicit values the user referred to but did not supply — a number nobody
+ *  stated would be searched as if they had, so these always ask. */
+const AMOUNT_FIELDS = new Set(["salary_min", "employee_count", "revenue"]);
+const AMOUNT_QUESTIONS: Record<string, string> = {
+  salary_min: "What salary amount do you mean?",
+  employee_count: "What company size do you mean?",
+  revenue: "What revenue amount do you mean?",
+};
+
+/** Derived-fact categories that can materially change discovery, research, or
+ *  qualification. Static on purpose: materiality is deterministic (no second
+ *  understanding pass, no SearchSpec diff). */
+const MATERIAL_CATEGORIES = new Set(["target", "geo", "offering", "quantity", "constraint"]);
+
+function tokenSet(s: string): Set<string> {
+  return new Set(
+    s
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter(Boolean),
+  );
+}
+
+/** Same fact said twice? Token containment either way, ≥60% overlap. */
+function valuesOverlap(a: string, b: string): boolean {
+  const A = tokenSet(a);
+  const B = tokenSet(b);
+  if (A.size === 0 || B.size === 0) return false;
+  const [small, big] = A.size <= B.size ? [A, B] : [B, A];
+  let hits = 0;
+  for (const w of small) if (big.has(w)) hits++;
+  return hits / small.size >= 0.6;
+}
+
+/**
+ * Deterministic materiality (INV-2/INV-5): a derived fact (website, document,
+ * image) is MATERIAL when its category can change what is searched and the
+ * user's own text did not already state a compatible fact in that category.
+ * Pure function over provenance-tagged facts — no LLM, no SearchSpec.
+ */
+export function materialFacts(facts: SourceFact[] | null | undefined): SourceFact[] {
+  const all = facts ?? [];
+  const stated = all.filter((f) => f.provenance === "user_text");
+  const out: SourceFact[] = [];
+  for (const f of all) {
+    if (f.provenance === "user_text") continue;
+    if (!MATERIAL_CATEGORIES.has(f.category)) continue;
+    const corroborated = stated.some((s) => s.category === f.category && valuesOverlap(s.value, f.value));
+    if (!corroborated) out.push(f);
+  }
+  return out;
+}
+
+/** Deterministic presentation summary of externally derived context. */
+export function buildConfirmSummary(facts: SourceFact[] | null | undefined): string {
+  const derived = (facts ?? []).filter((f) => f.provenance !== "user_text");
+  if (derived.length === 0) return "";
+  const from = (p: string) => (p === "url" ? "website" : p === "document" ? "document" : "image");
+  return derived
+    .slice(0, 6)
+    .map((f) => `• ${f.value} (${from(f.provenance)})`)
+    .join("\n");
+}
+
+/** Record the user's acceptance of derived context — the minimal monotonic
+ *  marker; once set, the confirm gate never re-fires for this frame. */
+export function markConfirmed(frame: UnderstandingFrame): UnderstandingFrame {
+  const out = structuredClone(frame);
+  out.confirmation = { resolved: true };
+  out.meta.notes = [...out.meta.notes, "confirm: user accepted derived context"].slice(-20);
+  return out;
+}
+
+export type ResolveStageOpts = { force?: boolean };
+
+/**
+ * THE Stage-1 decision. One function decides READY / CLARIFY / CONFIRM from
+ * the canonical frame + its clarification state + resolved provenance.
+ * SearchSpec plays no part (INV-5): frameToSearchSpec runs only after this
+ * returns ready. Purpose is never a default blocker (INV-6).
+ *
+ * Decision order:
+ *  1. an explicit unresolved AMOUNT always asks (survives force);
+ *  2. semantic blockers minus purpose; force ("Search with defaults") skips
+ *     them except an unknown entity, which nothing runnable can come from;
+ *  3. material derived facts gate a CONFIRM (blocking, editable) until the
+ *     user confirms;
+ *  4. a question combined with unconfirmed derived context is ONE interaction
+ *     — a confirm card carrying the question;
+ *  5. supporting-only derived context is a non-blocking inline summary.
+ */
+export function resolveStage(
+  frame: UnderstandingFrame,
+  state: ClarificationState,
+  resolvedContext?: ResolvedInputContext | null,
+  opts: ResolveStageOpts = {},
+): Stage1Decision {
+  const amount = frame.unresolved.find((u) => AMOUNT_FIELDS.has(u.field));
+  if (amount) {
+    return {
+      stage: "clarify",
+      amountField: amount.field,
+      question: {
+        field: "unresolved.amount",
+        question: AMOUNT_QUESTIONS[amount.field] ?? "What amount do you mean?",
+        options: [],
+      },
+    };
+  }
+
+  const force = !!opts.force;
+  const list = blockers(state);
+  let question: Stage1Decision["question"];
+  if (force) {
+    const entityBlocker = list.find((b) => b.field === "target.entity_type");
+    const q = entityBlocker ? nextQuestion(state) : null;
+    question = q ? { field: q.field, question: q.question, options: q.options } : undefined;
+  } else {
+    const q = nextQuestion(state);
+    question = q ? { field: q.field, question: q.question, options: q.options } : undefined;
+  }
+
+  const facts = resolvedContext?.facts ?? frame.sources ?? [];
+  const derived = facts.filter((f) => f.provenance !== "user_text");
+  const material = materialFacts(facts);
+  const confirmed = frame.confirmation?.resolved === true;
+  const summary = buildConfirmSummary(facts);
+
+  if (question) {
+    // A question + unconfirmed derived context = ONE combined interaction.
+    if (derived.length > 0 && !confirmed) {
+      return { stage: "confirm", question, summary, material };
+    }
+    return { stage: "clarify", question };
+  }
+  if (material.length > 0 && !confirmed && !force) {
+    return { stage: "confirm", summary, material };
+  }
+  if (derived.length > 0 && !confirmed) {
+    return { stage: "ready", summary };
+  }
+  return { stage: "ready" };
 }
 
 // ── Answer interpretation (deterministic, small on purpose) ───────────────

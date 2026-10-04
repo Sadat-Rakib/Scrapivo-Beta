@@ -285,11 +285,40 @@ export function normalizeSearchFrame(input: UnderstandingFrame): UnderstandingFr
   return syncClarification(frame);
 }
 
-const entityOf = (frame: UnderstandingFrame): SpecEntity => {
+/** The single entity-type → SpecEntity mapping (used by the full spec build
+ *  AND the Stage-1 carry spec — one source, no second interpreter). */
+export const entityFromFrame = (frame: UnderstandingFrame): SpecEntity => {
   const kind = frame.target.entity_type.value;
   if (kind === 'organization') return 'company';
   return ['person', 'company', 'business', 'investor', 'job'].includes(kind) ? kind as SpecEntity : 'unknown';
 };
+const entityOf = entityFromFrame;
+
+/**
+ * Minimal carry spec for Stage-1 rounds (clarify/confirm): enough for the
+ * clarify UI to phrase its question (entity + known places) and to carry the
+ * frame across the HTTP boundary. NOT the Stage-2 SearchSpec — that is built
+ * by frameToSearchSpec after resolveStage says READY only (INV-5).
+ */
+export function lightSpecFromFrame(frame: UnderstandingFrame, status: SearchSpec['status']): SearchSpec {
+  const places = (frame.locations.length ? frame.locations : frame.location ? [frame.location] : [])
+    .filter((p) => p.scope !== 'remote');
+  const spec = buildSpec({
+    entity: entityFromFrame(frame),
+    criteria: places.length
+      ? [{ field: 'location', value: places[0]!.canonical ?? places[0]!.value, stated: true, confidence: places[0]!.confidence }]
+      : [],
+    raw_query: frame.input.raw,
+    signal_required: false,
+    signal_types: [],
+    signal_recency: null,
+    locationSuggestion: null,
+  });
+  spec.understanding = frame;
+  spec.locations = places.map((p) => p.canonical ?? p.value);
+  spec.status = status;
+  return spec;
+}
 
 /** Convert the validated interpretation, with no second raw-query extractor. */
 export function frameToSearchSpec(input: UnderstandingFrame): SearchSpec {
@@ -497,9 +526,11 @@ export function isActionableFrame(spec: SearchSpec): boolean {
   return !!(frame.target.role || frame.target.job_title || frame.target.industry || frame.target.category || frame.target.business_type || frame.relation.object);
 }
 
-/** Server extraction is bounded; provider failure returns the deterministic frame. */
-export async function understandSearchSpec(query: string, context: Record<string, string>, signal?: AbortSignal | null): Promise<SearchSpec> {
-  if (process.env.VITEST) return frameToSearchSpec(applyClarificationToFrame(validateFrame(extractFrameDeterministic(query)).frame, context));
+/** Server extraction is bounded; provider failure returns the deterministic frame.
+ *  Returns the FRAME only — frameToSearchSpec runs after the Stage-1 decision
+ *  says ready (INV-5: SearchSpec never feeds the Stage-1 decision). */
+export async function understandFrame(query: string, context: Record<string, string>, signal?: AbortSignal | null): Promise<UnderstandingFrame> {
+  if (process.env.VITEST) return applyClarificationToFrame(validateFrame(extractFrameDeterministic(query)).frame, context);
   let timer: ReturnType<typeof setTimeout> | undefined;
   let abort: (() => void) | undefined;
   const fallback = (reason: string) => {
@@ -516,9 +547,14 @@ export async function understandSearchSpec(query: string, context: Record<string
     });
     const extraction = import('./extract.server').then(({ extractFrameLLM }) => extractFrameLLM(query, { context, waitForSlotMs: 250 }))
       .then((result) => result.frame).catch(() => fallback('Understanding provider failed; deterministic fallback used.'));
-    return frameToSearchSpec(applyClarificationToFrame(validateFrame(await Promise.race([extraction, bounded])).frame, context));
+    return applyClarificationToFrame(validateFrame(await Promise.race([extraction, bounded])).frame, context);
   } finally {
     if (timer) clearTimeout(timer);
     if (abort) signal?.removeEventListener('abort', abort);
   }
+}
+
+/** Compat wrapper: full spec build for callers outside the Stage-1 core path. */
+export async function understandSearchSpec(query: string, context: Record<string, string>, signal?: AbortSignal | null): Promise<SearchSpec> {
+  return frameToSearchSpec(await understandFrame(query, context, signal));
 }

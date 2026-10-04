@@ -20,8 +20,9 @@ describe("provider frame repairs", () => {
     expect(spec.understanding?.relation.object?.value).toBe("website");
     expect(spec.criteria).toContainEqual(expect.objectContaining({ field: "website", value: "true" }));
     expect(spec.understanding?.meta.notes.join(" ")).toMatch(/recovered has_asset object/);
-    // No relation question remains; only the purpose question, which force skips.
-    expect(decideSpecClarification(spec, false)?.id).toBe("entity_purpose");
+    // No relation question remains, and purpose is never a default blocker:
+    // the repaired frame is complete and searches immediately.
+    expect(decideSpecClarification(spec, false)).toBeNull();
     expect(decideSpecClarification(spec, true)).toBeNull();
   });
 

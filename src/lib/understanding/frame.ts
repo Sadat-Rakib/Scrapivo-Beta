@@ -22,6 +22,7 @@
  */
 
 import { z } from "zod";
+import { SourceFactSchema } from "./input-envelope";
 import {
   CLARIFICATION_REASONS,
   DIRECTIONS,
@@ -293,6 +294,12 @@ export const ClarificationSchema = z.object({
   asked: z.array(z.string().max(60)).max(20).optional(),
 });
 
+/** Stage-1 provenance: where non-text facts came from (website / document /
+ *  image resolver). Data only — provenance never carries instructions.
+ *  Reuses the canonical SourceFact schema (input-envelope) so the frame and
+ *  the resolver share one contract. */
+const SourceFactOnFrame = SourceFactSchema;
+
 export const RepairMetadataSchema = z.object({
   initial_parse_status: z.enum(["not_attempted", "valid_json", "invalid_json"]),
   initial_failure_class: z
@@ -382,6 +389,13 @@ export const UnderstandingFrameSchema = z.object({
     reason: null,
     question: null,
   }),
+  /** Stage-1 provenance: non-text facts the resolver derived (website /
+   *  document / image). Data with provenance — never instructions. Additive
+   *  + optional so frames from older clients keep parsing. */
+  sources: z.array(SourceFactOnFrame).max(60).optional(),
+  /** Minimal monotonic confirm marker: the user accepted (or edited) the
+   *  externally derived context, so the confirm gate never re-fires. */
+  confirmation: z.object({ resolved: z.boolean() }).nullish(),
   meta: FrameMetaSchema.default({
     extractor: "deterministic",
     provider: null,

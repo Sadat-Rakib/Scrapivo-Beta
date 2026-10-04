@@ -719,6 +719,11 @@ export interface SpecSearchResult {
   qualified_count: number;
   /** Off-topic domain boundary copy when the request is out of scope. */
   boundary_message?: string;
+  /** Stage-1 workflow decision for this round. Clarify/confirm rounds always
+   *  carry it; a ready round that searched may omit it. */
+  stage?: "ready" | "clarify" | "confirm";
+  /** Deterministic summary of externally derived context (confirm card). */
+  confirmSummary?: string | null;
   /** Candidate survival ledger: fates, reject reasons, streamed-vs-final reconciliation. */
   candidateLedger?: import("@/lib/search/candidate-ledger").CandidateLedgerSummary;
   /** Bounded widening (PRD §33-37): widen passes run AFTER the first
@@ -1119,6 +1124,8 @@ export async function runSpecSearchCore(
     spec?: SearchSpec;
     /** Pending clarification continues from this validated canonical frame. */
     priorFrame?: UnderstandingFrame;
+    /** Server-resolved input facts (URLs/documents/images) from the InputResolver. */
+    resolvedContext?: import("@/lib/understanding/input-envelope").ResolvedInputContext | null;
     /** Internal OR-location branch; prevents recursive fanout. */
     locationBranch?: boolean;
     /** Data-asset pass: engine-driven widening + candidate dedupe for job modes. */
@@ -1238,16 +1245,92 @@ export async function runSpecSearchCore(
     hasMore: false,
     totalAvailable: null as number | null,
   };
-  const { understandSearchSpec, frameToSearchSpec, applyClarificationToFrame, isActionableFrame } = await import("@/lib/understanding/to-search-spec");
+  const { frameToSearchSpec, applyClarificationToFrame, isActionableFrame, understandFrame, lightSpecFromFrame } = await import("@/lib/understanding/to-search-spec");
+  const { decideStage1 } = await import("@/lib/search/spec-clarification");
+  const { buildSpec, computeMissing } = await import("@/lib/search/search-spec");
+  const { initState } = await import("@/lib/understanding/clarify-state");
   // World city gazetteer for understanding (real cities, one-edit typos).
   if (!opts.spec) await (await import("@/lib/search/gazetteer.server")).ensureCityGazetteer();
-  const base = opts.spec ?? (opts.priorFrame
-    ? frameToSearchSpec(applyClarificationToFrame(opts.priorFrame, answers))
-    : await understandSearchSpec(query, answers, deps.signal));
-  understandingDoneAt = Date.now();
-  if (deps.signal?.aborted) return withRun({ spec: base, ...pageInfo }, 0, true);
+
+  // Off-topic boundary FIRST: a clearly out-of-domain request gets a one-line
+  // product boundary — never retrieval, never a clarification round about
+  // people vs companies.
+  const OFF_TOPIC_RE =
+    /\b(weather|forecast|temperature|recipe|recipes|horoscope|lyrics|translate|translation|showtimes?|stock (?:price|quote)|sports scores?)\b/i;
+  const DOMAIN_NOUN_RE =
+    /\b(investors?|founders?|startups?|companies|company|businesses|business|jobs?|leads?|hire|hiring|clients?|customers?|prospects?|vcs?|angels?|funds?)\b/i;
+  if (OFF_TOPIC_RE.test(query) && !DOMAIN_NOUN_RE.test(query)) {
+    routeDiagnostics.push({
+      code: "UNSUPPORTED_CAPABILITY",
+      source: "domain-router",
+      detail:
+        "Scrapivo is built for finding and researching people, companies, local businesses, jobs, and investors. Try one of those instead.",
+    });
+    const boundarySpec = buildSpec({
+      entity: "unknown",
+      criteria: [],
+      raw_query: query,
+      signal_required: false,
+      signal_types: [],
+      signal_recency: null,
+      locationSuggestion: null,
+    });
+    return withRun({
+      spec: boundarySpec,
+      questions: [],
+      clarify: [],
+      rows: [],
+      ...pageInfo,
+      boundary_message:
+        "Scrapivo is built for finding and researching people, companies, local businesses, jobs, and investors. Try one of those instead.",
+    } as unknown as Record<string, unknown>, 0, false, false);
+  }
+
+  // ── Stage 1: ONE frame, ONE decision (INV-1/INV-5). ──
+  // The canonical frame is built first; clarify-state.resolveStage (via the
+  // decideStage1 adapter) is the ONLY authority for clarify/confirm/ready.
+  // The Stage-2 SearchSpec is built by frameToSearchSpec AFTER a ready
+  // decision — never before, and never as an input to the decision.
+  let spec: SearchSpec;
+  if (opts.spec) {
+    // Internal precompiled subrun (job passes): no Stage-1 round here.
+    spec = opts.spec;
+  } else {
+    const frame = opts.priorFrame
+      ? applyClarificationToFrame(opts.priorFrame, answers)
+      : await understandFrame(query, answers, deps.signal);
+    understandingDoneAt = Date.now();
+    if (deps.signal?.aborted) {
+      return withRun({ spec: lightSpecFromFrame(frame, "ready_to_search"), ...pageInfo }, 0, true);
+    }
+    const decision = decideStage1(
+      lightSpecFromFrame(frame, "needs_clarification"),
+      frame,
+      initState(frame),
+      opts.resolvedContext ?? null,
+      !!opts.force,
+    );
+    if (decision.stage !== "ready") {
+      // No search ran this round: no terminal outcome (P0), one question,
+      // and the frame rides back inside spec.understanding for the next turn.
+      return withRun({
+        spec: lightSpecFromFrame(frame, "needs_clarification"),
+        stage: decision.stage,
+        confirmSummary: decision.summary ?? null,
+        questions: decision.question ? [decision.question.question] : [],
+        clarify: decision.question ? [decision.question] : [],
+        rows: [],
+        ...pageInfo,
+      } as unknown as Record<string, unknown>, 0, false, false);
+    }
+    spec = frameToSearchSpec(frame);
+    // resolveStage decided READY — computeMissing stays Stage-2 data (INV-3)
+    // and must never flip a frame-backed request back into a clarification.
+    spec.status = "ready_to_search";
+  }
+  if (deps.signal?.aborted) return withRun({ spec, ...pageInfo }, 0, true);
   // Merge prior answers as stated criteria (multi-turn without session store).
-  const criteria = [...base.criteria];
+  const criteria = [...spec.criteria];
   for (const [field, value] of Object.entries(answers)) {
     const v = (value ?? "").trim();
     if (!v) continue;
@@ -1256,7 +1339,6 @@ export async function runSpecSearchCore(
     if (i >= 0) criteria[i] = stated;
     else criteria.push(stated);
   }
-  const { buildSpec } = await import("@/lib/search/search-spec");
   // Structured entity answer (unknown-entity clarify round): the deterministic
   // understanding fallback cannot read prior-answer context, so the entity
   // pick types the spec here. Option-label and canonical forms both accepted.
@@ -1275,56 +1357,22 @@ export async function runSpecSearchCore(
     job: "job",
   };
   const entityPick = ENTITY_ANSWER_ALIASES[entityAnswer];
-  const spec: SearchSpec = {
-    ...base,
+  spec = {
+    ...spec,
     criteria,
-    ...(entityPick && base.entity === "unknown" ? { entity: entityPick } : {}),
+    ...(entityPick && spec.entity === "unknown" ? { entity: entityPick } : {}),
   };
-  // Off-topic boundary: a clearly out-of-domain request ("what's the weather
-  // in Paris") gets a one-line product boundary — never retrieval, never
-  // Scrapy, never a clarification round about people vs companies.
-  const OFF_TOPIC_RE =
-    /\b(weather|forecast|temperature|recipe|recipes|horoscope|lyrics|translate|translation|showtimes?|stock (?:price|quote)|sports scores?)\b/i;
-  const DOMAIN_NOUN_RE =
-    /\b(investors?|founders?|startups?|companies|company|businesses|business|jobs?|leads?|hire|hiring|clients?|customers?|prospects?|vcs?|angels?|funds?)\b/i;
-  if (OFF_TOPIC_RE.test(query) && !DOMAIN_NOUN_RE.test(query)) {
-    routeDiagnostics.push({
-      code: "UNSUPPORTED_CAPABILITY",
-      source: "domain-router",
-      detail:
-        "Scrapivo is built for finding and researching people, companies, local businesses, jobs, and investors. Try one of those instead.",
-    });
-    return withRun({
-      spec,
-      questions: [],
-      clarify: [],
-      rows: [],
-      ...pageInfo,
-      boundary_message:
-        "Scrapivo is built for finding and researching people, companies, local businesses, jobs, and investors. Try one of those instead.",
-    } as unknown as Record<string, unknown>, 0, false);
-  }
-  const { computeMissing } = await import("@/lib/search/search-spec");
   spec.missing = computeMissing(spec);
-  spec.status = spec.missing.length ? "needs_clarification" : "ready_to_search";
-  if (spec.understanding) {
-    const { decideSpecClarification } = await import("@/lib/search/spec-clarification");
-    const question = decideSpecClarification(spec, opts.force);
-    if (question) {
-      spec.status = "needs_clarification";
-      return withRun({
-        spec,
-        questions: [question.question],
-        clarify: [question],
-        rows: [],
-        ...pageInfo,
-      } as unknown as Record<string, unknown>, 0, false, false);
-    }
-    spec.status = "ready_to_search";
+  // Stage-2 completeness data only (INV-3): for frame-backed requests the
+  // Stage-1 decision already ran above; computeMissing must never emit a user
+  // clarification or flip the status back to needs_clarification.
+  if (!spec.understanding) {
+    spec.status = spec.missing.length ? "needs_clarification" : "ready_to_search";
   }
   // Explicit user command ("Search" button): proceed with stated criteria even
   // when optional fields are still missing. Unknown entity still clarifies.
-  const forcedReady = !!opts.force && spec.entity !== "unknown";
+  // (Frame-backed force was already handled inside resolveStage.)
+  const forcedReady = !spec.understanding && !!opts.force && spec.entity !== "unknown";
   if (forcedReady) spec.status = "ready_to_search";
   // Universal query readiness: a BARE ask ("find me investors") asks the one
   // highest-information question instead of searching with arbitrary
@@ -1486,7 +1534,10 @@ export async function runSpecSearchCore(
       }
     }
   }
-  if (spec.status === "needs_clarification") {
+  // Generic missing-field return: SPEC-LESS requests only (INV-3). A
+  // frame-backed request's clarification was already decided by resolveStage;
+  // computeMissing must never produce a user-facing question here.
+  if (spec.status === "needs_clarification" && !spec.understanding) {
     if (typeof console !== "undefined") {
       console.info(
         "[spec-run] " +
