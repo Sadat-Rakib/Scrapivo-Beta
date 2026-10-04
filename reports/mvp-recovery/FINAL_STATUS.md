@@ -107,30 +107,25 @@ Funnel stage definitions: `reports/mvp-recovery/PIPELINE_MAP.md` §5–§10; led
 
 ## MVP VERDICT
 
-**READY FOR USER LOCAL TESTING** (2026-10-03, post Phase-B domain discovery — evidence: `evidence/runs/PC3.json` + `PHASE_A_POSITIVE_CONTROLS.md`)
+**NOT READY FOR USER LOCAL TESTING — but the mandatory reproductions moved from 0 to PARTIAL, and every remaining loss is named.**
 
-### The release gate criterion: MET
-**Browser/live-supplied leads delivered through the real UI:** PC3 ("Find 5 local businesses in Calgary with a public phone number and website") delivered **3 complete rows** — supply was OSM discovery (202 artifacts) + browser-live (6 artifacts); the stored DB contributed **zero** (indexed-db artifacts: 0). Each delivered lead carries its own **first-party domain discovered by the new search-based pass** (saucal.com, bristolwindowcleaning.ca — homepage + /contact reads), a public phone (+1-587-887-4706), email/message/website actions. Ledger: `unaccounted: 0`, streamed 3 == delivered 3.
+### Mandatory reproductions (2026-10-04, post Phase 1/3 fixes, real UI)
+| Query | Settled | Relevant | Delivered | Class | First loss |
+|---|---|---|---|---|---|
+| Find 10 HVAC companies in Toronto (website + phone) | yes 537s | 7 of 141 | **2** | PARTIAL | OSM craft=hvac pool thin (140 generic-heavy rows, `rejected_category` ×132); browser query "HVAC Toronto" EXTRACTION_EMPTY on 1 nav |
+| Find 5 wedding photographers in Cebu (public contact) | yes 678s | 7 of 141 | **2** (streamed 2) | PARTIAL | 6 candidates `missing: contact_or_site` — contact pages not reached |
 
-### The full picture from the final battery
-| Query | Settled | Delivered | Class | Attribution |
-|---|---|---|---|---|
-| W2 solar Windhoek | YES 622s | 0 | HONEST_ZERO | coverage-limited geography, stage-attributed |
-| T2 freight Tbilisi | YES 664s | 0 | HONEST_ZERO | UNPROVEN_CRITERION + rejected_location, named |
-| C2 photographers Cebu | YES 572s | 0 | HONEST_ZERO | 3 real photographers reached research, died `missing: contact` (contact yield) |
-| B2 construction Banja Luka | YES 618s | 0 | HONEST_ZERO | contact_or_site gaps, named |
-| D2 manufacturing Da Nang | YES 673s | 0 | HONEST_ZERO | model_ok → 10 normalized → emission-stage losses (named, next target) |
-| N2 informal solar Windhoek | YES 529s | 0 | HONEST_ZERO | **1 candidate streamed** — Phase 4 informal fix live |
-| PC3 Calgary businesses | **YES 656s** | **3** | **PASS** | browser/live + domain discovery + contact pass |
-| PC1 Calgary plumbers | YES 388s | **50** | **PASS** | stored-supplied end-to-end delivery proof |
-| X02 cancel during browsing | Cancel 112s | — | PASS | stop gone <=30s, no post-cancel rows |
+Both runs: ledger `unaccounted: 0`. Both delivered counts moved 0 → 2 with the deterministic extraction layer + target-aware queue + contact pass. The strict gate held throughout.
 
-### Gates
-- Full vitest **NEW_FAILURES=0** (1612/1678 at the last gate; typecheck 43 frozen; build exit 0).
-- Watchdog + stage tracking live (a hang now names itself); composer Stop proven during browsing; takeover 35/35; premature-zero guard held across all runs; new-chat isolation proven (S01 lineage).
+### What each Phase delivered (commits)
+- Phase 1 (`1daac8e` + the deterministic layer): first-party/directory extraction without the LLM — fixtures green (rainbowfish, directory×3, HVAC, no-JSON-LD, nav-only).
+- Phase 3 (`5849c74` watchdog + `645ad84` harness window): hangs eliminated — every battery run since settles.
+- Phase 3 target-aware queue (this session): research pool 6 → 12..60 by strength rank — HVAC1 delivered its first 2.
+- Person-card fallback (Phase 2, a9f3b16) and contact-page pass (ba5a2f1) live in the path.
 
-### Known remaining (non-blocking for local testing)
-- **MEDIUM:** delivered counts on hard geographies are 0-3 — the yield chain (browser candidate → verified) is instrumented end-to-end; the next lever is contact/enrichment yield on C2-class queries and the D2 emission-stage losses.
-- **MEDIUM:** run-to-run acquisition variance (PC3: 163↔498 raw) — the funnel is honest per run but supply width varies; measured, not blocking.
-- **EXTERNAL:** SearXNG down (Docker) — the ladder degrades to duckduckgo/bing and the battery still completes.
-- **LOW:** B2 page-classification drops (2 navigated → 0 extractable) — page-outcome aggregation into the funnel is an additive follow-up.
+### Remaining P1s (each instrumented, each with a named first loss)
+1. **HVAC candidate yield:** OSM `craft=hvac` Toronto returns mostly non-HVAC rows; 132 `rejected_category` is correct gating — the gap is the SOURCE (need HVAC-specific OSM tags or browser queries that surface real HVAC sites).
+2. **Cebu contact yield:** 6 photographers `missing: contact_or_site` — domain discovery resolves few small-business sites; the search-based pass (efff08d) fires only after a website_url exists — wire it to fire on `missing: website` candidates too.
+3. **Browser extraction on "HVAC Toronto":** 1 page navigated, 0 entities — the deterministic layer needs the category tokens present on the page; a generic directory page yields nothing.
+
+The broader battery and verdict re-grade continue in the next session from this instrumented state.
