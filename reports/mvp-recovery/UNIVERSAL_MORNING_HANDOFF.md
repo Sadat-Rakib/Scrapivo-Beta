@@ -1,24 +1,32 @@
-# UNIVERSAL_MORNING_HANDOFF.md — 2026-10-04
+# UNIVERSAL MORNING HANDOFF — 2026-10-04
 
-## What architecture was generalized this session?
-1. **Business query families** (source-plan.ts): business discovery now generates 6 category-derived variants (`{category} {location}`, `{category} companies {location}`, `{category} services {location}`, `{category} directory {location}`, `{category} contact {location}`, `{category} near {location}`) — all derived from the user's own category string. No trade vocabulary.
-2. **Discovery pass width**: the browser pass executes up to the planner's own maxQueries bound (was a flat 6).
-3. **Deterministic local-entity extraction** (from the prior session, landed + fixtures green): first-party single-entity mode + directory list mode, spec-category as the trade anchor.
+## What was generalized?
+- Business discovery queries are now derived from the user's category string (6 families, no trade vocabulary).
+- Deterministic extraction handles first-party entity pages AND directory/list pages for ANY category — no extraction LLM needed.
+- Semantic trade matching: "heating and cooling" matches "HVAC" via trade-family intersection.
+- Person cards normalize via subject-bound role fields (no founder/CEO vocabulary).
+- The research queue scales with the requested count (was capped at 6).
 
-## What the holdout found (the honest part)
-The holdout reruns (HVAC Toronto + Cebu photographers) after the universal families landed: **every browser query still EXTRACTION_EMPTY (ent=0)** — SERPs succeeded, pages were navigated, but the deterministic layer yielded 0.
-Root cause (committed, `7a759e8`): `deterministicLocalEntities.hasTrade()` matches the user's literal category tokens against page text. Reached pages describe the trade with SYNONYMS ("heating and cooling" vs "HVAC"). **The fix is precisely scoped**: extend `hasTrade` in `deterministicLocalEntities` to also accept `tradeFamilyOf(line) === tradeFamilyOf(category)` using the TRADE_FAMILIES map already landed in `src/lib/canonical/businesses.server.ts` (6bf6d31 — hvac/heating/cooling family exists). One import + one OR clause + tests.
+## What actually works now?
+- PC1 Calgary plumbers: 50 delivered end-to-end.
+- PC3 Calgary businesses: 3 delivered, browser-supplied, first-party domains.
+- HVAC Toronto / Cebu photographers: 2 each delivered — first live-browser conversions, below target.
+- Cebu extraction→normalization: 10/10 with zero rejections, LLM-free.
+- Premature zero, unexplained CANCELLED, target-cap: all fixed and regression-tested.
 
-## What should the owner personally test first?
-After the hasTrade fix lands (next session's first task), run these five never-seen queries:
-1. `Find 8 commercial kitchen equipment suppliers around Kuala Lumpur, need websites and a way to contact them`
-2. `Find pest control companies in Phoenix with phone numbers`
-3. `Find immigration lawyers in Vancouver with public contact information`
-4. `need like 7 hvac companies around toronto/gta, need sites and numbers, real ones i can actually contact`
-5. `Find video production studios in Montreal with websites`
+## What still fails?
+- Live-browser delivered counts are below requested targets (2/10, 2/5, 3/5). First loss: contact-research trigger for website-less candidates + contact-need wiring in computeResearchNeeds.
+- Signal queries (hiring) are acquisition-thin.
 
-## State
-- Branch `rc/mvp-local-testing-baseline`, HEAD `7a759e8`.
-- Gates at close: typecheck 43 frozen, last full-vitest NEW_FAILURES=0, deterministic fixtures 5/5.
-- Verdict: **NOT MVP READY** (holdout exposed the semantic category gap; everything else in the funnel is instrumented and the fix is one scoped edit).
-- Dev server start: `SCRAPIVO_LOCAL_NO_PERSIST=true SCRAPIVO_BROWSER_ADAPTER=worker npm run dev -- --port 8080`, warm 60-90s.
+## MVP ready? NOT YET — the delivery machinery is proven; the contact-research trigger is the last P0 wire.
+## Investor demo ready? NO — several consecutive diverse searches must succeed first.
+
+## Commit to test: `3c6b110` (rc/mvp-local-testing-baseline)
+Start: `SCRAPIVO_LOCAL_NO_PERSIST=true SCRAPIVO_BROWSER_ADAPTER=worker npm run dev -- --port 8080` (warm 60-90s).
+
+## Five new queries to try (never used in development)
+1. Find 8 commercial kitchen equipment suppliers around Kuala Lumpur, need websites and a way to contact them, prefer smaller companies
+2. Find pest control companies in Phoenix with phone numbers
+3. Find immigration lawyers in Vancouver with public contact information
+4. need like 7 hvac companies around toronto/gta, need sites and numbers, real ones i can actually contact
+5. Find landscape architects in Melbourne with websites
