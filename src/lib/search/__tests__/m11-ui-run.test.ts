@@ -86,7 +86,8 @@ function createUiHarness(session: ActiveSearchSession) {
 
   const applyResponse = (res: {
     search_run_id: string;
-    outcome: SearchOutcomeCode;
+    /** Stage 1: undefined when no search ran (clarify/confirm round). */
+    outcome?: SearchOutcomeCode;
     views?: ReturnType<typeof projectSpecRowsToQualifiedViews>["views"];
     qualified_count?: number;
     error?: string | null;
@@ -97,7 +98,7 @@ function createUiHarness(session: ActiveSearchSession) {
     state = {
       ...state,
       loading: false,
-      outcome: res.outcome,
+      outcome: res.outcome ?? null,
       views: res.views ?? state.views,
       qualified_count:
         res.qualified_count ??
@@ -556,7 +557,12 @@ describe("M11 — production-path acceptance (run identity through pipeline)", (
     expect(res.conversation_id).toBe("conv_prod");
     expect(res.turn_id).toBe("turn_prod");
     expect(res.request_id).toBe("req_prod");
-    expect(typeof res.outcome).toBe("string");
+    // Stage 1 P0: this deliberately underspecified request ends in a blocking
+    // clarify round — no retrieval ran, so the response carries NO terminal
+    // outcome (an unanswered request is not a zero-result search).
+    expect(res.clarify.length).toBeGreaterThan(0);
+    expect(res.spec.status).toBe("needs_clarification");
+    expect(res.outcome).toBeUndefined();
 
     const ui = createUiHarness(session);
     const decision = session.accept(res);
@@ -581,7 +587,7 @@ describe("M11 — production-path acceptance (run identity through pipeline)", (
       views: projected.views,
       qualified_count: projected.qualified_count,
     });
-    expect(ui.state.outcome).toBe(res.outcome);
+    expect(ui.state.outcome).toBe(res.outcome ?? null);
     expect(ui.state.qualified_count).toBe(projected.qualified_count);
   });
 
@@ -624,6 +630,6 @@ describe("M11 — production-path acceptance (run identity through pipeline)", (
         qualified_count: 0,
       }).applied,
     ).toBe(false);
-    expect(ui.state.outcome).toBe(resB.outcome);
+    expect(ui.state.outcome).toBe(resB.outcome ?? null);
   });
 });

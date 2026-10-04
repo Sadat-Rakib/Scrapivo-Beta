@@ -705,8 +705,10 @@ export interface SpecSearchResult {
   conversation_id: string;
   turn_id: string;
   request_id: string;
-  /** Typed overall outcome (never bare “0 results”). */
-  outcome: import("@/lib/search/canonical-contract").SearchOutcomeCode;
+  /** Typed overall outcome (never bare “0 results”). Undefined when NO search
+   *  ran this round (clarify/confirm) — a Stage-1 round is not a zero, and
+   *  clients must never render a zero state from it. */
+  outcome?: import("@/lib/search/canonical-contract").SearchOutcomeCode;
   /** Provider/source failures that did not set the overall outcome. */
   diagnostics?: Array<{
     code: import("@/lib/search/canonical-contract").SearchOutcomeCode;
@@ -1172,6 +1174,7 @@ export async function runSpecSearchCore(
     partial: T,
     qualifiedCount = 0,
     cancelled = false,
+    searchRan = true,
   ): SpecSearchResult => {
     const fin = finalizeSearchOutcome(routeDiagnostics, {
       cancelled,
@@ -1193,8 +1196,14 @@ export async function runSpecSearchCore(
       totalAvailable: null,
       ...partial,
       ...runIds,
-      outcome: cancelled ? "SEARCH_CANCELLED" : fin.outcome,
-      diagnostics: fin.diagnostics,
+      // Stage-1 rounds where no retrieval ran (clarify/confirm) carry NO
+      // terminal outcome: an unanswered request is not a zero-result search.
+      ...(searchRan
+        ? {
+            outcome: cancelled ? "SEARCH_CANCELLED" : fin.outcome,
+            diagnostics: fin.diagnostics,
+          }
+        : {}),
       qualified_count: qualifiedCount,
     } as unknown as SpecSearchResult;
   };
@@ -1309,7 +1318,7 @@ export async function runSpecSearchCore(
         clarify: [question],
         rows: [],
         ...pageInfo,
-      } as unknown as Record<string, unknown>, 0, false);
+      } as unknown as Record<string, unknown>, 0, false, false);
     }
     spec.status = "ready_to_search";
   }
@@ -1382,8 +1391,7 @@ export async function runSpecSearchCore(
         rejected: 0,
         liveDiscovery: "not_required" as const,
         ...pageInfo,
-        outcome: "NO_QUALIFIED_RESULTS",
-      });
+      }, 0, false, false);
     };
     if (!mode) {
       return gateReturn([
@@ -1501,8 +1509,7 @@ export async function runSpecSearchCore(
       rejected: 0,
       liveDiscovery: "not_required",
       ...pageInfo,
-      outcome: "NO_QUALIFIED_RESULTS",
-    });
+    }, 0, false, false);
   }
   if (!opts.locationBranch && (spec.locations?.length ?? 0) > 1) {
     const branchResults: SpecSearchResult[] = [];

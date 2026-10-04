@@ -724,17 +724,21 @@ function DiscoverPage() {
 
       setSpecEntity(res.spec.entity ?? null);
       // Two clarify shapes leave the server, and they must not behave the same:
-      // a BLOCKING clarify has no outcome — answering is required to search at
-      // all. Thin-ask rides on a COMPLETED zero-result run; offering it twice
+      // a BLOCKING clarify carries no outcome AND spec.status
+      // "needs_clarification" — no search ran, so no zero state may render.
+      // Thin-ask rides on a COMPLETED zero-result run; offering it twice
       // is the dead loop (E2E-C3), so it is offered exactly once per turn and
       // never after Skip / Search-with-defaults — the zero then settles as an
       // honest empty state.
+      const blockingClarify =
+        !res.outcome || res.spec.status === "needs_clarification";
       const thinAsk =
         res.clarify.length > 0 &&
         !!res.outcome &&
+        !blockingClarify &&
         !force &&
         !thinAskedTurnsRef.current.has(turnId);
-      if (res.clarify.length > 0 && (thinAsk || !res.outcome)) {
+      if (res.clarify.length > 0 && (thinAsk || blockingClarify)) {
         if (thinAsk) thinAskedTurnsRef.current.add(turnId);
         pendingFrameRef.current = res.spec.understanding ?? null;
         setClarifyQs(res.clarify);
@@ -875,12 +879,16 @@ function DiscoverPage() {
       }
 
       // Typed outcomes — never bare "No results found"; superseded cancel is silent.
-      const uiOutcome = outcomeUi(res.outcome, {
-        superseded: session.wasSuperseded(res.search_run_id),
-        // Raw provider diagnostics name internal infrastructure; only the
-        // user-safe source-health sentence may reach the toast.
-        detail: res.boundary_message ?? zeroResultsNarrative(res.retrievalTrace) ?? res.retrievalTrace?.sourceHealth?.summary ?? null,
-      });
+      // No outcome = a Stage-1 round (clarify/confirm) ran instead of a search;
+      // surfacing a zero toast here would be the premature-zero defect.
+      const uiOutcome = res.outcome
+        ? outcomeUi(res.outcome, {
+            superseded: session.wasSuperseded(res.search_run_id),
+            // Raw provider diagnostics name internal infrastructure; only the
+            // user-safe source-health sentence may reach the toast.
+            detail: res.boundary_message ?? zeroResultsNarrative(res.retrievalTrace) ?? res.retrievalTrace?.sourceHealth?.summary ?? null,
+          })
+        : null;
       setZeroNarrative(
         !append && qualifiedCount === 0 && res.outcome === "NO_QUALIFIED_RESULTS"
           ? enrichZeroNarrative(zeroResultsNarrative(res.retrievalTrace), res.candidateLedger)
@@ -898,6 +906,7 @@ function DiscoverPage() {
       if (
         !append &&
         turnId === pendingTurnIdRef.current &&
+        uiOutcome &&
         shouldSurfaceOutcome(uiOutcome) &&
         qualifiedCount === 0
       ) {
@@ -2208,6 +2217,7 @@ function DiscoverPage() {
                               bare "· 0 results" header. */}
                           {isLast &&
                             !runInFlight &&
+                            clarifyQs.length === 0 &&
                             t.results.leads.length === 0 &&
                             t.results.companies.length === 0 &&
                             t.results.people.length === 0 &&
