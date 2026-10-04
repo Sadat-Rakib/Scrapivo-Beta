@@ -207,7 +207,13 @@ export class WorkerBrowserAdapter implements AgentBrowser {
    * alone may be a time budget, not a cancellation.
    */
   async close(session: BrowserSession, outcome?: BrowserCloseOutcome): Promise<void> {
-    const cancelled = outcome ? outcome === "cancelled" : !!this.signal?.aborted;
+    // Cancellation attribution (Failure B): the run's abort reason, not the
+    // bare aborted boolean, decides whether the session is "cancelled". A
+    // deadline/stale-run abort is the run finishing its window — the session
+    // itself completed; only a user stop (or explicit outcome) cancels it.
+    const cancelled = outcome
+      ? outcome === "cancelled"
+      : !!this.signal?.aborted && searchAbortCode(this.signal) === "SEARCH_CANCELLED";
     try {
       await callBrowserWorker("POST", `/browser/sessions/${session.id}/close`, { ownerId: this.ownerId, retain: !cancelled }, { timeoutMs: 15_000 });
       // Retaining leaves whoever controls the browser in control.
