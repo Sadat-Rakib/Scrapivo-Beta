@@ -5,6 +5,7 @@ import {
   type SourceFact,
 } from "@/lib/understanding/input-envelope";
 import { loadVerifiedAttachment } from "@/lib/attachments/attachment-store.server";
+import { detectUserUrls, fetchSiteContext } from "./website-context.server";
 
 /**
  * Stage-1 InputResolver (INV-2): turns user text + verified attachments into
@@ -163,6 +164,31 @@ export async function resolveInputEnvelope(args: {
       unresolved.push({ ref: attachmentId, reason: "PDF content handler not yet active" });
     } else {
       unresolved.push({ ref: attachmentId, reason: "image handler not yet active" });
+    }
+  }
+
+  // User-provided websites: bounded same-domain retrieval (homepage + ≤2
+  // About/Services pages). Own-business context is research ABOUT the user —
+  // it never becomes a prospect-search keyword.
+  const siteUrls = detectUserUrls(trimmedText);
+  for (const site of siteUrls.slice(0, 2)) {
+    if (site.rejected) {
+      unresolved.push({ ref: site.url, reason: site.rejected });
+      continue;
+    }
+    const context = await fetchSiteContext(site.url);
+    if (context.failed || context.pages.length === 0) {
+      unresolved.push({ ref: site.url, reason: "website could not be fetched" });
+      continue;
+    }
+    for (const page of context.pages) {
+      if (sections.length >= 7) break;
+      sections.push({
+        label: `webpage ${page.url}${site.ownOrg ? " (the user's own website — org/offering context)" : ""}`,
+        provenance: "url",
+        sourceRef: page.url,
+        content: page.text,
+      });
     }
   }
 

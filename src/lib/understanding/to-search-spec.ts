@@ -7,6 +7,7 @@ import { openValue, type FrameLocation, type OpenValue, type UnderstandingFrame 
 import { classifyHead, LOCATIVE_PREP_TOKENS, opensWithExclusion } from './lexicon';
 import { validateFrame } from './validate';
 import { purposeFromFrame, repairExplicitPurpose } from './purpose';
+import { stripUrlsFromText } from '../stage1/url-utils';
 
 const clean = (value: string) => value.trim().replace(/[.!?]+$/, '').trim();
 const valueOf = (value: OpenValue | null | undefined) => value ? clean(value.normalized ?? value.value) : '';
@@ -424,7 +425,7 @@ export function frameToSearchSpec(input: UnderstandingFrame): SearchSpec {
     ['hiring', 'received_funding', 'seeking_funding', 'needs_service', 'asking_for_help', 'custom'].includes(relation);
   const signalTypes = signalRequired ? [['received_funding', 'seeking_funding', 'investing_in'].includes(relation) ? 'funding' : relation === 'hiring' ? 'hiring' : 'service_request'] : [];
   const purpose = purposeFromFrame(frame);
-  const spec = buildSpec({ entity, criteria, raw_query: frame.input.raw, signal_required: signalRequired, signal_types: signalTypes,
+  const spec = buildSpec({ entity, criteria, raw_query: stripUrlsFromText(frame.input.raw), signal_required: signalRequired, signal_types: signalTypes,
     signal_recency: frame.temporal?.window ?? null, locationSuggestion });
   spec.understanding = frame;
   spec.locations = locationNames;
