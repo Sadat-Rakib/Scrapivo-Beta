@@ -19,7 +19,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { VoiceInputButton } from "@/components/voice-input-button";
 import { mySupabase } from "@/integrations/my-supabase/client";
 import { registerAttachment, registerAttachmentDerivative } from "@/lib/attachments/attachment-functions";
-import { renderLowTextPages } from "@/lib/attachments/pdf-prepass.client";
 import { toast } from "sonner";
 
 export type ComposerMode = "search" | "chat";
@@ -304,6 +303,8 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
           // can read them. Text PDFs skip this entirely.
           if (file.type === "application/pdf" || /\.pdf$/i.test(file.name)) {
             try {
+              // Client-only + heavy: lazy-loaded on first PDF attach.
+              const { renderLowTextPages } = await import("@/lib/attachments/pdf-prepass.browser");
               const baseName = safeName.replace(/\.pdf$/i, "");
               const derivatives = await renderLowTextPages(file, baseName);
               for (const d of derivatives) {

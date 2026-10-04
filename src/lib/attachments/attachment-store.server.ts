@@ -133,6 +133,25 @@ export async function loadVerifiedAttachment(
   };
 }
 
+/** List verified DERIVATIVE ids of a parent attachment (scanned-PDF page
+ *  images). The listing itself is user-scoped under RLS. */
+export async function listDerivativeIds(
+  supabase: SupabaseClient,
+  userId: string,
+  parentAttachmentId: string,
+  limit = 6,
+): Promise<string[]> {
+  const { data, error } = await supabase
+    .from("attachments_registry")
+    .select("id")
+    .eq("parent_attachment_id", parentAttachmentId)
+    .order("created_at", { ascending: true })
+    .limit(limit)
+    .returns<Array<{ id: string }>>();
+  if (error || !data) return [];
+  return data.map((r) => r.id).filter((id) => /^[0-9a-f-]{36}$/i.test(id));
+}
+
 /** Register an already-uploaded object. Verifies existence in the owner's
  *  prefix before inserting the registry row (user-scoped insert, RLS-bound). */
 export async function registerVerifiedAttachment(
