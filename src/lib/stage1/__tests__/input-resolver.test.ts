@@ -14,12 +14,19 @@ vi.mock("@/lib/ai/router.server", () => ({
 
 // In-memory stand-in for the storage/registry layer.
 const objects = new Map<string, { bytes: Uint8Array; mime: string; name: string }>();
+const derivativeIds = new Map<string, string[]>();
 vi.mock("@/lib/attachments/attachment-store.server", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/attachments/attachment-store.server")>();
   void actual;
   return {
     ...actual,
-    loadVerifiedAttachment: async (_supabase: unknown, _userId: string, id: string) => {
+    loadVerifiedAttachment: async (_supabase: unknown, _userId: string, id: string, opts?: { parentAttachmentId?: string | null }) => {
+      if (opts?.parentAttachmentId) {
+        const allowed = derivativeIds.get(opts.parentAttachmentId) ?? [];
+        if (!allowed.includes(id)) {
+          return { ok: false, reason: "derivative is not linked to the given parent attachment" } as const;
+        }
+      }
       const found = objects.get(id);
       if (!found) return { ok: false, reason: "attachment not found in registry for this user" } as const;
       const kind = found.mime.startsWith("image/") ? "image" : found.mime === "application/pdf" ? "document" : "text";
@@ -31,6 +38,8 @@ vi.mock("@/lib/attachments/attachment-store.server", async (importOriginal) => {
         bytes: found.bytes,
       } as const;
     },
+    listDerivativeIds: async (_supabase: unknown, _userId: string, parentId: string) =>
+      derivativeIds.get(parentId) ?? [],
   };
 });
 
@@ -43,6 +52,7 @@ const supabase = {} as SupabaseClient;
 beforeEach(() => {
   extractMock.mockReset();
   objects.clear();
+  derivativeIds.clear();
 });
 
 describe("Stage 1 InputResolver (facts only, untrusted content = data)", () => {

@@ -373,6 +373,9 @@ function DiscoverPage() {
   // alongside results, which meant the first search was always the unrefined
   // one; the comment outlived the behaviour.)
   const [clarifyQs, setClarifyQs] = useState<ClarifyQuestion[]>([]);
+  // Stage-1 CONFIRM: provenance-tagged understanding summary from derived
+  // (website/document/image) facts. Null = no confirm gate this round.
+  const [confirmSummary, setConfirmSummary] = useState<string | null>(null);
   // Phase B dropdown: questions collapse above the input; reopened
   // automatically for each new question round.
   const [questionsOpen, setQuestionsOpen] = useState(true);
@@ -699,6 +702,7 @@ function DiscoverPage() {
     setBrowserProgressRun(run.search_run_id);
     setBrowserProgressEvents([]);
     setZeroNarrative(null);
+    setConfirmSummary(null);
     setStreamedMissing([]);
     setActivityExpanded(false);
     // Loading spinner only for the active run (stale cannot flip chrome).
@@ -737,17 +741,18 @@ function DiscoverPage() {
       // never after Skip / Search-with-defaults — the zero then settles as an
       // honest empty state.
       const blockingClarify =
-        !res.outcome || res.spec.status === "needs_clarification";
+        !res.outcome || res.spec.status === "needs_clarification" || res.stage === "confirm";
       const thinAsk =
         res.clarify.length > 0 &&
         !!res.outcome &&
         !blockingClarify &&
         !force &&
         !thinAskedTurnsRef.current.has(turnId);
-      if (res.clarify.length > 0 && (thinAsk || blockingClarify)) {
+      if ((res.clarify.length > 0 || res.stage === "confirm") && (thinAsk || blockingClarify)) {
         if (thinAsk) thinAskedTurnsRef.current.add(turnId);
         pendingFrameRef.current = res.spec.understanding ?? null;
         setClarifyQs(res.clarify);
+        setConfirmSummary(res.confirmSummary ?? null);
         setPendingQuery(query);
         setActiveQuery(query);
         if (res.outcome) {
@@ -1157,6 +1162,7 @@ function DiscoverPage() {
     pendingFrameRef.current = null;
     pendingAttachmentsRef.current = [];
     turnAttachmentsRef.current = [];
+    setConfirmSummary(null);
     setPlanTokens(null);
     setActiveQuery(null);
     setClarifyAnswers(null);
@@ -1674,28 +1680,34 @@ function DiscoverPage() {
     const pendingQuestion = clarifyQs[0];
     const startsNewRequest = /^(?:find|search|show|look for|looking for)\b/i.test(trimmed) ||
       (/^research\b/i.test(trimmed) && /\b(?:in|for|about|businesses|companies|people|jobs|investors)\b/i.test(trimmed));
-    if (specModeRef.current && pendingQuery && pendingId && pendingQuestion && !startsNewRequest) {
-      const field = ({
-        entity_location: "location",
-        entity_category: "category",
-        entity_industry: "industry",
-        entity_role: "role",
-        entity_mode: "mode",
-        entity_purpose: "purpose",
-        entity_salary: "salary_min",
-        entity_size: "employee_count",
-        entity_revenue: "revenue",
-        entity_relation: "relation.type",
-        entity_scope: "target.scope",
-      } as Record<string, string>)[pendingQuestion.id] ?? pendingQuestion.id;
-      setTurns((prev) => prev.map((turn) => turn.id === pendingId
-        ? { ...turn, text: `${turn.text}\n${trimmed}` }
-        : turn));
-      setClarifyQs([]);
-      setPendingQuery(null);
-      await runSpecBranch(pendingQuery, pendingId, { [field]: trimmed });
-      return;
-    }
+      if (specModeRef.current && pendingQuery && pendingId && pendingQuestion && !startsNewRequest) {
+        const field = ({
+          entity_location: "location",
+          entity_category: "category",
+          entity_industry: "industry",
+          entity_role: "role",
+          entity_mode: "mode",
+          entity_purpose: "purpose",
+          entity_salary: "salary_min",
+          entity_size: "employee_count",
+          entity_revenue: "revenue",
+          entity_relation: "relation.type",
+          entity_scope: "target.scope",
+        } as Record<string, string>)[pendingQuestion.id] ?? pendingQuestion.id;
+        setTurns((prev) => prev.map((turn) => turn.id === pendingId
+          ? { ...turn, text: `${turn.text}\n${trimmed}` }
+          : turn));
+        setClarifyQs([]);
+        setPendingQuery(null);
+        // Confirm gate: the combined card was shown — record acceptance so the
+        // confirm gate never re-fires on this frame.
+        setConfirmSummary(null);
+        await runSpecBranch(pendingQuery, pendingId, {
+          ...(confirmSummary ? { confirm: "confirmed" } : {}),
+          [field]: trimmed,
+        });
+        return;
+      }
     // User bubble first: the submitted text lives in the conversation from
     // this instant, independent of whatever happens downstream. Results are
     // attached to the owning turn by onSuccess (turn-owned transcript) — no
@@ -2480,7 +2492,7 @@ function DiscoverPage() {
                 BUG-09 (PRD §30–31): the open body is self-bounded (max-h + its
                 own scroll) so a long question set can never push the composer
                 off a 1366×768-class footer. */}
-            {clarifyQs.length > 0 && planDone && !runSearchMut.isPending && !specPending && (
+            {(clarifyQs.length > 0 || confirmSummary) && planDone && !runSearchMut.isPending && !specPending && (
               <div className="mb-2 flex flex-col overflow-hidden rounded-2xl border border-primary/25 bg-card shadow-xl">
                 <button
                   type="button"
@@ -2489,10 +2501,16 @@ function DiscoverPage() {
                   aria-expanded={questionsOpen}
                 >
                   <span className="text-xs font-medium text-primary">
-                    Narrow this down
-                    <span className="ml-1 text-muted-foreground">
-                      {clarifyQs.length} question{clarifyQs.length === 1 ? "" : "s"}
-                    </span>
+                    {clarifyQs.length > 0 ? (
+                      <>
+                        Narrow this down
+                        <span className="ml-1 text-muted-foreground">
+                          {clarifyQs.length} question{clarifyQs.length === 1 ? "" : "s"}
+                        </span>
+                      </>
+                    ) : (
+                      "Here is what I understood"
+                    )}
                   </span>
                   {questionsOpen ? (
                     <ChevronUp className="size-3.5 text-muted-foreground" />
@@ -2504,12 +2522,23 @@ function DiscoverPage() {
                   <div className="max-h-[40vh] min-h-0 overflow-y-auto overscroll-contain px-4 pb-4">
                     <ClarifyPanel
                       questions={clarifyQs}
+                      confirmSummary={confirmSummary}
                       refinement={defaultSummary || refinement}
                       disabled={runSearchMut.isPending || specPending}
                       onDismiss={() => {
                         setClarifyQs([]);
                         const q = pendingQuery;
                         setPendingQuery(null);
+                        // Stage-1 CONFIRM card "Edit": let the user restate the
+                        // request — a new submit re-runs understanding. Never
+                        // force-run a search they asked to edit.
+                        if (confirmSummary && clarifyQs.length === 0) {
+                          setConfirmSummary(null);
+                          if (q) setInput(q);
+                          composerRef.current?.focus();
+                          return;
+                        }
+                        setConfirmSummary(null);
                         if (!q) return;
                         if (specModeRef.current) {
                           void runSpecBranch(q, pendingTurnIdRef.current ?? "", {}, true).catch(
@@ -2527,6 +2556,8 @@ function DiscoverPage() {
                       onApply={(answers, opts) => {
                         setClarifyAnswers(answers);
                         setClarifyQs([]);
+                        const hadConfirm = !!confirmSummary;
+                        setConfirmSummary(null);
                         const q = pendingQuery ?? activeQuery;
                         setPendingQuery(null);
                         if (!q) return;
@@ -2534,10 +2565,15 @@ function DiscoverPage() {
                           // Spec path: answers merge as stated criteria.
                           // Search/Search-with-defaults buttons force the
                           // hunt with stated answers; option picks flow on.
+                          // A shown CONFIRM card records acceptance so the
+                          // gate never re-fires on this frame.
                           void runSpecBranch(
                             q,
                             pendingTurnIdRef.current ?? "",
-                            specAnswersFromPanel(answers),
+                            {
+                              ...(hadConfirm ? { confirm: "confirmed" } : {}),
+                              ...specAnswersFromPanel(answers),
+                            },
                             opts?.force ?? false,
                           ).catch((e: Error) =>
                             toast.error(friendlyErrorText(e, "Search failed to start")),

@@ -17,6 +17,10 @@ import type { ClarifyQuestion, ClarifyAnswers } from "@/lib/search/clarifier";
 
 type Props = {
   questions: ClarifyQuestion[];
+  /** Stage-1 CONFIRM: provenance-tagged understanding summary. With no
+   *  questions this becomes a confirm/edit card; with questions it renders
+   *  as ONE combined interaction (summary + question). */
+  confirmSummary?: string | null;
   /** Plain-English summary of what the search currently assumed. */
   refinement?: string;
   onApply: (answers: ClarifyAnswers, opts?: { force?: boolean }) => void;
@@ -24,14 +28,16 @@ type Props = {
   disabled?: boolean;
 };
 
-export function ClarifyPanel({ questions, refinement, onApply, onDismiss, disabled }: Props) {
+export function ClarifyPanel({ questions, confirmSummary, refinement, onApply, onDismiss, disabled }: Props) {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<ClarifyAnswers>({});
   const [otherText, setOtherText] = useState("");
 
-  if (!questions.length) return null;
+  const confirmOnly = questions.length === 0 && !!confirmSummary;
+  if (!questions.length && !confirmSummary) return null;
   const q = questions[step];
-  const isLast = step === questions.length - 1;
+  const isLast = questions.length === 0 || step === questions.length - 1;
+  if (!q && !confirmOnly) return null;
 
   const record = (value: string, isOther: boolean) => {
     const next: ClarifyAnswers = { ...answers };
@@ -54,6 +60,54 @@ export function ClarifyPanel({ questions, refinement, onApply, onDismiss, disabl
     if (isLast) onApply(next);
     else setStep((s) => s + 1);
   };
+
+  // Stage-1 CONFIRM card: the understanding summary is shown, then the user
+  // either confirms (Search) or dismisses to edit. With a combined question
+  // the regular question flow runs and the parent adds the confirm marker.
+  if (confirmOnly) {
+    return (
+      <div className="flex max-h-[65dvh] min-h-0 flex-col gap-3 overflow-hidden rounded-2xl border border-primary/25 bg-primary/5 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:max-h-none sm:overflow-visible">
+        <div className="flex shrink-0 items-start justify-between gap-2">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-primary">
+            <Sparkles className="size-3.5" />
+            Here is what I understood
+          </div>
+          <button
+            onClick={onDismiss}
+            className="text-muted-foreground transition-colors hover:text-foreground"
+            title="Edit before searching"
+          >
+            <X className="size-3.5" />
+          </button>
+        </div>
+        <div className="shrink-0 whitespace-pre-line rounded-lg border border-border bg-background/50 p-3 text-sm text-foreground/85">
+          {confirmSummary}
+        </div>
+        <p className="shrink-0 text-[11px] text-muted-foreground">
+          These details came from your website or attachments. Confirm them, or type an edit below before searching.
+        </p>
+        <div className="flex shrink-0 items-center justify-end gap-1.5 border-t border-border/60 bg-card/80 pt-2">
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-7 text-xs"
+            disabled={disabled}
+            onClick={onDismiss}
+          >
+            Edit
+          </Button>
+          <Button
+            size="sm"
+            className="h-7 text-xs"
+            disabled={disabled}
+            onClick={() => onApply({}, { force: true })}
+          >
+            Confirm &amp; search
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex max-h-[65dvh] min-h-0 flex-col gap-3 overflow-hidden rounded-2xl border border-primary/25 bg-primary/5 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:max-h-none sm:overflow-visible">
@@ -91,6 +145,13 @@ export function ClarifyPanel({ questions, refinement, onApply, onDismiss, disabl
         <p className="shrink-0 text-[11px] text-muted-foreground">
           Right now we assumed: <span className="text-foreground/80">{refinement}</span>
         </p>
+      ) : null}
+
+      {/* Stage-1 CONFIRM summary riding a combined question card. */}
+      {confirmSummary && step === 0 ? (
+        <div className="shrink-0 whitespace-pre-line rounded-lg border border-border bg-background/50 p-2.5 text-xs text-foreground/85">
+          {confirmSummary}
+        </div>
       ) : null}
 
       <p className="shrink-0 text-sm font-medium">{q.question}</p>

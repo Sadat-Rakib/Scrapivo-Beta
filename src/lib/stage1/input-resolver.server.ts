@@ -4,8 +4,9 @@ import {
   type ResolvedInputContext,
   type SourceFact,
 } from "@/lib/understanding/input-envelope";
-import { loadVerifiedAttachment } from "@/lib/attachments/attachment-store.server";
+import { loadVerifiedAttachment, listDerivativeIds } from "@/lib/attachments/attachment-store.server";
 import { detectUserUrls, fetchSiteContext } from "./website-context.server";
+import { extractPdfPages, pdfTextIsSufficient } from "./document-text.server";
 
 /**
  * Stage-1 InputResolver (INV-2): turns user text + verified attachments into
@@ -102,8 +103,72 @@ async function extractFacts(sections: Section[]): Promise<SourceFact[]> {
   }
 }
 
-/** Deterministic conflict detection: same category, different provenance,
- *  incompatible values. Explicit user text wins downstream (recorded here). */
+/** Vision understanding of one image. "" when vision is unavailable — callers
+ *  must report the source as unresolved, never pretend it was read. */
+async function understandImage(
+  _what: string,
+  _name: string,
+  bytes: Uint8Array,
+  mime: string,
+): Promise<string> {
+  try {
+    const { understandImageBytes } = await import("@/lib/vision/image-text.server");
+    return await understandImageBytes(bytes, mime);
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * PDF handling: text layer first; scanned/image-only PDFs fall back to vision
+ * over CLIENT-rendered page derivatives (authenticated registry rows linked to
+ * this parent — every derivative re-verified before vision). A scanned PDF
+ * with neither text nor derivatives is reported honestly as uninterpreted.
+ */
+async function resolveDocument(args: {
+  userId: string;
+  supabase: SupabaseClient;
+  attachmentId: string;
+  name: string;
+  bytes: Uint8Array;
+  addSection: (content: string, ref: string, label: string) => void;
+  markUnresolved: (reason: string) => void;
+}): Promise<void> {
+  const { userId, supabase, attachmentId, name, bytes, addSection, markUnresolved } = args;
+  const pdf = await extractPdfPages(bytes).catch(() => null);
+  if (!pdf) {
+    markUnresolved("not a readable PDF");
+    return;
+  }
+  if (pdfTextIsSufficient(pdf)) {
+    const body = pdf.pages
+      .map((t, i) => (t ? `— page ${i + 1} —\n${t}` : ""))
+      .filter(Boolean)
+      .join("\n")
+      .slice(0, 12_000);
+    addSection(body, attachmentId, `PDF attachment "${name}"`);
+    return;
+  }
+  // Scanned / image-only PDF: vision over CLIENT-rendered page derivatives.
+  // Each derivative is an authenticated registry row linked to this parent —
+  // re-verified here before a single byte reaches vision.
+  const derivativeIds = await listDerivativeIds(supabase, userId, attachmentId);
+  let pagesRead = 0;
+  for (const derId of derivativeIds.slice(0, 6)) {
+    const der = await loadVerifiedAttachment(supabase, userId, derId, {
+      parentAttachmentId: attachmentId,
+    });
+    if (!der.ok || der.kind !== "image") continue;
+    const described = await understandImage("scanned PDF page", der.name, der.bytes, der.mime);
+    if (!described) continue;
+    pagesRead++;
+    addSection(described.slice(0, 6_000), derId, `scanned page of PDF "${name}" (${der.name})`);
+    if (pagesRead >= 6) break;
+  }
+  if (pagesRead === 0) {
+    markUnresolved("scanned PDF has no text layer and no readable page images — it could not be interpreted");
+  }
+}
 function detectConflicts(facts: SourceFact[]): ResolvedInputContext["conflicts"] {
   const out: ResolvedInputContext["conflicts"] = [];
   const text = facts.filter((f) => f.provenance === "user_text");
@@ -160,10 +225,29 @@ export async function resolveInputEnvelope(args: {
         content: new TextDecoder().decode(att.bytes).slice(0, MAX_TEXT_CHARS),
       });
     } else if (att.kind === "document") {
-      // PDF text extraction arrives with the P4 resolver; never pretend.
-      unresolved.push({ ref: attachmentId, reason: "PDF content handler not yet active" });
+      await resolveDocument({
+        userId: args.userId,
+        supabase: args.supabase,
+        attachmentId,
+        name: att.name,
+        bytes: att.bytes,
+        addSection: (content, ref, label) =>
+          sections.push({ label, provenance: "document", sourceRef: ref, content }),
+        markUnresolved: (reason) => unresolved.push({ ref: attachmentId, reason }),
+      });
     } else {
-      unresolved.push({ ref: attachmentId, reason: "image handler not yet active" });
+      // Image: vision-first understanding (VL models read in-image text too).
+      const described = await understandImage("user attachment", att.name, att.bytes, att.mime);
+      if (described) {
+        sections.push({
+          label: `image attachment "${att.name}"`,
+          provenance: "image",
+          sourceRef: attachmentId,
+          content: described.slice(0, 6_000),
+        });
+      } else {
+        unresolved.push({ ref: attachmentId, reason: "image could not be interpreted (vision unavailable)" });
+      }
     }
   }
 

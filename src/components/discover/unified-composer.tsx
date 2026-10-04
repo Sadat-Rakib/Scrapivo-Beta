@@ -18,7 +18,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { VoiceInputButton } from "@/components/voice-input-button";
 import { mySupabase } from "@/integrations/my-supabase/client";
-import { registerAttachment } from "@/lib/attachments/attachment-functions";
+import { registerAttachment, registerAttachmentDerivative } from "@/lib/attachments/attachment-functions";
+import { renderLowTextPages } from "@/lib/attachments/pdf-prepass.client";
 import { toast } from "sonner";
 
 export type ComposerMode = "search" | "chat";
@@ -298,6 +299,43 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
             data: { attachmentId: id, name: safeName, mime: file.type, size: file.size },
           });
           if (!reg.ok) throw new Error(reg.reason);
+          // Scanned-PDF pre-pass (client-side rendering): low-text pages of a
+          // PDF become authenticated image derivatives so server-side vision
+          // can read them. Text PDFs skip this entirely.
+          if (file.type === "application/pdf" || /\.pdf$/i.test(file.name)) {
+            try {
+              const baseName = safeName.replace(/\.pdf$/i, "");
+              const derivatives = await renderLowTextPages(file, baseName);
+              for (const d of derivatives) {
+                const derId =
+                  typeof crypto !== "undefined" && "randomUUID" in crypto
+                    ? crypto.randomUUID()
+                    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+                const { error: derUploadError } = await mySupabase.storage
+                  .from("attachments")
+                  .upload(`${userId}/${derId}-${d.name}`, d.blob, { upsert: true });
+                if (derUploadError) throw derUploadError;
+                const derReg = await registerAttachmentDerivative({
+                  data: {
+                    attachmentId: derId,
+                    parentAttachmentId: id,
+                    name: d.name,
+                    mime: "image/jpeg",
+                    size: d.blob.size,
+                  },
+                });
+                if (!derReg.ok) throw new Error(derReg.reason);
+              }
+              if (derivatives.length > 0) {
+                toast.message(
+                  `Scanned PDF detected — ${derivatives.length} page image${derivatives.length === 1 ? "" : "s"} prepared for reading.`,
+                );
+              }
+            } catch (derError) {
+              console.error("[composer] scanned-PDF derivatives unavailable", derError);
+              toast.message("Scanned-PDF page images couldn't be prepared — text reading only.");
+            }
+          }
         } catch (e) {
           console.error("[composer] attachment unavailable", e);
           toast.error(
