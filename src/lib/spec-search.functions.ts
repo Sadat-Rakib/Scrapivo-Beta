@@ -1298,7 +1298,8 @@ export async function runSpecSearchCore(
   } else {
     const frame = opts.priorFrame
       ? applyClarificationToFrame(opts.priorFrame, answers)
-      : await understandFrame(query, answers, deps.signal);
+      : await understandFrame(query, answers, deps.signal, opts.resolvedContext ?? null);
+    if (opts.resolvedContext) frame.sources = opts.resolvedContext.facts;
     understandingDoneAt = Date.now();
     if (deps.signal?.aborted) {
       return withRun({ spec: lightSpecFromFrame(frame, "ready_to_search"), ...pageInfo }, 0, true);
@@ -3190,6 +3191,8 @@ export const runSpecSearch = createServerFn({ method: "POST" })
         offset: z.number().int().min(0).optional().default(0),
         answers: z.record(z.string(), z.string()).optional().default({}),
         prior_frame: z.unknown().optional(),
+        /** Registry ids only — the client never sends storage paths. */
+        attachments: z.array(z.string().uuid()).max(6).optional().default([]),
         force: z.boolean().optional().default(false),
         search_run_id: z.string().max(80).optional(),
         conversation_id: z.string().max(80).optional(),
@@ -3206,6 +3209,25 @@ export const runSpecSearch = createServerFn({ method: "POST" })
       ? undefined
       : (await import("@/lib/understanding/frame")).UnderstandingFrameSchema.parse(data.prior_frame);
     const { beginRegisteredSearchRun, scaledRunBudgetMs } = await import("@/lib/search/search-run.server");
+    // Stage 1 InputResolver: provenance-tagged facts from the user's text and
+    // verified attachments. Only runs when there is something to resolve
+    // (attachments, or text carrying a URL — P3); plain-text queries keep the
+    // zero-overhead path. Facts are DATA — they never decide anything.
+    let resolvedContext: import("@/lib/understanding/input-envelope").ResolvedInputContext | null = null;
+    const hasUrlInText = /(?:https?:\/\/|www\.)[^\s<>"')]+|(?:[a-z0-9-]+\.)+[a-z]{2,}/i.test(data.query);
+    if (data.attachments.length > 0 || hasUrlInText) {
+      try {
+        const { resolveInputEnvelope } = await import("@/lib/stage1/input-resolver.server");
+        resolvedContext = await resolveInputEnvelope({
+          userId: ownerId,
+          supabase: context.supabase,
+          text: data.query,
+          attachmentIds: data.attachments.map((id) => ({ attachmentId: id })),
+        });
+      } catch (e) {
+        console.warn("[stage1] input resolver failed; proceeding on text alone", e);
+      }
+    }
     // Beta-reality fix: a flat 120s deadline killed live people/company research
     // mid-flight (premature honest-looking zeros). Scale the budget with the
     // requested target; the absolute cap lives in search-run.server.
@@ -3226,6 +3248,7 @@ export const runSpecSearch = createServerFn({ method: "POST" })
       }, data.limit, data.answers, {
         force: data.force,
         priorFrame,
+        resolvedContext,
         offset: data.offset,
         search_run_id: runId,
         conversation_id: data.conversation_id,

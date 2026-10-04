@@ -456,6 +456,13 @@ export function applyClarificationToFrame(input: UnderstandingFrame, answers: Re
   for (const [key, rawAnswer] of Object.entries(answers)) {
     const answer = rawAnswer.trim();
     if (!answer) continue;
+    // Confirm marker: the user accepted (or edited) the externally derived
+    // context. Minimal monotonic state — the confirm gate never re-fires.
+    if (key === 'confirm') {
+      frame.confirmation = { resolved: true };
+      frame.meta.notes = [...frame.meta.notes, 'confirm: user accepted derived context'].slice(-20);
+      continue;
+    }
     const canonical = key === 'entity' ? 'target.entity_type' : key === 'entity_scope' ? 'target.scope' : key === 'entity_relation' ? 'relation.type' : key;
     if (['target.entity_type', 'target.scope', 'relation.type', 'relation.object', 'relation.direction'].includes(canonical)) {
       frame = patchFrame(initState(frame), canonical as BlockingField, answer).state.frame;
@@ -529,7 +536,12 @@ export function isActionableFrame(spec: SearchSpec): boolean {
 /** Server extraction is bounded; provider failure returns the deterministic frame.
  *  Returns the FRAME only — frameToSearchSpec runs after the Stage-1 decision
  *  says ready (INV-5: SearchSpec never feeds the Stage-1 decision). */
-export async function understandFrame(query: string, context: Record<string, string>, signal?: AbortSignal | null): Promise<UnderstandingFrame> {
+export async function understandFrame(
+  query: string,
+  context: Record<string, string>,
+  signal?: AbortSignal | null,
+  resolvedContext?: import('./input-envelope').ResolvedInputContext | null,
+): Promise<UnderstandingFrame> {
   if (process.env.VITEST) return applyClarificationToFrame(validateFrame(extractFrameDeterministic(query)).frame, context);
   let timer: ReturnType<typeof setTimeout> | undefined;
   let abort: (() => void) | undefined;
@@ -545,7 +557,8 @@ export async function understandFrame(query: string, context: Record<string, str
       abort = () => resolve(fallback('Understanding interrupted by search cancellation.'));
       if (signal?.aborted) abort(); else signal?.addEventListener('abort', abort, { once: true });
     });
-    const extraction = import('./extract.server').then(({ extractFrameLLM }) => extractFrameLLM(query, { context, waitForSlotMs: 250 }))
+    const extraction = import('./extract.server')
+      .then(({ extractFrameLLM }) => extractFrameLLM(query, { context, waitForSlotMs: 250, resolvedContext }))
       .then((result) => result.frame).catch(() => fallback('Understanding provider failed; deterministic fallback used.'));
     return applyClarificationToFrame(validateFrame(await Promise.race([extraction, bounded])).frame, context);
   } finally {

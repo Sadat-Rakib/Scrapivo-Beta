@@ -75,3 +75,19 @@ export type Stage1Decision = {
   /** The material facts that forced a confirm gate (empty otherwise). */
   material?: SourceFact[];
 };
+
+/**
+ * The structured user submission. Text is OPTIONAL when at least one valid
+ * uploaded attachment is present (attachment-only submissions are legal).
+ * Attachments are referenced by registry ID only — the client never sends
+ * filesystem/storage paths, and the server verifies ownership, bucket prefix,
+ * MIME, size, and existence before reading a byte.
+ */
+export const InputEnvelopeSchema = z.object({
+  text: z.string().max(4000).default(""),
+  attachments: z
+    .array(z.object({ attachmentId: z.string().uuid() }))
+    .max(6)
+    .default([]),
+});
+export type InputEnvelope = z.infer<typeof InputEnvelopeSchema>;

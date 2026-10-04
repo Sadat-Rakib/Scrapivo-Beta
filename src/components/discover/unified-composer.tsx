@@ -18,6 +18,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { VoiceInputButton } from "@/components/voice-input-button";
 import { mySupabase } from "@/integrations/my-supabase/client";
+import { registerAttachment } from "@/lib/attachments/attachment-functions";
 import { toast } from "sonner";
 
 export type ComposerMode = "search" | "chat";
@@ -33,6 +34,10 @@ type Props = {
   mode: ComposerMode;
   onModeChange: (m: ComposerMode) => void;
   onSubmit: () => void;
+  /** Stage 1: structured attachments (registry ids) staged for the next
+   *  submit. Called synchronously before onSubmit so the parent can consume
+   *  them atomically with the text. */
+  onSubmitAttachments?: (attachments: Array<{ attachmentId: string }>) => void;
   /** While pending, the submit button becomes Stop (PRD V2 WS5): the composer
    *  is the single stop affordance — stable, reachable, always clickable. */
   onStop?: () => void;
@@ -66,15 +71,9 @@ const TIERS: Array<{ value: SearchTier; label: string; hint: string; icon: typeo
   { value: "crazy", label: "Scrapy Crazy", hint: "Maximum-depth hunt", icon: Flame },
 ];
 
-type ComposerAttachment = { id: string; name: string; block: string };
+type ComposerAttachment = { id: string; name: string; uploaded: boolean };
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
-const TEXT_EXTENSIONS = ["txt", "md", "csv", "json", "log"];
-
-const isTextFile = (file: File) =>
-  file.type.startsWith("text/") ||
-  file.type === "application/json" ||
-  TEXT_EXTENSIONS.includes(file.name.split(".").pop()?.toLowerCase() ?? "");
 
 const sanitizeFileName = (name: string) => name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 80);
 
@@ -221,6 +220,7 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
     mode,
     onModeChange,
     onSubmit,
+    onSubmitAttachments,
     pending,
   onStop,
     maxChars = 3000,
@@ -253,23 +253,19 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
   };
 
   const submit = () => {
-    if (pending || !value.trim()) return;
+    if (pending) return;
+    // Stage 1 submit contract: non-empty text OR at least one successfully
+    // uploaded attachment. A chip only exists after upload + registration
+    // succeeded, so "uploaded" here means the server can actually read it.
+    if (!value.trim() && !attachments.some((a) => a.uploaded)) return;
+    onSubmitAttachments?.(attachments.filter((a) => a.uploaded).map((a) => ({ attachmentId: a.id })));
     onSubmit();
-    // Attachment context already lives inside the submitted text; reset chips.
+    // Attachments are sent as structured ids; reset chips.
     setAttachments([]);
   };
 
   const removeAttachment = (id: string) => {
-    const target = attachments.find((a) => a.id === id);
     setAttachments((prev) => prev.filter((a) => a.id !== id));
-    if (target) {
-      onChange(
-        value
-          .split(target.block)
-          .join("")
-          .replace(/\n{3,}/g, "\n\n"),
-      );
-    }
   };
 
   const handleFiles = async (files: FileList | null) => {
@@ -278,7 +274,6 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
     try {
       const { data } = await mySupabase.auth.getUser();
       const userId = data.user?.id ?? "anon";
-      let nextValue = value;
       const nextAttachments: ComposerAttachment[] = [];
       for (const file of Array.from(files)) {
         if (file.size > MAX_FILE_BYTES) {
@@ -290,38 +285,34 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
             ? crypto.randomUUID()
             : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
         const safeName = sanitizeFileName(file.name);
-        // Durable store: per-user private bucket (RLS owner-only). If the
-        // bucket/migration isn't deployed yet, keep the local attach working.
+        // Durable store: per-user private bucket (RLS owner-only), then
+        // register it so the server can resolve it by id. If either step
+        // fails, the attachment is NOT included — we never claim an
+        // attachment will be understood when its content is unreachable.
         try {
           const { error } = await mySupabase.storage
             .from("attachments")
             .upload(`${userId}/${id}-${safeName}`, file, { upsert: true });
           if (error) throw error;
-        } catch {
-          toast.message("Cloud upload unavailable — attached locally for this query.");
+          const reg = await registerAttachment({
+            data: { attachmentId: id, name: safeName, mime: file.type, size: file.size },
+          });
+          if (!reg.ok) throw new Error(reg.reason);
+        } catch (e) {
+          console.error("[composer] attachment unavailable", e);
+          toast.error(
+            `"${safeName}" could not be uploaded — it will NOT be included in this search. Remove it or retry.`,
+          );
+          continue;
         }
-        let block: string;
-        if (isTextFile(file)) {
-          try {
-            const raw = await file.text();
-            const excerpt = raw.slice(0, 1500).trim() || "(empty file)";
-            block = `\n\n[Attached ${safeName}]\n${excerpt}`;
-          } catch {
-            block = `\n\n[Attached file: ${safeName}]`;
-          }
-        } else {
-          block = `\n\n[Attached file: ${safeName}]`;
-        }
-        nextAttachments.push({ id, name: safeName, block });
-        nextValue = nextValue ? nextValue + block : block.trimStart();
+        nextAttachments.push({ id, name: safeName, uploaded: true });
       }
       if (nextAttachments.length > 0) {
         setAttachments((prev) => [...prev, ...nextAttachments]);
-        onChange(nextValue.slice(0, maxChars));
         toast.message(
           nextAttachments.length === 1
-            ? `Attached ${nextAttachments[0].name} — its context rides with your query.`
-            : `Attached ${nextAttachments.length} files — their context rides with your query.`,
+            ? `Attached ${nextAttachments[0].name} — Stage 1 will read it.`
+            : `Attached ${nextAttachments.length} files — Stage 1 will read them.`,
         );
       }
     } finally {

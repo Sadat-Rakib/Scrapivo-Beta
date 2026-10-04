@@ -573,6 +573,11 @@ function DiscoverPage() {
   // across clarify rounds so answering Q1 then Search on Q2 never loses Q1.
   const pendingTurnAnswersRef = useRef<Record<string, string>>({});
   const pendingFrameRef = useRef<import("@/lib/understanding/frame").UnderstandingFrame | null>(null);
+  // Stage 1 structured attachments: the composer stages uploaded+registered
+  // ids here; beginSearch hands them to the turn, and they ride every round
+  // of that turn so clarification rounds keep their input context.
+  const pendingAttachmentsRef = useRef<Array<{ attachmentId: string }>>([]);
+  const turnAttachmentsRef = useRef<Array<{ attachmentId: string }>>([]);
   // Thin-ask (refinement offer on a completed zero run) is offered at most once
   // per turn — re-offering it on every identical zero is the C3 dead loop.
   const thinAskedTurnsRef = useRef<Set<string>>(new Set());
@@ -711,6 +716,7 @@ function DiscoverPage() {
           offset,
           answers: merged,
           prior_frame: pendingFrameRef.current ?? undefined,
+          attachments: turnAttachmentsRef.current,
           force,
           search_run_id: run.search_run_id,
           conversation_id: run.conversation_id,
@@ -1149,6 +1155,8 @@ function DiscoverPage() {
     pendingTurnIdRef.current = null;
     pendingTurnAnswersRef.current = {};
     pendingFrameRef.current = null;
+    pendingAttachmentsRef.current = [];
+    turnAttachmentsRef.current = [];
     setPlanTokens(null);
     setActiveQuery(null);
     setClarifyAnswers(null);
@@ -1661,7 +1669,7 @@ function DiscoverPage() {
 
   const beginSearch = async (q: string) => {
     const trimmed = q.trim();
-    if (!trimmed) return;
+    if (!trimmed && pendingAttachmentsRef.current.length === 0) return;
     const pendingId = pendingTurnIdRef.current;
     const pendingQuestion = clarifyQs[0];
     const startsNewRequest = /^(?:find|search|show|look for|looking for)\b/i.test(trimmed) ||
@@ -1696,9 +1704,13 @@ function DiscoverPage() {
     pendingTurnIdRef.current = newTurnId;
     pendingTurnAnswersRef.current = {};
     pendingFrameRef.current = null;
+    // Stage 1: staged attachment ids ride THIS turn (resent on clarify
+    // rounds); the staging area clears so they cannot leak into later turns.
+    turnAttachmentsRef.current = pendingAttachmentsRef.current;
+    pendingAttachmentsRef.current = [];
     intentRunRef.current += 1; // cancel any in-flight intent enrichment
     setIntentProgress(null);
-    setTurns((prev) => [...prev, { id: newTurnId, text: trimmed, ts: Date.now() }]);
+    setTurns((prev) => [...prev, { id: newTurnId, text: trimmed || "(attachments only)", ts: Date.now() }]);
     // Fold state derives at render (open = explicitly opened, else the
     // latest turn), so no sync needed here; manual toggles persist.
     // New research starts with a clean screen — never leave the previous
@@ -1820,7 +1832,9 @@ function DiscoverPage() {
 
   const onSubmit = () => {
     const text = input.trim();
-    if (!text) return;
+    // Stage 1: attachment-only submissions are legal — text OR ≥1 uploaded
+    // attachment. The composer already enforces the same contract.
+    if (!text && pendingAttachmentsRef.current.length === 0) return;
     if (mode === "search") {
       setInput("");
       // Hardened: a freak throw must toast, never swallow the query silently.
@@ -2552,6 +2566,9 @@ function DiscoverPage() {
                 if (m === "chat") setChatOpen(true);
               }}
               onSubmit={onSubmit}
+              onSubmitAttachments={(atts) => {
+                pendingAttachmentsRef.current = atts;
+              }}
               onStop={stopSearch}
               pending={pending}
               tier={tier}
