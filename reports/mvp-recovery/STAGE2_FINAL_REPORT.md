@@ -95,6 +95,22 @@ browser-extraction failures now pass.
 5. Hosted-Supabase DDL (attachments registry) unavailable without a Postgres
    endpoint/management token — code prefers the registry when it exists.
 
+## POST-FIX VERIFICATION SWEEP (latest)
+
+With location-evidence binding + granular job reasons + extraction fixes
+live (16d9cc2):
+- solar installers Windhoek: **RESULTS again** (repeatable across 3 sweeps).
+- freight forwarders Tbilisi: raw=30 extracted (was 0 at baseline) →
+  FAILED_QUALIFICATION — qualification variance; funnel fully attributed.
+- hvac gta / Cebu / copywriters: card → forced run cycles still unstable —
+  a card re-appears after force on some queries (suspect: unresolved AMOUNT
+  cards survive force by design) and the harness loops force-clicks until
+  its own window expires; runs then log SEARCH_CANCELLED. Needs interactive
+  diagnosis of the card-reappears loop (amounts-vs-clarify distinction in
+  the harness) — harness artifact, not an acquisition defect.
+- React jobs Calgary: not re-reached in this sweep (previous funnel: 175
+  raw, granular reasons now in place).
+
 ## NEXT STEPS (in order)
 
 1. Fix harness post-card settle; re-sweep the 10 queries.
