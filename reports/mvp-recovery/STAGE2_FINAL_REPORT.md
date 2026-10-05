@@ -111,12 +111,60 @@ live (16d9cc2):
 - React jobs Calgary: not re-reached in this sweep (previous funnel: 175
   raw, granular reasons now in place).
 
-## NEXT STEPS (in order)
+## CLOSURE ADDENDUM (final sweeps, post-fixes)
 
-1. Fix harness post-card settle; re-sweep the 10 queries.
-2. Stage-1 narrow fix: trade-role + site/phone ask → business entity
-   reconcile (+ Stage-1 regression test).
-3. Jobs: lenient pre-research gate (contradictions only) for extracted job
-   rows; strict judge stays post-research, ledgered per row.
-4. Bring up SearXNG on a working Docker host; re-verify SERP-first path.
-5. Re-run acceptance battery twice for "repeatedly acquires".
+All funnel-order fixes landed and were re-swept 3 more times through the real
+UI. Shipped in the closure: role-contradiction tolerance (NOT PROVEN ≠ WRONG),
+jobs contradictions-only pre-research gate + role token-overlap, trade-service
+reconcile (Stage-1 exception, verified live: hvac spec → business/hvac/GTA/
+require_phone/ready_to_search), evidence-driven pipeline reconcile at
+qualification, acquisition-provenance stamping on live rows, location-evidence
+binding, and the insufficient-evidence gate that closed the fabrication vector
+("unicorn ranchers in Atlantis" now honestly zeroes).
+
+## VERDICT: NOT COMPLETE — architecture complete and proven; repeatability
+blocked on live SERP stability (environment)
+
+## MEASURED RESULTS ACROSS 6 REAL-UI SWEEPS (evidence: [stage2-funnel] ledger)
+
+Delivered (QUALIFIED_RESULTS, real leads, accounting ok) at least once, most
+repeatedly:
+- solar installers Windhoek: 4 of 6 sweeps (q=1-10; raw 17-174)
+- wedding photographers Cebu: 3 of 6 (2 consecutive after the reconcile)
+- find SaaS founders globally: 2 of 6 (q=13 and q=10)
+- freight forwarders Tbilisi: 2 of 6
+- find plumbers Austin: 3 of 6 (q=8, q=8, q=3)
+- construction companies Banja Luka: 1 of 6 (final sweeps)
+- copywriters Toronto / hvac gta / React jobs Calgary / seed investors: not yet
+
+Cancellation: PASS (Stop settles; no zombie runs). Impossible search: PASS
+post-gate (raw=7 mentions discovered, 0 delivered — honest zero; the
+fabrication vector found in an earlier sweep is closed).
+
+## THE BLOCKER (concrete, environmental)
+
+Live SERP stability. Free acquisition depends on the self-hosted SearXNG
+(engines suspend after a few runs — measured and documented in
+config/searxng/settings.yml: 6 of 7 engines suspended simultaneously) and the
+in-browser DDG/Bing fallback (bot challenges). Sweep results swing 0-8
+delivered per query class purely on SERP availability; a fresh SearXNG
+container made result quality WORSE initially (suspended engines return
+irrelevant links that exhaust the discovery budget). The Docker daemon also
+wedged twice during this effort. The pipeline itself is proven end-to-end:
+when sources return real pages, candidates flow through the full funnel and
+deliver with clean accounting (unaccounted=0, no fabrication).
+
+## NEW REGRESSIONS
+
+None. Full vitest: 1700 passed / 28 failed (identical set verified at the
+start commit on a baseline worktree). Typecheck 43 = baseline. Build green.
+Stage-1 suites 283/283. Browser suites 38/38 (two pre-existing failures
+fixed).
+
+## PATH TO CLOSURE (environment-dependent)
+
+1. SearXNG engine hygiene: API-keyed engines (Brave/GoogleCSE) or instance
+   rotation; re-run battery twice.
+2. Investor source routing: wire fund-site/portfolio discovery into
+   live-gapfill (company-registry adapter is currently a phantom).
+3. Optional: SERP-challenge retry-with-backoff inside the run budget.
