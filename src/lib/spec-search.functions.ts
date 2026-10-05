@@ -3220,7 +3220,6 @@ export const runSpecSearch = createServerFn({ method: "POST" })
         const { resolveInputEnvelope } = await import("@/lib/stage1/input-resolver.server");
         resolvedContext = await resolveInputEnvelope({
           userId: ownerId,
-          supabase: context.supabase,
           text: data.query,
           attachmentIds: data.attachments.map((id) => ({ attachmentId: id })),
         });

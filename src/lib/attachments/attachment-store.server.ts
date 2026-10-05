@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { getAdmin } from "@/integrations/my-supabase/admin.server";
 
 /**
  * Stage-1 secure attachment retrieval.
@@ -82,6 +83,220 @@ export type VerifiedAttachment =
       bytes: Uint8Array;
     }
   | { ok: false; reason: string };
+
+/**
+ * Stage-1 upload ticket: the server validates the descriptor, builds the
+ * object path ITSELF from the SESSION user's id (the client never supplies a
+ * path), and hands back a short-lived signed upload URL. This is the
+ * deployment-proof path for hosted projects whose storage RLS policies are
+ * not deployed: the service role acts strictly ON BEHALF of the verified
+ * user, confined to that user's own prefix.
+ */
+export async function createStage1UploadTicket(
+  userId: string,
+  input: { attachmentId: string; name: string; mime: string; size: number },
+): Promise<{ ok: true; signedUrl: string; token: string; path: string } | { ok: false; reason: string }> {
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(input.attachmentId)) {
+    return { ok: false, reason: "attachment id must be a uuid" };
+  }
+  if (input.size > MAX_ATTACHMENT_BYTES) {
+    return { ok: false, reason: "attachment exceeds the size cap" };
+  }
+  if (!classify(input.mime, input.name)) {
+    return { ok: false, reason: `unsupported content type "${input.mime || "unknown"}"` };
+  }
+  const safeName = input.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 80);
+  const objectPath = `${userId}/${input.attachmentId}-${safeName}`;
+  try {
+    const admin = getAdmin();
+    const { data, error } = await admin.storage
+      .from(ATTACHMENT_BUCKET)
+      .createSignedUploadUrl(objectPath);
+    if (error || !data) {
+      return { ok: false, reason: `upload ticket failed: ${error?.message ?? "unknown"}` };
+    }
+    // Best-effort registry row (path is already fixed). A missing registry
+    // table must not block the upload — verification re-checks existence.
+    await admin.from("attachments_registry").upsert({
+      id: input.attachmentId,
+      user_id: userId,
+      bucket: ATTACHMENT_BUCKET,
+      object_path: objectPath,
+      mime: input.mime,
+      size: input.size,
+      name: safeName,
+      status: "uploaded",
+      parent_attachment_id: null,
+    });
+    return { ok: true, signedUrl: data.signedUrl, token: data.token, path: objectPath };
+  } catch (e) {
+    return { ok: false, reason: `upload ticket failed: ${e instanceof Error ? e.message : "unknown"}` };
+  }
+}
+
+/**
+ * Stage-1 DERIVATIVE upload ticket (scanned-PDF page images). The parent must
+ * already exist under the caller's own prefix; the derivative path embeds the
+ * parent id (`<parent>-derived-<derId>-<name>`) so parent linkage is provable
+ * from the object name alone, with or without the registry.
+ */
+export async function createStage1DerivativeTicket(
+  userId: string,
+  input: {
+    attachmentId: string;
+    parentAttachmentId: string;
+    name: string;
+    mime: string;
+    size: number;
+  },
+): Promise<{ ok: true; signedUrl: string; token: string; path: string } | { ok: false; reason: string }> {
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(input.attachmentId)) {
+    return { ok: false, reason: "attachment id must be a uuid" };
+  }
+  if (input.size > MAX_ATTACHMENT_BYTES) {
+    return { ok: false, reason: "derivative exceeds the size cap" };
+  }
+  if (classify(input.mime, input.name) !== "image") {
+    return { ok: false, reason: "derivatives must be images" };
+  }
+  const admin = getAdmin();
+  // The parent must exist under the CALLER'S OWN prefix.
+  const { data: objects, error: listError } = await admin.storage
+    .from(ATTACHMENT_BUCKET)
+    .list(userId, { limit: 100, search: input.parentAttachmentId });
+  if (listError || !objects?.some((o) => o.name.startsWith(`${input.parentAttachmentId}-`))) {
+    return { ok: false, reason: "parent attachment not found in the owner's storage prefix" };
+  }
+  const safeName = input.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 80);
+  const objectPath = `${userId}/${input.parentAttachmentId}-derived-${input.attachmentId}-${safeName}`;
+  try {
+    const { data, error } = await admin.storage
+      .from(ATTACHMENT_BUCKET)
+      .createSignedUploadUrl(objectPath);
+    if (error || !data) {
+      return { ok: false, reason: `upload ticket failed: ${error?.message ?? "unknown"}` };
+    }
+    await admin.from("attachments_registry").upsert({
+      id: input.attachmentId,
+      user_id: userId,
+      bucket: ATTACHMENT_BUCKET,
+      object_path: objectPath,
+      mime: input.mime,
+      size: input.size,
+      name: safeName,
+      status: "uploaded",
+      parent_attachment_id: input.parentAttachmentId,
+    });
+    return { ok: true, signedUrl: data.signedUrl, token: data.token, path: objectPath };
+  } catch (e) {
+    return { ok: false, reason: `upload ticket failed: ${e instanceof Error ? e.message : "unknown"}` };
+  }
+}
+
+/** Derivative ids of a parent, server-mediated: registry rows first, then the
+ *  parent-derived naming convention under the owner's prefix. */
+export async function listDerivativeIdsForUser(
+  userId: string,
+  parentAttachmentId: string,
+  limit = 6,
+): Promise<string[]> {
+  const admin = getAdmin();
+  const { data: rows, error } = await admin
+    .from("attachments_registry")
+    .select("id")
+    .eq("parent_attachment_id", parentAttachmentId)
+    .order("created_at", { ascending: true })
+    .limit(limit)
+    .returns<Array<{ id: string }>>();
+  if (!error && rows && rows.length > 0) {
+    return rows.map((r) => r.id).filter((id) => /^[0-9a-f-]{36}$/i.test(id));
+  }
+  const { data: objects, error: listError } = await admin.storage
+    .from(ATTACHMENT_BUCKET)
+    .list(userId, { limit: 100, search: `${parentAttachmentId}-derived-` });
+  if (listError || !objects) return [];
+  const marker = `${parentAttachmentId}-derived-`;
+  const ids: string[] = [];
+  for (const o of objects) {
+    if (!o.name.startsWith(marker)) continue;
+    const id = o.name.slice(marker.length).split("-").slice(0, 5).join("-");
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) ids.push(id);
+    if (ids.length >= limit) break;
+  }
+  return ids;
+}
+
+/**
+ * Server-mediated verification + read, used when storage RLS policies are not
+ * deployed (user-scoped downloads would 403). EVERY guarantee of the 4-step
+ * contract is preserved; ownership is enforced by construction: the service
+ * role only ever touches objects under the VERIFIED session user's own
+ * prefix, and the id→object mapping is derived from that prefix — never from
+ * a client-supplied path. A cross-user id cannot exist under this prefix.
+ */
+export async function loadVerifiedAttachmentForUser(
+  userId: string,
+  attachmentId: string,
+  opts: { parentAttachmentId?: string | null } = {},
+): Promise<VerifiedAttachment> {
+  const admin = getAdmin();
+  // (1)+(2) Locate the object strictly inside the owner's own prefix; the id
+  // → name mapping comes from that prefix listing, never from the client.
+  const { data, error } = await admin.storage
+    .from(ATTACHMENT_BUCKET)
+    .list(userId, { limit: 100, search: attachmentId });
+  if (error || !data) {
+    return { ok: false, reason: "attachment listing failed for the owner's prefix" };
+  }
+  const objectName = data.find((o) => o.name.startsWith(`${attachmentId}-`));
+  if (!objectName) {
+    return { ok: false, reason: "attachment not found in the owner's storage prefix" };
+  }
+  const objectPath = `${userId}/${objectName.name}`;
+  // Parent-linkage proof without the registry: the naming convention embeds
+  // the parent id (parent-derived-derId-…); with the registry, the row is
+  // authoritative.
+  const { data: regRow } = await admin
+    .from("attachments_registry")
+    .select("parent_attachment_id, object_path")
+    .eq("id", attachmentId)
+    .maybeSingle();
+  if (regRow?.object_path && regRow.object_path !== objectPath) {
+    return { ok: false, reason: "object path does not match the registry row" };
+  }
+  if (opts.parentAttachmentId) {
+    const linked = regRow
+      ? regRow.parent_attachment_id === opts.parentAttachmentId
+      : objectName.name.includes(`${opts.parentAttachmentId}-derived-`);
+    if (!linked) {
+      return { ok: false, reason: "derivative is not linked to the given parent attachment" };
+    }
+  }
+  // (3) MIME allowlist by extension (upload-time MIME was validated at
+  // ticket time); size capped at download.
+  const kind = kindFromExtension(objectName.name);
+  if (!kind) {
+    return { ok: false, reason: `unsupported content type "${objectName.name}"` };
+  }
+  // (4) Existence + download (service role, confined to the owner's prefix).
+  const { data: blob, error: downloadError } = await admin.storage
+    .from(ATTACHMENT_BUCKET)
+    .download(objectPath);
+  if (downloadError || !blob) {
+    return { ok: false, reason: "attachment object could not be downloaded" };
+  }
+  const bytes = new Uint8Array(await blob.arrayBuffer());
+  if (bytes.length > MAX_ATTACHMENT_BYTES) {
+    return { ok: false, reason: "attachment exceeds the size cap" };
+  }
+  return {
+    ok: true,
+    kind,
+    mime: "",
+    name: objectName.name.slice(attachmentId.length + 1),
+    bytes,
+  };
+}
 
 export type AttachmentRegistryRow = {
   id: string;

@@ -1,10 +1,12 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   ResolvedInputContextSchema,
   type ResolvedInputContext,
   type SourceFact,
 } from "@/lib/understanding/input-envelope";
-import { loadVerifiedAttachment, listDerivativeIds } from "@/lib/attachments/attachment-store.server";
+import {
+  loadVerifiedAttachmentForUser,
+  listDerivativeIdsForUser,
+} from "@/lib/attachments/attachment-store.server";
 import { detectUserUrls, fetchSiteContext } from "./website-context.server";
 import { extractPdfPages, pdfTextIsSufficient } from "./document-text.server";
 
@@ -127,14 +129,13 @@ async function understandImage(
  */
 async function resolveDocument(args: {
   userId: string;
-  supabase: SupabaseClient;
   attachmentId: string;
   name: string;
   bytes: Uint8Array;
   addSection: (content: string, ref: string, label: string) => void;
   markUnresolved: (reason: string) => void;
 }): Promise<void> {
-  const { userId, supabase, attachmentId, name, bytes, addSection, markUnresolved } = args;
+  const { userId, attachmentId, name, bytes, addSection, markUnresolved } = args;
   const pdf = await extractPdfPages(bytes).catch(() => null);
   if (!pdf) {
     markUnresolved("not a readable PDF");
@@ -152,10 +153,10 @@ async function resolveDocument(args: {
   // Scanned / image-only PDF: vision over CLIENT-rendered page derivatives.
   // Each derivative is an authenticated registry row linked to this parent —
   // re-verified here before a single byte reaches vision.
-  const derivativeIds = await listDerivativeIds(supabase, userId, attachmentId);
+  const derivativeIds = await listDerivativeIdsForUser(userId, attachmentId);
   let pagesRead = 0;
   for (const derId of derivativeIds.slice(0, 6)) {
-    const der = await loadVerifiedAttachment(supabase, userId, derId, {
+    const der = await loadVerifiedAttachmentForUser(userId, derId, {
       parentAttachmentId: attachmentId,
     });
     if (!der.ok || der.kind !== "image") continue;
@@ -194,7 +195,6 @@ function detectConflicts(facts: SourceFact[]): ResolvedInputContext["conflicts"]
 
 export async function resolveInputEnvelope(args: {
   userId: string;
-  supabase: SupabaseClient;
   text: string;
   attachmentIds: Array<{ attachmentId: string }>;
 }): Promise<ResolvedInputContext> {
@@ -212,7 +212,7 @@ export async function resolveInputEnvelope(args: {
   }
 
   for (const { attachmentId } of args.attachmentIds.slice(0, 6)) {
-    const att = await loadVerifiedAttachment(args.supabase, args.userId, attachmentId);
+    const att = await loadVerifiedAttachmentForUser(args.userId, attachmentId);
     if (!att.ok) {
       unresolved.push({ ref: attachmentId, reason: att.reason });
       continue;
@@ -227,7 +227,6 @@ export async function resolveInputEnvelope(args: {
     } else if (att.kind === "document") {
       await resolveDocument({
         userId: args.userId,
-        supabase: args.supabase,
         attachmentId,
         name: att.name,
         bytes: att.bytes,

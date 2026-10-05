@@ -18,7 +18,10 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { VoiceInputButton } from "@/components/voice-input-button";
 import { mySupabase } from "@/integrations/my-supabase/client";
-import { registerAttachment, registerAttachmentDerivative } from "@/lib/attachments/attachment-functions";
+import {
+  createAttachmentDerivativeUpload,
+  createAttachmentUpload,
+} from "@/lib/attachments/attachment-functions";
 import { toast } from "sonner";
 
 export type ComposerMode = "search" | "chat";
@@ -285,19 +288,22 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
             ? crypto.randomUUID()
             : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
         const safeName = sanitizeFileName(file.name);
-        // Durable store: per-user private bucket (RLS owner-only), then
-        // register it so the server can resolve it by id. If either step
-        // fails, the attachment is NOT included — we never claim an
-        // attachment will be understood when its content is unreachable.
+        // Stage-1 upload: the server validates the descriptor, builds the
+        // object path from the SESSION user's id, and returns a short-lived
+        // signed upload URL. If the ticket fails, the attachment is NOT
+        // included — we never claim an attachment will be understood when its
+        // content is unreachable.
         try {
-          const { error } = await mySupabase.storage
-            .from("attachments")
-            .upload(`${userId}/${id}-${safeName}`, file, { upsert: true });
-          if (error) throw error;
-          const reg = await registerAttachment({
+          const ticket = await createAttachmentUpload({
             data: { attachmentId: id, name: safeName, mime: file.type, size: file.size },
           });
-          if (!reg.ok) throw new Error(reg.reason);
+          if (!ticket.ok) throw new Error(ticket.reason);
+          const put = await fetch(ticket.signedUrl, {
+            method: "PUT",
+            body: file,
+            headers: { "Content-Type": file.type || "application/octet-stream" },
+          });
+          if (!put.ok) throw new Error(`upload failed: ${put.status}`);
           // Scanned-PDF pre-pass (client-side rendering): low-text pages of a
           // PDF become authenticated image derivatives so server-side vision
           // can read them. Text PDFs skip this entirely.
@@ -312,11 +318,7 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
                   typeof crypto !== "undefined" && "randomUUID" in crypto
                     ? crypto.randomUUID()
                     : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-                const { error: derUploadError } = await mySupabase.storage
-                  .from("attachments")
-                  .upload(`${userId}/${id}-derived-${derId}-${d.name}`, d.blob, { upsert: true });
-                if (derUploadError) throw derUploadError;
-                const derReg = await registerAttachmentDerivative({
+                const derTicket = await createAttachmentDerivativeUpload({
                   data: {
                     attachmentId: derId,
                     parentAttachmentId: id,
@@ -325,7 +327,13 @@ export const UnifiedComposer = forwardRef<ComposerHandle, Props>(function Unifie
                     size: d.blob.size,
                   },
                 });
-                if (!derReg.ok) throw new Error(derReg.reason);
+                if (!derTicket.ok) throw new Error(derTicket.reason);
+                const derPut = await fetch(derTicket.signedUrl, {
+                  method: "PUT",
+                  body: d.blob,
+                  headers: { "Content-Type": "image/jpeg" },
+                });
+                if (!derPut.ok) throw new Error(`derivative upload failed: ${derPut.status}`);
               }
               if (derivatives.length > 0) {
                 toast.message(

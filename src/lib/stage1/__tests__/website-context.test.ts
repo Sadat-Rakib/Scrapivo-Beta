@@ -1,5 +1,4 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Stage 1 P3: user-provided websites become bounded, provenance-tagged
@@ -22,7 +21,6 @@ vi.mock("@/lib/ai/router.server", () => ({
 }));
 
 const OWNER = "11111111-1111-1111-1111-111111111111";
-const supabase = {} as SupabaseClient;
 
 beforeEach(() => {
   fetchPageMock.mockReset();
@@ -127,7 +125,6 @@ describe("resolver integration: the mirrin case", () => {
     });
     const ctx = await resolveInputEnvelope({
       userId: OWNER,
-      supabase,
       text: "I want leads for my agency mirrin.agency where we develop websites for international businesses especially IVF centres",
       attachmentIds: [],
     });
@@ -144,7 +141,6 @@ describe("resolver integration: the mirrin case", () => {
     fetchPageMock.mockResolvedValue(null);
     const ctx = await resolveInputEnvelope({
       userId: OWNER,
-      supabase,
       text: "leads for my agency mirrin.agency",
       attachmentIds: [],
     });
@@ -179,7 +175,6 @@ describe("resolver integration: the mirrin case", () => {
     });
     const ctx = await resolveInputEnvelope({
       userId: OWNER,
-      supabase,
       text: "research https://evil.example.com",
       attachmentIds: [],
     });

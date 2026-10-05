@@ -1,5 +1,4 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Stage 1 InputResolver contract: resolvers extract provenance-tagged FACTS
@@ -20,7 +19,7 @@ vi.mock("@/lib/attachments/attachment-store.server", async (importOriginal) => {
   void actual;
   return {
     ...actual,
-    loadVerifiedAttachment: async (_supabase: unknown, _userId: string, id: string, opts?: { parentAttachmentId?: string | null }) => {
+    loadVerifiedAttachmentForUser: async (userId: string, id: string, opts?: { parentAttachmentId?: string | null }) => {
       if (opts?.parentAttachmentId) {
         const allowed = derivativeIds.get(opts.parentAttachmentId) ?? [];
         if (!allowed.includes(id)) {
@@ -38,7 +37,7 @@ vi.mock("@/lib/attachments/attachment-store.server", async (importOriginal) => {
         bytes: found.bytes,
       } as const;
     },
-    listDerivativeIds: async (_supabase: unknown, _userId: string, parentId: string) =>
+    listDerivativeIdsForUser: async (userId: string, parentId: string) =>
       derivativeIds.get(parentId) ?? [],
   };
 });
@@ -47,7 +46,6 @@ import { resolveInputEnvelope } from "../input-resolver.server";
 
 const OWNER = "11111111-1111-1111-1111-111111111111";
 const ATT_ID = "22222222-2222-2222-2222-222222222222";
-const supabase = {} as SupabaseClient;
 
 beforeEach(() => {
   extractMock.mockReset();
@@ -72,7 +70,6 @@ describe("Stage 1 InputResolver (facts only, untrusted content = data)", () => {
     });
     const ctx = await resolveInputEnvelope({
       userId: OWNER,
-      supabase,
       text: "we develop websites",
       attachmentIds: [{ attachmentId: ATT_ID }],
     });
@@ -116,7 +113,6 @@ describe("Stage 1 InputResolver (facts only, untrusted content = data)", () => {
     });
     const ctx = await resolveInputEnvelope({
       userId: OWNER,
-      supabase,
       text: "find plumbers in Austin",
       attachmentIds: [{ attachmentId: ATT_ID }],
     });
@@ -148,7 +144,6 @@ describe("Stage 1 InputResolver (facts only, untrusted content = data)", () => {
     });
     const ctx = await resolveInputEnvelope({
       userId: OWNER,
-      supabase,
       text: "",
       attachmentIds: [{ attachmentId: ATT_ID }],
     });
@@ -161,7 +156,6 @@ describe("Stage 1 InputResolver (facts only, untrusted content = data)", () => {
   it("an inaccessible attachment is reported honestly — never faked as read", async () => {
     const ctx = await resolveInputEnvelope({
       userId: OWNER,
-      supabase,
       text: "",
       attachmentIds: [{ attachmentId: ATT_ID }],
     });
@@ -188,7 +182,6 @@ describe("Stage 1 InputResolver (facts only, untrusted content = data)", () => {
     });
     const ctx = await resolveInputEnvelope({
       userId: OWNER,
-      supabase,
       text: "we target Canada",
       attachmentIds: [{ attachmentId: DOC }],
     });
@@ -199,7 +192,7 @@ describe("Stage 1 InputResolver (facts only, untrusted content = data)", () => {
   });
 
   it("no text and no attachments resolves to empty facts without any LLM call", async () => {
-    const ctx = await resolveInputEnvelope({ userId: OWNER, supabase, text: "", attachmentIds: [] });
+    const ctx = await resolveInputEnvelope({ userId: OWNER, text: "", attachmentIds: [] });
     expect(ctx.facts).toHaveLength(0);
     expect(extractMock).not.toHaveBeenCalled();
   });

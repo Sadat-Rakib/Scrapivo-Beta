@@ -1,11 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireMyAuth } from "@/integrations/my-supabase/auth-middleware";
-import { registerDerivativeAttachment, registerVerifiedAttachment } from "./attachment-store.server";
+import {
+  createStage1DerivativeTicket,
+  createStage1UploadTicket,
+} from "./attachment-store.server";
 
-/** Client calls this after a successful storage upload. The server verifies
- *  the object exists under the caller's own prefix before registering it. */
-export const registerAttachment = createServerFn({ method: "POST" })
+/** Stage-1 upload: the server validates the descriptor, builds the path from
+ *  the SESSION user's id, and returns a short-lived signed upload URL. The
+ *  client PUTs the bytes there and never sends a path. */
+export const createAttachmentUpload = createServerFn({ method: "POST" })
   .middleware([requireMyAuth])
   .inputValidator((d: unknown) =>
     z
@@ -18,12 +22,12 @@ export const registerAttachment = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    return registerVerifiedAttachment(context.supabase, context.userId, data);
+    return createStage1UploadTicket(context.userId, data);
   });
 
-/** Client calls this for scanned-PDF page derivatives (P4). The derivative is
- *  registered with parent linkage; the server re-verifies the parent. */
-export const registerAttachmentDerivative = createServerFn({ method: "POST" })
+/** Stage-1 DERIVATIVE upload (scanned-PDF page images): parent verified
+ *  server-side; the derivative path embeds the parent id. */
+export const createAttachmentDerivativeUpload = createServerFn({ method: "POST" })
   .middleware([requireMyAuth])
   .inputValidator((d: unknown) =>
     z
@@ -37,5 +41,5 @@ export const registerAttachmentDerivative = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    return registerDerivativeAttachment(context.supabase, context.userId, data);
+    return createStage1DerivativeTicket(context.userId, data);
   });
