@@ -2886,6 +2886,22 @@ export async function runSpecSearchCore(
     }
     // Belt-and-suspenders: only theorem-qualified rows may be delivered.
     completeRows = completeRows.filter((r) => r.disposition === "qualified");
+    // Insufficient-evidence gate (final qualification, "Is there enough
+    // evidence?"): a live row that research could NOT resolve to any
+    // first-party footprint (no site, no contact, no profile) is a page
+    // MENTION, not a verified candidate — even when the theorem passed on
+    // name+quote alone. Without this, a nonsense ask ("unicorn ranchers in
+    // Atlantis") delivers concept mentions as leads. The no_website hunt is
+    // exempt: absence verified by its own evidence path.
+    if (!fieldOf(spec, "opportunity")) {
+      const footprintless = completeRows.filter(
+        (r) => !r.website_url && !r.profile_url && !r.email && !r.phone && !r.contact_page_url,
+      );
+      for (const r of footprintless) {
+        ledger.gated(r, "INSUFFICIENT_EVIDENCE");
+      }
+      completeRows = completeRows.filter((r) => !footprintless.includes(r));
+    }
     if (completeRows.length) {
       emitProgress("Leads qualified", "verification", undefined, completeRows.length);
     }
