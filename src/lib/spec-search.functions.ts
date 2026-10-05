@@ -644,7 +644,14 @@ export function rowSatisfyRejectReason(spec: SearchSpec, row: SpecRow): string |
     const role = fieldOf(spec, "role");
     const location = fieldOf(spec, "location");
     const jobTitleNorm = row.title.replace(/[-–—]/g, " ");
-    if (role && !role.toLowerCase().split(/\s+/).every((term) => term && new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(jobTitleNorm)))
+    // Token-overlap tolerance: "Senior React Engineer" is researchable for a
+    // "React developer" ask (the skill token matches; the role noun differs).
+    // Only a disjoint title ("Junior Java Dev") is a contradiction.
+    if (
+      role &&
+      !role.toLowerCase().split(/\s+/).every((term) => term && new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(jobTitleNorm)) &&
+      !roleTokensOverlap(row.title, role)
+    )
       return "rejected_role";
     if (location && location.toLowerCase() !== "remote" && !locationOk(row.country, row.location, row.detail, location))
       return "rejected_location";
