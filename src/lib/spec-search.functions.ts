@@ -3266,24 +3266,25 @@ export const runSpecSearch = createServerFn({ method: "POST" })
       // the client never sees an outcome, the hang is below product code
       // (framework response write to a disconnected SSE client).
       console.info("[spec-run] core returned", JSON.stringify({ search_run_id: runId, elapsedMs: Date.now() - coreStartedAt, outcome: coreResult.outcome }));
-      // [stage2-baseline] TEMPORARY forensic funnel dump (removed after baseline).
-      console.info("[stage2-baseline]", JSON.stringify({
+      // Stage-2 funnel observability (mandated ledger): every run answers
+      // raw -> spec-filter -> complete -> qualified -> delivered, with named
+      // rejection reasons and per-fate accounting.
+      console.info("[stage2-funnel]", JSON.stringify({
         query: data.query.slice(0, 80),
         outcome: coreResult.outcome,
         qualified: coreResult.qualified_count,
         liveDiscovery: coreResult.liveDiscovery,
         reason: coreResult.retrievalTrace?.reason ?? null,
-        rawCandidates: coreResult.retrievalTrace?.rawCandidates ?? null,
-        postSpecFilter: coreResult.retrievalTrace?.postSpecFilter ?? null,
+        raw: coreResult.retrievalTrace?.rawCandidates ?? null,
+        postSpec: coreResult.retrievalTrace?.postSpecFilter ?? null,
         complete: coreResult.retrievalTrace?.complete ?? null,
-        qualifiedTrace: coreResult.retrievalTrace?.qualified ?? null,
+        qualifiedN: coreResult.retrievalTrace?.qualified ?? null,
         returned: coreResult.retrievalTrace?.returned ?? null,
-        funnel: coreResult.candidateLedger?.funnel ?? null,
-        rejectReasons: coreResult.candidateLedger?.rejectReasons ?? null,
-        accountingOk: coreResult.candidateLedger?.accounting?.ok ?? null,
-        unaccounted: coreResult.candidateLedger?.funnel?.unaccounted ?? null,
-        providers: (coreResult.providerAttempts ?? []).map((d) => ({ p: d.provider, a: d.attempted, s: d.succeeded, n: d.artifactsFound, e: (d.error ?? "").slice(0, 60) })),
         widen: coreResult.widening ?? null,
+        counts: coreResult.candidateLedger?.counts ?? null,
+        rejectReasons: coreResult.candidateLedger?.rejectReasons ?? null,
+        incompleteReasons: coreResult.candidateLedger?.incompleteReasons ?? null,
+        accounting: coreResult.candidateLedger?.accounting ?? null,
       }));
       return coreResult;
     } finally {
