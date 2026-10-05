@@ -19,7 +19,7 @@ import { investorSectorMatches } from "@/lib/search/search-spec";
 import type { DbHitMeta } from "@/lib/canonical/read-parquet.server";
 import { personRoleMatches } from "@/lib/canonical/people.server";
 import { companyCategoryMatches } from "@/lib/canonical/companies.server";
-import { craftMatches } from "@/lib/canonical/businesses.server";
+import { craftMatches, tradeFamiliesOf } from "@/lib/canonical/businesses.server";
 import type { searchPeopleDB } from "@/lib/canonical/people.server";
 import type { searchCompaniesDB } from "@/lib/canonical/companies.server";
 import type { searchBusinessesDB } from "@/lib/canonical/businesses.server";
@@ -422,7 +422,7 @@ export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
     const role = fieldOf(spec, "role");
     const industry = fieldOf(spec, "industry");
     const location = fieldOf(spec, "location");
-    if (role && !personRoleMatches(row.role ?? row.title, role))
+    if (role && !personRoleMatches(row.role ?? row.title, role) && !roleTokensOverlap(row.role ?? row.title, role))
       return false;
     if (industry && !like(row.industry ?? row.detail, industry) && !( /^saas$/i.test(industry) && /software[ -]as[ -]a[ -]service/i.test(row.industry ?? "") )) return false;
     if (location && !locationOk(row.country, row.location, row.detail, location)) return false;
@@ -532,6 +532,29 @@ export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
   return true;
 }
 
+
+/** Role-token overlap: an observed role that shares a trade token with the
+ *  requested role is a BROADER OR NARROWER wording of the same trade —
+ *  researchable. Only disjoint trades are contradictions ("Plumber" for a
+ *  "dentist" ask). */
+function roleTokensOverlap(observed: string | null | undefined, wanted: string): boolean {
+  const tokens = (v: string) =>
+    new Set(
+      (v ?? "")
+        .toLowerCase()
+        .split(/[^\p{L}\p{N}]+/u)
+        .filter((t) => t.length > 2),
+    );
+  const a = tokens(observed ?? "");
+  const b = tokens(wanted ?? "");
+  if (a.size === 0 || b.size === 0) return true; // nothing to contradict
+  for (const t of a) if (b.has(t)) return true;
+  // Trade-family overlap ("heating & cooling" vs "hvac guy").
+  const fa = tradeFamiliesOf(observed ?? "");
+  const fb = tradeFamiliesOf(wanted ?? "");
+  return fa.some((f) => fb.includes(f));
+}
+
 /** Role wording that counts as an explicitly stated role on a person row. */
 const ROLE_WORD_RE =
   /\b(founder|co-?founder|ceo|cto|cfo|coo|owner|partner|president|director|head\s+of|engineer|developer|designer|manager|consultant|accountant|attorney|lawyer|dentist|plumber|electrician|realtor|recruiter|marketer|freelancer|photographer|architect)\b/i;
@@ -570,7 +593,8 @@ export function rowSatisfyRejectReason(spec: SearchSpec, row: SpecRow): string |
       const explicitRole =
         (row.role && row.role.trim()) ||
         (row.title && ROLE_WORD_RE.test(row.title) ? row.title : null);
-      if (explicitRole && !personRoleMatches(explicitRole, role)) return "rejected_role";
+      if (explicitRole && !personRoleMatches(explicitRole, role) && !roleTokensOverlap(explicitRole, role))
+        return "rejected_role";
     }
     if (
       industry &&
@@ -2082,7 +2106,10 @@ export async function runSpecSearchCore(
   // every pre-funnel drop gets a NAMED fate — silent losses are forbidden.
   for (const r of rows) ledger.retrieved(r);
   const kept = rows.filter((r) => {
-    const ok = rowSatisfiesSpec(spec, r);
+    // Job rows: the registry pre-filtered role/location pushdown already ran;
+    // the funnel gate here is CONTRADICTIONS ONLY (broadly relevant jobs
+    // proceed to research, where exact role/location/status get verified).
+    const ok = spec.entity === "job" ? rowSatisfyRejectReason(spec, r) === null : rowSatisfiesSpec(spec, r);
     if (!ok) ledger.filtered(r, rowSatisfyRejectReason(spec, r) ?? "spec_filter");
     return ok;
   });
@@ -2711,13 +2738,46 @@ export async function runSpecSearchCore(
 
   setStage("qualification");
   // Post-research judge: the strict split the pre-research gate defers to.
+  setStage("qualification");
+  // Evidence-driven pipeline reconcile: a person-typed spec whose researched
+  // evidence is organization-shaped (business rows whose trade matches the
+  // requested role) delivers through the BUSINESS gates — the discovered
+  // entities define the pipeline ("hvac guys … sites + nums" wants the
+  // trade's providers, not its employees). Person-kind rows keep the person
+  // gates; nothing is re-typed without trade evidence.
+  let effectiveSpec = spec;
+  {
+    const role = fieldOf(spec, "role") ?? "";
+    const orgRows =
+      spec.entity === "person" && role
+        ? completeRows.filter(
+            (row) =>
+              (row.kind === "business" || row.kind === "company") &&
+              roleTokensOverlap(`${row.category ?? ""} ${row.title ?? ""} ${row.detail ?? ""}`, role),
+          )
+        : [];
+    if (orgRows.length >= 1) {
+      effectiveSpec = {
+        ...spec,
+        entity: "business",
+        criteria: [
+          ...spec.criteria.filter((c) => c.field !== "role"),
+          { field: "category", value: role, stated: true, confidence: 0.8 },
+        ],
+      };
+      console.info("[stage2-reconcile]", JSON.stringify({ entity: "person→business", rows: orgRows.length, role }));
+    }
+  }
+  // Post-research judge: the strict split the pre-research gate defers to.
   // Unknown category/role/industry/location was researchable; after research
   // an unproven stated criterion is a miss, never a pass. Stored rows already
   // met this at retrieval, so in practice it binds live candidates.
   {
     const judged: SpecRow[] = [];
     for (const row of completeRows) {
-      if (rowSatisfiesSpec(spec, row)) judged.push(row);
+      const rowSpec =
+        effectiveSpec !== spec && (row.kind === "business" || row.kind === "company") ? effectiveSpec : spec;
+      if (rowSatisfiesSpec(rowSpec, row)) judged.push(row);
       else ledger.filtered(row, "UNPROVEN_CRITERION");
     }
     completeRows = judged;
@@ -2726,7 +2786,14 @@ export async function runSpecSearchCore(
   enrichDoneAt = Date.now();
   const qualificationInputCount = completeRows.length;
   const { qualifyLead } = await import("@/lib/search/qualify");
-  const decisions = completeRows.map((row) => ({ row, decision: qualifyLead(row, spec, row.evidence) }));
+  const decisions = completeRows.map((row) => ({
+    row,
+    decision: qualifyLead(
+      row,
+      effectiveSpec !== spec && (row.kind === "business" || row.kind === "company") ? effectiveSpec : spec,
+      row.evidence,
+    ),
+  }));
   for (const { row, decision } of decisions) ledger.decided(row, decision);
   const rejectionSummary = decisions
     .filter(({ decision }) => decision.disposition !== "qualified")

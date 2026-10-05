@@ -7,6 +7,7 @@ import { openValue, type FrameLocation, type OpenValue, type UnderstandingFrame 
 import { classifyHead, LOCATIVE_PREP_TOKENS, opensWithExclusion } from './lexicon';
 import { validateFrame } from './validate';
 import { purposeFromFrame, repairExplicitPurpose } from './purpose';
+import { tradeFamiliesOf } from '../canonical/businesses.server';
 import { stripUrlsFromText } from '../stage1/url-utils';
 
 const clean = (value: string) => value.trim().replace(/[.!?]+$/, '').trim();
@@ -282,6 +283,38 @@ export function normalizeSearchFrame(input: UnderstandingFrame): UnderstandingFr
       frame.constraints.push({ field: 'geo_scope', operator: 'eq', value: 'worldwide', raw, confidence: 1, negated: false, unit: null });
     }
     frame.meta.notes.push('worldwide wording is a search scope, not a place');
+  }
+  // Trade-service reconcile: "yo need 7 hvac guys gta sites + nums" — a TRADE
+  // role combined with contact-proof requirements (phone/site) and no hiring
+  // intent is a hunt for that trade's PROVIDERS, not its employees. The
+  // discovered entities define the pipeline: re-type person → business with
+  // the trade as category. Recruiting wording keeps the person reading.
+  {
+    const roleText = valueOf(frame.target.role ?? frame.target.job_title);
+    const families = tradeFamiliesOf(roleText);
+    const asksContactProof = frame.required_fields.some((f) =>
+      /^(?:phone|website|site|contact|email)$/i.test(valueOf(f)),
+    );
+    const recruiting = ["hiring", "seeking_work", "partnered_with"].includes(frame.relation.type.value) ||
+      /\b(?:hire|hiring|recruit|job|jobs|vacanc)/i.test(frame.input.raw);
+    if (
+      frame.target.entity_type.value === "person" &&
+      families.length > 0 &&
+      asksContactProof &&
+      !recruiting
+    ) {
+      const trade = families[0];
+      frame.target.entity_type = {
+        value: "business",
+        raw: frame.target.role?.raw ?? roleText,
+        confidence: 0.75,
+      };
+      if (!frame.target.category)
+        frame.target.category = openValue(trade, roleText, trade, 0.8);
+      frame.target.role = null;
+      frame.target.job_title = null;
+      frame.meta.notes.push(`trade-service reconcile: "${roleText}" + contact-proof ask → business/${trade}`);
+    }
   }
   return syncClarification(frame);
 }
