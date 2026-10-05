@@ -197,6 +197,28 @@ export function stampSpecOpportunity(row: SpecRow, spec?: SearchSpec): SpecRow {
   return opp ? { ...row, opportunity: opp } : row;
 }
 
+/**
+ * Acquisition-provenance stamping: every live discovery query is built from
+ * the spec's location/category, so a row the source returned for that query
+ * carries that context as evidence. Unstamped dimensions stay unknown
+ * (researchable) — never fabricated. Applies to FIRST-round AND widen-round
+ * live rows alike.
+ */
+export function stampAcquisitionProvenance(row: SpecRow, spec: SearchSpec): SpecRow {
+  const row2 = sanitizeSpecRow(row, spec);
+  const acquireLocation = fieldOf(spec, "location");
+  const acquireCategory = fieldOf(spec, "category") ?? fieldOf(spec, "industry");
+  if (!row2.location && acquireLocation) {
+    row2.location = acquireLocation;
+    row2.detail = `${row2.detail ?? ""} [acquired via location-anchored search: ${acquireLocation}]`.trim();
+  }
+  if (!row2.category && !row2.industry && acquireCategory) {
+    row2.category = acquireCategory;
+    row2.detail = `${row2.detail ?? ""} [acquired via category-anchored search: ${acquireCategory}]`.trim();
+  }
+  return row2;
+}
+
 /** Apply mojibake repair to all user-visible string fields. Never invents. */
 export function sanitizeSpecRow(row: SpecRow, spec?: SearchSpec): SpecRow {
   const stamped = stampSpecOpportunity(row, spec);
@@ -2373,24 +2395,7 @@ export async function runSpecSearchCore(
         // rowSatisfiesSpec runs after enrichment, on the final split. The
         // failing dimension is booked so rejection buckets stay explorable.
         const liveSanitized: SpecRow[] = [];
-        // Acquisition-provenance stamping: every live discovery query is
-        // built from the spec's location/category, so a row the source
-        // returned for that query carries that context as evidence. Unstamped
-        // dimensions stay unknown (researchable) — never fabricated.
-        const acquireLocation = fieldOf(spec, "location");
-        const acquireCategory = fieldOf(spec, "category") ?? fieldOf(spec, "industry");
-        for (const r of live.rows.map((row) => {
-          const row2 = sanitizeSpecRow(row, spec);
-          if (!row2.location && acquireLocation) {
-            row2.location = acquireLocation;
-            row2.detail = `${row2.detail ?? ""} [acquired via location-anchored search: ${acquireLocation}]`.trim();
-          }
-          if (!row2.category && !row2.industry && acquireCategory) {
-            row2.category = acquireCategory;
-            row2.detail = `${row2.detail ?? ""} [acquired via category-anchored search: ${acquireCategory}]`.trim();
-          }
-          return row2;
-        })) {
+        for (const r of live.rows.map((row) => stampAcquisitionProvenance(row, spec))) {
           const rejectReason = rowSatisfyRejectReason(spec, r);
           if (!rejectReason) liveSanitized.push(r);
           // A merge can surface a contradicting fact after a lead streamed.
@@ -2606,7 +2611,7 @@ export async function runSpecSearchCore(
             rowsReturned: live.rows.length,
           });
           let newCount = 0;
-          for (const r of live.rows.map((row) => sanitizeSpecRow(row, spec))) {
+          for (const r of live.rows.map((row) => stampAcquisitionProvenance(row, spec))) {
             const rejectReason = rowSatisfyRejectReason(spec, r);
             if (!rejectReason) {
               const k = identityOf(r);
