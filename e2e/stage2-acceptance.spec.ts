@@ -74,10 +74,11 @@ test("stage2 acceptance — 10 queries", async ({ page }) => {
     }
     const settled = await runQuery(page, q);
     if (settled === "card") {
+      // Forced runs get the SAME full settle window — no mid-run rotation.
       const force = page.getByRole("button", { name: /Search with defaults|Confirm & search/ }).first();
       if (await force.isVisible().catch(() => false)) {
         await force.click();
-        await page.waitForTimeout(30_000);
+        await runQuery(page, q, 660_000);
       }
     }
   }
