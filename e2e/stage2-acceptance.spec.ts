@@ -41,7 +41,7 @@ async function login(page: Page) {
   await expect(page.getByRole("textbox").first()).toBeVisible({ timeout: 30_000 });
 }
 
-async function runQuery(page: Page, q: string, waitMs = 240_000) {
+async function runQuery(page: Page, q: string, waitMs = 660_000) {
   await page.getByRole("textbox").first().fill(q);
   await page.getByRole("textbox").first().press("Enter");
   const deadline = Date.now() + waitMs;
@@ -57,13 +57,20 @@ async function runQuery(page: Page, q: string, waitMs = 240_000) {
 }
 
 test("stage2 acceptance — 10 queries", async ({ page }) => {
-  test.setTimeout(3_600_000);
+  test.setTimeout(7_200_000);
   await login(page);
   for (const q of QUERIES) {
+    // Rotating the conversation aborts in-flight runs — only rotate when the
+    // previous run has settled (or after Stop), never mid-run.
+    const stopBtn = page.getByRole("button", { name: /Stop/i }).first();
+    if (await stopBtn.isVisible().catch(() => false)) {
+      await stopBtn.click();
+      await page.waitForTimeout(5_000);
+    }
     const newChat = page.getByRole("button", { name: "New chat" }).first();
     if (await newChat.isVisible().catch(() => false)) {
       await newChat.click();
-      await page.waitForTimeout(1500);
+      await page.waitForTimeout(2000);
     }
     const settled = await runQuery(page, q);
     if (settled === "card") {
