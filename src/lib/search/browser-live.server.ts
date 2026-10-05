@@ -699,9 +699,30 @@ export async function extractEntities(
     return found;
   };
 
-  const fallback = observedFallback();
+  // Location-evidence binding: a candidate extracted from a page whose text
+  // visibly carries the spec's location inherits it — with the containing
+  // line as the verbatim quote. Real source evidence, never invented; rows
+  // keep their own location when the extractor found a better one.
+  const specLocation = spec.criteria.find((c) => c.field === "location")?.value?.trim();
+  const attachLocation = (entities: BrowserExtractedEntity[]): BrowserExtractedEntity[] => {
+    if (!specLocation || !entities.length) return entities;
+    for (const [pageIndex, page] of pages.entries()) {
+      const line = page.text
+        .split(/\n+/)
+        .find((l) => l.toLowerCase().includes(specLocation.toLowerCase()) && l.length >= 10)
+        ?.slice(0, 200);
+      if (!line) continue;
+      for (const entity of entities) {
+        if (entity.page !== pageIndex || !entity.fields || entity.fields.location) continue;
+        entity.fields.location = { value: specLocation, quote: line };
+      }
+    }
+    return entities;
+  };
+
+  const fallback = attachLocation(observedFallback());
   if (fallback.length >= 3) return report("deterministic", "not_called", fallback);
-  if (Date.now() < extractionModelUnavailableUntil) return report("deterministic", "breaker", fallback, "model unavailable cooldown");
+  if (Date.now() < extractionModelUnavailableUntil) return report("deterministic", "breaker", attachLocation(fallback), "model unavailable cooldown");
   const terms = spec.criteria.map((criterion) => criterion.value.toLowerCase()).filter((value) => value.length > 2);
   const rankedPages = pages.map((page, index) => ({ page, index, score: terms.reduce((score, term) => score + (page.text.toLowerCase().includes(term) ? 1 : 0) + (page.title.toLowerCase().includes(term) ? 2 : 0), 0) }))
     .sort((a, b) => b.score - a.score).slice(0, 2);
@@ -728,12 +749,12 @@ export async function extractEntities(
     user: JSON.stringify({ intent: { entity: spec.entity, criteria: spec.criteria.map(({ field, value }) => ({ field, value })) }, pages: compactPages }),
   });
     const result = safeJsonParse<{ entities?: BrowserExtractedEntity[] }>(content);
-    if (Array.isArray(result?.entities) && result.entities.length) return report("llm", "ok", result.entities);
-    return report("deterministic", "empty", observedFallback(), content ? `unparsed_or_empty(${String(content).length} chars)` : "no content");
+    if (Array.isArray(result?.entities) && result.entities.length) return report("llm", "ok", attachLocation(result.entities));
+    return report("deterministic", "empty", attachLocation(observedFallback()), content ? `unparsed_or_empty(${String(content).length} chars)` : "no content");
   } catch (error) {
     if (/model_missing|model.*unavailable|no.*model/i.test(String(error))) extractionModelUnavailableUntil = Date.now() + 60_000;
     const message = String(error instanceof Error ? error.message : error);
-    return report("deterministic", /timeout|timed out|abort/i.test(message) ? "timeout" : "error", observedFallback(), message.slice(0, 160));
+    return report("deterministic", /timeout|timed out|abort/i.test(message) ? "timeout" : "error", attachLocation(observedFallback()), message.slice(0, 160));
   }
 }
 

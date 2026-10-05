@@ -616,7 +616,17 @@ export function rowSatisfyRejectReason(spec: SearchSpec, row: SpecRow): string |
       return "rejected_location";
     return null;
   }
-  // investor/job rows are structured enough that strict validation is the
+  if (spec.entity === "job") {
+    const role = fieldOf(spec, "role");
+    const location = fieldOf(spec, "location");
+    const jobTitleNorm = row.title.replace(/[-–—]/g, " ");
+    if (role && !role.toLowerCase().split(/\s+/).every((term) => term && new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(jobTitleNorm)))
+      return "rejected_role";
+    if (location && location.toLowerCase() !== "remote" && !locationOk(row.country, row.location, row.detail, location))
+      return "rejected_location";
+    return null;
+  }
+  // investor rows are structured enough that strict validation is the
   // contradiction judge; no researchable-unknown gap has been shown there.
   return rowSatisfiesSpec(spec, row) ? null : "rejected_spec";
 }
