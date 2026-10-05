@@ -246,7 +246,13 @@ export function sanitizeSpecRow(row: SpecRow, spec?: SearchSpec): SpecRow {
     opportunity: out.opportunity,
   });
   out.missingFields = miss;
-  out.complete = miss.length === 0;
+  // Stage-2 candidate rule: missing CONTACT information must not remove an
+  // otherwise valid candidate. A row whose only gaps are contact channels
+  // (email/phone/url — no identity/location/category gap) stays in the pool;
+  // enrichment remains best-effort and the qualification theorem still judges
+  // every USER-required field. Identity/location gaps keep it incomplete.
+  const CONTACT_GAPS = new Set(["contact", "contact_or_site", "apply_or_contact", "email", "phone", "url"]);
+  out.complete = miss.length === 0 || (miss.length > 0 && miss.every((f) => CONTACT_GAPS.has(f)));
   return out;
 }
 
@@ -1201,6 +1207,7 @@ export async function runSpecSearchCore(
       limit,
       hasMore: false,
       totalAvailable: null,
+      candidateLedger: ledger.summary(),
       ...partial,
       ...runIds,
       // Stage-1 rounds where no retrieval ran (clarify/confirm) carry NO
@@ -2061,7 +2068,14 @@ export async function runSpecSearchCore(
       );
     }
   } // end legacy-order else (coverage selector off / unplannable)
-  const kept = rows.filter((r) => rowSatisfiesSpec(spec, r));
+  // Stage-2 accounting: every row entering the funnel is stub-entered and
+  // every pre-funnel drop gets a NAMED fate — silent losses are forbidden.
+  for (const r of rows) ledger.retrieved(r);
+  const kept = rows.filter((r) => {
+    const ok = rowSatisfiesSpec(spec, r);
+    if (!ok) ledger.filtered(r, rowSatisfyRejectReason(spec, r) ?? "spec_filter");
+    return ok;
+  });
   // Anti-hallucination boundary (Batch 1): on the indexed path every kept
   // row must carry the registry_key of its retrieved DB row. Keyless rows
   // (fabricated anywhere upstream of retrieval) are dropped and counted as
@@ -2090,8 +2104,12 @@ export async function runSpecSearchCore(
     for (let i = kept.length - 1; i >= 0; i--) {
       const entitySite = sanitizeSpecRow(kept[i]).website_url;
       if (opp === "no_website") {
-        if (entitySite) kept.splice(i, 1);
+        if (entitySite) {
+          ledger.filtered(kept[i], "opportunity_filter:no_website");
+          kept.splice(i, 1);
+        }
       } else if (!(entitySite && !kept[i].email && !kept[i].phone)) {
+        ledger.filtered(kept[i], "opportunity_filter:stale_site");
         kept.splice(i, 1);
       }
     }
@@ -3248,6 +3266,25 @@ export const runSpecSearch = createServerFn({ method: "POST" })
       // the client never sees an outcome, the hang is below product code
       // (framework response write to a disconnected SSE client).
       console.info("[spec-run] core returned", JSON.stringify({ search_run_id: runId, elapsedMs: Date.now() - coreStartedAt, outcome: coreResult.outcome }));
+      // [stage2-baseline] TEMPORARY forensic funnel dump (removed after baseline).
+      console.info("[stage2-baseline]", JSON.stringify({
+        query: data.query.slice(0, 80),
+        outcome: coreResult.outcome,
+        qualified: coreResult.qualified_count,
+        liveDiscovery: coreResult.liveDiscovery,
+        reason: coreResult.retrievalTrace?.reason ?? null,
+        rawCandidates: coreResult.retrievalTrace?.rawCandidates ?? null,
+        postSpecFilter: coreResult.retrievalTrace?.postSpecFilter ?? null,
+        complete: coreResult.retrievalTrace?.complete ?? null,
+        qualifiedTrace: coreResult.retrievalTrace?.qualified ?? null,
+        returned: coreResult.retrievalTrace?.returned ?? null,
+        funnel: coreResult.candidateLedger?.funnel ?? null,
+        rejectReasons: coreResult.candidateLedger?.rejectReasons ?? null,
+        accountingOk: coreResult.candidateLedger?.accounting?.ok ?? null,
+        unaccounted: coreResult.candidateLedger?.funnel?.unaccounted ?? null,
+        providers: (coreResult.providerAttempts ?? []).map((d) => ({ p: d.provider, a: d.attempted, s: d.succeeded, n: d.artifactsFound, e: (d.error ?? "").slice(0, 60) })),
+        widen: coreResult.widening ?? null,
+      }));
       return coreResult;
     } finally {
       registered?.finish();
