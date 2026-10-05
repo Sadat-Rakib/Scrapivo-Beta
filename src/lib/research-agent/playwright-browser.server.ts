@@ -43,7 +43,19 @@ let browserPromise: Promise<import("playwright-core").Browser> | null = null;
 async function getBrowser(headless: boolean): Promise<import("playwright-core").Browser> {
   if (!browserPromise) {
     browserPromise = import("playwright-core")
-      .then((pw) => pw.chromium.launch({ headless, args: ["--disable-blink-features=AutomationControlled"] }))
+      .then((pw) =>
+        pw.chromium
+          .launch({ headless, args: ["--disable-blink-features=AutomationControlled"] })
+          .then((browser) => {
+            // A crashed/closed browser must never stay cached: later rounds
+            // would hit "Target page, context or browser has been closed"
+            // forever. Reset the promise so the next call relaunches.
+            browser.on("disconnected", () => {
+              browserPromise = null;
+            });
+            return browser;
+          }),
+      )
       .catch((err) => {
         browserPromise = null;
         throw err;
@@ -137,11 +149,23 @@ export class PlaywrightBrowserAdapter implements AgentBrowser {
     this.check();
     const visible = options?.visible ?? !this.headless;
     if (visible) this.headless = false;
-    const browser = await getBrowser(this.headless);
-    const context = await browser.newContext({
-      viewport: { width: 1366, height: 850 },
-      userAgent: undefined, // default Playwright UA — no fingerprint spoofing
-    });
+    let browser = await getBrowser(this.headless);
+    const newContext = () =>
+      browser.newContext({
+        viewport: { width: 1366, height: 850 },
+        userAgent: undefined, // default Playwright UA — no fingerprint spoofing
+      });
+    let context: import("playwright-core").BrowserContext;
+    try {
+      context = await newContext();
+    } catch (e) {
+      const message = String(e instanceof Error ? e.message : e);
+      if (!/has been closed|Target page, context/i.test(message)) throw e;
+      // The cached browser process died between rounds — relaunch once.
+      browserPromise = null;
+      browser = await getBrowser(this.headless);
+      context = await newContext();
+    }
     const id = options?.id ?? `pw-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
     const page = await context.newPage();
     page.setDefaultTimeout(NAV_TIMEOUT_MS);

@@ -595,6 +595,44 @@ export function browserEntitiesToRows(
   return [...rows.values()];
 }
 
+/**
+ * Navigation/CTA phrases and link-farm headings that the text dump of a
+ * directory page otherwise serves as "names" ("Click Here", "Get Matched",
+ * "KEY INSIGHTS", "Tag Cloud", "Related Searches", ...). Never identities.
+ */
+const NAV_PHRASES = new RegExp(
+  "\b(?:click here|learn more|read more|view more|get (?:in touch|matched|started|a quote|quotes)|contact us|about us|our (?:team|services|work|story)|sign (?:in|up)|log ?in|subscribe|follow us|book (?:now|online)|key insights|related searches|similar (?:searches|services|businesses|profiles)|tag cloud|latest posts|recent posts|vendor spotlights|expert advice|privacy policy|terms of (?:service|use)|all rights reserved|skip to content|back to top|see more|show more|load more|leave a (?:comment|reply)|write a (?:review|comment)|request a (?:quote|callback)|find out more|discover more|get started today)\b",
+  "i",
+);
+/** A real person identity is 2-4 title-case words; ALL-CAPS multi-word
+ *  strings are headings, not names. */
+function personNameOk(line: string): boolean {
+  const words = line.trim().split(/\s+/);
+  if (words.length < 2 || words.length > 4) return false;
+  if (NAV_PHRASES.test(line)) return false;
+  const allCaps = words.filter((w) => w.length > 3 && w === w.toUpperCase() && /[A-Z]/.test(w));
+  return allCaps.length <= 1;
+}
+/** Token overlap between the page title and a candidate line: when the line
+ *  mostly restates the title it is the directory's own brand heading, never a
+ *  listing. */
+function titleTokenOverlap(title: string, line: string): boolean {
+  const stop = new Set(["the", "and", "for", "with", "best", "top", "near", "me", "in", "of", "a", "to"]);
+  const tokens = (t: string) =>
+    new Set(
+      t
+        .toLowerCase()
+        .split(/[^a-z0-9]+/)
+        .filter((w) => w.length > 2 && !stop.has(w)),
+    );
+  const a = tokens(title);
+  const b = tokens(line);
+  if (a.size === 0 || b.size === 0) return false;
+  let hits = 0;
+  for (const w of b) if (a.has(w)) hits++;
+  return hits / b.size >= 0.6;
+}
+
 export async function extractEntities(
   pages: BrowserObservedPage[],
   spec: SearchSpec,
@@ -644,7 +682,11 @@ export async function extractEntities(
             const nameLine = lineList[i];
             const roleLine = lineList[i + 1] ?? "";
             if (!/^[A-Z][\p{L}'-]+(?:[ \t]+[A-Z][\p{L}'-]+){1,3}$/u.test(nameLine)) continue;
+            // Navigation/CTA text is not a person ("Read More", "Get In
+            // Touch", "Tag Cloud" never become candidate identities).
+            if (!personNameOk(nameLine)) continue;
             if (!roleTokens.some((t) => roleLine.toLowerCase().includes(t))) continue;
+            if (roleLine.split(/\s+/).length > 12) continue;
             if (/^(?:home|about|contact|team|gallery|pricing|blog|read more|view|menu)$/i.test(roleLine)) continue;
             if (found.some((item) => normalized(item.name) === normalized(nameLine))) continue;
             found.push({ page: pageIndex, kind: "person", name: nameLine, identityQuote: `${nameLine}\n${roleLine}`.trim(),
@@ -713,7 +755,16 @@ export async function extractEntities(
  */
 export function deterministicLocalEntities(pages: BrowserObservedPage[], spec: SearchSpec): BrowserExtractedEntity[] {
   const category = spec.criteria.find((c) => c.field === "category")?.value ?? "";
-  const categoryTokens = category.toLowerCase().split(/[^a-z0-9]+/).filter((t) => t.length > 2);
+  let categoryTokens = category.toLowerCase().split(/[^a-z0-9]+/).filter((t) => t.length > 2);
+  if (!categoryTokens.length && pages.length) {
+    // A spec without category criteria (entity typed by role/employer words)
+    // still extracts: the page TITLE supplies the anchor ("Toronto SaaS
+    // Companies"), so evidence-backed lists keep working without a vocab.
+    categoryTokens = pages[0]!
+      .title.toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter((t) => t.length > 2);
+  }
   if (!categoryTokens.length) return [];
   // Semantic trade matching (PRD V2 §12/§19): literal category tokens are
   // hints; a line belongs to the same trade when its own words name that
@@ -739,14 +790,31 @@ export function deterministicLocalEntities(pages: BrowserObservedPage[], spec: S
     const isDirectory = isDirectoryHost(page.url);
     const lines = page.text.split(/\n+/).map((l) => l.trim()).filter(Boolean);
 
-    // Mode 1 — first-party single-entity page: a non-directory host whose
+    // A LIST page announces itself by repeated "name + description" blocks
+    // (each description re-opening with the name above it) — regardless of
+    // whether the host is a known directory. On such a page the entries, not
+    // the host, are the entities.
+    const pairCount = (() => {
+      let n = 0;
+      for (let i = 0; i < lines.length - 1; i++) {
+        const next = lines[i + 1] ?? "";
+        if (next.toLowerCase().startsWith(lines[i]!.toLowerCase()) && next.length > lines[i]!.length) n++;
+      }
+      return n;
+    })();
+    const isListPage = isDirectory || pairCount >= 2;
+
+    // Mode 1 — first-party single-entity page: a non-list host whose
     // title or text visibly carries the requested trade.
-    if (!isDirectory) {
+    if (!isListPage) {
       const tradeEvidence = hasTrade(page.title) || lines.some((l) => hasTrade(l));
       if (tradeEvidence) {
         const brandFromTitle = (page.title || "").split(/\s*[|\u2013\u2014-]\s*/).map((seg) => seg.trim())
           .filter((seg) => seg.length >= 3 && !categoryTokens.some((t) => seg.toLowerCase().includes(t)));
-        const name = (page.structured?.organizationName ?? brandFromTitle[brandFromTitle.length - 1] ?? host).replace(/\s+/g, " ").trim();
+        const rawName = (page.structured?.organizationName ?? brandFromTitle[brandFromTitle.length - 1] ?? "").replace(/\s+/g, " ").trim();
+        // A bare hostname is not a brand: without a title-derived name the
+        // page is a list fragment, not a first-party entity page.
+        const name = rawName && !/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(rawName) ? rawName : "";
         const nameKey = name.toLowerCase();
         if (name && nameKey.length >= 3 && !NAV.test(name) && !seenNames.has(nameKey)
             && lines.filter((l) => isNameLike(l) && hasTrade(l) && l.split(/\s+/).length <= 5).length < 2) {
@@ -770,22 +838,66 @@ export function deterministicLocalEntities(pages: BrowserObservedPage[], spec: S
       }
     }
 
+    // Mode 2.5 — single-line entity sentences: "Acme is a SaaS company based
+    // in Toronto, Canada." One line = one entity with its description inline.
+    for (const line of lines) {
+      if (line.split(/\s+/).length > 16) continue;
+      const sentence = /^([A-Z][\p{L}0-9&.'-]*(?:[ \t]+[A-Z][\p{L}0-9&.'-]*){0,3})\s+is a\s/u.exec(line);
+      if (!sentence) continue;
+      const name = sentence[1].trim();
+      const nameKey = name.toLowerCase();
+      if (!name || nameKey.length < 3 || seenNames.has(nameKey)) continue;
+      if (NAV_PHRASES.test(name) || NAV.test(name)) continue;
+      if (titleTokenOverlap(page.title, name)) continue;
+      if (!hasTrade(line) && !hasTrade(page.title) && !isListPage) continue;
+      const fields: BrowserExtractedEntity["fields"] = { category: { value: category, quote: line.slice(0, 200) } };
+      const locIn = /\bin ([A-Z][\p{L}'-]*(?:[ \t]+[A-Z][\p{L}'-]*){0,2})/u.exec(line);
+      if (locIn) fields.location = { value: locIn[1].split(",")[0].trim(), quote: line.slice(0, 200) };
+      const phoneMatch = /\+?\d[\d ().-]{7,}\d/.exec(line);
+      const emailMatch = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i.exec(line);
+      if (phoneMatch) fields.phone = { value: phoneMatch[0], quote: line.slice(0, 200) };
+      if (emailMatch) fields.email = { value: emailMatch[0], quote: line.slice(0, 200) };
+      out.push({ page: pageIndex, kind: spec.entity === "company" ? "company" : "business", name, identityQuote: line.slice(0, 200), fields });
+      seenNames.add(nameKey);
+      if (out.length >= 10) return out;
+    }
+
     // Mode 2 — list/directory blocks: repeated name-like lines with trade or
     // contact context in the adjacent line. The directory is never the entity.
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       if (!isNameLike(line)) continue;
+      if (NAV_PHRASES.test(line)) continue;
       const nameKey = line.toLowerCase();
       if (seenNames.has(nameKey)) continue;
-      if (categoryTokens.some((t) => nameKey.includes(t)) && line.split(/\s+/).length <= 3 && !isDirectory) continue;
-      const nextLine = lines[i + 1] ?? "";
+      if (categoryTokens.some((t) => nameKey.includes(t)) && line.split(/\s+/).length <= 3 && !isListPage) continue;
+      let nextLine = lines[i + 1] ?? "";
       if (line.split(/\s+/).length > 5) continue;
-      if (nextLine.split(/\s+/).length < line.split(/\s+/).length) continue;
+      // A descriptive SENTENCE that opens with the name is the listing's own
+      // detail ("Acme Cloud is a Toronto SaaS platform ...") — pair it even
+      // though it is longer than the name line.
+      const descriptive =
+        nextLine.toLowerCase().startsWith(line.toLowerCase()) && nextLine.split(/\s+/).length > line.split(/\s+/).length;
+      if (descriptive) {
+        // Swallow the whole sentence so its words cannot become the next name.
+        let j = i + 1;
+        while (j + 1 < lines.length && lines[j + 1] && !/^[A-Z0-9]/.test(lines[j + 1]!)) j++;
+        nextLine = lines.slice(i + 1, j + 1).join(" ");
+        i = j;
+      } else if (nextLine.split(/\s+/).length < line.split(/\s+/).length) {
+        continue;
+      }
       const block = `${line} ${nextLine}`;
+      // "X is a ... category" marks a taxonomy entry, not an entity.
+      if (/\bis a\b[^.]*\bcategory\b/i.test(nextLine)) continue;
+      if (NAV_PHRASES.test(block)) continue;
+      // A heading that mostly restates the page title is the directory's own
+      // brand, never a listing.
+      if (titleTokenOverlap(page.title, line)) continue;
       const tradeHere = hasTrade(block) || hasTrade(page.title);
       const contactHere = /\+?\d[\d ().-]{7,}\d/.test(block) || /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i.test(block);
-      if (!tradeHere && !contactHere && !isDirectory) continue;
-      if (!hasTrade(block) && !hasTrade(page.title) && !isDirectory) continue;
+      if (!tradeHere && !contactHere && !isListPage) continue;
+      if (!hasTrade(block) && !hasTrade(page.title) && !isListPage) continue;
       const fields: BrowserExtractedEntity["fields"] = { category: { value: category, quote: block.trim().slice(0, 200) } };
       const phoneMatch = /\+?\d[\d ().-]{7,}\d/.exec(block);
       const emailMatch = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i.exec(block);
