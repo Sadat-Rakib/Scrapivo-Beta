@@ -1246,7 +1246,7 @@ export async function runSpecSearchCore(
     totalAvailable: null as number | null,
   };
   const { frameToSearchSpec, applyClarificationToFrame, isActionableFrame, understandFrame, lightSpecFromFrame } = await import("@/lib/understanding/to-search-spec");
-  const { decideStage1 } = await import("@/lib/search/spec-clarification");
+  const { decideStage1 } = await import("@/lib/stage1/stage1-adapter");
   const { buildSpec, computeMissing } = await import("@/lib/search/search-spec");
   const { initState } = await import("@/lib/understanding/clarify-state");
   // World city gazetteer for understanding (real cities, one-edit typos).
@@ -3168,18 +3168,6 @@ export const getScrapyBrowserState = createServerFn({ method: "POST" })
     };
   });
 
-export const getSpecFlag = createServerFn({ method: "GET" })
-  .middleware([requireMyAuth])
-  .handler(
-    async (): Promise<{
-      enabled: boolean;
-      stamp: { hash: string; builtAt: string };
-    }> => {
-      const { useSpecPath } = await import("@/lib/search/flag");
-      const { buildStamp } = await import("@/lib/build-stamp.server");
-      return { enabled: useSpecPath(), stamp: buildStamp() };
-    },
-  );
 
 export const runSpecSearch = createServerFn({ method: "POST" })
   .middleware([requireMyAuth])
@@ -3192,7 +3180,7 @@ export const runSpecSearch = createServerFn({ method: "POST" })
         answers: z.record(z.string(), z.string()).optional().default({}),
         prior_frame: z.unknown().optional(),
         /** Registry ids only — the client never sends storage paths. */
-        attachments: z.array(z.string().uuid()).max(6).optional().default([]),
+        attachments: z.array(z.object({ attachmentId: z.string().uuid() })).max(6).optional().default([]),
         force: z.boolean().optional().default(false),
         search_run_id: z.string().max(80).optional(),
         conversation_id: z.string().max(80).optional(),
@@ -3221,7 +3209,7 @@ export const runSpecSearch = createServerFn({ method: "POST" })
         resolvedContext = await resolveInputEnvelope({
           userId: ownerId,
           text: data.query,
-          attachmentIds: data.attachments.map((id) => ({ attachmentId: id })),
+          attachmentIds: data.attachments,
         });
       } catch (e) {
         console.warn("[stage1] input resolver failed; proceeding on text alone", e);

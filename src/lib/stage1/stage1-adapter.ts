@@ -1,5 +1,5 @@
-import type { SearchSpec } from "./search-spec";
-import { entityQuestionsForSpec, type ClarifyQuestion, type ClarifyQuestionId } from "./clarifier";
+import type { SearchSpec } from "@/lib/search/search-spec";
+import { entityQuestionsForSpec, type ClarifyQuestion, type ClarifyQuestionId } from "@/lib/search/clarifier";
 import { initState, resolveStage, type ClarificationState } from "@/lib/understanding/clarify-state";
 import type { ResolvedInputContext } from "@/lib/understanding/input-envelope";
 import type { UnderstandingFrame } from "@/lib/understanding/frame";
@@ -66,11 +66,7 @@ export function decideStage1(
   };
 }
 
-/**
- * Compat shim over the adapter (removed at the P5 cutover). Frame-backed
- * specs delegate to resolveStage; spec-less specs have no Stage-1 decision
- * here — their optional handling lives in the runSpecSearchCore legacy path.
- */
+/** Compat shim for tests: frame-backed specs delegate to resolveStage. */
 export function decideSpecClarification(spec: SearchSpec, force = false): ClarifyQuestion | null {
   const frame = spec.understanding;
   if (!frame) return null;

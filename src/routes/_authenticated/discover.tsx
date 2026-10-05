@@ -4,10 +4,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { buildProjectQuery } from "@/lib/project-query";
 import { displaySearchLabel, scrapyAckReply, toPlainSearchQuery } from "@/lib/display-query";
-import { runSearch, getRemainingSearches } from "@/lib/search.functions";
-import { runSpecSearch, getSpecFlag, getSearchBrowserProgress } from "@/lib/spec-search.functions";
+import { getRemainingSearches } from "@/lib/search.functions";
+import { runSpecSearch, getSearchBrowserProgress } from "@/lib/spec-search.functions";
 import { aiChat } from "@/lib/ai-chat.functions";
-import { prepareDynamicQuestions } from "@/lib/search/clarify-ai.functions";
 import { saveLead, listSavedLeads } from "@/lib/leads.functions";
 import { saveTranscript, getTranscript } from "@/lib/transcript.functions";
 import { getIntentStrategy, discoverCandidateIntent } from "@/lib/intent/intent.functions";
@@ -124,7 +123,6 @@ function DiscoverPage() {
   const { userId } = AuthRoute.useRouteContext();
   const routeSearch = Route.useSearch();
   const qc = useQueryClient();
-  const search = useServerFn(runSearch);
   const chat = useServerFn(aiChat);
   const save = useServerFn(saveLead);
   const getSaved = useServerFn(listSavedLeads);
@@ -137,11 +135,9 @@ function DiscoverPage() {
   const getProfile = useServerFn(getMyProfile);
   const patchProfile = useServerFn(updateMyProfile);
   const getUsage = useServerFn(getRemainingSearches);
-  const askDynamicQuestions = useServerFn(prepareDynamicQuestions);
   const runSpec = useServerFn(runSpecSearch);
   const cancelRun = useServerFn(cancelSearchRun);
   const getBrowserProgress = useServerFn(getSearchBrowserProgress);
-  const readSpecFlag = useServerFn(getSpecFlag);
   const getStrategy = useServerFn(getIntentStrategy);
   const discoverIntent = useServerFn(discoverCandidateIntent);
   // Step 4: verified intent per row-key + run progress. Entries are scoped
@@ -177,9 +173,6 @@ function DiscoverPage() {
   // Build stamp (freshness proof): console only. The footer tag was removed
   // per UX review; the stamp still logs once for debugging which code serves.
   useEffect(() => {
-    readSpecFlag()
-      .then((r) => console.info(`[build] ${r.stamp.hash} (${r.stamp.builtAt ?? "unknown time"})`))
-      .catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -584,11 +577,8 @@ function DiscoverPage() {
   // Thin-ask (refinement offer on a completed zero run) is offered at most once
   // per turn — re-offering it on every identical zero is the C3 dead loop.
   const thinAskedTurnsRef = useRef<Set<string>>(new Set());
-  // Spec-first cutover (SPEC_SEARCH_ENABLED): when true the turn is served by
-  // the canonical spec path; legacy flow below runs untouched otherwise.
-  const specModeRef = useRef(false);
   // Spec loading state: runSpec is a plain server-fn await (not a mutation),
-  // so runSearchMut.isPending never fires on this path. Without this the UI
+  // so false never fires on this path. Without this the UI
   // looks dead during the S3 scan then pops results "out of blue".
   const [specPending, setSpecPending] = useState(false);
   // Current-run in-flight flag: set SYNCHRONOUSLY at submit (and when a
@@ -1322,114 +1312,6 @@ function DiscoverPage() {
   const shownCompanies = companies;
   const shownPeople = people;
 
-  const runSearchMut = useMutation({
-    mutationFn: async (
-      vars: string | { query: string; clarify?: ClarifyAnswers | null; turnId?: string },
-    ) => {
-      const q = typeof vars === "string" ? vars : vars.query;
-      const clarify = typeof vars === "string" ? clarifyAnswers : (vars.clarify ?? clarifyAnswers);
-      const plain = toPlainSearchQuery(q) || q.trim();
-      return search({
-        data: {
-          query: plain,
-          context: searchContext,
-          ...(clarify ? { clarify } : {}),
-          tier,
-          thinker,
-        },
-      });
-    },
-    onSuccess: (res, vars) => {
-      if (res.error === "limit") {
-        toast.error(res.message ?? "Search limit reached");
-        return;
-      }
-      const q = typeof vars === "string" ? vars : vars.query;
-      // Empty [] is truthy for ?? — fall back to ranked leads when posts is empty
-      // so Discover never paints a blank wall while Companies/People have rows.
-      const rawPosts = (res.posts as Lead[] | undefined) ?? [];
-      const rawLeads = (res.leads as Lead[] | undefined) ?? [];
-      const posts = rawPosts.length > 0 ? rawPosts : rawLeads;
-      const cos = (res.companies as CompanyRow[]) ?? [];
-      const ppl = (res.people as PersonRow[]) ?? [];
-      const locs = (res.local as LocalBusinessRow[] | undefined) ?? [];
-      // Turn-owned results (Phase 6): the owning turn keeps its output forever,
-      // so earlier inputs never lose their outputs when new searches append.
-      const ownerId =
-        (typeof vars === "string" ? undefined : vars.turnId) ?? pendingTurnIdRef.current;
-      if (ownerId) {
-        const frozen: TurnResults = { leads: posts, companies: cos, people: ppl, local: locs };
-        setTurns((prev) => prev.map((t) => (t.id === ownerId ? { ...t, results: frozen } : t)));
-      }
-      setLeads(posts);
-      setCompanies(cos);
-      setPeople(ppl);
-      setLocalRows(locs);
-      // Intent follows selling offers only (offer rides in clarify answers).
-      {
-        const vClarify = typeof vars === "string" ? null : vars.clarify;
-        const other = (vClarify?.other ?? clarifyAnswers?.other ?? {}) as Record<string, unknown>;
-        const offer =
-          (typeof vClarify?.entity_offer === "string" && vClarify.entity_offer.trim()) ||
-          (typeof other.entity_offer === "string" && other.entity_offer.trim()) ||
-          (typeof clarifyAnswers?.entity_offer === "string" &&
-            clarifyAnswers.entity_offer.trim()) ||
-          "";
-        if (offer && (ppl.length || cos.length || locs.length)) {
-          const entity = ppl.length ? "person" : cos.length ? "company" : "business";
-          void runIntentEnrichment(offer, entity, { people: ppl, companies: cos, local: locs });
-        }
-      }
-      // Seed known contacts so Show contact isn't needed to see them. Honest
-      // provenance only — no "in database" framing, just the state of the
-      // email/phone we already hold.
-      const seeded: Record<string, ResolvedContactInfo> = {};
-      for (const c of cos) {
-        const email = c.inline_contacts?.emails?.[0];
-        const phone = c.inline_contacts?.phones?.[0];
-        if (email || phone) {
-          const fromDb = (c.platforms ?? []).includes("Investors");
-          seeded[`co:${c.key}`] = {
-            email,
-            phone,
-            note: fromDb ? "Verified contact" : "Published in post",
-            status: "ok",
-          };
-        }
-      }
-      for (const p of ppl) {
-        const email = p.inline_contacts?.emails?.[0];
-        const phone = p.inline_contacts?.phones?.[0];
-        if (email || phone) {
-          const fromDb = p.lead.source === "investors";
-          seeded[p.key] = {
-            email,
-            phone,
-            note: fromDb ? "Verified contact" : "Published in post",
-            status: "ok",
-          };
-        }
-      }
-      // MERGE (not replace): frozen turns keep rendering their seeded
-      // contacts; the map is global and keyed by row key.
-      setContactByKey((m) => ({ ...m, ...seeded }));
-      setSelected(null);
-      setSelectedEntity(null);
-      setActiveQuery(q);
-      setSuggestions(res.suggestions ?? []);
-      setQueryType(res.queryType ?? null);
-      setRefinement((res as { refinement?: string }).refinement ?? "");
-      qc.invalidateQueries({ queryKey: ["usage"] });
-      qc.invalidateQueries({ queryKey: ["history"] });
-      const serverMessage = (res as { message?: string | null }).message;
-      if (serverMessage) {
-        toast.info(serverMessage);
-      } else if (!posts.length && !cos.length && !ppl.length) {
-        toast.info("No buyer-signal posts found. Try a different angle.");
-      }
-    },
-    onError: (e: Error) => toast.error(friendlyErrorText(e)),
-  });
 
   const chatMut = useMutation({
     mutationFn: async (messages: ChatTurn[]) => chat({ data: { messages } }),
@@ -1485,7 +1367,7 @@ function DiscoverPage() {
   // (own crawler + public registries), sequential so the server isn't hammered.
   const autoResolvedFor = useRef<string | null>(null);
   useEffect(() => {
-    if (!activeQuery || runSearchMut.isPending || specPending) return;
+    if (!activeQuery || false || specPending) return;
     if (autoResolvedFor.current === activeQuery) return;
     if (!companies.length && !people.length) return;
     autoResolvedFor.current = activeQuery;
@@ -1509,7 +1391,7 @@ function DiscoverPage() {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeQuery, companies, people, runSearchMut.isPending, specPending]);
+  }, [activeQuery, companies, people, false, specPending]);
 
   /**
    * Wipe the previous answer before starting a new one.
@@ -1616,7 +1498,7 @@ function DiscoverPage() {
   // Unmount flush covers fast-close (<1500ms) loss. Failures stay silent:
   // transcript is best-effort; in-memory truth stays intact.
   useEffect(() => {
-    if (!turns.length || runSearchMut.isPending || specPending) return;
+    if (!turns.length || false || specPending) return;
     const cid = getConversationId();
     const snapshot = turns;
     let flushed = false;
@@ -1635,7 +1517,7 @@ function DiscoverPage() {
       if (unmountedRef.current) flush();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [turns, runSearchMut.isPending, specPending]);
+  }, [turns, false, specPending]);
 
   const unmountedRef = useRef(false);
   useEffect(
@@ -1671,7 +1553,7 @@ function DiscoverPage() {
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTo({ top: el.scrollHeight });
-  }, [turns.length, clarifyQs.length, runSearchMut.isPending, specPending]);
+  }, [turns.length, clarifyQs.length, false, specPending]);
 
   const beginSearch = async (q: string) => {
     const trimmed = q.trim();
@@ -1680,7 +1562,7 @@ function DiscoverPage() {
     const pendingQuestion = clarifyQs[0];
     const startsNewRequest = /^(?:find|search|show|look for|looking for)\b/i.test(trimmed) ||
       (/^research\b/i.test(trimmed) && /\b(?:in|for|about|businesses|companies|people|jobs|investors)\b/i.test(trimmed));
-      if (specModeRef.current && pendingQuery && pendingId && pendingQuestion && !startsNewRequest) {
+      if (pendingQuery && pendingId && pendingQuestion && !startsNewRequest) {
         const field = ({
           entity_location: "location",
           entity_category: "category",
@@ -1735,111 +1617,14 @@ function DiscoverPage() {
     // hunting while the old sales cards were still on screen.
     setClarifyAnswers(null);
     setDefaultSummary("");
-    // Spec-first cutover (SPEC_SEARCH_ENABLED=true): canonical DB-first path.
-    // Legacy flow below runs byte-identical when the flag is off.
-    try {
-      const flag = await readSpecFlag();
-      if (pendingTurnIdRef.current !== newTurnId) return;
-      if (flag.enabled) {
-        specModeRef.current = true;
-        try {
-          await runSpecBranch(trimmed, newTurnId, {});
-        } catch (e) {
-          toast.error(friendlyErrorText(e as Error, "Spec search failed"));
-        }
-        return;
-      }
-    } catch {
-      // Flag unreadable → fall through to legacy path (safe default).
-    }
+    // Stage 1: the canonical path is the ONLY user-input path (legacy
+    // clarify stack removed at the P5 cutover).
     if (pendingTurnIdRef.current !== newTurnId) return;
-    specModeRef.current = false;
     try {
-      const plain = toPlainSearchQuery(trimmed) || trimmed;
-      const [{ classifyQuery }, clarifier, { tokenizeInput }, { resolveSearchVertical }] =
-        await Promise.all([
-          import("@/lib/search/query-classifier"),
-          import("@/lib/search/clarifier"),
-          import("@/lib/search/tokenize-input"),
-          import("@/lib/search/vertical"),
-        ]);
-      // Canonical vertical from the SAME resolver the server routes with —
-      // narration and pipeline can never disagree ("investor" category must
-      // win even when the hunt regex misses filler like "find ME investors").
-      setActiveVertical(resolveSearchVertical(trimmed));
-      const tokens = tokenizeInput(plain);
-      setPlanTokens(tokens);
-      const classified = classifyQuery(plain);
-      if (clarifier.shouldClarify(classified)) {
-        // Dynamic AI questions first (per-input, memory-aware), hardcoded as fallback.
-        // Server-fn call — never import `.server` modules from this client
-        // component (their node builtins break the browser bundle / Vercel build).
-        // Deterministic tokens travel along as un-overridable facts.
-        let questions: ClarifyQuestion[] = [];
-        let specReady = false;
-        try {
-          const res = await askDynamicQuestions({
-            data: {
-              query: plain,
-              tokens,
-              thinker,
-              memory: {
-                service: searchContext?.service ?? null,
-                niche: searchContext?.niche ?? null,
-                location: searchContext?.location ?? null,
-                audience: searchContext?.audience ?? null,
-                goal: searchContext?.goal ?? null,
-                experience_level: searchContext?.experience_level ?? null,
-                work_style: searchContext?.work_style ?? null,
-                website: searchContext?.website ?? null,
-                about_doc: searchContext?.about_doc?.slice(0, 1200) ?? null,
-              },
-            },
-          });
-          questions = (res.questions ?? []) as ClarifyQuestion[];
-          // Spec-complete verdict from the server wins over EVERYTHING below:
-          // a ready spec searches instantly with zero questions (locked).
-          specReady =
-            (res as { specStatus?: string }).specStatus === "ready_to_search" &&
-            ["person", "company", "business"].includes(
-              (res as { specEntity?: string }).specEntity ?? "",
-            );
-          if (specReady) {
-            questions = [];
-          }
-        } catch (e) {
-          console.warn("[discover] dynamic questions failed, using fallback", e);
-        }
-        // Legacy fallback ONLY when the spec did not already decide. A ready
-        // spec must never be re-questioned by seller defaults (the bug where
-        // "founders" got "What do you do?").
-        if (!questions.length && !specReady) {
-          questions = clarifier.buildClarifyingQuestions(classified, {
-            hasLocation: !!classified.location || !!searchContext?.location,
-            known: {
-              stage: tokens.stage,
-              sector: tokens.sector,
-              geo: tokens.geo ?? searchContext?.location ?? null,
-            },
-            niche: searchContext?.niche ?? null,
-          }) as ClarifyQuestion[];
-        }
-        // Empty question list = nothing left to ask (all dims inferred).
-        if (questions.length) {
-          setPendingQuery(trimmed);
-          setPlanDone(false);
-          setClarifyQs(questions as ClarifyQuestion[]);
-          setDefaultSummary(clarifier.applyClarifyAnswers(classified, {}).summary ?? "");
-          setActiveQuery(trimmed);
-          return;
-        }
-      }
-    } catch (err) {
-      // Still never block the search — but say so, rather than vanishing.
-      console.error("[discover] clarifier failed; searching without it", err);
+      await runSpecBranch(trimmed, newTurnId, {});
+    } catch (e) {
+      toast.error(friendlyErrorText(e as Error, "Search failed"));
     }
-    setActiveQuery(trimmed);
-    runSearchMut.mutate({ query: trimmed, turnId: newTurnId });
   };
 
   const onSubmit = () => {
@@ -1871,12 +1656,12 @@ function DiscoverPage() {
     chatMut.mutate(next);
   };
 
-  const pending = runSearchMut.isPending || chatMut.isPending || specPending;
+  const pending = false || chatMut.isPending || specPending;
   const hasResults = leads.length > 0 || localRows.length > 0 || activeQuery !== null;
   // A submitted turn starts the conversation instantly: the echoed user
   // bubble renders on the next frame, never held until the clarifier
   // round-trip finishes (ChatGPT-style echo).
-  const idle = !hasResults && !runSearchMut.isPending && !specPending && turns.length === 0;
+  const idle = !hasResults && !false && !specPending && turns.length === 0;
   const showHero = idle;
 
   /** One full result feed (People → Companies → Posts → Local) — rendered for
@@ -2306,7 +2091,7 @@ function DiscoverPage() {
                 </div>
               )}
               {clarifyQs.length === 0 &&
-                !runSearchMut.isPending &&
+                !false &&
                 !specPending &&
                 !turns[turns.length - 1]?.results &&
                 renderResultSections(
@@ -2323,7 +2108,7 @@ function DiscoverPage() {
                   header reads correctly), which made this empty-state render
                   UNDER the questions — telling the user nothing was found before
                   the search had even run. No results box while clarifying. */}
-              {!runSearchMut.isPending &&
+              {!false &&
                 !specPending &&
                 !runInFlight &&
                 clarifyQs.length === 0 &&
@@ -2389,7 +2174,7 @@ function DiscoverPage() {
             {/* Phase B: unified thinking sequence (replaces SearchingPlan +
                 SearchingSteps). One composer-attached narration derived from
                 live query/tokens/entity — never fixed ladders. */}
-            {(clarifyQs.length > 0 || runSearchMut.isPending || specPending) && (
+            {(clarifyQs.length > 0 || false || specPending) && (
               <div className="mb-2 rounded-2xl border border-border bg-card p-4 space-y-1.5">
                 <ThinkingSteps
                   inputKey={pendingQuery ?? activeQuery ?? "idle"}
@@ -2402,7 +2187,7 @@ function DiscoverPage() {
                     // uses the live tokenizer slots only; the confirmed
                     // entity label appears once the turn settles.
                     entityLabel:
-                      runSearchMut.isPending || specPending
+                      false || specPending
                         ? null
                         : specEntity === "business"
                           ? "businesses"
@@ -2414,7 +2199,7 @@ function DiscoverPage() {
                                 ? "local businesses"
                                 : (activeVertical ?? null),
                   }}
-                  pending={runSearchMut.isPending || specPending}
+                  pending={false || specPending}
                   compact={planDone}
                   onDone={() => setPlanDone(true)}
                 />
@@ -2484,7 +2269,7 @@ function DiscoverPage() {
                 and controllable (it renders nothing when the run used no
                 browser). */}
             <ScrapyBrowser runId={browserProgressRun} />
-            {!specPending && !runSearchMut.isPending && streamedMissing.length > 0 && (
+            {!specPending && !false && streamedMissing.length > 0 && (
               <StreamedReconciliationNote items={streamedMissing} />
             )}
             {/* Clarifying questions as an attached dropdown above the input —
@@ -2492,7 +2277,7 @@ function DiscoverPage() {
                 BUG-09 (PRD §30–31): the open body is self-bounded (max-h + its
                 own scroll) so a long question set can never push the composer
                 off a 1366×768-class footer. */}
-            {(clarifyQs.length > 0 || confirmSummary) && planDone && !runSearchMut.isPending && !specPending && (
+            {(clarifyQs.length > 0 || confirmSummary) && planDone && !false && !specPending && (
               <div className="mb-2 flex flex-col overflow-hidden rounded-2xl border border-primary/25 bg-card shadow-xl">
                 <button
                   type="button"
@@ -2524,7 +2309,7 @@ function DiscoverPage() {
                       questions={clarifyQs}
                       confirmSummary={confirmSummary}
                       refinement={defaultSummary || refinement}
-                      disabled={runSearchMut.isPending || specPending}
+                      disabled={false || specPending}
                       onDismiss={() => {
                         setClarifyQs([]);
                         const q = pendingQuery;
@@ -2540,18 +2325,13 @@ function DiscoverPage() {
                         }
                         setConfirmSummary(null);
                         if (!q) return;
-                        if (specModeRef.current) {
+                        {
                           void runSpecBranch(q, pendingTurnIdRef.current ?? "", {}, true).catch(
                             (e: Error) =>
                               toast.error(friendlyErrorText(e, "Search failed to start")),
                           );
                           return;
                         }
-                        runSearchMut.mutate({
-                          query: q,
-                          clarify: null,
-                          turnId: pendingTurnIdRef.current ?? undefined,
-                        });
                       }}
                       onApply={(answers, opts) => {
                         setClarifyAnswers(answers);
@@ -2561,7 +2341,7 @@ function DiscoverPage() {
                         const q = pendingQuery ?? activeQuery;
                         setPendingQuery(null);
                         if (!q) return;
-                        if (specModeRef.current) {
+                        {
                           // Spec path: answers merge as stated criteria.
                           // Search/Search-with-defaults buttons force the
                           // hunt with stated answers; option picks flow on.
@@ -2581,11 +2361,6 @@ function DiscoverPage() {
                           return;
                         }
                         // Pass clarify into mutate vars — do not rely on setState timing.
-                        runSearchMut.mutate({
-                          query: q,
-                          clarify: answers,
-                          turnId: pendingTurnIdRef.current ?? undefined,
-                        });
                       }}
                     />
                   </div>

@@ -21,20 +21,6 @@ export function useObjectSearchIndex(): boolean {
   return (process.env.USE_OBJECT_SEARCH_INDEX ?? "false").trim().toLowerCase() === "true";
 }
 
-/** Production Discover engine. Default ON: spec-first is the path users hit.
- *  Under vitest, default OFF unless SPEC_SEARCH_ENABLED=true (legacy tests).
- *  Set SPEC_SEARCH_ENABLED=false to force the legacy live fan-out in prod. */
-export function useSpecPath(): boolean {
-  const raw = (process.env.SPEC_SEARCH_ENABLED ?? "").trim();
-  const enabled =
-    raw.length > 0 ? raw.toLowerCase() === "true" : !process.env.VITEST;
-  if (typeof console !== "undefined") {
-    console.info(
-      `[spec-flag] SPEC_SEARCH_ENABLED=${JSON.stringify(raw || "(unset)")} → ${enabled ? "SPEC" : "LEGACY"}`,
-    );
-  }
-  return enabled;
-}
 
 /** Coverage selector (Phase 1.2 / D). Production default ON; under vitest
  *  default OFF so unit tests stay on the legacy order unless they opt in.

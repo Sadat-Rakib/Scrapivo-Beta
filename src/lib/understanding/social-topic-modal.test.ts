@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { extractFrameDeterministic } from "./fallback";
 import { validateFrame } from "./validate";
 import { applyClarificationToFrame, frameToSearchSpec } from "./to-search-spec";
-import { decideSpecClarification } from "../search/spec-clarification";
+import { decideSpecClarification } from "@/lib/stage1/stage1-adapter";
 
 const understand = (query: string) =>
   frameToSearchSpec(applyClarificationToFrame(validateFrame(extractFrameDeterministic(query)).frame, {}));

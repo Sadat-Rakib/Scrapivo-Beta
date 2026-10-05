@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { decideSpecClarification } from "../spec-clarification";
+import { decideSpecClarification } from "../stage1-adapter";
 import { extractFrameDeterministic } from "../../understanding/fallback";
 import { applyClarificationToFrame, frameToSearchSpec } from "../../understanding/to-search-spec";
 import { validateFrame } from "../../understanding/validate";
