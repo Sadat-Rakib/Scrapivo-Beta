@@ -78,6 +78,14 @@ test("stage2 acceptance — 10 queries", async ({ page }) => {
       const force = page.getByRole("button", { name: /Search with defaults|Confirm & search/ }).first();
       if (await force.isVisible().catch(() => false)) {
         await force.click();
+        // The clarify panel STAYS RENDERED until the forced response arrives;
+        // wait for it to close before settle-watching, or the stale card
+        // reads as a new ask and the next query cancels the forced run.
+        await page
+          .getByText(/Narrow this down|Here is what I understood/)
+          .first()
+          .waitFor({ state: "hidden", timeout: 120_000 })
+          .catch(() => {});
         await runQuery(page, q, 660_000);
       }
     }
