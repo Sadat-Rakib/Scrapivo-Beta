@@ -295,8 +295,14 @@ export function normalizeSearchFrame(input: UnderstandingFrame): UnderstandingFr
     const asksContactProof = frame.required_fields.some((f) =>
       /^(?:phone|website|site|contact|email)$/i.test(valueOf(f)),
     );
-    const recruiting = ["hiring", "seeking_work", "partnered_with"].includes(frame.relation.type.value) ||
-      /\b(?:hire|hiring|recruit|job|jobs|vacanc)/i.test(frame.input.raw);
+    // "sites" in the ask means company websites — a provider hunt even when
+    // the wording reads like hiring ("need 7 hvac guys ... sites + nums").
+    const siteAsk = /\b(?:sites?|websites?)\b/i.test(frame.input.raw) ||
+      frame.required_fields.some((f) => /^(?:website|site)$/i.test(valueOf(f)));
+    const recruiting =
+      (["hiring", "seeking_work", "partnered_with"].includes(frame.relation.type.value) ||
+        /\b(?:hire|hiring|recruit|vacanc)/i.test(frame.input.raw)) &&
+      !siteAsk;
     if (
       frame.target.entity_type.value === "person" &&
       families.length > 0 &&
