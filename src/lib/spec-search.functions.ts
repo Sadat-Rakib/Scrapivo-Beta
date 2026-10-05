@@ -2366,7 +2366,24 @@ export async function runSpecSearchCore(
         // rowSatisfiesSpec runs after enrichment, on the final split. The
         // failing dimension is booked so rejection buckets stay explorable.
         const liveSanitized: SpecRow[] = [];
-        for (const r of live.rows.map((row) => sanitizeSpecRow(row, spec))) {
+        // Acquisition-provenance stamping: every live discovery query is
+        // built from the spec's location/category, so a row the source
+        // returned for that query carries that context as evidence. Unstamped
+        // dimensions stay unknown (researchable) — never fabricated.
+        const acquireLocation = fieldOf(spec, "location");
+        const acquireCategory = fieldOf(spec, "category") ?? fieldOf(spec, "industry");
+        for (const r of live.rows.map((row) => {
+          const row2 = sanitizeSpecRow(row, spec);
+          if (!row2.location && acquireLocation) {
+            row2.location = acquireLocation;
+            row2.detail = `${row2.detail ?? ""} [acquired via location-anchored search: ${acquireLocation}]`.trim();
+          }
+          if (!row2.category && !row2.industry && acquireCategory) {
+            row2.category = acquireCategory;
+            row2.detail = `${row2.detail ?? ""} [acquired via category-anchored search: ${acquireCategory}]`.trim();
+          }
+          return row2;
+        })) {
           const rejectReason = rowSatisfyRejectReason(spec, r);
           if (!rejectReason) liveSanitized.push(r);
           // A merge can surface a contradicting fact after a lead streamed.
