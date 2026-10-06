@@ -207,10 +207,46 @@ start commit on a baseline worktree). Typecheck 43 = baseline. Build green.
 Stage-1 suites 283/283. Browser suites 38/38 (two pre-existing failures
 fixed).
 
+## FINAL SESSION DIAGNOSIS (investor probe traces, per-entity reject evidence)
+
+The investor chain was probed end-to-end with per-entity reject traces.
+Findings:
+1. SearXNG result quality swings per query: fund-list pages ("Top 77 Venture
+   Capital Firms in Canada") appear for "firms/funds/portfolio" queries;
+   podcast/news pages appear for generic "investors" queries — sometimes
+   within the same sweep.
+2. The LLM extractor (free ladder) swings between 10 entities extracted and
+   an empty `{"entities":[]}` response (15 chars) for the SAME query — free
+   provider rate limiting. The extraction breaker (60s cooldown) then falls
+   to the deterministic investor fallback.
+3. The normalization gates WORK: podcast rows ("LATEST EPISODES", "Listen",
+   "Thunder Bay") die ENTITY_TYPE_MISMATCH/MISSING_IDENTITY; nav garbage dies
+   on the NAV_PHRASES blocklist. No garbage reaches delivery.
+4. The delivery-path hang class is CLOSED: both unbounded dynamic imports in
+   the delivery path are bounded (thin-ask 15s, persist-live 15s); the
+   watchdog's past-budget logging is by-design diagnostics with a 30-min
+   self-expiry, not a run hang.
+
+## INVESTOR CHAIN STATE
+
+Wired and verified: fund-list query families (2-3-term list queries return
+24-56 SearXNG results; 5-6-term ANDed queries return 0), deterministic
+investor fallback (fund firms extracted from list pages anchored on
+sector/stage), 120s browser budget, remember-stage fund-shape tolerance
+(company/business-kind rows accepted under investor specs), investor-aware
+extraction prompt guidance. REMAINING GAP: the LLM extractor still returns
+empty entities on fund listicles when the free ladder rate-limits, and
+accepted entities die in remember()/research downstream — needs an
+investor-aware extraction model (paid/keyed) before the investor class
+delivers reliably.
+
 ## PATH TO CLOSURE (environment-dependent)
 
-1. SearXNG engine hygiene: API-keyed engines (Brave/GoogleCSE) or instance
+1. Investor extraction: investor-aware extraction model (paid/keyed) — the
+   discovery chain is proven to reach fund pages and the gates are proven to
+   reject garbage.
+2. SearXNG engine hygiene: API-keyed engines (Brave/GoogleCSE) or instance
    rotation; re-run battery twice.
-2. Investor source routing: wire fund-site/portfolio discovery into
-   live-gapfill (company-registry adapter is currently a phantom).
-3. Optional: SERP-challenge retry-with-backoff inside the run budget.
+3. Jobs discovery quality: skill-token query variants to surface
+   city-accurate postings.
+4. Optional: SERP-challenge retry-with-backoff inside the run budget.
