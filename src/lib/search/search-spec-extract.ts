@@ -54,7 +54,7 @@ export function normCityLookup(raw: string): string {
 const PERSON_NOUNS =
   /\b(founders?|co-?founders?|ceo|ceos|cto|ctos|owners?|people|executives?|professionals?|designers?|developers?|engineers?|writers?|copywriters?|marketers?|managers?|directors?|leads?|recruiters?|principals?|partners?|researchers?|scientists?|agents?)\b/i;
 const BUSINESS_NOUNS =
-  /\b(business(es)?|compan(y|ies)|agenc(y|ies)|brands?|shops?|stores?|restaurants?|contractors?|plumbers?|plumbing|dentists?|dental|electricians?|roofers?|roofing|salons?|gyms?|cafes?|bakeries?|bakery|locksmiths?|landscapers?|hvac|barbers?|hotels?|spas?|mechanics?|lawyers?|attorneys?|florists?|clinics?|d2c|dtc|b2b|b2c|coffee\s+roasters?|roasters?|yoga(\s+studios?)?|studios?|boutiques?|pharmacies?|pharmacy|veterinar(?:y|ies|ians?)|vets?|chiropractors?|optometrists?|accountants?|bookkeepers?|photographers?|caterers?|cleaners?|janitorial|movers?|painters?|welders?|fabricators?|startups?)\b/i;
+  /\b(business(es)?|compan(y|ies)|agenc(y|ies)|brands?|shops?|stores?|restaurants?|contractors?|plumbers?|plumbing|dentists?|dental|electricians?|roofers?|roofing|salons?|gyms?|cafes?|bakeries?|bakery|locksmiths?|landscapers?|hvac|barbers?|hotels?|spas?|mechanics?|lawyers?|attorneys?|florists?|clinics?|d2c|dtc|b2b|b2c|coffee\s+roasters?|roasters?|yoga(\s+studios?)?|studios?|boutiques?|pharmacies?|pharmacy|veterinar(?:y|ies|ians?)|vets?|chiropractors?|optometrists?|accountants?|bookkeepers?|photographers?|caterers?|cleaners?|janitorial|movers?|painters?|welders?|fabricators?|startups?|installers?|solar|forwarders?|freight|logistics|couriers?|hauliers?|truckers?|carriers?|shippers?|transport(?:ation|ers?)|brokers?|builders?|construction|renovators?|gardeners?|surveyors?|inspectors?|appraisers?|restorers?|repairers?|technicians?|tailors?|printers?|suppliers?|manufacturers?|distributors?|wholesalers?|importers?|exporters?|dealers?|butchers?|bakers?|videographers?|exterminators?|opticians?|hospitals?|realtors?|realty|real[ -]?estate)\b/i;
 const ORG_NOUNS =
   /\b(organizations?|organisations?|orgs?|institutes?|firms?|associations?)\b/i;
 const INVESTOR_NOUNS = /\b(investors?|vcs?|angels?|funds?)\b/i;
@@ -538,10 +538,14 @@ export function extractSearchSpec(
     );
   } else if (entity === "business") {
     const catM = text.match(
-      /\b(plumbers?|plumbing|dentists?|dental|electricians?|roofers?|roofing|salons?|gyms?|cafes?|bakeries?|bakery|locksmiths?|landscapers?|hvac|barbers?|hotels?|spas?|mechanics?|lawyers?|attorneys?|florists?|restaurants?|contractors?|clinics?|shops?|stores?|real[ -]?estate|realestate|realtors?|realty|coffee\s+roasters?|roasters?|yoga(\s+studios?)?|boutiques?|pharmacies?|pharmacy|veterinar(?:y|ies|ians?)|chiropractors?|optometrists?|accountants?|photographers?|caterers?|cleaners?|movers?|painters?)\b/i,
+      /\b((?:[a-z][a-z'-]*\s+)?(plumbers?|plumbing|dentists?|dental|electricians?|roofers?|roofing|salons?|gyms?|cafes?|bakeries?|bakery|locksmiths?|landscapers?|hvac|barbers?|hotels?|spas?|mechanics?|lawyers?|attorneys?|florists?|restaurants?|contractors?|clinics?|shops?|stores?|real[ -]?estate|realestate|realtors?|realty|coffee\s+roasters?|roasters?|yoga(\s+studios?)?|boutiques?|pharmacies?|pharmacy|veterinar(?:y|ies|ians?)|chiropractors?|optometrists?|accountants?|photographers?|caterers?|cleaners?|movers?|painters?|installers?|solar|forwarders?|freight|logistics|couriers?|hauliers?|truckers?|carriers?|shippers?|transport(?:ation|ers?)|brokers?|builders?|construction|renovators?|gardeners?|surveyors?|inspectors?|appraisers?|restorers?|repairers?|technicians?|tailors?|printers?|suppliers?|manufacturers?|distributors?|wholesalers?|importers?|exporters?|dealers?|butchers?|bakers?|videographers?|exterminators?|opticians?|hospitals?))\b/i,
     );
     if (catM) {
-      const c = catM[1].toLowerCase().replace(/\s+/g, " ");
+      // Keep the intent qualifier ("wedding photographers", "solar
+      // installers"); drop filler/evaluative words and bare connectors.
+      const qualifier = (catM[1].split(/\s+/).length > 1 ? catM[1].split(/\s+/)[0] : "").toLowerCase();
+      const keep = qualifier && !/^(best|top|cheap|local|good|great|affordable|reliable|licensed|certified|professional|expert|trusted|find|hiring|in|with|and|or|the|a|an|for|of|to|near|me|my|our|your|us|we|here|this|that|these|those|some|any|all|need|needs|want|looking|seeking)$/i.test(qualifier);
+      const c = (keep ? catM[1] : catM[2] || catM[1]).toLowerCase().replace(/\s+/g, " ");
       criteria.push(stated("category", c));
     }
   }

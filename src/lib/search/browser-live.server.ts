@@ -462,6 +462,7 @@ export function browserEntitiesToRows(
     if (typeof entity.name !== "string" || typeof entity.identityQuote !== "string") { reject(entity, "MISSING_IDENTITY", "name_or_quote_missing"); continue; }
     if (entity.name.length < 2 || entity.name.length > 180 || entity.identityQuote.length < 15) { reject(entity, "MISSING_IDENTITY", "name_or_quote_length"); continue; }
     if (entity.kind === "company" && (taxonomyLabel(entity.name) || sourceHeading(entity.name))) { reject(entity, "LIST_PAGE_AS_ENTITY", "taxonomy_or_heading_name"); continue; }
+    if (isFurnitureName(entity.name)) { reject(entity, "LIST_PAGE_AS_ENTITY", "navigation_furniture_name"); continue; }
     if (!contains(page.text, entity.identityQuote)) { reject(entity, "PROVENANCE_INCOMPLETE", "identity_quote_not_on_page"); continue; }
     if (!contains(entity.identityQuote, entity.name)) { reject(entity, "PROVENANCE_INCOMPLETE", "identity_quote_missing_name"); continue; }
     if (spec?.entity === "investor" && (entity.kind === "company" || entity.kind === "business") &&
@@ -628,6 +629,27 @@ const NAV_PHRASES = new RegExp(
   "\b(?:click here|learn more|read more|view more|get (?:in touch|matched|started|a quote|quotes)|contact us|about us|our (?:team|services|work|story)|sign (?:in|up)|log ?in|subscribe|follow us|book (?:now|online)|key insights|related searches|similar (?:searches|services|businesses|profiles)|tag cloud|latest posts|recent posts|vendor spotlights|expert advice|privacy policy|terms of (?:service|use)|all rights reserved|skip to content|back to top|see more|show more|load more|leave a (?:comment|reply)|write a (?:review|comment)|request a (?:quote|callback)|find out more|discover more|get started today)\b",
   "i",
 );
+/**
+ * Generic page-furniture nouns that can never be an extracted identity
+ * ("Personal", "Enterprise", "Solutions"). Model extraction serves them from
+ * nav menus and section headers; one even became a discovery query
+ * (`"Personal" Banja Luka construction company official website`). Rejected
+ * for every entity kind — real businesses are named things, not sections.
+ */
+const FURNITURE_NAMES = new Set([
+  "personal", "business", "enterprise", "corporate", "solutions", "overview",
+  "home", "about", "contact", "services", "team", "gallery", "pricing", "blog",
+  "menu", "shop", "store", "login", "subscribe", "search", "portfolio",
+  "testimonials", "faq", "faqs", "news", "careers", "jobs", "support", "help",
+  "privacy", "terms", "disclaimer", "cookies", "accessibility", "products",
+  "clients", "partners", "projects", "insights", "resources", "industries",
+  "company", "companies", "profile", "account", "settings", "dashboard",
+  "categories", "tags", "archive", "featured", "sponsored", "advertisement",
+  "downloads", "events", "locations", "brands", "stories", "press", "media",
+  "investors", "suppliers", "reviews", "explore", "more", "details",
+]);
+const isFurnitureName = (name: string) =>
+  FURNITURE_NAMES.has(name.trim().toLowerCase().replace(/[^a-z ]/gi, "").trim());
 /** A real person identity is 2-4 title-case words; ALL-CAPS multi-word
  *  strings are headings, not names. */
 function personNameOk(line: string): boolean {
