@@ -35,7 +35,8 @@ const like = (v: unknown, needle: string) =>
 /** Query vocabulary differs from stored category labels. Aliases stay narrow:
  * AI must not become a two-letter substring match against words like retail. */
 export function companyCategoryTerms(wanted: string): string[] {
-  const key = wanted.trim().toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  const industry = wanted.trim().replace(/\s+compan(?:y|ies)$/i, "");
+  const key = industry.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
   const aliases: Record<string, string[]> = {
     saas: ["saas", "software"],
     ai: ["artificial intelligence", "machine learning"],
@@ -44,7 +45,7 @@ export function companyCategoryTerms(wanted: string): string[] {
     fintech: ["fintech", "financial technology"],
     "e commerce": ["e-commerce", "ecommerce"],
   };
-  return aliases[key] ?? [wanted.trim()];
+  return aliases[key] ?? [industry];
 }
 
 export function companyCategoryMatches(value: unknown, wanted: string): boolean {

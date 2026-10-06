@@ -323,11 +323,15 @@ describe("M4 — SPEC_SEARCH runtime", () => {
       identity_confidence: 0.92,
       page_type: "entity_page",
       url: null,
-      phone: "+1-416-555-0199",
-      opportunity: "no_website",
+      phone: null,
+      evidence: [makeEvidence({
+        source_url: "https://www.openstreetmap.org/node/123",
+        source_type: "osm", evidence_type: "identity", supports: "identity",
+        subject: "live-osm:nosite-cafe", excerpt: "NoSite Cafe, cafe in Toronto",
+      })],
     };
     const res = await runSpecSearchCore(
-      "cafes in Toronto without a website",
+      "cafes in Toronto",
       {
         businesses: (async () => ({
           rows: [],
@@ -343,11 +347,32 @@ describe("M4 — SPEC_SEARCH runtime", () => {
         liveGapfill: { osm: async () => [osmRow], web: null, jobs: null },
       },
       25,
-      { mode: "selling", offer: "websites" },
+      { mode: "looking" },
     );
     expect(res.rows.every((r) => r.disposition === "qualified")).toBe(true);
     expect(res.rows.length).toBeGreaterThanOrEqual(1);
     expect(res.rows[0].entity_resolved).toBe(true);
+    // Authority identity proves an ordinary lead, never requested contacts or
+    // website absence. A web mention or another subject cannot use the exemption.
+    for (const [query, candidate] of [
+      ["cafes in Toronto with websites", osmRow],
+      ["cafes in Toronto with phone numbers", osmRow],
+      ["cafes in Toronto without a website", osmRow],
+      ["cafes in Toronto", { ...osmRow, evidence: osmRow.evidence!.map((e) => ({ ...e, source_type: "web" as const })) }],
+      ["cafes in Toronto", { ...osmRow, evidence: osmRow.evidence!.map((e) => ({ ...e, subject: "another-business" })) }],
+    ] as const) {
+      const rejected = await runSpecSearchCore(query, {
+        businesses: (async () => ({ rows: [], meta: { dbHit: false, engine: "none", partitionsRead: [], rowsScanned: 0, rowsReturned: 0 } })) as never,
+        index: null,
+        liveGapfill: { osm: async () => [candidate], web: null, jobs: null },
+      }, 25, { mode: "looking" }, {
+        spec: { ...extractSearchSpec(query),
+          requested_fields: query.includes("with websites") ? ["website"] :
+            query.includes("with phone numbers") ? ["phone"] : [],
+        },
+      });
+      expect(rejected.rows, query).toEqual([]);
+    }
   });
 
   it("live web job-board injection cannot reach delivery", async () => {

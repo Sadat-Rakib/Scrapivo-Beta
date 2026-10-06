@@ -3,6 +3,7 @@
  *  provider honestly skipped, legacy parity with the flag off. */
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { runSpecSearchCore } from "../spec-search.functions";
+import { makeEvidence } from "../search/evidence";
 
 afterEach(() => {
   delete process.env.USE_COVERAGE_SELECTOR;
@@ -36,6 +37,15 @@ const indexFake = (rows: Record<string, unknown>[]) =>
     rows: rows.slice(off ?? 0, (off ?? 0) + (lim ?? rows.length)).map((r, i) => ({
       kind: "business" as const,
       key: (r.key as string) ?? `k${i}`,
+      entity_id: (r.key as string) ?? `k${i}`,
+      entity_resolved: true,
+      page_type: "entity_page" as const,
+      evidence: [makeEvidence({
+        source_url: `db://businesses/${(r.key as string) ?? `k${i}`}`,
+        source_type: "db", evidence_type: "identity", supports: "identity",
+        subject: (r.key as string) ?? `k${i}`,
+        excerpt: [r.title, r.category, r.location].filter(Boolean).join(" · "),
+      })],
       title: (r.title as string) ?? "?",
       detail: (r.detail as string) ?? "",
       category: (r.category as string) ?? null,

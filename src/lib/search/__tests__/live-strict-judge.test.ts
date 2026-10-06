@@ -7,8 +7,10 @@
  * browser and the structured live source are fixtures.
  */
 import { describe, expect, it } from "vitest";
-import { runSpecSearchCore, type SpecRow } from "@/lib/spec-search.functions";
+import { runSpecSearchCore, stampAcquisitionProvenance, type SpecRow } from "@/lib/spec-search.functions";
 import { makeEvidence } from "../evidence";
+import { extractSearchSpec } from "../search-spec-extract";
+import { companyCategoryMatches, companyCategoryTerms } from "@/lib/canonical/companies.server";
 
 const QUERY = "Plumbers in Bristol with websites";
 const none = (async () => ({ rows: [], meta: { dbHit: false, engine: "none", partitionsRead: [], rowsScanned: 0, rowsReturned: 0 } })) as never;
@@ -32,6 +34,20 @@ const lead = (candidate: SpecRow) => ({
 });
 
 describe("live rows face the strict post-research judge", () => {
+  it("keeps discovery query dimensions out of candidate observations", () => {
+    const unknown = { ...row("Just Eat", null, "justeat.test"), location: null, detail: "Food ordering platform" };
+    const observed = stampAcquisitionProvenance(unknown, extractSearchSpec(QUERY));
+    expect(observed.category).toBeNull();
+    expect(observed.location).toBeNull();
+    expect(observed.detail).toBe("Food ordering platform");
+  });
+
+  it("matches company industry nouns without widening to unrelated industries", () => {
+    expect(companyCategoryMatches("construction", "construction company")).toBe(true);
+    expect(companyCategoryMatches("construction", "construction companies")).toBe(true);
+    expect(companyCategoryMatches("retail", "construction company")).toBe(false);
+    expect(companyCategoryTerms("company")).toEqual(["company"]);
+  });
   it("never streams or delivers a business whose category is unknown or contradicting, and explains the drop", async () => {
     const unknown = row("Just Eat", null, "justeat.test");
     const contradicting = row("Matthew Clark Wholesale", "company", "matthewclark.test");

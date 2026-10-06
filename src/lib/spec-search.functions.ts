@@ -198,25 +198,11 @@ export function stampSpecOpportunity(row: SpecRow, spec?: SearchSpec): SpecRow {
 }
 
 /**
- * Acquisition-provenance stamping: every live discovery query is built from
- * the spec's location/category, so a row the source returned for that query
- * carries that context as evidence. Unstamped dimensions stay unknown
- * (researchable) — never fabricated. Applies to FIRST-round AND widen-round
- * live rows alike.
+ * Normalize live rows without turning the discovery query into observations.
+ * Missing category/location remain unknown until subject research proves them.
  */
 export function stampAcquisitionProvenance(row: SpecRow, spec: SearchSpec): SpecRow {
-  const row2 = sanitizeSpecRow(row, spec);
-  const acquireLocation = fieldOf(spec, "location");
-  const acquireCategory = fieldOf(spec, "category") ?? fieldOf(spec, "industry");
-  if (!row2.location && acquireLocation) {
-    row2.location = acquireLocation;
-    row2.detail = `${row2.detail ?? ""} [acquired via location-anchored search: ${acquireLocation}]`.trim();
-  }
-  if (!row2.category && !row2.industry && acquireCategory) {
-    row2.category = acquireCategory;
-    row2.detail = `${row2.detail ?? ""} [acquired via category-anchored search: ${acquireCategory}]`.trim();
-  }
-  return row2;
+  return sanitizeSpecRow(row, spec);
 }
 
 /** Apply mojibake repair to all user-visible string fields. Never invents. */
@@ -840,7 +826,7 @@ export interface SpecSearchResult {
     reason: "NO_DATA" | "NO_PARTITION" | "NO_INDEX_COVERAGE" | "NO_LOCATION_ROUTE" |
       "NO_CATEGORY_MATCH" | "NO_ROLE_MATCH" | "FILTERED_BY_SPEC" | "INCOMPLETE" |
       "FAILED_ENRICHMENT" | "FAILED_VERIFICATION" | "FAILED_QUALIFICATION" | "TIMEOUT" |
-      "SOURCE_UNAVAILABLE" | "RESULTS";
+      "SOURCE_UNAVAILABLE" | "RESULTS" | "CANCELLED";
   };
 }
 
@@ -1197,6 +1183,8 @@ export async function runSpecSearchCore(
     resolvedContext?: import("@/lib/understanding/input-envelope").ResolvedInputContext | null;
     /** Internal OR-location branch; prevents recursive fanout. */
     locationBranch?: boolean;
+    /** Root run clock shared by internal OR-location branches. */
+    runStartedAt?: number;
     /** Data-asset pass: engine-driven widening + candidate dedupe for job modes. */
     jobContext?: {
       poolTargetOverride?: number;
@@ -1213,7 +1201,9 @@ export async function runSpecSearchCore(
     turn_id: opts.turn_id,
     request_id: opts.request_id,
   });
-  const runStartedAt = Date.now();
+  // Location branches belong to one user-visible run. Carry this root clock
+  // through recursive branches so widening uses remaining shared budget.
+  const runStartedAt = opts.runStartedAt ?? Date.now();
   // Run watchdog stage tracking (PRD V2 Phase 3 / P1-A): the stage name is
   // what the watchdog reports when the run overruns its budget, so a hung
   // await names itself instead of vanishing into "not settled".
@@ -1252,6 +1242,10 @@ export async function runSpecSearchCore(
     cancelled = false,
     searchRan = true,
   ): SpecSearchResult => {
+    if (cancelled) {
+      const reason = searchAbortCode(deps.signal);
+      ledger.cancelled(reason === "SEARCH_STALE_RUN" ? reason : "SEARCH_CANCELLED");
+    }
     const fin = finalizeSearchOutcome(routeDiagnostics, {
       cancelled,
       qualifiedCount,
@@ -1270,8 +1264,8 @@ export async function runSpecSearchCore(
       limit,
       hasMore: false,
       totalAvailable: null,
-      candidateLedger: ledger.summary(),
       ...partial,
+      candidateLedger: cancelled ? ledger.summary() : (partial.candidateLedger ?? ledger.summary()),
       ...runIds,
       // Stage-1 rounds where no retrieval ran (clarify/confirm) carry NO
       // terminal outcome: an unanswered request is not a zero-result search.
@@ -1646,6 +1640,7 @@ export async function runSpecSearchCore(
         offset: 0,
         priorFrame: undefined,
         locationBranch: true,
+        runStartedAt,
         spec: { ...spec, locations: [place], criteria },
       }));
       if (deps.signal?.aborted) break;
@@ -1659,6 +1654,26 @@ export async function runSpecSearchCore(
     const rows = all.slice(effOffset, effOffset + limit);
     const representative = branchResults.find((result) => result.rows.length > 0) ?? branchResults[0];
     const { mergeCandidateLedgers } = await import("@/lib/search/candidate-ledger");
+    // A later location can stop after an earlier branch completed. This is one
+    // cancelled run, so never expose the earlier branch as a success outcome.
+    const abortCode = searchAbortCode(deps.signal);
+    const cancelled = deps.signal?.aborted && abortCode !== "SEARCH_DEADLINE";
+    if (cancelled && representative) return {
+      ...representative,
+      spec,
+      rows: [],
+      candidateLedger: mergeCandidateLedgers(branchResults.map((result) => result.candidateLedger), [], abortCode === "SEARCH_STALE_RUN" ? abortCode : "SEARCH_CANCELLED"),
+      dbMeta: branchResults.flatMap((result) => result.dbMeta),
+      qualified_count: 0,
+      offset: effOffset,
+      limit,
+      hasMore: false,
+      moreAvailableMessage: null,
+      totalAvailable: null,
+      retrievalTrace: representative.retrievalTrace && { ...representative.retrievalTrace, returned: 0, reason: "CANCELLED" },
+      providerAttempts: branchResults.flatMap((result) => result.providerAttempts ?? []),
+      outcome: "SEARCH_CANCELLED",
+    };
     if (representative) return {
       ...representative,
       spec,
@@ -2262,6 +2277,8 @@ export async function runSpecSearchCore(
       browserProgress?.({ action: "Still working", source: "watchdog", detail: `${event.stage} · ${Math.round(event.elapsedMs / 1000)}s elapsed` });
     },
   });
+  // Own the watchdog only after creation; all returns and errors below stop it.
+  try {
   // Volume engine (Phase 1): discovery should BROADLY oversample the request.
   // The user's N is the delivery bar, not the discovery bar — research/enrich
   // sits between broad discovery and strict qualification.
@@ -2904,10 +2921,16 @@ export async function runSpecSearchCore(
     // MENTION, not a verified candidate — even when the theorem passed on
     // name+quote alone. Without this, a nonsense ask ("unicorn ranchers in
     // Atlantis") delivers concept mentions as leads. The no_website hunt is
-    // exempt: absence verified by its own evidence path.
+    // exempt: absence verified by its own evidence path. Resolved structured
+    // authority records prove identity without a public contact footprint;
+    // requested site/contact fields still pass the upstream required gates.
     if (!fieldOf(spec, "opportunity")) {
       const footprintless = completeRows.filter(
-        (r) => !r.website_url && !r.profile_url && !r.email && !r.phone && !r.contact_page_url,
+        (r) => !r.website_url && !r.profile_url && !r.email && !r.phone && !r.contact_page_url &&
+          !(r.entity_resolved === true && r.entity_id && !r.entity_id.startsWith("provisional:") &&
+            r.evidence?.some((e) => e.subject === r.entity_id &&
+              e.evidence_type === "identity" && e.supports === "identity" &&
+              ["db", "osm", "registry"].includes(e.source_type))),
       );
       for (const r of footprintless) {
         ledger.gated(r, "INSUFFICIENT_EVIDENCE");
@@ -3247,6 +3270,9 @@ export async function runSpecSearchCore(
     page.length,
     deps.signal?.aborted === true && !deadlineNow(),
   );
+  } finally {
+    runWatchdog.stop();
+  }
 }
 
 export const getScrapyBrowserState = createServerFn({ method: "POST" })
