@@ -378,6 +378,11 @@ const TASK_LADDERS: Record<"classify" | "extract" | "research" | "expand", Model
   classify: [
     { gateway: "groq", model: "openai/gpt-oss-20b", reasoningEffort: "low" },
     { gateway: "groq", model: "openai/gpt-oss-120b", reasoningEffort: "low" },
+    // Keyed fallback (MISTRAL_API_KEY): the openrouter :free ids below
+    // rate-limit hard during long sweeps and left the browser extractor
+    // returning empty entity arrays at the exact moment list pages were
+    // on screen. Mistral's dev-tier limits survive that load.
+    { gateway: "mistral", model: "mistral-small-latest" },
     { gateway: "openrouter", model: "google/gemma-4-31b-it:free" },
     { gateway: "openrouter", model: "nvidia/nemotron-3-super-120b-a12b:free" },
     { gateway: "openrouter", model: "nvidia/nemotron-3.5-lightning:free" },
