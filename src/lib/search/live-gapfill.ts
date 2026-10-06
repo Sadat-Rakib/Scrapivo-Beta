@@ -815,7 +815,7 @@ export async function runLiveGapfill(
     desiredCount,
     isVerified,
     // Leave time for final enrichment/qualification before the 120s run abort.
-    timeoutMs: spec.entity === "company" ? 75_000 : 90_000,
+    timeoutMs: spec.entity === "company" ? 75_000 : spec.entity === "investor" ? 120_000 : 90_000,
   };
   const browserStartedAt = Date.now();
   const browserResult = shouldBrowse

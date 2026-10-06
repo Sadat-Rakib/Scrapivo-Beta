@@ -451,6 +451,21 @@ export function buildResearchPlan(
       [role ?? requestedRole ?? category, location, "job"].filter(Boolean).join(" "),
       [role ?? requestedRole ?? category, "remote job"].filter(Boolean).join(" "),
     ]);
+  } else if (spec.entity === "investor") {
+    // Investor discovery: fund-site and portfolio queries per the source
+    // routing contract — fund sites, team/thesis pages, directories, and
+    // stage/sector-qualified lists. Never the generic entity dump.
+    const sector = fieldOf(spec, "investor_sector") ?? fieldOf(spec, "industry") ?? category;
+    const stage = fieldOf(spec, "investor_stage");
+    const geo = location ? [location] : [];
+    discoveryQueries = uniq([
+      [sector, "venture capital", stage, ...geo, "fund"].filter(Boolean).join(" "),
+      [sector, "VC firms", stage, ...geo].filter(Boolean).join(" "),
+      [sector, "investors", stage, ...geo, "portfolio"].filter(Boolean).join(" "),
+      ["venture capital", sector, ...geo, "investing in"].filter(Boolean).join(" "),
+      [sector, "angel investors", stage, ...geo].filter(Boolean).join(" "),
+      ["VC", sector, stage, ...geo, "thesis"].filter(Boolean).join(" "),
+    ]);
   } else {
     const terms = discoveryTerms(spec);
     discoveryQueries = uniq([
