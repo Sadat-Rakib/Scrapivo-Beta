@@ -2953,9 +2953,14 @@ export async function runSpecSearchCore(
   // Phase 1D: stamp VERIFIED + best-effort write-back (never blocks UI).
   if (!process.env.VITEST && completeRows.length) {
     try {
-      const { stampVerified, persistVerifiedLiveRows } = await import(
-        "@/lib/canonical/persist-live.server"
-      );
+      // Bounded import: same HMR-hang risk as the thin-ask import — a module
+      // left half-initialized hangs this await forever past the deadline.
+      const persistModule = await Promise.race([
+        import("@/lib/canonical/persist-live.server"),
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), 15_000)),
+      ]);
+      if (!persistModule) throw new Error("persist module import timeout");
+      const { stampVerified, persistVerifiedLiveRows } = persistModule;
       completeRows = stampVerified(completeRows);
       const liveOnly = completeRows.filter(
         (r) =>
