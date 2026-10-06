@@ -652,6 +652,18 @@ export async function extractEntities(
     if (spec.entity === "business" || spec.entity === "company") {
       return deterministicLocalEntities(pages, spec);
     }
+    if (spec.entity === "investor") {
+      // Investor fallback: fund firms appear on list pages as named entities
+      // with sector context ("Firm Name — early-stage AI investor"). Reuse the
+      // list-page extractor anchored on the requested sector/stage.
+      const sector = spec.criteria.find((c) => c.field === "investor_sector")?.value ?? "";
+      const stage = spec.criteria.find((c) => c.field === "investor_stage")?.value ?? "";
+      const anchor = [sector, stage].filter(Boolean).join(" ") || "investor";
+      return deterministicLocalEntities(pages, {
+        ...spec,
+        criteria: [{ field: "category", value: anchor, stated: true, confidence: 0.8 }],
+      }).map((e) => ({ ...e, kind: "investor" as const }));
+    }
     for (const [pageIndex, page] of pages.entries()) {
       if (spec.entity === "person") {
         const cards = /(?:^|\n)[ \t]*([A-Z][\p{L}'-]+(?:[ \t]+[A-Z][\p{L}'-]+){1,3})[ \t]*\n[ \t]*((?:Co-)?Founder(?:[ \t]*&[ \t]*(?:Co-)?CEO)?|CEO[ \t]*&[ \t]*(?:Co-)?Founder)[ \t]*\n[ \t]*([^\n]{2,80})[ \t]*\n[ \t]*View Bio/giu;

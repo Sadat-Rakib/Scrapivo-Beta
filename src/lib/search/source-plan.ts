@@ -455,16 +455,23 @@ export function buildResearchPlan(
     // Investor discovery: fund-site and portfolio queries per the source
     // routing contract — fund sites, team/thesis pages, directories, and
     // stage/sector-qualified lists. Never the generic entity dump.
+    // MEASURED: search engines return 0 for 5-6-term ANDed investor queries
+    // ("AI venture capital seed Canada fund" → 0) while 2-3-term queries
+    // return 24-56. Keep each query at ≤3 content terms; the extraction and
+    // qualification stages do the narrowing.
     const sector = fieldOf(spec, "investor_sector") ?? fieldOf(spec, "industry") ?? category;
     const stage = fieldOf(spec, "investor_stage");
-    const geo = location ? [location] : [];
+    // MEASURED: generic "[sector] investors [location]" queries surface
+    // podcasts/news, not fund pages ("AI investors Canada" → a podcast).
+    // "firms"/"funds"/"portfolio" force list-page results that the extractor
+    // can actually read.
     discoveryQueries = uniq([
-      [sector, "venture capital", stage, ...geo, "fund"].filter(Boolean).join(" "),
-      [sector, "VC firms", stage, ...geo].filter(Boolean).join(" "),
-      [sector, "investors", stage, ...geo, "portfolio"].filter(Boolean).join(" "),
-      ["venture capital", sector, ...geo, "investing in"].filter(Boolean).join(" "),
-      [sector, "angel investors", stage, ...geo].filter(Boolean).join(" "),
-      ["VC", sector, stage, ...geo, "thesis"].filter(Boolean).join(" "),
+      ["venture capital firms", sector, location].filter(Boolean).join(" "),
+      [sector, "VC funds portfolio"].filter(Boolean).join(" "),
+      [sector, "startup investors list"].filter(Boolean).join(" "),
+      [stage, "VC firms", sector].filter(Boolean).join(" "),
+      ["venture capital funds", location].filter(Boolean).join(" "),
+      [sector, "angel list"].filter(Boolean).join(" "),
     ]);
   } else {
     const terms = discoveryTerms(spec);
