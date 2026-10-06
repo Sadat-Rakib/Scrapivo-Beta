@@ -10,18 +10,20 @@ import { expect, test, type Page } from "@playwright/test";
 const EMAIL = "e2e.scrapivo.test.001@gmail.com";
 const PASS = "E2eTest!2026-xyz";
 
-const QUERIES = [
-  "find plumbers in Austin",
-  "yo need like 7 hvac guys gta sites + nums",
-  "solar installers in Windhoek",
-  "wedding photographers in Cebu",
-  "freight forwarders in Tbilisi",
-  "construction companies in Banja Luka",
-  "find SaaS founders globally",
-  "find copywriters in Toronto",
-  "React developer jobs in Calgary",
-  "seed investors for AI startups in Canada",
-];
+const QUERIES = process.env.S2_QUERIES
+  ? process.env.S2_QUERIES.split("|")
+  : [
+      "find plumbers in Austin",
+      "yo need like 7 hvac guys gta sites + nums",
+      "solar installers in Windhoek",
+      "wedding photographers in Cebu",
+      "freight forwarders in Tbilisi",
+      "construction companies in Banja Luka",
+      "find SaaS founders globally",
+      "find copywriters in Toronto",
+      "React developer jobs in Calgary",
+      "seed investors for AI startups in Canada",
+    ];
 
 async function login(page: Page) {
   await page.addInitScript(() => {
