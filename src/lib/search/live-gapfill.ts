@@ -241,9 +241,14 @@ async function defaultWeb(
     operation: `live-gapfill:${entity}`,
   });
   // Kind starts neutral — M4 resolution sets entity type from the page,
-  // never from Spec.entity / query-kind inheritance.
-  return results.slice(0, opts?.widen ? 30 : 15).map((r, i) => {
+  // never from Spec.entity / query-kind inheritance. Junk SERP titles
+  // ("Preferences", "Free Quote", "5,000 A&R Solar Projects Installed") are
+  // not entities; a junk seed becomes the subject of its own research query
+  // and burns the browser budget, so it never becomes a candidate.
+  const { isJunkEntityName } = await import("./entity-name-quality");
+  return results.slice(0, opts?.widen ? 30 : 15).flatMap((r, i) => {
     const title = (r.title || "").trim() || "Web result";
+    if (isJunkEntityName(title)) return [];
     const url = r.url || null;
     const snippet = (r.content || "").slice(0, 180);
     const entity_id = mintProvisionalEntityId(`live-web:${i}:${(url ?? title).slice(0, 48)}`);
@@ -272,7 +277,7 @@ async function defaultWeb(
     const resolved = applyEntityResolutionToRow(classified);
     // A search hit is provenance, not an independently verified entity destination.
     // Browser research may later promote an official site or profile URL.
-    return { ...resolved, url: null };
+    return [{ ...resolved, url: null }];
   });
 }
 

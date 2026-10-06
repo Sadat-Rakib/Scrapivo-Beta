@@ -15,6 +15,7 @@ export function buildDefaultAgentBrowser(
 }
 import type { SearchSpec } from "./search-spec";
 import { makeEvidence, type Evidence, type EvidenceProvenance } from "./evidence";
+import { isJunkEntityName } from "./entity-name-quality";
 import { classifyPage } from "./page-classify";
 import { classifyPageRelevance } from "./page-relevance";
 import { extractStructuredFacts, factsFromJsonLdText, type StructuredPageFacts } from "./page-structured";
@@ -630,26 +631,11 @@ const NAV_PHRASES = new RegExp(
   "i",
 );
 /**
- * Generic page-furniture nouns that can never be an extracted identity
- * ("Personal", "Enterprise", "Solutions"). Model extraction serves them from
- * nav menus and section headers; one even became a discovery query
- * (`"Personal" Banja Luka construction company official website`). Rejected
- * for every entity kind — real businesses are named things, not sections.
+ * Generic page-furniture nouns and metric banners can never be an extracted
+ * identity ("Personal", "5,000 A&R Solar Projects Installed") — shared gate
+ * in entity-name-quality.ts, also applied when SERP titles become seeds.
  */
-const FURNITURE_NAMES = new Set([
-  "personal", "business", "enterprise", "corporate", "solutions", "overview",
-  "home", "about", "contact", "services", "team", "gallery", "pricing", "blog",
-  "menu", "shop", "store", "login", "subscribe", "search", "portfolio",
-  "testimonials", "faq", "faqs", "news", "careers", "jobs", "support", "help",
-  "privacy", "terms", "disclaimer", "cookies", "accessibility", "products",
-  "clients", "partners", "projects", "insights", "resources", "industries",
-  "company", "companies", "profile", "account", "settings", "dashboard",
-  "categories", "tags", "archive", "featured", "sponsored", "advertisement",
-  "downloads", "events", "locations", "brands", "stories", "press", "media",
-  "investors", "suppliers", "reviews", "explore", "more", "details",
-]);
-const isFurnitureName = (name: string) =>
-  FURNITURE_NAMES.has(name.trim().toLowerCase().replace(/[^a-z ]/gi, "").trim());
+const isFurnitureName = (name: string) => isJunkEntityName(name);
 /** A real person identity is 2-4 title-case words; ALL-CAPS multi-word
  *  strings are headings, not names. */
 function personNameOk(line: string): boolean {
