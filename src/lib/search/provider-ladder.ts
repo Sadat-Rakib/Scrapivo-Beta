@@ -97,15 +97,16 @@ export async function discoverWebFreeFirst(args: {
 
   const baseUrl = rawBase.replace(/:\/\/localhost(?=[:/]|$)/i, "://127.0.0.1");
   // Fail closed before spending the query budget: unreachable Docker / dead
-  // public host must not register as "0 results for this Spec".
+  // public host must not register as "0 results for this Spec". Probe /healthz
+  // — a 7ms availability endpoint. Probing /search fires a full engine
+  // fan-out (10s+ when upstream engines are cold or rate-limiting) and the
+  // 4s budget then "proved" a healthy SearXNG unreachable, marking the best
+  // free provider unavailable and producing false coverage-exhausted zeros.
   try {
-    const probe = await fetch(
-      `${baseUrl.replace(/\/$/, "")}/search?q=ping&format=json`,
-      {
-        headers: { Accept: "application/json" },
-        signal: AbortSignal.timeout(4_000),
-      },
-    );
+    const probe = await fetch(`${baseUrl.replace(/\/$/, "")}/healthz`, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(4_000),
+    });
     if (probe.status >= 500) {
       const err = new Error(`SEARXNG_UNREACHABLE HTTP ${probe.status}`);
       (err as Error & { code: string }).code = "SOURCE_UNAVAILABLE";
