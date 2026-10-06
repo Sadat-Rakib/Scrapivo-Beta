@@ -84,6 +84,13 @@ describe("jobs fleet tier (USE_COVERAGE_SELECTOR=true)", () => {
         expect(r.kind).toBe("job");
         expect(r.key).toMatch(/^job:/);
         expect(r.url).toMatch(/^https?:\/\//);
+        expect(r.apply_url).toBe(r.url);
+        expect(r.employer).toBe("Acme");
+        expect(r.evidence).toContainEqual(expect.objectContaining({
+          subject: r.entity_id, source_type: "job", evidence_type: "hiring",
+          source_url: r.apply_url, extraction_method: "structured_job_provider",
+          event_at: POSTINGS[0].posted_at, observed_at: POSTINGS[0].fetched_at,
+        }));
       }
       expect(res.dbMeta.map((m) => m.engine)).toContain("provider-jobs");
     } finally {
@@ -102,6 +109,21 @@ describe("jobs fleet tier (USE_COVERAGE_SELECTOR=true)", () => {
       );
       // Backend Go Engineer must not pass a frontend-developer spec.
       expect(res.rows.map((r) => r.title)).not.toContain("Backend Go Engineer @ Beta");
+    } finally {
+      delete process.env.USE_COVERAGE_SELECTOR;
+    }
+  });
+
+  it("an application URL cannot qualify a posting without an employer", async () => {
+    process.env.USE_COVERAGE_SELECTOR = "true";
+    try {
+      const result = await runSpecSearchCore("frontend developer jobs", {
+        providerJobs: (async () => ({
+          jobs: [{ ...POSTINGS[0], company: "" }], fetched: 1, droppedSeeker: 0,
+          sourceStatuses: [{ id: "remoteok", label: "RemoteOK", status: "ok", count: 1 }],
+        })) as never,
+      }, 25);
+      expect(result.rows).toEqual([]);
     } finally {
       delete process.env.USE_COVERAGE_SELECTOR;
     }

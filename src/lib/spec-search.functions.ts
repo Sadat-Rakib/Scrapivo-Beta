@@ -2927,6 +2927,7 @@ export async function runSpecSearchCore(
     if (!fieldOf(spec, "opportunity")) {
       const footprintless = completeRows.filter(
         (r) => !r.website_url && !r.profile_url && !r.email && !r.phone && !r.contact_page_url &&
+          !(r.kind === "job" && r.apply_url) &&
           !(r.entity_resolved === true && r.entity_id && !r.entity_id.startsWith("provisional:") &&
             r.evidence?.some((e) => e.subject === r.entity_id &&
               e.evidence_type === "identity" && e.supports === "identity" &&
