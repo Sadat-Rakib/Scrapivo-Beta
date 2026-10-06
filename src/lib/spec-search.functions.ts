@@ -3056,8 +3056,14 @@ export async function runSpecSearchCore(
     !opts.force &&
     (liveDiscovery === "db_thin_gapfill_pending" || liveDiscovery === "completed")
   ) {
-    const { thinClarifyForSpec } = await import("@/lib/search/clarifier");
-    thinClarify = thinClarifyForSpec(spec);
+    // Bounded import: a module left half-initialized by HMR invalidation can
+    // hang this await forever, leaking a zombie run past its deadline. A
+    // timeout skips the optional thin-ask — delivery never depends on it.
+    const thinAskModule = await Promise.race([
+      import("@/lib/search/clarifier"),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 15_000)),
+    ]);
+    if (thinAskModule) thinClarify = thinAskModule.thinClarifyForSpec(spec);
     thinQuestions = thinClarify.map((q) => q.question);
   }
   // Permanent run journal (locked observability): one JSON line per search —
