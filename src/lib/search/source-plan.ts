@@ -6,7 +6,7 @@
  */
 import type { SearchSpec, SpecEntity } from "@/lib/search/search-spec";
 import type { EvidenceType } from "@/lib/search/evidence";
-import { planDiscoveryVariants } from "./search-query-planner";
+import { jobDiscoveryRemoteIntent, jobDiscoveryRole, planDiscoveryVariants } from "./search-query-planner";
 import { requestedClaimTypes } from "@/lib/search/canonical-contract";
 import type { SearchOutcomeCode } from "@/lib/search/canonical-contract";
 import {
@@ -447,9 +447,10 @@ export function buildResearchPlan(
       [category, "near", location].filter(Boolean).join(" "),
     ]);
   } else if (spec.entity === "job") {
+    const jobRole = jobDiscoveryRole(spec);
     discoveryQueries = uniq([
-      [role ?? requestedRole ?? category, location, "job"].filter(Boolean).join(" "),
-      [role ?? requestedRole ?? category, "remote job"].filter(Boolean).join(" "),
+      [jobRole, location, "job"].filter(Boolean).join(" "),
+      jobDiscoveryRemoteIntent(spec) ? [jobRole, "remote job"].filter(Boolean).join(" ") : null,
     ]);
   } else if (spec.entity === "investor") {
     // Investor discovery: fund-site and portfolio queries per the source

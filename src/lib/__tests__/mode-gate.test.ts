@@ -1,6 +1,5 @@
-/** Phase 1.3: mode gate battery. Bare directory queries must ask mode BEFORE
- *  retrieval; offer only follows selling; just-looking never sees the offer
- *  question; explicit signals and force bypass. No network (injected fakes). */
+/** Legacy answer utilities plus the current frame-owned discovery contract.
+ * Explicit targets search directly; selling context never forces a funnel. */
 import { describe, expect, it } from "vitest";
 import { runSpecSearchCore } from "../spec-search.functions";
 import {
@@ -55,12 +54,15 @@ describe("interpretModeAnswer", () => {
 });
 
 describe("mode gate in runSpecSearchCore", () => {
-  it("bare SaaS founders asks intent, then location before retrieval", async () => {
+  it("bare SaaS founders preserves broad role and industry without a mode funnel", async () => {
     const res = await runSpecSearchCore("SaaS founders", { people: fakePeople, index: null, liveGapfill: null });
     expect(res.spec.status).toBe("ready_to_search");
     expect(res.rows).toEqual([]);
-    expect(res.dbMeta).toEqual([]);
-    expect(res.clarify.map((q) => q.id)).toEqual(["entity_mode"]);
+    expect(res.dbMeta.length).toBeGreaterThan(0);
+    expect(res.clarify.map((q) => q.id)).toEqual(["entity_location"]);
+    expect(res.spec.criteria).toContainEqual(expect.objectContaining({ field: "role", value: "founder" }));
+    expect(res.spec.criteria).toContainEqual(expect.objectContaining({ field: "industry", value: expect.stringMatching(/^saas$/i) }));
+    expect(res.spec.criteria.some((c) => c.field === "location")).toBe(false);
 
     const afterMode = await runSpecSearchCore(
       "SaaS founders",
@@ -68,17 +70,18 @@ describe("mode gate in runSpecSearchCore", () => {
       25,
       { mode: "looking" },
     );
-    expect(afterMode.dbMeta).toEqual([]);
+    expect(afterMode.dbMeta.length).toBeGreaterThan(0);
     expect(afterMode.clarify.map((q) => q.id)).toEqual(["entity_location"]);
   });
-  it("bare ready business query → exactly the mode question, zero retrieval", async () => {
+  it("bare ready business query searches the stated category and city directly", async () => {
     const res = await runSpecSearchCore(
       "dentists in Pune", { businesses: fakeBusinesses, index: null }, 25,
     );
     expect(res.spec.status).toBe("ready_to_search");
-    expect(res.rows).toEqual([]);
-    expect(res.clarify).toHaveLength(1);
-    expect(res.clarify[0].id).toBe("entity_mode");
+    expect(res.rows).toHaveLength(1);
+    expect(res.clarify).toEqual([]);
+    expect(res.spec.criteria).toContainEqual(expect.objectContaining({ field: "category", value: "dentist" }));
+    expect(res.spec.criteria).toContainEqual(expect.objectContaining({ field: "location", value: "Pune" }));
   });
 
   it("looking answer → search runs, offer question never appears", async () => {
@@ -90,14 +93,14 @@ describe("mode gate in runSpecSearchCore", () => {
     expect(res.clarify).toEqual([]);
   });
 
-  it("selling without offer → exactly the offer question", async () => {
+  it("selling without an offer keeps an already specified target searchable", async () => {
     const res = await runSpecSearchCore(
       "dentists in Pune", { businesses: fakeBusinesses, index: null }, 25,
       { mode: "selling" },
     );
-    expect(res.rows).toEqual([]);
-    expect(res.clarify).toHaveLength(1);
-    expect(res.clarify[0].id).toBe("entity_offer");
+    expect(res.rows).toHaveLength(1);
+    expect(res.clarify).toEqual([]);
+    expect(res.spec.criteria.some((c) => c.field === "opportunity")).toBe(false);
   });
 
   it("selling + non-taxonomy offer → search runs with no follow-up", async () => {
@@ -109,15 +112,13 @@ describe("mode gate in runSpecSearchCore", () => {
     expect(res.clarify).toEqual([]);
   });
 
-  it("mode answer naming the offering skips the offer round (site follow-up next)", async () => {
+  it("an offering answer stays user context and does not invent a site requirement", async () => {
     const res = await runSpecSearchCore(
       "dentists in Pune", { businesses: fakeBusinesses, index: null }, 25,
-      { mode: "websites" },
+      { offer: "websites" },
     );
-    // Offer inferred from the answer; the website follow-up is the one round.
-    expect(res.rows).toEqual([]);
-    expect(res.clarify).toHaveLength(1);
-    expect(res.clarify[0].id).toBe("entity_site");
+    expect(res.rows).toHaveLength(1);
+    expect(res.clarify).toEqual([]);
     expect(res.spec.criteria.some((c) => c.field === "offer" && c.value === "websites")).toBe(true);
   });
 

@@ -36,6 +36,7 @@ export function zeroResultsNarrative(
     complete?: number;
     pendingEnrichment?: number;
     qualificationRejected?: number;
+    returned?: number;
     reason?: string;
     /** User-safe source health sentence (never raw provider errors). */
     sourceHealth?: { summary?: string | null } | null;

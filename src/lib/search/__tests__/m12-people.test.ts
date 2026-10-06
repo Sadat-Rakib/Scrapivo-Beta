@@ -74,7 +74,7 @@ function founderEmploymentEvidence(
       organization_name: "Acme",
       role_currentness: opts?.currentness ?? "current_role",
     },
-  } as Evidence & { claim_parameters: Record<string, string> });
+    });
 }
 
 describe("M12 — open role ontology (not a finite occupation list)", () => {
@@ -222,7 +222,7 @@ describe("M12 — employment relationship (not co-mention)", () => {
       subject: personId,
       // company named but no organization_entity_id
       claim_parameters: { company: "Acme", role: "speaker" },
-    } as Evidence & { claim_parameters: Record<string, string> });
+    });
     const built = employmentFromEvidence({
       person_entity_id: personId,
       evidence: ev,
@@ -263,7 +263,7 @@ describe("M12 — employment relationship (not co-mention)", () => {
         organization_entity_id: "provisional:org:acme",
         role_currentness: "current_role",
       },
-    } as Evidence & { claim_parameters: Record<string, string> });
+    });
     const gate = requireEmploymentForPersonSpec({
       spec,
       person_entity_id: personId,
@@ -392,7 +392,7 @@ describe("M12 — need/signal separate from identity", () => {
       supports: "requested_role",
       subject: personId,
       claim_parameters: { role: "developer" },
-    } as Evidence & { claim_parameters: Record<string, string> });
+    });
     const row = personRow({
       entity_id: personId,
       title: "Ada",
@@ -537,7 +537,7 @@ describe("M12 — production path + inverse", () => {
       supports: "requested_role",
       subject: personId,
       claim_parameters: { role: "developer" },
-    } as Evidence & { claim_parameters: Record<string, string> });
+    });
 
     const row = personRow({
       entity_id: personId,

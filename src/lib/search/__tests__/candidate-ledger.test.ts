@@ -1,8 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 import type { AgentBrowser, PageSnapshot } from "@/lib/research-agent/browser";
-import { runSpecSearchCore } from "@/lib/spec-search.functions";
+import { runSpecSearchCore, type SpecSearchDeps } from "@/lib/spec-search.functions";
 import { discoverWithBrowser } from "../browser-live.server";
 import { createCandidateLedger, mergeCandidateLedgers, streamedFateLabel } from "../candidate-ledger";
+import * as watchdogModule from "../run-watchdog";
 
 describe("candidate ledger", () => {
   it("gives every candidate one fate and reconciles streamed leads with the final page", () => {
@@ -55,6 +56,34 @@ describe("candidate ledger", () => {
     expect(unfated.summary().accounting).toEqual({ retrieved: 1, fated: 0, unaccounted: 0, ok: false });
   });
 
+  it("reconciles only outstanding entries on cancellation and preserves every booked fate", () => {
+    const ledger = createCandidateLedger();
+    ledger.streamed({ key: "stream", title: "Stream" });
+    ledger.retrieved({ key: "stub", title: "Stub" });
+    const booked = ["returned", "more", "rejected", "absorbed", "filtered", "incomplete", "gated", "excluded"];
+    for (const key of booked) ledger.streamed({ key, title: key });
+    ledger.delivered([{ key: "returned" }], [{ key: "more" }]);
+    ledger.decided({ key: "rejected" }, { disposition: "rejected", reject_code: "LOCATION_MISMATCH" });
+    ledger.merged({ key: "absorbed" }, { key: "returned" });
+    ledger.filtered({ key: "filtered" }, "SPEC_MISMATCH");
+    ledger.incomplete({ key: "incomplete", missingFields: ["email"] });
+    ledger.gated({ key: "gated" }, "SIGNAL_NOT_VERIFIED");
+    ledger.excluded({ key: "excluded" });
+    const before = ledger.summary();
+    ledger.cancelled("SEARCH_STALE_RUN");
+    const after = ledger.summary();
+    expect(after.accounting).toEqual({ retrieved: 10, fated: 10, unaccounted: 0, ok: true });
+    expect(after.counts).toMatchObject({ returned: 1, qualified_more: 1, rejected: 1, absorbed: 1, gated: 3, unaccounted: 0 });
+    expect(after.streamedNotReturned.filter((item) => booked.includes(item.key))).toEqual(
+      before.streamedNotReturned.filter((item) => booked.includes(item.key)),
+    );
+    expect(after.streamedNotReturned.find((item) => item.key === "stream")).toEqual({
+      key: "stream", title: "Stream", fate: "gated", reason: "SEARCH_STALE_RUN",
+    });
+    ledger.cancelled("SEARCH_CANCELLED");
+    expect(ledger.summary()).toEqual(after);
+  });
+
   it("matches a re-minted entity id by registrable host and name", () => {
     const ledger = createCandidateLedger();
     ledger.streamed({ key: "browser:amina", entity_id: "browser:amina", title: "Amina Carter", company: "Acme", website_url: "https://www.amina.test/bio" });
@@ -79,10 +108,23 @@ describe("candidate ledger", () => {
     expect(mergeCandidateLedgers([undefined], [])).toBeUndefined();
   });
 
+  it("retracts a branch-local delivery when the aggregate is cancelled", () => {
+    const branch = createCandidateLedger();
+    branch.streamed({ key: "chattogram", title: "Chattogram Solar" });
+    branch.delivered([{ key: "chattogram", title: "Chattogram Solar" }], []);
+    const merged = mergeCandidateLedgers([branch.summary()], [], "SEARCH_STALE_RUN");
+    expect(merged?.counts).toMatchObject({ returned: 0, qualified_more: 0, gated: 1 });
+    expect(merged?.streamedNotReturned).toEqual([
+      { key: "chattogram", title: "Chattogram Solar", fate: "gated", reason: "SEARCH_STALE_RUN" },
+    ]);
+  });
+
   it("explains fates in plain words", () => {
     expect(streamedFateLabel({ fate: "qualified_more", reason: null })).toBe("on the next page");
     expect(streamedFateLabel({ fate: "rejected", reason: "MISSING_QUERY_REQUIRED" })).toBe("missing a detail you asked for");
     expect(streamedFateLabel({ fate: "unaccounted", reason: null })).toBe("could not be confirmed");
+    expect(streamedFateLabel({ fate: "gated", reason: "SEARCH_CANCELLED" })).toBe("search was cancelled before delivery");
+    expect(streamedFateLabel({ fate: "gated", reason: "SEARCH_STALE_RUN" })).toBe("search was replaced before delivery");
   });
 });
 
@@ -153,6 +195,101 @@ function fixtureBrowser(): AgentBrowser {
 }
 
 describe("candidate ledger in the real server core", () => {
+  it("still reports an unexplained streamed loss on an ordinary successful run", async () => {
+    const res = await runSpecSearchCore("B2B SaaS founders with public contact details", {
+      people: (async () => ({ rows: [], meta: { dbHit: false, engine: "none", partitionsRead: [], rowsScanned: 0, rowsReturned: 0 } })) as never,
+      index: null,
+      browserProgress: () => {},
+      liveGapfill: { osm: null, web: null, jobs: null, browser: async (_spec, options) => {
+        const event = { action: "Researching", row: { key: "lost", entity_id: "lost", kind: "person", title: "Lost founder" } };
+        options.onProgress?.(event);
+        return [];
+      } },
+    }, 1, {}, { force: true });
+    expect(res.outcome).toBe("NO_QUALIFIED_RESULTS");
+    expect(res.candidateLedger?.accounting).toEqual({ retrieved: 1, fated: 1, unaccounted: 1, ok: false });
+    expect(res.candidateLedger?.streamedNotReturned).toEqual([
+      { key: "lost", title: "Lost founder", fate: "unaccounted", reason: null },
+    ]);
+  });
+
+  it.each(["SEARCH_CANCELLED", "SEARCH_STALE_RUN"] as const)("reconciles streamed and retrieved candidates after %s", async (code) => {
+    const controller = new AbortController();
+    const browser = vi.fn<NonNullable<NonNullable<SpecSearchDeps["liveGapfill"]>["browser"]>>(async (_spec, options) => {
+      const event = { action: "Researching", row: { key: "streamed", entity_id: "streamed", kind: "person", title: "Streamed founder" } };
+      options.onProgress?.(event);
+      controller.abort({ code });
+      return [];
+    });
+    const res = await runSpecSearchCore("B2B SaaS founders with public contact details", {
+      signal: controller.signal,
+      people: (async () => ({ rows: [{ key: "stored", entity_id: "stored", kind: "person", title: "Stored founder", role: "Founder", industry: "B2B SaaS" }], meta: { dbHit: true, engine: "fixture", partitionsRead: [], rowsScanned: 1, rowsReturned: 1 } })) as never,
+      index: null,
+      browserProgress: () => {},
+      liveGapfill: { osm: null, web: null, jobs: null, browser },
+    }, 1, {}, { force: true });
+    expect(browser).toHaveBeenCalled();
+    expect(res.outcome).toBe("SEARCH_CANCELLED");
+    expect(res.rows).toEqual([]);
+    expect(res.candidateLedger?.accounting).toEqual({ retrieved: 2, fated: 2, unaccounted: 0, ok: true });
+    expect(res.candidateLedger?.counts).toMatchObject({ gated: 2, unaccounted: 0 });
+    expect(res.candidateLedger?.streamedNotReturned).toEqual([
+      { key: "streamed", title: "Streamed founder", fate: "gated", reason: code },
+    ]);
+  });
+
+  it.each(["success", "cancelled", "error"])("keeps watchdog active while hung, then stops after %s", async (terminal) => {
+    vi.useFakeTimers({ toFake: ["Date", "setInterval", "clearInterval"] });
+    const originalStart = watchdogModule.startRunWatchdog;
+    const start = vi.spyOn(watchdogModule, "startRunWatchdog").mockImplementation((options) =>
+      originalStart({ ...options, budgetMs: 1_000, intervalMs: 50 }),
+    );
+    const controller = new AbortController();
+    const progress = vi.fn();
+    let failFinalLog = false;
+    const info = vi.spyOn(console, "info").mockImplementation((message) => {
+      if (failFinalLog && typeof message === "string" && message.startsWith("[spec-run] ")) throw new Error("terminal fixture error");
+    });
+    let release!: () => void;
+    let entered!: () => void;
+    const pending = new Promise<void>((resolve) => { release = resolve; });
+    const ready = new Promise<void>((resolve) => { entered = resolve; });
+    let run: ReturnType<typeof runSpecSearchCore> | undefined;
+    try {
+      run = runSpecSearchCore("B2B SaaS founders with public contact details", {
+        signal: controller.signal,
+        people: (async () => ({ rows: [], meta: { dbHit: false, engine: "none", partitionsRead: [], rowsScanned: 0, rowsReturned: 0 } })) as never,
+        index: null,
+        browserProgress: (event) => {
+          progress(event);
+        },
+        liveGapfill: { osm: null, web: null, jobs: null, browser: async () => { entered(); await pending; return []; } },
+      }, 1, {}, { force: true });
+      await ready;
+      await vi.advanceTimersByTimeAsync(1_050);
+      expect(progress.mock.calls.some(([event]) => event.source === "watchdog")).toBe(true);
+      if (terminal === "cancelled") controller.abort();
+      // Final logging is outside provider recovery: a sink failure must also
+      // release the watchdog when the core rejects instead of returning.
+      if (terminal === "error") {
+        failFinalLog = true;
+      }
+      release();
+      if (terminal === "error") await expect(run).rejects.toThrow("terminal fixture error");
+      else expect((await run).outcome).toBe(terminal === "cancelled" ? "SEARCH_CANCELLED" : "NO_QUALIFIED_RESULTS");
+      expect(start).toHaveBeenCalledOnce();
+      const eventCount = progress.mock.calls.filter(([event]) => event.source === "watchdog").length;
+      await vi.advanceTimersByTimeAsync(1_000);
+      expect(progress.mock.calls.filter(([event]) => event.source === "watchdog")).toHaveLength(eventCount);
+    } finally {
+      release();
+      await run?.catch(() => {});
+      info.mockRestore();
+      start.mockRestore();
+      vi.useRealTimers();
+    }
+  });
+
   it("reports a streamed lead that did not fit the page instead of dropping it silently", async () => {
     const streamed: string[] = [];
     const res = await runSpecSearchCore("B2B SaaS founders with public contact details", {

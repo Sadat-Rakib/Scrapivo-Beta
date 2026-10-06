@@ -33,4 +33,59 @@ describe("OR location execution", () => {
     await runSpecSearchCore(spec.raw_query, { companies, index: null, liveGapfill: null }, 5, {}, { spec, force: true });
     expect(searched).toEqual(["Chattogram", "Dhaka"]);
   });
+
+  it("does not relabel a cancelled aggregate as the first successful location", async () => {
+    const successfulCompanies = (async () => ({
+      rows: [{
+        company_name: "Chattogram Solar",
+        category: "Solar installers",
+        location: "Chattogram",
+        website: "https://chattogram-solar.example",
+        email: "hello@chattogram-solar.example",
+        phone: null,
+      }],
+      meta: { dbHit: true, engine: "fixture", partitionsRead: ["Chattogram"], rowsScanned: 1, rowsReturned: 1 },
+    })) as never;
+    const firstBranch = await runSpecSearchCore(spec.raw_query, {
+      companies: successfulCompanies,
+      index: null,
+      liveGapfill: null,
+    }, 5, {}, {
+      spec: { ...spec, locations: ["Chattogram"] },
+      locationBranch: true,
+      force: true,
+    });
+    expect(firstBranch.outcome).toBe("QUALIFIED_RESULTS");
+    expect(firstBranch.rows).toHaveLength(1);
+
+    const controller = new AbortController();
+    const searched: string[] = [];
+    const companies = (async (request: { location?: string }) => {
+      const location = request.location ?? "";
+      searched.push(location);
+      if (location === "Dhaka") controller.abort({ code: "SEARCH_STALE_RUN" });
+      return {
+        rows: location === "Chattogram" ? [{
+          company_name: "Chattogram Solar",
+          category: "Solar installers",
+          location,
+          website: "https://chattogram-solar.example",
+          email: "hello@chattogram-solar.example",
+          phone: null,
+        }] : [],
+        meta: { dbHit: location === "Chattogram", engine: "fixture", partitionsRead: [location], rowsScanned: 1, rowsReturned: location === "Chattogram" ? 1 : 0 },
+      };
+    }) as never;
+    const result = await runSpecSearchCore(spec.raw_query, {
+      companies,
+      index: null,
+      liveGapfill: null,
+      signal: controller.signal,
+    }, 5, {}, { spec, force: true });
+    expect(searched).toEqual(["Chattogram", "Dhaka"]);
+    expect(result.rows).toEqual([]);
+    expect(result.outcome).toBe("SEARCH_CANCELLED");
+    expect(result.retrievalTrace).toMatchObject({ returned: 0, reason: "CANCELLED" });
+    expect(result.candidateLedger?.counts.returned).toBe(0);
+  });
 });

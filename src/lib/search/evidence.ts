@@ -6,10 +6,12 @@ export type EvidenceSourceType =
   | "web"
   | "osm"
   | "job"
+  | "job_posting"
   | "social"
   | "news"
   | "registry"
   | "db"
+  | "company"
   | "other";
 
 export type EvidenceType =
@@ -26,6 +28,7 @@ export type EvidenceSupports =
   | "requested_role"
   | "requested_service"
   | "requested_product"
+  | "funding_status"
   | "opportunity"
   | "intent"
   | "identity"

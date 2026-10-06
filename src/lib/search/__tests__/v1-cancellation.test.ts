@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ActiveSearchSession } from "../search-run-client";
 import { beginRegisteredSearchRun, cancelRegisteredSearchRun } from "../search-run.server";
+import { SEARCH_DEADLINE_REASON, SEARCH_STALE_RUN_REASON, searchAbortCode } from "../search-run";
 import { enrichIncompleteRows } from "../enrich-incomplete";
 import { resilientFetch } from "../http-fetch.server";
 import type { SpecRow } from "@/lib/spec-search.functions";
@@ -30,6 +31,17 @@ describe("V1 cancellation boundaries", () => {
     cancelRegisteredSearchRun("early", "delayed");
     const delayed = beginRegisteredSearchRun({ ownerId: "early", runId: "delayed" });
     expect(delayed.signal.aborted).toBe(true);
+  });
+
+  it.each([
+    ["deadline", SEARCH_DEADLINE_REASON],
+    ["stale run", SEARCH_STALE_RUN_REASON],
+  ] as const)("preserves a later external %s abort reason", (_label, reason) => {
+    const external = new AbortController();
+    const registered = beginRegisteredSearchRun({ ownerId: `external-${reason.code}`, runId: crypto.randomUUID(), signal: external.signal });
+    external.abort(reason);
+    expect(searchAbortCode(registered.signal)).toBe(reason.code);
+    registered.finish();
   });
 
   it("new run in the same conversation stops old work but leaves other conversations alone", () => {

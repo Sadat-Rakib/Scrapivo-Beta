@@ -281,6 +281,69 @@ describe("browser discovery evidence boundary", () => {
     expect(result[0]).toMatchObject({ kind, title: name, entity_resolved: true, page_type: "entity_page" });
   });
 
+  it.each(["company", "business"] as const)("reconciles observed fund evidence from %s before investor qualification", (kind) => {
+    const investorSpec = { ...spec, entity: "investor" as const };
+    const quote = "Maple Capital is an investment firm investing in seed AI companies in Canada.";
+    const page = { url: "https://maplecapital.test/", title: "Maple Capital", text: quote };
+    const rows = browserEntitiesToRows([{ page: 0, kind, name: "Maple Capital", identityQuote: quote }], [page], undefined, investorSpec);
+    expect(rows).toHaveLength(1);
+    expect(rows[0].kind).toBe("investor");
+    expect(qualifyLead(rows[0], investorSpec, rows[0].evidence).disposition).toBe("qualified");
+    // The same observed organization keeps its kind for a company search.
+    const companyQuote = "Maple Capital is a company and an investment firm investing in seed AI companies in Canada.";
+    expect(browserEntitiesToRows([{ page: 0, kind: "company", name: "Maple Capital", identityQuote: companyQuote }], [{ ...page, text: companyQuote }])[0].kind).toBe("company");
+  });
+
+  it.each([
+    "Maple Capital is a software company serving venture capital firms.",
+    "Maple Capital is a software company. Cedar Capital invests in AI startups.",
+    "Maple Capital is a software company with a product portfolio.",
+    "Maple Capital builds software for an investment firm.",
+    "Maple Capital is a software company. Cedar is an investor.",
+    "Maple Capital is an advisor to a venture capital firm in Canada.",
+    "Maple Capital serves a seed fund in Canada.",
+  ])("keeps ordinary companies outside investor admission: %s", async (quote) => {
+    const investorSpec = { ...spec, entity: "investor" as const };
+    const normalizationTrace = vi.fn();
+    const rows = browserEntitiesToRows([{ page: 0, kind: "company", name: "Maple Capital", identityQuote: quote }],
+      [{ url: "https://maplecapital.test/", title: "Maple Capital", text: quote }], normalizationTrace, investorSpec);
+    expect(rows.every((row) => row.kind === "company")).toBe(true);
+    const trace = vi.fn();
+    await expect(discoverWithBrowser(investorSpec, { browser: fakeBrowser(), discoveryQueries: [], initialCandidates: rows, onTrace: trace }))
+      .rejects.toThrow("BROWSER_SEARCH_SOURCES_UNAVAILABLE");
+    if (rows.length) expect(trace).toHaveBeenCalledWith(expect.objectContaining({ kind: "remember", outcome: "ENTITY_TYPE_MISMATCH" }));
+    else expect(normalizationTrace).toHaveBeenCalledWith(expect.objectContaining({ kind: "entity", outcome: "rejected", reason: "ENTITY_TYPE_MISMATCH" }));
+    expect(trace).not.toHaveBeenCalledWith(expect.objectContaining({ kind: "remember", outcome: "accepted", name: "Maple Capital" }));
+  });
+
+  it("retains a source-observed direct fund role header", () => {
+    const quote = "Maple Capital — Canadian VC firm";
+    const page = { url: "https://maplecapital.test/", title: "Maple Capital", text: quote };
+    const rows = browserEntitiesToRows([{ page: 0, kind: "company", name: "Maple Capital", identityQuote: quote }], [page], undefined, { ...spec, entity: "investor" });
+    expect(rows[0]).toMatchObject({ kind: "investor", title: "Maple Capital" });
+    expect(rows[0].evidence?.[0].excerpt).toBe(quote);
+  });
+
+  it("proves investor identity for a firm whose name starts with a Unicode letter", () => {
+    const quote = "Éclat Capital is an investment firm investing in AI companies.";
+    const page = { url: "https://eclatcapital.test/", title: "Éclat Capital", text: quote };
+    const rows = browserEntitiesToRows([{ page: 0, kind: "company", name: "Éclat Capital", identityQuote: quote }], [page], undefined, { ...spec, entity: "investor" });
+    expect(rows[0]).toMatchObject({ kind: "investor", title: "Éclat Capital" });
+    expect(rows[0].evidence?.[0].excerpt).toBe(quote);
+  });
+
+  it("reconciles injected observed funds through the existing discovery pipeline", async () => {
+    const browser = fakeBrowser();
+    const source = "https://maplecapital.test/";
+    const quote = "Maple Capital is an investment firm investing in seed AI companies in Canada.";
+    vi.mocked(browser.navigate).mockImplementation(async (_session, url) => ({ snapshot: snapshot({ url, title: "Maple Capital" }), action: "navigate", verified: true }));
+    vi.mocked(browser.extract).mockResolvedValue({ values: { body: `${quote}\nRead about our investment thesis and meet our public team.` }, sourceUrl: source, observedAt: new Date().toISOString(), errors: [] });
+    const rows = await discoverWithBrowser({ ...spec, entity: "investor" }, { browser, discoveryQueries: [], desiredCount: 1,
+      initialCandidates: [{ kind: "company", title: "Maple Capital", detail: "Source page", source_url: source, entity_resolved: false }],
+      extractEntities: async () => [{ page: 0, kind: "company", name: "Maple Capital", identityQuote: quote }] });
+    expect(rows.some((row) => row.title === "Maple Capital" && row.kind === "investor")).toBe(true);
+  });
+
   it("retains explicit no-website evidence and never calls its directory URL the business website", () => {
     const quote = "North Plumbing is a plumbing service in Austin with no website.";
     const rows = browserEntitiesToRows([{ page: 0, kind: "business", name: "North Plumbing", identityQuote: quote, fields: { opportunity: { value: "no_website", quote } } }], [{ ...observed[0], text: quote }]);

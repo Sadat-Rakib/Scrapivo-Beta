@@ -175,7 +175,7 @@ describe("M14 — POST ≠ AUTHOR ≠ COMPANY", () => {
         organization_name: "Acme",
         role_currentness: "current_role",
       },
-    } as Evidence & { claim_parameters: Record<string, string> });
+    });
     const binding = bindSocialClaimSubject({
       author_entity_id: "person:mir-dev",
       need,
@@ -204,7 +204,7 @@ describe("M14 — POST ≠ AUTHOR ≠ COMPANY", () => {
         organization_name: "Acme",
         role_currentness: "current_role",
       },
-    } as Evidence & { claim_parameters: Record<string, string> });
+    });
     const binding = bindSocialClaimSubject({
       author_entity_id: "person:mir-dev",
       need,
@@ -491,7 +491,7 @@ describe("M14 — dedup + unavailable evidence", () => {
           supports: "requested_service",
           subject: "person:fake",
           claim_parameters: { is_ask: "true" },
-        } as Evidence & { claim_parameters: Record<string, string> }),
+    }),
       ],
     };
     const gate = evaluateSocialGates({ row, spec, evidence: row.evidence! });

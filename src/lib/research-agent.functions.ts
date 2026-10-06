@@ -3,8 +3,79 @@ import { z } from "zod";
 import { requireMyAuth } from "@/integrations/my-supabase/auth-middleware";
 import type { SearchSpec } from "@/lib/search/search-spec";
 import type { UnderstandingFrame } from "@/lib/understanding/frame";
+import type { JsonValue } from "@/lib/research-agent/types";
 
-async function researchWorker<T>(path: string, init: RequestInit): Promise<T> {
+const JsonValueSchema: z.ZodType<JsonValue> = z.lazy(() => z.union([
+  z.string(),
+  z.number(),
+  z.boolean(),
+  z.null(),
+  z.array(JsonValueSchema),
+  z.record(JsonValueSchema),
+]));
+
+const SessionStatus = z.enum(["running", "done", "cancelled", "failed"]);
+const ResearchEventResponse = z.object({
+  sessionId: z.string(),
+  timestamp: z.string(),
+  type: z.string(),
+  phase: z.string(),
+  internal: z.record(JsonValueSchema),
+  message: z.string(),
+  domain: z.string().nullable().optional(),
+  screenshotRef: z.string().nullable().optional(),
+  candidateCount: z.number().optional(),
+});
+const ResearchResultResponse = z.object({
+  sessionId: z.string(),
+  plan: z.record(JsonValueSchema),
+  candidates: z.array(z.record(JsonValueSchema)),
+  events: z.array(ResearchEventResponse),
+  needsMore: z.boolean(),
+  exhausted: z.boolean(),
+  cancelled: z.boolean(),
+  continuationToken: z.string().nullable(),
+  metrics: z.record(JsonValueSchema),
+});
+const ResearchSessionResponse = z.object({
+  id: z.string(),
+  ownerId: z.string(),
+  scopeId: z.string(),
+  status: SessionStatus,
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  eventCount: z.number().int().nonnegative(),
+  events: z.array(ResearchEventResponse),
+  result: ResearchResultResponse.nullable(),
+  error: z.string().nullable(),
+});
+const StartResearchResponse = z.object({
+  sessionId: z.string(),
+  status: SessionStatus,
+  targetQuantity: z.number().int().positive(),
+});
+const ContinueResearchResponse = z.object({
+  sessionId: z.string(),
+  status: SessionStatus,
+});
+const ResearchEventsResponse = z.object({
+  events: z.array(ResearchEventResponse),
+  nextCursor: z.number().int().nonnegative(),
+  sessionStatus: SessionStatus,
+  done: z.boolean(),
+  result: ResearchResultResponse.nullable(),
+  error: z.string().nullable(),
+});
+const WorkerError = z.object({ error: z.string().optional() });
+
+export const researchWorkerResponseSchemas = {
+  start: StartResearchResponse,
+  session: ResearchSessionResponse,
+  events: ResearchEventsResponse,
+  continue: ContinueResearchResponse,
+};
+
+async function researchWorker<T>(path: string, init: RequestInit, responseSchema: z.ZodType<T>): Promise<T> {
   const base = process.env.BROWSER_WORKER_URL?.replace(/\/$/, "");
   const token = process.env.BROWSER_WORKER_TOKEN;
   if (!base || !token) throw new Error("RESEARCH_SERVICE_UNAVAILABLE");
@@ -13,9 +84,9 @@ async function researchWorker<T>(path: string, init: RequestInit): Promise<T> {
     headers: { ...init.headers, authorization: `Bearer ${token}`, "content-type": "application/json" },
     signal: AbortSignal.timeout(125_000),
   });
-  const value = await response.json() as T & { error?: string };
-  if (!response.ok) throw new Error(value.error || "RESEARCH_SERVICE_UNAVAILABLE");
-  return value;
+  const value: unknown = await response.json();
+  if (!response.ok) throw new Error(WorkerError.safeParse(value).data?.error || "RESEARCH_SERVICE_UNAVAILABLE");
+  return responseSchema.parse(value);
 }
 
 const SpecInput = z.custom<SearchSpec>((value) => {
@@ -38,17 +109,17 @@ export const startResearchSession = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => researchWorker("/research/start", {
     method: "POST",
     body: JSON.stringify({ ownerId: context.userId, ...data }),
-  }));
+  }, StartResearchResponse));
 
 export const getResearchSession = createServerFn({ method: "GET" })
   .middleware([requireMyAuth])
   .inputValidator((value: unknown) => SessionInput.parse(value))
-  .handler(async ({ data, context }) => researchWorker(`/research/${encodeURIComponent(data.sessionId)}?ownerId=${encodeURIComponent(context.userId)}`, { method: "GET" }));
+  .handler(async ({ data, context }) => researchWorker(`/research/${encodeURIComponent(data.sessionId)}?ownerId=${encodeURIComponent(context.userId)}`, { method: "GET" }, ResearchSessionResponse));
 
 export const getResearchEvents = createServerFn({ method: "GET" })
   .middleware([requireMyAuth])
   .inputValidator((value: unknown) => SessionInput.extend({ after: z.number().int().min(0).default(0) }).parse(value))
-  .handler(async ({ data, context }) => researchWorker(`/research/${encodeURIComponent(data.sessionId)}/events?ownerId=${encodeURIComponent(context.userId)}&after=${data.after}`, { method: "GET" }));
+  .handler(async ({ data, context }) => researchWorker(`/research/${encodeURIComponent(data.sessionId)}/events?ownerId=${encodeURIComponent(context.userId)}&after=${data.after}`, { method: "GET" }, ResearchEventsResponse));
 
 export const continueResearchSession = createServerFn({ method: "POST" })
   .middleware([requireMyAuth])
@@ -56,7 +127,7 @@ export const continueResearchSession = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => researchWorker(`/research/${encodeURIComponent(data.sessionId)}/continue`, {
     method: "POST",
     body: JSON.stringify({ ownerId: context.userId }),
-  }));
+  }, ContinueResearchResponse));
 
 export const cancelResearchSession = createServerFn({ method: "POST" })
   .middleware([requireMyAuth])
@@ -64,7 +135,7 @@ export const cancelResearchSession = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => researchWorker(`/research/${encodeURIComponent(data.sessionId)}/cancel`, {
     method: "POST",
     body: JSON.stringify({ ownerId: context.userId }),
-  }));
+  }, ResearchSessionResponse));
 
 export const getResearchAgentDiscoverFlag = createServerFn({ method: "GET" })
   .middleware([requireMyAuth])

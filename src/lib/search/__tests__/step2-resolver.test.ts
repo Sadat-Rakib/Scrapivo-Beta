@@ -14,6 +14,7 @@ import { extractSearchSpec } from "../search-spec-extract";
 import { entityQuestionsForSpec } from "../clarifier";
 import { expandCategory, canonCraft } from "@/lib/canonical/businesses.server";
 import { runSpecSearchCore } from "@/lib/spec-search.functions";
+import { makeEvidence } from "../evidence";
 
 describe("Step 2.1 location resolver", () => {
   it("exact + alias resolve at confidence 1", () => {
@@ -243,7 +244,7 @@ describe("Step 2.3 opportunity slot + investor phrasing", () => {
     expect(spec.criteria.find((c) => c.field === "investor_sector")?.value).toBe("AI");
   });
 
-  it("no_website filters site rows on every engine", async () => {
+  it("no_website filters site rows without mistaking null values for verified absence", async () => {
     const fake = async () => ({
       rows: [
         { name: "NoSite Plumbing", category: "plumber", locality: "Austin", country: "US", website: null, phone: "+1-512-555-0100" },
@@ -251,14 +252,45 @@ describe("Step 2.3 opportunity slot + investor phrasing", () => {
       ],
       meta: { dbHit: true, engine: "s3-parquet", partitionsRead: ["fake"], rowsScanned: 2, rowsReturned: 2 },
     });
-    // Phase 1.3: the mode gate fires first (no mode stated) — pass it
-    // explicitly so this test isolates opportunity filtering, not gating.
     const res = await runSpecSearchCore(
       "plumbers in Austin without a website", { businesses: fake as never }, 20,
       { mode: "selling", offer: "websites" },
     );
-    expect(res.rows).toHaveLength(1);
-    expect(res.rows[0].title).toBe("NoSite Plumbing");
+    expect(res.rows).toEqual([]);
+    expect(res.candidateLedger?.rejectReasons["opportunity_filter:no_website"]).toBe(1);
+    expect(res.candidateLedger?.rejectReasons.NO_CLAIM_EVIDENCE).toBe(1);
+  });
+  it("a subject-bound structured absence plus two exact checks can qualify an indexed lead", async () => {
+    process.env.USE_INDEXED_SEARCH = "true";
+    const entityId = "overture:verified-nosite-plumbing";
+    const observed = {
+      kind: "business" as const, key: entityId, entity_id: entityId,
+      entity_resolved: true, page_type: "entity_page" as const,
+      title: "NoSite Plumbing", detail: "Austin, US", category: "plumber",
+      location: "Austin", country: "US", website_url: null, url: null,
+      no_website_verification: {
+        structured_source_url: entityId, structured_absence: true,
+        exact_queries: ['"NoSite Plumbing" "Austin" official website', '"NoSite Plumbing" "Austin" contact'],
+      },
+      evidence: [makeEvidence({
+        source_url: entityId, source_type: "db", evidence_type: "no_website",
+        supports: "opportunity", subject: entityId, confidence: 0.7,
+        extraction_method: "structured_absence_plus_exact_web_check",
+        excerpt: "Structured website field absent; neither exact-name check found an official website.",
+      })],
+    };
+    const result = await runSpecSearchCore("plumbers in Austin without a website", {
+      index: (async () => ({ rows: [observed], meta: {
+        dbHit: true, engine: "pg-index", partitionsRead: ["fixture"], rowsScanned: 1, rowsReturned: 1,
+      } })) as never,
+      liveGapfill: null, providerBusinesses: null,
+    }, 20);
+    expect(result.rows.map((r) => r.title)).toEqual(["NoSite Plumbing"]);
+    expect(result.rows[0].disposition).toBe("qualified");
+    expect(result.rows[0].no_website_verification?.exact_queries).toHaveLength(2);
+    expect(result.rows[0].evidence).toContainEqual(expect.objectContaining({
+      subject: entityId, source_url: entityId, evidence_type: "no_website",
+    }));
   });
 });
 

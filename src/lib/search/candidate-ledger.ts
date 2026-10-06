@@ -14,7 +14,7 @@ export type CandidateFate =
   | "qualified_more"
   /** Qualification rejected it (reject code as reason). */
   | "rejected"
-  /** Qualified by the lead check, dropped by the final why-match/signal gate. */
+  /** Dropped by the final gate or held back by terminal cancellation. */
   | "gated"
   /** A stated criterion (category, role, location…) is contradicted or still unproven after research. */
   | "filtered"
@@ -59,6 +59,9 @@ export type CandidateLedgerSummary = {
   streamed: number;
   /** Streamed leads that are not on the delivered page, each with its fate. */
   streamedNotReturned: StreamedReconciliation[];
+  /** Streamed leads on this branch's page; retained so a cancelled aggregate
+   * can retract branch-local delivery truthfully. */
+  streamedReturned?: StreamedReconciliation[];
   accounting?: CandidateAccounting;
 };
 
@@ -169,6 +172,16 @@ export function createCandidateLedger() {
       for (const row of rest) upsert(row, "qualified_more", null);
       for (const row of page) upsert(row, "returned", null);
     },
+    /** Terminal cancellation explains outstanding work without replacing any
+     * booked fate (including absorbed duplicates). Never used on success. */
+    cancelled(reason: "SEARCH_CANCELLED" | "SEARCH_STALE_RUN") {
+      for (const entry of entries) {
+        if (entry.fated && entry.fate !== "unaccounted") continue;
+        entry.fate = "gated";
+        entry.reason = reason;
+        entry.fated = true;
+      }
+    },
     summary(): CandidateLedgerSummary {
       const counts = Object.fromEntries(FATES.map((fate) => [fate, 0])) as Record<CandidateFate, number>;
       const rejectReasons: Record<string, number> = {};
@@ -196,6 +209,8 @@ export function createCandidateLedger() {
         streamed: streamed.length,
         streamedNotReturned: streamed.filter((entry) => entry.fate !== "returned")
           .map(({ key, title, fate, reason }) => ({ key, title, fate, reason })),
+        streamedReturned: streamed.filter((entry) => entry.fate === "returned")
+          .map(({ key, title, fate, reason }) => ({ key, title, fate, reason })),
         accounting: { retrieved, fated, unaccounted, ok: retrieved === fated && unaccounted === 0 },
       };
     },
@@ -205,10 +220,21 @@ export function createCandidateLedger() {
 export type CandidateLedger = ReturnType<typeof createCandidateLedger>;
 
 /** Combine per-location branch ledgers; a streamed lead delivered by any branch is not missing. */
-export function mergeCandidateLedgers(summaries: Array<CandidateLedgerSummary | undefined>, delivered: LedgerRow[]): CandidateLedgerSummary | undefined {
+export function mergeCandidateLedgers(
+  summaries: Array<CandidateLedgerSummary | undefined>,
+  delivered: LedgerRow[],
+  terminalCancellation?: "SEARCH_CANCELLED" | "SEARCH_STALE_RUN",
+): CandidateLedgerSummary | undefined {
   const present = summaries.filter((summary): summary is CandidateLedgerSummary => !!summary);
   if (!present.length) return undefined;
   const counts = Object.fromEntries(FATES.map((fate) => [fate, present.reduce((sum, summary) => sum + (summary.counts[fate] ?? 0), 0)])) as Record<CandidateFate, number>;
+  if (terminalCancellation) {
+    // A subrun may have marked rows returned before a later location cancels
+    // the aggregate. They were never delivered by the user-visible run.
+    counts.gated += counts.returned + counts.qualified_more;
+    counts.returned = 0;
+    counts.qualified_more = 0;
+  }
   const rejectReasons: Record<string, number> = {};
   const incompleteReasons: Record<string, number> = {};
   for (const summary of present) {
@@ -217,7 +243,13 @@ export function mergeCandidateLedgers(summaries: Array<CandidateLedgerSummary | 
   }
   const deliveredIds = new Set(delivered.flatMap(identities));
   const seen = new Set<string>();
-  const streamedNotReturned = present.flatMap((summary) => summary.streamedNotReturned).filter((item) => {
+  const branchReconciliations = present.flatMap((summary) => terminalCancellation
+    ? [...summary.streamedNotReturned, ...(summary.streamedReturned ?? [])].map((item) =>
+      item.fate === "returned" || item.fate === "qualified_more"
+        ? { ...item, fate: "gated" as const, reason: terminalCancellation }
+        : item)
+    : summary.streamedNotReturned);
+  const streamedNotReturned = branchReconciliations.filter((item) => {
     const ids = identities({ key: item.key, title: item.title });
     if (ids.some((id) => deliveredIds.has(id)) || seen.has(item.key)) return false;
     seen.add(item.key);
@@ -241,7 +273,10 @@ export function streamedFateLabel(item: Pick<StreamedReconciliation, "fate" | "r
   switch (item.fate) {
     case "qualified_more": return "on the next page";
     case "rejected": return item.reason === "MISSING_QUERY_REQUIRED" ? "missing a detail you asked for" : "did not pass the final checks";
-    case "gated": return item.reason === "SIGNAL_NOT_VERIFIED" ? "no verified signal found" : "did not pass the final checks";
+    case "gated":
+      if (item.reason === "SEARCH_CANCELLED") return "search was cancelled before delivery";
+      if (item.reason === "SEARCH_STALE_RUN") return "search was replaced before delivery";
+      return item.reason === "SIGNAL_NOT_VERIFIED" ? "no verified signal found" : "did not pass the final checks";
     case "filtered": return "did not match every part of your request";
     case "incomplete": return "still missing required details";
     case "excluded": return "already delivered earlier";

@@ -27,7 +27,7 @@ export function formatPlace(parts: Array<string | null | undefined>): string {
 /** Flag rows that share the same phone + address blob (soft duplicate). */
 export function markSoftDuplicates<
   T extends { phone?: string | null; detail?: string | null; soft_duplicate?: boolean },
->(rows: T[]): T[] {
+>(rows: T[]): Array<T & { soft_duplicate?: boolean }> {
   const counts = new Map<string, number>();
   const keyOf = (r: T) => {
     const phone = (r.phone ?? "").replace(/\D+/g, "");
@@ -40,7 +40,7 @@ export function markSoftDuplicates<
     if (!k) continue;
     counts.set(k, (counts.get(k) ?? 0) + 1);
   }
-  return rows.map((r) => {
+  return rows.map((r): T & { soft_duplicate?: boolean } => {
     const k = keyOf(r);
     if (k && (counts.get(k) ?? 0) > 1) return { ...r, soft_duplicate: true };
     return r;

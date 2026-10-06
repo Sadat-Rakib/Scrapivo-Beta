@@ -54,7 +54,7 @@ function hiringRow(partial?: Partial<SpecRow> & { entity_id?: string }): SpecRow
       technology: "React",
       seniority: "senior",
     },
-  } as Evidence & { claim_parameters: Record<string, string> });
+    });
   return {
     kind: "company",
     title: "Acme",

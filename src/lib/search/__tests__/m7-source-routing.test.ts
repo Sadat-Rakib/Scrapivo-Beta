@@ -7,6 +7,8 @@
  */
 import { describe, expect, it, beforeEach } from "vitest";
 import { extractSearchSpec } from "../search-spec-extract";
+import type { SearchSpec } from "../search-spec";
+import { planDiscoveryVariants } from "../search-query-planner";
 import {
   deriveCoverageRequirements,
   buildSourcePlan,
@@ -137,6 +139,141 @@ describe("M7 — deriveCoverageRequirements + buildSourcePlan", () => {
     const plan = buildResearchPlan(spec);
     expect(plan.discoveryQueries.join(" ")).not.toMatch(/founder|CEO|CTO/i);
     expect(plan.discoveryQueries.join(" ")).toMatch(/copywriter/i);
+  });
+});
+
+describe("M7 — job discovery query constraints", () => {
+  function calgarySpec(role = "react developer", technology = "React"): SearchSpec {
+    // Criteria captured from run_ef2e55fc, not reconstructed by the extractor.
+    return {
+      entity: "job",
+      raw_query: "React developer jobs in Calgary",
+      status: "ready_to_search",
+      missing: [],
+      signal_required: false,
+      signal_types: [],
+      signal_recency: null,
+      criteria: [
+        { field: "role", value: role, stated: true, confidence: 0.85 },
+        { field: "industry", value: "react developer job", stated: true, confidence: 0.85 },
+        { field: "technology", value: technology, stated: true, confidence: 1 },
+        { field: "location", value: "Calgary", stated: true, confidence: 0.9 },
+        { field: "location_id", value: "geo:city:calgary", stated: true, confidence: 1 },
+        { field: "location_kind", value: "city", stated: true, confidence: 1 },
+        { field: "location_country", value: "CA", stated: true, confidence: 1 },
+        { field: "location_parents", value: "geo:country:ca", stated: true, confidence: 1 },
+      ],
+    };
+  }
+
+  it.each([false, true])("keeps the captured Calgary spec local (widen=%s)", (widen) => {
+    const spec = calgarySpec();
+    const queries = buildResearchPlan(spec, { widen }).discoveryQueries;
+    expect(queries).toEqual([
+      "react developer Calgary job",
+      '"react developer" Calgary',
+      '"react engineer" Calgary',
+      "site:greenhouse.io react developer Calgary",
+    ]);
+    for (const query of queries) {
+      expect(query).not.toMatch(/\bremote\b/i);
+      expect(query.match(/\breact\b/gi)).toHaveLength(1);
+    }
+  });
+
+  it.each(["React", "TypeScript", "Node.js"])("preserves separate technology %s in every variant", (technology) => {
+    const spec = calgarySpec("developer", technology);
+    for (const widen of [false, true]) {
+      const queries = buildResearchPlan(spec, { widen }).discoveryQueries;
+      expect(queries.length).toBeGreaterThan(1);
+      for (const query of queries) {
+        expect(query.toLowerCase()).toContain(technology.toLowerCase());
+        expect(query).toContain("Calgary");
+        expect(query).not.toMatch(/\bremote\b/i);
+      }
+    }
+    expect(planDiscoveryVariants(spec).every((query) => query.toLowerCase().includes(technology.toLowerCase()))).toBe(true);
+  });
+
+  it("preserves comma-delimited multi-technology criteria without duplicate role terms", () => {
+    const spec = calgarySpec("developer", "React, TypeScript, Node.js, .NET, C++");
+    for (const query of buildResearchPlan(spec).discoveryQueries) {
+      expect(query).toMatch(/\breact\b/i);
+      expect(query).toContain("TypeScript");
+      expect(query).toContain("Node.js");
+      expect(query).toContain(".NET");
+      expect(query).toContain("C++");
+      expect(query.match(/\breact\b/gi)).toHaveLength(1);
+    }
+  });
+
+  it("uses the longest role alias match before shorter technology names", () => {
+    const spec = calgarySpec("react native developer", "React");
+    const variants = planDiscoveryVariants(spec);
+    expect(variants).toContain('"react native developer" Calgary');
+    expect(variants).not.toContain('"react developer" Calgary');
+  });
+
+  it.each(["criterion", "raw wording"])("allows explicit remote intent from %s", (source) => {
+    const spec = calgarySpec("developer");
+    if (source === "criterion") {
+      spec.criteria.push({ field: "employment", value: "remote", stated: true, confidence: 1 });
+    } else {
+      spec.raw_query = "Remote React developer jobs in Calgary";
+    }
+    const queries = buildResearchPlan(spec).discoveryQueries;
+    expect(queries).toContain("developer React remote job");
+    const variants = planDiscoveryVariants(spec);
+    expect(variants.length).toBeGreaterThan(1);
+    for (const query of variants) {
+      expect(query).toMatch(/\bremote\b/);
+      expect(query).toMatch(/\breact\b/i);
+    }
+    expect(variants).toContain("site:greenhouse.io developer React remote");
+  });
+
+  it.each(["not remote", "no remote", "non-remote", "without remote", "not fully remote"])("keeps %s local even with an extracted remote criterion", (negation) => {
+    const spec = calgarySpec();
+    spec.raw_query += `, ${negation}`;
+    spec.criteria.push({ field: "employment", value: "remote", stated: true, confidence: 1 });
+    for (const query of buildResearchPlan(spec).discoveryQueries) {
+      expect(query).toContain("Calgary");
+      expect(query).not.toMatch(/\bremote\b/i);
+    }
+  });
+
+  it("does not treat inferred employment or raw substrings as explicit remote intent", () => {
+    const spec = calgarySpec();
+    spec.raw_query += " remotely relevant";
+    spec.criteria.push({ field: "employment", value: "remote", stated: false, confidence: 0.5 });
+    expect(buildResearchPlan(spec).discoveryQueries.join(" ")).not.toMatch(/\bremote\b/i);
+  });
+
+  it.each(["on-site", "onsite", "hybrid"])("keeps stated %s authoritative over raw remote wording", (employment) => {
+    const spec = calgarySpec();
+    spec.criteria.push({ field: "employment", value: employment, stated: true, confidence: 1 });
+    for (const rawQuery of [
+      "React developer jobs in Calgary, not interested in remote jobs",
+      "Remote React developer jobs in Calgary",
+    ]) {
+      spec.raw_query = rawQuery;
+      for (const query of buildResearchPlan(spec).discoveryQueries) {
+        expect(query).toContain("Calgary");
+        expect(query).not.toMatch(/\bremote\b/i);
+      }
+    }
+  });
+
+  it.each([
+    ["frontend", "frontend developer"],
+    ["front end", "front-end developer"],
+    ["react developer", "react engineer"],
+    ["backend", "back-end developer"],
+    ["fullstack", "full-stack engineer"],
+    ["ml", "machine learning engineer"],
+  ])("preserves existing aliases for %s", (role, alias) => {
+    const spec = calgarySpec(role, "");
+    expect(planDiscoveryVariants(spec)).toContain(`"${alias}" Calgary`);
   });
 });
 

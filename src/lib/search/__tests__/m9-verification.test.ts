@@ -170,7 +170,7 @@ describe("M9 — claim type + parameter alignment", () => {
       supports: "requested_role",
       subject: entity_id,
       claim_parameters: { role: "accountant", location: "Austin" },
-    } as Evidence & { claim_parameters: Record<string, string> });
+    });
     const match = claimParametersMatch(ev, params);
     expect(match.ok).toBe(false);
     expect(match.mismatched.length).toBeGreaterThan(0);
@@ -205,7 +205,7 @@ describe("M9 — claim type + parameter alignment", () => {
         technology: "React",
         seniority: "junior",
       },
-    } as Evidence & { claim_parameters: Record<string, string> });
+    });
     expect(claimParametersMatch(ev, deriveRequiredClaimParameters(spec)).ok).toBe(
       false,
     );
@@ -239,7 +239,7 @@ describe("M9 — claim type + parameter alignment", () => {
         technology: "React",
         seniority: "senior",
       },
-    } as Evidence & { claim_parameters: Record<string, string> });
+    });
     const row: SpecRow = {
       kind: "company",
       title: "Acme",
@@ -426,7 +426,7 @@ describe("M9 — provenance + event_at freeze + currentness", () => {
       supports: "requested_role",
       subject: entity_id,
       claim_parameters: { role: "developer", role_currentness: "former_role" },
-    } as Evidence & { claim_parameters: Record<string, string> });
+    });
     const cur = evaluateRoleCurrentness(ev, forced);
     expect(cur.ok).toBe(false);
     const row: SpecRow = {
@@ -455,7 +455,7 @@ describe("M9 — provenance + event_at freeze + currentness", () => {
       subject: entity_id,
       event_at: daysAgo(5),
       claim_parameters: { role: "developer", technology: "React", seniority: "senior" },
-    } as Evidence & { claim_parameters: Record<string, string> });
+    });
     const claim = asClaimEvidence(ev, entity_id)!;
     expect(claim.subject).toBe(entity_id);
     expect(claim.claim_type).toBe("hiring");
@@ -504,7 +504,7 @@ describe("M9 — production path NL→…→verify→qualify", () => {
                   technology: "React",
                   seniority: "senior",
                 },
-              } as Evidence & { claim_parameters: Record<string, string> }),
+    }),
             ],
           },
         ]),

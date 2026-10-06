@@ -151,7 +151,7 @@ export function applyPageClassificationToLiveRow<
     entity_resolved?: boolean | null;
     page_type?: PageType | null;
   },
->(row: T): T {
+>(row: T): T & { page_type: PageType; entity_resolved: boolean; entity_id: string } {
   const clf = classifyPage({
     url: row.url,
     title: row.title,
@@ -172,5 +172,5 @@ export function applyPageClassificationToLiveRow<
           /* keep provisional id; theorem will LIST_PAGE_AS_ENTITY */
         }
       : {}),
-  };
+  } as T & { page_type: PageType; entity_resolved: boolean; entity_id: string };
 }

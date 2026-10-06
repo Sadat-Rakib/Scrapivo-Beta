@@ -195,7 +195,10 @@ describe.skipIf(!chromiumInstalled)("WorkerBrowserAdapter over the real worker (
       },
     }).catch(() => undefined);
     expect(abortedAt).toBeGreaterThan(0);
-    expect(Date.now() - abortedAt).toBeLessThan(3000);
+    // Standalone this settles in ~1.5s; the budget only guards against the
+    // zombie-run class (cancel unnoticed), so it stays generous for real
+    // Chromium under full-suite parallel load.
+    expect(Date.now() - abortedAt).toBeLessThan(15_000);
     expect(streamed).toEqual([]);
     expect(extractor).not.toHaveBeenCalled();
     const state = readScrapyBrowserState(runId, OWNER);

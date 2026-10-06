@@ -1,5 +1,5 @@
-/** Phase 1.4: offering taxonomy battery. Inference, site mapping, and the
- *  gate's offer/follow-up sequencing. Retrieval fakes are canonical-shaped. */
+/** Offering utilities and frame-owned user-context semantics. Sales context
+ * cannot invent a target need, website absence, or site-quality claim. */
 import { describe, expect, it } from "vitest";
 import { runSpecSearchCore } from "../spec-search.functions";
 import {
@@ -60,46 +60,49 @@ describe("siteAnswerToCriteria", () => {
 });
 
 describe("offering-aware gate", () => {
-  it("'without a website' query: zero questions, selling + offer inferred, rows filtered", async () => {
+  it("explicit website absence filters site rows but a missing value cannot verify absence", async () => {
     const res = await runSpecSearchCore(
       "plumbers in Austin without a website",
       { businesses: fakeBusinesses, index: null }, 25,
     );
-    expect(res.clarify).toEqual([]);
-    expect(res.spec.criteria.some((c) => c.field === "mode" && c.value === "selling") ||
-      res.spec.criteria.some((c) => c.field === "offer")).toBe(true);
-    expect(res.rows).toHaveLength(1);
-    expect(res.rows[0].title).toBe("NoSite Plumbing");
+    expect(res.dbMeta.length).toBeGreaterThan(0);
+    expect(res.clarify.map((q) => q.id)).not.toContain("entity_mode");
+    expect(res.spec.criteria).toContainEqual(expect.objectContaining({ field: "opportunity", value: "no_website" }));
+    expect(res.spec.signal_required).toBe(false);
+    expect(res.rows).toEqual([]);
+    expect(res.candidateLedger?.rejectReasons.NO_CLAIM_EVIDENCE).toBe(1);
   });
 
-  it("selling + website offer, no site pref → exactly the site follow-up", async () => {
+  it("selling a website service does not force a target website preference", async () => {
     const res = await runSpecSearchCore(
       "dentists in Pune", { businesses: fakeBusinesses, index: null }, 25,
       { mode: "selling", offer: "websites" },
     );
-    // Fake rows are Austin/US: validation rejects for Pune — but the gate
-    // fires BEFORE retrieval, so clarify is what matters here.
-    expect(res.clarify).toHaveLength(1);
-    expect(res.clarify[0].id).toBe("entity_site");
+    expect(res.dbMeta.length).toBeGreaterThan(0);
+    expect(res.clarify.map((q) => q.id)).not.toContain("entity_site");
+    expect(res.spec.criteria).toContainEqual(expect.objectContaining({ field: "offer", value: "websites" }));
+    expect(res.spec.criteria.some((c) => c.field === "opportunity")).toBe(false);
   });
 
-  it("site=without answer filters to no-website rows", async () => {
+  it("an explicit absence answer still needs observed verification", async () => {
     const res = await runSpecSearchCore(
       "plumbers in Austin", { businesses: fakeBusinesses, index: null }, 25,
       { mode: "selling", offer: "websites", opportunity: "no_website" },
     );
-    expect(res.clarify).toEqual([]);
-    expect(res.rows).toHaveLength(1);
-    expect(res.rows[0].title).toBe("NoSite Plumbing");
+    expect(res.dbMeta.length).toBeGreaterThan(0);
+    expect(res.clarify.map((q) => q.id)).not.toContain("entity_site");
+    expect(res.rows).toEqual([]);
+    expect(res.candidateLedger?.rejectReasons.NO_CLAIM_EVIDENCE).toBe(1);
   });
 
-  it("marketing offer → channel follow-up (pitch tailoring, no row filter)", async () => {
+  it("marketing user context does not force a channel follow-up", async () => {
     const res = await runSpecSearchCore(
       "dentists in Pune", { businesses: fakeBusinesses, index: null }, 25,
       { mode: "selling", offer: "seo services" },
     );
-    expect(res.clarify).toHaveLength(1);
-    expect(res.clarify[0].id).toBe("entity_channel");
+    expect(res.dbMeta.length).toBeGreaterThan(0);
+    expect(res.clarify.map((q) => q.id)).not.toContain("entity_channel");
+    expect(res.spec.criteria).toContainEqual(expect.objectContaining({ field: "offer", value: "seo services" }));
   });
 
   it("channel answer proceeds without filtering rows", async () => {
@@ -116,8 +119,8 @@ describe("offering-aware gate", () => {
       "web designers in Austin", { businesses: fakeBusinesses, index: null }, 25,
       { role: "web designer", mode: "selling" },
     );
-    // Offer must be asked, never auto-filled, for person entities.
-    expect(res.clarify.map((q) => q.id)).toContain("entity_offer");
+    expect(res.clarify.map((q) => q.id)).not.toContain("entity_offer");
+    expect(res.spec.criteria.some((c) => c.field === "offer")).toBe(false);
   });
 
 describe("stale_site (design redesign angle)", () => {
@@ -146,17 +149,17 @@ describe("stale_site (design redesign angle)", () => {
     },
   })) as never;
 
-  it("design offer, no site pref → design-worded site follow-up", async () => {
+  it("design user context keeps target discovery free of site coaching", async () => {
     const res = await runSpecSearchCore(
       "plumbers in Austin", { businesses: siteFakes, index: null }, 25,
       { mode: "selling", offer: "logo and branding" },
     );
-    expect(res.clarify).toHaveLength(1);
-    expect(res.clarify[0].id).toBe("entity_site");
-    expect(res.clarify[0].question).toMatch(/design/i);
+    expect(res.rows).toHaveLength(3);
+    expect(res.clarify).toEqual([]);
+    expect(res.spec.criteria).toContainEqual(expect.objectContaining({ field: "offer", value: "logo and branding" }));
   });
 
-  it("design + site=with → opportunity=stale_site derived, only thin-presence rows", async () => {
+  it("design + site=with does not invent a stale-site opportunity", async () => {
     const res = await runSpecSearchCore(
       "plumbers in Austin", { businesses: siteFakes, index: null }, 25,
       { mode: "selling", offer: "logo and branding", site: "with" },
@@ -164,19 +167,30 @@ describe("stale_site (design redesign angle)", () => {
     expect(res.clarify).toEqual([]);
     expect(
       res.spec.criteria.some((c) => c.field === "opportunity" && c.value === "stale_site"),
-    ).toBe(true);
-    expect(res.rows).toHaveLength(1);
-    expect(res.rows[0].title).toBe("StaleSite Studio");
+    ).toBe(false);
+    expect(res.rows.map((r) => r.title)).toEqual(["StaleSite Studio", "RichSite Studio", "NoSite Studio"]);
   });
 
-  it("design + site=without → no_website as before", async () => {
+  it("explicit stale_site refinement keeps only the stored thin-presence proxy", async () => {
+    const res = await runSpecSearchCore("plumbers in Austin", {
+      businesses: siteFakes, index: null,
+    }, 25, { mode: "selling", offer: "logo and branding", opportunity: "stale_site" });
+    expect(res.clarify).toEqual([]);
+    expect(res.rows.map((r) => r.title)).toEqual(["StaleSite Studio"]);
+    expect(res.rows[0].website_url).toBe("https://stale.example");
+    expect(res.rows[0].email).toBeNull();
+    expect(res.rows[0].phone).toBeNull();
+  });
+
+  it("design + explicit absence still requires bounded observation", async () => {
     const res = await runSpecSearchCore(
       "plumbers in Austin", { businesses: siteFakes, index: null }, 25,
       { mode: "selling", offer: "logo and branding", opportunity: "no_website" },
     );
-    expect(res.clarify).toEqual([]);
-    expect(res.rows).toHaveLength(1);
-    expect(res.rows[0].title).toBe("NoSite Studio");
+    expect(res.dbMeta.length).toBeGreaterThan(0);
+    expect(res.clarify.map((q) => q.id)).not.toContain("entity_site");
+    expect(res.rows).toEqual([]);
+    expect(res.candidateLedger?.rejectReasons.NO_CLAIM_EVIDENCE).toBe(1);
   });
 });
   it("force (Search with defaults) bypasses the gate unfiltered — client shows the chip", async () => {
@@ -185,7 +199,7 @@ describe("stale_site (design redesign angle)", () => {
       { mode: "selling", offer: "websites" },
       { force: true },
     );
-    expect(res.clarify).toEqual([]);
+    expect(res.clarify.map((q) => q.id)).not.toContain("entity_mode");
     // No opportunity criterion: both rows pass; the filter bar (client,
     // filterBarModel unset state) is what makes this explicit, not silence.
     expect(res.rows).toHaveLength(2);
@@ -200,6 +214,7 @@ describe("stale_site (design redesign angle)", () => {
       { companies: emptyCompanies, index: null }, 25,
     );
     expect(res.spec.signal_required).toBe(true);
-    expect(res.clarify).toEqual([]);
+    expect(res.dbMeta.length).toBeGreaterThan(0);
+    expect(res.clarify.map((q) => q.id)).not.toContain("entity_mode");
   });
 });

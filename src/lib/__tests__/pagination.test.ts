@@ -19,9 +19,9 @@ const ROWS_5 = Array.from({ length: 5 }, (_, i) => ({
   registry_id: `overture:p${i}`,
 }));
 
-// Contact-less rows: every one dies at the qualification/completeness gate,
-// so the delivered page is empty while the raw kept set still overflows the
-// fetch window — the exact zero-delivered shape from the evidence runs.
+// Contact-less rows: resolved authority records (identity evidence from the
+// store) qualify without a public contact footprint and deliver honestly
+// labeled (missingFields contact_or_site).
 const ROWS_5_NO_CONTACT = ROWS_5.map(({ phone: _phone, ...rest }) => rest);
 
 const s3Fake = (rows: unknown[]) =>
@@ -103,16 +103,39 @@ describe("pagination (S3 path)", () => {
     expect(res.hasMore).toBe(true);
     expect(res.moreAvailableMessage).toBe("There are more verified leads — want to see them?");
   });
-});
 
-describe("zero-delivery contract (Defect A)", () => {
-  it("zero rows returned: hasMore false and no more-leads promise (fetch-window overflow)", async () => {
-    // Every row fails qualification → the delivered page is empty, but the
-    // kept set (5) still overflows offset 2 + limit 2 — pre-fix this produced
-    // hasMore: true + "There are more verified leads…" under 0 results.
+  it("stored authority rows without contact deliver, labeled incomplete", async () => {
     const res = await runSpecSearchCore(
       "dentists in Pune",
       { businesses: s3Fake(ROWS_5_NO_CONTACT), index: null },
+      2,
+      MODE,
+      { offset: 0 },
+    );
+    expect(res.rows).toHaveLength(2);
+    expect(res.rows[0].missingFields).toContain("contact_or_site");
+    expect(res.hasMore).toBe(true);
+  });
+});
+
+describe("zero-delivery contract (Defect A)", () => {
+  // Stored authority rows without contact now deliver by design (resolved
+  // identity evidence qualifies them), so the honest-zero shape is probed
+  // with stored rows that fail the why-match gate instead: a full window of
+  // dentists-category mismatches keeps the kept set empty at any offset.
+  const ROWS_5_WRONG_CATEGORY = ROWS_5.map((r) => ({
+    ...r,
+    category: "locksmith",
+    name: r.name.replace("Dental", "Locksmith"),
+  }));
+
+  it("zero rows returned: hasMore false and no more-leads promise (fetch-window overflow)", async () => {
+    // Every row fails the why-match gate → the delivered page is empty while
+    // the store still overflows offset 2 + limit 2 — pre-fix this produced
+    // hasMore: true + "There are more verified leads…" under 0 results.
+    const res = await runSpecSearchCore(
+      "dentists in Pune",
+      { businesses: s3Fake(ROWS_5_WRONG_CATEGORY), index: null },
       2,
       MODE,
       { offset: 2 },
@@ -126,7 +149,7 @@ describe("zero-delivery contract (Defect A)", () => {
   it("zero rows returned on the first page: no more-leads promise either", async () => {
     const res = await runSpecSearchCore(
       "dentists in Pune",
-      { businesses: s3Fake(ROWS_5_NO_CONTACT), index: null },
+      { businesses: s3Fake(ROWS_5_WRONG_CATEGORY), index: null },
       2,
       MODE,
       { offset: 0 },

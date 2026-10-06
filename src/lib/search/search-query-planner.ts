@@ -6,7 +6,7 @@
  * signals) instead of re-pasting the user's sentence. Only publicly indexed
  * results are used — never private groups or login walls.
  */
-import type { SearchSpec } from "./search-spec";
+import { getField, type SearchSpec } from "./search-spec";
 
 /** "term" — exact phrase operator. */
 export const quote = (term: string): string => `"${term.replace(/"/g, "").trim()}"`;
@@ -18,6 +18,39 @@ export const anyOf = (terms: string[]): string =>
 
 function fieldOf(spec: SearchSpec, f: string): string | null {
   return spec.criteria.find((c) => c.field === f)?.value?.trim() || null;
+}
+
+function technologyTerms(spec: SearchSpec): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const term of (fieldOf(spec, "technology") ?? "").split(/\s*(?:,|;|\||\/)\s*/).map((t) => t.trim()).filter(Boolean)) {
+    const key = term.toLowerCase().replace(/\s+/g, " ");
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(term);
+  }
+  return out;
+}
+
+/** Keep separate technology criteria in both base queries and role aliases. */
+export function jobDiscoveryRole(
+  spec: SearchSpec,
+  role = fieldOf(spec, "role") ?? fieldOf(spec, "requested_role") ?? fieldOf(spec, "category") ?? fieldOf(spec, "industry") ?? "",
+): string {
+  const missing = technologyTerms(spec).filter((term) => {
+    const escaped = term.replace(/[.*+?^$(){}|[\]\\]/g, "\\$&");
+    return !new RegExp(`(?:^|\\W)${escaped}(?:$|\\W)`, "i").test(role);
+  });
+  return [role, ...missing].filter(Boolean).join(" ");
+}
+
+/** Query wording must not turn a negated or inferred work mode into remote intent. */
+export function jobDiscoveryRemoteIntent(spec: SearchSpec): boolean {
+  const employment = getField(spec, "employment");
+  const denied = /\b(?:not|no|non|without|never|exclude|excluding)[\s-]+(?:fully[\s-]+)?remote\b/i;
+  if (denied.test(spec.raw_query) || denied.test(employment?.value ?? "")) return false;
+  if (employment?.stated === true) return /^remote$/i.test(employment.value.trim());
+  return /\bremote\b/i.test(spec.raw_query);
 }
 
 const JOB_ROLE_ALIASES: Record<string, string[]> = {
@@ -53,12 +86,16 @@ export function planDiscoveryVariants(spec: SearchSpec): string[] {
     variants.push(`${quote(sector)} portfolio ${stage ?? ""}`.trim());
   }
   if (spec.entity === "job") {
-    const rawRole = (role ?? fieldOf(spec, "requested_role") ?? "").toLowerCase();
-    const aliases = Object.entries(JOB_ROLE_ALIASES).find(([key]) => rawRole.includes(key))?.[1] ?? [];
+    const jobRole = jobDiscoveryRole(spec);
+    const scope = jobDiscoveryRemoteIntent(spec) ? "remote" : location;
+    const rawRole = jobRole.toLowerCase();
+    const aliases = Object.entries(JOB_ROLE_ALIASES)
+      .sort(([a], [b]) => b.length - a.length)
+      .find(([key]) => rawRole.includes(key))?.[1] ?? [];
     for (const alias of aliases.slice(0, 2)) {
-      variants.push(`${quote(alias)}${/remote/i.test(spec.raw_query) ? " remote" : location ? ` ${location}` : ""}`);
+      variants.push([quote(jobDiscoveryRole(spec, alias)), scope].filter(Boolean).join(" "));
     }
-    variants.push(`${site("greenhouse.io")} ${role ?? ""} remote`.trim());
+    variants.push([site("greenhouse.io"), jobRole, scope].filter(Boolean).join(" "));
   }
   // Signal/intent hunts: publicly indexed asks, never private groups.
   if (requestedService && (spec.signal_required || /recently|posted|looking for|complain/i.test(spec.raw_query))) {

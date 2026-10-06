@@ -91,7 +91,7 @@ function fundingEv(subject: string, eventAt: string): Evidence {
     event_at: eventAt,
     observed_at: new Date(NOW).toISOString(),
     claim_parameters: { funding_stage: "series_a" },
-  } as Evidence & { claim_parameters: Record<string, string> });
+    });
 }
 
 function hiringEv(subject: string): Evidence {
@@ -104,7 +104,7 @@ function hiringEv(subject: string): Evidence {
     subject,
     event_at: new Date(NOW - 86400000).toISOString(),
     claim_parameters: { role: "copywriter" },
-  } as Evidence & { claim_parameters: Record<string, string> });
+    });
 }
 
 function employmentEv(personId: string, orgId: string): Evidence {
@@ -122,7 +122,7 @@ function employmentEv(personId: string, orgId: string): Evidence {
       organization_name: "Acme",
       role_currentness: "current_role",
     },
-  } as Evidence & { claim_parameters: Record<string, string> });
+    });
 }
 
 function needEv(personId: string): Evidence {
@@ -135,7 +135,7 @@ function needEv(personId: string): Evidence {
     subject: personId,
     event_at: new Date(NOW - 86400000).toISOString(),
     claim_parameters: { role: "developer", is_ask: "true" },
-  } as Evidence & { claim_parameters: Record<string, string> });
+    });
 }
 
 /** Score one query class through the spine with a hand-built candidate. */
@@ -433,7 +433,7 @@ describe("M15 — adversarial pairs (zero false-positive qualified)", () => {
           supports: "requested_service",
           subject: "person:designer",
           claim_parameters: { is_ask: "false", intent: "identity_offer" },
-        } as Evidence & { claim_parameters: Record<string, string> }),
+    }),
       ],
     },
   ];

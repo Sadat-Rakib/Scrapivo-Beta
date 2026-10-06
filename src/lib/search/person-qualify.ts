@@ -54,7 +54,7 @@ export function evaluatePersonGates(args: {
   if (row.page_type === "institute" || row.page_type === "company_page") {
     // company_page as person is only ok when upstream resolved entity_type person;
     // institute is never a person.
-    if (row.page_type === "institute" || row.kind === "company" || row.kind === "business") {
+    if (row.page_type === "institute") {
       return {
         ok: false,
         reject_code: "ENTITY_TYPE_MISMATCH",

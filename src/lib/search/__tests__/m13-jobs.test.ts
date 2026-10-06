@@ -68,7 +68,7 @@ function employerEvidence(
       employer: "Acme",
       job_currentness: opts?.currentness ?? "active",
     },
-  } as Evidence & { claim_parameters: Record<string, string> });
+    });
 }
 
 describe("M13 — job Spec + open role", () => {
@@ -137,7 +137,7 @@ describe("M13 — employer binding + currentness", () => {
       supports: "requested_role",
       subject: jobId,
       claim_parameters: { company: "Acme", role: "developer" },
-    } as Evidence & { claim_parameters: Record<string, string> });
+    });
     const built = employerFromEvidence({ job_entity_id: jobId, evidence: ev });
     expect(built.ok).toBe(false);
     if (!built.ok) expect(built.reject_code).toBe("EMPLOYMENT_UNPROVEN");

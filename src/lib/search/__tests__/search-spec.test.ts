@@ -13,19 +13,19 @@ describe("Phase 1 assertion prompts", () => {
     expect(s.status).toBe("ready_to_search");
   });
 
-  it("'bro i need businesses' asks for location", () => {
+  it("'bro i need businesses' asks for category and location", () => {
     const s = extractSearchSpec("bro i need businesses plz asap");
     expect(s.entity).toBe("business");
-    expect(s.missing).toEqual(["location"]);
+    expect(s.missing).toEqual(["category", "location"]);
     expect(s.status).toBe("needs_clarification");
   });
 
-  it("broad businesses in Canada can search without a category", () => {
+  it("businesses in Canada ask for a category even with a location", () => {
     const s = extractSearchSpec("businesses in Canada with a website");
     expect(s.entity).toBe("business");
     expect(s.criteria.find((field) => field.field === "category")).toBeUndefined();
-    expect(s.missing).toEqual([]);
-    expect(s.status).toBe("ready_to_search");
+    expect(s.missing).toEqual(["category"]);
+    expect(s.status).toBe("needs_clarification");
   });
 
   it("'companies looking for website developers' is signal-required", () => {

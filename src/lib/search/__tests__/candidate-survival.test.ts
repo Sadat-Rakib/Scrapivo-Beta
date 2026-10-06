@@ -237,7 +237,7 @@ describe("candidate survival — no_website opportunity", () => {
         structured_absence: true,
         structured_source_url: "osm://node/9",
         exact_queries: ["Bob's Plumbing Austin", "Bob's Plumbing Austin official site"],
-        official_site_found: false,
+        official_site_found: null,
       } as SpecRow["no_website_verification"],
       evidence: [
         makeEvidence({

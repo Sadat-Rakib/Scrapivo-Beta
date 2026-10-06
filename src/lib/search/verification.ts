@@ -50,6 +50,12 @@ export type ClaimParameters = {
   [key: string]: string | number | boolean | null | undefined;
 };
 
+function definedClaimParameters(params: ClaimParameters): ClaimEvidence["claim_parameters"] {
+  return Object.fromEntries(
+    Object.entries(params).filter(([, value]) => value !== undefined),
+  ) as ClaimEvidence["claim_parameters"];
+}
+
 export type TemporalConstraint = {
   /** Recency window from Spec (e.g. "90d"). */
   signal_recency: string | null;
@@ -534,7 +540,7 @@ export function verifyClaimEvidence(args: {
   if (claim) {
     claim.freshness = temporal.freshness;
     if (!claim.claim_parameters) {
-      claim.claim_parameters = { ...requiredParams };
+      claim.claim_parameters = definedClaimParameters(requiredParams);
     }
   }
 
