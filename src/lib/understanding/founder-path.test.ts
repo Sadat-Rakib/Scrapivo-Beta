@@ -6,11 +6,185 @@ import { describe, expect, it } from "vitest";
 import { extractFrameDeterministic } from "./fallback";
 import { validateFrame } from "./validate";
 import { applyClarificationToFrame, frameToSearchSpec } from "./to-search-spec";
-import { openValue } from "./frame";
+import { emptyFrame, openValue } from "./frame";
 
 const QUERY = "Founders of B2B SaaS startups in Tallinn, Estonia who are hiring engineers right now, with public contact";
 const deterministic = () => validateFrame(extractFrameDeterministic(QUERY)).frame;
 const fields = (spec: ReturnType<typeof frameToSearchSpec>) => spec.criteria.map((c) => `${c.field}=${c.value}`);
+
+describe("investor frame to spec mapping", () => {
+  function investorFrame(category = " seed investor") {
+    const frame = emptyFrame("Find investors in Canada");
+    frame.target.entity_type = { value: "investor", raw: "investors", confidence: 1 };
+    frame.target.category = openValue(category, category, null, 0.9);
+    frame.location = { value: "Canada", raw: "Canada", scope: "in", radius: null, radius_unit: null, country_code: "CA", canonical: "Canada", confidence: 1 };
+    frame.locations = [frame.location];
+    return frame;
+  }
+
+  function freshInvestorFrame() {
+    const frame = investorFrame("seed investor");
+    frame.target.category = openValue("seed investor", "seed investors", null, 0.9);
+    frame.relation.type = { value: "investing_in", raw: "for", confidence: 0.9 };
+    frame.relation.object = openValue("AI startup", "AI startups", null, 0.85);
+    frame.meta.extractor = "llm";
+    frame.meta.notes.push("recovered target descriptors from deterministicparse");
+    return frame;
+  }
+
+  it("compiles the relayed fresh investor frame from its structured fields", () => {
+    const frame = freshInvestorFrame();
+    expect(frame.target.industry).toBeNull();
+    expect(frame.target.company_stage).toBeNull();
+    const spec = frameToSearchSpec(frame);
+    expect(spec.criteria).toContainEqual({ field: "investor_sector", value: "AI", stated: true, confidence: 0.85 });
+    expect(spec.criteria).toContainEqual({ field: "investor_stage", value: "seed", stated: true, confidence: 0.9 });
+    expect(fields(spec)).not.toContain("investor_sector=seed investor");
+    expect(fields(spec).some((field) => field.startsWith("investor_check="))).toBe(false);
+    expect(spec.understanding?.relation.object).toEqual(frame.relation.object);
+    expect(spec.understanding?.target.category?.raw).toBe("seed investors");
+    // Input wording contains neither AI nor seed: no raw-query recovery needed.
+    expect(spec.raw_query).toBe("Find investors in Canada");
+  });
+
+  it.each([
+    ["battery recycling startup", "battery recycling"],
+    ["precision agriculture companies", "precision agriculture"],
+    ["quantum sensing", "quantum sensing"],
+  ])("preserves open beneficiary sector %s", (object, sector) => {
+    const frame = freshInvestorFrame();
+    frame.relation.object = openValue(object, object, null, 0.85);
+    expect(fields(frameToSearchSpec(frame))).toContain(`investor_sector=${sector}`);
+  });
+
+  it("does not invent a sector from a generic beneficiary entity noun", () => {
+    const frame = freshInvestorFrame();
+    frame.relation.object = openValue("startup", "startups");
+    expect(fields(frameToSearchSpec(frame)).some((field) => field.startsWith("investor_sector="))).toBe(false);
+  });
+
+  it.each(["unknown", "hiring", "seeking_funding"] as const)("does not infer beneficiary sector or category stage for %s", (relation) => {
+    const frame = freshInvestorFrame();
+    frame.relation.type.value = relation;
+    expect(fields(frameToSearchSpec(frame)).filter((field) => /^investor_(sector|stage)=/.test(field))).toEqual([]);
+  });
+
+  it("keeps explicit sector and stage ahead of beneficiary and category modifiers", () => {
+    const frame = freshInvestorFrame();
+    frame.target.industry = openValue("healthcare", "healthcare");
+    frame.target.company_stage = openValue("series-a", "series-a");
+    expect(fields(frameToSearchSpec(frame))).toEqual(expect.arrayContaining(["investor_sector=healthcare", "investor_stage=series-a"]));
+    frame.constraints.push({ field: "investor_stage", operator: "eq", value: "series-b", raw: "series-b", confidence: 1, negated: false, unit: null });
+    expect(fields(frameToSearchSpec(frame))).toContain("investor_stage=series-b");
+  });
+
+  it("maps an explicit company-stage constraint ahead of the category modifier", () => {
+    const frame = freshInvestorFrame();
+    frame.constraints.push({ field: "company_stage", operator: "eq", value: "series-b", raw: "series-b", confidence: 0.95, negated: false, unit: null });
+    const spec = frameToSearchSpec(frame);
+    expect(spec.criteria).toContainEqual({ field: "investor_stage", value: "series-b", confidence: 0.95, stated: true });
+    expect(fields(spec).some((field) => field.startsWith("company_stage="))).toBe(false);
+  });
+
+  it.each([["pre-seed investors", "pre-seed"], ["series A investors", "series-a"]])("recovers source-bound financial stage from %s", (category, stage) => {
+    const frame = freshInvestorFrame();
+    frame.target.category = openValue(category, category, null, 0.9);
+    expect(fields(frameToSearchSpec(frame))).toContain(`investor_stage=${stage}`);
+  });
+
+  it.each(["seed libraries", "investors"])("does not infer seed from a category whose raw source is %s", (raw) => {
+    const frame = freshInvestorFrame();
+    frame.target.category = openValue("seed investor", raw);
+    expect(fields(frameToSearchSpec(frame)).some((field) => field.startsWith("investor_stage="))).toBe(false);
+  });
+
+  it.each(["pre-seed libraries", "series A cameras"])("does not infer financial stage from non-financial category %s", (category) => {
+    const frame = freshInvestorFrame();
+    frame.target.category = openValue(category, category);
+    expect(fields(frameToSearchSpec(frame)).some((field) => field.startsWith("investor_stage="))).toBe(false);
+  });
+
+  it("keeps seed-library business category unchanged", () => {
+    const frame = emptyFrame("Find seed libraries in Canada");
+    frame.target.entity_type = { value: "business", raw: "seed libraries", confidence: 1 };
+    frame.target.category = openValue("seed library", "seed libraries");
+    const spec = frameToSearchSpec(frame);
+    expect(fields(spec)).toContain("category=seed library");
+    expect(fields(spec).filter((field) => /^investor_(sector|stage)=/.test(field))).toEqual([]);
+  });
+
+  it("honors any stage instead of recovering the category stage again", () => {
+    const answered = applyClarificationToFrame(freshInvestorFrame(), { investor_stage: "any" });
+    expect(fields(frameToSearchSpec(answered)).some((field) => field.startsWith("investor_stage="))).toBe(false);
+  });
+
+  it("maps canonical industry and company stage to investor sector and stage", () => {
+    const frame = investorFrame();
+    frame.target.industry = openValue("AI", "AI", null, 0.9);
+    frame.target.company_stage = openValue("seed", "seed", null, 0.8);
+    const spec = frameToSearchSpec(frame);
+    expect(spec.entity).toBe("investor");
+    expect(spec.criteria).toContainEqual({ field: "investor_sector", value: "AI", confidence: 0.9, stated: true });
+    expect(spec.criteria).toContainEqual({ field: "investor_stage", value: "seed", confidence: 0.8, stated: true });
+    expect(fields(spec)).not.toContain("investor_sector=seed investor");
+    expect(fields(spec).some((field) => field.startsWith("company_stage="))).toBe(false);
+  });
+
+  it.each([" seed investor", "angel investor", "venture capital", "family office", "fund"])("does not turn investor category %s into a sector", (category) => {
+    const frame = investorFrame(category);
+    frame.target.business_type = openValue(category, category);
+    const spec = frameToSearchSpec(frame);
+    expect(fields(spec).some((field) => field.startsWith("investor_sector="))).toBe(false);
+    expect(fields(spec).some((field) => field.startsWith("investor_stage="))).toBe(false);
+  });
+
+  it("preserves company stage for a noninvestor frame", () => {
+    const frame = emptyFrame("Find software companies in Canada");
+    frame.target.entity_type = { value: "company", raw: "companies", confidence: 1 };
+    frame.target.industry = openValue("software", "software");
+    frame.target.company_stage = openValue("seed", "seed", null, 0.8);
+    const spec = frameToSearchSpec(frame);
+    expect(fields(spec)).toContain("company_stage=seed");
+    expect(fields(spec).some((field) => field.startsWith("investor_stage="))).toBe(false);
+  });
+
+  it.each(["seed", "series-a"])("persists optional investor stage answer %s without an unresolved slot", (stage) => {
+    const frame = investorFrame();
+    expect(frame.unresolved).toEqual([]);
+    const answered = applyClarificationToFrame(frame, { investor_stage: stage });
+    expect(fields(frameToSearchSpec(answered))).toContain(`investor_stage=${stage}`);
+    expect(answered.clarification.answered?.investor_stage).toBe(stage);
+    expect(frame.target.company_stage).toBeNull();
+  });
+
+  it.each(["angel", "seed", "growth"])("persists optional investor check answer %s as a categorical constraint", (check) => {
+    const answered = applyClarificationToFrame(investorFrame(), { investor_check: check });
+    expect(fields(frameToSearchSpec(answered))).toContain(`investor_check=${check}`);
+    expect(answered.constraints).toContainEqual({ field: "investor_check", operator: "eq", value: check, raw: check, confidence: 1, negated: false, unit: null });
+    expect(answered.clarification.answered?.investor_check).toBe(check);
+  });
+
+  it("replaces prior investor refinements and removes them on any", () => {
+    const frame = investorFrame();
+    frame.target.company_stage = openValue("seed", "seed");
+    frame.constraints.push({ field: "investor_stage", operator: "eq", value: "seed", raw: "seed", confidence: 1, negated: false, unit: null });
+    frame.constraints.push({ field: "company_stage", operator: "eq", value: "seed", raw: "seed", confidence: 1, negated: false, unit: null });
+    const answered = applyClarificationToFrame(frame, { investor_stage: "series-a", investor_check: "growth" });
+    expect(fields(frameToSearchSpec(answered))).toEqual(expect.arrayContaining(["investor_stage=series-a", "investor_check=growth"]));
+    const cleared = applyClarificationToFrame(answered, { investor_stage: "any", investor_check: "any" });
+    expect(fields(frameToSearchSpec(cleared)).filter((field) => /^investor_(stage|check)=/.test(field))).toEqual([]);
+    expect(cleared.clarification.answered?.investor_stage).toBe("any");
+    expect(cleared.clarification.answered?.investor_check).toBe("any");
+  });
+
+  it("clears an unresolved investor refinement after applying its named answer", () => {
+    const frame = investorFrame();
+    frame.unresolved.push({ field: "investor_stage", raw: "early" });
+    const answered = applyClarificationToFrame(frame, { "unresolved.investor_stage": "seed" });
+    expect(answered.unresolved).toEqual([]);
+    expect(fields(frameToSearchSpec(answered))).toContain("investor_stage=seed");
+  });
+});
 
 /** What the provider returned in a real run: no place, contact split into email AND phone. */
 function providerFrame() {

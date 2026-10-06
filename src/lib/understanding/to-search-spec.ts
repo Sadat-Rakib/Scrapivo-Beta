@@ -45,6 +45,23 @@ const modalOffer = (tail: string) => clean(tail
   .replace(/^\s*(?:help\s+with\s+|help\s+from\s+|some\s+|a\s+|an\s+)/i, '')
   .split(/[,;.!?]|\s(?:and|but|with|verify|check|give|include|plus)\s/i)[0]
   .replace(/\s+(?:help|support)\s*$/i, ''));
+const investorStage = (value: string) => {
+  const text = clean(value);
+  if (!/\b(?:investors?|funds?|capital|vc|venture)\b/i.test(text)) return null;
+  if (/\bpre[ -]?seed\b/i.test(text)) return 'pre-seed';
+  const series = /\bseries\s*([a-f])\b/i.exec(text);
+  if (series) return `series-${series[1].toLowerCase()}`;
+  if (/\bseed\b/i.test(text)) return 'seed';
+  if (/\bgrowth\b/i.test(text)) return 'growth';
+  return null;
+};
+const investorBeneficiarySector = (value: string) => {
+  const sector = clean(value)
+    .replace(/\b(?:startups?|companies|businesses|ventures)\b/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return sector && !/^(?:startup|company|business|venture)$/i.test(sector) ? sector : null;
+};
 
 /**
  * "Seed investors in fintech in London": the first "in" introduced a sector,
@@ -376,13 +393,22 @@ export function frameToSearchSpec(input: UnderstandingFrame): SearchSpec {
   };
 
   const role = frame.target.job_title ?? frame.target.role;
+  const anyInvestorStage = /^(?:any|all|none|no preference|skip)$/i.test(frame.clarification.answered?.investor_stage ?? '');
   if (role) put('role', normalizeRole(valueOf(role)), role.confidence, !!role.raw);
   else if (entity === 'job' && frame.target.category) {
     put('role', normalizeRole(valueOf(frame.target.category).replace(/\b(?:remote|jobs?|positions?|openings?|roles?)\b/gi, '').trim()), frame.target.category.confidence);
   }
   const trade = frame.target.industry ?? frame.target.category ?? frame.target.business_type;
-  if (trade) put(entity === 'business' ? 'category' : entity === 'investor' ? 'investor_sector' : 'industry', valueOf(trade), trade.confidence, !!trade.raw);
-  descriptor('company_stage', frame.target.company_stage);
+  if (trade) {
+    if (entity === 'business') put('category', valueOf(trade), trade.confidence, !!trade.raw);
+    else if (entity === 'investor') {
+      if (frame.target.industry) put('investor_sector', valueOf(frame.target.industry), frame.target.industry.confidence, !!frame.target.industry.raw);
+    } else put('industry', valueOf(trade), trade.confidence, !!trade.raw);
+  }
+  if (entity === 'investor') {
+    if (!anyInvestorStage) descriptor('investor_stage', frame.target.company_stage);
+  }
+  else descriptor('company_stage', frame.target.company_stage);
   if (frame.target.technologies.length) put('technology', frame.target.technologies.map(valueOf).join(', '));
   const modelText = [frame.target.business_type, frame.target.category, frame.target.entity_subtype].map(valueOf).join(' ');
   if (/\b(?:d2c|direct.to.consumer)\b/i.test(modelText)) put('business_model', 'd2c');
@@ -418,10 +444,23 @@ export function frameToSearchSpec(input: UnderstandingFrame): SearchSpec {
 
   const relation = frame.relation.type.value;
   const object = valueOf(frame.relation.object);
+  if (entity === 'investor' && relation === 'investing_in') {
+    const sector = investorBeneficiarySector(object);
+    if (!criteria.some((c) => c.field === 'investor_sector') && sector) {
+      put('investor_sector', sector, frame.relation.object?.confidence ?? 1, !!frame.relation.object?.raw);
+    }
+    if (!anyInvestorStage && !criteria.some((c) => c.field === 'investor_stage')) {
+      const categoryStage = investorStage(frame.target.category?.raw ?? '');
+      if (categoryStage) put('investor_stage', categoryStage, frame.target.category?.confidence ?? 1, !!frame.target.category?.raw);
+    }
+  }
   if (relation === 'needs_service' || relation === 'asking_for_help') put('requested_service', object);
   if (relation === 'hiring') put('requested_role', object);
   if (relation === 'seeking_funding') put('funding_status', 'seeking');
-  if (relation === 'has_asset' && /\b(?:website|site)\b/i.test(object)) put('website', 'true');
+  if (relation === 'has_asset' && /\b(?:website|site)\b/i.test(object)) {
+    put('website', 'true');
+    put('require_website', 'true');
+  }
   if (relation === 'lacks_asset' && /\b(?:website|site)\b/i.test(object)) put('opportunity', 'no_website');
   const offer = valueOf(frame.user_context.selling?.service ?? frame.user_context.selling?.product);
   if (offer) { put('offer', offer); put('mode', 'selling'); }
@@ -429,7 +468,11 @@ export function frameToSearchSpec(input: UnderstandingFrame): SearchSpec {
   for (const constraint of frame.constraints) {
     const value = Array.isArray(constraint.value) ? constraint.value.join('|') : constraint.value;
     if (constraint.field === 'website' && constraint.operator === 'exists') {
-      if (constraint.negated) put('opportunity', 'no_website'); else put('website', 'true');
+      if (constraint.negated) put('opportunity', 'no_website');
+      else {
+        put('website', 'true');
+        put('require_website', 'true');
+      }
       continue;
     }
     if (constraint.negated || constraint.operator === 'neq') {
@@ -437,6 +480,10 @@ export function frameToSearchSpec(input: UnderstandingFrame): SearchSpec {
       continue;
     }
     if (constraint.field === 'work_mode') { put('employment', value); continue; }
+    if (entity === 'investor' && constraint.field === 'company_stage') {
+      if (!anyInvestorStage) put('investor_stage', value, constraint.confidence, !!constraint.raw);
+      continue;
+    }
     if (entity === 'job' && ['price', 'salary', 'annual_salary'].includes(constraint.field) && ['gte', 'gt', 'eq'].includes(constraint.operator)) {
       put('salary_min', value); continue;
     }
@@ -553,6 +600,13 @@ export function applyClarificationToFrame(input: UnderstandingFrame, answers: Re
       markAnswered(frame, canonical.replace(/^unresolved\./, ''), answer);
     }
     const field = canonical.replace(/^unresolved\./, '');
+    if (field === 'investor_stage' || field === 'investor_check') {
+      frame.constraints = frame.constraints.filter((c) => c.field !== field);
+      frame.unresolved = frame.unresolved.filter((u) => u.field !== field);
+      if (/^(?:any|all|none|no preference|skip)$/i.test(answer)) continue;
+      frame.constraints.push({ field, operator: 'eq', value: answer, unit: null, negated: false, raw: answer, confidence: 1 });
+      continue;
+    }
     if (frame.unresolved.some((u) => u.field === field) || ['salary_min', 'revenue', 'employee_count', 'amount'].includes(field)) {
       const short = /(-?\d+(?:\.\d+)?)\s*([kmb])\b/i.exec(answer.replace(/,/g, ''));
       const amount = short ? Number(short[1]) * ({ k: 1_000, m: 1_000_000, b: 1_000_000_000 }[short[2].toLowerCase() as 'k' | 'm' | 'b']) : Number(answer.replace(/[^\d.]/g, ''));

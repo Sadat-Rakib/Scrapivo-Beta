@@ -352,6 +352,26 @@ describe("M4 — SPEC_SEARCH runtime", () => {
     expect(res.rows.every((r) => r.disposition === "qualified")).toBe(true);
     expect(res.rows.length).toBeGreaterThanOrEqual(1);
     expect(res.rows[0].entity_resolved).toBe(true);
+    const siteRow: SpecRow = {
+      ...osmRow,
+      title: "Site Cafe",
+      key: "live-osm:site-cafe",
+      entity_id: "live-osm:site-cafe",
+      url: "https://site-cafe.example",
+      website_url: "https://site-cafe.example",
+      evidence: [makeEvidence({
+        source_url: "https://www.openstreetmap.org/node/456",
+        source_type: "osm", evidence_type: "identity", supports: "identity",
+        subject: "live-osm:site-cafe", excerpt: "Site Cafe, cafe in Toronto, https://site-cafe.example",
+      })],
+    };
+    const withSite = await runSpecSearchCore("cafes in Toronto with websites", {
+      businesses: (async () => ({ rows: [], meta: { dbHit: false, engine: "none", partitionsRead: [], rowsScanned: 0, rowsReturned: 0 } })) as never,
+      index: null,
+      liveGapfill: { osm: async () => [siteRow], web: null, jobs: null },
+    }, 25, { mode: "looking" });
+    expect(withSite.rows.length).toBeGreaterThanOrEqual(1);
+    expect(withSite.rows[0].website_url).toBe("https://site-cafe.example");
     // Authority identity proves an ordinary lead, never requested contacts or
     // website absence. A web mention or another subject cannot use the exemption.
     for (const [query, candidate] of [
@@ -365,12 +385,11 @@ describe("M4 — SPEC_SEARCH runtime", () => {
         businesses: (async () => ({ rows: [], meta: { dbHit: false, engine: "none", partitionsRead: [], rowsScanned: 0, rowsReturned: 0 } })) as never,
         index: null,
         liveGapfill: { osm: async () => [candidate], web: null, jobs: null },
-      }, 25, { mode: "looking" }, {
+      }, 25, { mode: "looking" }, query.includes("with phone numbers") ? {
         spec: { ...extractSearchSpec(query),
-          requested_fields: query.includes("with websites") ? ["website"] :
-            query.includes("with phone numbers") ? ["phone"] : [],
+          requested_fields: ["phone"],
         },
-      });
+      } : undefined);
       expect(rejected.rows, query).toEqual([]);
     }
   });

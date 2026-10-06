@@ -3,6 +3,7 @@ import { extractFrameDeterministic } from "./fallback";
 import { validateFrame } from "./validate";
 import { applyClarificationToFrame, frameToSearchSpec } from "./to-search-spec";
 import { decideSpecClarification } from "@/lib/stage1/stage1-adapter";
+import { queryRequiredFields } from "@/lib/search/canonical-contract";
 
 /** A provider frame that kept the relation type but dropped its object. */
 function providerFrameWithoutObject(query: string) {
@@ -19,6 +20,7 @@ describe("provider frame repairs", () => {
     const spec = frameToSearchSpec(frame);
     expect(spec.understanding?.relation.object?.value).toBe("website");
     expect(spec.criteria).toContainEqual(expect.objectContaining({ field: "website", value: "true" }));
+    expect(queryRequiredFields(spec)).toContain("website");
     expect(spec.understanding?.meta.notes.join(" ")).toMatch(/recovered has_asset object/);
     // No relation question remains, and purpose is never a default blocker:
     // the repaired frame is complete and searches immediately.

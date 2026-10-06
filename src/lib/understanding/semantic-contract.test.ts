@@ -67,6 +67,13 @@ describe('canonical semantic contract', () => {
     expect(read('find plumbers in Austin with no website').spec.criteria.find((c) => c.field === 'opportunity')?.value).toBe('no_website');
   });
 
+  it('turns positive website asset wording into a required website field', () => {
+    const spec = read('cafes in Toronto with websites').spec;
+    expect(spec.criteria.find((c) => c.field === 'website')?.value).toBe('true');
+    expect(spec.criteria.find((c) => c.field === 'require_website')?.value).toBe('true');
+    expect(spec.criteria.find((c) => c.field === 'opportunity')).toBeUndefined();
+  });
+
   it('preserves output fields, recent social checks and stated purpose', () => {
     const requested = read('D2C brands in Dhaka; give me email, phone, website and socials; check when they last posted').spec;
     for (const name of ['email', 'phone', 'website', 'socials']) {
