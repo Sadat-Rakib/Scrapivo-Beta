@@ -467,6 +467,39 @@ function normalizeSemanticCore(
     }
   }
 
+  // A plural premises-trade compound in a local lead search ("wedding
+  // photographers in Cebu", "mechanics in Leeds") asks for the practices
+  // people book — the deterministic extractor types the same noun business,
+  // so the model's person reading must not send the run down the people
+  // pipeline. Ambiguous heads never flip silently: the other reading stays
+  // declared via entity_ambiguous, and a singular/article wording ("a wedding
+  // photographer") or any relation verb keeps the person reading.
+  const rawNamed = target.role?.raw ?? target.category?.raw ?? target.entity_type.raw ?? named ?? "";
+  if (
+    localLeadDiscovery &&
+    relation.type.value === "none" &&
+    current === "person" &&
+    head && head.ambiguous && head.kind === "business" &&
+    named && /(?:[^aeiou]s|ies|sses)$/i.test(named.trim()) &&
+    !/\b(?:a|an|one)\s+(?:\w+\s+){0,3}\w+$/i.test(rawNamed.trim())
+  ) {
+    target.entity_type = {
+      value: "business",
+      raw: target.entity_type.raw,
+      confidence: Math.max(head.confidence, 0.75),
+    };
+    target.entity_ambiguous = true;
+    if (target.role && !target.category) {
+      target.category = target.role;
+      target.role = null;
+    }
+    repairs.push({
+      code: "PLURAL_PREMISES_TRADE_BUSINESS",
+      message: `"${named}" in a local lead search reads as the practices they run — entity_type is business (ambiguous) rather than person`,
+      path: `${targetPath}.entity_type`,
+    });
+  }
+
   // A geographically scoped lead search normally asks for local entities, but
   // an open noun can also name the thing they provide ("showrooms" versus a
   // product sold by them). Prefer an explicit establishment head. For a bare,

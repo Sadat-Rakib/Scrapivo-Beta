@@ -398,7 +398,7 @@ const HEAD_NOUNS: Record<string, HeadEntry> = {
   graduate: P(), intern: P(), apprentice: P(), freelancer: P(), contractor: AMBIG("business"),
   creator: P(), influencer: P(), streamer: P(), blogger: P(), podcaster: P(),
   youtuber: P(), artist: P(), musician: P(), illustrator: P(), animator: P(),
-  videographer: P(), photographer: AMBIG("person"), sommelier: P(), chef: P(),
+  videographer: P(), photographer: AMBIG("business"), sommelier: P(), chef: P(),
   barista: P(), bartender: P(), waiter: P(), driver: P(), courier: P(),
   pilot: P(), welder: P(), machinist: P(), carpenter: P(), joiner: P(),
   mechanic: AMBIG("business"), stylist: P(), hairdresser: P(), beautician: P(),
@@ -455,6 +455,7 @@ const HEAD_NOUNS: Record<string, HeadEntry> = {
   locksmith: B(), landscaper: B(), builder: B(), glazier: B(), plasterer: B(),
   tiler: B(), decorator: B(), gardener: B(),
   installer: B(), fitter: B(), upholsterer: B(), exterminator: B(),
+  forwarder: B(), "freight forwarder": B(), "customs broker": B(),
   "driving school": B(), "estate agent": B(), "travel agent": B(),
   cobbler: B(), sailmaker: B(), chocolatier: B(), cidery: B(), creamery: B(),
   // Trades whose name is an OCCUPATION rather than premises. "arborists looking
