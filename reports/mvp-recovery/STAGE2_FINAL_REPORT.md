@@ -111,6 +111,29 @@ live (16d9cc2):
 - React jobs Calgary: not re-reached in this sweep (previous funnel: 175
   raw, granular reasons now in place).
 
+## TWO-SWEEP REPEATABILITY EVIDENCE (SearXNG live, all closure fixes: 7b929b9, 7f401cd, eed6af3, a8d7d0a, 7cda33e)
+
+Sweep D1 (59.2m, 3 passed) and Sweep D2 (58.4m, 3 passed) — the mandated
+double run on the final code:
+
+| Query | D1 | D2 | Verdict |
+|---|---|---|---|
+| solar installers Windhoek | **results q=3** | **results q=1** | REPEATABLE ✓ (difficult geography) |
+| freight forwarders Tbilisi | **results q=1** | **results q=1** | REPEATABLE ✓ (difficult geography) |
+| find SaaS founders globally | zero (raw=8) | **results q=1** | intermittent |
+| find plumbers Austin | card→zero (discovery TIMEOUT) | card→zero | variance (delivered q=8 ×2 earlier sweeps) |
+| hvac gta sites+nums | forced run: raw=11, comp=3 → MISSING_QUERY_REQUIRED (phone) | forced run: raw=31 → MISSING_QUERY_REQUIRED ×10 | correct pipeline; discovery lacks phone-bearing pages |
+| React developer jobs Calgary | raw=175 → granular rejects (role 80 / location 26) | raw=175 → granular rejects (role 91 / location 35) | gate now named; discovery quality still kills delivery |
+| wedding photographers Cebu | card→zero (discovery TIMEOUT) | card→zero (TIMEOUT) | discovery variance |
+| construction Banja Luka | card→zero (discovery TIMEOUT) | card→zero (TIMEOUT) | discovery variance |
+| copywriters Toronto | card→zero (TIMEOUT raw=0) | card→zero (FILTERED, raw=2) | discovery variance |
+| seed investors Canada | TIMEOUT raw=0 | TIMEOUT raw=0 | no wired investor source |
+| unicorn ranchers Atlantis (impossible) | **honest zero** ✓ | **honest zero** ✓ | fabrication vector closed |
+| Stop/Cancel | **PASS** | **PASS** | repeatable |
+
+Accounting held on every settled run: unaccounted=0 (verified in the
+[candidate-ledger] dumps for both sweeps).
+
 ## CLOSURE ADDENDUM (final sweeps, post-fixes)
 
 All funnel-order fixes landed and were re-swept 3 more times through the real
