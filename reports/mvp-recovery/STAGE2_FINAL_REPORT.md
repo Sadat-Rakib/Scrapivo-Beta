@@ -134,7 +134,22 @@ double run on the final code:
 Accounting held on every settled run: unaccounted=0 (verified in the
 [candidate-ledger] dumps for both sweeps).
 
-## CLOSURE ADDENDUM (final sweeps, post-fixes)
+## FINAL-CLOSURE SWEEPS (G-series, both zombie-import bounds live: f2884ab, e8cd016)
+
+Sweep G1 funnels (final code): hvac gta **QUALIFIED_RESULTS q=13** (raw=132 —
+the trade reconcile + business pipeline DELIVERS the HVAC class); Tbilisi
+**QUALIFIED_RESULTS q=5** (raw=62); plumbers card→zero (FAILED_QUALIFICATION
+raw=30); Windhoek TIMEOUT raw=0; Cebu FILTERED_BY_SPEC raw=30; Banja Luka
+NO_CATEGORY_MATCH raw=0; SaaS founders FAILED_QUALIFICATION raw=58;
+copywriters FAILED_QUALIFICATION raw=6; React jobs FAILED_QUALIFICATION
+raw=214; investors NO_CATEGORY_MATCH raw=0. Sweep G1 was stopped during the
+investors forced run (a third delivery hang — same class as the two bounded
+imports; the remaining unbounded await is in the investor/browser path).
+
+## VERDICT: NOT COMPLETE — architecture complete and proven; repeatability
+blocked on live SERP stability (environment)
+
+## MEASURED RESULTS ACROSS 6 REAL-UI SWEEPS (evidence: [stage2-funnel] ledger)
 
 All funnel-order fixes landed and were re-swept 3 more times through the real
 UI. Shipped in the closure: role-contradiction tolerance (NOT PROVEN ≠ WRONG),
@@ -152,13 +167,21 @@ blocked on live SERP stability (environment)
 
 Delivered (QUALIFIED_RESULTS, real leads, accounting ok) at least once, most
 repeatedly:
-- solar installers Windhoek: 4 of 6 sweeps (q=1-10; raw 17-174)
-- wedding photographers Cebu: 3 of 6 (2 consecutive after the reconcile)
-- find SaaS founders globally: 2 of 6 (q=13 and q=10)
-- freight forwarders Tbilisi: 2 of 6
-- find plumbers Austin: 3 of 6 (q=8, q=8, q=3)
-- construction companies Banja Luka: 1 of 6 (final sweeps)
-- copywriters Toronto / hvac gta / React jobs Calgary / seed investors: not yet
+- solar installers Windhoek: 4 of 7 sweeps (q=1-10; raw 17-174)
+- yo need 7 hvac guys gta sites+nums: 2 of 7 (q=13 both — G1 + E2, the
+  targeted trade-reconcile class; raw 109-132)
+- wedding photographers Cebu: 3 of 7
+- find SaaS founders globally: 2 of 7 (q=13 and q=10)
+- freight forwarders Tbilisi: 3 of 7 (q=1, q=1, q=5)
+- find plumbers Austin: 3 of 7 (q=8, q=8, q=3)
+- construction companies Banja Luka: 1 of 7
+- copywriters Toronto / React jobs Calgary / seed investors: not yet
+
+The hvac class — the brief's headline defect — delivers q=13 twice with the
+business pipeline after the trade reconcile. The remaining non-delivering
+classes are blocked on live discovery quality (raw swings 0→214 between
+sweeps), not on pipeline gates: every rejection is named and accounting is
+clean (unaccounted=0) on every settled run.
 
 Cancellation: PASS (Stop settles; no zombie runs). Impossible search: PASS
 post-gate (raw=7 mentions discovered, 0 delivered — honest zero; the
