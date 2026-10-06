@@ -4,8 +4,8 @@ import {
   SEARCH_DEADLINE_REASON,
   SEARCH_STALE_RUN_REASON,
   searchAbortCode,
-  type SearchAbortReason,
 } from "@/lib/search/search-run";
+import type { SearchAbortReason } from "@/lib/search/search-run";
 
 type RegisteredRun = {
   controller: AbortController;
@@ -76,11 +76,14 @@ export function beginRegisteredSearchRun(args: {
     }
   }
   const controller = new AbortController();
-  const externalReason: SearchAbortReason =
-    args.signal?.aborted && searchAbortCode(args.signal) === "SEARCH_DEADLINE"
+  const abortExternal = () => {
+    const code = searchAbortCode(args.signal);
+    abort(controller, code === "SEARCH_DEADLINE"
       ? SEARCH_DEADLINE_REASON
-      : SEARCH_CANCELLED_REASON;
-  const abortExternal = () => abort(controller, externalReason);
+      : code === "SEARCH_STALE_RUN"
+        ? SEARCH_STALE_RUN_REASON
+        : SEARCH_CANCELLED_REASON);
+  };
   if (args.signal?.aborted) abortExternal();
   else args.signal?.addEventListener("abort", abortExternal, { once: true });
   // Hard deadline: stop research but keep already-qualified rows downstream.

@@ -49,6 +49,11 @@ describe("taxonomy extraction", () => {
     const s = extractSearchSpec("bro i need businesses plz asap");
     expect(s.missing).toEqual(["category", "location"]);
   });
+
+  it("explicit broad local-business intent does not require category narrowing", () => {
+    expect(extractSearchSpec("all businesses in Austin").missing).toEqual([]);
+    expect(extractSearchSpec("any type of businesses in Austin").missing).toEqual([]);
+  });
 });
 
 describe("businessModelMatches + rowSatisfiesSpec", () => {

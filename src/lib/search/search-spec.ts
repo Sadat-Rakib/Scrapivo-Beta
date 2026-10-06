@@ -92,7 +92,7 @@ const stated = (field: string, value: string): SpecField => ({
 const REQUIRED: Record<Exclude<SpecEntity, "unknown">, string[]> = {
   person: ["role"],
   company: [],
-  business: ["location"],
+  business: ["category", "location"],
   investor: [],
   job: ["role"],
 };
@@ -172,6 +172,13 @@ const NEED_FIELDS = new Set([
   "funding_status",
 ]);
 
+function permitsBroadBusinessCategory(spec: SearchSpec): boolean {
+  if (spec.entity !== "business") return false;
+  return /\b(?:all|any\s+type\s+of|any\s+kind\s+of)\s+(?:local\s+)?business(?:es)?\b/i.test(
+    spec.raw_query,
+  );
+}
+
 export function computeMissing(spec: SearchSpec): string[] {
   if (spec.entity === "unknown") return ["entity"];
   const worldwide = hasField(spec, "geo_scope") && getField(spec, "geo_scope")?.value === "worldwide";
@@ -187,6 +194,7 @@ export function computeMissing(spec: SearchSpec): string[] {
   }
   const required = (REQUIRED[spec.entity] ?? []).filter((f) => {
     if (f === "location" && worldwide) return false;
+    if (f === "category" && permitsBroadBusinessCategory(spec)) return false;
     // Phase 1A: person role identity is optional when the need phrase carries
     // requested_role/service (demand hunt) or signal_required.
     if (

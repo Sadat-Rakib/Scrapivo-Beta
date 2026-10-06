@@ -6,11 +6,12 @@ import {
 import { extractSearchSpec } from "../search-spec-extract";
 
 describe("entity-slot clarifier (Phase 4)", () => {
-  it("bare businesses ask for location (mode comes from the pre-retrieval gate)", () => {
+  it("bare businesses ask for category and location (mode comes from the pre-retrieval gate)", () => {
     const spec = extractSearchSpec("bro i need businesses plz asap");
     const qs = entityQuestionsForSpec(spec);
-    expect(qs.map((q) => q.id)).toEqual(["entity_location"]);
-    expect(qs[0].question).toMatch(/location/i);
+    expect(qs.map((q) => q.id)).toEqual(["entity_category", "entity_location"]);
+    expect(qs[0].question).toMatch(/kind|category|type/i);
+    expect(qs[1].question).toMatch(/location/i);
   });
 
   it("SaaS founders NY → no questions", () => {
