@@ -525,9 +525,16 @@ export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
     const seniority = fieldOf(spec, "seniority");
     const employment = fieldOf(spec, "employment");
     // Hyphen/space normalization: "front-end developer" titles must satisfy
-    // a "frontend" role ask and vice versa.
+    // a "frontend" role ask and vice versa. Stated technologies count toward
+    // the role ask: "React developer" is satisfied by "Senior React
+    // Engineer" (skill token matches; the role noun differs).
     const jobTitleNorm = row.title.replace(/[-–—]/g, " ");
-    if (role && !role.toLowerCase().split(/\s+/).every((term) => term && new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(jobTitleNorm))) return false;
+    const wanted = [role, ...spec.criteria.filter((c) => c.field === "technology" && c.value.trim()).map((c) => c.value)]
+      .filter(Boolean)
+      .join(" ");
+    if (role && !role.toLowerCase().split(/\s+/).every((term) => term && new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(jobTitleNorm))) {
+      if (!wanted || !roleTokensOverlap(row.title, wanted)) return false;
+    }
     // "remote" as a location is a work MODE, not a geo gate — rows may carry
     // a city alongside remote employment.
     if (location && location.toLowerCase() !== "remote" && !locationOk(row.country, row.location, row.detail, location)) return false;
@@ -653,15 +660,23 @@ export function rowSatisfyRejectReason(spec: SearchSpec, row: SpecRow): string |
     const location = fieldOf(spec, "location");
     const jobTitleNorm = row.title.replace(/[-–—]/g, " ");
     // Token-overlap tolerance: "Senior React Engineer" is researchable for a
-    // "React developer" ask (the skill token matches; the role noun differs).
-    // Only a disjoint title ("Junior Java Dev") is a contradiction.
+    // "React developer" ask — stated technologies count toward the role ask
+    // (the skill token matches; the role noun differs). Only a disjoint
+    // title ("Junior Java Dev") is a contradiction.
+    const wanted = [role, ...spec.criteria.filter((c) => c.field === "technology" && c.value.trim()).map((c) => c.value)]
+      .filter(Boolean)
+      .join(" ");
     if (
       role &&
       !role.toLowerCase().split(/\s+/).every((term) => term && new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(jobTitleNorm)) &&
-      !roleTokensOverlap(row.title, role)
+      !roleTokensOverlap(row.title, wanted)
     )
       return "rejected_role";
-    if (location && location.toLowerCase() !== "remote" && !locationOk(row.country, row.location, row.detail, location))
+    // "remote" as a location is a work MODE, not a geo gate — rows may carry
+    // a city alongside remote employment. A posting with NO observed location
+    // is an unknown, not a contradiction: research may establish it (the
+    // pre-research gate rejects known hard contradictions only).
+    if (location && location.toLowerCase() !== "remote" && (row.location || row.country) && !locationOk(row.country, row.location, row.detail, location))
       return "rejected_location";
     return null;
   }

@@ -26,7 +26,7 @@ import { projectQualifiedLead } from "../qualified-lead";
 import { projectSpecRowsToQualifiedViews } from "../qualified-lead-view";
 import { createSearchRun } from "../search-run";
 import { resolveCanonicalLocation } from "../location-resolver";
-import type { SpecRow } from "@/lib/spec-search.functions";
+import { rowSatisfyRejectReason, rowSatisfiesSpec, type SpecRow } from "@/lib/spec-search.functions";
 import type { Evidence } from "../evidence";
 
 const NOW = Date.parse("2026-09-15T12:00:00.000Z");
@@ -362,5 +362,30 @@ describe("M13 — production path + inverse", () => {
       nowMs: NOW,
     });
     expect(views.qualified_count).toBe(0);
+  });
+});
+
+describe("job pre-research gate: role+technology and unknown location", () => {
+  it("a stated technology satisfies a role ask when the title names the skill", () => {
+    const spec = extractSearchSpec("React developer jobs in Calgary");
+    expect(spec.criteria.find((c) => c.field === "technology")?.value).toBe("React");
+    // Skill token matches, role noun differs — researchable AND deliverable.
+    const reactEngineer = jobRow({ entity_id: "job:react-eng", title: "Senior React Engineer", location: "Calgary, AB" });
+    expect(rowSatisfyRejectReason(spec, reactEngineer)).toBeNull();
+    expect(rowSatisfiesSpec(spec, reactEngineer)).toBe(true);
+    // Role noun matches on its own.
+    const frontendDev = jobRow({ entity_id: "job:fe-dev", title: "Frontend Developer", location: "Calgary, AB" });
+    expect(rowSatisfyRejectReason(spec, frontendDev)).toBeNull();
+    // A disjoint title stays a contradiction.
+    const javaDev = jobRow({ entity_id: "job:java", title: "Junior Accountant", location: "Calgary, AB" });
+    expect(rowSatisfyRejectReason(spec, javaDev)).toBe("rejected_role");
+  });
+
+  it("an unknown location is researchable; a contradicting one is not", () => {
+    const spec = extractSearchSpec("React developer jobs in Calgary");
+    const noLocation = jobRow({ entity_id: "job:noloc", title: "React Developer", location: null as never });
+    expect(rowSatisfyRejectReason(spec, noLocation)).toBeNull();
+    const germany = jobRow({ entity_id: "job:de", title: "React Developer", location: "Remote (Germany)" });
+    expect(rowSatisfyRejectReason(spec, germany)).toBe("rejected_location");
   });
 });
