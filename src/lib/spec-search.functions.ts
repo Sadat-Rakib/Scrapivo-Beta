@@ -3127,12 +3127,19 @@ export async function runSpecSearchCore(
   });
   const rawCandidateCount = rows.length + liveCandidateCount;
   const postSpecFilterCount = kept.length + liveSpecMatchCount;
+  // Acquisition-failure reasons need an acquisition FAILURE: the run hit its
+  // deadline, or widening never started/completed a pass. Bounded per-phase
+  // timeouts inside completed widen passes are normal work-stops, not run
+  // failures — labeling them TIMEOUT sent coverage-exhausted honest zeros to
+  // the UI as errors.
+  const acquisitionFailed =
+    deadlineHit || (widenOutcome !== "NOT_REQUIRED" && widenPasses === 0);
   const zeroReason: NonNullable<SpecSearchResult["retrievalTrace"]>["reason"] =
     page.length > 0
       ? "RESULTS"
-      : rawCandidateCount === 0 && routeDiagnostics.some((d) => /timeout/i.test(d.detail ?? ""))
+      : rawCandidateCount === 0 && acquisitionFailed && routeDiagnostics.some((d) => /timeout/i.test(d.detail ?? ""))
         ? "TIMEOUT"
-        : rawCandidateCount === 0 && routeDiagnostics.some((d) => d.code === "SOURCE_UNAVAILABLE")
+        : rawCandidateCount === 0 && acquisitionFailed && routeDiagnostics.some((d) => d.code === "SOURCE_UNAVAILABLE")
           ? "SOURCE_UNAVAILABLE"
       : rawCandidateCount === 0
         ? dbMeta.some((m) => m.partitionsRead.some((p) => /no gazetteer hit/i.test(p)))
