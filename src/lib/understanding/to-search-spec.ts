@@ -1,8 +1,8 @@
 import { buildSpec, type SearchSpec, type SpecEntity, type SpecField } from '../search/search-spec';
 import { normalizeRole } from '../search/search-spec-extract';
-import { resolveCanonicalLocation, splitMultiPlace } from '../search/location-resolver';
+import { resolveCanonicalLocation, splitTargetLocationList } from '../search/location-resolver';
 import { initState, patchFrame, syncClarification, type BlockingField } from './clarify-state';
-import { extractFrameDeterministic } from './fallback';
+import { extractFrameDeterministic, fieldRequirements } from './fallback';
 import { openValue, type FrameLocation, type OpenValue, type UnderstandingFrame } from './frame';
 import { classifyHead, LOCATIVE_PREP_TOKENS, opensWithExclusion } from './lexicon';
 import { validateFrame } from './validate';
@@ -156,8 +156,7 @@ export function normalizeSearchFrame(input: UnderstandingFrame): UnderstandingFr
     // span (or the whole request) names two or more known places, widen to a
     // multi-location search instead of dropping the rest of the list.
     if (frame.location && frame.locations.length < 2) {
-      const splitPlaces = splitMultiPlace(frame.location.raw ?? frame.location.value) ??
-        splitMultiPlace(frame.input.raw);
+      const splitPlaces = splitTargetLocationList(frame.input.raw, frame.location.raw ?? frame.location.value);
       if (splitPlaces) {
         frame.locations = splitPlaces.map((geo) => ({
           value: geo.name, raw: geo.name, scope: 'in' as const, radius: null, radius_unit: null,
@@ -379,11 +378,15 @@ export function normalizeSearchFrame(input: UnderstandingFrame): UnderstandingFr
   // required per the established contract.
   {
     const CONTACT_CHANNEL = /^(?:e-?mails?(?:\s+address(?:es)?)?|phones?(?:\s+numbers?)?|websites?|sites?|linkedin|socials?|social\s+(?:media|profiles?|links?)|instagram|ig|contact(?:\s+(?:details?|info(?:rmation)?))?)$/i;
-    const VERIFIABILITY_HEDGE = /\b(?:whatever\s+(?:you\s+)?(?:can\s+)?(?:actually\s+)?(?:verif\w*|works?|findable)|whatever\s+(?:is\s+)?available|if\s+possible|where\s+possible|when\s+possible)\b/i.test(frame.input.raw);
-    if (VERIFIABILITY_HEDGE) {
-      const channelRequirements = frame.required_fields.filter((f) => CONTACT_CHANNEL.test(valueOf(f)));
+    const asks = fieldRequirements(frame.input.raw);
+    const soft = new Set(asks.preferred.map(valueOf));
+    const hard = new Set(asks.required.map(valueOf));
+    if (soft.size) {
+      const isSoft = (f: OpenValue) => CONTACT_CHANNEL.test(valueOf(f)) && soft.has(valueOf(f)) && !hard.has(valueOf(f));
+      const channelRequirements = frame.required_fields.filter(isSoft);
       if (channelRequirements.length) {
-        frame.required_fields = frame.required_fields.filter((f) => !CONTACT_CHANNEL.test(valueOf(f)));
+        frame.required_fields = frame.required_fields.filter((f) => !isSoft(f));
+        frame.contact_requirements = frame.contact_requirements.filter((f) => !isSoft(f));
         for (const channel of channelRequirements) {
           if (!frame.enrichment_requirements.some((item) => valueOf(item) === valueOf(channel))) {
             frame.enrichment_requirements.push(channel);

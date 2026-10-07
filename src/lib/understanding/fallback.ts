@@ -44,7 +44,7 @@
  * being careful.
  */
 
-import { knownCityName, resolveCanonicalLocation, splitMultiPlace } from "@/lib/search/location-resolver";
+import { knownCityName, resolveCanonicalLocation, splitTargetLocationList } from "@/lib/search/location-resolver";
 import { normalizeRole } from "@/lib/search/search-spec-extract";
 import {
   clamp,
@@ -1811,7 +1811,7 @@ export function fieldRequirements(
   // "gyms in Valencia, opening hours and owner name" needs no verb to be an ask.
   const claimed = new Set(deliverableClauses(tail).map((c) => c.trim()));
   for (const clause of deliverableClauses(text)) {
-    const isPreferred = PREFERRED_MARKER.test(clause);
+    const isPreferred = preferredDeliverableClause(clause);
     const isRequired =
       REQUIRED_MARKER.test(clause) ||
       DELIVERY_MARKER.test(clause) ||
@@ -1899,12 +1899,21 @@ function deliverableClauses(text: string): string[] {
   for (const chunk of text.split(/[,;.\u2014]|\bplus\b|\+/i)) {
     const parts = chunk.split(/\band\b/i);
     const marked = parts.filter(
-      (p) => PREFERRED_MARKER.test(p) || REQUIRED_MARKER.test(p) || DELIVERY_MARKER.test(p),
+      (p) => preferredDeliverableClause(p) || REQUIRED_MARKER.test(p) || DELIVERY_MARKER.test(p),
     ).length;
-    if (parts.length > 1 && marked === parts.length) out.push(...parts);
+    // A final hedge qualifies a bare coordinated list: "include email and
+    // phone whatever is available". A separate mandatory marker or a fresh
+    // delivery verb establishes separate asks instead.
+    const independent = REQUIRED_MARKER.test(parts[0] ?? '') || preferredDeliverableClause(parts[0] ?? '') ||
+      parts.slice(1).some((part) => DELIVERY_MARKER.test(part));
+    if (parts.length > 1 && marked === parts.length && independent) out.push(...parts);
     else out.push(chunk);
   }
   return out;
+}
+
+function preferredDeliverableClause(clause: string): boolean {
+  return PREFERRED_MARKER.test(clause) || /\bwhatever\s+(?:(?:you\s+)?can\s+(?:actually\s+)?(?:verif\w*|find)|(?:is\s+)?available|works?|findable)\b/i.test(clause);
 }
 
 const VERIFY_RE =
@@ -2718,7 +2727,7 @@ export function extractFrameDeterministic(
   // nobody named. When that blob (or the request text behind it) contains
   // several known places, search all of them instead.
   if (frame.location) {
-    const splitPlaces = splitMultiPlace(frame.location.raw ?? frame.location.value) ?? splitMultiPlace(primaryRaw);
+    const splitPlaces = splitTargetLocationList(primaryRaw, frame.location.raw ?? frame.location.value);
     if (splitPlaces) {
       frame.locations = splitPlaces.map((geo) => geoFor(geo.name, geo.name, "in", 0.8));
       frame.location = { ...frame.location, value: splitPlaces[0]!.name, canonical: splitPlaces[0]!.name };

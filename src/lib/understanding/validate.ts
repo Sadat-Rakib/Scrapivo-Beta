@@ -823,9 +823,15 @@ export function validateFrame(input: UnderstandingFrame): ValidationResult {
   // it, because plenty of preferred fields are asked for plainly and promoting
   // those would invent the filter this repair exists to remove.
   {
-    const hedged = frame.required_fields.filter((f) => hedgesTheAsk(f.raw));
+    const asks = fieldRequirements(frame.input.raw);
+    const hard = new Set(asks.required.map((f) => f.value));
+    const soft = new Set(asks.preferred.map((f) => f.value));
+    // Providers can attach the whole sentence to each field. A hedge in that
+    // broad raw span must not override a separate mandatory field clause.
+    const isHedged = (f: OpenValue) => !hard.has(f.value) && (soft.has(f.value) || hedgesTheAsk(f.raw));
+    const hedged = frame.required_fields.filter(isHedged);
     if (hedged.length) {
-      frame.required_fields = frame.required_fields.filter((f) => !hedgesTheAsk(f.raw));
+      frame.required_fields = frame.required_fields.filter((f) => !isHedged(f));
       for (const f of hedged) {
         repairs.push({
           code: "FIELD_HEDGED_NOT_REQUIRED",

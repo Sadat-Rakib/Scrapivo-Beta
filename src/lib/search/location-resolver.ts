@@ -685,16 +685,12 @@ export function splitMultiPlace(raw: string): GeoEntity[] | null {
   const SKIP = new Set([
     "area", "around", "near", "nearby", "maybe", "also", "both", "either",
     "the", "and", "or", "plus", "too", "city", "mostly", "honestly",
-    "anywhere", "is", "fine", "greater", "downtown", "greater area",
+    "anywhere", "is", "fine", "greater", "downtown", "greater area", "in", "across", "throughout",
   ]);
   const singleKnownCity = (phrase: string): GazetteerCity | null => {
     if (!gazetteer) return null;
-    // The map is ordered most-populous first, so the first hit is the
-    // principal namesake ("Edmonton AB" over Edmonton, London). A wrong-city
-    // row still dies at the evidence gates downstream; the split exists so a
-    // multi-place ask is never stranded on one city.
     const hits = gazetteer.lookup(phrase);
-    return hits[0] ?? null;
+    return hits.length === 1 ? hits[0]! : null;
   };
   const out: GeoEntity[] = [];
   let i = 0;
@@ -733,9 +729,25 @@ export function splitMultiPlace(raw: string): GeoEntity[] | null {
     if (hit) {
       if (!out.some((o) => o.id === hit!.id)) out.push(hit);
       i += span;
-    } else i += 1;
+    } else {
+      // Once the list starts, unrelated predicates/exclusions end its span.
+      // Searching past "serving clients in ..." changes the target geography.
+      if (out.length && !SKIP.has(words[i]!.toLowerCase()) && !/^[+-]+$/.test(words[i]!)) break;
+      i += 1;
+    }
   }
   return out.length >= 2 ? out : null;
+}
+
+/** Continue only the retained target's locative span, never scan the request's other places. */
+export function splitTargetLocationList(raw: string, placeSpan: string): GeoEntity[] | null {
+  const request = raw.toLowerCase();
+  const span = placeSpan.trim().toLowerCase();
+  const at = request.indexOf(span);
+  // Repeated abbreviated spans lack enough provenance to choose a target
+  // occurrence over a client/address mention. Retain only the stated span.
+  if (at >= 0 && request.indexOf(span, at + span.length) >= 0) return splitMultiPlace(placeSpan);
+  return splitMultiPlace(at >= 0 ? raw.slice(at) : placeSpan);
 }
 export type ResolveLocationOptions = {
   /** Consult the registered world gazetteer (query understanding only). */
