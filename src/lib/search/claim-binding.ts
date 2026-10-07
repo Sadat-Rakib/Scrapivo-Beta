@@ -31,6 +31,7 @@ export const QUALIFYING_CLAIM_TYPES: EvidenceType[] = [
   "service_request",
   "no_website",
   "funding",
+  "investment",
   "social_ask",
 ];
 
@@ -46,6 +47,7 @@ export function requestedClaimTypes(spec: SearchSpec): EvidenceType[] {
   const out = new Set<EvidenceType>();
   for (const t of spec.signal_types ?? []) {
     const n = t.toLowerCase().trim();
+    if (n === "investment") out.add("investment");
     if (n === "hiring" || n === "job") out.add("hiring");
     if (n === "funding" || n === "funded") out.add("funding");
     if (n === "social_ask" || n === "social") out.add("social_ask");

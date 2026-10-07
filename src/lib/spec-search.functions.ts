@@ -15,10 +15,10 @@ import { startRunWatchdog } from "@/lib/search/run-watchdog";
 import { scaledRunBudgetMs } from "@/lib/search/search-run.server";
 import type { SearchSpec } from "@/lib/search/search-spec";
 import type { UnderstandingFrame } from "@/lib/understanding/frame";
-import { investorSectorMatches } from "@/lib/search/search-spec";
 import type { DbHitMeta } from "@/lib/canonical/read-parquet.server";
 import { personRoleMatches } from "@/lib/canonical/people.server";
 import { companyCategoryMatches } from "@/lib/canonical/companies.server";
+import { criterionPhraseMatches } from "@/lib/search/criterion-match";
 import { craftMatches, tradeFamiliesOf } from "@/lib/canonical/businesses.server";
 import type { searchPeopleDB } from "@/lib/canonical/people.server";
 import type { searchCompaniesDB } from "@/lib/canonical/companies.server";
@@ -420,15 +420,22 @@ function violatesExclusion(spec: SearchSpec, row: SpecRow): boolean {
 /**
  * Spec-category matching for messy multi-category asks: "restaurants cafes
  * bakeries whatever food businesses" is several categories the understanding
- * layer kept as one blob. A row matches when it matches the whole blob OR any
- * category-sized token of it — matching only the whole string discarded every
- * row that named just one of the asked-for trades.
+ * layer kept as one blob. Explicit coordination creates category alternatives;
+ * whitespace stays inside each category so modifiers cannot become trades.
  */
 function specCategoryMatches(rowCategory: string | null | undefined, specCategory: string): boolean {
-  if (rowCategory && craftMatches(rowCategory, specCategory)) return true;
-  const tokens = specCategory.split(/\s+/).filter((t) => t.length > 2);
-  if (tokens.length < 2 || !rowCategory) return false;
-  return tokens.some((t) => craftMatches(rowCategory, t));
+  if (!rowCategory) return false;
+  // Only explicit coordination creates alternatives. Modifiers stay bound
+  // to their trade: commercial electricians cannot match commercial cleaners.
+  return specCategory.split(/\s*(?:[,;/|&]|\b(?:or|and)\b)\s*/i)
+    .filter(Boolean).some((category) => {
+      if (!craftMatches(rowCategory, category.trim())) return false;
+      const words = category.toLowerCase().replace(/[_-]+/g, " ").trim().split(/\s+/);
+      const observed = rowCategory.toLowerCase().replace(/[_-]+/g, " ");
+      // A shared trade family proves the trade, not its stated modifiers.
+      return words.slice(0, -1).filter((word) => !tradeFamiliesOf(word).length)
+        .every((word) => new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(observed));
+    });
 }
 
 export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
@@ -446,7 +453,7 @@ export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
     const location = fieldOf(spec, "location");
     if (role && !personRoleMatches(row.role ?? row.title, role) && !roleTokensOverlap(row.role ?? row.title, role))
       return false;
-    if (industry && !like(row.industry ?? row.detail, industry) && !( /^saas$/i.test(industry) && /software[ -]as[ -]a[ -]service/i.test(row.industry ?? "") )) return false;
+    if (industry && !criterionPhraseMatches(row.industry ?? row.detail, industry)) return false;
     if (location && !locationOk(row.country, row.location, row.detail, location)) return false;
   }
   if (spec.entity === "business") {
@@ -529,7 +536,7 @@ export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
     const location = fieldOf(spec, "location");
     // Broad-then-enrich: stored sector strings are curated mega-tokens; match
     // ANY content token of the requested focus ("AI infrastructure startups").
-    if (sector && !investorSectorMatches(row.sector ?? row.detail, sector) && !like(row.title, sector)) return false;
+    if (sector && !criterionPhraseMatches(row.sector ?? row.detail, sector)) return false;
     if (stage && !like(row.stage ?? row.detail, stage)) return false;
     if (check && !like(row.check ?? row.detail, check)) return false;
     if (location && !locationOk(row.country, row.location, row.detail, location)) return false;
@@ -548,6 +555,8 @@ export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
     // the role ask: "React developer" is satisfied by "Senior React
     // Engineer" (skill token matches; the role noun differs).
     const jobTitleNorm = row.title.replace(/[-–—]/g, " ");
+    if (spec.criteria.some(criterion => criterion.field === "technology" &&
+      !criterionPhraseMatches(`${row.title} ${row.detail ?? ""}`, criterion.value))) return false;
     const wanted = [role, ...spec.criteria.filter((c) => c.field === "technology" && c.value.trim()).map((c) => c.value)]
       .filter(Boolean)
       .join(" ");
@@ -606,6 +615,20 @@ const ROLE_WORD_RE =
  * only feeds the ledger so rejection buckets are explorable (Windhoek manual
  * QA: 149 rows filtered with rejectReasons {} — invisible losses).
  */
+/** Terminal research failures retain the exact requirement and evidence state. */
+export function postResearchRejectReason(spec: SearchSpec, row: SpecRow): string {
+  const aliases: Record<string, string> = { investor_sector: "sector", investor_stage: "stage", investor_check: "check" };
+  const failures = spec.criteria.filter((criterion) => criterion.stated &&
+    !criterion.field.startsWith("exclude_") &&
+    !rowSatisfiesSpec({ ...spec, locations: undefined, criteria: [criterion] }, row))
+    .map((criterion) => {
+      const observed = (row as unknown as Record<string, unknown>)[aliases[criterion.field] ?? criterion.field];
+      const state = observed == null || observed === "" ? "UNKNOWN" : "CONTRADICTED";
+      return `${criterion.field}=${JSON.stringify(criterion.value)}:${state}`;
+    });
+  return `UNPROVEN_CRITERION:${failures.join(";") || rowSatisfyRejectReason(spec, row) || "UNKNOWN"}`;
+}
+
 export function rowSatisfyRejectReason(spec: SearchSpec, row: SpecRow): string | null {
   if (violatesExclusion(spec, row)) return "rejected_exclusion";
   if ((spec.locations?.length ?? 0) > 1) {
@@ -634,8 +657,7 @@ export function rowSatisfyRejectReason(spec: SearchSpec, row: SpecRow): string |
       industry &&
       row.industry &&
       row.industry.trim() &&
-      !like(row.industry, industry) &&
-      !(/^saas$/i.test(industry) && /software[ -]as[ -]a[ -]service/i.test(row.industry))
+      !criterionPhraseMatches(row.industry, industry)
     )
       return "rejected_industry";
     if (location && (row.location || row.country) && !locationOk(row.country, row.location, "", location))
@@ -1187,7 +1209,13 @@ async function fetchS3Tier(
             supports: "identity",
             extraction_method: "stored_investor_record",
             subject: entity_id,
-          })],
+          }), ...(rowSectors ? [makeEvidence({
+            source_url: v.linkedin?.trim() || v.website?.trim() || `db://investors/${encodeURIComponent(entity_id)}`,
+            source_type: "db", subject: entity_id, evidence_type: "investment", supports: "intent",
+            excerpt: `${v.name ?? "?"}: curated investment sectors ${rowSectors}; stages ${rowStages}`,
+            extraction_method: "stored_investor_record",
+            claim_parameters: { investor_sector: rowSectors, ...(rowStages ? { investor_stage: rowStages } : {}) },
+          })] : [])],
         };
       }),
       meta: r.meta,
@@ -1217,8 +1245,12 @@ export async function runSpecSearchCore(
     resolvedContext?: import("@/lib/understanding/input-envelope").ResolvedInputContext | null;
     /** Internal OR-location branch; prevents recursive fanout. */
     locationBranch?: boolean;
+    /** Compound semantic branch, sharing the root run and clock. */
+    compoundBranch?: boolean;
     /** Root run clock shared by internal OR-location branches. */
     runStartedAt?: number;
+    /** Root budget is shared even when child goals request fewer rows. */
+    runBudgetMs?: number;
     /** Data-asset pass: engine-driven widening + candidate dedupe for job modes. */
     jobContext?: {
       poolTargetOverride?: number;
@@ -1238,6 +1270,7 @@ export async function runSpecSearchCore(
   // Location branches belong to one user-visible run. Carry this root clock
   // through recursive branches so widening uses remaining shared budget.
   const runStartedAt = opts.runStartedAt ?? Date.now();
+  const rootRunBudgetMs = opts.runBudgetMs ?? scaledRunBudgetMs(limit);
   // Run watchdog stage tracking (PRD V2 Phase 3 / P1-A): the stage name is
   // what the watchdog reports when the run overruns its budget, so a hung
   // await names itself instead of vanishing into "not settled".
@@ -1661,22 +1694,55 @@ export async function runSpecSearchCore(
       ...pageInfo,
     }, 0, false, false);
   }
-  if (!opts.locationBranch && (spec.locations?.length ?? 0) > 1) {
+  const subgoals = !opts.compoundBranch && spec.understanding?.compound.is_compound
+    ? spec.understanding.compound.subgoals : [];
+  if (subgoals.length > 1 || (!opts.locationBranch && (spec.locations?.length ?? 0) > 1)) {
     const branchResults: SpecSearchResult[] = [];
-    for (const place of spec.locations!) {
+    const branchSpecs: Array<{ spec: SearchSpec; limit: number }> = subgoals.length > 1
+      ? subgoals.map((goal) => {
+        const rootFrame = structuredClone(spec.understanding!);
+        const branchFrame: UnderstandingFrame = { ...rootFrame,
+          input: { raw: goal.raw ?? rootFrame.input.raw, normalized: goal.raw ?? rootFrame.input.normalized },
+          target: goal.target, relation: goal.relation, location: goal.location ?? rootFrame.location,
+          locations: goal.location ? [goal.location] : rootFrame.locations,
+          temporal: goal.temporal ?? rootFrame.temporal, quantity: goal.quantity ?? rootFrame.quantity,
+          constraints: [...rootFrame.constraints, ...goal.constraints], compound: { is_compound: false, subgoals: [] },
+        };
+        const branch = frameToSearchSpec(branchFrame);
+        return { spec: { ...branch, required_field_groups: spec.required_field_groups ?? branch.required_field_groups },
+          limit: Math.max(1, Math.min(limit + effOffset, goal.quantity?.requested ?? limit + effOffset)) };
+      }) : spec.locations!.map((place) => {
       const locationCriterion = { field: "location", value: place, stated: true, confidence: 1 };
       const criteria = spec.criteria.filter((criterion) => ![
         "location", "location_id", "location_kind", "location_country", "location_scope", "location_parents",
       ].includes(criterion.field));
       criteria.push(locationCriterion);
-      branchResults.push(await runSpecSearchCore(query, deps, limit + effOffset, {}, {
+      return { spec: { ...spec, locations: [place], criteria }, limit: limit + effOffset };
+    });
+    for (const [branchIndex, branch] of branchSpecs.entries()) {
+      if (deps.signal?.aborted) break;
+      const branchController = new AbortController();
+      const abortParent = () => branchController.abort(deps.signal?.reason);
+      deps.signal?.addEventListener("abort", abortParent, { once: true });
+      const remainingBudget = Math.max(1, rootRunBudgetMs - (Date.now() - runStartedAt));
+      const branchTimer = setTimeout(() => branchController.abort({ code: "SEARCH_DEADLINE" }),
+        Math.max(1, Math.floor(remainingBudget / (branchSpecs.length - branchIndex))));
+      try {
+      branchResults.push(await runSpecSearchCore(query, { ...deps, signal: branchController.signal }, branch.limit, {}, {
         ...opts,
+        ...runIds,
         offset: 0,
         priorFrame: undefined,
-        locationBranch: true,
+        locationBranch: !subgoals.length || opts.locationBranch,
+        compoundBranch: !!subgoals.length || opts.compoundBranch,
         runStartedAt,
-        spec: { ...spec, locations: [place], criteria },
+        runBudgetMs: rootRunBudgetMs,
+        spec: branch.spec,
       }));
+      } finally {
+        clearTimeout(branchTimer);
+        deps.signal?.removeEventListener("abort", abortParent);
+      }
       if (deps.signal?.aborted) break;
     }
     const unique = new Map<string, SpecRow>();
@@ -1686,8 +1752,34 @@ export async function runSpecSearchCore(
     }
     const all = [...unique.values()];
     const rows = all.slice(effOffset, effOffset + limit);
+    const deliveredKeys = new Set(rows.map((row) => row.entity_id ?? row.key ?? row.url ?? `${row.kind}:${row.title}:${row.location ?? ""}`));
+    const bookedReturned = new Set<string>();
+    const branchLedgers = branchResults.map((result) => {
+      if (!result.candidateLedger) return undefined;
+      const summary = structuredClone(result.candidateLedger);
+      for (const row of result.rows) {
+        const key = row.entity_id ?? row.key ?? row.url ?? `${row.kind}:${row.title}:${row.location ?? ""}`;
+        if (bookedReturned.has(key)) {
+          summary.counts.returned--;
+          summary.counts.absorbed++;
+        } else if (!deliveredKeys.has(key)) {
+          summary.counts.returned--;
+          summary.counts.qualified_more++;
+        }
+        bookedReturned.add(key);
+      }
+      return summary;
+    });
     const representative = branchResults.find((result) => result.rows.length > 0) ?? branchResults[0];
     const { mergeCandidateLedgers } = await import("@/lib/search/candidate-ledger");
+    const aggregateProviders = branchResults.flatMap((result) => result.providerAttempts ?? []);
+    const aggregateDiagnostics = branchResults.flatMap((result) => result.diagnostics ?? []);
+    const aggregateHealth = (await import("@/lib/search/source-health")).classifySourceHealth({ providers: aggregateProviders, diagnostics: aggregateDiagnostics });
+    const aggregateWidening = {
+      passes: branchResults.reduce((sum, result) => sum + (result.widening?.passes ?? 0), 0),
+      outcome: branchResults.find((result) => result.widening && !["NOT_REQUIRED", "TARGET_REACHED"].includes(result.widening.outcome))?.widening?.outcome
+        ?? representative?.widening?.outcome ?? "NOT_REQUIRED" as const,
+    };
     // A later location can stop after an earlier branch completed. This is one
     // cancelled run, so never expose the earlier branch as a success outcome.
     const abortCode = searchAbortCode(deps.signal);
@@ -1712,9 +1804,28 @@ export async function runSpecSearchCore(
       ...representative,
       spec,
       rows,
-      candidateLedger: mergeCandidateLedgers(branchResults.map((result) => result.candidateLedger), rows),
+      candidateLedger: mergeCandidateLedgers(branchLedgers, rows),
       dbMeta: branchResults.flatMap((result) => result.dbMeta),
       qualified_count: rows.length,
+      providerAttempts: aggregateProviders,
+      diagnostics: aggregateDiagnostics,
+      widening: aggregateWidening,
+      widenPasses: aggregateWidening.passes,
+      outcome: branchResults.some((result) => result.outcome === "SEARCH_FAILED") ? "SEARCH_FAILED"
+        : rows.length > 0 ? "QUALIFIED_RESULTS" : representative.outcome,
+      retrievalTrace: representative.retrievalTrace && {
+        ...representative.retrievalTrace,
+        sources: branchResults.flatMap((result) => result.retrievalTrace?.sources ?? []),
+        rawCandidates: branchResults.reduce((sum, result) => sum + (result.retrievalTrace?.rawCandidates ?? 0), 0),
+        postSpecFilter: branchResults.reduce((sum, result) => sum + (result.retrievalTrace?.postSpecFilter ?? 0), 0),
+        returned: rows.length,
+        qualified: branchResults.reduce((sum, result) => sum + (result.retrievalTrace?.qualified ?? 0), 0),
+        complete: branchResults.reduce((sum, result) => sum + (result.retrievalTrace?.complete ?? 0), 0),
+        pendingEnrichment: branchResults.reduce((sum, result) => sum + (result.retrievalTrace?.pendingEnrichment ?? 0), 0),
+        qualificationRejected: branchResults.reduce((sum, result) => sum + (result.retrievalTrace?.qualificationRejected ?? 0), 0),
+        sourceHealth: aggregateHealth,
+        widening: aggregateWidening,
+      },
       offset: effOffset,
       limit,
       // Zero-delivery contract (Defect A): an empty delivered page promises nothing.
@@ -2301,7 +2412,7 @@ export async function runSpecSearchCore(
   // tick past the budget it names the current stage. Diagnostics only.
   const runWatchdog = startRunWatchdog({
     runId: runIds.search_run_id,
-    budgetMs: scaledRunBudgetMs(requestedTarget),
+    budgetMs: rootRunBudgetMs,
     getStage: () => currentStage,
     isAborted: () => deps.signal?.aborted
       ? { aborted: true, reason: searchAbortCode(deps.signal) }
@@ -2557,7 +2668,7 @@ export async function runSpecSearchCore(
     let runBudgetMs = 120_000;
     try {
       const { scaledRunBudgetMs } = await import("@/lib/search/search-run.server");
-      runBudgetMs = scaledRunBudgetMs(requestedTarget);
+      runBudgetMs = rootRunBudgetMs;
     } catch {
       // non-node runtime: rely on the abort signal alone
     }
@@ -2858,7 +2969,7 @@ export async function runSpecSearchCore(
       const rowSpec =
         effectiveSpec !== spec && (row.kind === "business" || row.kind === "company") ? effectiveSpec : spec;
       if (rowSatisfiesSpec(rowSpec, row)) judged.push(row);
-      else ledger.filtered(row, "UNPROVEN_CRITERION");
+      else ledger.filtered(row, postResearchRejectReason(rowSpec, row));
     }
     completeRows = judged;
   }

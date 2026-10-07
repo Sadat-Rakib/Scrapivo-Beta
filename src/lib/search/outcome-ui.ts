@@ -81,7 +81,7 @@ export function enrichZeroNarrative(
   if (ledger) {
     const dropped = ledger.streamedNotReturned ?? [];
     const unproven = dropped.filter(
-      (s) => s.reason === "UNPROVEN_CRITERION" || s.reason === "SIGNAL_NOT_VERIFIED",
+      (s) => s.reason?.startsWith("UNPROVEN_CRITERION") || s.reason === "SIGNAL_NOT_VERIFIED",
     ).length;
     if (unproven > 0) {
       parts.push(

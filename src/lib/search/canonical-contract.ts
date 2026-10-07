@@ -357,6 +357,36 @@ export function evaluateQualifiedLeadTheorem(
   const missing: string[] = [];
   const qFields = queryRequiredFields(spec);
   const f = candidate.fields ?? {};
+  const socialObservation = (item: Evidence | ClaimEvidence): boolean => {
+    if (("source_type" in item && item.source_type === "social") ||
+      ("evidence_source" in item && /social|instagram|facebook|linkedin|tiktok|youtube/i.test(item.evidence_source ?? ""))) return true;
+    if (!("extraction_method" in item && item.extraction_method === "browser_observed_text" && item.evidence_type === "identity" &&
+      !!candidate.name && !!item.excerpt?.toLowerCase().includes(candidate.name.toLowerCase()))) return false;
+    try { return /(?:^|\.)(?:instagram|facebook|linkedin|tiktok|youtube|twitter|x)\.com$/i.test(new URL(item.source_url).hostname); }
+    catch { return false; }
+  };
+  const observedField = (field: string): boolean => {
+    const text = (value: unknown) => typeof value === "string" && !!value.trim();
+    if (field === "website") return text(f.website_url);
+    if (field === "contact") return text(f.email) || text(f.phone) ||
+      (text(f.contact_page_url) && (candidate.field_provenance?.contact_page_url as Record<string, unknown> | undefined)?.verification_status === "verified") ||
+      !!candidate.evidence?.some((item) => isSubjectBound(item, id!) && "evidence_type" in item && item.evidence_type === "contact" && !!item.source_url);
+    if (field === "socials" || field === "social") return !!candidate.evidence?.some((item) =>
+      isSubjectBound(item, id!) && socialObservation(item) &&
+      !!("source_url" in item ? item.source_url : item.evidence_url));
+    if (["instagram", "facebook", "linkedin", "tiktok", "youtube", "twitter"].includes(field)) {
+      const hostMatches = (url: unknown) => {
+        if (!text(url)) return false;
+        try { const host = new URL(String(url)).hostname.toLowerCase(); return host === `${field}.com` || host.endsWith(`.${field}.com`) || (field === "twitter" && host === "x.com"); } catch { return false; }
+      };
+      const verifiedField = (name: string) => hostMatches(f[name]) &&
+        (candidate.field_provenance?.[name] as Record<string, unknown> | undefined)?.verification_status === "verified";
+      return verifiedField(`${field}_url`) || verifiedField(field) || !!candidate.evidence?.some((item) =>
+        isSubjectBound(item, id!) && socialObservation(item) &&
+        hostMatches("source_url" in item ? item.source_url : item.evidence_url));
+    }
+    return text(f[field]);
+  };
 
   if (qFields.includes("location")) {
     const loc = f.location ?? null;
@@ -397,33 +427,10 @@ export function evaluateQualifiedLeadTheorem(
       }
     }
   }
-  if (qFields.includes("phone")) {
-    const phone = f.phone ?? null;
-    if (typeof phone !== "string" || !phone.trim()) missing.push("phone");
-  }
-  if (qFields.includes("email")) {
-    const email = f.email ?? null;
-    if (typeof email !== "string" || !email.trim()) missing.push("email");
-  }
-  if (qFields.includes("website") && !(typeof f.website_url === "string" && f.website_url.trim())) {
-    missing.push("website");
-  }
-  if (qFields.includes("contact")) {
-    // Contact is satisfied only by genuinely observed evidence: an email or
-    // phone on the row, a contact page whose provenance is verified, or a
-    // contact evidence item. A bare contact_page_url is a guess, not a lead.
-    const contactPageVerified = typeof f.contact_page_url === "string" && !!f.contact_page_url.trim() &&
-      (candidate.field_provenance?.contact_page_url as Record<string, unknown> | undefined)?.verification_status === "verified";
-    const hasContactEvidence = candidate.evidence?.some((item) => "evidence_type" in item && item.evidence_type === "contact") ?? false;
-    if (![f.email, f.phone].some((value) => typeof value === "string" && value.trim()) && !contactPageVerified && !hasContactEvidence) {
-      missing.push("contact");
-    }
-  }
-  if (qFields.includes("socials") && !candidate.evidence?.some((item) =>
-    ("source_type" in item && item.source_type === "social" && !!item.source_url) ||
-    ("evidence_source" in item && /social|instagram|facebook|linkedin|tiktok|youtube/i.test(item.evidence_source ?? "") && !!item.evidence_url))) {
-    missing.push("socials");
-  }
+  for (const field of ["phone", "email", "website", "contact", "socials"])
+    if (qFields.includes(field) && !observedField(field)) missing.push(field);
+  for (const group of spec.required_field_groups ?? [])
+    if (!group.any_of.some(observedField)) missing.push(`any_of(${group.any_of.join("|")})`);
   if (spec.entity === "job") {
     if (!candidate.source_url?.trim() && !f.apply_url) missing.push("apply_or_source_url");
     if (!f.employer && !f.company) missing.push("employer");

@@ -4,6 +4,7 @@
  */
 import { isReadDeadline, listPartitionFilesBySize, readFiltered, type DbHitMeta } from "./read-parquet.server";
 import { COUNTRY_ISO } from "@/lib/search/search-spec-extract";
+import { criterionPhraseMatches } from "@/lib/search/criterion-match";
 
 export interface CanonicalPerson {
   name: string | null;
@@ -138,7 +139,7 @@ export async function searchPeopleDB(
     keys = all.slice(0, 12);
     const where = (r: Record<string, unknown>) =>
       (!q.role || personRoleMatches(r.title, q.role) || (q.role === "founder" && like(r.title, "found"))) &&
-      (!q.industry || like(r.industry, q.industry)) &&
+      (!q.industry || criterionPhraseMatches(r.industry as string | null, q.industry)) &&
       (!q.country || personCountryMatches(r.country, q.country)) &&
       (!q.city || like(r.city, q.city)) &&
       (!q.name || like(r.name, q.name)) &&
@@ -185,7 +186,7 @@ export async function searchPeopleDB(
     ...budget,
     where: (r) =>
       (!q.role || personRoleMatches(r.title, q.role) || (q.role === "founder" && like(r.title, "found"))) &&
-      (!q.industry || like(r.industry, q.industry)) &&
+      (!q.industry || criterionPhraseMatches(r.industry as string | null, q.industry)) &&
       (!q.country || personCountryMatches(r.country, q.country)) &&
       (!q.city || like(r.city, q.city)) &&
       (!q.name || like(r.name, q.name)) &&

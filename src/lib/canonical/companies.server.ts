@@ -2,6 +2,7 @@
  * Canonical companies reader — S3 Parquet, initial-partition pruned (Phase 1).
  */
 import { listPartitionFilesBySize, readFiltered, type DbHitMeta } from "./read-parquet.server";
+import { criterionAlternatives, criterionPhraseMatches } from "@/lib/search/criterion-match";
 
 export interface CanonicalCompany {
   company_name: string | null;
@@ -50,7 +51,8 @@ export function companyCategoryTerms(wanted: string): string[] {
 
 export function companyCategoryMatches(value: unknown, wanted: string): boolean {
   if (typeof value !== "string") return false;
-  return companyCategoryTerms(wanted).some((term) => like(value, term));
+  return criterionPhraseMatches(value, wanted) || criterionAlternatives(wanted)
+    .some(part => companyCategoryTerms(part.replace(/\s+startups?$/i, "")).some((term) => like(value, term)));
 }
 
 /**

@@ -19,6 +19,7 @@ export type EvidenceType =
   | "service_request"
   | "no_website"
   | "funding"
+  | "investment"
   | "social_ask"
   | "contact"
   | "identity"
@@ -182,6 +183,6 @@ export function whyMatchFromEvidence(evidence: Evidence[] | null | undefined): s
 export function hasQualifyingEvidence(evidence: Evidence[] | null | undefined): boolean {
   if (!evidence?.length) return false;
   return evidence.some((e) =>
-    ["hiring", "service_request", "no_website", "funding", "social_ask"].includes(e.evidence_type),
+    ["hiring", "service_request", "no_website", "funding", "investment", "social_ask"].includes(e.evidence_type),
   );
 }

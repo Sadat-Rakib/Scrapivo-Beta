@@ -12,6 +12,7 @@
  * Boolean "verified: true" is a derived view — never a replacement for proof.
  */
 import type { SearchSpec } from "@/lib/search/search-spec";
+import { criterionPhraseMatches } from "@/lib/search/criterion-match";
 import type { Evidence } from "@/lib/search/evidence";
 import {
   asClaimEvidence,
@@ -251,6 +252,10 @@ export function evaluateTemporalValidity(
  */
 export function deriveRequiredClaimParameters(spec: SearchSpec): ClaimParameters {
   const params: ClaimParameters = {};
+  if (requestedClaimTypes(spec).includes("investment")) {
+    params.investor_sector = fieldOf(spec, "investor_sector") ?? fieldOf(spec, "industry");
+    params.investor_stage = fieldOf(spec, "investor_stage");
+  }
   const role =
     fieldOf(spec, "requested_role") ||
     (spec.entity === "job" ? fieldOf(spec, "role") : null);
@@ -333,6 +338,10 @@ export function claimParametersMatch(
     const want = normParam(required[key]);
     if (!want) continue;
     const haveRaw = params[key];
+    if (key === "investor_sector" || key === "technology") {
+      if (!criterionPhraseMatches(haveRaw == null ? hay : String(haveRaw), String(required[key]))) mismatched.push(key);
+      continue;
+    }
     if (haveRaw != null && String(haveRaw).trim() !== "") {
       const have = normParam(haveRaw);
       const wantToks = paramTokens(want);
