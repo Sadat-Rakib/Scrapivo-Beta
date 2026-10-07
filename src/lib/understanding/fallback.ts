@@ -44,7 +44,7 @@
  * being careful.
  */
 
-import { knownCityName, resolveCanonicalLocation } from "@/lib/search/location-resolver";
+import { knownCityName, resolveCanonicalLocation, splitMultiPlace } from "@/lib/search/location-resolver";
 import { normalizeRole } from "@/lib/search/search-spec-extract";
 import {
   clamp,
@@ -2713,6 +2713,18 @@ export function extractFrameDeterministic(
     modifierLocation ??
     (trailingPlace ? geoFor(trailingPlace, trailingPlace, "in", 0.4) : null);
   frame.locations = detectOrLocations(primaryRaw, frame.location);
+  // "around edmonton sherwood park st albert area" — a fused multi-place
+  // phrase reads as one provisional blob and pins the search to a place
+  // nobody named. When that blob (or the request text behind it) contains
+  // several known places, search all of them instead.
+  if (frame.location) {
+    const splitPlaces = splitMultiPlace(frame.location.raw ?? frame.location.value) ?? splitMultiPlace(primaryRaw);
+    if (splitPlaces) {
+      frame.locations = splitPlaces.map((geo) => geoFor(geo.name, geo.name, "in", 0.8));
+      frame.location = { ...frame.location, value: splitPlaces[0]!.name, canonical: splitPlaces[0]!.name };
+      frame.meta.notes.push(`split a multi-place phrase into ${splitPlaces.map((p) => p.name).join(", ")}`);
+    }
+  }
   if (!frame.location) {
     const prefix = /^([\p{Lu}][\p{L}'-]+(?:\s+[\p{Lu}][\p{L}'-]+){0,2})\s+(?:businesses|firms|shops|companies|brands|jobs|restaurants)\b/u.exec(primaryRaw);
     if (prefix) {

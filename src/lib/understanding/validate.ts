@@ -18,7 +18,7 @@
  */
 
 import { normalizeRole, extractTemporal } from "@/lib/search/search-spec-extract";
-import { resolveCanonicalLocation } from "@/lib/search/location-resolver";
+import { resolveCanonicalLocation, splitMultiPlace } from "@/lib/search/location-resolver";
 import type { Constraint, OpenValue, Relation, Target, UnderstandingFrame } from "./frame";
 import {
   canonicalWindow,

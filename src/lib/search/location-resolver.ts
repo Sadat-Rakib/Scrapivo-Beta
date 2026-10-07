@@ -668,6 +668,75 @@ export function cityGazetteerRegistered(): boolean {
 export function knownCityName(name: string): boolean {
   return !!gazetteer && gazetteer.lookup(name).length > 0;
 }
+
+/**
+ * Multi-place scan for chaotic prompts that list several places in one
+ * breath: "bali, phuket and santorini", "uk + ireland", "dubai singapore
+ * sydney maybe toronto too", "edmonton sherwood park st albert area". Word
+ * windows (3-1) are matched against the resolver tables; an unqualified
+ * gazetteer name counts only when it names exactly one city (the same
+ * ambiguity rule the qualified resolver applies). Two or more DISTINCT known
+ * places split into a multi-location search; anything else keeps the
+ * caller's reading. Continents and hedging words never resolve.
+ */
+export function splitMultiPlace(raw: string): GeoEntity[] | null {
+  const words = (raw ?? "").trim().split(/[^\p{L}\p{N}'+-]+/u).filter(Boolean);
+  if (words.length < 2) return null;
+  const SKIP = new Set([
+    "area", "around", "near", "nearby", "maybe", "also", "both", "either",
+    "the", "and", "or", "plus", "too", "city", "mostly", "honestly",
+    "anywhere", "is", "fine", "greater", "downtown", "greater area",
+  ]);
+  const singleKnownCity = (phrase: string): GazetteerCity | null => {
+    if (!gazetteer) return null;
+    // The map is ordered most-populous first, so the first hit is the
+    // principal namesake ("Edmonton AB" over Edmonton, London). A wrong-city
+    // row still dies at the evidence gates downstream; the split exists so a
+    // multi-place ask is never stranded on one city.
+    const hits = gazetteer.lookup(phrase);
+    return hits[0] ?? null;
+  };
+  const out: GeoEntity[] = [];
+  let i = 0;
+  while (i < words.length) {
+    let hit: GeoEntity | null = null;
+    let span = 0;
+    for (let n = Math.min(3, words.length - i); n >= 1 && !hit; n--) {
+      const phrase = words.slice(i, i + n).join(" ");
+      if (SKIP.has(phrase.toLowerCase())) continue;
+      const cand = phrase.replace(/^[-'+-]+|[-'+-]+$/g, "");
+      if (!cand || SKIP.has(cand.toLowerCase())) continue;
+      const ent = resolveCanonicalLocation(cand, { gazetteer: true });
+      if (ent && ent.resolution === "resolved" && ["city", "country", "metro"].includes(ent.kind)) {
+        hit = ent;
+        span = n;
+        break;
+      }
+      // A country pin needs no gazetteer; a bare city name counts only when
+      // unambiguous ("bali" with one match in, "portland" with several out).
+      const country = countryIsoOf(cand) && !GEO_ALIAS[norm(cand)] ? countryEntity(
+        countryIsoOf(cand)!,
+        GEO_ALIAS[norm(cand)] ?? titlePlace(cand),
+      ) : null;
+      if (country) {
+        hit = country;
+        span = n;
+        break;
+      }
+      const city = singleKnownCity(cand);
+      if (city && city.name.toLowerCase() === cand.toLowerCase()) {
+        hit = gazetteerCityEntity(city, null, false);
+        span = n;
+        break;
+      }
+    }
+    if (hit) {
+      if (!out.some((o) => o.id === hit!.id)) out.push(hit);
+      i += span;
+    } else i += 1;
+  }
+  return out.length >= 2 ? out : null;
+}
 export type ResolveLocationOptions = {
   /** Consult the registered world gazetteer (query understanding only). */
   gazetteer?: boolean;

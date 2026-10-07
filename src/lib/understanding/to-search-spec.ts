@@ -1,6 +1,6 @@
 import { buildSpec, type SearchSpec, type SpecEntity, type SpecField } from '../search/search-spec';
 import { normalizeRole } from '../search/search-spec-extract';
-import { resolveCanonicalLocation } from '../search/location-resolver';
+import { resolveCanonicalLocation, splitMultiPlace } from '../search/location-resolver';
 import { initState, patchFrame, syncClarification, type BlockingField } from './clarify-state';
 import { extractFrameDeterministic } from './fallback';
 import { openValue, type FrameLocation, type OpenValue, type UnderstandingFrame } from './frame';
@@ -150,6 +150,24 @@ export function normalizeSearchFrame(input: UnderstandingFrame): UnderstandingFr
       frame.location = structuredClone(detPlace);
       if (deterministic.locations.length > 1) frame.locations = structuredClone(deterministic.locations);
       frame.meta.notes.push(`recovered location: ${detPlace.canonical ?? detPlace.value}`);
+    }
+    // "uk + ireland", "dubai singapore sydney maybe toronto too" — the model
+    // kept one place of several named in one breath. When the kept place's
+    // span (or the whole request) names two or more known places, widen to a
+    // multi-location search instead of dropping the rest of the list.
+    if (frame.location && frame.locations.length < 2) {
+      const splitPlaces = splitMultiPlace(frame.location.raw ?? frame.location.value) ??
+        splitMultiPlace(frame.input.raw);
+      if (splitPlaces) {
+        frame.locations = splitPlaces.map((geo) => ({
+          value: geo.name, raw: geo.name, scope: 'in' as const, radius: null, radius_unit: null,
+          country_code: geo.country_code, canonical: geo.name, confidence: 0.8,
+        }));
+        if (frame.location.value !== splitPlaces[0]!.name && !splitPlaces.some((p) => p.name === frame.location!.value)) {
+          frame.location = { ...frame.location, value: splitPlaces[0]!.name, canonical: splitPlaces[0]!.name, country_code: splitPlaces[0]!.country_code };
+        }
+        frame.meta.notes.push(`split a multi-place phrase into ${splitPlaces.map((p) => p.name).join(', ')}`);
+      }
     }
     // A provider sometimes returns the right entity with NO descriptor at all
     // ("B2B SaaS founders" -> person, role/industry null), which strands the
