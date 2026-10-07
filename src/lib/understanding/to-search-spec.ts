@@ -2,7 +2,7 @@ import { buildSpec, type SearchSpec, type SpecEntity, type SpecField } from '../
 import { normalizeRole } from '../search/search-spec-extract';
 import { resolveCanonicalLocation, splitTargetLocationList } from '../search/location-resolver';
 import { initState, patchFrame, syncClarification, type BlockingField } from './clarify-state';
-import { extractFrameDeterministic, fieldRequirements, fieldAlternativeGroups, independentlyRequiredFields } from './fallback';
+import { canonicalWindow, extractFrameDeterministic, fieldRequirements, fieldAlternativeGroups, independentlyRequiredFields } from './fallback';
 import { openValue, type FrameLocation, type OpenValue, type UnderstandingFrame } from './frame';
 import { classifyHead, hedgesTheAsk, LOCATIVE_PREP_TOKENS, opensWithExclusion } from './lexicon';
 import { validateFrame } from './validate';
@@ -13,6 +13,17 @@ import { keyDeliverableField } from './vocab';
 
 const clean = (value: string) => value.trim().replace(/[.!?]+$/, '').trim();
 const valueOf = (value: OpenValue | null | undefined) => value ? clean(value.normalized ?? value.value) : '';
+function prefersOwnSpan(raw: string, span: string | null | undefined, value?: string): boolean {
+  const stated = span?.trim();
+  if (!stated) return false;
+  const pieces = raw.split(/[,;.!?]|\b(?:and|but)\b/i);
+  let clauses = pieces.filter(part => part.toLowerCase().includes(stated.toLowerCase()));
+  // A provider may attach the entire request as provenance. Use the field's
+  // own value to recover its clause instead of inheriting another field's hedge.
+  if (!clauses.length && value) clauses = pieces.filter(part => part.toLowerCase().includes(value.toLowerCase()));
+  if (!clauses.length && value && /[,;.!?]|\b(?:and|but)\b/i.test(stated)) return false;
+  return hedgesTheAsk(clauses.length === 1 ? clauses[0] : clauses.length ? null : stated);
+}
 const MODAL_NEED = /\b(?:may|might|could)\s+(?:potentially\s+)?(?:need|use|benefit from)\b|\b(?:relevant|suitable|a good fit)\s+for\b/i;
 // A discussion clause, not a compound noun: "grant writing agencies" and
 // "actively writing checks" are not topics. Requires `about`/`on`, a relative
@@ -131,7 +142,9 @@ export function normalizeSearchFrame(input: UnderstandingFrame): UnderstandingFr
     frame.meta.notes.push('treated hiring evidence wording as a signal requirement');
   }
   const social = raw.match(SOCIAL_TOPIC);
-  if (social && !/^(?:\s*(?:and|or)\s+(?:emails?|phones?|socials?)|\s*(?:this|last|next)\s+(?:week|month|year))\b/i.test(social[1])) {
+  const socialPrefix = social ? raw.slice(0, social.index).split(/[,;.!?]|\band\b/i).at(-1) ?? '' : '';
+  const excludedSocial = /\b(?:not|no|exclude|excluding|except|skip|without|don'?t|dont)\b/i.test(socialPrefix);
+  if (social && !excludedSocial && !/^(?:\s*(?:and|or)\s+(?:emails?|phones?|socials?)|\s*(?:this|last|next)\s+(?:week|month|year))\b/i.test(social[1])) {
     frame.constraints = frame.constraints.filter((c) => c.field !== 'content_topic');
     frame.constraints.push({ field: 'content_topic', operator: 'eq', value: clean(social[1]), raw: social[0], confidence: 1, negated: false, unit: null });
     if (!frame.evidence.intent_signal_required) frame.prospecting_mode = { value: 'social_signal_based', raw: social[0], confidence: 1 };
@@ -408,11 +421,7 @@ export function normalizeSearchFrame(input: UnderstandingFrame): UnderstandingFr
   // branch does not lose it when its raw input becomes just one bucket.
   for (const constraint of frame.constraints) {
     if (constraint.field.startsWith('prefer_')) continue;
-    const stated = constraint.raw?.trim();
-    const clauses = stated ? raw.split(/[,;.!?]|\b(?:and|but)\b/i)
-      .filter(part => part.toLowerCase().includes(stated.toLowerCase())) : [];
-    const clause = clauses.length === 1 ? clauses[0] : stated;
-    if (hedgesTheAsk(clause)) constraint.field = `prefer_${constraint.field}`;
+    if (prefersOwnSpan(raw, constraint.raw)) constraint.field = `prefer_${constraint.field}`;
   }
   return syncClarification(frame);
 }
@@ -476,7 +485,8 @@ export function frameToSearchSpec(input: UnderstandingFrame): SearchSpec {
     if (index < 0) criteria.push(next); else criteria[index] = next;
   };
   const descriptor = (field: string, value: OpenValue | null | undefined) => {
-    if (value) put(field, valueOf(value), value.confidence, !!value.raw);
+    if (value) put(prefersOwnSpan(frame.input.raw, value.raw, valueOf(value)) ? `prefer_${field}` : field,
+      valueOf(value), value.confidence, !!value.raw);
   };
 
   const role = frame.target.job_title ?? frame.target.role;
@@ -536,9 +546,10 @@ export function frameToSearchSpec(input: UnderstandingFrame): SearchSpec {
     if (!criteria.some((c) => c.field === 'investor_sector') && sector) {
       put('investor_sector', sector, frame.relation.object?.confidence ?? 1, !!frame.relation.object?.raw);
     }
-    if (!anyInvestorStage && !criteria.some((c) => c.field === 'investor_stage')) {
+    if (!anyInvestorStage && !criteria.some((c) => c.field === 'investor_stage' || c.field === 'prefer_investor_stage')) {
       const categoryStage = investorStage(frame.target.category?.raw ?? '');
-      if (categoryStage) put('investor_stage', categoryStage, frame.target.category?.confidence ?? 1, !!frame.target.category?.raw);
+      if (categoryStage) put(prefersOwnSpan(frame.input.raw, frame.target.category?.raw, categoryStage) ? 'prefer_investor_stage' : 'investor_stage',
+        categoryStage, frame.target.category?.confidence ?? 1, !!frame.target.category?.raw);
     }
   }
   if (relation === 'needs_service' || relation === 'asking_for_help') put('requested_service', object);
@@ -600,9 +611,24 @@ export function frameToSearchSpec(input: UnderstandingFrame): SearchSpec {
   const signalRequired = frame.evidence.intent_signal_required ||
     ['hiring', 'received_funding', 'seeking_funding', 'needs_service', 'asking_for_help', 'custom'].includes(relation);
   const signalTypes = signalRequired ? [relation === 'investing_in' ? 'investment' : ['received_funding', 'seeking_funding'].includes(relation) ? 'funding' : relation === 'hiring' ? 'hiring' : 'service_request'] : [];
+  const matchingWindowSpans = frame.temporal?.window ? [...frame.input.raw.matchAll(/\b\d{1,3}\s*[- ]?\s*(?:days?|weeks?|months?|quarters?|years?)\b/gi)]
+    .map(match => match[0]).filter(span => canonicalWindow(span.replace(/-/g, '')) === canonicalWindow(frame.temporal?.window)) : [];
+  const temporalSpan = matchingWindowSpans.length === 1 && frame.temporal?.raw === frame.input.raw ? matchingWindowSpans[0] : frame.temporal?.raw;
+  const softTemporal = !!frame.temporal && prefersOwnSpan(frame.input.raw, temporalSpan, frame.temporal.relation);
+  if (frame.temporal) {
+    const prefix = softTemporal ? 'prefer_' : '';
+    put(`${prefix}temporal_relation`, frame.temporal.relation);
+    put(`${prefix}temporal_window`, frame.temporal.window);
+    put(`${prefix}temporal_year`, frame.temporal.year);
+  }
+  // A soft desired date does not erase an independently explicit stale-age
+  // exclusion ("ideally last week, but no six-month-old openings").
+  const staleBound = /\b(?:do\s+not|don'?t|dont|exclude|excluding|skip|no)\b[^,;.!?]{0,80}?\b(\d{1,3})\s*[- ]?\s*(day|week|month|quarter|year)s?\s*[- ]?\s*old\b/i.exec(frame.input.raw);
+  const maxAge = staleBound ? canonicalWindow(`${staleBound[1]}${staleBound[2]}`) : null;
+  if (maxAge) put('temporal_max_age', maxAge);
   const purpose = purposeFromFrame(frame);
   const spec = buildSpec({ entity, criteria, raw_query: stripUrlsFromText(frame.input.raw), signal_required: signalRequired, signal_types: signalTypes,
-    signal_recency: frame.temporal?.window ?? null, locationSuggestion });
+    signal_recency: (!softTemporal ? frame.temporal?.window : null) ?? maxAge, locationSuggestion });
   spec.understanding = frame;
   spec.locations = locationNames;
   spec.unresolved = frame.unresolved;

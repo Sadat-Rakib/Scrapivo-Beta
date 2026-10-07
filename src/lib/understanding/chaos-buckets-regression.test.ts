@@ -4,6 +4,8 @@ import { validateFrame } from './validate';
 import { frameToSearchSpec } from './to-search-spec';
 import { openValue } from './frame';
 import { decideSpecClarification } from '../stage1/stage1-adapter';
+import { deriveTemporalConstraint, evaluateTemporalValidity } from '../search/verification';
+import { makeEvidence } from '../search/evidence';
 
 const specOf = (raw: string) => frameToSearchSpec(validateFrame(extractFrameDeterministic(raw)).frame);
 
@@ -126,5 +128,83 @@ describe('chaos bucket and preference contracts', () => {
     const spec = specOf(raw);
     expect(decideSpecClarification(spec, false)).toBeNull();
     expect(decideSpecClarification(spec, true)).toBeNull();
+  });
+
+  it.each([
+    ['Find investors in AI in Australia, ideally seed or pre-seed', 'seed or pre-seed', 'investor_stage'],
+    ['Find investors in healthtech in Ireland, seed stage preferred', 'seed stage', 'investor_stage'],
+    ['Find software founders in Japan, preferably early stage', 'early stage', 'company_stage'],
+  ])('keeps supplied stage descriptors soft in their own clause: %s', (raw, stage, field) => {
+    const frame = validateFrame(extractFrameDeterministic(raw)).frame;
+    frame.meta.extractor = 'llm';
+    frame.target.entity_type = { value: field === 'investor_stage' ? 'investor' : 'person', raw: field === 'investor_stage' ? 'investors' : 'founders', confidence: .95 };
+    const trade = /healthtech/.test(raw) ? 'healthtech' : /software/.test(raw) ? 'software' : 'AI';
+    frame.target.industry = openValue(trade, trade);
+    frame.target.company_stage = openValue(stage, stage);
+    const spec = frameToSearchSpec(frame);
+    expect(spec.criteria.some(c => c.field === field)).toBe(false);
+    expect(spec.criteria.some(c => c.field === `prefer_${field}`)).toBe(true);
+    expect(spec.criteria.some(c => c.field === (field === 'investor_stage' ? 'investor_sector' : 'industry'))).toBe(true);
+  });
+
+  it.each([
+    'Find investors in AI in Australia, must be seed stage; phone if possible',
+    'Find investors in healthtech in Ireland, seed stage required and phone preferred',
+  ])('keeps mandatory stage despite an unrelated hedge: %s', raw => {
+    const frame = validateFrame(extractFrameDeterministic(raw)).frame;
+    frame.meta.extractor = 'llm';
+    frame.target.company_stage = openValue('seed', 'seed stage');
+    const spec = frameToSearchSpec(frame);
+    expect(spec.criteria.some(c => c.field === 'investor_stage')).toBe(true);
+    expect(spec.criteria.some(c => c.field === 'prefer_investor_stage')).toBe(false);
+  });
+
+  it.each([false, true])('keeps bonus temporal evidence optional, whole raw=%s', whole => {
+    const raw = 'Find investors investing in AI in Australia, bonus if they invested recently';
+    const frame = validateFrame(extractFrameDeterministic(raw)).frame;
+    frame.meta.extractor = 'llm';
+    frame.temporal = { relation: 'recent', window: '90d', year: null, raw: whole ? raw : 'recently', confidence: .9 };
+    const spec = frameToSearchSpec(frame);
+    expect(spec.signal_recency).toBeNull();
+    expect(deriveTemporalConstraint(spec).required).toBe(false);
+    expect(spec.criteria.some(c => c.field === 'prefer_temporal_relation')).toBe(true);
+  });
+
+  it.each([false, true])('keeps mandatory event recency despite optional contact, whole raw=%s', whole => {
+    const raw = 'Find investors in Australia who invested within 90 days; phone if possible';
+    const frame = validateFrame(extractFrameDeterministic(raw)).frame;
+    frame.meta.extractor = 'llm';
+    frame.temporal = { relation: 'within_last', window: '90d', year: null, raw: whole ? raw : 'within 90 days', confidence: .9 };
+    expect(deriveTemporalConstraint(frameToSearchSpec(frame)).required).toBe(true);
+  });
+
+  it('keeps an independent hard stale-age bound beside an ideal date', () => {
+    const raw = 'Find React jobs in Canada, ideally last week but dont give 6 month old openings';
+    const frame = validateFrame(extractFrameDeterministic(raw)).frame;
+    frame.meta.extractor = 'llm';
+    frame.temporal = { relation: 'within_last', window: '1w', year: null, raw: 'last week', confidence: .9 };
+    const spec = frameToSearchSpec(frame);
+    expect(spec.signal_recency).toBe('6m');
+    expect(spec.criteria).toContainEqual(expect.objectContaining({ field: 'prefer_temporal_window', value: '1w' }));
+    expect(deriveTemporalConstraint(spec).required).toBe(true);
+    const now = Date.parse('2026-10-07T00:00:00Z');
+    const evidence = (daysAgo: number) => makeEvidence({ source_url: 'https://employer.example/jobs/react', source_type: 'web',
+      excerpt: 'React developer opening', evidence_type: 'hiring', supports: 'intent', subject: 'employer:react',
+      observed_at: new Date(now).toISOString(), event_at: new Date(now - daysAgo * 86_400_000).toISOString() });
+    expect(evaluateTemporalValidity(evidence(30), spec, now).ok).toBe(true);
+    expect(evaluateTemporalValidity(evidence(200), spec, now).ok).toBe(false);
+    expect(evaluateTemporalValidity({ ...evidence(0), event_at: null }, spec, now).ok).toBe(false);
+  });
+
+  it.each([
+    'Find investors in AI, not articles talking about venture capital',
+    'Find dentists in Canada, exclude news discussing dental care',
+    'Find software companies in Ireland, skip blogs writing about software',
+  ])('does not turn excluded source discussions into lead requirements: %s', raw => {
+    expect(specOf(raw).criteria.some(c => c.field === 'content_topic')).toBe(false);
+  });
+
+  it('preserves requested social discussion after a separate exclusion clause', () => {
+    expect(specOf('Find founders, not recruiters, who talk about fundraising').criteria.some(c => c.field === 'content_topic')).toBe(true);
   });
 });
