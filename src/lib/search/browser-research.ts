@@ -7,7 +7,23 @@ import { missingRequiredFields } from "./completeness";
 export type ResearchNeed = "identity" | "role" | "company" | "industry" | "location" | "website" | "profile" | "contact" | "social" | "signal" | "topic" | "no_website_verification";
 export type ResearchStatus = "discovered" | "researching" | "ready_for_qualification" | "verified" | "exhausted" | "rejected";
 
-const requested = (spec: SearchSpec, field: string) => spec.criteria.some((criterion) => criterion.field === field);
+/**
+ * Fields the ask wants, from hard requirements AND soft enrichment wishes.
+ * "get linkedin website email whatever you can actually verify" demotes its
+ * channels to enrichment_requirements — they must still be hunted here, they
+ * just no longer gate delivery.
+ */
+const requested = (spec: SearchSpec, field: string) =>
+  spec.criteria.some((criterion) => criterion.field === field) ||
+  (field !== "opportunity" &&
+    !!spec.understanding?.enrichment_requirements?.some((item) => {
+      const want = item.value.toLowerCase().replace(/[^a-z]/g, "");
+      return want === field ||
+        (want === "site" && field === "website") ||
+        (want === "ig" && field === "social") ||
+        (want === "instagram" && (field === "social" || field === "profile")) ||
+        (want === "linkedin" && field === "profile");
+    }));
 
 /**
  * A contact need is satisfied only by a genuinely observed channel: an email
@@ -44,9 +60,12 @@ export function computeResearchNeeds(row: SpecRow, spec: SearchSpec, qualificati
   else if (!row.website_url && !requested(spec, "opportunity")) add("website");
   if (requested(spec, "opportunity") && spec.criteria.some((criterion) => criterion.field === "opportunity" && criterion.value === "no_website") && !row.website_url) add("no_website_verification");
   if (required.some((field) => (field === "email" && !row.email) || (field === "phone" && !row.phone) ||
-      (field === "contact" && !contactSatisfied(row))) || wantsPublicContact) add("contact");
-  if (required.includes("website") && !row.website_url) add("website");
-  if (required.includes("socials") && !row.evidence?.some((item) => item.source_type === "social" && !!item.source_url)) add("social");
+      (field === "contact" && !contactSatisfied(row))) || wantsPublicContact ||
+      (requested(spec, "email") && !row.email)) add("contact");
+  if ((required.includes("website") || requested(spec, "website")) && !row.website_url) add("website");
+  if ((required.includes("socials") || requested(spec, "socials")) &&
+      !row.evidence?.some((item) => item.source_type === "social" && !!item.source_url)) add("social");
+  if (requested(spec, "linkedin") && !row.profile_url && !row.website_url) add("profile");
   if (requested(spec, "content_topic") && qualification.reject_code === "NO_CLAIM_EVIDENCE") add("topic");
   if (spec.signal_required && ["NO_CLAIM_EVIDENCE", "CLAIM_NOT_SUBJECT_BOUND"].includes(qualification.reject_code ?? "")) add("signal");
   if (qualification.reject_code === "MISSING_QUERY_REQUIRED") for (const field of required) {

@@ -351,6 +351,32 @@ export function normalizeSearchFrame(input: UnderstandingFrame): UnderstandingFr
       frame.meta.notes.push('dropped required website/site — the ask hunts businesses without one');
     }
   }
+  // "get linkedin website email whatever you can actually verify" — the
+  // verifiability hedge ("whatever you can verify", "if possible") makes the
+  // channel list an ANY-of enrichment wish, not an ALL-of gate: demanding
+  // every channel dropped 5-6 of every 12 founder candidates for missing
+  // whichever one they lacked. Hedged channels move to
+  // enrichment_requirements (still hunted, no longer delivery-gating); a
+  // plain enumeration ("give me email, phone, website and socials") stays
+  // required per the established contract.
+  {
+    const CONTACT_CHANNEL = /^(?:e-?mails?(?:\s+address(?:es)?)?|phones?(?:\s+numbers?)?|websites?|sites?|linkedin|socials?|social\s+(?:media|profiles?|links?)|instagram|ig|contact(?:\s+(?:details?|info(?:rmation)?))?)$/i;
+    const VERIFIABILITY_HEDGE = /\b(?:whatever\s+(?:you\s+)?(?:can\s+)?(?:actually\s+)?(?:verif\w*|works?|findable)|whatever\s+(?:is\s+)?available|if\s+possible|where\s+possible|when\s+possible)\b/i.test(frame.input.raw);
+    if (VERIFIABILITY_HEDGE) {
+      const channelRequirements = frame.required_fields.filter((f) => CONTACT_CHANNEL.test(valueOf(f)));
+      if (channelRequirements.length) {
+        frame.required_fields = frame.required_fields.filter((f) => !CONTACT_CHANNEL.test(valueOf(f)));
+        for (const channel of channelRequirements) {
+          if (!frame.enrichment_requirements.some((item) => valueOf(item) === valueOf(channel))) {
+            frame.enrichment_requirements.push(channel);
+          }
+        }
+        frame.meta.notes.push(
+          `${channelRequirements.length} contact channels hedged ("whatever you can verify") — treated as enrichment targets, not delivery gates`,
+        );
+      }
+    }
+  }
   return syncClarification(frame);
 }
 
