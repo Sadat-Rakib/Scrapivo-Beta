@@ -339,6 +339,18 @@ export function normalizeSearchFrame(input: UnderstandingFrame): UnderstandingFr
       frame.meta.notes.push(`trade-service reconcile: "${roleText}" + contact-proof ask → business/${trade}`);
     }
   }
+  // A "no website" hunt contradicts a required website: "instagram-only
+  // businesses are okay … dont make no website a reason to discard them" —
+  // the ask wants businesses WITHOUT a proper site, so demanding a website
+  // field would drop every qualifying lead. Contact channels that can exist
+  // on an instagram-only business (phone, instagram, socials) stay required.
+  if (frame.constraints.some((c) => c.field === 'opportunity' && c.value === 'no_website' && !c.negated)) {
+    const before = frame.required_fields.length;
+    frame.required_fields = frame.required_fields.filter((f) => !/^(?:website|site)$/i.test(valueOf(f)));
+    if (frame.required_fields.length !== before) {
+      frame.meta.notes.push('dropped required website/site — the ask hunts businesses without one');
+    }
+  }
   return syncClarification(frame);
 }
 

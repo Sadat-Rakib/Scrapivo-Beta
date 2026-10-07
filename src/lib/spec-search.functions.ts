@@ -417,6 +417,20 @@ function violatesExclusion(spec: SearchSpec, row: SpecRow): boolean {
  *  (never raw title substring alone) — the DB reader already filtered, so
  *  this catches misassigned/empty rows. Fixed the bug where 50 fetched
  *  dentists were all rejected because clinic names lack the word "dentists". */
+/**
+ * Spec-category matching for messy multi-category asks: "restaurants cafes
+ * bakeries whatever food businesses" is several categories the understanding
+ * layer kept as one blob. A row matches when it matches the whole blob OR any
+ * category-sized token of it — matching only the whole string discarded every
+ * row that named just one of the asked-for trades.
+ */
+function specCategoryMatches(rowCategory: string | null | undefined, specCategory: string): boolean {
+  if (rowCategory && craftMatches(rowCategory, specCategory)) return true;
+  const tokens = specCategory.split(/\s+/).filter((t) => t.length > 2);
+  if (tokens.length < 2 || !rowCategory) return false;
+  return tokens.some((t) => craftMatches(rowCategory, t));
+}
+
 export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
   if (violatesExclusion(spec, row)) return false;
   if ((spec.locations?.length ?? 0) > 1) return spec.locations!.some((place) =>
@@ -439,7 +453,12 @@ export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
     const cat = fieldOf(spec, "category");
     const location = fieldOf(spec, "location");
     const requestedGeo = location ? resolveCanonicalLocation(location) : null;
-    if (cat && !craftMatches(row.category, cat) && !like(row.title, cat) && !like(row.detail, cat))
+    if (
+      cat &&
+      !specCategoryMatches(row.category, cat) &&
+      !like(row.title, cat) &&
+      !like(row.detail, cat)
+    )
       return false;
     const model = fieldOf(spec, "business_model");
     if (
@@ -630,7 +649,7 @@ export function rowSatisfyRejectReason(spec: SearchSpec, row: SpecRow): string |
       cat &&
       row.category &&
       row.category.trim() &&
-      !craftMatches(row.category, cat) &&
+      !specCategoryMatches(row.category, cat) &&
       !like(row.title, cat) &&
       !like(row.detail, cat)
     )
