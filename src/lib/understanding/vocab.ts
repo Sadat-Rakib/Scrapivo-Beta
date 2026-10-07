@@ -526,7 +526,7 @@ export const CONSTRAINT_FIELD_ALIASES: Record<string, string> = {
 export const DELIVERABLE_FIELD_PATTERNS: ReadonlyArray<readonly [RegExp, string]> = [
   [/\bphone(?:\s+numbers?)?\b|\bnums\b/i, "phone"],
   [/\bemails?(?:\s+address(?:es)?)?\b/i, "email"],
-  [/\bwebsites?\b/i, "website"],
+  [/\b(?:websites?|sites?)\b/i, "website"],
   [/\baddress(?:es)?\b/i, "address"],
   [
     /\bowner(?:'?s)?\s+names?\b|\bfounders?\s+names?\b|\bnames?\s+of\s+(?:the\s+)?(?:owner|founder)/i,

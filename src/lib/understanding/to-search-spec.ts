@@ -2,13 +2,14 @@ import { buildSpec, type SearchSpec, type SpecEntity, type SpecField } from '../
 import { normalizeRole } from '../search/search-spec-extract';
 import { resolveCanonicalLocation, splitTargetLocationList } from '../search/location-resolver';
 import { initState, patchFrame, syncClarification, type BlockingField } from './clarify-state';
-import { extractFrameDeterministic, fieldRequirements } from './fallback';
+import { extractFrameDeterministic, fieldRequirements, fieldAlternativeGroups, independentlyRequiredFields } from './fallback';
 import { openValue, type FrameLocation, type OpenValue, type UnderstandingFrame } from './frame';
-import { classifyHead, LOCATIVE_PREP_TOKENS, opensWithExclusion } from './lexicon';
+import { classifyHead, hedgesTheAsk, LOCATIVE_PREP_TOKENS, opensWithExclusion } from './lexicon';
 import { validateFrame } from './validate';
 import { purposeFromFrame, repairExplicitPurpose } from './purpose';
 import { tradeFamiliesOf } from '../canonical/businesses.server';
 import { stripUrlsFromText } from '../stage1/url-utils';
+import { keyDeliverableField } from './vocab';
 
 const clean = (value: string) => value.trim().replace(/[.!?]+$/, '').trim();
 const valueOf = (value: OpenValue | null | undefined) => value ? clean(value.normalized ?? value.value) : '';
@@ -138,6 +139,11 @@ export function normalizeSearchFrame(input: UnderstandingFrame): UnderstandingFr
   if (frame.meta.extractor === 'llm') {
     const deterministic = validateFrame(extractFrameDeterministic(raw)).frame;
     splitInnerPlace(deterministic);
+    if (!frame.compound.is_compound && deterministic.compound.subgoals.length > 1 &&
+        deterministic.compound.subgoals.every(goal => goal.quantity?.requested)) {
+      frame.compound = structuredClone(deterministic.compound);
+      frame.meta.notes.push('recovered separately counted target buckets');
+    }
     // A provider sometimes drops the place entirely ("founders of SaaS
     // startups in Tallinn, Estonia who are hiring ..." -> no location), which
     // widens the search to the whole world. Recover the deterministic place
@@ -261,7 +267,7 @@ export function normalizeSearchFrame(input: UnderstandingFrame): UnderstandingFr
   const negatedContact = NEGATED_CONTACT.test(raw);
   // The words that remain once every negated contact phrase is removed.
   const named = negatedContact ? raw.replace(NEGATED_CONTACT_GLOBAL, ' ') : raw;
-  const genericContact = named.match(GENERIC_CONTACT_ASK);
+  const genericContact = named.match(GENERIC_CONTACT_ASK) ?? named.match(/\b(?:some|any|a)\s+way\s+to\s+contact\b/i);
   if (genericContact || negatedContact) {
     // "all/full/every contact details" asks for every channel: keep them.
     const everyChannel = !!genericContact && /\b(?:all|every|full|complete)\s+(?:(?:their|the|public)\s+)?contacts?\b/i.test(named);
@@ -398,6 +404,16 @@ export function normalizeSearchFrame(input: UnderstandingFrame): UnderstandingFr
       }
     }
   }
+  // Keep preference strength in the carried frame so a compound execution
+  // branch does not lose it when its raw input becomes just one bucket.
+  for (const constraint of frame.constraints) {
+    if (constraint.field.startsWith('prefer_')) continue;
+    const stated = constraint.raw?.trim();
+    const clauses = stated ? raw.split(/[,;.!?]|\b(?:and|but)\b/i)
+      .filter(part => part.toLowerCase().includes(stated.toLowerCase())) : [];
+    const clause = clauses.length === 1 ? clauses[0] : stated;
+    if (hedgesTheAsk(clause)) constraint.field = `prefer_${constraint.field}`;
+  }
   return syncClarification(frame);
 }
 
@@ -439,6 +455,18 @@ export function lightSpecFromFrame(frame: UnderstandingFrame, status: SearchSpec
 /** Convert the validated interpretation, with no second raw-query extractor. */
 export function frameToSearchSpec(input: UnderstandingFrame): SearchSpec {
   const frame = normalizeSearchFrame(input);
+  const requiredGroups = fieldAlternativeGroups(frame.input.raw).map(any_of => ({ any_of }));
+  for (const constraint of frame.constraints) {
+    if (constraint.field === 'required_field' && constraint.operator === 'one_of' && !constraint.negated && Array.isArray(constraint.value)) {
+      const any_of = [...new Set(constraint.value.map(field => keyDeliverableField(field) ?? field.trim().toLowerCase()))];
+      if (any_of.length > 1 && !requiredGroups.some(group => group.any_of.length === any_of.length && group.any_of.every(field => any_of.includes(field)))) requiredGroups.push({ any_of });
+    }
+  }
+  const groupedFields = new Set(requiredGroups.flatMap(group => group.any_of));
+  // A requested specific social channel also causes the extractor to infer
+  // its family. That family cannot turn an OR alternative into an AND gate.
+  if ([...groupedFields].some(field => ['instagram', 'facebook', 'linkedin'].includes(field))) groupedFields.add('socials');
+  for (const field of independentlyRequiredFields(frame.input.raw)) groupedFields.delete(field);
   const entity = entityOf(frame);
   const criteria: SpecField[] = [];
   const put = (field: string, value: string | number | boolean | null | undefined, confidence = 1, stated = true) => {
@@ -516,7 +544,7 @@ export function frameToSearchSpec(input: UnderstandingFrame): SearchSpec {
   if (relation === 'needs_service' || relation === 'asking_for_help') put('requested_service', object);
   if (relation === 'hiring') put('requested_role', object);
   if (relation === 'seeking_funding') put('funding_status', 'seeking');
-  if (relation === 'has_asset' && /\b(?:website|site)\b/i.test(object)) {
+  if (relation === 'has_asset' && /\b(?:website|site)\b/i.test(object) && !groupedFields.has('website')) {
     put('website', 'true');
     put('require_website', 'true');
   }
@@ -525,7 +553,10 @@ export function frameToSearchSpec(input: UnderstandingFrame): SearchSpec {
   if (offer) { put('offer', offer); put('mode', 'selling'); }
 
   for (const constraint of frame.constraints) {
+    if (constraint.field === 'required_field' && constraint.operator === 'one_of' && Array.isArray(constraint.value)) continue;
     const value = Array.isArray(constraint.value) ? constraint.value.join('|') : constraint.value;
+    if (constraint.field.startsWith('prefer_')) { put(constraint.field, value, constraint.confidence, !!constraint.raw); continue; }
+    if (constraint.operator === 'exists' && groupedFields.has(constraint.field) && !constraint.negated) continue;
     if (constraint.field === 'website' && constraint.operator === 'exists') {
       if (constraint.negated) put('opportunity', 'no_website');
       else {
@@ -555,7 +586,7 @@ export function frameToSearchSpec(input: UnderstandingFrame): SearchSpec {
     put('verify_last_social_post', 'true');
   }
 
-  const requestedFields = [...new Set(frame.required_fields.map(valueOf))];
+  const requestedFields = [...new Set(frame.required_fields.map(valueOf))].filter(field => !groupedFields.has(field));
   for (const field of requestedFields) {
     put(`require_${field}`, 'true');
     criteria.push({ field: 'required_field', value: field, stated: true, confidence: 1 });
@@ -568,7 +599,7 @@ export function frameToSearchSpec(input: UnderstandingFrame): SearchSpec {
 
   const signalRequired = frame.evidence.intent_signal_required ||
     ['hiring', 'received_funding', 'seeking_funding', 'needs_service', 'asking_for_help', 'custom'].includes(relation);
-  const signalTypes = signalRequired ? [['received_funding', 'seeking_funding', 'investing_in'].includes(relation) ? 'funding' : relation === 'hiring' ? 'hiring' : 'service_request'] : [];
+  const signalTypes = signalRequired ? [relation === 'investing_in' ? 'investment' : ['received_funding', 'seeking_funding'].includes(relation) ? 'funding' : relation === 'hiring' ? 'hiring' : 'service_request'] : [];
   const purpose = purposeFromFrame(frame);
   const spec = buildSpec({ entity, criteria, raw_query: stripUrlsFromText(frame.input.raw), signal_required: signalRequired, signal_types: signalTypes,
     signal_recency: frame.temporal?.window ?? null, locationSuggestion });
@@ -577,6 +608,7 @@ export function frameToSearchSpec(input: UnderstandingFrame): SearchSpec {
   spec.unresolved = frame.unresolved;
   spec.purpose = purpose;
   spec.requested_fields = requestedFields;
+  if (requiredGroups.length) spec.required_field_groups = requiredGroups;
   for (const item of frame.unresolved) if (!spec.missing.includes(item.field)) spec.missing.push(item.field);
   if (locationSuggestion && !spec.missing.includes('location')) spec.missing.push('location');
   if (spec.missing.length) spec.status = 'needs_clarification';

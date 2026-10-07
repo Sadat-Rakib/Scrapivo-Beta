@@ -44,7 +44,7 @@
  * being careful.
  */
 
-import { knownCityName, resolveCanonicalLocation, splitTargetLocationList } from "@/lib/search/location-resolver";
+import { knownCityName, resolveCanonicalLocation, splitMultiPlace, splitTargetLocationList } from "@/lib/search/location-resolver";
 import { normalizeRole } from "@/lib/search/search-spec-extract";
 import {
   clamp,
@@ -1672,7 +1672,7 @@ export function detectConstraints(text: string): Constraint[] {
   let m: RegExpExecArray | null;
 
   const EMP = new RegExp(
-    `\\b(?:(at\\s+least|minimum|min|more\\s+than|over|under|fewer\\s+than|less\\s+than|no\\s+more\\s+than)\\s+)?${NUM}\\s*(\\+)?\\s*(?:employees|staff|people|headcount|team\\s+members)\\b`,
+    `\\b(?:(at\\s+least|minimum|min|more\\s+than|over|under|fewer\\s+than|less\\s+than|no\\s+more\\s+than)\\s+(?:(?:like|about|roughly)\\s+)?)?${NUM}\\s*(\\+)?\\s*(?:employees|staff|people|headcount|team\\s+members)\\b`,
     "i",
   );
   if ((m = EMP.exec(text))) {
@@ -1916,6 +1916,34 @@ function preferredDeliverableClause(clause: string): boolean {
   return PREFERRED_MARKER.test(clause) || /\bwhatever\s+(?:(?:you\s+)?can\s+(?:actually\s+)?(?:verif\w*|find)|(?:is\s+)?available|works?|findable)\b/i.test(clause);
 }
 
+/** Explicit alternatives in a requested output clause; target-role ORs are not deliverables. */
+export function fieldAlternativeGroups(text: string): string[][] {
+  const groups: string[][] = [];
+  for (const clause of deliverableClauses(text).flatMap(part => part.split(/\bbut\b/i))) {
+    if (preferredDeliverableClause(clause) || /\b(?:do\s+not|don'?t|dont)\s+(?:need|require|want)\b/i.test(clause)) continue;
+    const alternatives = clause.split(/\bor\b/i);
+    if (alternatives.length < 2) continue;
+    const bareList = alternatives.every(part => FIELD_WORDS.reduce((rest, [pattern]) => rest.replace(pattern, ''), part)
+      .replace(/\b(?:a|an|their|the)\b/gi, '').trim() === '');
+    if (!(REQUIRED_MARKER.test(clause) || DELIVERY_MARKER.test(clause) || /\bwith\s+/i.test(clause) || bareList)) continue;
+    const named = alternatives.map(fieldsNamedIn);
+    if (!named.every(fields => fields.length === 1)) continue;
+    const group = [...new Set(named.flat())];
+    if (group.length > 1) groups.push(group);
+  }
+  return groups;
+}
+
+/** Singleton asks in separate clauses must survive overlapping alternative groups. */
+export function independentlyRequiredFields(text: string): Set<string> {
+  const fields = new Set<string>();
+  for (const clause of deliverableClauses(text).flatMap(part => part.split(/\bbut\b/i))) {
+    if (fieldAlternativeGroups(clause).length) continue;
+    for (const field of fieldRequirements(clause).required) fields.add(field.value);
+  }
+  return fields;
+}
+
 const VERIFY_RE =
   /\b(verify|verified|verification|confirm|confirmed|make\s+sure|double-?check|prove|proof)\b/i;
 
@@ -2046,6 +2074,11 @@ const COMPOUND_SIGNAL_RE =
   /\b(?:and\s+also|also\s+(?:find|get|need|want|pull|list)|plus\s+(?:find|get|some)|as\s+well\s+as)\b/i;
 
 function splitCompound(text: string): { parts: string[]; uncertain: boolean } {
+  const counted = text.split(/\b(?:then|and)\s+(?:another|an\s+additional|a\s+further)\s+(?=(?:(?:about|around|roughly|approximately)\s+)?\d)/i)
+    .map(part => part.trim()).filter(Boolean);
+  if (counted.length > 1 && counted.every(part => detectQuantity(part).quantity)) {
+    return { parts: counted, uncertain: false };
+  }
   const byImperative = text
     .split(SECOND_IMPERATIVE_RE)
     .map((p) => p.trim())
@@ -2795,10 +2828,25 @@ export function extractFrameDeterministic(
         location: sub.location,
         temporal: sub.temporal,
         constraints: sub.constraints,
+        quantity: sub.quantity,
       };
     });
     frame.compound.is_compound = true;
     frame.compound.subgoals = subgoals;
+    // A comma-delimited geography clause following all counted populations
+    // scopes the complete request. Per-population locatives remain separate.
+    const lastBucketAt = analysis.lastIndexOf(parts.at(-1)!);
+    const sharedGeoClause = analysis.slice(Math.max(0, lastBucketAt)).split(/[,;.!?]/).slice(1)
+      .find(clause => /^\s*(?:mostly|in|near|around|across|throughout)\s+/i.test(clause));
+    if (sharedGeoClause && subgoals.every(goal => goal.quantity?.requested)) {
+      const places = splitMultiPlace(sharedGeoClause);
+      const shared = detectLocation(sharedGeoClause, excluded).location ??
+        (places?.[0] ? geoFor(places[0].name, sharedGeoClause.trim(), 'in', .8) : null);
+      if (shared) {
+        frame.location ??= shared;
+        if (places) frame.locations = places.map(geo => geoFor(geo.name, geo.name, 'in', .8));
+      }
+    }
   } else if (uncertain) {
     // Second request announced, split not trustworthy. Marked compound with no
     // subgoals, which is what makes the clarification fire instead of silently

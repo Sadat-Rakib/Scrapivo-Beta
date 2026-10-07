@@ -53,6 +53,8 @@ export interface SearchSpec {
   purpose?: "research" | "prospecting" | "recruiting" | "partnership" | null;
   /** Fields the user asked to receive, independent of target filters. */
   requested_fields?: string[];
+  /** Required deliverable alternatives: every group needs at least one observed field. */
+  required_field_groups?: { any_of: string[] }[];
   /** Extracted criteria (stated + inferred). */
   criteria: SpecField[];
   /** Fields materially missing for this entity+intent (drives questions). */

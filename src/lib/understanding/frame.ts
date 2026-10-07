@@ -271,6 +271,7 @@ export const SubgoalSchema = z.object({
   location: LocationSchema.nullable().default(null),
   temporal: TemporalSchema.nullable().default(null),
   constraints: z.array(ConstraintSchema).max(30).default([]),
+  quantity: QuantitySchema.nullable().optional(),
 });
 export type Subgoal = z.infer<typeof SubgoalSchema>;
 

@@ -143,7 +143,7 @@ import {
  * v15 preserves calendar granularity: this month is not this quarter, and a
  * named calendar period is not a rolling within_last window.
  */
-export const UNDERSTANDING_PROMPT_VERSION = "u1-v16";
+export const UNDERSTANDING_PROMPT_VERSION = "u1-v17";
 
 const list = (xs: readonly string[]) => xs.join(" | ");
 
@@ -310,12 +310,23 @@ CONSTRAINTS ARE STRUCTURED, NOT PROSE
     whole point of such a request, so it is never recorded in only one place.
   "within 30 miles of Calgary"  -> location {value:"Calgary", scope:"within_radius", radius:30, radius_unit:"miles"}
   "either dentists or orthodontists" -> {field:"category", operator:"one_of", value:["dentist","orthodontist"]}
+  Required output alternatives ("need email or phone", "site or Instagram") ->
+    {field:"required_field", operator:"one_of", value:[<canonical field keys>]};
+    do not require every alternative separately in required_fields.
+  Soft attribute constraints ("preferably under 100 employees") use
+    field:"prefer_<attribute key>" with the stated operator/value. Preserve
+    this preference; unknown evidence must not become a hard rejection.
 
 COMPOUND REQUESTS
 Two different populations ("dentists in Perth and also orthodontists in
 Adelaide") -> compound.is_compound=true and one subgoal per population, at least
 two, never one. NEVER keep one half and drop the other. If you cannot split it
 reliably: clarification {needed:true, reason:"compound_parse_uncertain"}.
+Separately counted populations ("about 8 companies, then another 12 clinics")
+also form subgoals. Each subgoal.quantity uses the same quantity shape as the
+top-level quantity, preserving its own count and approximate/minimum/maximum.
+Keep shared trailing geography and preferences at the top level so both
+populations inherit them; retain any explicitly separate location per subgoal.
 
 LONG REQUESTS also carry deliverables: quantity, required_fields vs
 preferred_fields, contact_requirements, verification, output,
