@@ -402,7 +402,7 @@ const HEAD_NOUNS: Record<string, HeadEntry> = {
   barista: P(), bartender: P(), waiter: P(), driver: P(), courier: P(),
   pilot: P(), welder: P(), machinist: P(), carpenter: P(), joiner: P(),
   mechanic: AMBIG("business"), stylist: P(), hairdresser: P(), beautician: P(),
-  esthetician: P(), tattooist: P(), "tattoo artist": P(), masseuse: P(),
+  esthetician: P(), tattooist: AMBIG("business"), "tattoo artist": AMBIG("business"), masseuse: P(),
   "personal trainer": P(), "yoga instructor": P(), veterinarian: P(),
   // — people: generic —
   person: P(), people: P(), individual: P(), human: P(), professional: P(),
@@ -468,8 +468,8 @@ const HEAD_NOUNS: Record<string, HeadEntry> = {
   // reading is never scored as an error.
   orthodontist: AMBIG("business"),
   arborist: AMBIG("person"), surveyor: AMBIG("person"),
-  luthier: AMBIG("person"), thatcher: AMBIG("person"),
-  farrier: AMBIG("person"), blacksmith: AMBIG("person"),
+  luthier: AMBIG("business"), thatcher: AMBIG("person"),
+  farrier: AMBIG("business"), blacksmith: AMBIG("business"), chandler: B(), goldsmith: B(), silversmith: B(), bookbinder: B(),
   // — people: further occupations —
   agronomist: P(), actuary: P(), conservator: P(), archivist: P(),
   cartographer: P(), draughtsman: P(), draftsman: P(), interpreter: P(),
