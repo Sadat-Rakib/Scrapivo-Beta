@@ -1504,6 +1504,32 @@ export function validateFrame(input: UnderstandingFrame): ValidationResult {
   }
 
   if (frame.location) {
+    // Hallucinated-place guard: a live model once read "mostly north
+    // america/europe" as location "North Salt Lake" (a real Utah city nobody
+    // named), pinning a worldwide ask to one suburb. A location that is
+    // neither a literal span of the user's text nor carries a raw span that
+    // is, names no place the user asked about — drop it and let geo_scope
+    // speak. Canonicalizations stay safe: "ny" (raw) or "Tallinn, Estonia"
+    // both trace to the input. Punctuation is folded before matching, because
+    // "Money, Mississippi" canonically reads "Money Mississippi".
+    const fold = (v: string) => v.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").replace(/\s+/g, " ").trim();
+    const haystack = fold(frame.input.raw);
+    const appears = (needle: string | null | undefined) =>
+      !!needle && haystack.includes(fold(needle));
+    const tracesToInput =
+      appears(frame.location.value) || appears(frame.location.raw);
+    if (!tracesToInput) {
+      repairs.push({
+        code: "LOCATION_NOT_IN_INPUT",
+        message: `location "${frame.location.value}" does not come from the user's text — dropped rather than pinning the search to a place nobody named`,
+        path: "location",
+      });
+      frame.meta.notes.push(`dropped unverifiable location "${frame.location.value}" (not in input)`);
+      frame.location = null;
+    }
+  }
+
+  if (frame.location) {
     // "outside Turku" searches AROUND Turku. A model answered one of these
     // `scope: "in"`, which is the reverse of the only reading the words have,
     // and it is not the exclusion handled above either. The deterministic

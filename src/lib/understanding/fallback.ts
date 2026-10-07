@@ -424,6 +424,11 @@ const QUANTITY_UNLIMITED_WRAP_RE =
 
 const QUANTITY_RE = new RegExp(
   [
+    // "20-30 hvac companies" — a dash range of counts, before a letter (so a
+    // phone fragment or score never reads as a quantity). Without this the
+    // bare-number rule took the "30" of "20-30" and left "20-" glued to the
+    // target noun, which made the whole phrase unreadable.
+    String.raw`\b(\d{1,5})\s*[-–—]\s*(\d{1,5})\b(?!\s*\+)\s*(?=[\p{L}])`,
     // "at least 25" / "minimum of 30" / "no fewer than 10"
     String.raw`\b(at\s+least|minimum(?:\s+of)?|min|no\s+fewer\s+than|no\s+less\s+than)\s+(\d{1,5}|one|two|three|four|five|ten|twenty|thirty|fifty|hundred)\b`,
     // "up to 50" / "no more than 50" / "max 50"
@@ -490,7 +495,7 @@ function detectQuantity(text: string): { quantity: Quantity | null; text: string
   const re = new RegExp(QUANTITY_RE.source, "giu");
   let m: RegExpExecArray | null;
   while ((m = re.exec(text))) {
-    const [minWord, minNum, maxWord, maxNum, apxWord, apxNum, plusNum, verbNum, bareNum] =
+    const [rangeMin, rangeMax, minWord, minNum, maxWord, maxNum, apxWord, apxNum, plusNum, verbNum, bareNum] =
       m.slice(1);
 
     // A currency amount can contain a shorter digit match ("$120,000" used
@@ -516,7 +521,10 @@ function detectQuantity(text: string): { quantity: Quantity | null; text: string
       approximate: false,
       raw: m[0].trim(),
     };
-    if (minWord) q.minimum = toNumber(minNum);
+    if (rangeMin) {
+      q.minimum = toNumber(rangeMin);
+      q.maximum = toNumber(rangeMax);
+    } else if (minWord) q.minimum = toNumber(minNum);
     else if (maxWord) q.maximum = toNumber(maxNum);
     else if (apxWord) {
       q.requested = toNumber(apxNum);
@@ -661,7 +669,7 @@ const INTERROGATIVE_LEAD_RE =
   /^(?:who(?:ever|'s|\s+is)?|which|any(?:one|body|1)|some(?:one|body)|sb|folks?|ppl|peeps)\b/i;
 
 const LEAD_VERB_PREFIX_RE =
-  /^(?:(?:please|pls|hey|hi|ok|okay)\s+)?(?:(?:can|could)\s+you\s+)?(?:help\s+(?:me|us)\s+)?(?:(?:i|we|im|iam|ive|imma|ima|were)\s*(?:'m|'d|'ve|\s+am|\s+are)?\s+)?(?:(?:tryna|trying\s+to|looking\s+to|hoping\s+to|wanna|want\s+to|need\s+to|gonna|going\s+to)\s+)?(?:need|needs|want|would\s+like|am\s+looking\s+for|looking\s+for|lookin\s+for|find|get|search\s+for|search|look\s+for|show|give|gimme|send|pull|list|fetch|return|generate|help|who|what|any|some)\b\s*(?:me\s+|us\s+)?(?:out\s+)?(?:to\s+)?(?:some\s+|a\s+|an\s+|the\s+|all\s+|more\s+|any\s+|of\s+|for\s+|like\s+)*/i;
+  /^(?:(?:please|pls|hey|hi|ok|okay|yo|hello|so|well|now|btw|also|and)\s+)*(?:(?:can|could)\s+you\s+)?(?:help\s+(?:me|us)\s+)?(?:(?:i|we|im|iam|ive|imma|ima|were)\s*(?:'m|'d|'ve|\s+am|\s+are)?\s+)?(?:(?:basically|literally|actually|really|just|kinda|sorta|lowkey|honestly)\s+)?(?:(?:tryna|trying\s+to|looking\s+to|hoping\s+to|wanna|want\s+to|need\s+to|gonna|going\s+to)\s+)?(?:(?:need|needs|want|would\s+like|am\s+looking\s+for|looking\s+for|lookin\s+for|find|get|search\s+for|search|look\s+for|show|give|gimme|send|pull|list|fetch|return|generate|help|who|what|any|some)\b\s*(?:me\s+|us\s+)?(?:out\s+)?(?:to\s+)?(?:some\s+|a\s+|an\s+|the\s+|all\s+|more\s+|any\s+|of\s+|for\s+|like\s+)*)?/i;
 
 /**
  * Tokens that end a target phrase. This is `CLAUSE_STOP_TOKENS` minus the
@@ -2260,7 +2268,14 @@ export function extractFrameDeterministic(
   if (conj) {
     const a = clean(conj[1]).toLowerCase();
     const b = clean(conj[2]).toLowerCase();
-    if (a && b) {
+    // Both sides must independently name a thing ("wedding venues and
+    // florists", "photographers / videographers"). A slash that only
+    // separates aliases of ONE family — "hvac / heating cooling companies" —
+    // leaves the right side holding the head noun and the left side a bare
+    // trade word; splitting there strands "hvac" as the whole target and the
+    // entity reads unknown.
+    const sideHead = (side: string) => classifyHead(side, { guess: false }).kind !== "unknown";
+    if (a && b && sideHead(a) && sideHead(b)) {
       frame.constraints.push({
         field: "category",
         operator: "one_of",

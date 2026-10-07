@@ -26,7 +26,7 @@ const FURNITURE_NAMES = new Set([
 ]);
 
 const NAV_PHRASES = new RegExp(
-  "\b(?:click here|learn more|read more|view more|get (?:in touch|matched|started|a quote|quotes)|free quote(?:s)?|contact us|about us|our (?:team|services|work|story)|sign (?:in|up)|log ?in|subscribe|follow us|book (?:now|online)|key insights|related searches|similar (?:searches|services|businesses|profiles)|tag cloud|latest posts|recent posts|vendor spotlights|expert advice|privacy policy|terms of (?:service|use)|all rights reserved|skip to content|back to top|see more|show more|load more|leave a (?:comment|reply)|write a (?:review|comment)|request a (?:quote|callback)|find out more|discover more|get started today)\b",
+  "\\b(?:click here|learn more|read more|view more|get (?:in touch|matched|started|a quote|quotes)|free quote(?:s)?|contact us|about us|our (?:team|services|work|story)|sign (?:in|up)|log ?in|subscribe|follow us|book (?:now|online)|key insights|related searches|similar (?:searches|services|businesses|profiles)|tag cloud|latest posts|recent posts|vendor spotlights|expert advice|privacy policy|terms of (?:service|use)|all rights reserved|skip to content|back to top|see more|show more|load more|leave a (?:comment|reply)|write a (?:review|comment)|request a (?:quote|callback)|find out more|discover more|get started today)\\b",
   "i",
 );
 
@@ -37,6 +37,9 @@ const STAT_BANNER = /^\s*\d[\d.,]*\s*(?:\+|%|k\b|years?|projects?|customers?|cli
 export function isJunkEntityName(name: string): boolean {
   const cleaned = (name ?? "").trim();
   if (!cleaned) return true;
+  // A trailing colon is a UI label ("Showhome hours:", "Listings:"), never a
+  // name — real entity identities do not end in a colon.
+  if (/:\s*$/.test(cleaned)) return true;
   const letters = cleaned.replace(/[^a-zA-Z ]/g, "").trim();
   if (FURNITURE_NAMES.has(letters.toLowerCase())) return true;
   if (NAV_PHRASES.test(cleaned)) return true;

@@ -627,7 +627,7 @@ export function browserEntitiesToRows(
  * "KEY INSIGHTS", "Tag Cloud", "Related Searches", ...). Never identities.
  */
 const NAV_PHRASES = new RegExp(
-  "\b(?:click here|learn more|read more|view more|get (?:in touch|matched|started|a quote|quotes)|contact us|about us|our (?:team|services|work|story)|sign (?:in|up)|log ?in|subscribe|follow us|book (?:now|online)|key insights|related searches|similar (?:searches|services|businesses|profiles)|tag cloud|latest posts|recent posts|vendor spotlights|expert advice|privacy policy|terms of (?:service|use)|all rights reserved|skip to content|back to top|see more|show more|load more|leave a (?:comment|reply)|write a (?:review|comment)|request a (?:quote|callback)|find out more|discover more|get started today)\b",
+  "\\b(?:click here|learn more|read more|view more|get (?:in touch|matched|started|a quote|quotes)|contact us|about us|our (?:team|services|work|story)|sign (?:in|up)|log ?in|subscribe|follow us|book (?:now|online)|key insights|related searches|similar (?:searches|services|businesses|profiles)|tag cloud|latest posts|recent posts|vendor spotlights|expert advice|privacy policy|terms of (?:service|use)|all rights reserved|skip to content|back to top|see more|show more|load more|leave a (?:comment|reply)|write a (?:review|comment)|request a (?:quote|callback)|find out more|discover more|get started today)\\b",
   "i",
 );
 /**
