@@ -1,0 +1,27 @@
+ e2e/chaos-battery.spec.ts                          |  120 +-
+ e2e/fixtures/chaos-queries.json                    |   12 +
+ freehire                                           |    0
+ package-lock.json                                  | 1871 +++++++++-----------
+ package.json                                       |    4 +-
+ scripts/filter-investors-complete.mts              |    7 +-
+ scripts/verify-understanding-runner.test.ts        |   26 +-
+ scripts/verify-understanding-runner.ts             |   26 +-
+ scripts/verify-understanding.mts                   |   15 +-
+ .../__tests__/session-manager.test.ts              |   58 +-
+ src/browser-worker/session-manager.ts              |   56 +-
+ src/lib/canonical/companies.server.ts              |   67 +-
+ src/lib/canonical/investors.server.ts              |    4 +-
+ src/lib/canonical/read-parquet.server.ts           |    6 +-
+ .../__tests__/chaos-pipeline-contract.test.ts      |    4 +-
+ src/lib/search/browser-live-fallback.test.ts       |   52 +
+ src/lib/search/browser-live.server.ts              |   24 +-
+ src/lib/search/browser-research.ts                 |    7 +-
+ src/lib/search/source-plan.ts                      |    1 +
+ src/lib/spec-search.functions.ts                   |   38 +-
+ .../understanding/chaos-buckets-regression.test.ts |   91 +-
+ .../understanding/chaos-scope-regression.test.ts   |    2 +-
+ src/lib/understanding/fallback.ts                  |   77 +
+ src/lib/understanding/validate.ts                  |  102 ++
+ vite.config.ts                                     |    3 +-
+ vitest.config.ts                                   |    6 +-
+ 26 files changed, 1594 insertions(+), 1085 deletions(-)

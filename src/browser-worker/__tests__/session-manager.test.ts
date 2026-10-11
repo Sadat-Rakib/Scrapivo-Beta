@@ -3,7 +3,7 @@
  * Loopback is reachable ONLY through the test-injected guard allowlist.
  */
 import { createServer, type Server } from "node:http";
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -127,6 +127,23 @@ describe.skipIf(!chromiumInstalled)("browser worker sessions (real Chromium)", {
     await manager.close(session.id, OWNER);
   });
 
+  it("terminal close interrupts an in-flight navigation and leaves the lane reopenable", async () => {
+    const session = await manager.create({ ownerId: OWNER, runKey: "run-terminal-close" });
+    const started = Date.now();
+    const navigating = manager.observe(session.id, OWNER, `${base}/slow`);
+    const rejected = expect(navigating).rejects.toMatchObject({ code: "NAVIGATION_FAILED" });
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    await expect(manager.close(session.id, "owner-b")).rejects.toMatchObject({ code: "SESSION_NOT_FOUND" });
+    const closed = await manager.close(session.id, OWNER);
+    expect(closed.status).toBe("closed");
+    expect(Date.now() - started).toBeLessThan(3500);
+    await rejected;
+    expect(manager.get(session.id, OWNER).status).toBe("closed");
+    const reopened = await manager.reopen(session.id, OWNER);
+    expect(reopened).toMatchObject({ id: session.id, status: "active", controller: "agent" });
+    await manager.close(session.id, OWNER);
+  });
+
   it("runs structured ref actions with a stale-snapshot guard (list -> Contact -> read; form fill + submit)", async () => {
     const session = await manager.create({ ownerId: OWNER, runKey: "run-actions" });
     const list = await manager.observe(session.id, OWNER, `${base}/a`);
@@ -198,6 +215,45 @@ describe.skipIf(!chromiumInstalled)("browser worker persistence and failure", { 
   let dir = "";
   beforeAll(() => { dir = mkdtempSync(join(tmpdir(), "scrapivo-worker-persist-")); });
   afterAll(() => { rmSync(dir, { recursive: true, force: true }); });
+
+  it.each(["reopen", "create"] as const)("waits for terminal teardown before %s acquires the same profile", async (acquire) => {
+    let release!: () => void;
+    let teardownStarted!: () => void;
+    const teardown = new Promise<void>((resolve) => { teardownStarted = resolve; });
+    const gate = new Promise<void>((resolve) => { release = resolve; });
+    let launches = 0;
+    const manager = await createSessionManager({ dataDir: dir, guard: guardFor(), launch: async (profileDir, options) => {
+      const context = await (await import("playwright-core")).chromium.launchPersistentContext(profileDir, options);
+      launches++;
+      if (launches === 1) {
+        const close = context.close.bind(context);
+        context.close = async (...args) => { teardownStarted(); await gate; await close(...args); };
+      }
+      return context;
+    } });
+    try {
+      const runKey = `run-close-acquire-${acquire}`;
+      const session = await manager.create({ ownerId: OWNER, runKey });
+      await manager.observe(session.id, OWNER, `${base}/set-cookie`);
+      const closed = manager.close(session.id, OWNER);
+      await teardown;
+      // Duplicate closes share the barrier rather than finalizing metadata early.
+      const duplicate = manager.close(session.id, OWNER);
+      const opened = acquire === "reopen" ? manager.reopen(session.id.toUpperCase(), OWNER) : manager.create({ ownerId: OWNER, runKey });
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      expect(launches).toBe(1);
+      release();
+      expect((await closed).status).toBe("closed");
+      expect((await duplicate).status).toBe("closed");
+      expect(await opened).toMatchObject({ id: session.id, status: "active" });
+      expect(manager.get(session.id, OWNER).status).toBe("active");
+      expect(JSON.parse(readFileSync(join(dir, session.id, "session.json"), "utf8")).status).toBe("active");
+      expect((await manager.observe(session.id, OWNER, `${base}/echo-cookie`)).text).toContain("sid=abc123");
+    } finally {
+      release();
+      await manager.shutdown();
+    }
+  });
 
   it("reopens the same session id with its cookies after a worker restart", async () => {
     const a = await createSessionManager({ dataDir: dir, guard: guardFor() });

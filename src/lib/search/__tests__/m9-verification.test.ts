@@ -36,6 +36,33 @@ import type { Evidence } from "../evidence";
 
 const NOW = Date.parse("2026-09-15T12:00:00.000Z");
 
+describe("M9 — actual investment proof", () => {
+  const spec = { ...extractSearchSpec("AI investors"), entity: "investor" as const,
+    signal_required: true, signal_types: ["investment" as const], criteria: [] };
+  const proof = (excerpt: string, params = { investor_name: "North Fund", investee: "Acme" }, method = "browser_observed_subject_claim") => makeEvidence({
+    source_url: "https://north.example/portfolio", source_type: "web", evidence_type: "investment", supports: "intent",
+    subject: "investor:north", excerpt, observed_at: new Date(NOW).toISOString(), extraction_method: method, claim_parameters: params,
+  });
+  it.each(["stored_investor_record", "browser_observed_investment_mandate"])("rejects legacy cached mandate %s", method => {
+    expect(verifyClaimEvidence({ evidence: proof("North Fund invested in Acme.", undefined, method), entityId: "investor:north", spec }).ok).toBe(false);
+  });
+  it.each([
+    "North Fund invests in AI startups.",
+    "North Fund plans to invest in Acme.",
+    "South Fund invested in Acme; North Fund is an investor.",
+    "North Fund invested in Other, not Acme.",
+    "North Fund invested in Other. Acme is an AI company.",
+  ])("rejects target not proven by action: %s", excerpt => {
+    expect(verifyClaimEvidence({ evidence: proof(excerpt), entityId: "investor:north", spec }).ok).toBe(false);
+  });
+  it("requires literal target even on subject-bound evidence", () => {
+    expect(verifyClaimEvidence({ evidence: proof("North Fund invested in Acme.", { investor_name: "North Fund", investee: "" }), entityId: "investor:north", spec }).ok).toBe(false);
+  });
+  it.each(["North Fund invested in acme.", "North Fund’s portfolio includes acme."])("accepts observed target including lowercase brand: %s", excerpt => {
+    expect(verifyClaimEvidence({ evidence: proof(excerpt, { investor_name: "North Fund", investee: "acme" }), entityId: "investor:north", spec }).ok).toBe(true);
+  });
+});
+
 function daysAgo(n: number): string {
   return new Date(NOW - n * 86_400_000).toISOString();
 }

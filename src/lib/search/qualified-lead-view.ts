@@ -8,10 +8,7 @@ import type { SearchSpec, SpecEntity } from "@/lib/search/search-spec";
 import type { SpecRow } from "@/lib/spec-search.functions";
 import type { ClaimEvidence } from "@/lib/search/claim-binding";
 import type { SearchRunIds } from "@/lib/search/search-run";
-import {
-  projectQualifiedLead,
-  type QualifiedLead,
-} from "@/lib/search/qualified-lead";
+import { projectQualifiedLead, type QualifiedLead } from "@/lib/search/qualified-lead";
 import type { SearchOutcomeCode } from "@/lib/search/canonical-contract";
 import { fixMojibake } from "@/lib/encoding";
 
@@ -103,9 +100,7 @@ export type QualifiedLeadViewRow = {
 function contactCell(lead: QualifiedLead): string | null {
   const email = lead.fields.email;
   const phone = lead.fields.phone;
-  const parts = [email, phone].filter(
-    (v): v is string => typeof v === "string" && !!v.trim(),
-  );
+  const parts = [email, phone].filter((v): v is string => typeof v === "string" && !!v.trim());
   return parts.length ? parts.join(" · ") : null;
 }
 
@@ -120,10 +115,7 @@ function evidenceSummary(evidence: ClaimEvidence[]): string | null {
   return bits.join(" · ") || e.claim || null;
 }
 
-function cellValue(
-  col: QualifiedLeadColumnId,
-  lead: QualifiedLead,
-): string | null {
+function cellValue(col: QualifiedLeadColumnId, lead: QualifiedLead): string | null {
   switch (col) {
     case "name":
       return lead.name ? fixMojibake(lead.name) : null;
@@ -192,21 +184,23 @@ export function projectSpecRowsToQualifiedViews(args: {
   qualified_count: number;
 } {
   const views: QualifiedLeadViewRow[] = [];
-  const rejected: Array<{ title: string; reject_code: string; reason: string }> =
-    [];
+  const rejected: Array<{ title: string; reject_code: string; reason: string }> = [];
 
   for (const row of args.rows) {
     const places = (args.spec.locations?.length ?? 0) > 1 ? args.spec.locations! : [null];
     let projected: ReturnType<typeof projectQualifiedLead> | null = null;
     for (const place of places) {
-      const spec = place === null ? args.spec : {
-        ...args.spec,
-        locations: [place],
-        criteria: [
-          ...args.spec.criteria.filter((criterion) => criterion.field !== "location"),
-          { field: "location", value: place, stated: true, confidence: 1 },
-        ],
-      };
+      const spec =
+        place === null
+          ? args.spec
+          : {
+              ...args.spec,
+              locations: [place],
+              criteria: [
+                ...args.spec.criteria.filter((criterion) => criterion.field !== "location"),
+                { field: "location", value: place, stated: true, confidence: 1 },
+              ],
+            };
       const attempt = projectQualifiedLead({ row, spec, run: args.run, nowMs: args.nowMs });
       projected = attempt;
       if (attempt.ok) break;
@@ -267,6 +261,7 @@ export function viewToLocalBusinessRow(
   /** M11: canonical proof retained beside legacy fields. */
   qualified: QualifiedLead;
   claim_evidence: ClaimEvidence[];
+  outreach_drafts?: QualifiedLead["outreach_drafts"];
 } {
   const lead = view.lead;
   const slug =
@@ -283,17 +278,21 @@ export function viewToLocalBusinessRow(
     email: (lead.fields.email as string | null) ?? undefined,
     website: typeof lead.fields.website_url === "string" ? lead.fields.website_url : undefined,
     description: lead.location_country
-      ? fixMojibake(
-          [lead.location, lead.location_country].filter(Boolean).join(", "),
-        )
+      ? fixMojibake([lead.location, lead.location_country].filter(Boolean).join(", "))
       : undefined,
     source: `qualified-${lead.entity_type}`,
     sample_url: lead.source_url || "",
     score: Math.round((lead.relevance_score ?? 0.5) * 100),
-    opportunity_tags: typeof lead.fields.website_url === "string" ? ["has_website"] : lead.evidence.some((e) => e.claim_type === "no_website") ? ["no_website"] : [],
+    opportunity_tags:
+      typeof lead.fields.website_url === "string"
+        ? ["has_website"]
+        : lead.evidence.some((e) => e.claim_type === "no_website")
+          ? ["no_website"]
+          : [],
     website_status: typeof lead.fields.website_url === "string" ? "listed" : "unknown",
     why_match: view.why_match ?? undefined,
     qualified: lead,
+    outreach_drafts: lead.outreach_drafts,
     claim_evidence: view.evidence,
   };
 }
@@ -316,6 +315,7 @@ export function viewToLegacyLead(
   /** M11: canonical proof retained. */
   qualified: QualifiedLead;
   claim_evidence: ClaimEvidence[];
+  outreach_drafts?: QualifiedLead["outreach_drafts"];
 } {
   const lead = view.lead;
   const email = typeof lead.fields.email === "string" ? lead.fields.email : null;
@@ -323,15 +323,12 @@ export function viewToLegacyLead(
   return {
     source: `qualified-${lead.entity_type}`,
     platform: "qualified-lead",
-    platform_label:
-      lead.entity_type.charAt(0).toUpperCase() + lead.entity_type.slice(1),
+    platform_label: lead.entity_type.charAt(0).toUpperCase() + lead.entity_type.slice(1),
     title: fixMojibake(lead.name),
-    snippet: fixMojibake(
-      [view.why_match, email, phone].filter(Boolean).join(" · "),
-    ),
-    full_post_url:
-      lead.source_url || `qualified-${lead.entity_type}-${idx}-${lead.entity_id}`,
+    snippet: fixMojibake([view.why_match, email, phone].filter(Boolean).join(" · ")),
+    full_post_url: lead.source_url || `qualified-${lead.entity_type}-${idx}-${lead.entity_id}`,
     why_match: view.why_match ?? undefined,
+    outreach_drafts: lead.outreach_drafts,
     inline_contacts:
       email || phone
         ? {

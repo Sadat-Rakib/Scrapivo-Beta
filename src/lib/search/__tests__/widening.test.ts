@@ -156,10 +156,10 @@ describe("interactive widening loop (runSpecSearchCore)", () => {
   }, 30_000);
 
   it("a target-reached case stops widening immediately", async () => {
-    // Page size 2: initial pass returns 1, widen pass 1 completes the target.
+    // Requested target 2: initial pass returns 1, widen pass 1 completes it.
     const { osm, calls } = scriptedOsm([[1], [2, 3]]);
     const res = await runSpecSearchCore(
-      "Find 5 plumbers in Austin",
+      "Find 2 plumbers in Austin",
       { ...emptyDeps, liveGapfill: { osm, web: async () => [], browser: async () => [] as SpecRow[] } },
       2,
       ANSWERS,

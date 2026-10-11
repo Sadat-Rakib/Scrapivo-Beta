@@ -1,0 +1,138 @@
+import { describe, expect, it } from "vitest";
+import { extractFrameDeterministic } from "./fallback";
+import { validateFrame } from "./validate";
+import { frameToSearchSpec } from "./to-search-spec";
+import { rowCouldSatisfySpec, rowSatisfiesSpec, postResearchRejectReason, type SpecRow } from "../spec-search.functions";
+import type { Evidence } from "../search/evidence";
+import { computeResearchNeeds } from "../search/browser-research";
+import { buildCandidateResearchQueries } from "../search/source-plan";
+import { qualifyLead } from "../search/qualify";
+
+const q11 = 'need maybe 15 cybersecurity companies then another 15 ai infra/devtool startups, mostly usa/canada, preferably under like 100 employees but if headcount is unknown dont kill the result, founders or decision makers would be useful and pls dont mix cybersecurity consultants with actual product companies unless they genuinely fit';
+const branchSpecs = (raw: string, provider = false) => {
+  const frame = extractFrameDeterministic(raw);
+  if (provider) {
+    frame.meta.extractor = "llm";
+    for (const goal of frame.compound.subgoals) goal.constraints = goal.constraints.filter(item => item.field !== "service_only");
+    frame.compound.subgoals.at(-1)!.constraints.push({ field: "category", operator: "neq", value: "consultant", raw: "exclude consultants", confidence: .8, negated: false, unit: null });
+  }
+  const repaired = validateFrame(frame).frame;
+  return repaired.compound.subgoals.map(goal => ({ category: goal.target.category?.value ?? goal.target.industry?.value,
+    spec: frameToSearchSpec({ ...repaired, target: goal.target, relation: goal.relation,
+      location: goal.location ?? repaired.location, constraints: [...repaired.constraints, ...goal.constraints],
+      compound: { is_compound: false, subgoals: [] } }) }));
+};
+
+describe("scoped service-only product boundary", () => {
+  it.each([false, true])("recovers Q11 scope for deterministic/provider=%s", provider => {
+    const branches = branchSpecs(q11, provider);
+    expect(branches.find(branch => /cybersecurity/.test(branch.category!))!.spec.criteria).toContainEqual(expect.objectContaining({ field: "exclude_service_only", value: "consultant" }));
+    expect(branches.find(branch => /infra/.test(branch.category!))!.spec.criteria.some(item => /exclude_/.test(item.field))).toBe(false);
+  });
+  it.each([
+    ['find 15 AI companies then another 15 cybersecurity companies, dont mix cybersecurity consultants with actual product companies unless they genuinely fit', 'cybersecurity'],
+    ['find 15 fintech companies then another 15 climate startups, do not mix fintech consultants with actual product companies unless they fit', 'fintech'],
+  ])("scopes by target rather than bucket position: %s", (raw, target) => {
+    const branches = branchSpecs(raw, true);
+    for (const branch of branches) expect(branch.spec.criteria.some(item => item.field === "exclude_service_only")).toBe(branch.category!.includes(target));
+  });
+  it("applies an unqualified contrast to all company buckets", () => {
+    const branches = branchSpecs('find 15 cybersecurity companies then another 15 AI startups, dont mix consultants with actual product companies unless they fit');
+    expect(branches.every(branch => branch.spec.criteria.some(item => item.field === "exclude_service_only"))).toBe(true);
+  });
+  it("preserves an independently explicit hard consultant exclusion", () => {
+    const spec = frameToSearchSpec(validateFrame(extractFrameDeterministic('Find cybersecurity companies, NOT consultants')).frame);
+    expect(spec.criteria).toContainEqual(expect.objectContaining({ field: "exclude_category", value: "consultant" }));
+  });
+
+  const spec = branchSpecs(q11)[0].spec;
+  const row = (category: string, excerpt = `Acme: ${category}`, subject = "acme"): SpecRow => ({
+    kind: "company", title: "Acme", category, detail: category, location: "Toronto", country: "Canada", entity_id: "acme", source_url: "https://acme.example",
+    evidence: [{ subject, source_url: "https://acme.example", source_type: "db", evidence_type: "identity", supports: "identity", excerpt,
+      confidence: .9, observed_at: '2026-10-08T00:00:00Z' } as Evidence],
+  } as SpecRow);
+  it.each(['Cybersecurity', 'Cybersecurity Consulting', 'Cybersecurity IT Services', 'Cybersecurity Software Consulting'])("keeps unproven product evidence researchable and strict-unknown: %s", category => {
+    const candidate = row(category);
+    expect(rowCouldSatisfySpec(spec, candidate)).toBe(true);
+    expect(rowSatisfiesSpec(spec, candidate)).toBe(false);
+    expect(postResearchRejectReason(spec, candidate)).toBe('UNPROVEN_CRITERION:product_company=UNKNOWN');
+  });
+  it.each(['Cybersecurity SaaS, Consulting', 'Cybersecurity Software, Consulting', 'Cybersecurity Product Platform, Consulting'])("allows an observed product/service hybrid: %s", category => {
+    expect(rowSatisfiesSpec(spec, row(category, 'Acme builds its own cybersecurity software platform'))).toBe(true);
+    expect(rowSatisfiesSpec(spec, row(category))).toBe(false);
+  });
+  it.each([
+    q11,
+    'find 15 AI infrastructure startups in Canada then another 15 cybersecurity companies, dont mix cybersecurity consultants with actual product companies unless they fit',
+    'find 15 developer tools startups in Germany then another 15 fintech companies, do not mix fintech consultants with actual product companies unless they fit',
+  ])('does not admit arbitrary stored categories as technology startup proof: %s', raw => {
+    const branch = branchSpecs(raw).find(branch => /startups/.test(branch.category!))!;
+    const startupSpec = branch.spec;
+    for (const name of ['Sad Urdu Poetry', 'SF AppWorks', 'SPARK Experience']) {
+      const candidate = { ...row(branch.category!, `${name}: ${branch.category}, WebDesign, Advertising`), title: name, country: raw.includes('Germany') ? 'Germany' : 'Canada', location: raw.includes('Germany') ? 'Berlin' : 'Toronto' };
+      expect(rowCouldSatisfySpec(startupSpec, candidate)).toBe(true);
+      expect(rowSatisfiesSpec(startupSpec, candidate)).toBe(false);
+      expect(postResearchRejectReason(startupSpec, candidate)).toBe('UNPROVEN_CRITERION:product_company=UNKNOWN');
+    }
+  });
+  it("allows subject-bound own product observations and ignores unrelated co-mentions", () => {
+    expect(rowSatisfiesSpec(spec, row('Cybersecurity Consulting', 'Acme builds its own cybersecurity software platform'))).toBe(true);
+    expect(rowSatisfiesSpec(spec, row('Cybersecurity Consulting', 'Acme consults for SaaS businesses'))).toBe(false);
+    expect(rowSatisfiesSpec(spec, row('Cybersecurity Consulting', 'Acme develops cybersecurity software for clients'))).toBe(false);
+    expect(rowSatisfiesSpec(spec, row('Cybersecurity Consulting', 'Acme provides software development services'))).toBe(false);
+    expect(rowSatisfiesSpec(spec, row('Cybersecurity Consulting', 'Acme offers its own cybersecurity platform and consulting services'))).toBe(true);
+    expect(rowSatisfiesSpec(spec, row('Cybersecurity Consulting', 'OtherCo builds cybersecurity software', 'otherco'))).toBe(false);
+    const labeledOnly = row('Cybersecurity Consulting');
+    labeledOnly.evidence![0].supports = 'requested_product';
+    expect(rowSatisfiesSpec(spec, labeledOnly)).toBe(false);
+  });
+  it('accepts observed technology activity, including services, and researches unknown startup activity', () => {
+    const branch = branchSpecs(q11)[1];
+    const startupSpec = branch.spec;
+    const candidate = row(branch.category!);
+    expect(computeResearchNeeds(candidate, startupSpec, qualifyLead(candidate, startupSpec, candidate.evidence))).toContain('product_company');
+    expect(rowSatisfiesSpec(startupSpec, row(branch.category!, 'Acme operates AI infrastructure services for businesses'))).toBe(true);
+    expect(rowSatisfiesSpec(startupSpec, row(branch.category!, 'Acme builds developer tools for software engineers'))).toBe(true);
+    expect(rowSatisfiesSpec(startupSpec, row(branch.category!, 'Acme provides developer tools consulting services'))).toBe(false);
+  });
+  it('preserves industry-only and nontechnology startup searches without product requirements', () => {
+    for (const raw of ['Find cybersecurity companies in Canada', 'Find food startups in Canada']) {
+      const broadSpec = frameToSearchSpec(validateFrame(extractFrameDeterministic(raw)).frame);
+      const category = broadSpec.criteria.find(item => item.field === 'industry' || item.field === 'category')!.value;
+      expect(rowSatisfiesSpec(broadSpec, row(category))).toBe(true);
+    }
+  });
+  it.each(['Acme is a developer tooling platform', "Acme's developer productivity platform enables engineers", 'Acme builds a developer platform'])("accepts observed named business activity: %s", excerpt => {
+    const branch = branchSpecs(q11)[1];
+    expect(rowSatisfiesSpec(branch.spec, row(branch.category!, excerpt))).toBe(true);
+  });
+  it('accepts firstperson activity only from the resolved subject official website', () => {
+    const branch = branchSpecs(q11)[1];
+    const candidate = { ...row(branch.category!, 'We build our developer platform'), entity_resolved: true, website_url: 'https://acme.example' };
+    candidate.evidence![0].source_type = 'web';
+    expect(rowSatisfiesSpec(branch.spec, candidate)).toBe(true);
+    expect(rowSatisfiesSpec(branch.spec, { ...candidate, evidence: [{ ...candidate.evidence![0], source_url: 'https://directory.example/acme' }] })).toBe(false);
+    expect(rowSatisfiesSpec(branch.spec, { ...candidate, entity_resolved: false })).toBe(false);
+    expect(rowSatisfiesSpec(branch.spec, { ...candidate, evidence: [{ ...candidate.evidence![0], excerpt: 'We build developer tooling for clients' }] })).toBe(false);
+    expect(rowSatisfiesSpec(branch.spec, row(branch.category!, 'Acme is a consultancy for developer platform companies'))).toBe(false);
+    expect(rowSatisfiesSpec(branch.spec, row(branch.category!, "Acme's customers use developer productivity platforms"))).toBe(false);
+    expect(rowSatisfiesSpec(branch.spec, row(branch.category!, 'Acme is not a developer tooling platform'))).toBe(false);
+    expect(rowSatisfiesSpec(branch.spec, { ...candidate, evidence: [{ ...candidate.evidence![0], excerpt: 'We are not an AI infrastructure platform' }] })).toBe(false);
+  });
+  it("cannot turn query/directory prose or unbound category into a product fact", () => {
+    expect(rowSatisfiesSpec(spec, { ...row('Cybersecurity Consulting'), detail: 'Find actual software product companies' })).toBe(false);
+    expect(rowSatisfiesSpec(spec, row('Cybersecurity SaaS, Consulting', 'Directory of Cybersecurity SaaS, Consulting companies'))).toBe(false);
+    expect(rowSatisfiesSpec(spec, { ...row('Cybersecurity SaaS, Consulting'), evidence: [] })).toBe(false);
+  });
+  it("compiles unknown product status into actual candidate research, then reevaluates observed facts", () => {
+    const candidate = { ...row('Cybersecurity Consulting'), website_url: 'https://acme.example', entity_resolved: true, page_type: 'company_page' as const };
+    const needs = computeResearchNeeds(candidate, spec, qualifyLead(candidate, spec, candidate.evidence));
+    expect(needs).toContain('product_company');
+    expect(buildCandidateResearchQueries(spec, candidate, needs)).toContain('"Acme" cybersecurity company own software products platform official website');
+    expect(rowSatisfiesSpec(spec, candidate)).toBe(false);
+    const observed = { ...candidate, evidence: [...candidate.evidence!, { ...candidate.evidence![0], source_type: 'web' as const,
+      excerpt: 'Acme builds its own cybersecurity software platform' }] };
+    expect(rowSatisfiesSpec(spec, observed)).toBe(true);
+    expect(computeResearchNeeds(observed, spec, qualifyLead(observed, spec, observed.evidence))).not.toContain('product_company');
+  });
+});

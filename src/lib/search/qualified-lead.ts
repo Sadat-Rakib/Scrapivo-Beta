@@ -14,11 +14,7 @@ import {
   evaluateQualifiedLeadTheorem,
   isProvisionalEntityId,
 } from "@/lib/search/canonical-contract";
-import {
-  asClaimEvidence,
-  evidenceClaimType,
-  type ClaimEvidence,
-} from "@/lib/search/claim-binding";
+import { asClaimEvidence, evidenceClaimType, type ClaimEvidence } from "@/lib/search/claim-binding";
 import { theoremCandidateFromRow, qualifyLead } from "@/lib/search/qualify";
 import { verifyCandidateClaims } from "@/lib/search/verification";
 import type { SearchRunIds } from "@/lib/search/search-run";
@@ -84,6 +80,7 @@ export interface QualifiedLead {
   field_provenance: Record<string, FieldProvenance>;
 
   evidence: ClaimEvidence[];
+  outreach_drafts?: SpecRow["outreach_drafts"];
 
   identity_confidence: number;
   resolution_method: string | null;
@@ -127,11 +124,13 @@ export function canPersistAsQualifiedLead(args: {
   activeRunId?: string | null;
   cancelled?: boolean;
   nowMs?: number;
-}): { ok: true; claim_type: ClaimEvidence["claim_type"] } | {
-  ok: false;
-  reject_code: PersistRejectCode;
-  reason: string;
-} {
+}):
+  | { ok: true; claim_type: ClaimEvidence["claim_type"] }
+  | {
+      ok: false;
+      reject_code: PersistRejectCode;
+      reason: string;
+    } {
   const { row, spec } = args;
 
   if (args.cancelled) {
@@ -141,10 +140,7 @@ export function canPersistAsQualifiedLead(args: {
   if (
     args.activeRunId != null &&
     args.run?.search_run_id &&
-    shouldDiscardStaleResult(
-      { search_run_id: args.run.search_run_id },
-      args.activeRunId,
-    )
+    shouldDiscardStaleResult({ search_run_id: args.run.search_run_id }, args.activeRunId)
   ) {
     return {
       ok: false,
@@ -187,10 +183,7 @@ export function canPersistAsQualifiedLead(args: {
     };
   }
 
-  const theorem = evaluateQualifiedLeadTheorem(
-    theoremCandidateFromRow(row, evidence),
-    spec,
-  );
+  const theorem = evaluateQualifiedLeadTheorem(theoremCandidateFromRow(row, evidence), spec);
   if (!theorem.ok) {
     const code = theorem.reject_code ?? "THEOREM_FAILED";
     if (code === "TEMPORAL_STALE" || code === "TEMPORAL_UNKNOWN") {
@@ -295,20 +288,19 @@ export function projectQualifiedLead(args: {
 
   const proof = claims.length
     ? claims
-    : evidence
-        .map((e) => asClaimEvidence(e, entity_id))
-        .filter((c): c is ClaimEvidence => !!c);
+    : evidence.map((e) => asClaimEvidence(e, entity_id)).filter((c): c is ClaimEvidence => !!c);
 
   const run = args.run ?? {};
   const at = nowIso(args.nowMs);
   const fp =
-    (row as SpecRow & { field_provenance?: Record<string, FieldProvenance> })
-      .field_provenance ?? {};
+    (row as SpecRow & { field_provenance?: Record<string, FieldProvenance> }).field_provenance ??
+    {};
 
   const lead: QualifiedLead = {
     entity_id,
     entity_type: row.kind,
     name: (row.title ?? "").trim(),
+    outreach_drafts: row.outreach_drafts,
     claim_type: gate.claim_type,
     disposition: "qualified",
     relevance_score: q.relevance_score,
@@ -344,8 +336,7 @@ export function projectQualifiedLead(args: {
     evidence: proof,
     identity_confidence: row.identity_confidence ?? 0.7,
     resolution_method:
-      (row as SpecRow & { resolution_method?: string | null }).resolution_method ??
-      null,
+      (row as SpecRow & { resolution_method?: string | null }).resolution_method ?? null,
     page_type: row.page_type ?? null,
     source_url: row.source_url ?? row.url ?? null,
     qualified_at: at,

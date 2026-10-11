@@ -115,7 +115,7 @@ async function fetchRange(key: string, start: number, end?: number, budget: Read
   });
 }
 
-async function objectLength(key: string, budget: ReadBudget = {}): Promise<number> {
+export async function objectLength(key: string, budget: ReadBudget = {}): Promise<number> {
   return withRequestBudget(budget, async (signal) => {
     const res = await client().send(
       new GetObjectCommand({ Bucket: BUCKET, Key: key, Range: "bytes=0-0" }),
@@ -123,8 +123,10 @@ async function objectLength(key: string, budget: ReadBudget = {}): Promise<numbe
     );
     const cr = res.ContentRange ?? "";
     const m = cr.match(/\/(\d+)$/);
-    if (m) return Number(m[1]);
+    // The SDK returns a streaming body even for a one-byte range. Consume it
+    // before returning the header-derived length so its pooled socket is free.
     const buf = await res.Body!.transformToByteArray();
+    if (m) return Number(m[1]);
     return buf.length;
   });
 }

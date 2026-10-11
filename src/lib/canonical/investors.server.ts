@@ -4,6 +4,7 @@
  */
 import { readFiltered, type DbHitMeta } from "./read-parquet.server";
 import { investorSectorMatches } from "@/lib/search/search-spec";
+import { projectInvestorLocation } from "./investor-location";
 
 /** Macro-region → country codes (rows store countries, users say regions). */
 const REGION_COUNTRY: Record<string, string[]> = {
@@ -66,7 +67,7 @@ export async function searchInvestorsDB(q: {
   // "angel"/"growth" appear there); sector against sectors. All optional.
   const checkValue = moneyValue(q.check);
   const stageNeedle = (q.stage ?? (checkValue == null ? q.check : "") ?? "").trim().toLowerCase();
-  return readFiltered<CanonicalInvestor>({
+  const result = await readFiltered<CanonicalInvestor>({
     keys: [KEY],
     columns: COLS,
     limit,
@@ -82,4 +83,5 @@ export async function searchInvestorsDB(q: {
         REGION_COUNTRY[q.location.toLowerCase()]?.includes(String((r as unknown as Record<string, unknown>).location_country ?? "").toLowerCase())) &&
       (!q.kind || r.kind === q.kind),
   });
+  return { ...result, rows: result.rows.map(row => ({ ...row, ...projectInvestorLocation(row) })) };
 }

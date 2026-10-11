@@ -16,6 +16,7 @@ import {
   type SourceProviderId,
 } from "@/lib/search/source-capabilities";
 import { applyStableYieldOrder } from "./source-yield";
+import { geoById, resolveCanonicalLocation } from "./location-resolver";
 import { SOURCE_REGISTRY, type SourceDefinition } from "@/lib/sources/registry";
 
 function fieldOf(spec: SearchSpec, f: string): string | null {
@@ -404,6 +405,21 @@ export function buildResearchPlan(
 ): ResearchPlan {
   const desiredCount = Math.max(1, opts?.desiredCount ?? 10);
   const location = usefulLocation(spec);
+  // Geo-scoped discovery: search engines do NOT scope a bare city query —
+  // "solar installer Windhoek" served US/UK/ZA results and starved every
+  // downstream stage. Appending the resolved country name focuses each
+  // engine on the requested geography; the query is deduplicated when the
+  // user's own wording already names the country.
+  const locationGeo = location
+    ? resolveCanonicalLocation(location, { gazetteer: true, correctTypos: true })
+    : null;
+  const countryName = locationGeo?.country_code
+    ? geoById(`geo:country:${locationGeo.country_code.toLowerCase()}`)?.name ?? null
+    : null;
+  const scopedLocation =
+    countryName && location && !location.toLowerCase().includes(countryName.toLowerCase())
+      ? `${location} ${countryName}`
+      : location;
   const role = fieldOf(spec, "role");
   const industry = fieldOf(spec, "industry") ?? fieldOf(spec, "category");
   const model = fieldOf(spec, "business_model");
@@ -419,37 +435,37 @@ export function buildResearchPlan(
   if (spec.entity === "person") {
     const roles = roleTerms(role);
     discoveryQueries = keepSubstantive([
-      ...topics.map((topic) => [role, location, `"${topic.replace(/"/g, "")}"`].filter(Boolean).join(" ")),
-      ...[requestedService, requestedProduct].filter(Boolean).map((want) => [`"looking for" "${want}"`, location].filter(Boolean).join(" ")),
-      ...roles.map((r) => [r, industry, model, location].filter(Boolean).join(" ")),
-      ...roles.map((r) => ['site:linkedin.com/in', r, industry, location].filter(Boolean).join(" ")),
-      [role, industry, location].filter(Boolean).join(" "),
+      ...topics.map((topic) => [role, scopedLocation, `"${topic.replace(/"/g, "")}"`].filter(Boolean).join(" ")),
+      ...[requestedService, requestedProduct].filter(Boolean).map((want) => [`"looking for" "${want}"`, scopedLocation].filter(Boolean).join(" ")),
+      ...roles.map((r) => [r, industry, model, scopedLocation].filter(Boolean).join(" ")),
+      ...roles.map((r) => ['site:linkedin.com/in', r, industry, scopedLocation].filter(Boolean).join(" ")),
+      [role, industry, scopedLocation].filter(Boolean).join(" "),
     ]);
   } else if (spec.entity === "company") {
     discoveryQueries = keepSubstantive([
-      [industry, model, location].filter(Boolean).join(" "),
-      funding ? [industry, "funded startup", location].filter(Boolean).join(" ") : null,
-      requestedRole ? [industry, "hiring", requestedRole, location].filter(Boolean).join(" ") : null,
-      requestedService ? [industry, "needs", requestedService, location].filter(Boolean).join(" ") : null,
-      ...topics.map((topic) => [`"${topic.replace(/"/g, "")}"`, location].filter(Boolean).join(" ")),
+      [industry, model, scopedLocation].filter(Boolean).join(" "),
+      funding ? [industry, "funded startup", scopedLocation].filter(Boolean).join(" ") : null,
+      requestedRole ? [industry, "hiring", requestedRole, scopedLocation].filter(Boolean).join(" ") : null,
+      requestedService ? [industry, "needs", requestedService, scopedLocation].filter(Boolean).join(" ") : null,
+      ...topics.map((topic) => [`"${topic.replace(/"/g, "")}"`, scopedLocation].filter(Boolean).join(" ")),
     ]);
   } else if (spec.entity === "business") {
     // Universal business query families (PRD: general planner): every
     // variant derives from the user's own category string — no trade
     // vocabulary, no benchmark terms.
-    const base = [category, location].filter(Boolean).join(" ");
+    const base = [category, scopedLocation].filter(Boolean).join(" ");
     discoveryQueries = uniq([
       base,
-      [category, "companies", location].filter(Boolean).join(" "),
-      [category, "services", location].filter(Boolean).join(" "),
-      [category, "directory", location].filter(Boolean).join(" "),
-      [category, noWebsite ? '"no website"' : "contact", location].filter(Boolean).join(" "),
-      [category, "near", location].filter(Boolean).join(" "),
+      [category, "companies", scopedLocation].filter(Boolean).join(" "),
+      [category, "services", scopedLocation].filter(Boolean).join(" "),
+      [category, "directory", scopedLocation].filter(Boolean).join(" "),
+      [category, noWebsite ? '"no website"' : "contact", scopedLocation].filter(Boolean).join(" "),
+      [category, "near", scopedLocation].filter(Boolean).join(" "),
     ]);
   } else if (spec.entity === "job") {
     const jobRole = jobDiscoveryRole(spec);
     discoveryQueries = uniq([
-      [jobRole, location, "job"].filter(Boolean).join(" "),
+      [jobRole, scopedLocation, "job"].filter(Boolean).join(" "),
       jobDiscoveryRemoteIntent(spec) ? [jobRole, "remote job"].filter(Boolean).join(" ") : null,
     ]);
   } else if (spec.entity === "investor") {
@@ -466,26 +482,34 @@ export function buildResearchPlan(
     // podcasts/news, not fund pages ("AI investors Canada" → a podcast).
     // "firms"/"funds"/"portfolio" force list-page results that the extractor
     // can actually read.
-    discoveryQueries = uniq([
-      ["venture capital firms", sector, location].filter(Boolean).join(" "),
+    const investorScope = fieldOf(spec, "investor_type");
+    discoveryQueries = investorScope ? uniq([
+      /\bfund\b/i.test(investorScope) ? ["venture capital funds", sector, scopedLocation].filter(Boolean).join(" ") : null,
+      /\bfund\b/i.test(investorScope) ? [sector, "VC funds portfolio"].filter(Boolean).join(" ") : null,
+      /\bfund\b/i.test(investorScope) ? ["venture capital funds", scopedLocation].filter(Boolean).join(" ") : null,
+      /\bangel\b/i.test(investorScope) ? ["angel investors", sector, scopedLocation].filter(Boolean).join(" ") : null,
+      /\bangel\b/i.test(investorScope) ? [sector, '"angel investor" portfolio'].filter(Boolean).join(" ") : null,
+      /\bangel\b/i.test(investorScope) ? ['site:linkedin.com/in "angel investor"', sector].filter(Boolean).join(" ") : null,
+    ]) : uniq([
+      ["venture capital firms", sector, scopedLocation].filter(Boolean).join(" "),
       [sector, "VC funds portfolio"].filter(Boolean).join(" "),
       [sector, "startup investors list"].filter(Boolean).join(" "),
       [stage, "VC firms", sector].filter(Boolean).join(" "),
-      ["venture capital funds", location].filter(Boolean).join(" "),
+      ["venture capital funds", scopedLocation].filter(Boolean).join(" "),
       [sector, "angel list"].filter(Boolean).join(" "),
     ]);
   } else {
     const terms = discoveryTerms(spec);
     discoveryQueries = uniq([
-      [spec.entity !== "unknown" ? spec.entity : null, ...terms, location].filter(Boolean).join(" "),
-      [...terms, location].filter(Boolean).join(" "),
+      [spec.entity !== "unknown" ? spec.entity : null, ...terms, scopedLocation].filter(Boolean).join(" "),
+      [...terms, scopedLocation].filter(Boolean).join(" "),
     ]);
   }
 
   // Query planner (Part 7): Boolean/site: discovery variants as ADDITIONS —
   // exact phrases, publicly indexed signal hunts, role aliases. Capped by the
   // existing maxQueries rule.
-  discoveryQueries = uniq([...discoveryQueries, ...planDiscoveryVariants(spec)]);
+  discoveryQueries = uniq([...discoveryQueries, ...(spec.entity === "investor" && fieldOf(spec, "investor_type") ? [] : planDiscoveryVariants(spec))]);
 
   // Last resort: if every constructed query was filler, the user's own words
   // are still the honest query — never hand the live browser an empty plan.
@@ -539,6 +563,7 @@ export function buildCandidateResearchQueries(
   const industry = fieldOf(spec, "industry") ?? fieldOf(spec, "category");
   const noWebsite = fieldOf(spec, "opportunity") === "no_website";
   const queries: Array<string | null> = [];
+  if (missing.includes("product_company")) queries.push([`"${exactName}"`, industry, "own software products platform official website"].filter(Boolean).join(" "));
   const topics = (fieldOf(spec, "content_topic") ?? "").split(/\s+or\s+|\|/i).map((topic) => topic.trim()).filter(Boolean);
   if (missing.includes("topic") || missing.includes("topic_evidence")) for (const topic of topics) queries.push([subject, `"${topic.replace(/"/g, "")}"`].join(" "));
   if (noWebsite && (missing.includes("no_website_evidence") || missing.includes("no_website_verification"))) {
@@ -548,6 +573,7 @@ export function buildCandidateResearchQueries(
 
   if (missing.some((f) => /role|company|identity/i.test(f))) {
     queries.push([`"${exactName}"`, company ? `"${company.replace(/"/g, "")}"` : null, fieldOf(spec, "role"), industry].filter(Boolean).join(" "));
+    if (spec.entity === "investor" && fieldOf(spec, "investor_type")) queries.push([`"${exactName}"`, 'fund OR "angel investor"', "official profile"].join(" "));
   }
   if (missing.some((f) => /industry|location/i.test(f)) && spec.entity === "company") {
     queries.push([`"${exactName}"`, fieldOf(spec, "location"), industry, "official website"].filter(Boolean).join(" "));
@@ -562,9 +588,16 @@ export function buildCandidateResearchQueries(
     queries.push([`"${exactName}"`, "Instagram OR Facebook OR LinkedIn recent posts"].join(" "));
   }
   if (spec.signal_required && missing.some((f) => /signal|evidence/.test(f))) {
-    if (requestedRole) queries.push([subject, "hiring", requestedRole].join(" "));
-    if (requestedService) queries.push([subject, "needs", requestedService].join(" "));
-    queries.push([subject, "careers"].join(" "));
+    const claims = requestedClaimTypes(spec);
+    if (claims.includes("hiring")) {
+      queries.push([subject, "hiring", requestedRole].filter(Boolean).join(" "));
+      queries.push([subject, "careers"].join(" "));
+    }
+    if (claims.includes("investment")) queries.push([subject, fieldOf(spec, "investor_sector"), "portfolio invested backed"].filter(Boolean).join(" "));
+    if (claims.includes("funding")) queries.push([subject, "funding raised round", fieldOf(spec, "funding_status")].filter(Boolean).join(" "));
+    if (claims.includes("service_request") && requestedService) queries.push([subject, "needs", requestedService].join(" "));
+    if (claims.includes("social_ask")) queries.push([subject, "looking for", requestedRole ?? requestedService].filter(Boolean).join(" "));
+    if (claims.includes("custom_signal") || !claims.length) queries.push([subject, spec.custom_signal_text?.trim() || "recent activity evidence"].join(" "));
   }
   return uniq(queries);
 }

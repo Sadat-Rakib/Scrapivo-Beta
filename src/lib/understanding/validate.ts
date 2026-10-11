@@ -23,11 +23,14 @@ import type { Constraint, OpenValue, Relation, Target, UnderstandingFrame } from
 import {
   canonicalWindow,
   detectRelation,
+  detectConstraints,
   detectTemporal as detectTemporalDeterministic,
   fieldRequirements,
   splitCompound,
+  repairInvestorScope,
 } from "./fallback";
 import { openValue } from "./frame";
+import { repairServiceBoundaries } from "./service-boundary";
 import {
   classifyHead,
   hedgesTheAsk,
@@ -267,6 +270,50 @@ function locationSpan(clause: string, value: string): string | null {
   const prefix = clause.slice(0, at);
   const cue = /(?:^|\s)(in|near|nearby|around|round|outside|across|throughout|within)\s*$/iu.exec(prefix);
   return cue ? `${cue[1]} ${place}` : place;
+}
+
+const ORG_TARGET_RE = /\b(?:compan(?:y|ies)|startups?|business(?:es)?|firms?|agenc(?:y|ies)|clinics?|studios?|shops?|funds?)\b/i;
+const OPTIONAL_PERSON_ROLE_RE = /\b(?:founders?|co-?founders?|owners?|operators?|decision[-\s]?makers?|ceos?|ctos?|presidents?|principals?)\b/i;
+const OPTIONAL_ROLE_CUE_RE =
+  /\b(?:would\s+be\s+(?:useful|helpful|great|nice)|could\s+be\s+(?:useful|helpful|great|nice)|prefer(?:ably|red)?|ideally|if\s+(?:possible|you\s+can)|nice\s+to\s+have|bonus)\b/i;
+
+function optionalRoleMention(raw: string, role: OpenValue | null | undefined): boolean {
+  const roleText = `${role?.raw ?? ""} ${role?.value ?? ""}`.trim();
+  if (!OPTIONAL_PERSON_ROLE_RE.test(roleText)) return false;
+  const match = OPTIONAL_PERSON_ROLE_RE.exec(raw);
+  if (!match) return false;
+  const organization = ORG_TARGET_RE.exec(raw);
+  // "Find founders of startups" asks for people even if another attribute is soft.
+  if (!organization || match.index < organization.index) return false;
+  const roleList = new RegExp(
+    `${OPTIONAL_PERSON_ROLE_RE.source}(?:\\s*(?:,|or|and|/)\\s*${OPTIONAL_PERSON_ROLE_RE.source})*`,
+    "i",
+  ).exec(raw.slice(match.index));
+  const before = raw.slice(0, match.index).trimEnd();
+  const after = raw.slice(match.index + (roleList?.[0].length ?? match[0].length)).trimStart();
+  // Bind the preference to the role phrase, not a nearby headcount/contact clause.
+  return new RegExp(`${OPTIONAL_ROLE_CUE_RE.source}$`, "i").test(before)
+    || new RegExp(`^${OPTIONAL_ROLE_CUE_RE.source}`, "i").test(after);
+}
+
+function repairOrganizationTargetWithOptionalRole(
+  target: Target,
+  raw: string,
+  path: string,
+  repairs: Repair[],
+): void {
+  if (target.entity_type.value !== "person") return;
+  const witness = `${target.entity_type.raw ?? ""} ${target.category?.raw ?? ""} ${target.category?.value ?? ""}`;
+  if (!ORG_TARGET_RE.test(witness)) return;
+  if (!optionalRoleMention(raw, target.role)) return;
+  const role = target.role;
+  target.entity_type = { value: "company", raw: target.entity_type.raw, confidence: target.entity_type.confidence };
+  target.role = null;
+  repairs.push({
+    code: "OPTIONAL_ROLE_NOT_PRIMARY_ENTITY",
+    message: `"${role?.raw ?? role?.value}" is a hedged contact preference; the requested target is the organization`,
+    path: `${path}.entity_type`,
+  });
 }
 
 /**
@@ -885,6 +932,57 @@ export function validateFrame(input: UnderstandingFrame): ValidationResult {
     }
   }
 
+  // A provider can miss a numeric preference while still returning an otherwise
+  // valid frame. Re-read only structured constraints from the raw text; the
+  // existing spec compiler decides whether the span is soft or hard.
+  {
+    const existing = new Set(frame.constraints.map((c) => `${c.field}:${c.operator}:${c.value}`));
+    for (const c of detectConstraints(frame.input.raw ?? "")) {
+      const key = `${fieldKey(c.field)}:${c.operator}:${c.value}`;
+      if (!["employee_count", "prefer_investor_check"].includes(c.field)) continue;
+      if (c.field === "prefer_investor_check") {
+        // A provider may preserve the range but miss its optional strength.
+        // Reclassify only the same stated monetary check; categorical answers
+        // from a separate clarification retain their hard band semantics.
+        for (const held of frame.constraints) {
+          // Extraction may singularize raw spans ("checks" -> "check"), or
+          // the provider may quote only the endpoints. Match the structured
+          // range instead; a different range, currency or negation stays hard.
+          const endpoints = (value: Constraint["value"]) =>
+            (Array.isArray(value) ? value : String(value).split("|")).map(Number);
+          const stated = endpoints(c.value);
+          const heldRange = endpoints(held.value);
+          if (held.field === "investor_check" && held.operator === c.operator &&
+              heldRange.length === 2 && heldRange.every((n, i) => Number.isFinite(n) && n === stated[i]) &&
+              (held.unit ?? "").toUpperCase() === (c.unit ?? "").toUpperCase() && held.negated === c.negated) {
+            if (frame.constraints.some(other => other !== held && other.field === "prefer_investor_check" &&
+                other.operator === c.operator && String(other.value) === String(c.value) &&
+                (other.unit ?? "").toUpperCase() === (c.unit ?? "").toUpperCase() && other.negated === c.negated)) {
+              frame.constraints = frame.constraints.filter(other => other !== held);
+            } else {
+              held.field = "prefer_investor_check";
+            }
+            existing.add(key);
+            repairs.push({
+              code: "CONSTRAINT_STRENGTH_RECOVERED_FROM_INPUT",
+              message: `"${c.raw}" makes the stated monetary check range a preference`,
+              path: "constraints",
+            });
+          }
+        }
+      }
+      if (existing.has(key)) continue;
+      c.field = fieldKey(c.field);
+      frame.constraints.push(c);
+      existing.add(key);
+      repairs.push({
+        code: "CONSTRAINT_RECOVERED_FROM_INPUT",
+        message: `"${c.raw}" constrains ${c.field}, which the extraction did not carry`,
+        path: "constraints",
+      });
+    }
+  }
+
   // — an absence stated as a constraint IS lacks_asset ————————————————
   //
   // The converse of the rule further down, which turns lacks_asset(X) into a
@@ -1002,6 +1100,8 @@ export function validateFrame(input: UnderstandingFrame): ValidationResult {
       });
     }
   }
+
+  repairOrganizationTargetWithOptionalRole(frame.target, raw, "target", repairs);
 
   // Root and nested semantic cores enter through the same normalizer. Run the
   // root before relation-dependent checks so every later invariant observes
@@ -1328,12 +1428,16 @@ export function validateFrame(input: UnderstandingFrame): ValidationResult {
   }
 
   propagateCompoundProvenance(frame, repairs);
+  if (repairInvestorScope(frame)) repairs.push({ code: "INVESTOR_SCOPE_RECOVERED", path: "target.entity_subtype", message: "Recovered explicit fund-or-angel investor scope" });
+  if (repairServiceBoundaries(frame)) repairs.push({ code: "SERVICE_BOUNDARY_RECOVERED",
+    message: "product-fit service contrast recovered in its named target scope", path: "constraints" });
 
   // A subgoal that says nothing is a dropped half wearing a placeholder. It
   // reads as a handled compound in the inspector, which is worse than an
   // honest clarification.
   frame.compound.subgoals.forEach((sg, i) => {
     const base = `compound.subgoals[${i}]`;
+    repairOrganizationTargetWithOptionalRole(sg.target, raw, `${base}.target`, repairs);
     normalizeSemanticCore(
       sg.target,
       sg.relation,

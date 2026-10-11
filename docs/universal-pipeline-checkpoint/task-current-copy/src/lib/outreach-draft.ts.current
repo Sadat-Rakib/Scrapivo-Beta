@@ -1,0 +1,389 @@
+/**
+ * Deterministic outreach drafts, per vertical. Template frameworks follow the
+ * patterns that consistently perform in outreach research (specific verifiable
+ * observation → relevance → low-friction ask; PAS/AIDA structure):
+ *   - investor: raise story + matched thesis (existing)
+ *   - company:  hiring signal + sender proof ("I built X")
+ *   - local:    the "I searched for X in Y and couldn't find your website"
+ *               observation angle (no_website) or SEO refresh angle
+ *   - job:      candidate intro — relevance + proof, ask for a conversation
+ * Every sentence is assembled ONLY from real row data, the user's Memory, and
+ * the sender inputs in the modal. No LLM, no invented facts, instant, $0.
+ *
+ * Phase E: append jurisdiction-aware compliance footers from lead geo.
+ */
+import {
+  jurisdictionDraftHints,
+  resolveJurisdiction,
+  type OutreachJurisdiction,
+} from "@/lib/outreach/jurisdiction";
+
+export type DraftVertical = "investor" | "company" | "local" | "job";
+/** Alias some callers use for the local-business vertical. */
+export type DraftLeadVertical = DraftVertical | "business";
+export type PreparedOutreachDraft = { email_subject: string; email_body: string; dm: string };
+
+export type DraftLead = {
+  /** Pipeline drafts must state only supplied verified facts and sender intent. */
+  verifiedFactsOnly?: boolean;
+  vertical?: DraftLeadVertical;
+  name: string;
+  firm?: string;
+  role?: string;
+  location?: string;
+  /** ISO country when known (drives jurisdiction). */
+  country?: string;
+  sector?: string;
+  /** Matched-thesis sentence from the pipeline ("Investor at X — backs Y rounds."). */
+  whyMatch?: string;
+  /** Company/hiring: the why-now signal ("Actively hiring — YC S24"). */
+  whyNow?: string;
+  /** Company: platform the signal came from ("Greenhouse", "YC"). */
+  platform?: string;
+  /** Local: business category ("plumbing") + observed opportunity. */
+  category?: string;
+  address?: string;
+  noWebsite?: boolean;
+  seoPoor?: boolean;
+  /** Job: the posting title the sender is replying to. */
+  postingTitle?: string;
+};
+
+export type DraftSender = {
+  name?: string;
+  service?: string;
+  /** Sender role/service line for the intro ("designer", "web developer"). */
+  senderRole?: string;
+  /** Proof/metrics line the user states ("built X · grew Y to Z"). */
+  proof?: string;
+  /** The raise facts the user stated — investor drafts are tailored to them. */
+  stage?: string;
+  sector?: string;
+};
+
+function firstName(name: string): string {
+  return (name || "").trim().split(/\s+/)[0] || "there";
+}
+
+function article(word: string): string {
+  return /^[aeiou]/i.test(word.trim()) ? "an" : "a";
+}
+
+const STAGE_LABELS: Record<string, string> = {
+  "pre-seed": "Pre-seed",
+  seed: "Seed",
+  "series-a": "Series A",
+  "series-b": "Series B",
+  angel: "Angel",
+};
+
+function titleCase(word: string): string {
+  const w = word.trim();
+  const known = STAGE_LABELS[w.toLowerCase()];
+  if (known) return known;
+  return w
+    .split(/\s+/)
+    .map((part) =>
+      part.length <= 3 ? part.toUpperCase() : part.charAt(0).toUpperCase() + part.slice(1),
+    )
+    .join(" ");
+}
+
+/** Sender identity without the "a founder" filler — name (+service) only. */
+function senderWho(sender: DraftSender): string {
+  const name = sender.name?.trim() || "a founder";
+  const service = sender.service?.trim();
+  return service ? `${name} (${service})` : name;
+}
+
+/**
+ * Matched-thesis fragments from the pipeline's why-match sentence
+ * ("Investor at .406 Ventures — backs pre-seed rounds, invests in AI.")
+ * → ["backs pre-seed rounds", "invests in AI"]. Empty for non-investor rows.
+ */
+function thesisBits(whyMatch?: string): string[] {
+  const tail = (whyMatch?.split("—") ?? [])[1];
+  if (!tail) return [];
+  return tail
+    .replace(/\.$/, "")
+    .split(/,\s*/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+/** Sender proof sentence — the user's stated metrics/proof, if any. */
+function proofClause(sender: DraftSender): string {
+  const proof = sender.proof?.trim();
+  return proof ? ` ${proof.replace(/\.$/, "")}.` : "";
+}
+
+// ── Investor (existing behavior, refactored into a branch) ──────────────────
+
+function investorEmail(lead: DraftLead, sender: DraftSender): { subject: string; body: string } {
+  const fn = firstName(lead.name);
+  const firm = lead.firm?.trim() || "your firm";
+  const stage = sender.stage?.trim();
+  const sector = sender.sector?.trim();
+
+  const subjectLabel = [stage ? titleCase(stage) : "", sector ? titleCase(sector) : ""]
+    .filter(Boolean)
+    .join(" ");
+  const subject = subjectLabel
+    ? `${subjectLabel} founder — intro for ${firm}`
+    : `${fn} — quick intro for ${firm}`;
+
+  const raise = [
+    stage ? `raising ${stage}` : "",
+    sector ? `for ${article(sector)} ${sector.toLowerCase()} startup` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const intro = raise
+    ? `I'm ${senderWho(sender)}, ${raise}.`
+    : `I'm ${senderWho(sender)} — reaching out about our current raise.`;
+
+  const firstBit = thesisBits(lead.whyMatch)[0] ?? "";
+  const thesis = firstBit
+    ? `${firm} ${firstBit.charAt(0).toLowerCase() + firstBit.slice(1)} — exactly the partner we're looking for${
+        stage ? " at this stage" : ""
+      }.`
+    : `I'm trying to get on ${firm}'s radar for our raise.`;
+
+  const body = [
+    `Hi ${fn},`,
+    ``,
+    intro,
+    thesis,
+    ``,
+    `Would you be open to a 15-minute intro next week? Deck ready — happy to send it over first.`,
+    ``,
+    `Best,`,
+    `${sender.name?.trim() || "—"}`,
+  ].join("\n");
+  return { subject, body };
+}
+
+function investorMessage(lead: DraftLead, sender: DraftSender): string {
+  const fn = firstName(lead.name);
+  const firm = lead.firm?.trim();
+  const stage = sender.stage?.trim();
+  const sector = sender.sector?.trim();
+
+  const raise = [stage ? `raising ${stage}` : "", sector ? `in ${sector.toLowerCase()}` : ""]
+    .filter(Boolean)
+    .join(" ");
+  const intro = raise
+    ? `${senderWho(sender)} here, ${raise}.`
+    : `${senderWho(sender)} here — reaching out about our raise.`;
+
+  const firstBit = thesisBits(lead.whyMatch)[0] ?? "";
+  const thesis = firstBit
+    ? `${firm ?? "You"} ${firm ? firstBit.charAt(0).toLowerCase() + firstBit.slice(1) : firstBit}, so you were the first person I wanted to reach.`
+    : `${firm ?? "You"} ${firm ? "was" : "were"} at the top of my list for this raise.`;
+
+  return `Hi ${fn} — ${intro} ${thesis} Open to a quick chat next week?`;
+}
+
+// ── Local business pitch ("I searched for X in Y — no website" angle) ───────
+
+function localEmail(lead: DraftLead, sender: DraftSender): { subject: string; body: string } {
+  const fn = firstName(lead.name);
+  const name = lead.name.trim();
+  const category = lead.category?.replace(/_/g, " ") || "local business";
+  const city = lead.location?.trim() || lead.address?.split(",").slice(-2, -1)[0]?.trim() || "";
+  const service = sender.service?.trim() || sender.senderRole?.trim() || "web design";
+
+  const observation = lead.noWebsite
+    ? `I was looking for ${article(category)} ${category} in ${city || "your area"} and couldn't find a website for ${name} anywhere.`
+    : lead.seoPoor
+      ? `I came across ${name} in ${city || "your area"} — your site is harder to find on Google than it should be for what you do.`
+      : `I came across ${name} in ${city || "your area"} while looking at ${category} businesses there.`;
+
+  const value = lead.noWebsite
+    ? `Right now, people searching for ${category} nearby are finding your competitors instead. A simple, fast site with your hours, photos and a contact button usually pays for itself within a couple of months.`
+    : `A few quick fixes — page speed, Google Business sync, and clearer contact paths — usually bring in noticeably more calls from the searches you're already showing up for.`;
+
+  const subject = lead.noWebsite
+    ? `${name} — no website comes up when people search`
+    : `Quick notes for ${name}'s website`;
+
+  const body = [
+    `Hi ${fn},`,
+    ``,
+    `I'm ${sender.name?.trim() || "a local " + service}, and ${observation}`,
+    ``,
+    value,
+    ``,
+    `I help ${category} businesses in ${city || "your area"} with exactly this${service ? ` — ${service}, start to finish` : ""}.`,
+    ``,
+    `Want me to send over a 2-minute walkthrough of what I'd change? No strings attached.`,
+    ``,
+    `Best,`,
+    `${sender.name?.trim() || "—"}`,
+  ].join("\n");
+  return { subject, body };
+}
+
+function localMessage(lead: DraftLead, sender: DraftSender): string {
+  const fn = firstName(lead.name);
+  const name = lead.name.trim();
+  const category = lead.category?.replace(/_/g, " ") || "business";
+  const city = lead.location?.trim() || "";
+  const service = sender.service?.trim() || sender.senderRole?.trim() || "web design";
+
+  const hook = lead.noWebsite
+    ? `I searched for ${category} in ${city || "your area"} and ${name} doesn't show up with a website — that's people walking straight past you to competitors.`
+    : `I was looking at ${category} businesses in ${city || "your area"} and ${name} caught my eye.`;
+
+  return (
+    `Hi ${fn} — ${sender.name?.trim() || "hello"}, ${service ? `${service} here. ` : ""}${hook} ` +
+    `Want me to send a free 2-minute video of what I'd fix first? No strings.`
+  );
+}
+
+// ── Company (hiring signal) + job (candidate intro) ─────────────────────────
+
+function companyEmail(lead: DraftLead, sender: DraftSender): { subject: string; body: string } {
+  const fn = firstName(lead.name);
+  const firm = lead.firm?.trim() || lead.name.trim();
+  const hiring = lead.whyNow?.trim();
+
+  const subject = hiring
+    ? `${firm} is hiring — quick note from ${titleCase(sender.senderRole?.trim() || sender.service?.trim() || "someone who can help")}`
+    : `${fn} — quick note about ${firm}`;
+
+  const hook = hiring
+    ? `I saw ${firm} is hiring right now${lead.platform ? ` (posted via ${lead.platform})` : ""} — congrats, that's usually a good sign.`
+    : lead.whyMatch?.trim()
+      ? lead.whyMatch.trim().replace(/\.$/, "") + "."
+      : `I've been following ${firm}'s work.`;
+
+  const relevance = sender.senderRole?.trim()
+    ? `I'm ${sender.senderRole.trim()}${sender.service?.trim() ? ` working mostly in ${sender.service.trim()}` : ""}, and teams in a hiring phase usually need exactly the kind of help I provide.`
+    : `Teams in a hiring phase usually need extra hands — that's precisely when I can help.`;
+
+  const body = [
+    `Hi ${fn},`,
+    ``,
+    `${hook}`,
+    ``,
+    `${relevance}${proofClause(sender)}`,
+    ``,
+    `If useful, I'm happy to send a short portfolio or hop on a 15-minute call — whichever is easier.`,
+    ``,
+    `Best,`,
+    `${sender.name?.trim() || "—"}`,
+  ].join("\n");
+  return { subject, body };
+}
+
+function companyMessage(lead: DraftLead, sender: DraftSender): string {
+  const fn = firstName(lead.name);
+  const firm = lead.firm?.trim() || lead.name.trim();
+  const hiring = lead.whyNow?.trim();
+
+  const hook = hiring
+    ? `I saw ${firm} is hiring right now`
+    : `I've been following ${firm}`;
+  const relevance = sender.senderRole?.trim()
+    ? `I'm ${sender.senderRole.trim()}${proofClause(sender)}`
+    : `I can help with exactly this kind of work`;
+
+  return `Hi ${fn} — ${hook}. ${relevance}. Open to a quick chat this week?`;
+}
+
+function jobEmail(lead: DraftLead, sender: DraftSender): { subject: string; body: string } {
+  const fn = firstName(lead.name);
+  const posting = lead.postingTitle?.trim() || lead.role?.trim() || "the role";
+
+  const subject = `${posting} — ${sender.name?.trim() || "application"}`;
+
+  const relevance = sender.senderRole?.trim()
+    ? `I'm ${article(sender.senderRole.trim())} ${sender.senderRole.trim().toLowerCase()}${sender.service?.trim() ? ` focused on ${sender.service.trim()}` : ""}.`
+    : `I believe I'd be a strong fit.`;
+
+  const body = [
+    `Hi ${fn},`,
+    ``,
+    `I'm reaching out about ${posting}${lead.firm ? ` at ${lead.firm}` : ""}.`,
+    ``,
+    `${relevance}${proofClause(sender)}`,
+    ``,
+    `Rather than a long pitch — could I ask you two smart questions about what the team needs most right now? A 10-minute call would be plenty.`,
+    ``,
+    `Best,`,
+    `${sender.name?.trim() || "—"}`,
+  ].join("\n");
+  return { subject, body };
+}
+
+function jobMessage(lead: DraftLead, sender: DraftSender): string {
+  const posting = lead.postingTitle?.trim() || lead.role?.trim() || "the role";
+  const relevance = sender.senderRole?.trim() ? `I'm ${article(sender.senderRole.trim())} ${sender.senderRole.trim().toLowerCase()}` : `I work in this exact space`;
+  return `Hi ${fn0(lead.name)} — I'm reaching out about ${posting}${lead.firm ? ` at ${lead.firm}` : ""}. ${relevance}${proofClause(sender)} Could I ask you two quick questions about the team's priorities?`;
+}
+
+function fn0(name: string): string {
+  return firstName(name);
+}
+
+// ── Dispatch ────────────────────────────────────────────────────────────────
+
+function withJurisdictionFooter(
+  draft: { subject: string; body: string },
+  lead: DraftLead,
+): { subject: string; body: string; jurisdiction: OutreachJurisdiction } {
+  const j = resolveJurisdiction({ country: lead.country, location: lead.location });
+  const hints = jurisdictionDraftHints(j);
+  const footer = ["", "—", ...hints.footerLines].join("\n");
+  return {
+    subject: draft.subject,
+    body: `${draft.body.trimEnd()}\n${footer}`,
+    jurisdiction: j,
+  };
+}
+
+export function buildEmailDraft(
+  lead: DraftLead,
+  sender: DraftSender,
+): { subject: string; body: string; jurisdiction?: OutreachJurisdiction } {
+  if (lead.verifiedFactsOnly) {
+    const fact = lead.whyMatch?.trim();
+    const purpose = sender.service?.trim() ? `I'd like to discuss ${sender.service.trim()}.` : "I'd like to connect about a potential opportunity.";
+    return withJurisdictionFooter({ subject: `A quick note for ${lead.name}`, body: [
+      `Hi ${lead.name},`, '', fact ? `I came across this public information: ${fact}` : `I came across ${lead.name}.`,
+      '', purpose, 'Would you be open to a brief conversation?', '', sender.name?.trim() || '[Your name]',
+    ].join('\n') }, lead);
+  }
+  let draft: { subject: string; body: string };
+  switch (lead.vertical) {
+    case "local":
+    case "business":
+      draft = localEmail(lead, sender);
+      break;
+    case "company":
+      draft = companyEmail(lead, sender);
+      break;
+    case "job":
+      draft = jobEmail(lead, sender);
+      break;
+    default:
+      draft = investorEmail(lead, sender);
+  }
+  return withJurisdictionFooter(draft, lead);
+}
+
+export function buildMessageDraft(lead: DraftLead, sender: DraftSender): string {
+  if (lead.verifiedFactsOnly) return `Hi ${lead.name}, ${lead.whyMatch?.trim() ? `I came across this public information: ${lead.whyMatch.trim()} ` : ''}${sender.service?.trim() ? `I'd like to discuss ${sender.service.trim()}. ` : ''}Would you be open to a brief conversation?`;
+  switch (lead.vertical) {
+    case "local":
+    case "business":
+      return localMessage(lead, sender);
+    case "company":
+      return companyMessage(lead, sender);
+    case "job":
+      return jobMessage(lead, sender);
+    default:
+      return investorMessage(lead, sender);
+  }
+}

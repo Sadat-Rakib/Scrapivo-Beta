@@ -13,15 +13,11 @@
  * - status=ready_to_search requires zero materially-missing fields.
  */
 
-import type { UnderstandingFrame } from '../understanding/frame';
+import type { UnderstandingFrame } from "../understanding/frame";
 
 export type SpecEntity = "person" | "company" | "business" | "investor" | "job" | "unknown";
 
-export type SpecStatus =
-  | "needs_clarification"
-  | "ready_to_search"
-  | "searching"
-  | "complete";
+export type SpecStatus = "needs_clarification" | "ready_to_search" | "searching" | "complete";
 
 export interface SpecField {
   /** Canonical field name, e.g. "industry", "location", "role". */
@@ -61,6 +57,8 @@ export interface SearchSpec {
   missing: string[];
   signal_required: boolean;
   signal_types: string[];
+  /** Explicit clause semantics; absent preserves legacy alternative aliases. */
+  signal_mode?: "all" | "any";
   /** e.g. "7d", "90d", null when unknown. */
   signal_recency: string | null;
   status: SpecStatus;
@@ -105,9 +103,29 @@ export function getField(spec: SearchSpec, field: string): SpecField | undefined
 
 /** Words in a requested focus phrase that describe the ASK, not the sector. */
 const INVESTOR_SECTOR_STOPWORDS = new Set([
-  "startups", "startup", "companies", "company", "investors", "investor",
-  "vc", "vcs", "funds", "fund", "focus", "focuses", "focused", "focusing",
-  "the", "a", "an", "on", "in", "who", "that", "and", "or",
+  "startups",
+  "startup",
+  "companies",
+  "company",
+  "investors",
+  "investor",
+  "vc",
+  "vcs",
+  "funds",
+  "fund",
+  "focus",
+  "focuses",
+  "focused",
+  "focusing",
+  "the",
+  "a",
+  "an",
+  "on",
+  "in",
+  "who",
+  "that",
+  "and",
+  "or",
 ]);
 
 /**
@@ -123,7 +141,10 @@ export function investorSectorTokens(wanted: string | null | undefined): string[
   return [...new Set(tokens)];
 }
 
-export function investorSectorMatches(rowSectorText: string | null | undefined, wanted: string | null | undefined): boolean {
+export function investorSectorMatches(
+  rowSectorText: string | null | undefined,
+  wanted: string | null | undefined,
+): boolean {
   if (!wanted || !wanted.trim()) return true;
   const row = (rowSectorText ?? "").toLowerCase();
   const tokens = investorSectorTokens(wanted);
@@ -183,10 +204,10 @@ function permitsBroadBusinessCategory(spec: SearchSpec): boolean {
 
 export function computeMissing(spec: SearchSpec): string[] {
   if (spec.entity === "unknown") return ["entity"];
-  const worldwide = hasField(spec, "geo_scope") && getField(spec, "geo_scope")?.value === "worldwide";
+  const worldwide =
+    hasField(spec, "geo_scope") && getField(spec, "geo_scope")?.value === "worldwide";
   const hasNeed =
-    spec.signal_required ||
-    spec.criteria.some((c) => NEED_FIELDS.has(c.field) && c.value.trim());
+    spec.signal_required || spec.criteria.some((c) => NEED_FIELDS.has(c.field) && c.value.trim());
   if (
     spec.entity === "company" &&
     spec.criteria.filter((c) => !NON_SUBSTANTIVE.has(c.field)).length === 0 &&
@@ -219,6 +240,7 @@ export function buildSpec(args: {
   criteria: SpecField[];
   signal_required?: boolean;
   signal_types?: string[];
+  signal_mode?: "all" | "any";
   signal_recency?: string | null;
   raw_query: string;
   locationSuggestion?: LocationSuggestion | null;
@@ -231,6 +253,7 @@ export function buildSpec(args: {
     missing: [],
     signal_required: args.signal_required ?? false,
     signal_types: args.signal_types ?? [],
+    signal_mode: args.signal_mode,
     signal_recency: args.signal_recency ?? null,
     status: "ready_to_search",
     raw_query: args.raw_query,

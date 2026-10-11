@@ -32,25 +32,24 @@ export function craftTags(skill: string): string[] {
   const s = (skill || "").toLowerCase();
   if (/dentist|dental|ortho/.test(s))
     return ['"amenity"="dentist"', '"healthcare"="dentist"', '"amenity"="clinic"'];
-  if (/\bplumb/.test(s)) return ['"craft"="plumber"', '"shop"="hardware"', '"office"="company"'];
-  if (/\broof/.test(s)) return ['"craft"="roofer"', '"office"="company"'];
-  if (/\belectric/.test(s)) return ['"craft"="electrician"', '"office"="company"'];
+  if (/\bplumb/.test(s)) return ['"craft"="plumber"', '"shop"="hardware"'];
+  if (/\broof/.test(s)) return ['"craft"="roofer"'];
+  if (/\belectric/.test(s)) return ['"craft"="electrician"'];
   if (/solar|photovoltaic|\bpv\b/.test(s)) {
-    return ['"craft"="photovoltaic"', '"shop"="solar"', '"craft"="electrician"', '"office"="company"'];
+    return ['"craft"="photovoltaic"', '"shop"="solar"', '"craft"="electrician"'];
   }
   if (/construct|builder|contract|renovat|civil/.test(s)) {
     return [
       '"craft"="builder"',
       '"office"="construction_company"',
       '"craft"="carpenter"',
-      '"office"="company"',
     ];
   }
   if (/photograph|photo|fotograf|studio/.test(s)) {
-    return ['"shop"="photo"', '"craft"="photographer"', '"office"="company"'];
+    return ['"shop"="photo"', '"craft"="photographer"'];
   }
   if (/freight|forward|logistic|shipping|sped/.test(s)) {
-    return ['"office"="forwarding_agent"', '"office"="logistics"', '"office"="company"'];
+    return ['"office"="forwarding_agent"', '"office"="logistics"'];
   }
   if (/\bhvac|heating|cooling|air.?cond/.test(s)) {
     return [
@@ -59,17 +58,20 @@ export function craftTags(skill: string): string[] {
       '"shop"="air_conditioning"',
     ];
   }
-  if (/law|attorney|legal/.test(s)) return ['"office"="lawyer"', '"office"="company"'];
+  if (/law|attorney|legal/.test(s)) return ['"office"="lawyer"'];
   if (/gym|fitness|yoga/.test(s)) return ['"leisure"="fitness_centre"', '"sport"="fitness"'];
   if (/cafe|coffee|restaurant|food/.test(s)) return ['"amenity"="cafe"', '"amenity"="restaurant"'];
   if (/market|agency|seo|design|lead|sales/.test(s)) {
-    return ['"office"="advertising_agency"', '"office"="marketing"', '"office"="company"'];
+    return ['"office"="advertising_agency"', '"office"="marketing"'];
   }
   if (/med.?spa|salon|beauty|spa/.test(s)) return ['"shop"="beauty"', '"leisure"="spa"'];
   if (/account|bookkeep|cpa/.test(s)) return ['"office"="accountant"', '"office"="tax_advisor"'];
   if (/real.?estate|realtor/.test(s)) return ['"office"="estate_agent"'];
-  // Fallback: add broader office/company tag
-  return ['"office"="company"', '"shop"="yes"'];
+  // Unknown craft: no mapped OSM tags. The office=company / shop=yes
+  // catch-alls imported EVERY registered business in the bbox (Windhoek run:
+  // 149 unrelated shops, all correctly rejected downstream). An empty answer
+  // is honest - scoped SERP discovery covers these crafts.
+  return [];
 }
 
 export function nameNeedleFor(skill: string): string {
@@ -152,7 +154,8 @@ export function formatOsmAddress(tags: Record<string, string>): string {
   return parts.join(", ");
 }
 
-async function geocodeNominatimPoint(place: string): Promise<GeoHit | null> {
+async function geocodeNominatimPoint(place: string, signal?: AbortSignal | null): Promise<GeoHit | null> {
+  signal?.throwIfAborted();
   try {
     const q = disambiguatePlaceQuery(normalizeLocalLocation(place));
     const url = `https://nominatim.openstreetmap.org/search?format=json&limit=5&addressdetails=1&q=${encodeURIComponent(q)}`;
@@ -160,7 +163,7 @@ async function geocodeNominatimPoint(place: string): Promise<GeoHit | null> {
       headers: {
         "User-Agent": "Scrapivo/1.0 (local-business discovery; contact: support@scrapivo.app)",
       },
-      signal: AbortSignal.timeout(12_000),
+      signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(12_000)]) : AbortSignal.timeout(12_000),
     });
     if (!res.ok) return null;
     const data = (await res.json()) as Array<{
@@ -205,7 +208,7 @@ async function geocodeNominatimPoint(place: string): Promise<GeoHit | null> {
   }
 }
 
-async function overpass(query: string): Promise<any[]> {
+async function overpass(query: string, signal?: AbortSignal | null): Promise<any[]> {
   // Round 0 tries every mirror once (preferred mirror first). A second round
   // runs ONLY when no mirror gave a usable HTTP response (transient outage) —
   // legitimate empty results are final, otherwise sparse areas double latency.
@@ -215,11 +218,13 @@ async function overpass(query: string): Promise<any[]> {
   ];
   let sawResponse = false;
   for (let round = 0; round < 2; round++) {
+    signal?.throwIfAborted();
     if (round > 0) {
       if (sawResponse) break;
       await new Promise((r) => setTimeout(r, 900));
     }
     for (const mirror of order) {
+      signal?.throwIfAborted();
       try {
         const res = await fetch(mirror, {
           method: "POST",
@@ -231,7 +236,7 @@ async function overpass(query: string): Promise<any[]> {
             Accept: "*/*",
           },
           body: `data=${encodeURIComponent(query)}`,
-          signal: AbortSignal.timeout(round === 0 ? 22_000 : 14_000),
+          signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(round === 0 ? 22_000 : 14_000)]) : AbortSignal.timeout(round === 0 ? 22_000 : 14_000),
         });
         if (!res.ok) continue;
         sawResponse = true;
@@ -375,7 +380,7 @@ export function elementsToLeads(elements: any[], loc: string, skill: string, cap
 /** Options for one OSM acquisition round. `widen` deepens the sweep of the
  *  SAME constraints (PRD §35): forced 25km tag pass, synonym name sweep,
  *  higher capture cap. Never changes skill, tags, or the location area. */
-export type OsmSearchOptions = { widen?: boolean };
+export type OsmSearchOptions = { widen?: boolean; signal?: AbortSignal | null };
 
 async function searchAroundCity(
   skill: string,
@@ -399,12 +404,12 @@ async function searchAroundCity(
   const needle = widen ? nameNeedlesForWiden(skill) : nameNeedleFor(skill);
   const start = Date.now();
   // Try smaller radius first (12km)
-  let leads = elementsToLeads(await overpass(tagQuery(tags, lat, lon, 12_000, cap)), locLabel, skill, cap);
+  let leads = elementsToLeads(await overpass(tagQuery(tags, lat, lon, 12_000, cap), opts.signal), locLabel, skill, cap);
   // If insufficient results, expand to 25km — but never blow the wall-clock.
   // Widen passes always take the 25km sweep (deeper pages of the same area).
   if ((leads.length < 15 || widen) && Date.now() - start < deadlineMs * 0.45) {
     leads = elementsToLeads(
-      await overpass(tagQuery(tags, lat, lon, 25_000, cap)),
+      await overpass(tagQuery(tags, lat, lon, 25_000, cap), opts.signal),
       locLabel,
       skill,
       cap,
@@ -414,7 +419,7 @@ async function searchAroundCity(
   // run the synonym name sweep even when the tag sweep looked healthy.
   if ((leads.length < 10 || widen) && needle && Date.now() - start < deadlineMs * 0.75) {
     const extra = await Promise.race([
-      overpass(nameQuery(needle, lat, lon, 25_000)),
+      overpass(nameQuery(needle, lat, lon, 25_000), opts.signal),
       new Promise<any[]>((r) => setTimeout(() => r([]), 18_000)),
     ]);
     const merged = [...elementsToLeads(extra, locLabel, skill, widen ? 120 : 60), ...leads];
@@ -437,6 +442,7 @@ export async function searchOsmLocalBusinesses(
   place: string,
   opts: OsmSearchOptions = {},
 ): Promise<SourceLead[]> {
+  opts.signal?.throwIfAborted();
   const skill = (qx.skill || qx.role || "").trim();
   const loc = normalizeLocalLocation(place || "");
   if (!skill || !loc || loc.toLowerCase() === "anywhere") return [];
@@ -446,7 +452,7 @@ export async function searchOsmLocalBusinesses(
     if (!cities.length) return [];
     const batches = await Promise.all(
       cities.map(async (city) => {
-        const hit = await geocodeNominatimPoint(`${city}, ${loc}`);
+        const hit = await geocodeNominatimPoint(`${city}, ${loc}`, opts.signal);
         if (!hit || isBroadAdmin(hit)) return [] as SourceLead[];
         return searchAroundCity(skill, `${city}, ${loc}`, hit.lat, hit.lon, 55_000, opts);
       }),
@@ -466,7 +472,7 @@ export async function searchOsmLocalBusinesses(
     return merged.slice(0, 100);
   }
 
-  const hit = await geocodeNominatimPoint(loc);
+  const hit = await geocodeNominatimPoint(loc, opts.signal);
   if (!hit) return [];
   if (isBroadAdmin(hit)) {
     const cities = fanOutCitiesForAdmin(loc, 6);
@@ -476,7 +482,7 @@ export async function searchOsmLocalBusinesses(
     }
     const batches = await Promise.all(
       cities.map(async (city) => {
-        const cityHit = await geocodeNominatimPoint(`${city}, ${loc}`);
+        const cityHit = await geocodeNominatimPoint(`${city}, ${loc}`, opts.signal);
         if (!cityHit || isBroadAdmin(cityHit)) return [] as SourceLead[];
         return searchAroundCity(skill, `${city}, ${loc}`, cityHit.lat, cityHit.lon, 55_000, opts);
       }),

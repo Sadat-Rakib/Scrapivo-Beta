@@ -9,6 +9,7 @@
   },
   {
     "id": "Q8",
+    "expect": { "places": [["Dubai"], ["Singapore"], ["Sydney"], ["Toronto"]], "optionalFields": ["email", "phone"] },
     "q": "yo need some companies in dubai singapore sydney maybe toronto too that do logistics freight forwarding shipping customs type stuff, around 10-20 per place if possible, contact details preferred, skip giant global companies like dhl fedex etc i want actual regional/local operators"
   },
   {
@@ -17,6 +18,7 @@
   },
   {
     "id": "Q12",
+    "expect": { "entity": ["job"], "remoteScope": ["global", "worldwide"], "exclusions": [["us-only", "US only"]], "softRecency": true, "hardRecency": ["180d", "6m"] },
     "q": "im looking for remote jobs globally basically frontend react nextjs typescript maybe fullstack node too, internship junior entry level 0-1 yr but 2 yrs requirement is okay if everything else fits, posted recently ideally last few days/weeks, dont show me us-only remote pretending to be worldwide remote and dont give me 6 month old stuff"
   },
   {
@@ -29,10 +31,12 @@
   },
   {
     "id": "Q4",
+    "expect": { "places": [["Bali"], ["Phuket"], ["Santorini"]], "alternatives": [["website", "instagram"]], "optionalFields": ["email"] },
     "q": "can you find like wedding photographers videographers and maybe small creative studios in bali, phuket and santorini? mainly businesses that actually do weddings, need their site or insta and some way to contact them, but dont reject somebody just because you couldnt find an email yet"
   },
   {
     "id": "Q5",
+    "expect": { "entity": ["investor"], "places": [["Canada"], ["USA", "United States"]], "signals": ["investment"], "forbiddenSignals": ["funding"], "softCriteria": ["investor_stage", "investor_check"], "softRecency": true },
     "q": "looking for investors who actually invest in ai startups, ideally seed/preseed, canada or us is good, checks maybe 100k to 2m ish but thats not an absolute rule, bonus if theyve invested in devtools automation agents data infra kinda stuff recently, i want actual funds/angels not articles talking about venture capital"
   },
   {
@@ -45,34 +49,42 @@
   },
   {
     "id": "Q11",
+    "expect": { "places": [["USA", "United States"], ["Canada"]], "buckets": [{ "target": ["cybersecurity"], "requested": 15 }, { "target": ["AI", "devtool", "developer tools"], "requested": 15 }], "softCriteria": ["employee_count"] },
     "q": "need maybe 15 cybersecurity companies then another 15 ai infra/devtool startups, mostly usa/canada, preferably under like 100 employees but if headcount is unknown dont kill the result, founders or decision makers would be useful and pls dont mix cybersecurity consultants with actual product companies unless they genuinely fit"
   },
   {
     "id": "Q13",
+    "expect": { "entity": ["business", "company"], "places": [["Ottawa"], ["Gatineau"]], "requiredFields": ["email"], "optionalFields": ["phone"], "preferredFields": ["phone"] },
     "q": "need about 12 independent dental clinics around Ottawa and Gatineau, email is mandatory because this is an email campaign, phone would be nice but dont require it, bilingual sites fine and skip national chains"
   },
   {
     "id": "Q14",
+    "expect": { "places": [["Alberta"]], "notPositivePlaces": ["Calgary"], "exclusions": [["Calgary"]], "optionalFields": ["email", "phone"], "targets": [["roof"], ["gutter"]] },
     "q": "find local roofing and gutter companies anywhere in Alberta except Calgary, Edmonton Red Deer Lethbridge are examples not the whole list, roughly 15 and phone preferred but no email is totally fine"
   },
   {
     "id": "Q15",
+    "expect": { "places": [["Wellington"], ["Christchurch"], ["New Zealand", "NZ"]], "notPositivePlaces": ["Canada"], "alternatives": [["instagram", "website"]], "targets": [["coffee roaster"], ["cafe"]] },
     "q": "need coffee roasters and specialty cafes in Wellington and Christchurch New Zealand, not Canada just mentioning Canada because thats where im contacting them from, small real operators with instagram or website and whatever contact you can verify"
   },
   {
     "id": "Q16",
+    "expect": { "places": [["Porto"], ["Braga"]], "targets": [["florist"], ["cater"]], "optionalFields": ["email"], "searchCombinations": true },
     "q": "wedding florists plus event caterers in Porto and Braga Portugal, search both kinds in both places please, about 5 per combination if possible, prefer independent businesses, email nice to have not required"
   },
   {
     "id": "Q17",
+    "expect": { "entity": ["person"], "places": [["Germany"], ["Netherlands"]], "targets": [["founder", "cofounder"]], "signals": ["funding", "hiring"], "signalMode": "any" },
     "q": "find founders or cofounders of early stage climate tech and battery startups in Germany or Netherlands that recently raised funding or are hiring sales growth people, either signal is enough, names and proof preferred, dont swap in recruiters or employees"
   },
   {
     "id": "Q18",
+    "expect": { "entity": ["investor"], "places": [["Australia"], ["New Zealand"]], "signals": ["investment"], "forbiddenSignals": ["funding"], "optionalFields": ["email"], "softRecency": true },
     "q": "looking for funds or angels investing preseed seed in healthtech in Australia or New Zealand, recent portfolio or new fund announcements are helpful signals not mandatory, need actual investors not VC news sites, website okay if contact email is unknown"
   },
   {
     "id": "Q19",
+    "expect": { "entity": ["job"], "places": [["Europe"], ["Dublin"], ["Lisbon"]], "targets": [["data analyst"], ["python developer"]], "softRecency": true },
     "q": "junior data analyst or python developer jobs remote across Europe, hybrid Dublin or Lisbon also okay, posted in the last month ideally, 0 to 2 years preferred and salary unknown fine, actual current employer openings not job board companies"
   }
 ]

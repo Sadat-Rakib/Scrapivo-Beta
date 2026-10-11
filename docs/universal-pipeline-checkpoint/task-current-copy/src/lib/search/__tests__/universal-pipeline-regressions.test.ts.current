@@ -1,0 +1,107 @@
+import { describe, expect, it, vi } from 'vitest';
+import { buildSpec, stated } from '../search-spec';
+import { runLiveGapfill } from '../live-gapfill';
+import { enrichCandidatesForSpec } from '../enrichment-run';
+import { mergeEnrichmentIntoRow } from '../enrichment-merge';
+import { runDeepSignalPass } from '../../signals/deep-pass.server';
+import { makeEvidence } from '../evidence';
+import { preliminaryEligibility, type SpecRow } from '../../spec-search.functions';
+import { createCandidateLedger, mergeCandidateLedgers } from '../candidate-ledger';
+import { compileCustomSignal } from '../../signals/custom-compiler';
+import { buildEmailDraft, buildMessageDraft } from '../../outreach-draft';
+import { verifyCandidateClaims } from '../verification';
+import { qualifyLead } from '../qualify';
+import { runCanonicalSourcePipeline } from '../source-pipeline';
+
+const row = (): SpecRow => ({ kind: 'company', title: 'Acme', entity_id: 'acme', entity_resolved: true,
+  page_type: 'company_page', identity_confidence: .9, detail: 'Software', category: 'Software', website_url: 'https://acme.com', url: 'https://acme.com', email: null } as SpecRow);
+const ev = (type: 'hiring'|'funding') => makeEvidence({ subject: 'acme', source_url: 'https://acme.com/news', source_type: 'web',
+  evidence_type: type, excerpt: `Acme ${type}`, supports: 'intent', event_at: new Date().toISOString() });
+
+describe('ordered universal pipeline regressions', () => {
+  it.each(['investor', 'job'] as const)('actually invokes advertised web adapter for %s', async entity => {
+    const web = vi.fn(async (..._args: unknown[]) => []);
+    await runLiveGapfill(buildSpec({ entity, criteria: [stated('role', 'engineer')], raw_query: `find ${entity}s` }),
+      { web, jobs: null, osm: null, browser: null });
+    expect(web).toHaveBeenCalled();
+    expect(web.mock.calls[0]?.[2]).toBe(entity);
+  });
+  it('keeps absent hard investor fields researchable', () => {
+    const spec = buildSpec({ entity: 'investor', criteria: [stated('investor_stage', 'seed')], raw_query: 'seed investors' });
+    expect(preliminaryEligibility(spec, { ...row(), kind: 'investor', stage: null })).toBe('RESEARCHABLE_UNKNOWN');
+    expect(preliminaryEligibility(spec, row(), true)).toBe('DUPLICATE');
+  });
+  it('researches wrong-signal evidence and accumulates AND evidence across probes', async () => {
+    const spec = buildSpec({ entity: 'company', criteria: [], raw_query: 'funded and hiring', signal_required: true,
+      signal_types: ['funding', 'hiring'], signal_mode: 'all' });
+    const hunter = vi.fn(async (_row, _spec, ctx) => [ev(ctx.probeIndex === 0 ? 'funding' : 'hiring')]);
+    const result = await runDeepSignalPass([row()], spec, { hunter, probesPerCandidate: 2 });
+    expect(result.signalReady).toHaveLength(1);
+    expect(hunter).toHaveBeenCalledTimes(2);
+    expect(result.signalReady[0].evidence).toHaveLength(2);
+  });
+  it('propagates cancellation into active hunter operations', async () => {
+    const controller = new AbortController();
+    let abortObserved = false;
+    const spec = buildSpec({ entity: 'company', criteria: [], raw_query: 'hiring', signal_required: true, signal_types: ['hiring'] });
+    const result = await runDeepSignalPass([row()], spec, { signal: controller.signal, hunter: async (_r, _s, ctx) => {
+      return new Promise(resolve => { ctx.signal?.addEventListener('abort', () => { abortObserved = true; resolve(null); }); controller.abort(); });
+    } });
+    expect(abortObserved).toBe(true);
+    expect(result.signalReady).toHaveLength(0);
+  });
+  it('never invokes contact enrichment without mandatory signal support', async () => {
+    const contact = vi.fn(async () => ({ fields: [] }));
+    const spec = buildSpec({ entity: 'company', criteria: [stated('require_email', 'true')], raw_query: 'hiring companies with email',
+      signal_required: true, signal_types: ['hiring'] });
+    await enrichCandidatesForSpec([row()], spec, { adapters: { 'contact-harvest': contact } });
+    expect(contact).not.toHaveBeenCalled();
+  });
+  it('treats an empty claim authorization as deny-all', () => {
+    const claim = ev('hiring');
+    const result = mergeEnrichmentIntoRow(row(), { fields: [], claims: [{ ...claim, excerpt: claim.excerpt! }] }, { entityId: 'acme', allowedClaims: [] });
+    expect(result.row.evidence ?? []).toHaveLength(0);
+  });
+  it('preserves stage reasons across branch merge without changing fate accounting', () => {
+    const ledger = createCandidateLedger();
+    ledger.retrieved(row());
+    ledger.stage(row(), 'RESEARCHABLE_UNKNOWN', 'NOT_RESEARCHED_BUDGET', 'deadline');
+    ledger.gated(row(), 'deadline');
+    const merged = mergeCandidateLedgers([ledger.summary()], []);
+    expect(merged?.stages).toContainEqual(expect.objectContaining({ signal: 'NOT_RESEARCHED_BUDGET', reason: 'deadline' }));
+    expect(merged?.accounting?.ok).toBe(true);
+  });
+  it('free-only custom compilation never invokes the AI adapter', async () => {
+    const ai = vi.fn(async () => '');
+    expect((await compileCustomSignal('manual onboarding', { allowAI: false, signal: ai })).searchQueries.length).toBeGreaterThan(0);
+    expect(ai).not.toHaveBeenCalled();
+  });
+  it('grounded drafts preserve supplied facts and omit unsupported hiring assertions', () => {
+    const lead = { name: 'Acme', vertical: 'company' as const, verifiedFactsOnly: true, whyMatch: 'Acme raised Series A.' };
+    const email = buildEmailDraft(lead, { service: 'automation' });
+    expect(email.body).toContain('Acme raised Series A.');
+    expect(email.body).not.toMatch(/hiring|competitors|following/);
+    expect(buildMessageDraft(lead, { service: 'automation' })).toContain('automation');
+  });
+  it('future-dated evidence cannot satisfy a current event requirement', () => {
+    const evidence = { ...ev('funding'), event_at: new Date(Date.now() + 10 * 86_400_000).toISOString() };
+    const spec = buildSpec({ entity: 'company', criteria: [], raw_query: 'recently funded', signal_required: true, signal_types: ['funding'], signal_recency: '30d' });
+    expect(verifyCandidateClaims({ evidence: [evidence], entityId: 'acme', spec }).ok).toBe(false);
+  });
+  it('a supplied future event cannot prove an occurred signal without a recency window', () => {
+    const evidence = { ...ev('hiring'), event_at: new Date(Date.now() + 10 * 86_400_000).toISOString() };
+    const spec = buildSpec({ entity: 'company', criteria: [], raw_query: 'hiring', signal_required: true, signal_types: ['hiring'] });
+    expect(verifyCandidateClaims({ evidence: [evidence], entityId: 'acme', spec }).reason).toBe('event_at_in_future');
+  });
+  it.each([['Toronto', 'CA', true], ['Austin', 'US', true], ['London', 'GB', false]])('enforces all requested geography alternatives: %s', (location, country, pass) => {
+    const spec = { ...buildSpec({ entity: 'company', criteria: [stated('location', 'USA')], raw_query: 'companies in USA or Canada' }), locations: ['USA', 'Canada'] };
+    const candidate = { ...row(), location: location as string, country: country as string };
+    expect(qualifyLead(candidate, spec, []).disposition === 'qualified').toBe(pass);
+  });
+  it.each([10, 50, 100])('preserves caller requested volume %i when no numeric query is supplied', async desiredCount => {
+    const spec = buildSpec({ entity: 'company', criteria: [stated('industry', 'software')], raw_query: 'software companies' });
+    const result = await runCanonicalSourcePipeline({ spec, desiredCount, adapters: {}, skipEnrichment: true });
+    expect(result.plan.researchPlan.desiredCount).toBe(desiredCount);
+    expect(result.qualified).toHaveLength(0);
+  });
+});

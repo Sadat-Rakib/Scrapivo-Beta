@@ -1,6 +1,7 @@
 import { detectDemandBuckets, scoreUrgency, buildIntentWhy } from "./search/intent-lexicon";
 
 export type Lead = {
+  outreach_drafts?: import("./outreach-draft").PreparedOutreachDraft;
   source: string;
   platform: string;
   platform_label?: string; // friendly badge label, e.g. "Reddit r/forhire [Hiring]"

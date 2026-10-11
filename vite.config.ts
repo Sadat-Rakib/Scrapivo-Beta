@@ -49,8 +49,7 @@ export default defineConfig({
         // Marking them external leaves the specifier untouched in the client
         // chunks instead of substituting a stub with no exports. Nitro/Vercel
         // resolve `node:` natively for the server bundle, which is unaffected.
-        external: (id: string, importer: string | undefined, isResolved: boolean) =>
-          id === "kerberos" || (isResolved === false && id.startsWith("node:")),
+        external: ["kerberos", /^node:/],
       },
     },
   },

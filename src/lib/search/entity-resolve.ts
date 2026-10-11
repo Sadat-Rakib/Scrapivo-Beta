@@ -14,6 +14,7 @@
  *   page classification → **entity resolution** → Spec match → claims → …
  */
 import type { SpecRow } from "@/lib/spec-search.functions";
+import type { SearchSpec } from "./search-spec";
 import type { PageType } from "@/lib/search/canonical-contract";
 import {
   mintProvisionalEntityId,
@@ -24,6 +25,39 @@ import { mergeKnownWithRegistry } from "@/lib/search/entity-registry";
 
 /** Below this, entity_resolved stays false (theorem cannot pass). */
 export const MIN_IDENTITY_CONFIDENCE = 0.7;
+
+/** Literal named identity classifications; employer/client affiliation is not ownership. */
+export function observedInvestorTypes(name: string, quote: string): Array<'fund' | 'angel'> {
+  const escaped = name.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  if (!escaped) return [];
+  const out = new Set<'fund' | 'angel'>();
+  for (const match of quote.matchAll(new RegExp(`(?<![\\p{L}\\p{N}])${escaped}(?![\\p{L}\\p{N}])`, 'giu'))) {
+    const after = quote.slice(match.index! + match[0].length).split(/[.!?;\n]/)[0];
+    const identity = /^\s*(?:[—–:,-]\s*|(?:is|operates as)\s+)(?:an?\s+)?(.+)$/iu.exec(after)?.[1];
+    if (!identity || /^(?:not|never|no|without)\b/i.test(identity)) continue;
+    for (const role of identity.split(/\s+and\s+(?:an?\s+)?/i)) {
+      const nominal = /^((?:[\p{L}\p{N}-]+\s+){0,4}?)(angel investor|venture capital (?:firm|fund)|vc (?:firm|fund)|investment (?:firm|fund)|fund)\b/iu.exec(role);
+      if (!nominal) continue;
+      if (/^\s+(?:partner|employee|staff|advisor|consultant|analyst|associate|principal|manager|director|team\s+member)\b/i.test(role.slice(nominal[0].length))) continue;
+      if (/\b(?:not|no|never|without|partner|employee|staff|advisor|consultant|client|supplier|for|at|of|with|to|in|by|from|invested|backed|interviewed|works?)\b/i.test(nominal[1])) continue;
+      const modifiers = nominal[1].replace(/\b[A-Z][A-Z0-9]{1,7}\b(?!-)/g, '').trim();
+      if (!/^(?:(?:individual|private|active|registered|global|early[ -]stage|pre[ -]seed|seed|growth[ -]stage|late[ -]stage|[\p{L}\p{N}]+-(?:focused|based)|[\p{L}]+(?:ian|an|ese|ish))\s*)*$/iu.test(modifiers)) continue;
+      out.add(/^angel investor$/i.test(nominal[2]) ? 'angel' : 'fund');
+    }
+  }
+  return [...out];
+}
+
+/** Unknown class can be researched, but cannot satisfy an explicitly requested OR class. */
+export function investorScopeState(spec: SearchSpec, row: SpecRow): 'pass' | 'unknown' {
+  const scope = spec.entity === 'investor' ? spec.criteria.find(item => item.field === 'investor_type')?.value : null;
+  if (!scope) return 'pass';
+  const requested = scope.toLowerCase().split(/\s+or\s+|[|/]/).map(value => value.trim());
+  const name = row.title.split(/\s+[—–]\s+/)[0];
+  return (row.evidence ?? []).some(item => item.subject === row.entity_id && !!item.subject &&
+    !!item.source_url && !!item.excerpt && item.evidence_type === 'identity' && item.supports === 'identity' &&
+    observedInvestorTypes(name, item.excerpt).some(type => requested.includes(type))) ? 'pass' : 'unknown';
+}
 
 export type ResolvedEntityType =
   | "person"

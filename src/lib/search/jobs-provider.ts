@@ -13,6 +13,7 @@ import type { JobPosting, JobSourceId } from "@/lib/jobs/types";
 import { makeEvidence } from "@/lib/search/evidence";
 import { isSeekerPhrasing } from "@/lib/search/lead-segments";
 import type { SpecRow } from "@/lib/spec-search.functions";
+import { awaitSearchWork, throwIfAborted } from "./search-run";
 
 /** Keyless, fast board sources + the FreeHire API. No tenant scraping.
  *  "hn" is back in: the registry adapter now consumes the hiring-thread-only
@@ -127,7 +128,9 @@ export async function fetchSpecJobs(args: {
   /** Optional post-filters (Phase 3): matched leniently, never throw. */
   seniority?: string;
   employment?: string;
+  signal?: AbortSignal | null;
 }): Promise<SpecJobsResult> {
+  throwIfAborted(args.signal);
   // The catalog + registry pull the ATS adapter chain -> http-fetch.server ->
   // node:child_process and registry -> node:crypto. Load them dynamically so a
   // client-reachable importer never drags those into the browser bundle.
@@ -140,12 +143,12 @@ export async function fetchSpecJobs(args: {
   ensureJobCatalogRegistered();
   const statuses: SpecJobsResult["sourceStatuses"] = [];
   let fetched = 0;
-  const phase1 = await fetchAllJobSourcesWithMeta({
+  const phase1 = await awaitSearchWork(fetchAllJobSourcesWithMeta({
     query: args.query,
     location: args.location,
     sources: SPEC_JOB_SOURCES,
     limit: args.limit,
-  });
+  }), args.signal);
   statuses.push(...phase1.sourceStatuses);
   fetched += phase1.fetched;
   const matchesFilters = (j: JobPosting): boolean => {
@@ -168,12 +171,13 @@ export async function fetchSpecJobs(args: {
   // thin — cheapest-first ordering applied to providers, same as retrieval
   // tiers. Skipped entirely when phase 1 already fills the page.
   if (kept.length < args.limit) {
-    const phase2 = await fetchAllJobSourcesWithMeta({
+    throwIfAborted(args.signal);
+    const phase2 = await awaitSearchWork(fetchAllJobSourcesWithMeta({
       query: args.query,
       location: args.location,
       sources: SPEC_JOB_ATS_SOURCES,
       limit: args.limit,
-    });
+    }), args.signal);
     statuses.push(...phase2.sourceStatuses);
     fetched += phase2.fetched;
     for (const j of phase2.jobs) {

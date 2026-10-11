@@ -174,7 +174,9 @@ const CITY_COUNTRY_HINT: Record<string, string> = {
 
 const COUNTRY_NAME_ISO: Record<string, string> = {
   usa: "US",
+  "united states": "US",
   uk: "GB",
+  "united kingdom": "GB",
   canada: "CA",
   india: "IN",
   france: "FR",
@@ -188,6 +190,44 @@ const COUNTRY_NAME_ISO: Record<string, string> = {
   netherlands: "NL",
   ireland: "IE",
   sweden: "SE",
+  namibia: "NA",
+  georgia: "GE",
+  philippines: "PH",
+  portugal: "PT",
+  austria: "AT",
+  switzerland: "CH",
+  poland: "PL",
+  brazil: "BR",
+  mexico: "MX",
+  argentina: "AR",
+  chile: "CL",
+  colombia: "CO",
+  peru: "PE",
+  "south africa": "ZA",
+  nigeria: "NG",
+  kenya: "KE",
+  egypt: "EG",
+  morocco: "MA",
+  ghana: "GH",
+  tanzania: "TZ",
+  botswana: "BW",
+  vietnam: "VN",
+  thailand: "TH",
+  malaysia: "MY",
+  indonesia: "ID",
+  pakistan: "PK",
+  "sri lanka": "LK",
+  nepal: "NP",
+  turkey: "TR",
+  greece: "GR",
+  romania: "RO",
+  hungary: "HU",
+  norway: "NO",
+  denmark: "DK",
+  finland: "FI",
+  belgium: "BE",
+  "new zealand": "NZ",
+  israel: "IL",
 };
 
 /**
@@ -851,9 +891,20 @@ function resolveViaGazetteer(core: string, primary: string, qualifier: string | 
       // (a repaired typo, a validated frame) may confirm a bare name.
       const q = reading.qualifier ? qualifierOf(reading.qualifier) : null;
       const iso = reading.qualifier ? q?.iso ?? q?.hier?.country_code ?? null : countryHint?.toUpperCase() ?? null;
-      if (!iso) continue;
-      const city = gazetteer.lookup(reading.city).find((item) => item.iso2 === iso);
-      if (city) return qualifyCity(gazetteerCityEntity(city, scope, false), reading.qualifier) ?? statedEntity(core, scope);
+      if (iso) {
+        const city = gazetteer.lookup(reading.city).find((item) => item.iso2 === iso);
+        if (city) return qualifyCity(gazetteerCityEntity(city, scope, false), reading.qualifier) ?? statedEntity(core, scope);
+        continue;
+      }
+      // Bare name: an unambiguous gazetteer hit (every known city of that
+      // name shares one country — "Windhoek" → NA) resolves with its own
+      // country. Multi-country names ("Paris") stay provisional rather than
+      // guessing a geography the user never stated.
+      const hits = gazetteer.lookup(reading.city);
+      if (hits.length && new Set(hits.map((item) => item.iso2)).size === 1) {
+        const city = hits[0]!;
+        return qualifyCity(gazetteerCityEntity(city, scope, false), reading.qualifier) ?? statedEntity(core, scope);
+      }
       continue;
     }
     if (gazetteer.lookup(reading.city).length) return null; // a real name is not a typo
@@ -1130,7 +1181,7 @@ export function geoById(id: string): GeoEntity | null {
     const iso = id.slice("geo:country:".length).toUpperCase();
     const name =
       Object.entries(COUNTRY_NAME_ISO).find(([, v]) => v === iso)?.[0] ?? iso;
-    return countryEntity(iso, GEO_ALIAS[name] ?? name.toUpperCase());
+    return countryEntity(iso, GEO_ALIAS[name] ?? titlePlace(name));
   }
   return null;
 }

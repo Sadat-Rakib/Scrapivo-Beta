@@ -43,19 +43,26 @@ describe("browser lifecycle trace", () => {
   it("reports each entity rejection with a structured reason", () => {
     const { events, onTrace } = collect();
     const rows = browserEntitiesToRows([
+      // Contract change (Windhoek delivery fix): a paraphrased or fabricated
+      // quote no longer discards an entity whose NAME occurs on the page —
+      // the quote is rebuilt from the page text around that occurrence, so
+      // provenance stays page-backed. Rejection only fires when the name is
+      // absent (Ben Miller) or the provenance is unusable (bad page index).
       { ...entity, identityQuote: "Amina Carter founded a company that is not on this page at all." },
       { ...entity, name: "Ben Miller" },
       { page: 3, kind: "person", name: "Ghost", identityQuote: "Ghost is a founder somewhere." },
       { page: 0, kind: "person", name: "Amina Carter", identityQuote: "Acme, a software-as-a-service company in Toronto, Canada." },
       entity,
     ], [page], onTrace);
-    expect(rows.map((row) => row.title)).toEqual(["Amina Carter"]);
+    // The two salvaged quote-less entries merge on identity (no company
+    // field); `entity` (with a company field) stays a second row.
+    expect(rows.map((row) => row.title)).toEqual(["Amina Carter", "Amina Carter"]);
     const entityEvents = events.filter((event) => event.kind === "entity") as Extract<BrowserTraceEvent, { kind: "entity" }>[];
     expect(entityEvents.map((event) => [event.outcome, event.reason ?? null, event.detail ?? null])).toEqual([
-      ["rejected", "PROVENANCE_INCOMPLETE", "identity_quote_not_on_page"],
+      ["row", null, null],
       ["rejected", "PROVENANCE_INCOMPLETE", "identity_quote_missing_name"],
       ["rejected", "PROVENANCE_INCOMPLETE", "page_index_unknown"],
-      ["rejected", "PROVENANCE_INCOMPLETE", "identity_quote_missing_name"],
+      ["row", null, null],
       ["row", null, null],
     ]);
   });

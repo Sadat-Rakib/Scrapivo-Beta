@@ -57,6 +57,8 @@ export class CustomSignalCompileError extends Error {
 }
 
 export interface CompileCustomSignalOptions {
+  /** Free-only callers use the established deterministic compiler. */
+  allowAI?: boolean;
   /**
    * Injectable LLM (tests/adapters). Receives the full compile prompt and
    * returns the raw model text. Omitted → the production AI router.
@@ -117,9 +119,7 @@ function extractJsonBlock(raw: string): Record<string, unknown> | null {
 
 function coerceStringArray(v: unknown): string[] {
   if (!Array.isArray(v)) return [];
-  return v
-    .map((x) => (typeof x === "string" ? x.trim() : ""))
-    .filter((s) => s.length > 0);
+  return v.map((x) => (typeof x === "string" ? x.trim() : "")).filter((s) => s.length > 0);
 }
 
 /**
@@ -145,8 +145,7 @@ function fromLlmOutput(raw: string): CompiledCustomSignal | null {
   const parsed = CustomSignalSchema.safeParse(candidate);
   if (!parsed.success) return null;
   // Uselessly empty (e.g. the model answered only negatives) → fallback.
-  if (!parsed.data.observableIndicators.length || !parsed.data.searchQueries.length)
-    return null;
+  if (!parsed.data.observableIndicators.length || !parsed.data.searchQueries.length) return null;
   return parsed.data;
 }
 
@@ -155,21 +154,102 @@ function fromLlmOutput(raw: string): CompiledCustomSignal | null {
 // ---------------------------------------------------------------------------
 
 const STOPWORDS = new Set([
-  "a", "an", "the", "and", "or", "but", "with", "without", "that", "who",
-  "whom", "whose", "which", "for", "of", "in", "on", "at", "to", "from",
-  "by", "about", "into", "over", "under", "is", "are", "was", "were", "be",
-  "been", "being", "have", "has", "had", "do", "does", "did", "will",
-  "would", "should", "can", "could", "may", "might", "their", "there",
-  "they", "them", "its", "it", "this", "these", "those", "using", "use",
-  "uses", "still", "yet", "also", "very", "really", "some", "any", "all",
+  "a",
+  "an",
+  "the",
+  "and",
+  "or",
+  "but",
+  "with",
+  "without",
+  "that",
+  "who",
+  "whom",
+  "whose",
+  "which",
+  "for",
+  "of",
+  "in",
+  "on",
+  "at",
+  "to",
+  "from",
+  "by",
+  "about",
+  "into",
+  "over",
+  "under",
+  "is",
+  "are",
+  "was",
+  "were",
+  "be",
+  "been",
+  "being",
+  "have",
+  "has",
+  "had",
+  "do",
+  "does",
+  "did",
+  "will",
+  "would",
+  "should",
+  "can",
+  "could",
+  "may",
+  "might",
+  "their",
+  "there",
+  "they",
+  "them",
+  "its",
+  "it",
+  "this",
+  "these",
+  "those",
+  "using",
+  "use",
+  "uses",
+  "still",
+  "yet",
+  "also",
+  "very",
+  "really",
+  "some",
+  "any",
+  "all",
 ]);
 
 /** Entity kinds that are never informative indicators on their own. */
 const GENERIC_NOUNS = new Set([
-  "company", "companies", "business", "businesses", "people", "person",
-  "founder", "founders", "startup", "startups", "team", "teams", "client",
-  "clients", "customer", "customers", "firm", "firms", "agency", "agencies",
-  "owner", "owners", "shop", "shops", "store", "stores", "organization",
+  "company",
+  "companies",
+  "business",
+  "businesses",
+  "people",
+  "person",
+  "founder",
+  "founders",
+  "startup",
+  "startups",
+  "team",
+  "teams",
+  "client",
+  "clients",
+  "customer",
+  "customers",
+  "firm",
+  "firms",
+  "agency",
+  "agencies",
+  "owner",
+  "owners",
+  "shop",
+  "shops",
+  "store",
+  "stores",
+  "organization",
   "organizations",
 ]);
 
@@ -202,8 +282,7 @@ const LEXICON: Record<string, string[]> = {
 /** Simple plural → singular (enough for the lexicon; no real stemmer). */
 function singularize(token: string): string {
   if (token.length >= 5 && token.endsWith("ies")) return `${token.slice(0, -3)}y`;
-  if (token.length >= 4 && token.endsWith("s") && !token.endsWith("ss"))
-    return token.slice(0, -1);
+  if (token.length >= 4 && token.endsWith("s") && !token.endsWith("ss")) return token.slice(0, -1);
   return token;
 }
 
@@ -276,7 +355,7 @@ function fallbackSearchQueries(text: string, indicators: string[]): string[] {
   return out;
 }
 
-function deterministicFallback(text: string): CompiledCustomSignal {
+export function deterministicFallback(text: string): CompiledCustomSignal {
   const indicators = fallbackIndicators(text);
   return {
     observableIndicators: indicators,
@@ -306,17 +385,17 @@ export async function compileCustomSignal(
       `custom signal text must be at least 3 characters (got ${text.length})`,
     );
   }
+  if (opts.allowAI === false) return deterministicFallback(text);
 
-  const timeoutMs = Math.max(
-    50,
-    Math.floor(opts.signalTimeoutMs ?? DEFAULT_SIGNAL_TIMEOUT_MS),
-  );
+  const timeoutMs = Math.max(50, Math.floor(opts.signalTimeoutMs ?? DEFAULT_SIGNAL_TIMEOUT_MS));
   const prompt = buildCompilePrompt(text);
 
   let timer: ReturnType<typeof setTimeout> | null = null;
   try {
     const run: Promise<string> = opts.signal
-      ? Promise.resolve().then(() => opts.signal!(prompt)).then((r) => r ?? "")
+      ? Promise.resolve()
+          .then(() => opts.signal!(prompt))
+          .then((r) => r ?? "")
       : (async () => {
           const { aiComplete } = await import("@/lib/ai/router.server");
           return aiComplete({

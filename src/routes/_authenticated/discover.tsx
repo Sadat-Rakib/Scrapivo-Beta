@@ -30,7 +30,10 @@ import type { CompanyRow, PersonRow, LocalBusinessRow } from "@/lib/search/lead-
 import { filterBarModel, relevanceChips, type TurnFilter } from "@/lib/search/relevance";
 import { specRowsToCandidates } from "@/lib/intent/spec-candidates";
 import { LeadDetailPanel } from "@/components/lead-detail-panel";
-import { DiscoverWelcomeHero, GUIDED_SEARCH_TEXT } from "@/components/discover/discover-welcome-hero";
+import {
+  DiscoverWelcomeHero,
+  GUIDED_SEARCH_TEXT,
+} from "@/components/discover/discover-welcome-hero";
 import { ActiveSearchSession, isSearchAbortError } from "@/lib/search/search-run-client";
 import { cancelSearchRun } from "@/lib/search/search-run.functions";
 import {
@@ -38,7 +41,12 @@ import {
   viewToLegacyLead,
   viewToLocalBusinessRow,
 } from "@/lib/search/qualified-lead-view";
-import { enrichZeroNarrative, outcomeUi, shouldSurfaceOutcome, zeroResultsNarrative } from "@/lib/search/outcome-ui";
+import {
+  enrichZeroNarrative,
+  outcomeUi,
+  shouldSurfaceOutcome,
+  zeroResultsNarrative,
+} from "@/lib/search/outcome-ui";
 
 import {
   UnifiedComposer,
@@ -358,7 +366,9 @@ function DiscoverPage() {
   const [zeroNarrative, setZeroNarrative] = useState<string | null>(null);
   // Streamed-vs-final reconciliation: leads shown live while researching that
   // the final list does not include, each with the reason (never a silent drop).
-  const [streamedMissing, setStreamedMissing] = useState<Array<{ key: string; title: string; label: string }>>([]);
+  const [streamedMissing, setStreamedMissing] = useState<
+    Array<{ key: string; title: string; label: string }>
+  >([]);
   const [activityExpanded, setActivityExpanded] = useState(false);
   const [queryType, setQueryType] = useState<string | null>(null);
   // Clarifying-question flow. Questions are computed BEFORE the search runs and
@@ -393,6 +403,7 @@ function DiscoverPage() {
   const [contactByKey, setContactByKey] = useState<Record<string, ResolvedContactInfo>>({});
   const [selectedEntity, setSelectedEntity] = useState<SelectedEntity | null>(null);
   type GenTarget = {
+    preparedDrafts?: import("@/lib/outreach-draft").PreparedOutreachDraft;
     kind: "email" | "message";
     vertical: "investor" | "company" | "local" | "job";
     name: string;
@@ -423,6 +434,7 @@ function DiscoverPage() {
         kind,
         vertical: "investor",
         name: p.name,
+        preparedDrafts: p.lead.outreach_drafts,
         firm: p.company_hint,
         role: p.title_hint ?? p.role_hint ?? undefined,
         location: p.location_hint ?? undefined,
@@ -437,6 +449,7 @@ function DiscoverPage() {
         kind,
         vertical: "local",
         name: b.name,
+        preparedDrafts: b.outreach_drafts,
         category: b.category,
         address: b.address,
         location: b.address?.split(",").slice(-2, -1)[0]?.trim(),
@@ -452,6 +465,7 @@ function DiscoverPage() {
         kind,
         vertical: "company",
         name: c.name,
+        preparedDrafts: c.leads.find((lead) => lead.outreach_drafts)?.outreach_drafts,
         firm: c.name,
         whyNow: c.why_now,
         platform: c.platforms?.[0],
@@ -464,6 +478,7 @@ function DiscoverPage() {
       kind,
       vertical: "local",
       name: row.name,
+      preparedDrafts: row.outreach_drafts,
       category: row.category,
       address: row.address,
       location: row.address?.split(",").slice(-2, -1)[0]?.trim(),
@@ -480,6 +495,7 @@ function DiscoverPage() {
       vertical: "company",
       name: row.name,
       firm: row.name,
+      preparedDrafts: row.leads.find((lead) => lead.outreach_drafts)?.outreach_drafts,
       whyNow: row.why_now,
       platform: row.platforms?.[0],
       email: contactByKey[`co:${row.key}`]?.email,
@@ -492,6 +508,7 @@ function DiscoverPage() {
       vertical: "investor",
       name: row.name,
       firm: row.company_hint,
+      preparedDrafts: row.lead.outreach_drafts,
       role: row.title_hint ?? row.role_hint ?? undefined,
       location: row.location_hint ?? undefined,
       email: row.inline_contacts?.emails?.[0],
@@ -568,7 +585,9 @@ function DiscoverPage() {
   // Accumulated panel answers for the active turn: partial answers persist
   // across clarify rounds so answering Q1 then Search on Q2 never loses Q1.
   const pendingTurnAnswersRef = useRef<Record<string, string>>({});
-  const pendingFrameRef = useRef<import("@/lib/understanding/frame").UnderstandingFrame | null>(null);
+  const pendingFrameRef = useRef<import("@/lib/understanding/frame").UnderstandingFrame | null>(
+    null,
+  );
   // Stage 1 structured attachments: the composer stages uploaded+registered
   // ids here; beginSearch hands them to the turn, and they ride every round
   // of that turn so clarification rounds keep their input context.
@@ -588,7 +607,16 @@ function DiscoverPage() {
   const [runInFlight, setRunInFlight] = useState(false);
   const [browserProgressRun, setBrowserProgressRun] = useState<string | null>(null);
   type StreamedLead = import("@/lib/search/search-browser-progress.server").StreamedLead;
-  const [browserProgressEvents, setBrowserProgressEvents] = useState<Array<{ id: number; action: string; source?: string; detail?: string; count?: number | string; row?: StreamedLead }>>([]);
+  const [browserProgressEvents, setBrowserProgressEvents] = useState<
+    Array<{
+      id: number;
+      action: string;
+      source?: string;
+      detail?: string;
+      count?: number | string;
+      row?: StreamedLead;
+    }>
+  >([]);
   // M11: only the active search_run_id may mutate results/loading/outcome UI.
   const searchSessionRef = useRef<ActiveSearchSession | null>(null);
   useEffect(() => {
@@ -598,8 +626,11 @@ function DiscoverPage() {
     let timer: number | undefined;
     const poll = async () => {
       try {
-        const result = await getBrowserProgress({ data: { search_run_id: browserProgressRun, after: cursor } });
-        if (!active || !searchSessionRef.current?.accept({ search_run_id: browserProgressRun }).ok) return;
+        const result = await getBrowserProgress({
+          data: { search_run_id: browserProgressRun, after: cursor },
+        });
+        if (!active || !searchSessionRef.current?.accept({ search_run_id: browserProgressRun }).ok)
+          return;
         if (result.events.length) {
           cursor = result.events[result.events.length - 1].id;
           setBrowserProgressEvents((events) => [...events, ...result.events].slice(-12));
@@ -610,7 +641,10 @@ function DiscoverPage() {
       }
     };
     void poll();
-    return () => { active = false; if (timer) window.clearTimeout(timer); };
+    return () => {
+      active = false;
+      if (timer) window.clearTimeout(timer);
+    };
   }, [browserProgressRun, getBrowserProgress]);
   const getSearchSession = () => {
     if (!searchSessionRef.current) {
@@ -781,7 +815,11 @@ function DiscoverPage() {
           if (turnId === pendingTurnIdRef.current) {
             const zeroOutcome = outcomeUi(res.outcome, {
               superseded: session.wasSuperseded(res.search_run_id),
-              detail: res.boundary_message ?? zeroResultsNarrative(res.retrievalTrace) ?? res.retrievalTrace?.sourceHealth?.summary ?? null,
+              detail:
+                res.boundary_message ??
+                zeroResultsNarrative(res.retrievalTrace) ??
+                res.retrievalTrace?.sourceHealth?.summary ??
+                null,
             });
             if (shouldSurfaceOutcome(zeroOutcome)) toast.info(zeroOutcome.message!);
           }
@@ -887,7 +925,11 @@ function DiscoverPage() {
             superseded: session.wasSuperseded(res.search_run_id),
             // Raw provider diagnostics name internal infrastructure; only the
             // user-safe source-health sentence may reach the toast.
-            detail: res.boundary_message ?? zeroResultsNarrative(res.retrievalTrace) ?? res.retrievalTrace?.sourceHealth?.summary ?? null,
+            detail:
+              res.boundary_message ??
+              zeroResultsNarrative(res.retrievalTrace) ??
+              res.retrievalTrace?.sourceHealth?.summary ??
+              null,
           })
         : null;
       setZeroNarrative(
@@ -1005,7 +1047,10 @@ function DiscoverPage() {
     setIntentProgress({ done: 0, total: candidates.length });
     let strategy: IntentStrategy;
     try {
-      strategy = await getStrategy({ data: { offer: trimmedOffer, entity }, signal: controller.signal });
+      strategy = await getStrategy({
+        data: { offer: trimmedOffer, entity },
+        signal: controller.signal,
+      });
     } catch {
       if (intentRunRef.current === runId) setIntentProgress(null);
       return; // Strategy failed: base results stand, no intent layer.
@@ -1016,7 +1061,10 @@ function DiscoverPage() {
     for (const c of candidates) {
       if (intentRunRef.current !== runId) return; // superseded
       try {
-        const res = await discoverIntent({ data: { candidate: c, strategy, offer: trimmedOffer }, signal: controller.signal });
+        const res = await discoverIntent({
+          data: { candidate: c, strategy, offer: trimmedOffer },
+          signal: controller.signal,
+        });
         done += 1;
         if (intentRunRef.current !== runId) return;
         setIntentProgress({ done, total: candidates.length });
@@ -1088,7 +1136,8 @@ function DiscoverPage() {
     if (invStage && invStage !== "any") out.investor_stage = invStage;
     if (invCheck && invCheck !== "any") out.investor_check = invCheck;
     if (invSector && invSector !== "any") out.investor_sector = invSector;
-    if (investorSector && investorSector.toLowerCase() !== "any") out.investor_sector = investorSector;
+    if (investorSector && investorSector.toLowerCase() !== "any")
+      out.investor_sector = investorSector;
     // Mode/offer ride along as stated criteria (ignored by retrieval and
     // validation; consumed by Intent in Batch 4). Phase 1.3: the server mode
     // gate blocks retrieval until mode is stated (one question), and asks the
@@ -1311,7 +1360,6 @@ function DiscoverPage() {
   const shownLeads = leads;
   const shownCompanies = companies;
   const shownPeople = people;
-
 
   const chatMut = useMutation({
     mutationFn: async (messages: ChatTurn[]) => chat({ data: { messages } }),
@@ -1560,36 +1608,43 @@ function DiscoverPage() {
     if (!trimmed && pendingAttachmentsRef.current.length === 0) return;
     const pendingId = pendingTurnIdRef.current;
     const pendingQuestion = clarifyQs[0];
-    const startsNewRequest = /^(?:find|search|show|look for|looking for)\b/i.test(trimmed) ||
-      (/^research\b/i.test(trimmed) && /\b(?:in|for|about|businesses|companies|people|jobs|investors)\b/i.test(trimmed));
-      if (pendingQuery && pendingId && pendingQuestion && !startsNewRequest) {
-        const field = ({
-          entity_location: "location",
-          entity_category: "category",
-          entity_industry: "industry",
-          entity_role: "role",
-          entity_mode: "mode",
-          entity_purpose: "purpose",
-          entity_salary: "salary_min",
-          entity_size: "employee_count",
-          entity_revenue: "revenue",
-          entity_relation: "relation.type",
-          entity_scope: "target.scope",
-        } as Record<string, string>)[pendingQuestion.id] ?? pendingQuestion.id;
-        setTurns((prev) => prev.map((turn) => turn.id === pendingId
-          ? { ...turn, text: `${turn.text}\n${trimmed}` }
-          : turn));
-        setClarifyQs([]);
-        setPendingQuery(null);
-        // Confirm gate: the combined card was shown — record acceptance so the
-        // confirm gate never re-fires on this frame.
-        setConfirmSummary(null);
-        await runSpecBranch(pendingQuery, pendingId, {
-          ...(confirmSummary ? { confirm: "confirmed" } : {}),
-          [field]: trimmed,
-        });
-        return;
-      }
+    const startsNewRequest =
+      /^(?:find|search|show|look for|looking for)\b/i.test(trimmed) ||
+      (/^research\b/i.test(trimmed) &&
+        /\b(?:in|for|about|businesses|companies|people|jobs|investors)\b/i.test(trimmed));
+    if (pendingQuery && pendingId && pendingQuestion && !startsNewRequest) {
+      const field =
+        (
+          {
+            entity_location: "location",
+            entity_category: "category",
+            entity_industry: "industry",
+            entity_role: "role",
+            entity_mode: "mode",
+            entity_purpose: "purpose",
+            entity_salary: "salary_min",
+            entity_size: "employee_count",
+            entity_revenue: "revenue",
+            entity_relation: "relation.type",
+            entity_scope: "target.scope",
+          } as Record<string, string>
+        )[pendingQuestion.id] ?? pendingQuestion.id;
+      setTurns((prev) =>
+        prev.map((turn) =>
+          turn.id === pendingId ? { ...turn, text: `${turn.text}\n${trimmed}` } : turn,
+        ),
+      );
+      setClarifyQs([]);
+      setPendingQuery(null);
+      // Confirm gate: the combined card was shown — record acceptance so the
+      // confirm gate never re-fires on this frame.
+      setConfirmSummary(null);
+      await runSpecBranch(pendingQuery, pendingId, {
+        ...(confirmSummary ? { confirm: "confirmed" } : {}),
+        [field]: trimmed,
+      });
+      return;
+    }
     // User bubble first: the submitted text lives in the conversation from
     // this instant, independent of whatever happens downstream. Results are
     // attached to the owning turn by onSuccess (turn-owned transcript) — no
@@ -1604,7 +1659,10 @@ function DiscoverPage() {
     pendingAttachmentsRef.current = [];
     intentRunRef.current += 1; // cancel any in-flight intent enrichment
     setIntentProgress(null);
-    setTurns((prev) => [...prev, { id: newTurnId, text: trimmed || "(attachments only)", ts: Date.now() }]);
+    setTurns((prev) => [
+      ...prev,
+      { id: newTurnId, text: trimmed || "(attachments only)", ts: Date.now() },
+    ]);
     // Fold state derives at render (open = explicitly opened, else the
     // latest turn), so no sync needed here; manual toggles persist.
     // New research starts with a clean screen — never leave the previous
@@ -1915,7 +1973,13 @@ function DiscoverPage() {
                                     onClick={() => {
                                       const tid = pendingTurnIdRef.current ?? "";
                                       const off = specOffsetRef.current[tid] ?? 0;
-                                      void runSpecBranch(activeQuery ?? "", tid, {}, true, off).catch((e: Error) =>
+                                      void runSpecBranch(
+                                        activeQuery ?? "",
+                                        tid,
+                                        {},
+                                        true,
+                                        off,
+                                      ).catch((e: Error) =>
                                         toast.error(friendlyErrorText(e, "Could not load more")),
                                       );
                                     }}
@@ -2040,7 +2104,8 @@ function DiscoverPage() {
                                     : `No verified matches found for "${displaySearchLabel(t.text)}" yet.`}
                                 </div>
                                 <div>
-                                  Try broadening the search — remove a constraint, add a location, or search without a filter.
+                                  Try broadening the search — remove a constraint, add a location,
+                                  or search without a filter.
                                 </div>
                               </div>
                             )}
@@ -2133,7 +2198,10 @@ function DiscoverPage() {
                       </div>
                     )}
                     {activeVertical !== "local" && (
-                      <div>Try broadening the search — remove a constraint, add a location, or search without a filter.</div>
+                      <div>
+                        Try broadening the search — remove a constraint, add a location, or search
+                        without a filter.
+                      </div>
                     )}
                     {suggestions.length > 0 && (
                       <div className="space-y-2">
@@ -2209,16 +2277,28 @@ function DiscoverPage() {
                     The old floating pill is removed; the accessible name
                     "Stop search" is preserved for the cancel harness. */}
                 {browserProgressEvents.length > 0 && (
-                  <div className={`mt-2 border-t border-border pt-2 space-y-1 ${activityExpanded ? "max-h-44 overflow-y-auto" : ""}`} aria-live="polite" aria-label="Live research activity">
+                  <div
+                    className={`mt-2 border-t border-border pt-2 space-y-1 ${activityExpanded ? "max-h-44 overflow-y-auto" : ""}`}
+                    aria-live="polite"
+                    aria-label="Live research activity"
+                  >
                     {(activityExpanded
                       ? browserProgressEvents
                       : browserProgressEvents.slice(-3)
                     ).map((event) => (
-                      <div key={event.id} className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <div
+                        key={event.id}
+                        className="flex items-center gap-2 text-xs text-muted-foreground"
+                      >
                         <span className="size-1.5 rounded-full bg-primary shrink-0" />
                         <span>
-                          {event.action}{event.source ? ` · ${event.source}` : ""}
-                          {event.count != null ? ` · ${event.count}` : event.detail ? ` · ${event.detail}` : ""}
+                          {event.action}
+                          {event.source ? ` · ${event.source}` : ""}
+                          {event.count != null
+                            ? ` · ${event.count}`
+                            : event.detail
+                              ? ` · ${event.detail}`
+                              : ""}
                         </span>
                       </div>
                     ))}
@@ -2242,9 +2322,16 @@ function DiscoverPage() {
                       );
                       if (verifiedEvents.length === 0) return null;
                       return (
-                        <div className="space-y-0.5 pt-1" aria-live="polite" aria-label="Verified while researching">
+                        <div
+                          className="space-y-0.5 pt-1"
+                          aria-live="polite"
+                          aria-label="Verified while researching"
+                        >
                           {verifiedEvents.slice(-4).map((event) => (
-                            <div key={`v${event.id}`} className="flex items-center gap-2 text-xs text-emerald-400/90">
+                            <div
+                              key={`v${event.id}`}
+                              className="flex items-center gap-2 text-xs text-emerald-400/90"
+                            >
                               <span>✓</span>
                               <span className="truncate">
                                 {event.row?.title}
@@ -2447,6 +2534,8 @@ function DiscoverPage() {
       {showTour && <GuidedTour userId={userId} onDone={() => setTourSeen(true)} />}
       {genTarget && (
         <GenerateModal
+          key={`${genTarget.vertical}:${genTarget.name}:${genTarget.kind}`}
+          preparedDrafts={genTarget.preparedDrafts}
           lead={{
             vertical: genTarget.vertical,
             name: genTarget.name,

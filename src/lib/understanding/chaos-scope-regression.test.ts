@@ -76,7 +76,7 @@ describe('chaos scope boundaries', () => {
     const frame = read(raw, true);
     if (raw.includes('UK + Ireland')) frame.location = { value: 'UK', canonical: 'UK', raw: 'in UK', scope: 'in', radius: null, radius_unit: null, country_code: 'GB', confidence: .9 };
     const normalized = normalizeSearchFrame(frame);
-    expect(frameToSearchSpec(frame).locations.length).toBeGreaterThanOrEqual(2);
+    expect(frameToSearchSpec(frame).locations?.length ?? 0).toBeGreaterThanOrEqual(2);
     expect(normalized.required_fields.some(f => ['email', 'phone', 'website', 'linkedin'].includes(f.value))).toBe(false);
     expect([...normalized.preferred_fields, ...normalized.enrichment_requirements].some(f => f.value === 'email')).toBe(true);
   });

@@ -7,7 +7,7 @@
  *
  * Readers are injectable so tests prove logic without S3 credentials.
  */
-import { createServerFn } from "@tanstack/react-start";
+import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireMyAuth } from "@/integrations/my-supabase/auth-middleware";
 import { extractSearchSpec } from "@/lib/search/search-spec-extract";
@@ -17,13 +17,15 @@ import type { SearchSpec } from "@/lib/search/search-spec";
 import type { UnderstandingFrame } from "@/lib/understanding/frame";
 import type { DbHitMeta } from "@/lib/canonical/read-parquet.server";
 import { personRoleMatches } from "@/lib/canonical/people.server";
-import { companyCategoryMatches } from "@/lib/canonical/companies.server";
-import { criterionPhraseMatches } from "@/lib/search/criterion-match";
+import { companyCategoryMatches, companyCountryCode } from "@/lib/canonical/companies.server";
+import { criterionCraftMatches, criterionPhraseMatches } from "@/lib/search/criterion-match";
 import { craftMatches, tradeFamiliesOf } from "@/lib/canonical/businesses.server";
 import type { searchPeopleDB } from "@/lib/canonical/people.server";
 import type { searchCompaniesDB } from "@/lib/canonical/companies.server";
 import type { searchBusinessesDB } from "@/lib/canonical/businesses.server";
 import type { searchInvestorsDB } from "@/lib/canonical/investors.server";
+import { serviceBoundaryState, softwareActivityRequested } from "@/lib/search/service-boundary";
+import { investorScopeState } from "@/lib/search/entity-resolve";
 import { COUNTRY_ISO } from "@/lib/search/search-spec-extract";
 import { countryHintForCity, locationSatisfies, resolveCanonicalLocation } from "@/lib/search/location-resolver";
 import { useIndexedSearch, useObjectSearchIndex } from "@/lib/search/flag";
@@ -158,6 +160,7 @@ export interface SpecRow {
   soft_duplicate?: boolean;
   /** Phase 1B/C: observed evidence backing signal/opportunity/intent. */
   evidence?: import("@/lib/search/evidence").Evidence[];
+  outreach_drafts?: { email_subject: string; email_body: string; dm: string };
   /** Phase 1C: request↔entity fit (0..1). */
   relevance_score?: number | null;
   /** Phase 1C: seeking intensity from evidence (0..1). */
@@ -363,13 +366,18 @@ async function loadCoverageMatrix(): Promise<CoverageMatrix> {
 /** Bounded tier execution: a hung source can delay one query by at most its
  *  budget, never the whole search. Timeout errors propagate to the caller,
  *  which logs the stage and continues to the next tier. */
-function withTierTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
+function withTierTimeout<T>(p: Promise<T>, ms: number, label: string, onTimeout?: () => void, signal?: AbortSignal | null): Promise<T> {
   let t: ReturnType<typeof setTimeout> | undefined;
+  let abort = () => {};
   const timeout = new Promise<never>((_, reject) => {
-    t = setTimeout(() => reject(new Error(`tier timeout: ${label} after ${ms}ms`)), ms);
+    abort = () => { onTimeout?.(); reject(new Error("SEARCH_CANCELLED")); };
+    signal?.addEventListener("abort", abort, { once: true });
+    if (signal?.aborted) abort();
+    t = setTimeout(() => { onTimeout?.(); reject(new Error(`tier timeout: ${label} after ${ms}ms`)); }, ms);
   });
   return Promise.race([p, timeout]).finally(() => {
     if (t !== undefined) clearTimeout(t);
+    signal?.removeEventListener("abort", abort);
   });
 }
 
@@ -439,6 +447,8 @@ function specCategoryMatches(rowCategory: string | null | undefined, specCategor
 }
 
 export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
+  if (investorScopeState(spec, row) !== "pass") return false;
+  if (serviceBoundaryState(spec, row) !== "pass") return false;
   if (violatesExclusion(spec, row)) return false;
   if ((spec.locations?.length ?? 0) > 1) return spec.locations!.some((place) =>
     rowSatisfiesSpec({
@@ -460,11 +470,20 @@ export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
     const cat = fieldOf(spec, "category");
     const location = fieldOf(spec, "location");
     const requestedGeo = location ? resolveCanonicalLocation(location) : null;
+    // The judge also reads the row's own subject-bound evidence: research
+    // exists to establish exactly these facts, so an identity excerpt that
+    // names the place or the trade is proof, not just row fields.
+    const subject = row.entity_id ?? row.key ?? "";
+    const evidenceText = (row.evidence ?? [])
+      .filter((item) => item.excerpt && (!subject || item.subject === subject))
+      .map((item) => item.excerpt)
+      .join(" · ");
+    const proofText = `${row.detail ?? ""} · ${evidenceText}`;
     if (
       cat &&
       !specCategoryMatches(row.category, cat) &&
       !like(row.title, cat) &&
-      !like(row.detail, cat)
+      !criterionCraftMatches(proofText, cat)
     )
       return false;
     const model = fieldOf(spec, "business_model");
@@ -477,15 +496,21 @@ export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
     )
       return false;
     if (location && requestedGeo?.kind === "metro") {
-      if (!locationSatisfies(row.location ?? row.detail ?? "", requestedGeo)) return false;
+      const hasLocationField = !!(row.location && row.location.trim());
+      if (!locationSatisfies(hasLocationField ? row.location! : proofText, requestedGeo)) return false;
     } else if (location) {
+      // A populated location FIELD is the row's own claim and wins; evidence
+      // excerpts only prove the place when the row states none (a stale or
+      // unrelated excerpt must not override a contradicting field).
+      const hasLocationField = !!(row.location && row.location.trim()) || !!(row.country && row.country.trim());
+      const locationText = hasLocationField ? `${row.location ?? ""} ${row.detail ?? ""}` : proofText;
       const isoList = COUNTRY_ISO[location.toLowerCase().trim()];
       if (isoList) {
         // Country query ("Canada"): strict ISO gate. DB stores "CA",
         // never "Canada", so text match alone rejects everything.
         const rowIso = (row.country ?? "").toLowerCase().trim();
         const isoOk = isoList.some((s) => rowIso === s || (rowIso && rowIso.includes(s)));
-        const nameOk = like(row.location ?? "", location) || like(row.detail, location);
+        const nameOk = like(locationText, location);
         if (!isoOk && !nameOk) return false;
       } else {
         // City query: when the city maps to a known country, the row must
@@ -496,14 +521,13 @@ export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
         const rowIso = (row.country ?? "").toLowerCase().trim();
         if (hint) {
           const isoOk = !!rowIso && rowIso === hint.toLowerCase();
-          const nameOk = like(row.location ?? "", location) || like(row.detail, location);
+          const nameOk = like(locationText, location);
           // The city is proof; a populated country is only a disambiguation
           // guard. Providers such as OSM often omit country on exact-city rows.
           if (!nameOk || (rowIso.length > 0 && !isoOk)) return false;
         } else if (
           !like(row.country ?? "", location) &&
-          !like(row.location ?? "", location) &&
-          !like(row.detail, location) &&
+          !like(locationText, location) &&
           !(row.country ?? row.location)
         )
           return false;
@@ -616,7 +640,13 @@ const ROLE_WORD_RE =
  * QA: 149 rows filtered with rejectReasons {} — invisible losses).
  */
 /** Terminal research failures retain the exact requirement and evidence state. */
-export function postResearchRejectReason(spec: SearchSpec, row: SpecRow): string {
+export function postResearchRejectReason(spec: SearchSpec, row: SpecRow): string | null {
+  // A row the full judge accepts has no reject reason — the per-criterion
+  // decomposition below is only meaningful for rows that failed.
+  if (rowSatisfiesSpec(spec, row)) return null;
+  if (investorScopeState(spec, row) !== "pass") return "UNPROVEN_CRITERION:investor_type=UNKNOWN";
+  if (serviceBoundaryState(spec, row) !== "pass")
+    return softwareActivityRequested(spec) ? "UNPROVEN_CRITERION:industry=UNKNOWN" : "UNPROVEN_CRITERION:product_company=UNKNOWN";
   const aliases: Record<string, string> = { investor_sector: "sector", investor_stage: "stage", investor_check: "check" };
   const failures = spec.criteria.filter((criterion) => criterion.stated &&
     !criterion.field.startsWith("exclude_") &&
@@ -721,13 +751,29 @@ export function rowSatisfyRejectReason(spec: SearchSpec, row: SpecRow): string |
       return "rejected_location";
     return null;
   }
-  // investor rows are structured enough that strict validation is the
-  // contradiction judge; no researchable-unknown gap has been shown there.
+  if (spec.entity === 'investor') {
+    const location = fieldOf(spec, 'location');
+    if (location && (row.location || row.country) && !locationOk(row.country, row.location, '', location)) return 'rejected_location';
+    const sector = fieldOf(spec, 'investor_sector') ?? fieldOf(spec, 'industry');
+    if (sector && (row.sector || row.industry) && !criterionPhraseMatches(row.sector ?? row.industry, sector)) return 'rejected_sector';
+    for (const [field, observed] of [['investor_stage', row.stage], ['investor_check', row.check]] as const) {
+      if (fieldOf(spec, field) && observed && !rowSatisfiesSpec({ ...spec, locations: undefined, criteria: spec.criteria.filter(c => c.field === field) }, row)) return `rejected_${field}`;
+    }
+    return null;
+  }
   return rowSatisfiesSpec(spec, row) ? null : "rejected_spec";
 }
 
 export function rowCouldSatisfySpec(spec: SearchSpec, row: SpecRow): boolean {
   return rowSatisfyRejectReason(spec, row) === null;
+}
+
+/** Cheap pre-screen reuses the established strict/unknown matching gates. */
+export function preliminaryEligibility(spec: SearchSpec, row: SpecRow, duplicate = false): 'ELIGIBLE' | 'RESEARCHABLE_UNKNOWN' | 'CONTRADICTED' | 'DUPLICATE' {
+  if (duplicate) return 'DUPLICATE';
+  if (spec.entity !== 'unknown' && row.kind && row.kind !== spec.entity && row.entity_resolved === true) return 'CONTRADICTED';
+  if (!rowCouldSatisfySpec(spec, row)) return 'CONTRADICTED';
+  return rowSatisfiesSpec(spec, row) ? 'ELIGIBLE' : 'RESEARCHABLE_UNKNOWN';
 }
 
 /**
@@ -1073,6 +1119,8 @@ async function fetchS3Tier(
       category: category ?? industry ?? undefined,
       location: location ?? undefined,
       limit,
+      signal: params.signal,
+      deadline: params.deadline,
     });
     return {
       rows: r.rows.map((c, i) => {
@@ -1094,13 +1142,14 @@ async function fetchS3Tier(
           website_url: c.website,
           category: c.category,
           location: c.location,
+          country: companyCountryCode(c.location),
           opportunity: fieldOf(spec, "opportunity"),
           // Same contract as stored business/people rows: the stored record
           // is the evidence a delivered lead shows.
           evidence: [makeEvidence({
             source_url: c.website?.trim() || `db://companies/${encodeURIComponent(entity_id)}`,
             source_type: "db",
-            excerpt: [c.company_name, c.category, c.location].filter(has).join(" · "),
+              excerpt: [c.company_name, c.category, c.location, c.description].filter(has).join(" · "),
             evidence_type: "identity",
             supports: "identity",
             extraction_method: "stored_company_record",
@@ -1176,8 +1225,11 @@ async function fetchS3Tier(
         const rowSectors = (v.sectors ?? []).join(" ");
         const rowStages = (v.stages ?? []).join(" ");
         const entity_id = `db:investor:${(v.name ?? "x").toLowerCase().replace(/\s+/g, "-").slice(0, 48)}:${i}`;
+        const sourceUrl = v.linkedin?.trim() || v.website?.trim() || `db://investors/${encodeURIComponent(entity_id)}`;
         return {
           kind: "investor" as const,
+          role: v.role,
+          company: v.firm,
           key: entity_id,
           entity_id,
           entity_resolved: true,
@@ -1201,21 +1253,16 @@ async function fetchS3Tier(
           url: v.website ?? v.linkedin,
           website_url: v.website,
           profile_url: v.linkedin,
+          source_url: sourceUrl,
           evidence: [makeEvidence({
-            source_url: v.linkedin?.trim() || v.website?.trim() || `db://investors/${encodeURIComponent(entity_id)}`,
+            source_url: sourceUrl,
             source_type: "db",
             excerpt: [`${v.name ?? "?"} — ${v.role ?? "investor"} @ ${v.firm ?? "?"}`, rowSectors, rowStages, v.location_raw ?? v.location_city].filter(has).join(" · "),
             evidence_type: "identity",
             supports: "identity",
             extraction_method: "stored_investor_record",
             subject: entity_id,
-          }), ...(rowSectors ? [makeEvidence({
-            source_url: v.linkedin?.trim() || v.website?.trim() || `db://investors/${encodeURIComponent(entity_id)}`,
-            source_type: "db", subject: entity_id, evidence_type: "investment", supports: "intent",
-            excerpt: `${v.name ?? "?"}: curated investment sectors ${rowSectors}; stages ${rowStages}`,
-            extraction_method: "stored_investor_record",
-            claim_parameters: { investor_sector: rowSectors, ...(rowStages ? { investor_stage: rowStages } : {}) },
-          })] : [])],
+          })],
         };
       }),
       meta: r.meta,
@@ -1224,7 +1271,7 @@ async function fetchS3Tier(
   return { rows: [], meta: null };
 }
 
-export async function runSpecSearchCore(
+const runSpecSearchBody = createServerOnlyFn(async function runSpecSearchBody(
   query: string,
   deps: SpecSearchDeps = {},
   limit = 25,
@@ -1251,6 +1298,14 @@ export async function runSpecSearchCore(
     runStartedAt?: number;
     /** Root budget is shared even when child goals request fewer rows. */
     runBudgetMs?: number;
+    /** Internal deadline checkpoint; only already-qualified rows may be saved. */
+    deadlineSnapshot?: (result: SpecSearchResult | (() => SpecSearchResult)) => void;
+    /** Internal guard against adapter completions after this request settled. */
+    isSettled?: () => boolean;
+    /** Internal branches share the root's enrichment counters and deadline. */
+    enrichmentBudget?: { deadlineMs?: number; adapterCalls: number; contactCandidates: number; paidCalls: number };
+    /** Evidence-only cache: branch geography must never overwrite row identity. */
+    signalResearchCache?: Map<string, Evidence[]>;
     /** Data-asset pass: engine-driven widening + candidate dedupe for job modes. */
     jobContext?: {
       poolTargetOverride?: number;
@@ -1258,19 +1313,37 @@ export async function runSpecSearchCore(
     };
   } = {},
 ): Promise<SpecSearchResult> {
-  const { createSearchRun, finalizeSearchOutcome, throwIfAborted, searchAbortCode } = await import(
+  const { createSearchRun, finalizeSearchOutcome, throwIfAborted, searchAbortCode, awaitSearchWork } = await import(
     "@/lib/search/search-run"
   );
+  const waitForRunWork = <T>(work: () => Promise<T>): Promise<T> => {
+    throwIfAborted(deps.signal);
+    return awaitSearchWork(work(), deps.signal);
+  };
   const runIds = createSearchRun({
     search_run_id: opts.search_run_id,
     conversation_id: opts.conversation_id,
     turn_id: opts.turn_id,
     request_id: opts.request_id,
   });
+  // The world gazetteer powers city→country resolution everywhere downstream
+  // (spec criteria, geo-scoped discovery queries, page-geo guards). It is a
+  // one-time parse of a local data file; it was previously registered only by
+  // the verify script, so live runs resolved "Windhoek" to nothing. Await it
+  // with a small bound so the first run never stalls.
+  try {
+    const { ensureCityGazetteer } = await import("@/lib/search/gazetteer.server");
+    await Promise.race([ensureCityGazetteer(), new Promise<void>((resolve) => setTimeout(resolve, 2500))]);
+  } catch { /* structural overlay still applies */ }
   // Location branches belong to one user-visible run. Carry this root clock
   // through recursive branches so widening uses remaining shared budget.
   const runStartedAt = opts.runStartedAt ?? Date.now();
   const rootRunBudgetMs = opts.runBudgetMs ?? scaledRunBudgetMs(limit);
+  const enrichmentRunBudget = opts.enrichmentBudget ?? {
+    deadlineMs: undefined as number | undefined,
+    adapterCalls: 0, contactCandidates: 0, paidCalls: 0,
+  };
+  const signalResearchCache = opts.signalResearchCache ?? new Map<string, Evidence[]>();
   // Run watchdog stage tracking (PRD V2 Phase 3 / P1-A): the stage name is
   // what the watchdog reports when the run overruns its budget, so a hung
   // await names itself instead of vanishing into "not settled".
@@ -1281,7 +1354,7 @@ export async function runSpecSearchCore(
   // Candidate survival ledger: every funnel candidate ends in one explained
   // fate, and every lead streamed while researching is reconciled with the
   // final page. Bookkeeping only; it never changes delivery.
-  const { createCandidateLedger } = await import("@/lib/search/candidate-ledger");
+  const { createCandidateLedger, mergeCandidateLedgers: mergeDeadlineLedgers } = await waitForRunWork(async () => (import("@/lib/search/candidate-ledger")));
   const ledger = createCandidateLedger();
   // Keys already streamed to the user. Widen passes (PRD §33-37) must never
   // re-stream a known lead: progressive delivery stays first-once.
@@ -1292,7 +1365,7 @@ export async function runSpecSearchCore(
           ledger.streamed(event.row);
           if (event.row.key) streamedKeys.add(event.row.key);
         }
-        deps.browserProgress!(event);
+        if (!deps.signal?.aborted && !opts.isSettled?.()) deps.browserProgress!(event);
       }
     : undefined;
   let understandingDoneAt = runStartedAt;
@@ -1347,7 +1420,7 @@ export async function runSpecSearchCore(
   };
 
   if (deps.signal?.aborted) {
-    const { extractSearchSpec: extract } = await import("@/lib/search/search-spec-extract");
+    const { extractSearchSpec: extract } = await waitForRunWork(async () => (import("@/lib/search/search-spec-extract")));
     return withRun(
       {
         spec: extract(query),
@@ -1376,12 +1449,12 @@ export async function runSpecSearchCore(
     hasMore: false,
     totalAvailable: null as number | null,
   };
-  const { frameToSearchSpec, applyClarificationToFrame, isActionableFrame, understandFrame, lightSpecFromFrame } = await import("@/lib/understanding/to-search-spec");
-  const { decideStage1 } = await import("@/lib/stage1/stage1-adapter");
-  const { buildSpec, computeMissing } = await import("@/lib/search/search-spec");
-  const { initState } = await import("@/lib/understanding/clarify-state");
+  const { frameToSearchSpec, applyClarificationToFrame, isActionableFrame, understandFrame, lightSpecFromFrame } = await waitForRunWork(async () => (import("@/lib/understanding/to-search-spec")));
+  const { decideStage1 } = await waitForRunWork(async () => (import("@/lib/stage1/stage1-adapter")));
+  const { buildSpec, computeMissing } = await waitForRunWork(async () => (import("@/lib/search/search-spec")));
+  const { initState } = await waitForRunWork(async () => (import("@/lib/understanding/clarify-state")));
   // World city gazetteer for understanding (real cities, one-edit typos).
-  if (!opts.spec) await (await import("@/lib/search/gazetteer.server")).ensureCityGazetteer();
+  if (!opts.spec) await waitForRunWork(async () => ((await waitForRunWork(async () => (import("@/lib/search/gazetteer.server")))).ensureCityGazetteer()));
 
   // Off-topic boundary FIRST: a clearly out-of-domain request gets a one-line
   // product boundary — never retrieval, never a clarification round about
@@ -1429,7 +1502,7 @@ export async function runSpecSearchCore(
   } else {
     const frame = opts.priorFrame
       ? applyClarificationToFrame(opts.priorFrame, answers)
-      : await understandFrame(query, answers, deps.signal, opts.resolvedContext ?? null);
+      : await waitForRunWork(async () => (understandFrame(query, answers, deps.signal, opts.resolvedContext ?? null)));
     if (opts.resolvedContext) frame.sources = opts.resolvedContext.facts;
     understandingDoneAt = Date.now();
     if (deps.signal?.aborted) {
@@ -1443,22 +1516,54 @@ export async function runSpecSearchCore(
       !!opts.force,
     );
     if (decision.stage !== "ready") {
-      // No search ran this round: no terminal outcome (P0), one question,
-      // and the frame rides back inside spec.understanding for the next turn.
-      return withRun({
-        spec: lightSpecFromFrame(frame, "needs_clarification"),
-        stage: decision.stage,
-        confirmSummary: decision.summary ?? null,
-        questions: decision.question ? [decision.question.question] : [],
-        clarify: decision.question ? [decision.question] : [],
-        rows: [],
-        ...pageInfo,
-      } as unknown as Record<string, unknown>, 0, false, false);
+      // Deterministic readiness is the final authority (PRD 3.2): a cached or
+      // LLM frame quirk must not downgrade a request the deterministic
+      // validator can execute. When the frame yields a spec with a known
+      // entity and a target-defining criterion, search with defaults instead
+      // of carding — confirm-on-derived-facts and soft clarify both defer to
+      // this probe. Structural blockers (unknown entity, unresolved amount)
+      // never reach a complete probe and still card above.
+      const probe = frameToSearchSpec(frame);
+      // A target-definer that merely restates the entity ("employment" for a
+      // jobs ask) is not a definer — bare entity nouns still card.
+      const GENERIC_TARGET = /^(?:employment|jobs?|roles?|companies|businesses|people|persons?|organizations?|locals?|startups?|firms?|agencies)$/i;
+      const probeReady =
+        probe.entity !== "unknown" &&
+        probe.criteria.some(
+          (criterion) =>
+            criterion.stated &&
+            ["category", "industry", "role", "business_type", "niche"].includes(criterion.field) &&
+            !GENERIC_TARGET.test(criterion.value),
+        );
+      if (probeReady) {
+        console.info("[stage1-override]", JSON.stringify({
+          stage: decision.stage,
+          question: (decision.question as unknown as { field?: string; question?: string } | undefined)?.field ??
+            (decision.question as unknown as { question?: string } | undefined)?.question?.slice(0, 60) ?? null,
+          entity: probe.entity,
+          criteria: probe.criteria.length,
+        }));
+        spec = probe;
+        spec.status = "ready_to_search";
+      } else {
+        // No search ran this round: no terminal outcome (P0), one question,
+        // and the frame rides back inside spec.understanding for the next turn.
+        return withRun({
+          spec: lightSpecFromFrame(frame, "needs_clarification"),
+          stage: decision.stage,
+          confirmSummary: decision.summary ?? null,
+          questions: decision.question ? [decision.question.question] : [],
+          clarify: decision.question ? [decision.question] : [],
+          rows: [],
+          ...pageInfo,
+        } as unknown as Record<string, unknown>, 0, false, false);
+      }
+    } else {
+      spec = frameToSearchSpec(frame);
+      // resolveStage decided READY — computeMissing stays Stage-2 data (INV-3)
+      // and must never flip a frame-backed request back into a clarification.
+      spec.status = "ready_to_search";
     }
-    spec = frameToSearchSpec(frame);
-    // resolveStage decided READY — computeMissing stays Stage-2 data (INV-3)
-    // and must never flip a frame-backed request back into a clarification.
-    spec.status = "ready_to_search";
   }
   if (deps.signal?.aborted) return withRun({ spec, ...pageInfo }, 0, true);
   // Merge prior answers as stated criteria (multi-turn without session store).
@@ -1494,6 +1599,12 @@ export async function runSpecSearchCore(
     criteria,
     ...(entityPick && spec.entity === "unknown" ? { entity: entityPick } : {}),
   };
+  // Compound buckets and jobs own their separate per-pass quantities.
+  const countValue = !opts.jobContext && !(spec.understanding?.compound.is_compound && !opts.compoundBranch)
+    ? Math.floor(Number(fieldOf(spec, "requested_count"))) : NaN;
+  const requestedCount = Number.isFinite(countValue) && countValue > 0 ? countValue : null;
+  const deliveryLimit = requestedCount === null ? limit : Math.min(limit, Math.max(0, requestedCount - effOffset));
+  if (requestedCount !== null && deliveryLimit === 0) return withRun({ spec, rows: [], ...pageInfo, hasMore: false }, 0);
   spec.missing = computeMissing(spec);
   // Stage-2 completeness data only (INV-3): for frame-backed requests the
   // Stage-1 decision already ran above; computeMissing must never emit a user
@@ -1511,7 +1622,7 @@ export async function runSpecSearchCore(
   // assumptions. "Search with defaults" in the panel bypasses; an explicit
   // count in the query signals the user knows what they want.
   if (!spec.understanding && spec.status === "ready_to_search") {
-    const { evaluateQueryReadiness } = await import("@/lib/search/query-readiness");
+    const { evaluateQueryReadiness } = await waitForRunWork(async () => (import("@/lib/search/query-readiness")));
     const readiness = evaluateQueryReadiness({ spec, query, force: opts.force });
     if (!readiness.ready && readiness.question) {
       return withRun({
@@ -1686,7 +1797,7 @@ export async function runSpecSearchCore(
     return withRun({
       spec,
       questions: questionsForMissing(spec),
-      clarify: await clarifyQuestionsForSpec(spec),
+      clarify: await waitForRunWork(async () => (clarifyQuestionsForSpec(spec))),
       rows: [],
       dbMeta: [],
       rejected: 0,
@@ -1721,14 +1832,7 @@ export async function runSpecSearchCore(
     });
     for (const [branchIndex, branch] of branchSpecs.entries()) {
       if (deps.signal?.aborted) break;
-      const branchController = new AbortController();
-      const abortParent = () => branchController.abort(deps.signal?.reason);
-      deps.signal?.addEventListener("abort", abortParent, { once: true });
-      const remainingBudget = Math.max(1, rootRunBudgetMs - (Date.now() - runStartedAt));
-      const branchTimer = setTimeout(() => branchController.abort({ code: "SEARCH_DEADLINE" }),
-        Math.max(1, Math.floor(remainingBudget / (branchSpecs.length - branchIndex))));
-      try {
-      branchResults.push(await runSpecSearchCore(query, { ...deps, signal: branchController.signal }, branch.limit, {}, {
+      branchResults.push(await waitForRunWork(async () => (runSpecSearchCore(query, deps, branch.limit, {}, {
         ...opts,
         ...runIds,
         offset: 0,
@@ -1737,12 +1841,29 @@ export async function runSpecSearchCore(
         compoundBranch: !!subgoals.length || opts.compoundBranch,
         runStartedAt,
         runBudgetMs: rootRunBudgetMs,
+        enrichmentBudget: enrichmentRunBudget,
+        signalResearchCache,
         spec: branch.spec,
-      }));
-      } finally {
-        clearTimeout(branchTimer);
-        deps.signal?.removeEventListener("abort", abortParent);
-      }
+        deadlineSnapshot: (checkpoint) => opts.deadlineSnapshot?.(() => {
+          const active = typeof checkpoint === "function" ? checkpoint() : checkpoint;
+          const results = [...branchResults, active];
+          const candidates = new Map<string, SpecRow>();
+          for (const result of results) for (const row of result.rows) {
+            const key = row.entity_id ?? row.key ?? row.url ?? `${row.kind}:${row.title}:${row.location ?? ""}`;
+            if (!candidates.has(key)) candidates.set(key, row);
+          }
+          const abort = searchAbortCode(deps.signal);
+      const page = abort === "SEARCH_DEADLINE" ? [...candidates.values()].slice(effOffset, effOffset + deliveryLimit) : [];
+          const trace = results.find((result) => result.retrievalTrace)?.retrievalTrace;
+          return withRun({ spec, rows: page,
+            dbMeta: results.flatMap((result) => result.dbMeta),
+            retrievalTrace: trace && { ...trace, returned: page.length, reason: abort === "SEARCH_DEADLINE" ? trace.reason : "CANCELLED" },
+            candidateLedger: mergeDeadlineLedgers(results.map((result) => result.candidateLedger), page,
+              abort === "SEARCH_DEADLINE" ? undefined : abort),
+            ...pageInfo,
+          }, page.length);
+        }),
+      }))));
       if (deps.signal?.aborted) break;
     }
     const unique = new Map<string, SpecRow>();
@@ -1751,7 +1872,7 @@ export async function runSpecSearchCore(
       if (!unique.has(key)) unique.set(key, row);
     }
     const all = [...unique.values()];
-    const rows = all.slice(effOffset, effOffset + limit);
+    const rows = all.slice(effOffset, effOffset + deliveryLimit);
     const deliveredKeys = new Set(rows.map((row) => row.entity_id ?? row.key ?? row.url ?? `${row.kind}:${row.title}:${row.location ?? ""}`));
     const bookedReturned = new Set<string>();
     const branchLedgers = branchResults.map((result) => {
@@ -1771,10 +1892,10 @@ export async function runSpecSearchCore(
       return summary;
     });
     const representative = branchResults.find((result) => result.rows.length > 0) ?? branchResults[0];
-    const { mergeCandidateLedgers } = await import("@/lib/search/candidate-ledger");
+    const { mergeCandidateLedgers } = await waitForRunWork(async () => (import("@/lib/search/candidate-ledger")));
     const aggregateProviders = branchResults.flatMap((result) => result.providerAttempts ?? []);
     const aggregateDiagnostics = branchResults.flatMap((result) => result.diagnostics ?? []);
-    const aggregateHealth = (await import("@/lib/search/source-health")).classifySourceHealth({ providers: aggregateProviders, diagnostics: aggregateDiagnostics });
+    const aggregateHealth = (await waitForRunWork(async () => (import("@/lib/search/source-health")))).classifySourceHealth({ providers: aggregateProviders, diagnostics: aggregateDiagnostics });
     const aggregateWidening = {
       passes: branchResults.reduce((sum, result) => sum + (result.widening?.passes ?? 0), 0),
       outcome: branchResults.find((result) => result.widening && !["NOT_REQUIRED", "TARGET_REACHED"].includes(result.widening.outcome))?.widening?.outcome
@@ -1829,7 +1950,8 @@ export async function runSpecSearchCore(
       offset: effOffset,
       limit,
       // Zero-delivery contract (Defect A): an empty delivered page promises nothing.
-      hasMore: rows.length > 0 && (all.length > effOffset + limit || branchResults.some((result) => result.hasMore)),
+      hasMore: rows.length > 0 && (all.length > effOffset + deliveryLimit || branchResults.some((result) => result.hasMore)) &&
+        (requestedCount === null || effOffset + rows.length < requestedCount),
       moreAvailableMessage:
         rows.length > 0
           ? branchResults.find((result) => result.moreAvailableMessage)?.moreAvailableMessage ?? null
@@ -1841,12 +1963,12 @@ export async function runSpecSearchCore(
   }
   // S3 + index readers reach node builtins (AWS SDK -> node:os/crypto), so they
   // load dynamically — a static import would pull them into the client bundle.
-  const [peopleMod, companiesMod, businessesMod, investorsMod] = await Promise.all([
+  const [peopleMod, companiesMod, businessesMod, investorsMod] = await waitForRunWork(async () => (Promise.all([
     import("@/lib/canonical/people.server"),
     import("@/lib/canonical/companies.server"),
     import("@/lib/canonical/businesses.server"),
     import("@/lib/canonical/investors.server"),
-  ]);
+  ])));
   const people = deps.people ?? peopleMod.searchPeopleDB;
   const companies = deps.companies ?? companiesMod.searchCompaniesDB;
   const businesses = deps.businesses ?? businessesMod.searchBusinessesDB;
@@ -1857,10 +1979,33 @@ export async function runSpecSearchCore(
   let indexer: typeof queryIndexForSpec | null = deps.index ?? null;
   if (deps.index === undefined) {
     indexer = (useObjectSearchIndex()
-      ? (await import("@/lib/object-index/search.server")).queryObjectIndexForSpec
-      : (await import("@/lib/indexed/search-index.server")).queryIndexForSpec) as typeof queryIndexForSpec;
+      ? (await waitForRunWork(async () => (import("@/lib/object-index/search.server")))).queryObjectIndexForSpec
+      : (await waitForRunWork(async () => (import("@/lib/indexed/search-index.server")))).queryIndexForSpec) as typeof queryIndexForSpec;
   }
   const dbMeta: DbHitMeta[] = [];
+  const { applyWhyMatchGate: applyDeadlineGate } = await waitForRunWork(async () => (import("@/lib/search/live-gapfill")));
+  const captureCompletedTier = (tier: Awaited<ReturnType<typeof fetchS3Tier>>) => {
+    // A reader can synchronously abort its deadline and still return the work
+    // it just completed. Checkpoint that settled value without starting research.
+    if (opts.isSettled?.() || !deps.signal?.aborted || searchAbortCode(deps.signal) !== "SEARCH_DEADLINE") return tier;
+    for (const row of tier.rows) ledger.retrieved(row);
+    const prepared = tier.rows.map((row) => sanitizeSpecRow(row, spec));
+    const qualified = applyDeadlineGate(prepared.filter((row) => row.complete && rowSatisfiesSpec(spec, row)), spec, !!spec.signal_required).kept
+      .filter((row) => row.disposition === "qualified")
+      .filter((row) => !!fieldOf(spec, "opportunity") || !!(row.website_url || row.profile_url || row.email || row.phone || row.contact_page_url ||
+        (row.kind === "job" && row.apply_url) || (row.entity_resolved === true && row.entity_id && !row.entity_id.startsWith("provisional:") &&
+          row.evidence?.some((e) => e.subject === row.entity_id && e.evidence_type === "identity" && e.supports === "identity" && ["db", "osm", "registry"].includes(e.source_type)))));
+    const page = qualified.slice(effOffset, effOffset + deliveryLimit);
+    ledger.delivered(page, qualified.filter((row) => !page.includes(row)));
+    ledger.cancelled("SEARCH_DEADLINE");
+    opts.deadlineSnapshot?.(withRun({ spec, rows: page, dbMeta: tier.meta ? [tier.meta] : [], ...pageInfo,
+      retrievalTrace: { sources: [], rawCandidates: tier.rows.length, postSpecFilter: prepared.length,
+        complete: prepared.filter((row) => row.complete).length, qualified: qualified.length, returned: page.length,
+        pendingEnrichment: prepared.filter((row) => !row.complete).length, qualificationRejected: prepared.length - qualified.length,
+        reason: page.length ? "RESULTS" : "TIMEOUT" },
+    }, page.length));
+    return tier;
+  };
   let rows: SpecRow[] = [];
   let liveCandidateCount = 0;
   let liveSpecMatchCount = 0;
@@ -1902,16 +2047,16 @@ export async function runSpecSearchCore(
   if (spec.entity === "job" && useCoverageSelector()) {
     // (Dynamic import: this module is client-reachable; the jobs chain
     // reaches node builtins which must not join the static browser graph.)
-    const { fetchSpecJobs: fetchJobs, jobPostingToSpecRow } = await import(
+    const { fetchSpecJobs: fetchJobs, jobPostingToSpecRow } = await waitForRunWork(async () => (import(
       "@/lib/search/jobs-provider"
-    );
+    )));
     const runJobs = deps.providerJobs === null ? null : (deps.providerJobs ?? fetchJobs);
     if (runJobs) {
       try {
         // 60s tier budget (not 30s): the bounded ATS second phase alone may
         // take up to its 18s shared budget after the fast boards. The timeout
         // still caps wall-clock per query — never unbounded crawling.
-        const j = await withTierTimeout(
+        const j = await waitForRunWork(async () => (withTierTimeout(
           runJobs({
             query: role ?? category ?? industry ?? query,
             location: location ?? undefined,
@@ -1920,10 +2065,12 @@ export async function runSpecSearchCore(
             limit: Math.max(fetchWindow, 100),
             seniority: fieldOf(spec, "seniority") ?? undefined,
             employment: fieldOf(spec, "employment") ?? undefined,
+            signal: deps.signal,
           }),
           60000,
           "provider-jobs",
-        );
+          undefined, deps.signal,
+        )));
         const okSources = j.sourceStatuses.filter((s) => s.status === "ok").length;
         dbMeta.push({
           dbHit: j.jobs.length > 0,
@@ -1960,7 +2107,7 @@ export async function runSpecSearchCore(
     const entity = spec.entity as "business" | "company" | "person";
     const decision = selectCoverageSources(
       { entity, countryIso: planIso, cityNorm: planCity, pageSize: limit },
-      await loadCoverageMatrix(),
+      await waitForRunWork(async () => (loadCoverageMatrix())),
     );
     console.info(
       "[coverage] decision " +
@@ -2003,7 +2150,7 @@ export async function runSpecSearchCore(
           // (Dynamic import: this module is client-reachable; the OSM chain
           // must not join the static browser graph.)
           const { searchOsmLocalBusinesses: searchOsm } =
-            await import("@/lib/search/osm-local-businesses.server");
+            await waitForRunWork(async () => (import("@/lib/search/osm-local-businesses.server")));
           const provider =
             deps.providerBusinesses === null ? null : (deps.providerBusinesses ?? searchOsm);
           if (!provider || spec.entity !== "business" || !location || !category) {
@@ -2018,8 +2165,8 @@ export async function runSpecSearchCore(
             );
             continue;
           }
-          const { fanOutProviders } = await import("@/lib/search/provider-fanout");
-          const fanout = await fanOutProviders(
+          const { fanOutProviders } = await waitForRunWork(async () => (import("@/lib/search/provider-fanout")));
+          const fanout = await waitForRunWork(async () => (fanOutProviders(
             [
               {
                 name: "provider-osm",
@@ -2044,11 +2191,12 @@ export async function runSpecSearchCore(
                       negativeSignals: [],
                     },
                     location,
+                    { signal: deps.signal },
                   ),
               },
             ],
             { timeoutMs: step.timeoutMs },
-          );
+          )));
           for (const e of fanout.errors) {
             console.warn("[coverage] tier-error " + JSON.stringify({ source: e.name, error: e.error }));
           }
@@ -2116,11 +2264,12 @@ export async function runSpecSearchCore(
             );
             continue;
           }
-          const r = await withTierTimeout(
+          const r = await waitForRunWork(async () => (withTierTimeout(
             (indexer as typeof queryIndexForSpec)(spec, fetchWindow, 0, deps.reuse),
             step.timeoutMs,
             "hot-index",
-          );
+            undefined, deps.signal,
+          )));
           if (!r) {
             console.info("[coverage] tier-empty " + JSON.stringify({ source: "hot-index" }));
             continue;
@@ -2140,16 +2289,27 @@ export async function runSpecSearchCore(
         const s3TimeoutMs = spec.entity === "company" && fieldOf(spec, "location_kind") === "city"
           ? Math.min(step.timeoutMs, 5_000)
           : step.timeoutMs;
-        const t = await withTierTimeout(
+        const tierController = new AbortController();
+        const abortTier = () => tierController.abort(deps.signal?.reason);
+        deps.signal?.addEventListener("abort", abortTier, { once: true });
+        if (deps.signal?.aborted) abortTier();
+        let t: Awaited<ReturnType<typeof fetchS3Tier>>;
+        try {
+        t = await waitForRunWork(async () => (withTierTimeout(
           fetchS3Tier(
             spec,
             { people, companies, businesses, investors },
             { role, industry, location, category, limit: fetchWindow,
-              signal: deps.signal, deadline: Date.now() + Math.min(15_000, Math.max(1, s3TimeoutMs - 50)) },
-          ),
+              signal: tierController.signal, deadline: Date.now() + Math.min(15_000, Math.max(1, s3TimeoutMs - 50)) },
+          ).then(captureCompletedTier),
           s3TimeoutMs,
           "s3-parquet",
-        );
+          () => tierController.abort(),
+          deps.signal,
+        )));
+        } finally {
+          deps.signal?.removeEventListener("abort", abortTier);
+        }
         if (t.meta) dbMeta.push(t.meta);
         if (t.meta?.coverageIncomplete) routeDiagnostics.push({
           code: "SOURCE_UNAVAILABLE", source: "s3-parquet",
@@ -2195,7 +2355,7 @@ export async function runSpecSearchCore(
     // +1 probe row makes hasMore exact without a count scan.
     if (indexer && useIndexedSearch()) {
       try {
-        const r = await (indexer as typeof queryIndexForSpec)(spec, limit + 1, effOffset, deps.reuse);
+        const r = await waitForRunWork(async () => ((indexer as typeof queryIndexForSpec)(spec, limit + 1, effOffset, deps.reuse)));
         if (r) {
           dbMeta.push(r.meta);
           rows = r.rows;
@@ -2270,11 +2430,11 @@ export async function runSpecSearchCore(
         !indexedServed &&
         ["person", "company", "business", "investor", "job"].includes(spec.entity)
       ) {
-        const t = await fetchS3Tier(
+        const t = await waitForRunWork(async () => (fetchS3Tier(
           spec,
           { people, companies, businesses, investors },
           { role, industry, location, category, limit: fetchWindow, signal: deps.signal },
-        );
+        ).then(captureCompletedTier)));
         if (t.meta) dbMeta.push(t.meta);
         if (t.meta?.coverageIncomplete) routeDiagnostics.push({
           code: "SOURCE_UNAVAILABLE", source: "s3-parquet",
@@ -2298,7 +2458,8 @@ export async function runSpecSearchCore(
     // Job rows: the registry pre-filtered role/location pushdown already ran;
     // the funnel gate here is CONTRADICTIONS ONLY (broadly relevant jobs
     // proceed to research, where exact role/location/status get verified).
-    const ok = spec.entity === "job" ? rowSatisfyRejectReason(spec, r) === null : rowSatisfiesSpec(spec, r);
+    const deferActivity = serviceBoundaryState(spec, r) === "unknown" || investorScopeState(spec, r) === "unknown";
+    const ok = spec.entity === "job" || deferActivity ? rowCouldSatisfySpec(spec, r) : rowSatisfiesSpec(spec, r);
     if (!ok) ledger.filtered(r, rowSatisfyRejectReason(spec, r) ?? "spec_filter");
     return ok;
   });
@@ -2349,6 +2510,73 @@ export async function runSpecSearchCore(
   let completeRows = sanitized.filter((r) => r.complete);
   let incompleteRows = sanitized.filter((r) => !r.complete);
 
+  // One shared signal engine runs before expensive contacts, including
+  // incomplete candidates. The final theorem remains after enrichment.
+  const signalResearchSignature = JSON.stringify({
+    entity: spec.entity, types: spec.signal_types, mode: spec.signal_mode,
+    recency: spec.signal_recency, custom: spec.custom_signal_text,
+    currentRole: /\b(current|currently)\s+(founder|ceo|cto|role|employee)/i.test(spec.raw_query) || /\bcurrent\s+founders?\b/i.test(spec.raw_query),
+    criteria: spec.criteria.filter(c => !['location', 'location_country'].includes(c.field)),
+  });
+  const signalResearchKey = (row: SpecRow) => `${signalResearchSignature}:${row.entity_id ?? row.key ?? row.title}`;
+  const screenRequiredSignals = async (input: SpecRow[]): Promise<SpecRow[]> => {
+    if (!spec.signal_required) {
+      input.forEach(row => ledger.stage(row, preliminaryEligibility(spec, row), 'NOT_REQUIRED', 'no_signal_requested'));
+      return input;
+    }
+    throwIfAborted(deps.signal);
+    const remainingMs = Math.max(0, runStartedAt + rootRunBudgetMs - Date.now());
+    if (!remainingMs) {
+      input.forEach(row => ledger.stage(row, preliminaryEligibility(spec, row), 'NOT_RESEARCHED_BUDGET', 'run_deadline'));
+      return input;
+    }
+    const fresh = input.filter(row => !signalResearchCache.has(signalResearchKey(row)));
+    const { verifyCandidateClaims } = await waitForRunWork(async () => (import('@/lib/search/verification')));
+    const prior = input.filter(row => signalResearchCache.has(signalResearchKey(row))).map(row => {
+      // Replay is idempotent: keep raw Evidence metadata and distinct events,
+      // rather than projecting through the narrower persisted claim schema.
+      const seen = new Set<string>();
+      const evidence = [...(row.evidence ?? []), ...(signalResearchCache.get(signalResearchKey(row)) ?? [])].filter(item => {
+        const key = JSON.stringify([
+          item.source_url, item.source_type, item.evidence_type, item.subject,
+          item.event_at, item.excerpt, item.supports, item.observed_at,
+          item.confidence, item.extraction_method, item.id,
+          item.claim_parameters == null ? null : Object.entries(item.claim_parameters).sort(([a], [b]) => a.localeCompare(b)),
+          item.provenance == null ? null : Object.entries(item.provenance).sort(([a], [b]) => a.localeCompare(b)),
+        ]);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+      return { ...row, evidence };
+    });
+    for (const row of prior) ledger.stage(row, preliminaryEligibility(spec, row),
+      verifyCandidateClaims({ evidence: row.evidence ?? [], entityId: row.entity_id ?? row.key ?? '', spec }).ok ? 'SUPPORTED' : 'UNVERIFIED',
+      'shared_signal_research_cache');
+    if (!fresh.length) return prior;
+    const { splitBaseEligibility, runDeepSignalPass } = await waitForRunWork(async () => (import('@/lib/signals/deep-pass.server')));
+    const split = splitBaseEligibility(fresh, spec);
+    let customSignal: import('@/lib/signals/custom-compiler').CompiledCustomSignal | undefined;
+    if (spec.custom_signal_text?.trim()) {
+      const { compileCustomSignal } = await waitForRunWork(async () => (import('@/lib/signals/custom-compiler')));
+      const customSignalText = spec.custom_signal_text;
+      customSignal = await waitForRunWork(async () => (compileCustomSignal(customSignalText, { allowAI: false })));
+    }
+    const deep = await waitForRunWork(async () => (runDeepSignalPass(split.baseEligible, spec, {
+      signal: deps.signal, customSignal, budgetMs: Math.min(45_000, remainingMs), hunter: process.env.VITEST ? null : undefined,
+      onProgress: e => browserProgress?.(e),
+    })));
+    // Budget-skipped and unverified candidates remain eligible for bounded
+    // follow-up. Cache supported evidence; each branch rechecks its claims.
+    for (const row of [...deep.alreadyVerified, ...deep.signalReady])
+      signalResearchCache.set(signalResearchKey(row), row.evidence ?? []);
+    for (const row of [...deep.alreadyVerified, ...deep.signalReady]) ledger.stage(row, preliminaryEligibility(spec, row), 'SUPPORTED', 'requested_claims_verified');
+    for (const row of deep.stillUnsignaled) ledger.stage(row, preliminaryEligibility(spec, row), 'UNVERIFIED', 'bounded_research_no_matching_evidence');
+    for (const row of deep.notResearched) ledger.stage(row, preliminaryEligibility(spec, row), 'NOT_RESEARCHED_BUDGET', 'signal_budget_exhausted');
+    for (const row of split.baseRejected) ledger.stage(row, 'CONTRADICTED', 'CONTRADICTED', rowSatisfyRejectReason(spec, row) ?? 'known_constraint_contradiction');
+    return [...prior, ...deep.alreadyVerified, ...deep.signalReady, ...deep.stillUnsignaled, ...deep.notResearched, ...split.baseRejected];
+  };
+
   // Phase B: enrich incomplete (capped). deps.enrichFn=null skips.
   // Under vitest, undefined also skips so unit tests stay offline.
   const enrichOpt =
@@ -2357,15 +2585,21 @@ export async function runSpecSearchCore(
       : process.env.VITEST
         ? null
         : undefined;
-  if (incompleteRows.length && enrichOpt !== null) {
+  if (!spec.signal_required && incompleteRows.length && enrichOpt !== null) {
     try {
-      const { enrichIncompleteRows } = await import("@/lib/search/enrich-incomplete");
-      const enriched = await enrichIncompleteRows(incompleteRows, {
+      const { enrichIncompleteRows } = await waitForRunWork(async () => (import("@/lib/search/enrich-incomplete")));
+      const eligibleInput = incompleteRows.filter(row => rowCouldSatisfySpec(spec, row));
+      const eligible = mergeDuplicateCandidates(eligibleInput);
+      for (const { absorbed, survivor } of mergeReportPairs(eligibleInput, eligible.mergeReport ?? [])) ledger.merged(absorbed, survivor);
+      const rejected = incompleteRows.filter(row => !rowCouldSatisfySpec(spec, row));
+      const enriched = await waitForRunWork(async () => (enrichIncompleteRows(eligible, {
         enrichFn: enrichOpt ?? undefined,
         signal: deps.signal,
-      });
+        sharedBudget: enrichmentRunBudget,
+        deadlineMs: Math.min(runStartedAt + rootRunBudgetMs, Date.now() + 20_000),
+      })));
       completeRows = [...completeRows, ...enriched.complete];
-      incompleteRows = enriched.stillIncomplete;
+      incompleteRows = [...enriched.stillIncomplete, ...rejected];
     } catch (e) {
       console.warn(
         "[enrich] incomplete enrich failed:",
@@ -2380,7 +2614,7 @@ export async function runSpecSearchCore(
   // Research known candidates before spending discovery budget on replacements.
   try {
     throwIfAborted(deps.signal);
-    const { enrichCandidatesForSpec } = await import("@/lib/search/enrichment-run");
+    const { enrichCandidatesForSpec } = await waitForRunWork(async () => (import("@/lib/search/enrichment-run")));
     const knownInput = [...completeRows, ...incompleteRows];
     const known = mergeDuplicateCandidates(knownInput);
     // C6: duplicates dropped by the merge are ledgered as absorbed, not lost.
@@ -2388,12 +2622,15 @@ export async function runSpecSearchCore(
     // C6 accounting: every row entering the funnel gets booked, so
     // summary().accounting can prove retrieved === fated (unaccounted: 0).
     for (const row of known) ledger.retrieved(row);
-    const enriched = await enrichCandidatesForSpec(known, spec, {
+    const screened = await waitForRunWork(async () => (screenRequiredSignals(known)));
+    const enriched = await waitForRunWork(async () => (enrichCandidatesForSpec(screened, spec, {
+      sharedBudget: enrichmentRunBudget,
+      contactBudgetMs: Math.min(20_000, Math.max(0, runStartedAt + rootRunBudgetMs - Date.now())),
       signal: deps.signal,
       maxContactCandidates: process.env.VITEST ? 0 : 12,
       maxPaidCalls: 0,
       adapters: deps.enrichmentAdapters,
-    });
+    })));
     const checked = enriched.rows.map((r) => sanitizeSpecRow(r, spec));
     completeRows = checked.filter((row) => row.complete);
     incompleteRows = checked.filter((row) => !row.complete);
@@ -2404,9 +2641,23 @@ export async function runSpecSearchCore(
   let liveDiscovery: SpecSearchResult["liveDiscovery"] =
     completeRows.length === 0 ? "db_thin_gapfill_pending" : "not_required";
   setStage("stored_search");
-  const { applyWhyMatchGate } = await import("@/lib/search/live-gapfill");
-  const qualifiedDbCount = applyWhyMatchGate(completeRows, spec, !!spec.signal_required).kept.length;
-  const requestedTarget = pageBaseOffset + limit;
+  const { applyWhyMatchGate } = await waitForRunWork(async () => (import("@/lib/search/live-gapfill")));
+  const qualifiedDbCount = applyWhyMatchGate(completeRows, spec, !!spec.signal_required).kept
+    .filter(row => rowSatisfiesSpec(spec, row)).length;
+  opts.deadlineSnapshot?.(() => {
+  const deadlineQualified = applyWhyMatchGate(completeRows, spec, !!spec.signal_required).kept
+    .filter((row) => row.disposition === "qualified" && rowSatisfiesSpec(spec, row))
+    .filter((row) => !!fieldOf(spec, "opportunity") || !!(row.website_url || row.profile_url || row.email || row.phone || row.contact_page_url ||
+      (row.kind === "job" && row.apply_url) || (row.entity_resolved === true && row.entity_id && !row.entity_id.startsWith("provisional:") &&
+        row.evidence?.some((e) => e.subject === row.entity_id && e.evidence_type === "identity" && e.supports === "identity" && ["db", "osm", "registry"].includes(e.source_type)))))
+    ;
+  const deadline = searchAbortCode(deps.signal) === "SEARCH_DEADLINE";
+  const deadlineRows = deadline ? deadlineQualified.slice(effOffset, effOffset + deliveryLimit) : [];
+  ledger.delivered(deadlineRows, deadline ? deadlineQualified.filter((row) => !deadlineRows.includes(row)) : []);
+  ledger.cancelled(searchAbortCode(deps.signal));
+  return withRun({ spec, rows: deadlineRows, dbMeta: [...dbMeta], ...pageInfo }, deadlineRows.length);
+  });
+  const requestedTarget = requestedCount ?? pageBaseOffset + limit;
   // Independent watchdog (PRD V2 Phase 3 / P1-A): T2 hung 81 minutes past its
   // budget invisibly. This timer does not trust the run to check in — every
   // tick past the budget it names the current stage. Diagnostics only.
@@ -2447,18 +2698,18 @@ export async function runSpecSearchCore(
     ? Math.min(2000, Math.max(basePoolTarget, opts.jobContext.poolTargetOverride))
     : basePoolTarget;
   const storedSearchDoneAt = Date.now();
-  const { buildSourcePlan } = await import("@/lib/search/source-plan");
+  const { buildSourcePlan } = await waitForRunWork(async () => (import("@/lib/search/source-plan")));
   let executionPlan = buildSourcePlan(spec, undefined, { desiredCount: requestedTarget });
   // Yield-aware ordering (data-asset): decayed historical yield reorders the
   // plan when enough evidence exists; no data keeps the plan unchanged.
   if (!process.env.VITEST && executionPlan.steps.length > 1) {
     try {
-      const { reorderByYield } = await import("@/lib/search/source-yield.server");
-      const ordered = await reorderByYield(
+      const { reorderByYield } = await waitForRunWork(async () => (import("@/lib/search/source-yield.server")));
+      const ordered = await waitForRunWork(async () => (reorderByYield(
         executionPlan.steps.map((s) => s.providerId),
         spec.signal_required ? "signal" : "general",
         spec.entity,
-      );
+      )));
       const rank = new Map(ordered.map((id, i) => [id, i]));
       const ranked = executionPlan.steps.map((s, i) => ({
         step: s,
@@ -2493,15 +2744,15 @@ export async function runSpecSearchCore(
   if (liveOpt !== null && (forceLiveDiscovery || spec.signal_required || fieldOf(spec, "needs_live") === "true" || qualifiedDbCount < requestedTarget)) {
     emitProgress("Stored search complete", "database", undefined, kept.length);
     try {
-      const { runLiveGapfill } = await import("@/lib/search/live-gapfill");
+      const { runLiveGapfill } = await waitForRunWork(async () => (import("@/lib/search/live-gapfill")));
       setStage("live_gapfill");
-      const live = await runLiveGapfill(spec, {
+      const live = await waitForRunWork(async () => (runLiveGapfill(spec, {
         ...(liveOpt ?? {}),
         searchRunId: runIds.search_run_id,
         signal: deps.signal,
         onBrowserProgress: browserProgress,
         ownerId: deps.ownerId,
-        desiredCount: Math.min(candidatePoolTarget, 30),
+        desiredCount: requestedCount ?? Math.min(candidatePoolTarget, 30),
         initialCandidates: [...completeRows, ...incompleteRows],
         // Verification order fix: stamp the Spec opportunity BEFORE judging
         // completeness, so a no-site candidate with structured absence + two
@@ -2515,7 +2766,7 @@ export async function runSpecSearchCore(
           return rowSatisfiesSpec(spec, prepared) && prepared.complete === true &&
             applyWhyMatchGate([prepared], spec, !!spec.signal_required).kept.length === 1;
         },
-      });
+      })));
       executionPlan = live.plan ?? executionPlan;
       providerAttempts = live.diagnostics ?? [];
       // Source learning (data-asset): drain provider outcomes into daily
@@ -2574,8 +2825,8 @@ export async function runSpecSearchCore(
       // Phase 1E: social provider on SPEC when signal_required (provider mandatory).
       if (spec.signal_required && !process.env.VITEST) {
         try {
-          const { runSocialSignalGapfill } = await import("@/lib/search/social-signal");
-          const social = await runSocialSignalGapfill(spec);
+          const { runSocialSignalGapfill } = await waitForRunWork(async () => (import("@/lib/search/social-signal")));
+          const social = await waitForRunWork(async () => (runSocialSignalGapfill(spec)));
           if (social.rows.length) {
             dbMeta.push({
               dbHit: true,
@@ -2655,7 +2906,7 @@ export async function runSpecSearchCore(
   let emptyWidenPasses = 0;
   let widenOutcome: import("@/lib/search/widening").WidenStopOutcome = "NOT_REQUIRED";
   if (liveOpt !== null && !opts.jobContext && !deadlineHit && !deps.signal?.aborted) {
-    const { widenStopDecision, widenDesiredCount, MAX_WIDEN_PASSES } = await import("@/lib/search/widening");
+    const { widenStopDecision, widenDesiredCount, MAX_WIDEN_PASSES } = await waitForRunWork(async () => (import("@/lib/search/widening")));
     const identityOf = (row: SpecRow) => row.entity_id ?? row.key ?? "";
     const seenKeys = new Set<string>();
     for (const r of [...completeRows, ...incompleteRows, ...liveIncompleteRows]) {
@@ -2667,7 +2918,7 @@ export async function runSpecSearchCore(
     // disagreed with the real clock would mis-time every widening decision.
     let runBudgetMs = 120_000;
     try {
-      const { scaledRunBudgetMs } = await import("@/lib/search/search-run.server");
+      const { scaledRunBudgetMs } = await waitForRunWork(async () => (import("@/lib/search/search-run.server")));
       runBudgetMs = rootRunBudgetMs;
     } catch {
       // non-node runtime: rely on the abort signal alone
@@ -2717,9 +2968,9 @@ export async function runSpecSearchCore(
           "widening",
           `pass ${widenPassNumber} of ${MAX_WIDEN_PASSES}`,
         );
-        const { runLiveGapfill } = await import("@/lib/search/live-gapfill");
+        const { runLiveGapfill } = await waitForRunWork(async () => (import("@/lib/search/live-gapfill")));
         setStage("widening");
-        const live = await runLiveGapfill(spec, {
+        const live = await waitForRunWork(async () => (runLiveGapfill(spec, {
           ...(liveOpt ?? {}),
           searchRunId: runIds.search_run_id,
           signal: deps.signal,
@@ -2737,7 +2988,7 @@ export async function runSpecSearchCore(
             : undefined,
           ownerId: deps.ownerId,
           // Deeper pages + more research per pass (doubles, bounded by pool).
-          desiredCount: widenDesiredCount({
+          desiredCount: requestedCount ?? widenDesiredCount({
             widenPass: widenPassNumber,
             baseDesiredCount: 30,
             poolTarget: candidatePoolTarget,
@@ -2750,7 +3001,7 @@ export async function runSpecSearchCore(
           },
           widen: true,
           widenPass: widenPassNumber,
-        });
+        })));
         widenPasses = widenPassNumber;
         providerAttempts = [...providerAttempts, ...(live.diagnostics ?? [])];
         if (!process.env.VITEST && live.diagnostics?.length) {
@@ -2830,12 +3081,20 @@ export async function runSpecSearchCore(
   // A deadline that fired mid-browser (which returned its rows anyway) must
   // not re-enter research phases here.
   if (deadlineNow()) deadlineHit = true;
-  if (!deadlineHit && liveIncompleteRows.length && enrichOpt !== null) {
+  if (!spec.signal_required && !deadlineHit && liveIncompleteRows.length && enrichOpt !== null) {
     try {
-      const { enrichIncompleteRows } = await import("@/lib/search/enrich-incomplete");
-      const enriched = await enrichIncompleteRows(liveIncompleteRows, { enrichFn: enrichOpt ?? undefined, signal: deps.signal });
+      const { enrichIncompleteRows } = await waitForRunWork(async () => (import("@/lib/search/enrich-incomplete")));
+      const eligibleInput = liveIncompleteRows.filter(row => rowCouldSatisfySpec(spec, row));
+      const eligible = mergeDuplicateCandidates(eligibleInput);
+      for (const { absorbed, survivor } of mergeReportPairs(eligibleInput, eligible.mergeReport ?? [])) ledger.merged(absorbed, survivor);
+      const rejected = liveIncompleteRows.filter(row => !rowCouldSatisfySpec(spec, row));
+      const enriched = await waitForRunWork(async () => (enrichIncompleteRows(eligible, {
+        enrichFn: enrichOpt ?? undefined, signal: deps.signal,
+        sharedBudget: enrichmentRunBudget,
+        deadlineMs: Math.min(runStartedAt + rootRunBudgetMs, Date.now() + 20_000),
+      })));
       completeRows = [...completeRows, ...enriched.complete];
-      liveIncompleteRows = enriched.stillIncomplete;
+      liveIncompleteRows = [...enriched.stillIncomplete, ...rejected];
     } catch (e) {
       console.warn("[enrich] live incomplete enrich failed:", e instanceof Error ? e.message : e);
     }
@@ -2868,7 +3127,7 @@ export async function runSpecSearchCore(
     setStage("enrichment");
   try {
       throwIfAborted(deps.signal);
-      const { enrichCandidatesForSpec } = await import("@/lib/search/enrichment-run");
+      const { enrichCandidatesForSpec } = await waitForRunWork(async () => (import("@/lib/search/enrichment-run")));
       const knownRows = completeRows.filter((row) => enrichedDbKeys.has(row.entity_id ?? row.key ?? ""));
       const poolInput = [...completeRows, ...incompleteRows];
       const pool = mergeDuplicateCandidates(poolInput);
@@ -2880,12 +3139,15 @@ export async function runSpecSearchCore(
       );
       for (const row of researchable) ledger.retrieved(row);
       researchableCount = researchable.length;
-      const enriched = await enrichCandidatesForSpec(researchable, spec, {
+      const screened = await waitForRunWork(async () => (screenRequiredSignals(researchable)));
+      const enriched = await waitForRunWork(async () => (enrichCandidatesForSpec(screened, spec, {
+        sharedBudget: enrichmentRunBudget,
+        contactBudgetMs: Math.min(20_000, Math.max(0, runStartedAt + rootRunBudgetMs - Date.now())),
         signal: deps.signal,
         maxContactCandidates: process.env.VITEST ? 0 : Math.min(14, Math.max(8, Math.ceil(candidatePoolTarget / 4))),
         maxPaidCalls: 0,
         adapters: deps.enrichmentAdapters,
-      });
+      })));
       researchedCount = enriched.rows.length;
       emitProgress("Enrichment pass complete", "enrich", undefined, `${researchedCount} candidates`);
       const checked = [...knownRows, ...enriched.rows].map((r) => sanitizeSpecRow(r, spec));
@@ -2969,14 +3231,31 @@ export async function runSpecSearchCore(
       const rowSpec =
         effectiveSpec !== spec && (row.kind === "business" || row.kind === "company") ? effectiveSpec : spec;
       if (rowSatisfiesSpec(rowSpec, row)) judged.push(row);
-      else ledger.filtered(row, postResearchRejectReason(rowSpec, row));
+      else {
+        // TEMP diagnostics: inspect real row state at judgment (remove after).
+        console.info("[stage2-judge-debug]", JSON.stringify({
+          search_run_id: runIds.search_run_id,
+          title: (row.title ?? "").slice(0, 60),
+          kind: row.kind,
+          category: row.category ?? null,
+          location: row.location ?? null,
+          country: row.country ?? null,
+          detail: (row.detail ?? "").slice(0, 70),
+          evidence: (row.evidence ?? []).slice(0, 3).map((item) => ({
+            self: item.subject === (row.entity_id ?? row.key ?? null),
+            type: item.evidence_type,
+            excerpt: (item.excerpt ?? "").slice(0, 90),
+          })),
+        }));
+        ledger.filtered(row, postResearchRejectReason(rowSpec, row) ?? undefined);
+      }
     }
     completeRows = judged;
   }
 
   enrichDoneAt = Date.now();
   const qualificationInputCount = completeRows.length;
-  const { qualifyLead } = await import("@/lib/search/qualify");
+  const { qualifyLead } = await waitForRunWork(async () => (import("@/lib/search/qualify")));
   const decisions = completeRows.map((row) => ({
     row,
     decision: qualifyLead(
@@ -3012,52 +3291,9 @@ export async function runSpecSearchCore(
     );
   }
   try {
-    const { applyWhyMatchGate } = await import("@/lib/search/live-gapfill");
-    if (spec.signal_required && !deadlineNow() && !process.env.VITEST) {
-      // Deep-signal split (WS7A): base eligibility → budgeted signal research
-      // → FINAL qualification. Kills the circular bug where a signalless
-      // candidate is rejected before it ever receives signal research.
-      // Gates are unchanged — finalQualify runs the exact production gate.
-      const { splitBaseEligibility, runDeepSignalPass, finalQualify } = await import(
-        "@/lib/signals/deep-pass.server"
-      );
-      const split = splitBaseEligibility(completeRows, spec);
-      emitProgress("Researching signals", "signals", undefined, split.baseEligible.length);
-      // WS7B V1: compile a user-supplied custom signal into observable search
-      // hypotheses. Compile failure degrades to the default signal hunter —
-      // it must never kill the search.
-      let customSignal: import("@/lib/signals/custom-compiler").CompiledCustomSignal | undefined;
-      if (typeof spec.custom_signal_text === "string" && spec.custom_signal_text.trim()) {
-        try {
-          const { compileCustomSignal } = await import("@/lib/signals/custom-compiler");
-          emitProgress("Understanding your custom signal", "signals");
-          customSignal = await compileCustomSignal(spec.custom_signal_text);
-        } catch (e) {
-          console.warn("[custom-signal] compile failed, using default signal hunter", e instanceof Error ? e.message : e);
-        }
-      }
-      const deep = await runDeepSignalPass(split.baseEligible, spec, {
-        signal: deps.signal ?? undefined,
-        customSignal,
-        onProgress: (e) => emitProgress(e.action, e.source, e.detail, e.count),
-      });
-      if (deep.verifiedRows > 0) {
-        emitProgress("Signals verified", "signals", undefined, deep.verifiedRows);
-      }
-      const fq = finalQualify({
-        signalReady: deep.signalReady,
-        alreadySignalRows: [
-          ...split.baseRejected,
-          ...deep.alreadyVerified,
-          ...deep.stillUnsignaled,
-          ...deep.notResearched,
-        ],
-        spec,
-      });
-      completeRows = fq.qualified;
-    } else {
-      completeRows = applyWhyMatchGate(completeRows, spec, !!spec.signal_required).kept;
-    }
+    const { applyWhyMatchGate } = await waitForRunWork(async () => (import("@/lib/search/live-gapfill")));
+    if (!deadlineNow()) completeRows = await waitForRunWork(async () => (screenRequiredSignals(completeRows)));
+    completeRows = applyWhyMatchGate(completeRows, spec, !!spec.signal_required).kept;
     // Belt-and-suspenders: only theorem-qualified rows may be delivered.
     completeRows = completeRows.filter((r) => r.disposition === "qualified");
     // Insufficient-evidence gate (final qualification, "Is there enough
@@ -3124,10 +3360,10 @@ export async function runSpecSearchCore(
     try {
       // Bounded import: same HMR-hang risk as the thin-ask import — a module
       // left half-initialized hangs this await forever past the deadline.
-      const persistModule = await Promise.race([
+      const persistModule = await waitForRunWork(async () => (Promise.race([
         import("@/lib/canonical/persist-live.server"),
         new Promise<null>((resolve) => setTimeout(() => resolve(null), 15_000)),
-      ]);
+      ])));
       if (!persistModule) throw new Error("persist module import timeout");
       const { stampVerified, persistVerifiedLiveRows } = persistModule;
       completeRows = stampVerified(completeRows);
@@ -3160,7 +3396,7 @@ export async function runSpecSearchCore(
         };
         // Scripts set AWAIT_PERSIST_LIVE=1 to exercise write-back synchronously.
         if (process.env.AWAIT_PERSIST_LIVE === "1") {
-          logPersist(await persistVerifiedLiveRows(liveOnly));
+          logPersist(await waitForRunWork(async () => (persistVerifiedLiveRows(liveOnly))));
         } else {
           void persistVerifiedLiveRows(liveOnly).then(logPersist);
         }
@@ -3190,18 +3426,32 @@ export async function runSpecSearchCore(
   // or validated overflow) — the result set itself has no ceiling.
   const { page, hasMore: fetchedHasMore } = applyPage(completeRows, {
     offset: pageBaseOffset,
-    limit,
+    limit: deliveryLimit,
     fetchedHitCap,
   });
+  // Deterministic drafts follow final qualification, with rechecked claim hooks.
+  if (page.length) {
+    const { buildEmailDraft, buildMessageDraft } = await waitForRunWork(async () => (import('@/lib/outreach-draft')));
+    const { verifyClaimEvidence } = await waitForRunWork(async () => (import('@/lib/search/verification')));
+    for (const row of page) {
+      if (row.disposition !== 'qualified') continue;
+      const fact = row.evidence?.find(e => verifyClaimEvidence({ evidence: e, entityId: row.entity_id ?? row.key ?? '', spec }).ok)?.excerpt;
+      const lead = { name: row.title, vertical: (row.kind === 'job' ? 'job' : row.kind === 'investor' ? 'investor' : row.kind === 'business' ? 'local' : 'company') as import('@/lib/outreach-draft').DraftVertical,
+        verifiedFactsOnly: true, whyMatch: fact ?? undefined, location: row.location ?? undefined, country: row.country ?? undefined };
+      const sender = { service: fieldOf(spec, 'offer') ?? undefined };
+      const email = buildEmailDraft(lead, sender);
+      row.outreach_drafts = { email_subject: email.subject, email_body: email.body, dm: buildMessageDraft(lead, sender) };
+    }
+  }
   // Zero-delivery contract (E2E Defect A, I01/I02/R03): when nothing was
   // returned to the user, the payload must not promise more — no "Show more"
   // affordance under 0 results, no "more verified leads" message. When at
   // least one row is delivered, the exact pagination signal is kept as-is.
-  const hasMore = page.length > 0 && fetchedHasMore;
+  const hasMore = page.length > 0 && fetchedHasMore && (requestedCount === null || effOffset + page.length < requestedCount);
   {
     // The UI renders only what the QualifiedLead projection accepts; a row
     // it refuses is a server→UI loss and must be explained, not vanish.
-    const { projectSpecRowsToQualifiedViews } = await import("@/lib/search/qualified-lead-view");
+    const { projectSpecRowsToQualifiedViews } = await waitForRunWork(async () => (import("@/lib/search/qualified-lead-view")));
     // Per row, so a namesake is never marked for another row's refusal.
     const refused = new Map<SpecRow, string>();
     for (const row of page) {
@@ -3233,10 +3483,10 @@ export async function runSpecSearchCore(
     // Bounded import: a module left half-initialized by HMR invalidation can
     // hang this await forever, leaking a zombie run past its deadline. A
     // timeout skips the optional thin-ask — delivery never depends on it.
-    const thinAskModule = await Promise.race([
+    const thinAskModule = await waitForRunWork(async () => (Promise.race([
       import("@/lib/search/clarifier"),
       new Promise<null>((resolve) => setTimeout(() => resolve(null), 15_000)),
-    ]);
+    ])));
     if (thinAskModule) thinClarify = thinAskModule.thinClarifyForSpec(spec);
     thinQuestions = thinClarify.map((q) => q.question);
   }
@@ -3314,7 +3564,7 @@ export async function runSpecSearchCore(
     qualified: completeRows.length,
     returned: page.length,
     reason: zeroReason,
-    sourceHealth: (await import("@/lib/search/source-health")).classifySourceHealth({ providers: providerAttempts, diagnostics: routeDiagnostics }),
+    sourceHealth: (await waitForRunWork(async () => (import("@/lib/search/source-health")))).classifySourceHealth({ providers: providerAttempts, diagnostics: routeDiagnostics }),
     // Full per-provider diagnostics (PRD §15): recorded on every run, surfaced
     // in the dev funnel dump below.
     providers: providerAttempts.length ? providerAttempts : undefined,
@@ -3426,7 +3676,78 @@ export async function runSpecSearchCore(
   } finally {
     runWatchdog.stop();
   }
-}
+});
+
+/** The root clock bounds every stage, including non-cooperative injected readers. */
+export const runSpecSearchCore = createServerOnlyFn(async function runSpecSearchCore(
+  query: string,
+  deps: SpecSearchDeps = {},
+  limit = 25,
+  answers: Record<string, string> = {},
+  opts: NonNullable<Parameters<typeof runSpecSearchBody>[4]> = {},
+): Promise<SpecSearchResult> {
+  const { createSearchRun, awaitSearchWork, searchAbortCode, SEARCH_DEADLINE_REASON } = await import("@/lib/search/search-run");
+  const runIds = createSearchRun(opts);
+  const runStartedAt = opts.runStartedAt ?? Date.now();
+  const runBudgetMs = opts.runBudgetMs ?? scaledRunBudgetMs(limit);
+  const controller = new AbortController();
+  const abortParent = () => controller.abort(deps.signal?.reason);
+  deps.signal?.addEventListener("abort", abortParent, { once: true });
+  if (deps.signal?.aborted) abortParent();
+  const timer = setTimeout(() => controller.abort(SEARCH_DEADLINE_REASON), Math.max(0, runStartedAt + runBudgetMs - Date.now()));
+  let checkpoint: SpecSearchResult | (() => SpecSearchResult) | undefined;
+  let settled = false;
+  try {
+    return await awaitSearchWork(runSpecSearchBody(query, { ...deps, signal: controller.signal }, limit, answers, {
+      ...opts, ...runIds, runStartedAt, runBudgetMs,
+      isSettled: () => settled || opts.isSettled?.() === true,
+      deadlineSnapshot: (result) => {
+        if (settled) return;
+        checkpoint = result;
+        opts.deadlineSnapshot?.(result);
+      },
+    }), controller.signal);
+  } catch (error) {
+    if (!controller.signal.aborted) throw error;
+    // Drain only already-settled work on a deadline. Provider admission remains
+    // closed; user cancellation returns immediately and discards candidates.
+    if (searchAbortCode(controller.signal) === "SEARCH_DEADLINE") {
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    }
+    const snapshot = typeof checkpoint === "function" ? checkpoint() : checkpoint;
+    const deadline = searchAbortCode(controller.signal) === "SEARCH_DEADLINE";
+    const rows = deadline ? snapshot?.rows ?? [] : [];
+    // User cancellation discards candidates, but the run is still fully
+    // accounted: the terminal ledger must exist or the cancellation proof
+    // (funnel accounting invariant) has nothing to verify.
+    const { mergeCandidateLedgers } = await import("@/lib/search/candidate-ledger");
+    return {
+      questions: [], clarify: [], dbMeta: snapshot?.dbMeta ?? [], rejected: snapshot?.rejected ?? 0,
+      liveDiscovery: snapshot?.liveDiscovery ?? "db_thin_gapfill_pending", pendingEnrichment: 0,
+      moreAvailableMessage: null, offset: opts.offset ?? 0, limit,
+      ...snapshot, ...runIds, spec: snapshot?.spec ?? opts.spec ?? extractSearchSpec(query), rows,
+      candidateLedger: mergeCandidateLedgers(
+        [snapshot?.candidateLedger],
+        [],
+        // Only a user cancellation retracts branch delivery truth; a deadline
+        // hands back its qualified rows as real returns.
+        deadline ? undefined : "SEARCH_CANCELLED",
+      ),
+      outcome: deadline ? (rows.length ? "QUALIFIED_RESULTS" : "SEARCH_FAILED") : "SEARCH_CANCELLED",
+      qualified_count: rows.length,
+      diagnostics: [...(snapshot?.diagnostics ?? []), {
+        code: "SOURCE_ERROR", source: "run-deadline",
+        detail: deadline ? `SEARCH_DEADLINE: root budget ${runBudgetMs}ms exhausted; returning ${rows.length} qualified rows` : searchAbortCode(controller.signal),
+      }],
+      // A timed-out source cannot prove a complete result set or an exact total.
+      hasMore: false, totalAvailable: null,
+    };
+  } finally {
+    settled = true;
+    clearTimeout(timer);
+    deps.signal?.removeEventListener("abort", abortParent);
+  }
+});
 
 export const getScrapyBrowserState = createServerFn({ method: "POST" })
   .middleware([requireMyAuth])
@@ -3558,6 +3879,11 @@ export const runSpecSearch = createServerFn({ method: "POST" })
     if (runId) beginSearchBrowserProgress(runId, ownerId);
     try {
       const coreStartedAt = Date.now();
+      console.info("[spec-run] core started", JSON.stringify({
+        search_run_id: runId,
+        conversation_id: data.conversation_id,
+        request_id: data.request_id,
+      }));
       const coreResult = await runSpecSearchCore(data.query, {
         signal: registered?.signal ?? getRequest().signal,
         browserProgress: runId ? (event) => publishSearchBrowserProgress(runId, ownerId, event) : undefined,
@@ -3582,16 +3908,23 @@ export const runSpecSearch = createServerFn({ method: "POST" })
       // raw -> spec-filter -> complete -> qualified -> delivered, with named
       // rejection reasons and per-fate accounting.
       console.info("[stage2-funnel]", JSON.stringify({
+        search_run_id: runId,
+        conversation_id: data.conversation_id,
+        request_id: data.request_id,
         query: data.query.slice(0, 80),
         outcome: coreResult.outcome,
         qualified: coreResult.qualified_count,
+        hasLedger: coreResult.candidateLedger != null,
         liveDiscovery: coreResult.liveDiscovery,
         reason: coreResult.retrievalTrace?.reason ?? null,
         raw: coreResult.retrievalTrace?.rawCandidates ?? null,
         postSpec: coreResult.retrievalTrace?.postSpecFilter ?? null,
         complete: coreResult.retrievalTrace?.complete ?? null,
         qualifiedN: coreResult.retrievalTrace?.qualified ?? null,
-        returned: coreResult.retrievalTrace?.returned ?? null,
+        returned: coreResult.retrievalTrace?.returned ??
+          // A cancelled run has no retrieval trace; the ledger's terminal
+          // count is the delivery truth (cancellation retracts returns).
+          coreResult.candidateLedger?.counts?.returned ?? null,
         widen: coreResult.widening ?? null,
         counts: coreResult.candidateLedger?.counts ?? null,
         rejectReasons: coreResult.candidateLedger?.rejectReasons ?? null,

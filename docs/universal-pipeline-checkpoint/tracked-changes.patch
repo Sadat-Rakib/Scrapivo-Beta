@@ -1,0 +1,3882 @@
+diff --git a/e2e/chaos-battery.spec.ts b/e2e/chaos-battery.spec.ts
+index f1087d47..cbabad1e 100644
+--- a/e2e/chaos-battery.spec.ts
++++ b/e2e/chaos-battery.spec.ts
+@@ -4,13 +4,21 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+ import type { SpecRow } from "../src/lib/spec-search.functions";
++import type { SearchSpec } from "../src/lib/search/search-spec";
+ import { fixMojibake } from "../src/lib/encoding";
+ import { enrichZeroNarrative, zeroResultsNarrative } from "../src/lib/search/outcome-ui";
+ 
+ const EMAIL = "e2e.scrapivo.test.001@gmail.com";
+ const PASS = "E2eTest!2026-xyz";
+ 
+-const QUERIES: Array<{ id: string; q: string }> = JSON.parse(readFileSync("e2e/fixtures/chaos-queries.json", "utf8"));
++type SemanticExpectation = {
++  entity?: string[]; places?: string[][]; notPositivePlaces?: string[]; exclusions?: string[][];
++  requiredFields?: string[]; optionalFields?: string[]; preferredFields?: string[]; alternatives?: string[][];
++  targets?: string[][]; buckets?: Array<{ target: string[]; requested: number }>; softCriteria?: string[];
++  signals?: string[]; forbiddenSignals?: string[]; signalMode?: "any"; softRecency?: boolean;
++  hardRecency?: string[]; remoteScope?: string[]; searchCombinations?: boolean;
++};
++const QUERIES: Array<{ id: string; q: string; expect?: SemanticExpectation }> = JSON.parse(readFileSync("e2e/fixtures/chaos-queries.json", "utf8"));
+ const SELECTED = process.env.CHAOS_IDS ? QUERIES.filter(item => process.env.CHAOS_IDS!.split(",").includes(item.id)) : QUERIES;
+ const ARTIFACT_DIR = process.env.CHAOS_REPORT_DIR ?? join(tmpdir(), "scrapivo-chaos", new Date().toISOString().replace(/[:.]/g, "-"));
+ mkdirSync(ARTIFACT_DIR, { recursive: true });
+@@ -51,7 +59,7 @@ type BackendResult = Omit<RunRequest, "query" | "force"> & {
+   [key: string]: unknown;
+   outcome?: string;
+   stage?: string;
+-  spec: { status?: string };
++  spec: SearchSpec;
+   clarify: unknown[];
+   rows: SpecRow[];
+   qualified_count: number;
+@@ -83,9 +91,107 @@ type ProviderEvidence = {
+   attempted: boolean;
+   succeeded: boolean;
+   queries?: number;
+-  queryFunnel?: Array<{ stage: string; serpEmpty: number; serpBlocked: number; serpErrors: number; linksObserved: number }>;
++  queryFunnel?: Array<{ query?: string; stage: string; serpEmpty: number; serpBlocked: number; serpErrors: number; linksObserved: number }>;
+ };
+ 
++// Check returned canonical meaning, never reparse the submitted wording.
++function semanticIssues(spec: SearchSpec, expected: SemanticExpectation, result?: BackendResult): string[] {
++  const issues: string[] = [];
++  const normalize = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
++  const matches = (text: string, alternatives: string[]) => {
++    const normalizedText = normalize(text);
++    if (!normalizedText) return false;
++    return alternatives.some(token => {
++      const normalizedToken = normalize(token);
++      if (!normalizedToken) return false;
++      if (normalizedToken.length <= 3) return ` ${normalizedText} `.includes(` ${normalizedToken} `);
++      return normalizedText.includes(normalizedToken);
++    });
++  };
++  const frame = spec.understanding;
++  const criteria = spec.criteria ?? [];
++  const values = (field: string) => criteria.filter(item => item.field === field).map(item => item.value);
++  const places = [ ...(spec.locations ?? []), ...values("location"), ...values("location_country"),
++    ...[frame?.location, ...(frame?.locations ?? [])].filter(Boolean).flatMap(place => [place!.value, place!.canonical ?? ""]),
++    ...(frame?.compound.subgoals ?? []).flatMap(goal => goal.location ? [goal.location.value, goal.location.canonical ?? ""] : []) ].join(" | ");
++  const required = new Set([...(spec.requested_fields ?? []), ...criteria.filter(item => item.field.startsWith("require_") && item.value !== "false").map(item => item.field.slice(8)),
++    ...(frame?.required_fields ?? []).map(field => field.value), ...(frame?.contact_requirements ?? []).map(field => field.value)]);
++  const preferred = new Set([...(frame?.preferred_fields ?? []).map(field => field.value), ...(frame?.enrichment_requirements ?? []).map(field => field.value),
++    ...criteria.filter(item => item.field.startsWith("prefer_")).map(item => item.field.slice(7))]);
++  const targetText = [frame?.target, ...(frame?.compound.subgoals ?? []).map(goal => goal.target)].filter(Boolean)
++    .flatMap(target => [target!.role, target!.job_title, target!.industry, target!.category, target!.business_type, target!.niche].map(value => value?.value ?? ""))
++    .concat(criteria.filter(item => /^(role|category|industry|investor_sector|requested_role)$/.test(item.field)).map(item => item.value)).join(" | ");
++  if (expected.entity && !expected.entity.includes(spec.entity)) issues.push(`entity ${spec.entity} not requested`);
++  for (const place of expected.places ?? []) {
++    if (!matches(places, place)) {
++      const unresolved = [...(spec.unresolved ?? []).map(item => item.raw), spec.locationSuggestion?.typed ?? ""];
++      if (!(spec.status === "needs_clarification" && unresolved.some(item => matches(item, place)))) issues.push(`lost place: ${place.join(" / ")}`);
++    }
++  }
++  for (const place of expected.notPositivePlaces ?? []) if (matches(places, [place])) issues.push(`non-target place became positive: ${place}`);
++  const exclusions = criteria.filter(item => item.field.startsWith("exclude_")).map(item => item.value)
++    .concat((frame?.constraints ?? []).filter(item => item.negated || item.operator === "neq").map(item => String(item.value ?? ""))).join(" | ");
++  for (const exclusion of expected.exclusions ?? []) if (!matches(exclusions, exclusion)) issues.push(`lost exclusion: ${exclusion.join(" / ")}`);
++  for (const field of expected.requiredFields ?? []) if (!required.has(field)) issues.push(`lost mandatory field: ${field}`);
++  for (const field of expected.optionalFields ?? []) if (required.has(field)) issues.push(`optional field became mandatory: ${field}`);
++  for (const field of expected.preferredFields ?? []) if (!preferred.has(field)) issues.push(`lost field preference: ${field}`);
++  for (const group of expected.alternatives ?? []) {
++    if (!(spec.required_field_groups ?? []).some(actual => group.every(field => actual.any_of.includes(field)))) issues.push(`lost channel OR group: ${group.join(" | ")}`);
++    if (group.some(field => required.has(field))) issues.push(`channel OR flattened into mandatory fields: ${group.join(" | ")}`);
++  }
++  for (const target of expected.targets ?? []) if (!matches(targetText, target)) issues.push(`lost target: ${target.join(" / ")}`);
++  for (const bucket of expected.buckets ?? []) {
++    const found = (frame?.compound.subgoals ?? []).some(goal => {
++      const text = [goal.target.category, goal.target.industry, goal.target.business_type].map(item => item?.value ?? "").join(" | ");
++      return matches(text, bucket.target) && goal.quantity?.requested === bucket.requested;
++    });
++    if (!found) issues.push(`lost independently counted bucket: ${bucket.target.join(" / ")} (${bucket.requested})`);
++  }
++  if (expected.buckets && (frame?.compound.subgoals.length ?? 0) < expected.buckets.length) issues.push("counted buckets collapsed");
++  for (const field of expected.softCriteria ?? []) {
++    if (criteria.some(item => item.field === field)) issues.push(`preference became hard criterion: ${field}`);
++    if (!criteria.some(item => item.field === `prefer_${field}`)) issues.push(`lost soft criterion: ${field}`);
++  }
++  for (const signal of expected.signals ?? []) if (!spec.signal_types.includes(signal)) issues.push(`lost signal type: ${signal}`);
++  for (const signal of expected.forbiddenSignals ?? []) if (spec.signal_types.includes(signal)) issues.push(`wrong signal type: ${signal}`);
++  if (expected.signalMode === "any" && !(frame?.constraints ?? []).some(item => item.field === "signal_types" && item.operator === "one_of")) issues.push("signal alternatives lack explicit OR semantics");
++  if (expected.softRecency) {
++    if (!expected.hardRecency && spec.signal_recency !== null) issues.push("preferred recency became mandatory");
++    if (!criteria.some(item => item.field.startsWith("prefer_temporal_"))) issues.push("lost preferred temporal window");
++  }
++  if (expected.hardRecency && ![spec.signal_recency ?? "", ...values("temporal_max_age")].some(value => matches(value, expected.hardRecency!))) issues.push("lost independent stale-age bound");
++  if (expected.remoteScope && !values("geo_scope").some(value => matches(value, expected.remoteScope!))) issues.push("lost worldwide remote scope");
++  const queries = (result?.providerAttempts ?? result?.retrievalTrace?.providers ?? []).flatMap(provider => provider.queryFunnel ?? []).map(query => query.query ?? "").filter(Boolean);
++  if (result?.outcome && expected.searchCombinations) {
++    for (const target of expected.targets ?? []) for (const place of expected.places ?? []) {
++      if (!queries.some(query => matches(query, target) && matches(query, place))) issues.push(`no observed search for ${target.join(" / ")} × ${place.join(" / ")}`);
++    }
++  }
++  return issues;
++}
++
++test("chaos semantic matcher uses token boundaries", () => {
++  const spec = (locations: string[]): SearchSpec => ({
++    entity: "business",
++    status: "ready",
++    criteria: [],
++    locations,
++    requested_fields: [],
++    required_field_groups: [],
++    signal_types: [],
++    signal_recency: null,
++    unresolved: [],
++  }) as unknown as SearchSpec;
++
++  expect(semanticIssues(spec(["paid search agencies", "Australia"]), { places: [["AI"], ["US"]] })).toEqual([
++    "lost place: AI",
++    "lost place: US",
++  ]);
++  expect(semanticIssues(spec(["AI consultancies", "US", "north-america robotics"]), { places: [["AI"], ["US"], ["north america"]] })).toEqual([]);
++  expect(semanticIssues(spec(["roofing contractors", "devtools agencies"]), { places: [["roof"], ["devtool"]] })).toEqual([]);
++  expect(semanticIssues(spec(["AI consultancies"]), { places: [[""]] })).toEqual(["lost place: "]);
++});
++
+ function searchRequest(request: Request, q: string, forced: boolean): RunRequest | undefined {
+   if (request.method() !== "POST") return;
+   const body = request.postData() ?? "";
+@@ -269,6 +375,8 @@ async function waitForSettlement(page: Page, id: string, q: string, action: () =
+     expect(envelope.error, "Server function returned an error").toBeUndefined();
+     expect(envelope.result).toBeDefined();
+     result = envelope.result!;
++    const expectedMeaning = QUERIES.find(query => query.id === id)?.expect;
++    if (expectedMeaning) expect(semanticIssues(result.spec, expectedMeaning, result), `${id} ${phase}: requested meaning must survive understanding and execution`).toEqual([]);
+     settled = assertBackend(result, data!, !forced, impossible);
+     if (settled !== "card" && Date.now() - startedAt > 5_000) {
+       expect(activity.length, "A running search must show progress activity before settlement").toBeGreaterThan(0);
+@@ -400,8 +508,10 @@ for (const { id, q } of SELECTED) {
+     test.setTimeout(1_400_000);
+     await login(page);
+     await expect(page.getByRole("button", { name: "Stop search", exact: true })).toBeHidden();
+-    const newChat = page.getByRole("button", { name: "New chat" }).first();
+-    if (await newChat.isVisible()) await newChat.click();
++    const newChat = page.getByRole("button", { name: "New chat", exact: true }).first();
++    await expect(newChat, "Every case must rotate the persisted conversation before submission").toBeVisible();
++    await newChat.click();
++    await expect(page.locator("div.space-y-4").filter({ has: page.getByText(q, { exact: true }) }), "Previous identical raw turn must be cleared before this run").toHaveCount(0);
+     const settled = await waitForSettlement(page, id, q, async () => {
+       await page.getByRole("textbox").first().fill(q);
+       await page.getByRole("textbox").first().press("Enter");
+diff --git a/e2e/fixtures/chaos-queries.json b/e2e/fixtures/chaos-queries.json
+index 5c6f5070..66de266d 100644
+--- a/e2e/fixtures/chaos-queries.json
++++ b/e2e/fixtures/chaos-queries.json
+@@ -9,6 +9,7 @@
+   },
+   {
+     "id": "Q8",
++    "expect": { "places": [["Dubai"], ["Singapore"], ["Sydney"], ["Toronto"]], "optionalFields": ["email", "phone"] },
+     "q": "yo need some companies in dubai singapore sydney maybe toronto too that do logistics freight forwarding shipping customs type stuff, around 10-20 per place if possible, contact details preferred, skip giant global companies like dhl fedex etc i want actual regional/local operators"
+   },
+   {
+@@ -17,6 +18,7 @@
+   },
+   {
+     "id": "Q12",
++    "expect": { "entity": ["job"], "remoteScope": ["global", "worldwide"], "exclusions": [["us-only", "US only"]], "softRecency": true, "hardRecency": ["180d", "6m"] },
+     "q": "im looking for remote jobs globally basically frontend react nextjs typescript maybe fullstack node too, internship junior entry level 0-1 yr but 2 yrs requirement is okay if everything else fits, posted recently ideally last few days/weeks, dont show me us-only remote pretending to be worldwide remote and dont give me 6 month old stuff"
+   },
+   {
+@@ -29,10 +31,12 @@
+   },
+   {
+     "id": "Q4",
++    "expect": { "places": [["Bali"], ["Phuket"], ["Santorini"]], "alternatives": [["website", "instagram"]], "optionalFields": ["email"] },
+     "q": "can you find like wedding photographers videographers and maybe small creative studios in bali, phuket and santorini? mainly businesses that actually do weddings, need their site or insta and some way to contact them, but dont reject somebody just because you couldnt find an email yet"
+   },
+   {
+     "id": "Q5",
++    "expect": { "entity": ["investor"], "places": [["Canada"], ["USA", "United States"]], "signals": ["investment"], "forbiddenSignals": ["funding"], "softCriteria": ["investor_stage", "investor_check"], "softRecency": true },
+     "q": "looking for investors who actually invest in ai startups, ideally seed/preseed, canada or us is good, checks maybe 100k to 2m ish but thats not an absolute rule, bonus if theyve invested in devtools automation agents data infra kinda stuff recently, i want actual funds/angels not articles talking about venture capital"
+   },
+   {
+@@ -45,34 +49,42 @@
+   },
+   {
+     "id": "Q11",
++    "expect": { "places": [["USA", "United States"], ["Canada"]], "buckets": [{ "target": ["cybersecurity"], "requested": 15 }, { "target": ["AI", "devtool", "developer tools"], "requested": 15 }], "softCriteria": ["employee_count"] },
+     "q": "need maybe 15 cybersecurity companies then another 15 ai infra/devtool startups, mostly usa/canada, preferably under like 100 employees but if headcount is unknown dont kill the result, founders or decision makers would be useful and pls dont mix cybersecurity consultants with actual product companies unless they genuinely fit"
+   },
+   {
+     "id": "Q13",
++    "expect": { "entity": ["business", "company"], "places": [["Ottawa"], ["Gatineau"]], "requiredFields": ["email"], "optionalFields": ["phone"], "preferredFields": ["phone"] },
+     "q": "need about 12 independent dental clinics around Ottawa and Gatineau, email is mandatory because this is an email campaign, phone would be nice but dont require it, bilingual sites fine and skip national chains"
+   },
+   {
+     "id": "Q14",
++    "expect": { "places": [["Alberta"]], "notPositivePlaces": ["Calgary"], "exclusions": [["Calgary"]], "optionalFields": ["email", "phone"], "targets": [["roof"], ["gutter"]] },
+     "q": "find local roofing and gutter companies anywhere in Alberta except Calgary, Edmonton Red Deer Lethbridge are examples not the whole list, roughly 15 and phone preferred but no email is totally fine"
+   },
+   {
+     "id": "Q15",
++    "expect": { "places": [["Wellington"], ["Christchurch"], ["New Zealand", "NZ"]], "notPositivePlaces": ["Canada"], "alternatives": [["instagram", "website"]], "targets": [["coffee roaster"], ["cafe"]] },
+     "q": "need coffee roasters and specialty cafes in Wellington and Christchurch New Zealand, not Canada just mentioning Canada because thats where im contacting them from, small real operators with instagram or website and whatever contact you can verify"
+   },
+   {
+     "id": "Q16",
++    "expect": { "places": [["Porto"], ["Braga"]], "targets": [["florist"], ["cater"]], "optionalFields": ["email"], "searchCombinations": true },
+     "q": "wedding florists plus event caterers in Porto and Braga Portugal, search both kinds in both places please, about 5 per combination if possible, prefer independent businesses, email nice to have not required"
+   },
+   {
+     "id": "Q17",
++    "expect": { "entity": ["person"], "places": [["Germany"], ["Netherlands"]], "targets": [["founder", "cofounder"]], "signals": ["funding", "hiring"], "signalMode": "any" },
+     "q": "find founders or cofounders of early stage climate tech and battery startups in Germany or Netherlands that recently raised funding or are hiring sales growth people, either signal is enough, names and proof preferred, dont swap in recruiters or employees"
+   },
+   {
+     "id": "Q18",
++    "expect": { "entity": ["investor"], "places": [["Australia"], ["New Zealand"]], "signals": ["investment"], "forbiddenSignals": ["funding"], "optionalFields": ["email"], "softRecency": true },
+     "q": "looking for funds or angels investing preseed seed in healthtech in Australia or New Zealand, recent portfolio or new fund announcements are helpful signals not mandatory, need actual investors not VC news sites, website okay if contact email is unknown"
+   },
+   {
+     "id": "Q19",
++    "expect": { "entity": ["job"], "places": [["Europe"], ["Dublin"], ["Lisbon"]], "targets": [["data analyst"], ["python developer"]], "softRecency": true },
+     "q": "junior data analyst or python developer jobs remote across Europe, hybrid Dublin or Lisbon also okay, posted in the last month ideally, 0 to 2 years preferred and salary unknown fine, actual current employer openings not job board companies"
+   }
+ ]
+diff --git a/freehire b/freehire
+--- a/freehire
++++ b/freehire
+@@ -1 +1 @@
+-Subproject commit 59718b25cb4834c4ced8e661c0bcbaf3ee2706f5
++Subproject commit 59718b25cb4834c4ced8e661c0bcbaf3ee2706f5-dirty
+diff --git a/package-lock.json b/package-lock.json
+index e2332b61..4b65195e 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -98,7 +98,7 @@
+         "tsx": "^4.23.12",
+         "typescript": "^5.8.3",
+         "typescript-eslint": "^8.56.1",
+-        "vite": "^7.3.1",
++        "vite": "8.2.2",
+         "vitest": "^4.1.10"
+       }
+     },
+@@ -1104,20 +1104,6 @@
+         "node": ">=18"
+       }
+     },
+-    "node_modules/@esbuild/win32-x64": {
+-      "version": "0.27.7",
+-      "cpu": [
+-        "x64"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "win32"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+     "node_modules/@eslint-community/eslint-utils": {
+       "version": "4.9.1",
+       "dev": true,
+@@ -1891,11 +1877,13 @@
+       }
+     },
+     "node_modules/@lovable.dev/vite-plugin-dev-server-bridge": {
+-      "version": "1.0.0",
++      "version": "1.3.2",
++      "resolved": "https://registry.npmjs.org/@lovable.dev/vite-plugin-dev-server-bridge/-/vite-plugin-dev-server-bridge-1.3.2.tgz",
++      "integrity": "sha512-YaokG/3zDEu1lUE6pD+ua+fDxTVvnJQhs1NdXpnJAZMAMeu3kGqG0UrbSezD2u63dwzC1N0D6ku2lh35yErolQ==",
+       "dev": true,
+       "license": "MIT",
+       "peerDependencies": {
+-        "vite": ">=5.0.0 <8.0.0"
++        "vite": ">=5.0.0 <9.0.0"
+       },
+       "peerDependenciesMeta": {
+         "vite": {
+@@ -1904,11 +1892,13 @@
+       }
+     },
+     "node_modules/@lovable.dev/vite-plugin-hmr-gate": {
+-      "version": "1.0.0",
++      "version": "1.8.1",
++      "resolved": "https://registry.npmjs.org/@lovable.dev/vite-plugin-hmr-gate/-/vite-plugin-hmr-gate-1.8.1.tgz",
++      "integrity": "sha512-8yxJ051W8K3IFsnezLDYHLRRWLaHf0thBxFH2bygmLCDQu85/KrB2Xcjne0GwnrIWEWMD9sw06WJCc17yuYiNA==",
+       "dev": true,
+       "license": "MIT",
+       "peerDependencies": {
+-        "vite": ">=5.0.0 <8.0.0"
++        "vite": ">=5.0.0 <9.0.0"
+       },
+       "peerDependenciesMeta": {
+         "vite": {
+@@ -2043,11 +2033,12 @@
+       }
+     },
+     "node_modules/@oxc-project/types": {
+-      "version": "0.134.0",
+-      "dev": true,
++      "version": "0.153.0",
++      "resolved": "https://registry.npmjs.org/@oxc-project/types/-/types-0.153.0.tgz",
++      "integrity": "sha512-jSNrRIyvPVLL5E1z/tS5zLAprosGz/FuI1PWwEOz59j3E4TTTzSpqKb/RDGqJhhW0QHYISGXxq582wGx6T11Tw==",
+       "license": "MIT",
+       "funding": {
+-        "url": "https://github.com/sponsors/Boshen"
++        "url": "https://github.com/sponsors/oxc-project"
+       }
+     },
+     "node_modules/@pkgr/core": {
+@@ -3612,43 +3603,26 @@
+       "version": "1.1.1",
+       "license": "MIT"
+     },
+-    "node_modules/@rolldown/binding-win32-x64-msvc": {
+-      "version": "1.1.0",
++    "node_modules/@rolldown/binding-android-arm-eabi": {
++      "version": "1.2.13",
++      "resolved": "https://registry.npmjs.org/@rolldown/binding-android-arm-eabi/-/binding-android-arm-eabi-1.2.13.tgz",
++      "integrity": "sha512-Vu/NICrgdRvUOeaJZIyB2FP63s6fO/4ud5l8dXmxDx9yDyn+mN0y+gsvsVviSli+T361Aqo0h46EuMoobrwawA==",
+       "cpu": [
+-        "x64"
++        "arm"
+       ],
+-      "dev": true,
+       "license": "MIT",
+       "optional": true,
+       "os": [
+-        "win32"
++        "android"
+       ],
+       "engines": {
+         "node": "^20.19.0 || >=22.12.0"
+       }
+     },
+-    "node_modules/@rolldown/pluginutils": {
+-      "version": "1.0.0-rc.3",
+-      "dev": true,
+-      "license": "MIT"
+-    },
+-    "node_modules/@rollup/rollup-android-arm-eabi": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-android-arm-eabi/-/rollup-android-arm-eabi-4.62.2.tgz",
+-      "integrity": "sha512-6o7ZLZK+BeenkZCFNDXqpbjw9bD6nuWonvS/lwQJp7NoVVxm6p3qE7qQ5jGuBjiFsgvqjD8mZAU5oWxTmbOeOg==",
+-      "cpu": [
+-        "arm"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "android"
+-      ]
+-    },
+-    "node_modules/@rollup/rollup-android-arm64": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-android-arm64/-/rollup-android-arm64-4.62.2.tgz",
+-      "integrity": "sha512-BaH7BllCACHoH1LguOU56UItGfUWjujlO65kS9LAodViaN4bwIKd7oeW/ZHJ/4ljr/7MIiENnNy3HJ0zXv8Zkw==",
++    "node_modules/@rolldown/binding-android-arm64": {
++      "version": "1.2.13",
++      "resolved": "https://registry.npmjs.org/@rolldown/binding-android-arm64/-/binding-android-arm64-1.2.13.tgz",
++      "integrity": "sha512-6LEoIrGy5vvCd2boNnv2soPSUZj/PRvhp8R/t9KlX+mIZxThIE/ZqxrGXxmuNX0FuvQFvLdZr7S4HrYpYBVhEQ==",
+       "cpu": [
+         "arm64"
+       ],
+@@ -3656,12 +3630,15 @@
+       "optional": true,
+       "os": [
+         "android"
+-      ]
++      ],
++      "engines": {
++        "node": "^20.19.0 || >=22.12.0"
++      }
+     },
+-    "node_modules/@rollup/rollup-darwin-arm64": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-darwin-arm64/-/rollup-darwin-arm64-4.62.2.tgz",
+-      "integrity": "sha512-v39RCCvj4He82I9sFmk+M1VZ0PLM9sfsLVikjfx2hYBNALhrrOR2D3JjQA6AhlaSOgcR+RzrKY7e1+bT6SUO/A==",
++    "node_modules/@rolldown/binding-darwin-arm64": {
++      "version": "1.2.13",
++      "resolved": "https://registry.npmjs.org/@rolldown/binding-darwin-arm64/-/binding-darwin-arm64-1.2.13.tgz",
++      "integrity": "sha512-CaJSRzlQ6Q+zkDMVA9OkVxBjVoPRCDEE3v0FSJ9kIQBgRjFApA3Si4ijhbNVUji7ZJt+PfO0e46qy4nPInHUPA==",
+       "cpu": [
+         "arm64"
+       ],
+@@ -3669,12 +3646,15 @@
+       "optional": true,
+       "os": [
+         "darwin"
+-      ]
++      ],
++      "engines": {
++        "node": "^20.19.0 || >=22.12.0"
++      }
+     },
+-    "node_modules/@rollup/rollup-darwin-x64": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-darwin-x64/-/rollup-darwin-x64-4.62.2.tgz",
+-      "integrity": "sha512-yl0y2vq3S3lHeuXhEdss6TWfKW8vkujImO12tn4ZkG/4oghr09LvdYm2RElVjokTQiUvDUGXLGsYeLqUMCKpGA==",
++    "node_modules/@rolldown/binding-darwin-x64": {
++      "version": "1.2.13",
++      "resolved": "https://registry.npmjs.org/@rolldown/binding-darwin-x64/-/binding-darwin-x64-1.2.13.tgz",
++      "integrity": "sha512-e4r340I5hxSzJkD3YJBxgzq/rJ3wwxwdLLb2FPt1Zpyem20nrQPT11DDEEkazwxaHumH8wpglsp/Ozgj/wT6mw==",
+       "cpu": [
+         "x64"
+       ],
+@@ -3682,25 +3662,15 @@
+       "optional": true,
+       "os": [
+         "darwin"
+-      ]
+-    },
+-    "node_modules/@rollup/rollup-freebsd-arm64": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-freebsd-arm64/-/rollup-freebsd-arm64-4.62.2.tgz",
+-      "integrity": "sha512-tT4pvt4qXD+vEoezupCWi+a1F0vvDiksiHc+PxRlYTOH1I6/X4id9jPxTP+Fg+545euaFT1jJVs4CEdHZAU1vw==",
+-      "cpu": [
+-        "arm64"
+       ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "freebsd"
+-      ]
++      "engines": {
++        "node": "^20.19.0 || >=22.12.0"
++      }
+     },
+-    "node_modules/@rollup/rollup-freebsd-x64": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-freebsd-x64/-/rollup-freebsd-x64-4.62.2.tgz",
+-      "integrity": "sha512-6nU5F2wCW+qvCBhTn1pdIU3bzsIoF7EUwsCDRxilWGprQR6yd508YnH9+OKFCwpfS8pjZqDUmnCAr7exax0XCg==",
++    "node_modules/@rolldown/binding-freebsd-x64": {
++      "version": "1.2.13",
++      "resolved": "https://registry.npmjs.org/@rolldown/binding-freebsd-x64/-/binding-freebsd-x64-1.2.13.tgz",
++      "integrity": "sha512-hoBWDZ4/K/mJKVMbsgUd1jfpA2DiOrJ54mpegObU9TBHBBrtX4FLIXJJQRDPZ/2Dn91GvPob+Z2hwKJzf4E5SQ==",
+       "cpu": [
+         "x64"
+       ],
+@@ -3708,25 +3678,15 @@
+       "optional": true,
+       "os": [
+         "freebsd"
+-      ]
+-    },
+-    "node_modules/@rollup/rollup-linux-arm-gnueabihf": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-arm-gnueabihf/-/rollup-linux-arm-gnueabihf-4.62.2.tgz",
+-      "integrity": "sha512-n1GJHPOvpIfhi3TmrCeh6S6URt9BFCt0KQE3qvexyGCTAKpR4Lg+eWvNZEqu7epxwus/8ElT3hacYEucm49SZg==",
+-      "cpu": [
+-        "arm"
+       ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "linux"
+-      ]
++      "engines": {
++        "node": "^20.19.0 || >=22.12.0"
++      }
+     },
+-    "node_modules/@rollup/rollup-linux-arm-musleabihf": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-arm-musleabihf/-/rollup-linux-arm-musleabihf-4.62.2.tgz",
+-      "integrity": "sha512-JqgflS8wEB+UXV/vS1RpRbifGBeN4D5lz8D8oOFbFZw4vedvdOgCFAjfBmIMdW3yL10XpQQ0Ambepw6MXrhOnA==",
++    "node_modules/@rolldown/binding-linux-arm-gnueabihf": {
++      "version": "1.2.13",
++      "resolved": "https://registry.npmjs.org/@rolldown/binding-linux-arm-gnueabihf/-/binding-linux-arm-gnueabihf-1.2.13.tgz",
++      "integrity": "sha512-oF9fZu3vTWnTiVAkDFxU9PJLt1nh20K9RRpuHsR7ZnE2L7XookBbDBVLojCVSLGbvtSlxeUNnjAj6DbNsKyzbg==",
+       "cpu": [
+         "arm"
+       ],
+@@ -3734,25 +3694,15 @@
+       "optional": true,
+       "os": [
+         "linux"
+-      ]
+-    },
+-    "node_modules/@rollup/rollup-linux-arm64-gnu": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-arm64-gnu/-/rollup-linux-arm64-gnu-4.62.2.tgz",
+-      "integrity": "sha512-wnFJkogWvN4jm/hQRF2UBaeUmk20j5+DmHvoyWii2b8HJDyvz1MF2OU/6ynXt2KR63rbZLWkFpoytpdc/yBuSA==",
+-      "cpu": [
+-        "arm64"
+       ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "linux"
+-      ]
++      "engines": {
++        "node": "^20.19.0 || >=22.12.0"
++      }
+     },
+-    "node_modules/@rollup/rollup-linux-arm64-musl": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-arm64-musl/-/rollup-linux-arm64-musl-4.62.2.tgz",
+-      "integrity": "sha512-HVu2bp0zhvJ8xHEV9+UUs7S90VadmBSY3LcIMvozbPo4AuMGDWlz3ymHLHZPX4hR67TKTt8Qp5PJ5RBg/i+RMQ==",
++    "node_modules/@rolldown/binding-linux-arm64-gnu": {
++      "version": "1.2.13",
++      "resolved": "https://registry.npmjs.org/@rolldown/binding-linux-arm64-gnu/-/binding-linux-arm64-gnu-1.2.13.tgz",
++      "integrity": "sha512-DTpb/+jMiqWMPgphn4ksW1zW+XLJ6dJJ9FMvnIk9I291LhCctMPhMYJrP5t9p6C9qa3KXadDdUEZHBaPh3kNxQ==",
+       "cpu": [
+         "arm64"
+       ],
+@@ -3760,51 +3710,31 @@
+       "optional": true,
+       "os": [
+         "linux"
+-      ]
+-    },
+-    "node_modules/@rollup/rollup-linux-loong64-gnu": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-loong64-gnu/-/rollup-linux-loong64-gnu-4.62.2.tgz",
+-      "integrity": "sha512-mQqqAV8QaoSgr9I2fKDLY2BAVvmKjWoGiu/cSYQonsLvtqwEn1E4QYfnCOcp5zoEqNhsDYin1s6jx/VJmrxlZg==",
+-      "cpu": [
+-        "loong64"
+       ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "linux"
+-      ]
++      "engines": {
++        "node": "^20.19.0 || >=22.12.0"
++      }
+     },
+-    "node_modules/@rollup/rollup-linux-loong64-musl": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-loong64-musl/-/rollup-linux-loong64-musl-4.62.2.tgz",
+-      "integrity": "sha512-IxKLoxCQ2IWi6bT2akyDUBGsOImDKB+sPp4EsTmwFQ/fMwpCKm8uLSSgP/Kx/QYUgKis6SEZ5/Nlhup0DIA0PQ==",
++    "node_modules/@rolldown/binding-linux-arm64-musl": {
++      "version": "1.2.13",
++      "resolved": "https://registry.npmjs.org/@rolldown/binding-linux-arm64-musl/-/binding-linux-arm64-musl-1.2.13.tgz",
++      "integrity": "sha512-xU+Kvv9N2A3SY35zFh1FWWNjxbadE/BKeqnkXe7vScU4GZsw757BlVmDLITZEq8DPpk6m7uoDYkK7P+x/uU5Ow==",
+       "cpu": [
+-        "loong64"
++        "arm64"
+       ],
+       "license": "MIT",
+       "optional": true,
+       "os": [
+         "linux"
+-      ]
+-    },
+-    "node_modules/@rollup/rollup-linux-ppc64-gnu": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-ppc64-gnu/-/rollup-linux-ppc64-gnu-4.62.2.tgz",
+-      "integrity": "sha512-Mk5ha2RQSgyFfmYYLkBpPnUk8D8FriBxesO1u9O75X0mHgXL1UQcH5Itl2lurWL2tj0RxV9b9tJgipac0hRY9A==",
+-      "cpu": [
+-        "ppc64"
+       ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "linux"
+-      ]
++      "engines": {
++        "node": "^20.19.0 || >=22.12.0"
++      }
+     },
+-    "node_modules/@rollup/rollup-linux-ppc64-musl": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-ppc64-musl/-/rollup-linux-ppc64-musl-4.62.2.tgz",
+-      "integrity": "sha512-CjvEnqJL/0/TQ3TXX3OPIJ/kmBellrWd4heXUmHeJlTnmwjKpSJzoehLaL6Xk0ZnMHBu9dZuFADNOrtjF4v+2w==",
++    "node_modules/@rolldown/binding-linux-ppc64-gnu": {
++      "version": "1.2.13",
++      "resolved": "https://registry.npmjs.org/@rolldown/binding-linux-ppc64-gnu/-/binding-linux-ppc64-gnu-1.2.13.tgz",
++      "integrity": "sha512-XMk/hnhh25oQ756Lclb1Q11h4ll0xC0Esa5w4Vzp+mAE2S3AGJgeM0SonrIgY8fHhjarb6hcoTuwoFG0VVP2ig==",
+       "cpu": [
+         "ppc64"
+       ],
+@@ -3812,38 +3742,15 @@
+       "optional": true,
+       "os": [
+         "linux"
+-      ]
+-    },
+-    "node_modules/@rollup/rollup-linux-riscv64-gnu": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-riscv64-gnu/-/rollup-linux-riscv64-gnu-4.62.2.tgz",
+-      "integrity": "sha512-1SiZbzwdkaDURsew/tSOrooKiYy7EQGT6m8ufavAi9NEyQb/6VuIxFXAL1fqa4iZe3g4NbNk4P7J32z2tw5Mgg==",
+-      "cpu": [
+-        "riscv64"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "linux"
+-      ]
+-    },
+-    "node_modules/@rollup/rollup-linux-riscv64-musl": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-riscv64-musl/-/rollup-linux-riscv64-musl-4.62.2.tgz",
+-      "integrity": "sha512-nQts12zJ3NQRoE6uYljOH89v7szzLDvG2JD/vsX+vGXU8w/At1GowTZ5/7qeFQ8m7L55rpR8Okugnuo5bgjy2Q==",
+-      "cpu": [
+-        "riscv64"
+       ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "linux"
+-      ]
++      "engines": {
++        "node": "^20.19.0 || >=22.12.0"
++      }
+     },
+-    "node_modules/@rollup/rollup-linux-s390x-gnu": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-s390x-gnu/-/rollup-linux-s390x-gnu-4.62.2.tgz",
+-      "integrity": "sha512-E9/ll019jhPIJgpzfZoIkBGhcz+kKNgVWYRY0zr9srBdPPFVpvOKW8VaJKUbeK+eZXyQF9ltME+Kk6affeaPgg==",
++    "node_modules/@rolldown/binding-linux-s390x-gnu": {
++      "version": "1.2.13",
++      "resolved": "https://registry.npmjs.org/@rolldown/binding-linux-s390x-gnu/-/binding-linux-s390x-gnu-1.2.13.tgz",
++      "integrity": "sha512-U1BoTHYmlywE2n3HUWjzZ+8EQsKr+OwpxYuDWaubx42tUL8QSL7nOqRz/NVHanibbFP3M1Rxuprz/wNcbMKjqw==",
+       "cpu": [
+         "s390x"
+       ],
+@@ -3851,12 +3758,15 @@
+       "optional": true,
+       "os": [
+         "linux"
+-      ]
++      ],
++      "engines": {
++        "node": "^20.19.0 || >=22.12.0"
++      }
+     },
+-    "node_modules/@rollup/rollup-linux-x64-gnu": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-x64-gnu/-/rollup-linux-x64-gnu-4.62.2.tgz",
+-      "integrity": "sha512-5BqxR/pshjey51iliyzTD5Xi3EN0aLmQ2lZ3lvefVV9c82BvrLo2/6OT55iifpWBufs6kdwWbuOKS841DrmK9A==",
++    "node_modules/@rolldown/binding-linux-x64-gnu": {
++      "version": "1.2.13",
++      "resolved": "https://registry.npmjs.org/@rolldown/binding-linux-x64-gnu/-/binding-linux-x64-gnu-1.2.13.tgz",
++      "integrity": "sha512-J4cm80Pc6wEwV5AZ42o62sIQgDk+Y7R2s646jIwuvO+4V46QB58N4vVuMPWCBaNgursXLpmUWJV//WQAkPvHBQ==",
+       "cpu": [
+         "x64"
+       ],
+@@ -3864,12 +3774,15 @@
+       "optional": true,
+       "os": [
+         "linux"
+-      ]
++      ],
++      "engines": {
++        "node": "^20.19.0 || >=22.12.0"
++      }
+     },
+-    "node_modules/@rollup/rollup-linux-x64-musl": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-x64-musl/-/rollup-linux-x64-musl-4.62.2.tgz",
+-      "integrity": "sha512-uNN83XxQrRAh/w0/pmAfibcwyb6YWt4gP+dpnQKPVJshAloQ785ii8CT8ZCIxkGg9opVsvAlGhFitSm6D1Jjpg==",
++    "node_modules/@rolldown/binding-linux-x64-musl": {
++      "version": "1.2.13",
++      "resolved": "https://registry.npmjs.org/@rolldown/binding-linux-x64-musl/-/binding-linux-x64-musl-1.2.13.tgz",
++      "integrity": "sha512-W0euZS40U4V6JkmEnVCIX9mcsL6cbXQ4X8c2w+MMOIjFg68TXUW+u3RT+2e1t1pv9mg/EP3pDtK3POXdQ7Rxyw==",
+       "cpu": [
+         "x64"
+       ],
+@@ -3877,25 +3790,15 @@
+       "optional": true,
+       "os": [
+         "linux"
+-      ]
+-    },
+-    "node_modules/@rollup/rollup-openbsd-x64": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-openbsd-x64/-/rollup-openbsd-x64-4.62.2.tgz",
+-      "integrity": "sha512-srjEIxSH3LRnJN6THczDHWQplqEMFiAJrTab0msUryh9kwNpkICf3Ea6q6MN/2cZwRFUNx5w+h6Hpi4QuHS6Zg==",
+-      "cpu": [
+-        "x64"
+       ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "openbsd"
+-      ]
++      "engines": {
++        "node": "^20.19.0 || >=22.12.0"
++      }
+     },
+-    "node_modules/@rollup/rollup-openharmony-arm64": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-openharmony-arm64/-/rollup-openharmony-arm64-4.62.2.tgz",
+-      "integrity": "sha512-8hOJnxgbyObnCm5AlRA3A931xX19xq80RjVTKgJOvEKWqJruP/Uf12IbAOaDjjEXYRewwHLfmF0YRIdK3OwKWA==",
++    "node_modules/@rolldown/binding-openharmony-arm64": {
++      "version": "1.2.13",
++      "resolved": "https://registry.npmjs.org/@rolldown/binding-openharmony-arm64/-/binding-openharmony-arm64-1.2.13.tgz",
++      "integrity": "sha512-do/AF/4n9MRshia3a5aXoy8xM2c6mgfT6D7H/dY6my5z+hfCIR4ab7mk4IRj++nsEQpKy39kd0DQnDq+r692tw==",
+       "cpu": [
+         "arm64"
+       ],
+@@ -3903,12 +3806,15 @@
+       "optional": true,
+       "os": [
+         "openharmony"
+-      ]
++      ],
++      "engines": {
++        "node": "^20.19.0 || >=22.12.0"
++      }
+     },
+-    "node_modules/@rollup/rollup-win32-arm64-msvc": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-win32-arm64-msvc/-/rollup-win32-arm64-msvc-4.62.2.tgz",
+-      "integrity": "sha512-mmF4AY1i0hG/bLWUctUq59gtmgaSIRa3cu/A3JFRp/sCNEme2bgDEiDS22P9FbnJB8NJNF4jPJiSP5RHQpUTDg==",
++    "node_modules/@rolldown/binding-win32-arm64-msvc": {
++      "version": "1.2.13",
++      "resolved": "https://registry.npmjs.org/@rolldown/binding-win32-arm64-msvc/-/binding-win32-arm64-msvc-1.2.13.tgz",
++      "integrity": "sha512-6FtUf2cJZobutJdxnGYX8z0vtbgqU0b2v8vfBhkXb9wp2MppMFtkunE+IaOntyi01rkIQoPW2GHABtfzsC0BRQ==",
+       "cpu": [
+         "arm64"
+       ],
+@@ -3916,25 +3822,15 @@
+       "optional": true,
+       "os": [
+         "win32"
+-      ]
+-    },
+-    "node_modules/@rollup/rollup-win32-ia32-msvc": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-win32-ia32-msvc/-/rollup-win32-ia32-msvc-4.62.2.tgz",
+-      "integrity": "sha512-DZgkknc6jhHrk46V25vbAM0zZkyP0nSDkJB8/dRkLTxv470dOmWDqGoEJl/9A0dFfS7yE3REOwNDxpHwSLSt0Q==",
+-      "cpu": [
+-        "ia32"
+       ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "win32"
+-      ]
++      "engines": {
++        "node": "^20.19.0 || >=22.12.0"
++      }
+     },
+-    "node_modules/@rollup/rollup-win32-x64-gnu": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-win32-x64-gnu/-/rollup-win32-x64-gnu-4.62.2.tgz",
+-      "integrity": "sha512-T6xr6ucWSFto+VGajA8YH26LdpHRuP4YLHEKAtCWvJDOlnmWcDZVCI2Jmjr+IFHDlt2zRaTAKE4tfjTaWLgJBg==",
++    "node_modules/@rolldown/binding-win32-x64-msvc": {
++      "version": "1.2.13",
++      "resolved": "https://registry.npmjs.org/@rolldown/binding-win32-x64-msvc/-/binding-win32-x64-msvc-1.2.13.tgz",
++      "integrity": "sha512-UKhFaZTeTcbKrb3iU82m17jVcPEAoqDkCN5MBqgPyZSwp/cQmib21crTS0DdH7T1B7wZRWEI89YQAOJMet5yhg==",
+       "cpu": [
+         "x64"
+       ],
+@@ -3942,20 +3838,15 @@
+       "optional": true,
+       "os": [
+         "win32"
+-      ]
+-    },
+-    "node_modules/@rollup/rollup-win32-x64-msvc": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.62.2.tgz",
+-      "integrity": "sha512-BfzEnDJOt9T8M989/lA37EcJgat01wLRnoi5dQf3QzOH7jzpqTAzdDbVfRljVr5r+jzKqpbHeyOfAaXxAd0PAA==",
+-      "cpu": [
+-        "x64"
+       ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "win32"
+-      ]
++      "engines": {
++        "node": "^20.19.0 || >=22.12.0"
++      }
++    },
++    "node_modules/@rolldown/pluginutils": {
++      "version": "1.0.0-rc.3",
++      "dev": true,
++      "license": "MIT"
+     },
+     "node_modules/@smithy/core": {
+       "version": "3.33.3",
+@@ -4839,6 +4730,7 @@
+       "version": "1.0.9",
+       "resolved": "https://registry.npmjs.org/@types/estree/-/estree-1.0.9.tgz",
+       "integrity": "sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==",
++      "dev": true,
+       "license": "MIT"
+     },
+     "node_modules/@types/json-schema": {
+@@ -6274,505 +6166,66 @@
+       "integrity": "sha512-Um/+FxMr9CISWh0bi5Zv0iOD+4cFh5qLeks1qhAopKVAJw3drgKbKySikp7wGhDL0HPeaja0P5ULZrxLkniUVg==",
+       "license": "MIT"
+     },
+-    "node_modules/esbuild": {
+-      "version": "0.27.7",
+-      "hasInstallScript": true,
+-      "license": "MIT",
+-      "bin": {
+-        "esbuild": "bin/esbuild"
+-      },
+-      "engines": {
+-        "node": ">=18"
+-      },
+-      "optionalDependencies": {
+-        "@esbuild/aix-ppc64": "0.27.7",
+-        "@esbuild/android-arm": "0.27.7",
+-        "@esbuild/android-arm64": "0.27.7",
+-        "@esbuild/android-x64": "0.27.7",
+-        "@esbuild/darwin-arm64": "0.27.7",
+-        "@esbuild/darwin-x64": "0.27.7",
+-        "@esbuild/freebsd-arm64": "0.27.7",
+-        "@esbuild/freebsd-x64": "0.27.7",
+-        "@esbuild/linux-arm": "0.27.7",
+-        "@esbuild/linux-arm64": "0.27.7",
+-        "@esbuild/linux-ia32": "0.27.7",
+-        "@esbuild/linux-loong64": "0.27.7",
+-        "@esbuild/linux-mips64el": "0.27.7",
+-        "@esbuild/linux-ppc64": "0.27.7",
+-        "@esbuild/linux-riscv64": "0.27.7",
+-        "@esbuild/linux-s390x": "0.27.7",
+-        "@esbuild/linux-x64": "0.27.7",
+-        "@esbuild/netbsd-arm64": "0.27.7",
+-        "@esbuild/netbsd-x64": "0.27.7",
+-        "@esbuild/openbsd-arm64": "0.27.7",
+-        "@esbuild/openbsd-x64": "0.27.7",
+-        "@esbuild/openharmony-arm64": "0.27.7",
+-        "@esbuild/sunos-x64": "0.27.7",
+-        "@esbuild/win32-arm64": "0.27.7",
+-        "@esbuild/win32-ia32": "0.27.7",
+-        "@esbuild/win32-x64": "0.27.7"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/aix-ppc64": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/aix-ppc64/-/aix-ppc64-0.27.7.tgz",
+-      "integrity": "sha512-EKX3Qwmhz1eMdEJokhALr0YiD0lhQNwDqkPYyPhiSwKrh7/4KRjQc04sZ8db+5DVVnZ1LmbNDI1uAMPEUBnQPg==",
+-      "cpu": [
+-        "ppc64"
+-      ],
++    "node_modules/escalade": {
++      "version": "3.2.0",
+       "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "aix"
+-      ],
+       "engines": {
+-        "node": ">=18"
++        "node": ">=6"
+       }
+     },
+-    "node_modules/esbuild/node_modules/@esbuild/android-arm": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/android-arm/-/android-arm-0.27.7.tgz",
+-      "integrity": "sha512-jbPXvB4Yj2yBV7HUfE2KHe4GJX51QplCN1pGbYjvsyCZbQmies29EoJbkEc+vYuU5o45AfQn37vZlyXy4YJ8RQ==",
+-      "cpu": [
+-        "arm"
+-      ],
++    "node_modules/escape-string-regexp": {
++      "version": "4.0.0",
+       "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "android"
+-      ],
+       "engines": {
+-        "node": ">=18"
++        "node": ">=10"
++      },
++      "funding": {
++        "url": "https://github.com/sponsors/sindresorhus"
+       }
+     },
+-    "node_modules/esbuild/node_modules/@esbuild/android-arm64": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/android-arm64/-/android-arm64-0.27.7.tgz",
+-      "integrity": "sha512-62dPZHpIXzvChfvfLJow3q5dDtiNMkwiRzPylSCfriLvZeq0a1bWChrGx/BbUbPwOrsWKMn8idSllklzBy+dgQ==",
+-      "cpu": [
+-        "arm64"
+-      ],
++    "node_modules/eslint": {
++      "version": "9.39.4",
++      "dev": true,
+       "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "android"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/android-x64": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/android-x64/-/android-x64-0.27.7.tgz",
+-      "integrity": "sha512-x5VpMODneVDb70PYV2VQOmIUUiBtY3D3mPBG8NxVk5CogneYhkR7MmM3yR/uMdITLrC1ml/NV1rj4bMJuy9MCg==",
+-      "cpu": [
+-        "x64"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "android"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/darwin-arm64": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/darwin-arm64/-/darwin-arm64-0.27.7.tgz",
+-      "integrity": "sha512-5lckdqeuBPlKUwvoCXIgI2D9/ABmPq3Rdp7IfL70393YgaASt7tbju3Ac+ePVi3KDH6N2RqePfHnXkaDtY9fkw==",
+-      "cpu": [
+-        "arm64"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "darwin"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/darwin-x64": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/darwin-x64/-/darwin-x64-0.27.7.tgz",
+-      "integrity": "sha512-rYnXrKcXuT7Z+WL5K980jVFdvVKhCHhUwid+dDYQpH+qu+TefcomiMAJpIiC2EM3Rjtq0sO3StMV/+3w3MyyqQ==",
+-      "cpu": [
+-        "x64"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "darwin"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/freebsd-arm64": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/freebsd-arm64/-/freebsd-arm64-0.27.7.tgz",
+-      "integrity": "sha512-B48PqeCsEgOtzME2GbNM2roU29AMTuOIN91dsMO30t+Ydis3z/3Ngoj5hhnsOSSwNzS+6JppqWsuhTp6E82l2w==",
+-      "cpu": [
+-        "arm64"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "freebsd"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/freebsd-x64": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/freebsd-x64/-/freebsd-x64-0.27.7.tgz",
+-      "integrity": "sha512-jOBDK5XEjA4m5IJK3bpAQF9/Lelu/Z9ZcdhTRLf4cajlB+8VEhFFRjWgfy3M1O4rO2GQ/b2dLwCUGpiF/eATNQ==",
+-      "cpu": [
+-        "x64"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "freebsd"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/linux-arm": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/linux-arm/-/linux-arm-0.27.7.tgz",
+-      "integrity": "sha512-RkT/YXYBTSULo3+af8Ib0ykH8u2MBh57o7q/DAs3lTJlyVQkgQvlrPTnjIzzRPQyavxtPtfg0EopvDyIt0j1rA==",
+-      "cpu": [
+-        "arm"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "linux"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/linux-arm64": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-0.27.7.tgz",
+-      "integrity": "sha512-RZPHBoxXuNnPQO9rvjh5jdkRmVizktkT7TCDkDmQ0W2SwHInKCAV95GRuvdSvA7w4VMwfCjUiPwDi0ZO6Nfe9A==",
+-      "cpu": [
+-        "arm64"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "linux"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/linux-ia32": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/linux-ia32/-/linux-ia32-0.27.7.tgz",
+-      "integrity": "sha512-GA48aKNkyQDbd3KtkplYWT102C5sn/EZTY4XROkxONgruHPU72l+gW+FfF8tf2cFjeHaRbWpOYa/uRBz/Xq1Pg==",
+-      "cpu": [
+-        "ia32"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "linux"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/linux-loong64": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/linux-loong64/-/linux-loong64-0.27.7.tgz",
+-      "integrity": "sha512-a4POruNM2oWsD4WKvBSEKGIiWQF8fZOAsycHOt6JBpZ+JN2n2JH9WAv56SOyu9X5IqAjqSIPTaJkqN8F7XOQ5Q==",
+-      "cpu": [
+-        "loong64"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "linux"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/linux-mips64el": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/linux-mips64el/-/linux-mips64el-0.27.7.tgz",
+-      "integrity": "sha512-KabT5I6StirGfIz0FMgl1I+R1H73Gp0ofL9A3nG3i/cYFJzKHhouBV5VWK1CSgKvVaG4q1RNpCTR2LuTVB3fIw==",
+-      "cpu": [
+-        "mips64el"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "linux"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/linux-ppc64": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/linux-ppc64/-/linux-ppc64-0.27.7.tgz",
+-      "integrity": "sha512-gRsL4x6wsGHGRqhtI+ifpN/vpOFTQtnbsupUF5R5YTAg+y/lKelYR1hXbnBdzDjGbMYjVJLJTd2OFmMewAgwlQ==",
+-      "cpu": [
+-        "ppc64"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "linux"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/linux-riscv64": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/linux-riscv64/-/linux-riscv64-0.27.7.tgz",
+-      "integrity": "sha512-hL25LbxO1QOngGzu2U5xeXtxXcW+/GvMN3ejANqXkxZ/opySAZMrc+9LY/WyjAan41unrR3YrmtTsUpwT66InQ==",
+-      "cpu": [
+-        "riscv64"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "linux"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/linux-s390x": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/linux-s390x/-/linux-s390x-0.27.7.tgz",
+-      "integrity": "sha512-2k8go8Ycu1Kb46vEelhu1vqEP+UeRVj2zY1pSuPdgvbd5ykAw82Lrro28vXUrRmzEsUV0NzCf54yARIK8r0fdw==",
+-      "cpu": [
+-        "s390x"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "linux"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/linux-x64": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.27.7.tgz",
+-      "integrity": "sha512-hzznmADPt+OmsYzw1EE33ccA+HPdIqiCRq7cQeL1Jlq2gb1+OyWBkMCrYGBJ+sxVzve2ZJEVeePbLM2iEIZSxA==",
+-      "cpu": [
+-        "x64"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "linux"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/netbsd-arm64": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/netbsd-arm64/-/netbsd-arm64-0.27.7.tgz",
+-      "integrity": "sha512-b6pqtrQdigZBwZxAn1UpazEisvwaIDvdbMbmrly7cDTMFnw/+3lVxxCTGOrkPVnsYIosJJXAsILG9XcQS+Yu6w==",
+-      "cpu": [
+-        "arm64"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "netbsd"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/netbsd-x64": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/netbsd-x64/-/netbsd-x64-0.27.7.tgz",
+-      "integrity": "sha512-OfatkLojr6U+WN5EDYuoQhtM+1xco+/6FSzJJnuWiUw5eVcicbyK3dq5EeV/QHT1uy6GoDhGbFpprUiHUYggrw==",
+-      "cpu": [
+-        "x64"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "netbsd"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/openbsd-arm64": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/openbsd-arm64/-/openbsd-arm64-0.27.7.tgz",
+-      "integrity": "sha512-AFuojMQTxAz75Fo8idVcqoQWEHIXFRbOc1TrVcFSgCZtQfSdc1RXgB3tjOn/krRHENUB4j00bfGjyl2mJrU37A==",
+-      "cpu": [
+-        "arm64"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "openbsd"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/openbsd-x64": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/openbsd-x64/-/openbsd-x64-0.27.7.tgz",
+-      "integrity": "sha512-+A1NJmfM8WNDv5CLVQYJ5PshuRm/4cI6WMZRg1by1GwPIQPCTs1GLEUHwiiQGT5zDdyLiRM/l1G0Pv54gvtKIg==",
+-      "cpu": [
+-        "x64"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "openbsd"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/openharmony-arm64": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/openharmony-arm64/-/openharmony-arm64-0.27.7.tgz",
+-      "integrity": "sha512-+KrvYb/C8zA9CU/g0sR6w2RBw7IGc5J2BPnc3dYc5VJxHCSF1yNMxTV5LQ7GuKteQXZtspjFbiuW5/dOj7H4Yw==",
+-      "cpu": [
+-        "arm64"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "openharmony"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/sunos-x64": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/sunos-x64/-/sunos-x64-0.27.7.tgz",
+-      "integrity": "sha512-ikktIhFBzQNt/QDyOL580ti9+5mL/YZeUPKU2ivGtGjdTYoqz6jObj6nOMfhASpS4GU4Q/Clh1QtxWAvcYKamA==",
+-      "cpu": [
+-        "x64"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "sunos"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/win32-arm64": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/win32-arm64/-/win32-arm64-0.27.7.tgz",
+-      "integrity": "sha512-7yRhbHvPqSpRUV7Q20VuDwbjW5kIMwTHpptuUzV+AA46kiPze5Z7qgt6CLCK3pWFrHeNfDd1VKgyP4O+ng17CA==",
+-      "cpu": [
+-        "arm64"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "win32"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/esbuild/node_modules/@esbuild/win32-ia32": {
+-      "version": "0.27.7",
+-      "resolved": "https://registry.npmjs.org/@esbuild/win32-ia32/-/win32-ia32-0.27.7.tgz",
+-      "integrity": "sha512-SmwKXe6VHIyZYbBLJrhOoCJRB/Z1tckzmgTLfFYOfpMAx63BJEaL9ExI8x7v0oAO3Zh6D/Oi1gVxEYr5oUCFhw==",
+-      "cpu": [
+-        "ia32"
+-      ],
+-      "license": "MIT",
+-      "optional": true,
+-      "os": [
+-        "win32"
+-      ],
+-      "engines": {
+-        "node": ">=18"
+-      }
+-    },
+-    "node_modules/escalade": {
+-      "version": "3.2.0",
+-      "license": "MIT",
+-      "engines": {
+-        "node": ">=6"
+-      }
+-    },
+-    "node_modules/escape-string-regexp": {
+-      "version": "4.0.0",
+-      "license": "MIT",
+-      "engines": {
+-        "node": ">=10"
+-      },
+-      "funding": {
+-        "url": "https://github.com/sponsors/sindresorhus"
+-      }
+-    },
+-    "node_modules/eslint": {
+-      "version": "9.39.4",
+-      "dev": true,
+-      "license": "MIT",
+-      "dependencies": {
+-        "@eslint-community/eslint-utils": "^4.8.0",
+-        "@eslint-community/regexpp": "^4.12.1",
+-        "@eslint/config-array": "^0.21.2",
+-        "@eslint/config-helpers": "^0.4.2",
+-        "@eslint/core": "^0.17.0",
+-        "@eslint/eslintrc": "^3.3.5",
+-        "@eslint/js": "9.39.4",
+-        "@eslint/plugin-kit": "^0.4.1",
+-        "@humanfs/node": "^0.16.6",
+-        "@humanwhocodes/module-importer": "^1.0.1",
+-        "@humanwhocodes/retry": "^0.4.2",
+-        "@types/estree": "^1.0.6",
+-        "ajv": "^6.14.0",
+-        "chalk": "^4.0.0",
+-        "cross-spawn": "^7.0.6",
+-        "debug": "^4.3.2",
+-        "escape-string-regexp": "^4.0.0",
+-        "eslint-scope": "^8.4.0",
+-        "eslint-visitor-keys": "^4.2.1",
+-        "espree": "^10.4.0",
+-        "esquery": "^1.5.0",
+-        "esutils": "^2.0.2",
+-        "fast-deep-equal": "^3.1.3",
+-        "file-entry-cache": "^8.0.0",
+-        "find-up": "^5.0.0",
+-        "glob-parent": "^6.0.2",
+-        "ignore": "^5.2.0",
+-        "imurmurhash": "^0.1.4",
+-        "is-glob": "^4.0.0",
+-        "json-stable-stringify-without-jsonify": "^1.0.1",
+-        "lodash.merge": "^4.6.2",
+-        "minimatch": "^3.1.5",
+-        "natural-compare": "^1.4.0",
+-        "optionator": "^0.9.3"
+-      },
+-      "bin": {
+-        "eslint": "bin/eslint.js"
+-      },
++      "dependencies": {
++        "@eslint-community/eslint-utils": "^4.8.0",
++        "@eslint-community/regexpp": "^4.12.1",
++        "@eslint/config-array": "^0.21.2",
++        "@eslint/config-helpers": "^0.4.2",
++        "@eslint/core": "^0.17.0",
++        "@eslint/eslintrc": "^3.3.5",
++        "@eslint/js": "9.39.4",
++        "@eslint/plugin-kit": "^0.4.1",
++        "@humanfs/node": "^0.16.6",
++        "@humanwhocodes/module-importer": "^1.0.1",
++        "@humanwhocodes/retry": "^0.4.2",
++        "@types/estree": "^1.0.6",
++        "ajv": "^6.14.0",
++        "chalk": "^4.0.0",
++        "cross-spawn": "^7.0.6",
++        "debug": "^4.3.2",
++        "escape-string-regexp": "^4.0.0",
++        "eslint-scope": "^8.4.0",
++        "eslint-visitor-keys": "^4.2.1",
++        "espree": "^10.4.0",
++        "esquery": "^1.5.0",
++        "esutils": "^2.0.2",
++        "fast-deep-equal": "^3.1.3",
++        "file-entry-cache": "^8.0.0",
++        "find-up": "^5.0.0",
++        "glob-parent": "^6.0.2",
++        "ignore": "^5.2.0",
++        "imurmurhash": "^0.1.4",
++        "is-glob": "^4.0.0",
++        "json-stable-stringify-without-jsonify": "^1.0.1",
++        "lodash.merge": "^4.6.2",
++        "minimatch": "^3.1.5",
++        "natural-compare": "^1.4.0",
++        "optionator": "^0.9.3"
++      },
++      "bin": {
++        "eslint": "bin/eslint.js"
++      },
+       "engines": {
+         "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
+       },
+@@ -7425,268 +6878,668 @@
+         "node": ">=20.0.0"
+       }
+     },
+-    "node_modules/iconv-lite": {
+-      "version": "0.6.3",
+-      "license": "MIT",
+-      "dependencies": {
+-        "safer-buffer": ">= 2.1.2 < 3.0.0"
+-      },
++    "node_modules/iconv-lite": {
++      "version": "0.6.3",
++      "license": "MIT",
++      "dependencies": {
++        "safer-buffer": ">= 2.1.2 < 3.0.0"
++      },
++      "engines": {
++        "node": ">=0.10.0"
++      }
++    },
++    "node_modules/ignore": {
++      "version": "5.3.2",
++      "dev": true,
++      "license": "MIT",
++      "engines": {
++        "node": ">= 4"
++      }
++    },
++    "node_modules/import-fresh": {
++      "version": "3.3.1",
++      "dev": true,
++      "license": "MIT",
++      "dependencies": {
++        "parent-module": "^1.0.0",
++        "resolve-from": "^4.0.0"
++      },
++      "engines": {
++        "node": ">=6"
++      },
++      "funding": {
++        "url": "https://github.com/sponsors/sindresorhus"
++      }
++    },
++    "node_modules/imurmurhash": {
++      "version": "0.1.4",
++      "dev": true,
++      "license": "MIT",
++      "engines": {
++        "node": ">=0.8.19"
++      }
++    },
++    "node_modules/input-otp": {
++      "version": "1.4.2",
++      "license": "MIT",
++      "peerDependencies": {
++        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0.0 || ^19.0.0-rc",
++        "react-dom": "^16.8 || ^17.0 || ^18.0 || ^19.0.0 || ^19.0.0-rc"
++      }
++    },
++    "node_modules/internmap": {
++      "version": "2.0.3",
++      "license": "ISC",
++      "engines": {
++        "node": ">=12"
++      }
++    },
++    "node_modules/is-binary-path": {
++      "version": "2.1.0",
++      "resolved": "https://registry.npmjs.org/is-binary-path/-/is-binary-path-2.1.0.tgz",
++      "integrity": "sha512-ZMERYes6pDydyuGidse7OsHxtbI7WVeUEozgR/g7rd0xUimYNlvZRE/K2MgZTjWy725IfelLeVcEM97mmtRGXw==",
++      "license": "MIT",
++      "dependencies": {
++        "binary-extensions": "^2.0.0"
++      },
++      "engines": {
++        "node": ">=8"
++      }
++    },
++    "node_modules/is-core-module": {
++      "version": "2.16.1",
++      "dev": true,
++      "license": "MIT",
++      "dependencies": {
++        "hasown": "^2.0.2"
++      },
++      "engines": {
++        "node": ">= 0.4"
++      },
++      "funding": {
++        "url": "https://github.com/sponsors/ljharb"
++      }
++    },
++    "node_modules/is-extglob": {
++      "version": "2.1.1",
++      "license": "MIT",
++      "engines": {
++        "node": ">=0.10.0"
++      }
++    },
++    "node_modules/is-glob": {
++      "version": "4.0.3",
++      "license": "MIT",
++      "dependencies": {
++        "is-extglob": "^2.1.1"
++      },
++      "engines": {
++        "node": ">=0.10.0"
++      }
++    },
++    "node_modules/is-number": {
++      "version": "7.0.0",
++      "license": "MIT",
++      "engines": {
++        "node": ">=0.12.0"
++      }
++    },
++    "node_modules/isbot": {
++      "version": "5.1.39",
++      "license": "Unlicense",
++      "engines": {
++        "node": ">=18"
++      }
++    },
++    "node_modules/isexe": {
++      "version": "2.0.0",
++      "dev": true,
++      "license": "ISC"
++    },
++    "node_modules/jiti": {
++      "version": "2.7.0",
++      "resolved": "https://registry.npmjs.org/jiti/-/jiti-2.7.0.tgz",
++      "integrity": "sha512-AC/7JofJvZGrrneWNaEnJeOLUx+JlGt7tNa0wZiRPT4MY1wmfKjt2+6O2p2uz2+skll8OZZmJMNqeke7kKbNgQ==",
++      "license": "MIT",
++      "bin": {
++        "jiti": "lib/jiti-cli.mjs"
++      }
++    },
++    "node_modules/js-tokens": {
++      "version": "4.0.0",
++      "license": "MIT"
++    },
++    "node_modules/js-yaml": {
++      "version": "4.1.1",
++      "license": "MIT",
++      "dependencies": {
++        "argparse": "^2.0.1"
++      },
++      "bin": {
++        "js-yaml": "bin/js-yaml.js"
++      }
++    },
++    "node_modules/jsesc": {
++      "version": "3.1.0",
++      "license": "MIT",
++      "bin": {
++        "jsesc": "bin/jsesc"
++      },
++      "engines": {
++        "node": ">=6"
++      }
++    },
++    "node_modules/json-buffer": {
++      "version": "3.0.1",
++      "dev": true,
++      "license": "MIT"
++    },
++    "node_modules/json-schema-traverse": {
++      "version": "0.4.1",
++      "dev": true,
++      "license": "MIT"
++    },
++    "node_modules/json-stable-stringify-without-jsonify": {
++      "version": "1.0.1",
++      "dev": true,
++      "license": "MIT"
++    },
++    "node_modules/json-stringify-safe": {
++      "version": "5.0.1",
++      "resolved": "https://registry.npmjs.org/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz",
++      "integrity": "sha512-ZClg6AaYvamvYEE82d3Iyd3vSSIjQ+odgjaTzRuO3s7toCdFKczob2i0zCh7JE8kWn17yvAWhUVxvqGwUalsRA==",
++      "license": "ISC"
++    },
++    "node_modules/json5": {
++      "version": "2.2.3",
++      "license": "MIT",
++      "bin": {
++        "json5": "lib/cli.js"
++      },
++      "engines": {
++        "node": ">=6"
++      }
++    },
++    "node_modules/keyv": {
++      "version": "4.5.4",
++      "dev": true,
++      "license": "MIT",
++      "dependencies": {
++        "json-buffer": "3.0.1"
++      }
++    },
++    "node_modules/lenis": {
++      "version": "1.3.23",
++      "license": "MIT",
++      "workspaces": [
++        "packages/*",
++        "playground",
++        "playground/*"
++      ],
++      "funding": {
++        "type": "github",
++        "url": "https://github.com/sponsors/darkroomengineering"
++      },
++      "peerDependencies": {
++        "@nuxt/kit": ">=3.0.0",
++        "react": ">=17.0.0",
++        "vue": ">=3.0.0"
++      },
++      "peerDependenciesMeta": {
++        "@nuxt/kit": {
++          "optional": true
++        },
++        "react": {
++          "optional": true
++        },
++        "vue": {
++          "optional": true
++        }
++      }
++    },
++    "node_modules/levn": {
++      "version": "0.4.1",
++      "dev": true,
++      "license": "MIT",
++      "dependencies": {
++        "prelude-ls": "^1.2.1",
++        "type-check": "~0.4.0"
++      },
++      "engines": {
++        "node": ">= 0.8.0"
++      }
++    },
++    "node_modules/lightningcss": {
++      "version": "1.32.0",
++      "license": "MPL-2.0",
++      "dependencies": {
++        "detect-libc": "^2.0.3"
++      },
++      "engines": {
++        "node": ">= 12.0.0"
++      },
++      "funding": {
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
++      },
++      "optionalDependencies": {
++        "lightningcss-android-arm64": "1.32.0",
++        "lightningcss-darwin-arm64": "1.32.0",
++        "lightningcss-darwin-x64": "1.32.0",
++        "lightningcss-freebsd-x64": "1.32.0",
++        "lightningcss-linux-arm-gnueabihf": "1.32.0",
++        "lightningcss-linux-arm64-gnu": "1.32.0",
++        "lightningcss-linux-arm64-musl": "1.32.0",
++        "lightningcss-linux-x64-gnu": "1.32.0",
++        "lightningcss-linux-x64-musl": "1.32.0",
++        "lightningcss-win32-arm64-msvc": "1.32.0",
++        "lightningcss-win32-x64-msvc": "1.32.0"
++      }
++    },
++    "node_modules/lightningcss-android-arm64": {
++      "version": "1.33.0",
++      "resolved": "https://registry.npmjs.org/lightningcss-android-arm64/-/lightningcss-android-arm64-1.33.0.tgz",
++      "integrity": "sha512-gEpRTalKdosp4Bb8qWtc2iOgE5SeIHlpS1up9bFq2wAyYhl1UdTObYiHe98zEM9SQvSoqQZ1IQD0JNpg3Ml5pg==",
++      "cpu": [
++        "arm64"
++      ],
++      "license": "MPL-2.0",
++      "optional": true,
++      "os": [
++        "android"
++      ],
+       "engines": {
+-        "node": ">=0.10.0"
++        "node": ">= 12.0.0"
++      },
++      "funding": {
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
+       }
+     },
+-    "node_modules/ignore": {
+-      "version": "5.3.2",
+-      "dev": true,
+-      "license": "MIT",
++    "node_modules/lightningcss-darwin-arm64": {
++      "version": "1.33.0",
++      "resolved": "https://registry.npmjs.org/lightningcss-darwin-arm64/-/lightningcss-darwin-arm64-1.33.0.tgz",
++      "integrity": "sha512-Sciaz8eenNTKn9b3t7+xr0ipTp9YxKQY4npwQ3mrRuL0BAVHBLyZxofhaKBAVtzmtRZ/zTyo0/to4B1uWG/Djg==",
++      "cpu": [
++        "arm64"
++      ],
++      "license": "MPL-2.0",
++      "optional": true,
++      "os": [
++        "darwin"
++      ],
+       "engines": {
+-        "node": ">= 4"
++        "node": ">= 12.0.0"
++      },
++      "funding": {
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
+       }
+     },
+-    "node_modules/import-fresh": {
+-      "version": "3.3.1",
+-      "dev": true,
+-      "license": "MIT",
+-      "dependencies": {
+-        "parent-module": "^1.0.0",
+-        "resolve-from": "^4.0.0"
+-      },
++    "node_modules/lightningcss-darwin-x64": {
++      "version": "1.33.0",
++      "resolved": "https://registry.npmjs.org/lightningcss-darwin-x64/-/lightningcss-darwin-x64-1.33.0.tgz",
++      "integrity": "sha512-Z5UPAxzrjlWNNyGy6i65cJzzvgJ5D3T6wMvs+gWpY9d7qRhANrxqAp6LhxIgZhWEw18RfJTGcRxjuLIBr+m8XQ==",
++      "cpu": [
++        "x64"
++      ],
++      "license": "MPL-2.0",
++      "optional": true,
++      "os": [
++        "darwin"
++      ],
+       "engines": {
+-        "node": ">=6"
++        "node": ">= 12.0.0"
+       },
+       "funding": {
+-        "url": "https://github.com/sponsors/sindresorhus"
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
+       }
+     },
+-    "node_modules/imurmurhash": {
+-      "version": "0.1.4",
+-      "dev": true,
+-      "license": "MIT",
++    "node_modules/lightningcss-freebsd-x64": {
++      "version": "1.33.0",
++      "resolved": "https://registry.npmjs.org/lightningcss-freebsd-x64/-/lightningcss-freebsd-x64-1.33.0.tgz",
++      "integrity": "sha512-QQM/Ti/hQajJwCY+RiWuCZ9sdtI/XQk7nDK5vC8kkdwixezOlDgvDx7+RT+QjK6FcFT4MpsuoBnHIo/O3StRRg==",
++      "cpu": [
++        "x64"
++      ],
++      "license": "MPL-2.0",
++      "optional": true,
++      "os": [
++        "freebsd"
++      ],
+       "engines": {
+-        "node": ">=0.8.19"
++        "node": ">= 12.0.0"
++      },
++      "funding": {
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
+       }
+     },
+-    "node_modules/input-otp": {
+-      "version": "1.4.2",
+-      "license": "MIT",
+-      "peerDependencies": {
+-        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0.0 || ^19.0.0-rc",
+-        "react-dom": "^16.8 || ^17.0 || ^18.0 || ^19.0.0 || ^19.0.0-rc"
++    "node_modules/lightningcss-linux-arm-gnueabihf": {
++      "version": "1.33.0",
++      "resolved": "https://registry.npmjs.org/lightningcss-linux-arm-gnueabihf/-/lightningcss-linux-arm-gnueabihf-1.33.0.tgz",
++      "integrity": "sha512-N7FVBe6iS24MlM6R/4RBTxGhQheZGs7tiQ9U32UtF75NzP5Q7xWPRqLBCKxlRQRk3rY1jCIPLzx7WzOhuUIRLQ==",
++      "cpu": [
++        "arm"
++      ],
++      "license": "MPL-2.0",
++      "optional": true,
++      "os": [
++        "linux"
++      ],
++      "engines": {
++        "node": ">= 12.0.0"
++      },
++      "funding": {
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
+       }
+     },
+-    "node_modules/internmap": {
+-      "version": "2.0.3",
+-      "license": "ISC",
++    "node_modules/lightningcss-linux-arm64-gnu": {
++      "version": "1.33.0",
++      "resolved": "https://registry.npmjs.org/lightningcss-linux-arm64-gnu/-/lightningcss-linux-arm64-gnu-1.33.0.tgz",
++      "integrity": "sha512-j2v/itmy4HlNxlc6voKXYgBqNi0Ng2LShg4z7GufpEgs05P+2suBVyi9I6YHq5uoVFx9ETin3eCEhLVyXGQnKg==",
++      "cpu": [
++        "arm64"
++      ],
++      "license": "MPL-2.0",
++      "optional": true,
++      "os": [
++        "linux"
++      ],
+       "engines": {
+-        "node": ">=12"
++        "node": ">= 12.0.0"
++      },
++      "funding": {
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
+       }
+     },
+-    "node_modules/is-binary-path": {
+-      "version": "2.1.0",
+-      "resolved": "https://registry.npmjs.org/is-binary-path/-/is-binary-path-2.1.0.tgz",
+-      "integrity": "sha512-ZMERYes6pDydyuGidse7OsHxtbI7WVeUEozgR/g7rd0xUimYNlvZRE/K2MgZTjWy725IfelLeVcEM97mmtRGXw==",
+-      "license": "MIT",
+-      "dependencies": {
+-        "binary-extensions": "^2.0.0"
+-      },
++    "node_modules/lightningcss-linux-arm64-musl": {
++      "version": "1.33.0",
++      "resolved": "https://registry.npmjs.org/lightningcss-linux-arm64-musl/-/lightningcss-linux-arm64-musl-1.33.0.tgz",
++      "integrity": "sha512-yiO5ROMuYQgXbC60yjZU5CYSFZGKXL0HFATXt9mHJn1+zW55oCtMI9NfcVhYLMFDL7gV7oBPon/EmMMGg2OvtQ==",
++      "cpu": [
++        "arm64"
++      ],
++      "license": "MPL-2.0",
++      "optional": true,
++      "os": [
++        "linux"
++      ],
+       "engines": {
+-        "node": ">=8"
++        "node": ">= 12.0.0"
++      },
++      "funding": {
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
+       }
+     },
+-    "node_modules/is-core-module": {
+-      "version": "2.16.1",
+-      "dev": true,
+-      "license": "MIT",
+-      "dependencies": {
+-        "hasown": "^2.0.2"
+-      },
++    "node_modules/lightningcss-linux-x64-gnu": {
++      "version": "1.33.0",
++      "resolved": "https://registry.npmjs.org/lightningcss-linux-x64-gnu/-/lightningcss-linux-x64-gnu-1.33.0.tgz",
++      "integrity": "sha512-ar+Ju7LmcN0Jo4FpL4hpFybwNG9/3A/Br5KW2n2jyODg3MEZXaDYADdemoNS+BDNfMgKvylJLj4S5tyRActuAg==",
++      "cpu": [
++        "x64"
++      ],
++      "license": "MPL-2.0",
++      "optional": true,
++      "os": [
++        "linux"
++      ],
+       "engines": {
+-        "node": ">= 0.4"
++        "node": ">= 12.0.0"
+       },
+       "funding": {
+-        "url": "https://github.com/sponsors/ljharb"
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
+       }
+     },
+-    "node_modules/is-extglob": {
+-      "version": "2.1.1",
+-      "license": "MIT",
++    "node_modules/lightningcss-linux-x64-musl": {
++      "version": "1.33.0",
++      "resolved": "https://registry.npmjs.org/lightningcss-linux-x64-musl/-/lightningcss-linux-x64-musl-1.33.0.tgz",
++      "integrity": "sha512-RYiYbkokw0trfKqqzfF55lginwEPrD3OJDfTuJzFs1MK6iFnDenaz1fqLLtX4ITG3OktJQXOeTaw1awrBAlZPw==",
++      "cpu": [
++        "x64"
++      ],
++      "license": "MPL-2.0",
++      "optional": true,
++      "os": [
++        "linux"
++      ],
+       "engines": {
+-        "node": ">=0.10.0"
++        "node": ">= 12.0.0"
++      },
++      "funding": {
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
+       }
+     },
+-    "node_modules/is-glob": {
+-      "version": "4.0.3",
+-      "license": "MIT",
+-      "dependencies": {
+-        "is-extglob": "^2.1.1"
+-      },
++    "node_modules/lightningcss-win32-arm64-msvc": {
++      "version": "1.33.0",
++      "resolved": "https://registry.npmjs.org/lightningcss-win32-arm64-msvc/-/lightningcss-win32-arm64-msvc-1.33.0.tgz",
++      "integrity": "sha512-1K+MPfLSFVpphzpdbfkhlWk6wBrTObBzS2T6db10PNOZgR9GoVsAWzwNyuhUYYbTp23j+4RrncfujZ4uAzXvwA==",
++      "cpu": [
++        "arm64"
++      ],
++      "license": "MPL-2.0",
++      "optional": true,
++      "os": [
++        "win32"
++      ],
+       "engines": {
+-        "node": ">=0.10.0"
++        "node": ">= 12.0.0"
++      },
++      "funding": {
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
+       }
+     },
+-    "node_modules/is-number": {
+-      "version": "7.0.0",
+-      "license": "MIT",
++    "node_modules/lightningcss-win32-x64-msvc": {
++      "version": "1.32.0",
++      "cpu": [
++        "x64"
++      ],
++      "license": "MPL-2.0",
++      "optional": true,
++      "os": [
++        "win32"
++      ],
+       "engines": {
+-        "node": ">=0.12.0"
++        "node": ">= 12.0.0"
++      },
++      "funding": {
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
+       }
+     },
+-    "node_modules/isbot": {
+-      "version": "5.1.39",
+-      "license": "Unlicense",
++    "node_modules/lightningcss/node_modules/lightningcss-android-arm64": {
++      "version": "1.32.0",
++      "resolved": "https://registry.npmjs.org/lightningcss-android-arm64/-/lightningcss-android-arm64-1.32.0.tgz",
++      "integrity": "sha512-YK7/ClTt4kAK0vo6w3X+Pnm0D2cf2vPHbhOXdoNti1Ga0al1P4TBZhwjATvjNwLEBCnKvjJc2jQgHXH0NEwlAg==",
++      "cpu": [
++        "arm64"
++      ],
++      "license": "MPL-2.0",
++      "optional": true,
++      "os": [
++        "android"
++      ],
+       "engines": {
+-        "node": ">=18"
++        "node": ">= 12.0.0"
++      },
++      "funding": {
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
+       }
+     },
+-    "node_modules/isexe": {
+-      "version": "2.0.0",
+-      "dev": true,
+-      "license": "ISC"
+-    },
+-    "node_modules/jiti": {
+-      "version": "2.7.0",
+-      "resolved": "https://registry.npmjs.org/jiti/-/jiti-2.7.0.tgz",
+-      "integrity": "sha512-AC/7JofJvZGrrneWNaEnJeOLUx+JlGt7tNa0wZiRPT4MY1wmfKjt2+6O2p2uz2+skll8OZZmJMNqeke7kKbNgQ==",
+-      "license": "MIT",
+-      "bin": {
+-        "jiti": "lib/jiti-cli.mjs"
++    "node_modules/lightningcss/node_modules/lightningcss-darwin-arm64": {
++      "version": "1.32.0",
++      "resolved": "https://registry.npmjs.org/lightningcss-darwin-arm64/-/lightningcss-darwin-arm64-1.32.0.tgz",
++      "integrity": "sha512-RzeG9Ju5bag2Bv1/lwlVJvBE3q6TtXskdZLLCyfg5pt+HLz9BqlICO7LZM7VHNTTn/5PRhHFBSjk5lc4cmscPQ==",
++      "cpu": [
++        "arm64"
++      ],
++      "license": "MPL-2.0",
++      "optional": true,
++      "os": [
++        "darwin"
++      ],
++      "engines": {
++        "node": ">= 12.0.0"
++      },
++      "funding": {
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
+       }
+     },
+-    "node_modules/js-tokens": {
+-      "version": "4.0.0",
+-      "license": "MIT"
+-    },
+-    "node_modules/js-yaml": {
+-      "version": "4.1.1",
+-      "license": "MIT",
+-      "dependencies": {
+-        "argparse": "^2.0.1"
++    "node_modules/lightningcss/node_modules/lightningcss-darwin-x64": {
++      "version": "1.32.0",
++      "resolved": "https://registry.npmjs.org/lightningcss-darwin-x64/-/lightningcss-darwin-x64-1.32.0.tgz",
++      "integrity": "sha512-U+QsBp2m/s2wqpUYT/6wnlagdZbtZdndSmut/NJqlCcMLTWp5muCrID+K5UJ6jqD2BFshejCYXniPDbNh73V8w==",
++      "cpu": [
++        "x64"
++      ],
++      "license": "MPL-2.0",
++      "optional": true,
++      "os": [
++        "darwin"
++      ],
++      "engines": {
++        "node": ">= 12.0.0"
+       },
+-      "bin": {
+-        "js-yaml": "bin/js-yaml.js"
++      "funding": {
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
+       }
+     },
+-    "node_modules/jsesc": {
+-      "version": "3.1.0",
+-      "license": "MIT",
+-      "bin": {
+-        "jsesc": "bin/jsesc"
+-      },
++    "node_modules/lightningcss/node_modules/lightningcss-freebsd-x64": {
++      "version": "1.32.0",
++      "resolved": "https://registry.npmjs.org/lightningcss-freebsd-x64/-/lightningcss-freebsd-x64-1.32.0.tgz",
++      "integrity": "sha512-JCTigedEksZk3tHTTthnMdVfGf61Fky8Ji2E4YjUTEQX14xiy/lTzXnu1vwiZe3bYe0q+SpsSH/CTeDXK6WHig==",
++      "cpu": [
++        "x64"
++      ],
++      "license": "MPL-2.0",
++      "optional": true,
++      "os": [
++        "freebsd"
++      ],
+       "engines": {
+-        "node": ">=6"
++        "node": ">= 12.0.0"
++      },
++      "funding": {
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
+       }
+     },
+-    "node_modules/json-buffer": {
+-      "version": "3.0.1",
+-      "dev": true,
+-      "license": "MIT"
+-    },
+-    "node_modules/json-schema-traverse": {
+-      "version": "0.4.1",
+-      "dev": true,
+-      "license": "MIT"
+-    },
+-    "node_modules/json-stable-stringify-without-jsonify": {
+-      "version": "1.0.1",
+-      "dev": true,
+-      "license": "MIT"
+-    },
+-    "node_modules/json-stringify-safe": {
+-      "version": "5.0.1",
+-      "resolved": "https://registry.npmjs.org/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz",
+-      "integrity": "sha512-ZClg6AaYvamvYEE82d3Iyd3vSSIjQ+odgjaTzRuO3s7toCdFKczob2i0zCh7JE8kWn17yvAWhUVxvqGwUalsRA==",
+-      "license": "ISC"
+-    },
+-    "node_modules/json5": {
+-      "version": "2.2.3",
+-      "license": "MIT",
+-      "bin": {
+-        "json5": "lib/cli.js"
+-      },
++    "node_modules/lightningcss/node_modules/lightningcss-linux-arm-gnueabihf": {
++      "version": "1.32.0",
++      "resolved": "https://registry.npmjs.org/lightningcss-linux-arm-gnueabihf/-/lightningcss-linux-arm-gnueabihf-1.32.0.tgz",
++      "integrity": "sha512-x6rnnpRa2GL0zQOkt6rts3YDPzduLpWvwAF6EMhXFVZXD4tPrBkEFqzGowzCsIWsPjqSK+tyNEODUBXeeVHSkw==",
++      "cpu": [
++        "arm"
++      ],
++      "license": "MPL-2.0",
++      "optional": true,
++      "os": [
++        "linux"
++      ],
+       "engines": {
+-        "node": ">=6"
++        "node": ">= 12.0.0"
++      },
++      "funding": {
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
+       }
+     },
+-    "node_modules/keyv": {
+-      "version": "4.5.4",
+-      "dev": true,
+-      "license": "MIT",
+-      "dependencies": {
+-        "json-buffer": "3.0.1"
++    "node_modules/lightningcss/node_modules/lightningcss-linux-arm64-gnu": {
++      "version": "1.32.0",
++      "resolved": "https://registry.npmjs.org/lightningcss-linux-arm64-gnu/-/lightningcss-linux-arm64-gnu-1.32.0.tgz",
++      "integrity": "sha512-0nnMyoyOLRJXfbMOilaSRcLH3Jw5z9HDNGfT/gwCPgaDjnx0i8w7vBzFLFR1f6CMLKF8gVbebmkUN3fa/kQJpQ==",
++      "cpu": [
++        "arm64"
++      ],
++      "license": "MPL-2.0",
++      "optional": true,
++      "os": [
++        "linux"
++      ],
++      "engines": {
++        "node": ">= 12.0.0"
++      },
++      "funding": {
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
+       }
+     },
+-    "node_modules/lenis": {
+-      "version": "1.3.23",
+-      "license": "MIT",
+-      "workspaces": [
+-        "packages/*",
+-        "playground",
+-        "playground/*"
++    "node_modules/lightningcss/node_modules/lightningcss-linux-arm64-musl": {
++      "version": "1.32.0",
++      "resolved": "https://registry.npmjs.org/lightningcss-linux-arm64-musl/-/lightningcss-linux-arm64-musl-1.32.0.tgz",
++      "integrity": "sha512-UpQkoenr4UJEzgVIYpI80lDFvRmPVg6oqboNHfoH4CQIfNA+HOrZ7Mo7KZP02dC6LjghPQJeBsvXhJod/wnIBg==",
++      "cpu": [
++        "arm64"
+       ],
+-      "funding": {
+-        "type": "github",
+-        "url": "https://github.com/sponsors/darkroomengineering"
+-      },
+-      "peerDependencies": {
+-        "@nuxt/kit": ">=3.0.0",
+-        "react": ">=17.0.0",
+-        "vue": ">=3.0.0"
++      "license": "MPL-2.0",
++      "optional": true,
++      "os": [
++        "linux"
++      ],
++      "engines": {
++        "node": ">= 12.0.0"
+       },
+-      "peerDependenciesMeta": {
+-        "@nuxt/kit": {
+-          "optional": true
+-        },
+-        "react": {
+-          "optional": true
+-        },
+-        "vue": {
+-          "optional": true
+-        }
++      "funding": {
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
+       }
+     },
+-    "node_modules/levn": {
+-      "version": "0.4.1",
+-      "dev": true,
+-      "license": "MIT",
+-      "dependencies": {
+-        "prelude-ls": "^1.2.1",
+-        "type-check": "~0.4.0"
+-      },
++    "node_modules/lightningcss/node_modules/lightningcss-linux-x64-gnu": {
++      "version": "1.32.0",
++      "resolved": "https://registry.npmjs.org/lightningcss-linux-x64-gnu/-/lightningcss-linux-x64-gnu-1.32.0.tgz",
++      "integrity": "sha512-V7Qr52IhZmdKPVr+Vtw8o+WLsQJYCTd8loIfpDaMRWGUZfBOYEJeyJIkqGIDMZPwPx24pUMfwSxxI8phr/MbOA==",
++      "cpu": [
++        "x64"
++      ],
++      "license": "MPL-2.0",
++      "optional": true,
++      "os": [
++        "linux"
++      ],
+       "engines": {
+-        "node": ">= 0.8.0"
++        "node": ">= 12.0.0"
++      },
++      "funding": {
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
+       }
+     },
+-    "node_modules/lightningcss": {
++    "node_modules/lightningcss/node_modules/lightningcss-linux-x64-musl": {
+       "version": "1.32.0",
++      "resolved": "https://registry.npmjs.org/lightningcss-linux-x64-musl/-/lightningcss-linux-x64-musl-1.32.0.tgz",
++      "integrity": "sha512-bYcLp+Vb0awsiXg/80uCRezCYHNg1/l3mt0gzHnWV9XP1W5sKa5/TCdGWaR/zBM2PeF/HbsQv/j2URNOiVuxWg==",
++      "cpu": [
++        "x64"
++      ],
+       "license": "MPL-2.0",
+-      "dependencies": {
+-        "detect-libc": "^2.0.3"
+-      },
++      "optional": true,
++      "os": [
++        "linux"
++      ],
+       "engines": {
+         "node": ">= 12.0.0"
+       },
+       "funding": {
+         "type": "opencollective",
+         "url": "https://opencollective.com/parcel"
+-      },
+-      "optionalDependencies": {
+-        "lightningcss-android-arm64": "1.32.0",
+-        "lightningcss-darwin-arm64": "1.32.0",
+-        "lightningcss-darwin-x64": "1.32.0",
+-        "lightningcss-freebsd-x64": "1.32.0",
+-        "lightningcss-linux-arm-gnueabihf": "1.32.0",
+-        "lightningcss-linux-arm64-gnu": "1.32.0",
+-        "lightningcss-linux-arm64-musl": "1.32.0",
+-        "lightningcss-linux-x64-gnu": "1.32.0",
+-        "lightningcss-linux-x64-musl": "1.32.0",
+-        "lightningcss-win32-arm64-msvc": "1.32.0",
+-        "lightningcss-win32-x64-msvc": "1.32.0"
+       }
+     },
+-    "node_modules/lightningcss-win32-x64-msvc": {
++    "node_modules/lightningcss/node_modules/lightningcss-win32-arm64-msvc": {
+       "version": "1.32.0",
++      "resolved": "https://registry.npmjs.org/lightningcss-win32-arm64-msvc/-/lightningcss-win32-arm64-msvc-1.32.0.tgz",
++      "integrity": "sha512-8SbC8BR40pS6baCM8sbtYDSwEVQd4JlFTOlaD3gWGHfThTcABnNDBda6eTZeqbofalIJhFx0qKzgHJmcPTnGdw==",
+       "cpu": [
+-        "x64"
++        "arm64"
+       ],
+       "license": "MPL-2.0",
+       "optional": true,
+@@ -8503,7 +8356,9 @@
+       }
+     },
+     "node_modules/nanoid": {
+-      "version": "3.3.11",
++      "version": "3.3.20",
++      "resolved": "https://registry.npmjs.org/nanoid/-/nanoid-3.3.20.tgz",
++      "integrity": "sha512-uKdg2G3GNCKQn9byYOpxbGqrT2fGO5KRt5J/8b3pok8rT6qxGWF6hxMyJiEYtAf+FVyYuD9hRaDqX5uPFYJ4ZQ==",
+       "funding": [
+         {
+           "type": "github",
+@@ -8861,7 +8716,9 @@
+       "license": "ISC"
+     },
+     "node_modules/picomatch": {
+-      "version": "4.0.4",
++      "version": "4.0.7",
++      "resolved": "https://registry.npmjs.org/picomatch/-/picomatch-4.0.7.tgz",
++      "integrity": "sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==",
+       "license": "MIT",
+       "engines": {
+         "node": ">=12"
+@@ -8922,7 +8779,9 @@
+       }
+     },
+     "node_modules/postcss": {
+-      "version": "8.5.10",
++      "version": "8.5.29",
++      "resolved": "https://registry.npmjs.org/postcss/-/postcss-8.5.29.tgz",
++      "integrity": "sha512-49cGhUbXj8Qenv0iTMxA1cFBzxXoctpC9Ujd77t1WcbJIr6nF/eI7g/8MgxrYldFRuAXvja7xQRwavoW7kgrxQ==",
+       "funding": [
+         {
+           "type": "opencollective",
+@@ -8939,9 +8798,9 @@
+       ],
+       "license": "MIT",
+       "dependencies": {
+-        "nanoid": "^3.3.11",
++        "nanoid": "^3.3.19",
+         "picocolors": "^1.1.1",
+-        "source-map-js": "^1.2.1"
++        "source-map-js": "^1.2.2"
+       },
+       "engines": {
+         "node": "^10 || ^12 || >=14"
+@@ -9433,11 +9292,12 @@
+       }
+     },
+     "node_modules/rolldown": {
+-      "version": "1.1.0",
+-      "dev": true,
++      "version": "1.2.13",
++      "resolved": "https://registry.npmjs.org/rolldown/-/rolldown-1.2.13.tgz",
++      "integrity": "sha512-/5apOkwWxtACcQtZ5WlrAsKS4JwXVThQPJZ3RqIruRY9UG9M8e0VlXN068xum/JRKA4aIUoJ13ghe/kGCvidiQ==",
+       "license": "MIT",
+       "dependencies": {
+-        "@oxc-project/types": "=0.134.0",
++        "@oxc-project/types": "=0.153.0",
+         "@rolldown/pluginutils": "^1.0.0"
+       },
+       "bin": {
+@@ -9447,72 +9307,27 @@
+         "node": "^20.19.0 || >=22.12.0"
+       },
+       "optionalDependencies": {
+-        "@rolldown/binding-android-arm64": "1.1.0",
+-        "@rolldown/binding-darwin-arm64": "1.1.0",
+-        "@rolldown/binding-darwin-x64": "1.1.0",
+-        "@rolldown/binding-freebsd-x64": "1.1.0",
+-        "@rolldown/binding-linux-arm-gnueabihf": "1.1.0",
+-        "@rolldown/binding-linux-arm64-gnu": "1.1.0",
+-        "@rolldown/binding-linux-arm64-musl": "1.1.0",
+-        "@rolldown/binding-linux-ppc64-gnu": "1.1.0",
+-        "@rolldown/binding-linux-s390x-gnu": "1.1.0",
+-        "@rolldown/binding-linux-x64-gnu": "1.1.0",
+-        "@rolldown/binding-linux-x64-musl": "1.1.0",
+-        "@rolldown/binding-openharmony-arm64": "1.1.0",
+-        "@rolldown/binding-wasm32-wasi": "1.1.0",
+-        "@rolldown/binding-win32-arm64-msvc": "1.1.0",
+-        "@rolldown/binding-win32-x64-msvc": "1.1.0"
++        "@rolldown/binding-android-arm-eabi": "1.2.13",
++        "@rolldown/binding-android-arm64": "1.2.13",
++        "@rolldown/binding-darwin-arm64": "1.2.13",
++        "@rolldown/binding-darwin-x64": "1.2.13",
++        "@rolldown/binding-freebsd-x64": "1.2.13",
++        "@rolldown/binding-linux-arm-gnueabihf": "1.2.13",
++        "@rolldown/binding-linux-arm64-gnu": "1.2.13",
++        "@rolldown/binding-linux-arm64-musl": "1.2.13",
++        "@rolldown/binding-linux-ppc64-gnu": "1.2.13",
++        "@rolldown/binding-linux-s390x-gnu": "1.2.13",
++        "@rolldown/binding-linux-x64-gnu": "1.2.13",
++        "@rolldown/binding-linux-x64-musl": "1.2.13",
++        "@rolldown/binding-openharmony-arm64": "1.2.13",
++        "@rolldown/binding-win32-arm64-msvc": "1.2.13",
++        "@rolldown/binding-win32-x64-msvc": "1.2.13"
+       }
+     },
+     "node_modules/rolldown/node_modules/@rolldown/pluginutils": {
+       "version": "1.0.1",
+-      "dev": true,
+       "license": "MIT"
+     },
+-    "node_modules/rollup": {
+-      "version": "4.62.2",
+-      "resolved": "https://registry.npmjs.org/rollup/-/rollup-4.62.2.tgz",
+-      "integrity": "sha512-RFnrW4lhXA3s3eqHDZvN654g8OTjzRfqpIRJYczCGB6HzphckVAi/Qh4tbPUbRuDi7s1Llv8g/NspLkttY3gTA==",
+-      "license": "MIT",
+-      "dependencies": {
+-        "@types/estree": "1.0.9"
+-      },
+-      "bin": {
+-        "rollup": "dist/bin/rollup"
+-      },
+-      "engines": {
+-        "node": ">=18.0.0",
+-        "npm": ">=8.0.0"
+-      },
+-      "optionalDependencies": {
+-        "@rollup/rollup-android-arm-eabi": "4.62.2",
+-        "@rollup/rollup-android-arm64": "4.62.2",
+-        "@rollup/rollup-darwin-arm64": "4.62.2",
+-        "@rollup/rollup-darwin-x64": "4.62.2",
+-        "@rollup/rollup-freebsd-arm64": "4.62.2",
+-        "@rollup/rollup-freebsd-x64": "4.62.2",
+-        "@rollup/rollup-linux-arm-gnueabihf": "4.62.2",
+-        "@rollup/rollup-linux-arm-musleabihf": "4.62.2",
+-        "@rollup/rollup-linux-arm64-gnu": "4.62.2",
+-        "@rollup/rollup-linux-arm64-musl": "4.62.2",
+-        "@rollup/rollup-linux-loong64-gnu": "4.62.2",
+-        "@rollup/rollup-linux-loong64-musl": "4.62.2",
+-        "@rollup/rollup-linux-ppc64-gnu": "4.62.2",
+-        "@rollup/rollup-linux-ppc64-musl": "4.62.2",
+-        "@rollup/rollup-linux-riscv64-gnu": "4.62.2",
+-        "@rollup/rollup-linux-riscv64-musl": "4.62.2",
+-        "@rollup/rollup-linux-s390x-gnu": "4.62.2",
+-        "@rollup/rollup-linux-x64-gnu": "4.62.2",
+-        "@rollup/rollup-linux-x64-musl": "4.62.2",
+-        "@rollup/rollup-openbsd-x64": "4.62.2",
+-        "@rollup/rollup-openharmony-arm64": "4.62.2",
+-        "@rollup/rollup-win32-arm64-msvc": "4.62.2",
+-        "@rollup/rollup-win32-ia32-msvc": "4.62.2",
+-        "@rollup/rollup-win32-x64-gnu": "4.62.2",
+-        "@rollup/rollup-win32-x64-msvc": "4.62.2",
+-        "fsevents": "~2.3.2"
+-      }
+-    },
+     "node_modules/rou3": {
+       "version": "0.8.1",
+       "license": "MIT"
+@@ -9714,7 +9529,9 @@
+       }
+     },
+     "node_modules/source-map-js": {
+-      "version": "1.2.1",
++      "version": "1.2.2",
++      "resolved": "https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.2.tgz",
++      "integrity": "sha512-KGj/8Y43x35aZVDtt+J4mK1hoLGHULMYfSkODJNQjNDC3oW1PqPoxMwo0pLUsWM/UEGzON/NxeHywEfNXNP3Vw==",
+       "license": "BSD-3-Clause",
+       "engines": {
+         "node": ">=0.10.0"
+@@ -9908,7 +9725,9 @@
+       }
+     },
+     "node_modules/tinyglobby": {
+-      "version": "0.2.16",
++      "version": "0.2.17",
++      "resolved": "https://registry.npmjs.org/tinyglobby/-/tinyglobby-0.2.17.tgz",
++      "integrity": "sha512-wXR/dYpcqKmfWpEdZjiKJOwCNFndD0DMnrW/cYjVGttEkBfVgcLFHoNrlj47mjOVic9yyNu65alsgF4NQyTa2g==",
+       "license": "MIT",
+       "dependencies": {
+         "fdir": "^6.5.0",
+@@ -10402,15 +10221,16 @@
+       }
+     },
+     "node_modules/vite": {
+-      "version": "7.3.2",
++      "version": "8.2.2",
++      "resolved": "https://registry.npmjs.org/vite/-/vite-8.2.2.tgz",
++      "integrity": "sha512-cFKLV/PRgAUlIRm5WjMjJ86jrftzpqcgH+Us+DS8mI3CDNiH30Whrz8uHL3+MOLPAgqbMBAqWdAHAphOAM+z/Q==",
+       "license": "MIT",
+       "dependencies": {
+-        "esbuild": "^0.27.0",
+-        "fdir": "^6.5.0",
+-        "picomatch": "^4.0.3",
+-        "postcss": "^8.5.6",
+-        "rollup": "^4.43.0",
+-        "tinyglobby": "^0.2.15"
++        "lightningcss": "^1.33.0",
++        "picomatch": "^4.0.5",
++        "postcss": "^8.5.26",
++        "rolldown": "~1.2.4",
++        "tinyglobby": "^0.2.17"
+       },
+       "bin": {
+         "vite": "bin/vite.js"
+@@ -10426,9 +10246,10 @@
+       },
+       "peerDependencies": {
+         "@types/node": "^20.19.0 || >=22.12.0",
++        "@vitejs/devtools": "^0.4.0 || ^0.5.0",
++        "esbuild": "^0.27.0 || ^0.28.0",
+         "jiti": ">=1.21.0",
+         "less": "^4.0.0",
+-        "lightningcss": "^1.21.0",
+         "sass": "^1.70.0",
+         "sass-embedded": "^1.70.0",
+         "stylus": ">=0.54.8",
+@@ -10441,13 +10262,16 @@
+         "@types/node": {
+           "optional": true
+         },
+-        "jiti": {
++        "@vitejs/devtools": {
+           "optional": true
+         },
+-        "less": {
++        "esbuild": {
+           "optional": true
+         },
+-        "lightningcss": {
++        "jiti": {
++          "optional": true
++        },
++        "less": {
+           "optional": true
+         },
+         "sass": {
+@@ -10485,6 +10309,55 @@
+         "vite": "*"
+       }
+     },
++    "node_modules/vite/node_modules/lightningcss": {
++      "version": "1.33.0",
++      "resolved": "https://registry.npmjs.org/lightningcss/-/lightningcss-1.33.0.tgz",
++      "integrity": "sha512-WkUDrojuJs0xkgGf2udWxa3yGBRxPtxUkB79i6aCZLRgc7PM8fZe9TosfPDcvEpQZbuFASnHYmRLBLUbmLOIIA==",
++      "license": "MPL-2.0",
++      "dependencies": {
++        "detect-libc": "^2.0.3"
++      },
++      "engines": {
++        "node": ">= 12.0.0"
++      },
++      "funding": {
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
++      },
++      "optionalDependencies": {
++        "lightningcss-android-arm64": "1.33.0",
++        "lightningcss-darwin-arm64": "1.33.0",
++        "lightningcss-darwin-x64": "1.33.0",
++        "lightningcss-freebsd-x64": "1.33.0",
++        "lightningcss-linux-arm-gnueabihf": "1.33.0",
++        "lightningcss-linux-arm64-gnu": "1.33.0",
++        "lightningcss-linux-arm64-musl": "1.33.0",
++        "lightningcss-linux-x64-gnu": "1.33.0",
++        "lightningcss-linux-x64-musl": "1.33.0",
++        "lightningcss-win32-arm64-msvc": "1.33.0",
++        "lightningcss-win32-x64-msvc": "1.33.0"
++      }
++    },
++    "node_modules/vite/node_modules/lightningcss-win32-x64-msvc": {
++      "version": "1.33.0",
++      "resolved": "https://registry.npmjs.org/lightningcss-win32-x64-msvc/-/lightningcss-win32-x64-msvc-1.33.0.tgz",
++      "integrity": "sha512-OlEICDx/Xl0FqSp4bry8zFnCvGpig3Gl4gCquvYwHuqJKEC1+n9NgDniFvqHGmMv1ZkqDJrDqKKSykTDX+ehuA==",
++      "cpu": [
++        "x64"
++      ],
++      "license": "MPL-2.0",
++      "optional": true,
++      "os": [
++        "win32"
++      ],
++      "engines": {
++        "node": ">= 12.0.0"
++      },
++      "funding": {
++        "type": "opencollective",
++        "url": "https://opencollective.com/parcel"
++      }
++    },
+     "node_modules/vitefu": {
+       "version": "1.1.3",
+       "license": "MIT",
+diff --git a/package.json b/package.json
+index 7976b778..0e69e000 100644
+--- a/package.json
++++ b/package.json
+@@ -7,7 +7,7 @@
+     "dev": "vite dev",
+     "build": "vite build",
+     "build:dev": "vite build --mode development",
+-    "preview": "vite preview",
++    "preview": "nitro preview",
+     "lint": "eslint .",
+     "format": "prettier --write .",
+     "smoke": "tsx scripts/smoke-all-features.mts",
+@@ -114,7 +114,7 @@
+     "tsx": "^4.23.12",
+     "typescript": "^5.8.3",
+     "typescript-eslint": "^8.56.1",
+-    "vite": "^7.3.1",
++    "vite": "8.2.2",
+     "vitest": "^4.1.10"
+   }
+ }
+diff --git a/scripts/filter-investors-complete.mts b/scripts/filter-investors-complete.mts
+index 464921fe..1ef00930 100644
+--- a/scripts/filter-investors-complete.mts
++++ b/scripts/filter-investors-complete.mts
+@@ -7,6 +7,7 @@
+  */
+ import { readFileSync, writeFileSync } from "node:fs";
+ import { resolve } from "node:path";
++import { projectInvestorLocation } from "../src/lib/canonical/investor-location";
+ 
+ const ROOT = resolve(process.cwd());
+ const IN = resolve(ROOT, "data/investors_merged.json");
+@@ -153,7 +154,7 @@ function main() {
+     const bio = rawBio ? rawBio.slice(0, 600) : null;
+ 
+     seen.add(id);
+-    const locParts = location.split(",").map((s: string) => s.trim()).filter(Boolean);
++    const projectedLocation = projectInvestorLocation({ location_raw: location });
+     out.push(
+       JSON.stringify({
+         id,
+@@ -161,8 +162,8 @@ function main() {
+         firm,
+         role,
+         location,
+-        location_city: locParts[0] ?? location,
+-        location_country: locParts[locParts.length - 1] ?? "",
++        location_city: projectedLocation.location_city,
++        location_country: projectedLocation.location_country,
+         sectors,
+         stages,
+         check_min_usd: checkMin,
+diff --git a/scripts/verify-understanding-runner.test.ts b/scripts/verify-understanding-runner.test.ts
+index c649fa4d..531d023d 100644
+--- a/scripts/verify-understanding-runner.test.ts
++++ b/scripts/verify-understanding-runner.test.ts
+@@ -1,6 +1,17 @@
+-import { describe, expect, it } from "vitest";
++import { beforeAll, describe, expect, it } from "vitest";
++import { buildCityGazetteer } from "../src/lib/search/gazetteer.server";
++import { registerCityGazetteer } from "../src/lib/search/location-resolver";
+ import { mustAbortRequiredLlmRun, sameLocation } from "./verify-understanding-runner";
+ 
++beforeAll(() => {
++  registerCityGazetteer(buildCityGazetteer({
++    aarhus: { iso2: "DK", name: "Aarhus", aliases: ["Århus"] },
++    paris_fr: { iso2: "FR", name: "Paris" },
++    paris_us: { iso2: "US", name: "Paris" },
++    waterford_ie: { iso2: "IE", name: "Waterford" },
++  }));
++});
++
+ describe("Gate 1 verifier boundaries", () => {
+   it("accepts harmless canonical location formatting but rejects suffix contamination", () => {
+     expect(sameLocation("surabaya", "Surabaya")).toBe(true);
+@@ -15,4 +26,17 @@ describe("Gate 1 verifier boundaries", () => {
+     expect(mustAbortRequiredLlmRun(true, false, false)).toBe(false);
+     expect(mustAbortRequiredLlmRun(false, false, true)).toBe(false);
+   });
++
++  it("accepts accent aliases only when gazetteer identity and country match", () => {
++    expect(sameLocation("Aarhus", "Århus", "DK")).toBe(true);
++  });
++
++  it("rejects unresolved typos without typo repair", () => {
++    expect(sameLocation("Aarhus", "Arahus", "DK")).toBe(false);
++  });
++
++  it("rejects different cities and country conflicts", () => {
++    expect(sameLocation("Aarhus", "Waterford", "DK")).toBe(false);
++    expect(sameLocation("Aarhus", "Aarhus", "US")).toBe(false);
++  });
+ });
+diff --git a/scripts/verify-understanding-runner.ts b/scripts/verify-understanding-runner.ts
+index 4e75c1b2..be9bf355 100644
+--- a/scripts/verify-understanding-runner.ts
++++ b/scripts/verify-understanding-runner.ts
+@@ -1,3 +1,5 @@
++import { resolveCanonicalLocation } from "../src/lib/search/location-resolver";
++
+ /** A formal model-validation run has no evidence after deterministic fallback. */
+ export function mustAbortRequiredLlmRun(
+   requireLlm: boolean,
+@@ -7,7 +9,11 @@ export function mustAbortRequiredLlmRun(
+   return requireLlm && !deterministicMode && fallbackUsed;
+ }
+ 
+-export function sameLocation(want: string, got: string | null | undefined): boolean {
++export function sameLocation(
++  want: string,
++  got: string | null | undefined,
++  countryHint?: string | null,
++): boolean {
+   const normalize = (s: string | null | undefined) =>
+     (s ?? "")
+       .normalize("NFKD")
+@@ -17,5 +23,21 @@ export function sameLocation(want: string, got: string | null | undefined): bool
+       .replace(/[\s-]+/g, " ")
+       .trim();
+   const expected = normalize(want);
+-  return !!expected && expected === normalize(got);
++  if (!expected || !got) return false;
++  if (!countryHint && expected === normalize(got)) return true;
++  const expectedGeo = resolveCanonicalLocation(want, {
++    gazetteer: true,
++    correctTypos: false,
++    countryHint,
++  });
++  const observedGeo = resolveCanonicalLocation(got, {
++    gazetteer: true,
++    correctTypos: false,
++    countryHint,
++  });
++  return !!expectedGeo?.id &&
++    expectedGeo.id === observedGeo?.id &&
++    !!expectedGeo.country_code &&
++    expectedGeo.country_code === observedGeo?.country_code &&
++    (!countryHint || expectedGeo.country_code === countryHint.toUpperCase());
+ }
+diff --git a/scripts/verify-understanding.mts b/scripts/verify-understanding.mts
+index b37ec89b..f009f9d2 100644
+--- a/scripts/verify-understanding.mts
++++ b/scripts/verify-understanding.mts
+@@ -17,13 +17,14 @@
+  * Usage:
+  *   npm run verify:understanding
+  *   npm run verify:understanding -- --seed 4242 --holdout 120 --chaos 120
++ *   npm run verify:understanding -- --report-dir "$TEMP/scrapivo-gate1"
+  *   npm run verify:understanding -- --set train
+  *   npm run verify:understanding -- --deterministic     (no LLM; fallback only)
+  */
+ 
+ import "./_env.mts";
+ import { mkdirSync, writeFileSync } from "node:fs";
+-import { join } from "node:path";
++import { join, resolve } from "node:path";
+ 
+ import {
+   TRAIN,
+@@ -41,6 +42,8 @@ import { syncClarification } from "../src/lib/understanding/clarify-state";
+ import { validateFrame, type Repair, type Violation } from "../src/lib/understanding/validate";
+ import type { UnderstandingFrame } from "../src/lib/understanding/frame";
+ import { mustAbortRequiredLlmRun, sameLocation } from "./verify-understanding-runner";
++import { ensureCityGazetteer } from "../src/lib/search/gazetteer.server";
++import { cityGazetteerRegistered } from "../src/lib/search/location-resolver";
+ 
+ // ── Arguments ─────────────────────────────────────────────────────────────
+ 
+@@ -54,6 +57,7 @@ const SEED = Number.parseInt(arg("seed", String(Date.now() % 100000)), 10);
+ const HOLDOUT_N = Number.parseInt(arg("holdout", "80"), 10);
+ const CHAOS_N = Number.parseInt(arg("chaos", "80"), 10);
+ const ONLY = flag("smoke") ? "smoke" : arg("set", "all");
++const REPORT_DIR = arg("report-dir", "");
+ const DETERMINISTIC = flag("deterministic");
+ /** Pin certification to one gateway/model. Empty string means "the ladder". */
+ const PROVIDER = arg("provider", "");
+@@ -324,8 +328,8 @@ function grade(c: Case, frame: UnderstandingFrame, violations: Violation[]): Che
+     "LOCATION",
+     e.location === undefined
+       ? null
+-      : sameLocation(e.location, frame.location?.value) ||
+-          sameLocation(e.location, frame.location?.canonical),
++      : sameLocation(e.location, frame.location?.value, frame.location?.country_code) ||
++          sameLocation(e.location, frame.location?.canonical, frame.location?.country_code),
+     `want ~"${e.location}" · got ${frame.location?.value ?? "null"}`,
+   );
+   add(
+@@ -1035,6 +1039,9 @@ function setSection(title: string, graded: Graded[], readMe: string): string {
+ // ── Main ──────────────────────────────────────────────────────────────────
+ 
+ async function main() {
++  await ensureCityGazetteer();
++  if (!cityGazetteerRegistered()) throw new Error("city gazetteer failed to register");
++
+   const holdout = generateHoldout(SEED, HOLDOUT_N);
+   const chaos = generateChaos(SEED, CHAOS_N);
+ 
+@@ -1088,7 +1095,7 @@ async function main() {
+ 
+   // Persist the drawn cases so a report can be reproduced even if the pools or
+   // the generator change later.
+-  const outDir = join(process.cwd(), "reports", "understanding");
++  const outDir = REPORT_DIR ? resolve(REPORT_DIR) : join(process.cwd(), "reports", "understanding");
+   mkdirSync(outDir, { recursive: true });
+   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+   const base = `gate1-${stamp}-seed${SEED}`;
+diff --git a/src/browser-worker/__tests__/session-manager.test.ts b/src/browser-worker/__tests__/session-manager.test.ts
+index d7e5ba0d..705d2dd9 100644
+--- a/src/browser-worker/__tests__/session-manager.test.ts
++++ b/src/browser-worker/__tests__/session-manager.test.ts
+@@ -3,7 +3,7 @@
+  * Loopback is reachable ONLY through the test-injected guard allowlist.
+  */
+ import { createServer, type Server } from "node:http";
+-import { existsSync, mkdtempSync, rmSync } from "node:fs";
++import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+ import { tmpdir } from "node:os";
+ import { join } from "node:path";
+ import { afterAll, beforeAll, describe, expect, it } from "vitest";
+@@ -127,6 +127,23 @@ describe.skipIf(!chromiumInstalled)("browser worker sessions (real Chromium)", {
+     await manager.close(session.id, OWNER);
+   });
+ 
++  it("terminal close interrupts an in-flight navigation and leaves the lane reopenable", async () => {
++    const session = await manager.create({ ownerId: OWNER, runKey: "run-terminal-close" });
++    const started = Date.now();
++    const navigating = manager.observe(session.id, OWNER, `${base}/slow`);
++    const rejected = expect(navigating).rejects.toMatchObject({ code: "NAVIGATION_FAILED" });
++    await new Promise((resolve) => setTimeout(resolve, 300));
++    await expect(manager.close(session.id, "owner-b")).rejects.toMatchObject({ code: "SESSION_NOT_FOUND" });
++    const closed = await manager.close(session.id, OWNER);
++    expect(closed.status).toBe("closed");
++    expect(Date.now() - started).toBeLessThan(3500);
++    await rejected;
++    expect(manager.get(session.id, OWNER).status).toBe("closed");
++    const reopened = await manager.reopen(session.id, OWNER);
++    expect(reopened).toMatchObject({ id: session.id, status: "active", controller: "agent" });
++    await manager.close(session.id, OWNER);
++  });
++
+   it("runs structured ref actions with a stale-snapshot guard (list -> Contact -> read; form fill + submit)", async () => {
+     const session = await manager.create({ ownerId: OWNER, runKey: "run-actions" });
+     const list = await manager.observe(session.id, OWNER, `${base}/a`);
+@@ -199,6 +216,45 @@ describe.skipIf(!chromiumInstalled)("browser worker persistence and failure", {
+   beforeAll(() => { dir = mkdtempSync(join(tmpdir(), "scrapivo-worker-persist-")); });
+   afterAll(() => { rmSync(dir, { recursive: true, force: true }); });
+ 
++  it.each(["reopen", "create"] as const)("waits for terminal teardown before %s acquires the same profile", async (acquire) => {
++    let release!: () => void;
++    let teardownStarted!: () => void;
++    const teardown = new Promise<void>((resolve) => { teardownStarted = resolve; });
++    const gate = new Promise<void>((resolve) => { release = resolve; });
++    let launches = 0;
++    const manager = await createSessionManager({ dataDir: dir, guard: guardFor(), launch: async (profileDir, options) => {
++      const context = await (await import("playwright-core")).chromium.launchPersistentContext(profileDir, options);
++      launches++;
++      if (launches === 1) {
++        const close = context.close.bind(context);
++        context.close = async (...args) => { teardownStarted(); await gate; await close(...args); };
++      }
++      return context;
++    } });
++    try {
++      const runKey = `run-close-acquire-${acquire}`;
++      const session = await manager.create({ ownerId: OWNER, runKey });
++      await manager.observe(session.id, OWNER, `${base}/set-cookie`);
++      const closed = manager.close(session.id, OWNER);
++      await teardown;
++      // Duplicate closes share the barrier rather than finalizing metadata early.
++      const duplicate = manager.close(session.id, OWNER);
++      const opened = acquire === "reopen" ? manager.reopen(session.id.toUpperCase(), OWNER) : manager.create({ ownerId: OWNER, runKey });
++      await new Promise((resolve) => setTimeout(resolve, 100));
++      expect(launches).toBe(1);
++      release();
++      expect((await closed).status).toBe("closed");
++      expect((await duplicate).status).toBe("closed");
++      expect(await opened).toMatchObject({ id: session.id, status: "active" });
++      expect(manager.get(session.id, OWNER).status).toBe("active");
++      expect(JSON.parse(readFileSync(join(dir, session.id, "session.json"), "utf8")).status).toBe("active");
++      expect((await manager.observe(session.id, OWNER, `${base}/echo-cookie`)).text).toContain("sid=abc123");
++    } finally {
++      release();
++      await manager.shutdown();
++    }
++  });
++
+   it("reopens the same session id with its cookies after a worker restart", async () => {
+     const a = await createSessionManager({ dataDir: dir, guard: guardFor() });
+     const session = await a.create({ ownerId: OWNER, runKey: "run-persist" });
+diff --git a/src/browser-worker/session-manager.ts b/src/browser-worker/session-manager.ts
+index c638ce56..8752334a 100644
+--- a/src/browser-worker/session-manager.ts
++++ b/src/browser-worker/session-manager.ts
+@@ -170,6 +170,8 @@ export async function createSessionManager(options: {
+   const sessions = new Map<string, WorkerSession>();
+   const running = new Map<string, Running>();
+   const queues = new Map<string, Promise<unknown>>();
++  const executing = new Map<string, Promise<unknown>>();
++  const closing = new Map<string, Promise<WorkerSession>>();
+   const proxy = await startEgressProxy(guard);
+ 
+   for (const id of await readdir(dataDir).catch(() => [] as string[])) {
+@@ -190,11 +192,21 @@ export async function createSessionManager(options: {
+     await rename(`${path}.tmp`, path);
+   }
+   async function serial<T>(key: string, fn: () => Promise<T>): Promise<T> {
++    if (SESSION_ID.test(key)) key = key.toLowerCase();
+     const previous = queues.get(key) ?? Promise.resolve();
+-    const next = previous.catch(() => {}).then(fn);
++    const next = previous.catch(() => {}).then(async () => {
++      for (let barrier = closing.get(key); barrier; barrier = closing.get(key)) await barrier;
++      const operation = Promise.resolve().then(fn);
++      executing.set(key, operation);
++      try { return await operation; } finally { if (executing.get(key) === operation) executing.delete(key); }
++    });
+     queues.set(key, next);
+     try { return await next; } finally { if (queues.get(key) === next) queues.delete(key); }
+   }
++  async function afterCurrent<T>(key: string, fn: () => Promise<T>): Promise<T> {
++    await (queues.get(key) ?? Promise.resolve()).catch(() => undefined);
++    return fn();
++  }
+   function owned(id: string, ownerId: string): WorkerSession {
+     const session = sessions.get(validateSessionId(id));
+     // Wrong owner and unknown id look identical: existence is not disclosed.
+@@ -345,6 +357,27 @@ export async function createSessionManager(options: {
+     return update(session, { status: session.status === "error" ? "error" : "closed", controller: "agent" });
+   }
+ 
++  function closeTerminal(session: WorkerSession): Promise<WorkerSession> {
++    const pending = closing.get(session.id);
++    if (pending) return pending;
++    const current = executing.get(session.id);
++    const instance = running.get(session.id);
++    if (instance) running.delete(session.id);
++    // Publish the barrier before teardown starts. Interrupt only the executing
++    // operation; queued steps wait here instead of acquiring the old profile.
++    const terminal = Promise.resolve().then(async () => {
++      if (instance) {
++        await instance.context.storageState({ path: join(directory(session.id), "storage.json") }).catch(() => undefined);
++        await instance.context.close().catch(() => undefined);
++      }
++      await current?.catch(() => undefined);
++      // A launch already executing when close began may have finished meanwhile.
++      return closeInternal(session);
++    }).finally(() => { if (closing.get(session.id) === terminal) closing.delete(session.id); });
++    closing.set(session.id, terminal);
++    return terminal;
++  }
++
+   async function evictProfilesFor(newId: string) {
+     const stored = [...sessions.values()].filter((item) => item.id !== newId);
+     if (stored.length < maxProfiles) return;
+@@ -417,11 +450,11 @@ export async function createSessionManager(options: {
+     counts: () => ({ active: running.size, stored: sessions.size, maxActive, maxProfiles }),
+     create,
+     /** Relaunch a saved profile under the same id. */
+-    reopen: (id: string, ownerId: string) => serial(id, async () => {
++    reopen: (id: string, ownerId: string) => afterCurrent(id, async () => serial(id, async () => {
+       const session = owned(id, ownerId);
+       await launch(session);
+       return { ...session };
+-    }),
++    })),
+     /** Atomic navigate → read (+ element refs) for the agent lane. */
+     observe: (id: string, ownerId: string, url: string, signal?: AbortSignal | null) => serial(id, async () => {
+       const session = owned(id, ownerId);
+@@ -555,14 +588,21 @@ export async function createSessionManager(options: {
+       return update(session, { url: page.url(), title: (await page.title().catch(() => "")).slice(0, 300) });
+     }),
+     /** retain=true keeps Chromium open for viewing/takeover until retainMs or an explicit close. */
+-    close: (id: string, ownerId: string, retain = false) => serial(id, async () => {
++    close: async (id: string, ownerId: string, retain = false) => {
+       const session = owned(id, ownerId);
+-      // A person driving the browser keeps control when the run ends.
+-      if (retain && running.has(session.id)) return update(session, { status: "retained" });
+-      return closeInternal(session);
+-    }),
++      if (!retain) return closeTerminal(session);
++      // A person driving the browser keeps control when the run ends. Retain
++      // stays serialized so takeover/input actions finish before the viewer
++      // lane becomes retained.
++      return serial(id, async () => {
++        const current = owned(id, ownerId);
++        if (running.has(current.id)) return update(current, { status: "retained" });
++        return closeInternal(current);
++      });
++    },
+     shutdown: async () => {
+       clearInterval(sweeper);
++      await Promise.allSettled([...closing.values()]);
+       await Promise.allSettled([...queues.values()]);
+       await Promise.allSettled([...sessions.values()].filter((item) => running.has(item.id)).map((item) => closeInternal(item)));
+       await proxy.close();
+diff --git a/src/lib/canonical/companies.server.ts b/src/lib/canonical/companies.server.ts
+index 22f7b0bc..a4ee9134 100644
+--- a/src/lib/canonical/companies.server.ts
++++ b/src/lib/canonical/companies.server.ts
+@@ -1,8 +1,9 @@
+ /**
+  * Canonical companies reader — S3 Parquet, initial-partition pruned (Phase 1).
+  */
+-import { listPartitionFilesBySize, readFiltered, type DbHitMeta } from "./read-parquet.server";
++import { listPartitionFilesBySize, readFiltered, type DbHitMeta, type ReadBudget } from "./read-parquet.server";
+ import { criterionAlternatives, criterionPhraseMatches } from "@/lib/search/criterion-match";
++import { locationSatisfies, resolveCanonicalLocation } from "@/lib/search/location-resolver";
+ 
+ export interface CanonicalCompany {
+   company_name: string | null;
+@@ -22,7 +23,7 @@ export interface CanonicalCompany {
+ const COLS = ["company_name", "website", "location", "category", "email", "phone",
+   "linkedin", "facebook", "twitter", "description", "employees", "quality_score"];
+ 
+-export interface CompanyQuery {
++export interface CompanyQuery extends ReadBudget {
+   name?: string;
+   category?: string;
+   industry?: string;
+@@ -45,6 +46,8 @@ export function companyCategoryTerms(wanted: string): string[] {
+     healthcare: ["healthcare", "health care"],
+     fintech: ["fintech", "financial technology"],
+     "e commerce": ["e-commerce", "ecommerce"],
++    cybersecurity: ["cybersecurity", "cyber security", "computer & network security", "computer and network security", "network security"],
++    "cyber security": ["cybersecurity", "cyber security", "computer & network security", "computer and network security", "network security"],
+   };
+   return aliases[key] ?? [industry];
+ }
+@@ -55,32 +58,35 @@ export function companyCategoryMatches(value: unknown, wanted: string): boolean
+     .some(part => companyCategoryTerms(part.replace(/\s+startups?$/i, "")).some((term) => like(value, term)));
+ }
+ 
+-/**
+- * Location matching against data-derived values (no hand-typed region maps).
+- * Distinct company locations come from processed/gazetteer/gazetteer.json.
+- * The ONLY hand seed is country abbreviations (us/usa/uk — pure linguistic
+- * knowledge, documented here): everything else matches data values directly.
+- */
+-const ABBREV_SEED: Record<string, string[]> = {
+-  us: ["northeastern us", "southern us", "midwestern us", "western us", "east coast", "west coast", "america"],
+-  usa: ["northeastern us", "southern us", "midwestern us", "western us", "east coast", "west coast", "america"],
+-  uk: ["london", "britain", "england"],
+-};
++function canonicalCompanyPlace(raw: string) {
++  // ISO abbreviations are language, not a city-to-country dictionary.
++  const token = raw.trim().replace(/^CAN$/i, "Canada").replace(/^US$/i, "USA");
++  return resolveCanonicalLocation(token);
++}
+ 
+-function locationMatches(v: unknown, needle: string): boolean {
+-  if (like(v, needle)) return true;
+-  const n = needle.toLowerCase().trim();
+-  // Abbreviation seed expands to region phrases that DO exist in data.
+-  const seeds = ABBREV_SEED[n] ?? [];
+-  if (seeds.length) return seeds.some((a) => like(v, a));
+-  // Token overlap against known data values: "new york" matches
+-  // "Greater New York Area, ..." without anyone typing the mapping.
+-  const toks = n.split(/[^a-z0-9]+/).filter((t) => t.length > 2);
+-  if (toks.length && typeof v === "string") {
+-    const vl = v.toLowerCase();
+-    if (toks.every((t) => vl.includes(t))) return true;
++/** Only observed country/city/region tokens establish country membership. */
++export function companyCountryCode(raw: string | null | undefined): string | null {
++  const codes = new Set<string>();
++  const explicit = new Set<string>();
++  for (const part of (raw ?? "").split(",").map(value => value.trim()).filter(Boolean)) {
++    if (/^(?:(?:north|south|central|latin)\s+)?america$/i.test(part)) continue;
++    const regional = part.match(/^(?:north(?:east|west)?ern|south(?:east|west)?ern|midwestern|western|eastern)\s+(US|USA|Canada|CAN)$/i);
++    const geo = canonicalCompanyPlace(regional?.[1] ?? part);
++    if (geo?.country_code && geo.resolution === "resolved") {
++      codes.add(geo.country_code);
++      if (geo.kind === "country" || regional) explicit.add(geo.country_code);
++    }
+   }
+-  return false;
++  if (explicit.size) return explicit.size === 1 ? [...explicit][0] : null;
++  return codes.size === 1 ? [...codes][0] : null;
++}
++
++export function companyLocationMatches(v: unknown, needle: string): boolean {
++  if (typeof v !== "string") return false;
++  const required = canonicalCompanyPlace(needle);
++  if (!required) return false;
++  if (required.kind === "country") return companyCountryCode(v) === required.country_code;
++  return locationSatisfies(v, required);
+ }
+ 
+ export async function searchCompaniesDB(
+@@ -89,7 +95,8 @@ export async function searchCompaniesDB(
+   const limit = Math.min(q.limit ?? 50, 200);
+   // Size-ordered shards (largest first): alphabetical order reads the
+   // emptiest shards first and starves results. Read until the limit is met.
+-  const all = (await listPartitionFilesBySize("processed/companies_by_initial/")).map((f) => f.key);
++  const budget = { signal: q.signal, deadline: q.deadline };
++  const all = (await listPartitionFilesBySize("processed/companies_by_initial/", budget)).map((f) => f.key);
+   let keys = all;
+   const read: string[] = [];
+   if (q.name) {
+@@ -111,21 +118,23 @@ export async function searchCompaniesDB(
+   const where = (r: Record<string, unknown>) =>
+     (!q.name || like(r.company_name, q.name)) &&
+     (!cat || companyCategoryMatches(r.category, cat)) &&
+-    (!q.location || locationMatches(r.location, q.location));
++    (!q.location || companyLocationMatches(r.location, q.location));
+   const first = await readFiltered<CanonicalCompany>({
++    ...budget,
+     keys,
+     columns: COLS,
+     limit,
+     meta: { dbHit: false, engine: "s3-parquet", partitionsRead: read },
+     where,
+   });
+-  if (first.rows.length >= limit || keys.length >= all.length) return first;
++  if (first.rows.length >= limit || keys.length >= all.length || first.meta.coverageIncomplete) return first;
+   // Thin first pass (location-only queries match no particular initial):
+   // widen to the remaining shards, same limit. Bounded: one extra pass over
+   // small files, then stop — the tier timeout owns the wall clock.
+   const rest = all.filter((k) => !keys.includes(k));
+   read.push(`processed/companies_by_initial/ (widened +${rest.length} shard(s))`);
+   const second = await readFiltered<CanonicalCompany>({
++    ...budget,
+     keys: rest,
+     columns: COLS,
+     limit,
+diff --git a/src/lib/canonical/investors.server.ts b/src/lib/canonical/investors.server.ts
+index bca95634..2bd0e497 100644
+--- a/src/lib/canonical/investors.server.ts
++++ b/src/lib/canonical/investors.server.ts
+@@ -4,6 +4,7 @@
+  */
+ import { readFiltered, type DbHitMeta } from "./read-parquet.server";
+ import { investorSectorMatches } from "@/lib/search/search-spec";
++import { projectInvestorLocation } from "./investor-location";
+ 
+ /** Macro-region → country codes (rows store countries, users say regions). */
+ const REGION_COUNTRY: Record<string, string[]> = {
+@@ -66,7 +67,7 @@ export async function searchInvestorsDB(q: {
+   // "angel"/"growth" appear there); sector against sectors. All optional.
+   const checkValue = moneyValue(q.check);
+   const stageNeedle = (q.stage ?? (checkValue == null ? q.check : "") ?? "").trim().toLowerCase();
+-  return readFiltered<CanonicalInvestor>({
++  const result = await readFiltered<CanonicalInvestor>({
+     keys: [KEY],
+     columns: COLS,
+     limit,
+@@ -82,4 +83,5 @@ export async function searchInvestorsDB(q: {
+         REGION_COUNTRY[q.location.toLowerCase()]?.includes(String((r as unknown as Record<string, unknown>).location_country ?? "").toLowerCase())) &&
+       (!q.kind || r.kind === q.kind),
+   });
++  return { ...result, rows: result.rows.map(row => ({ ...row, ...projectInvestorLocation(row) })) };
+ }
+diff --git a/src/lib/canonical/read-parquet.server.ts b/src/lib/canonical/read-parquet.server.ts
+index 1275d885..41c3e31f 100644
+--- a/src/lib/canonical/read-parquet.server.ts
++++ b/src/lib/canonical/read-parquet.server.ts
+@@ -115,7 +115,7 @@ async function fetchRange(key: string, start: number, end?: number, budget: Read
+   });
+ }
+ 
+-async function objectLength(key: string, budget: ReadBudget = {}): Promise<number> {
++export async function objectLength(key: string, budget: ReadBudget = {}): Promise<number> {
+   return withRequestBudget(budget, async (signal) => {
+     const res = await client().send(
+       new GetObjectCommand({ Bucket: BUCKET, Key: key, Range: "bytes=0-0" }),
+@@ -123,8 +123,10 @@ async function objectLength(key: string, budget: ReadBudget = {}): Promise<numbe
+     );
+     const cr = res.ContentRange ?? "";
+     const m = cr.match(/\/(\d+)$/);
+-    if (m) return Number(m[1]);
++    // The SDK returns a streaming body even for a one-byte range. Consume it
++    // before returning the header-derived length so its pooled socket is free.
+     const buf = await res.Body!.transformToByteArray();
++    if (m) return Number(m[1]);
+     return buf.length;
+   });
+ }
+diff --git a/src/lib/search/__tests__/chaos-pipeline-contract.test.ts b/src/lib/search/__tests__/chaos-pipeline-contract.test.ts
+index a5f73ae6..fe628e6b 100644
+--- a/src/lib/search/__tests__/chaos-pipeline-contract.test.ts
++++ b/src/lib/search/__tests__/chaos-pipeline-contract.test.ts
+@@ -110,7 +110,7 @@ describe("compound searches execute every semantic bucket", () => {
+     const raw = "need maybe 15 cybersecurity companies then another 15 ai infra/devtool startups, mostly usa/canada, preferably under like 100 employees but if headcount is unknown dont kill the result, founders or decision makers would be useful and pls dont mix cybersecurity consultants with actual product companies unless they genuinely fit";
+     const companies = vi.fn(async ({ category, location, limit }: { category: string; location: string; limit: number }) => ({
+       rows: Array.from({ length: limit }, (_, index) => ({ registry_id: `${category}:${location}:${index}`, company_name: `Product Firm ${category} ${location} ${index}`,
+-        category: index === 0 ? "Healthcare" : /cybersecurity/i.test(category) ? "Cybersecurity" : index % 2 ? "AI infrastructure" : "Developer tools",
++        category: index === 0 ? "Healthcare" : /cybersecurity/i.test(category) ? "Cybersecurity Software" : index % 2 ? "AI infrastructure" : "Developer tools",
+         location, website: `https://product-${index}.example` })),
+       meta: { dbHit: true, engine: "s3-parquet", partitionsRead: ["fixture"], rowsScanned: limit, rowsReturned: limit },
+     }));
+@@ -124,7 +124,7 @@ describe("compound searches execute every semantic bucket", () => {
+     expect(new Set(args.map(([query]) => query.location)).size).toBe(2);
+     expect(args.every(([query]) => query.limit === 16)).toBe(true);
+     expect(result.rows).toHaveLength(30);
+-    expect(result.rows.filter(row => row.category === "Cybersecurity")).toHaveLength(15);
++    expect(result.rows.filter(row => row.category === "Cybersecurity Software")).toHaveLength(15);
+     expect(result.rows.filter(row => ["AI infrastructure", "Developer tools"].includes(row.category ?? ""))).toHaveLength(15);
+     expect(result.rows.some(row => row.category === "Healthcare")).toBe(false);
+   });
+diff --git a/src/lib/search/browser-live-fallback.test.ts b/src/lib/search/browser-live-fallback.test.ts
+index f8909b3e..ee43ce2b 100644
+--- a/src/lib/search/browser-live-fallback.test.ts
++++ b/src/lib/search/browser-live-fallback.test.ts
+@@ -19,6 +19,58 @@ beforeEach(() => {
+ });
+ 
+ describe("browser extraction when the model is unavailable", () => {
++  it("does not treat paid or retail words as evidence of an AI company", () => {
++    const companySpec = { ...spec("company"), criteria: [{ field: "industry", value: "AI company", stated: true, confidence: 1 }] };
++    for (const name of ["Paid Services", "Retail Portal"]) {
++      const page = { url: "https://unrelated.example/", title: name, text: `${name} is a retail company offering paid subscriptions.` };
++      expect(deterministicLocalEntities([page], companySpec)).toEqual([]);
++    }
++  });
++
++  it("uses a meaningful industry when the category contains only generic company nouns", () => {
++    const page = { url: "https://acme.example/", title: "Acme Cloud", text: "Acme Cloud is a cybersecurity software company." };
++    const companySpec = { ...spec("company"), criteria: [
++      { field: "category", value: "company", stated: true, confidence: 1 },
++      { field: "industry", value: "cybersecurity", stated: true, confidence: 1 },
++    ] };
++    const entities = deterministicLocalEntities([page], companySpec);
++    expect(browserEntitiesToRows(entities, [page]).map((row) => row.title)).toEqual(["Acme Cloud"]);
++    expect(deterministicLocalEntities([page], { ...companySpec, criteria: companySpec.criteria.slice(0, 1) })).toEqual([]);
++  });
++
++  it("anchors company directories on the industry criterion and validates each named company", async () => {
++    const companySpec = { ...spec("company"), criteria: [{ field: "industry", value: "cybersecurity company", stated: true, confidence: 1 }] };
++    const page = { url: "https://publisher.example/security-products", title: "Product directory", text:
++      "Northstar Labs\nNorthstar Labs is a cybersecurity software company.\nAcme Cloud\nAcme Cloud builds a cybersecurity platform.\nBirch Security\nBirch Security is a cybersecurity company." };
++    const entities = await extractEntities([page], companySpec);
++    expect(browserEntitiesToRows(entities, [page], undefined, companySpec).map((row) => row.title).sort())
++      .toEqual(["Acme Cloud", "Birch Security", "Northstar Labs"]);
++    expect(aiComplete).not.toHaveBeenCalled();
++  });
++
++  it("anchors a first-party AI infrastructure company without inventing the requested industry label", () => {
++    const companySpec = { ...spec("company"), criteria: [{ field: "industry", value: "ai infra/devtool startup", stated: true, confidence: 1 }] };
++    const page = { url: "https://acme.example/", title: "Acme Cloud", text:
++      "Acme Cloud builds artificial intelligence infrastructure software for developers." };
++    const rows = browserEntitiesToRows(deterministicLocalEntities([page], companySpec), [page], undefined, companySpec);
++    expect(rows.map((row) => row.title)).toEqual(["Acme Cloud"]);
++    expect(rows[0].detail).toContain("artificial intelligence infrastructure");
++    expect(rows[0].category).toBeNull();
++    expect(rows[0].industry).toBeNull();
++  });
++
++  it("does not suppress model extraction when three or more company fallback names fail source validation", async () => {
++    const companySpec = { ...spec("company"), criteria: [{ field: "industry", value: "cybersecurity", stated: true, confidence: 1 }] };
++    const page = { url: "https://publisher.example/security-guide", title: "Cybersecurity guide", text:
++      "Resources\nCybersecurity best practices\nLearn More\nCybersecurity recommendations\nPopular Topics\nCybersecurity guidance\nProduct Categories\nCybersecurity resources" };
++    const fallback = deterministicLocalEntities([page], companySpec);
++    expect(fallback.length).toBeGreaterThanOrEqual(3);
++    expect(browserEntitiesToRows(fallback, [page], undefined, companySpec)).toHaveLength(0);
++    vi.mocked(aiComplete).mockResolvedValue(JSON.stringify({ entities: [] }));
++    await extractEntities([page], companySpec);
++    expect(aiComplete).toHaveBeenCalledOnce();
++  });
++
+   it("keeps source article founder cards as named people with source evidence", async () => {
+     const page = { url: "https://publisher.example/saas-founders", title: "Top SaaS Founders", text:
+       "Top 25 B2B SaaS Founder List\nThe Founders\nAndrew Breen\nFounder & CEO\nOutshine\nView Bio >>\nAndrew Breen is the founder of Outshine, a SaaS agency.\nDavid Chevalier\nCo-Founder & CEO\nSurfe\nView Bio >>" };
+diff --git a/src/lib/search/browser-live.server.ts b/src/lib/search/browser-live.server.ts
+index 35e77a90..607780d6 100644
+--- a/src/lib/search/browser-live.server.ts
++++ b/src/lib/search/browser-live.server.ts
+@@ -28,6 +28,7 @@ import { isDeadlineAbort } from "./search-run";
+ import { computeResearchNeeds, researchStatus, type ResearchNeed, type ResearchStatus } from "./browser-research";
+ import { discoverWebFreeFirst } from "./provider-ladder";
+ import { attributableEmail, attributablePhone } from "./contact-attribution";
++import { criterionPhraseMatches } from "./criterion-match";
+ 
+ type QuotedField = { value: string; quote: string };
+ export type BrowserExtractedEntity = {
+@@ -788,9 +789,10 @@ export async function extractEntities(
+   };
+ 
+   const fallback = attachLocation(observedFallback());
+-  // Raw fund candidates may have a title-derived name absent from their quote.
+-  // Only source-validated identities can make the model unnecessary.
+-  const fallbackCount = spec.entity === "investor" ? browserEntitiesToRows(fallback, pages).length : fallback.length;
++  // Raw names may fail identity validation or describe another entity kind.
++  // Only candidates the research lane can accept make the model unnecessary.
++  const fallbackCount = browserEntitiesToRows(fallback, pages, undefined, spec)
++    .filter((row) => spec.entity === "unknown" || row.kind === spec.entity).length;
+   if (fallbackCount >= 3) return report("deterministic", "not_called", fallback);
+   if (Date.now() < extractionModelUnavailableUntil) return report("deterministic", "breaker", attachLocation(fallback), "model unavailable cooldown");
+   const terms = spec.criteria.map((criterion) => criterion.value.toLowerCase()).filter((value) => value.length > 2);
+@@ -845,16 +847,23 @@ export async function extractEntities(
+  * hints and observed contacts, and die later only at the relevance/strict gates.
+  */
+ export function deterministicLocalEntities(pages: BrowserObservedPage[], spec: SearchSpec): BrowserExtractedEntity[] {
+-  const category = spec.criteria.find((c) => c.field === "category")?.value ?? "";
+-  let categoryTokens = category.toLowerCase().split(/[^a-z0-9]+/).filter((t) => t.length > 2 || spec.entity === "investor" && t.length === 2);
++  const genericCompany = /^(company|companies|startup|startups)$/;
++  const anchorCriteria = ["category", "industry"].flatMap((field) => spec.criteria.filter((c) => c.field === field));
++  const meaningful = (value: string) => value.toLowerCase().split(/[^a-z0-9]+/)
++    .some((token) => token.length >= 2 && !genericCompany.test(token));
++  const category = (spec.entity === "company" ? anchorCriteria.find((c) => meaningful(c.value)) : anchorCriteria[0])?.value ?? "";
++  let categoryTokens = category.toLowerCase().split(/[^a-z0-9]+/)
++    .filter((t) => (t.length > 2 || ["company", "investor"].includes(spec.entity) && t.length === 2) &&
++      !(spec.entity === "company" && genericCompany.test(t)));
+   if (!categoryTokens.length && pages.length) {
++    if (spec.entity === "company" && anchorCriteria.length) return [];
+     // A spec without category criteria (entity typed by role/employer words)
+     // still extracts: the page TITLE supplies the anchor ("Toronto SaaS
+     // Companies"), so evidence-backed lists keep working without a vocab.
+     categoryTokens = pages[0]!
+       .title.toLowerCase()
+       .split(/[^a-z0-9]+/)
+-      .filter((t) => t.length > 2);
++      .filter((t) => t.length > 2 && !(spec.entity === "company" && genericCompany.test(t)));
+   }
+   if (!categoryTokens.length) return [];
+   // Semantic trade matching (PRD V2 §12/§19): literal category tokens are
+@@ -863,7 +872,8 @@ export function deterministicLocalEntities(pages: BrowserObservedPage[], spec: S
+   // canonical map — no per-trade vocabulary here.
+   const categoryFamilies = tradeFamiliesOf(category);
+   const hasTrade = (line: string) =>
+-    categoryTokens.some((t) => line.toLowerCase().includes(t)) ||
++    (spec.entity === "company" && !!category && criterionPhraseMatches(line, category)) ||
++    categoryTokens.some((t) => t.length === 2 ? criterionPhraseMatches(line, t) : line.toLowerCase().includes(t)) ||
+     (categoryFamilies.length > 0 &&
+       tradeFamiliesOf(line).some((f) => categoryFamilies.includes(f)));
+   const locValue = spec.criteria.find((c) => c.field === "location")?.value ?? "";
+diff --git a/src/lib/search/browser-research.ts b/src/lib/search/browser-research.ts
+index 3b9bb8da..3b1294ab 100644
+--- a/src/lib/search/browser-research.ts
++++ b/src/lib/search/browser-research.ts
+@@ -3,8 +3,9 @@ import type { SearchSpec } from "./search-spec";
+ import type { Qualification } from "./qualify";
+ import { queryRequiredFields } from "./canonical-contract";
+ import { missingRequiredFields } from "./completeness";
++import { serviceBoundaryState } from "./service-boundary";
+ 
+-export type ResearchNeed = "identity" | "role" | "company" | "industry" | "location" | "website" | "profile" | "contact" | "social" | "signal" | "topic" | "no_website_verification";
++export type ResearchNeed = "identity" | "role" | "company" | "industry" | "location" | "website" | "profile" | "contact" | "social" | "signal" | "topic" | "no_website_verification" | "product_company";
+ export type ResearchStatus = "discovered" | "researching" | "ready_for_qualification" | "verified" | "exhausted" | "rejected";
+ 
+ /**
+@@ -39,15 +40,17 @@ export function computeResearchNeeds(row: SpecRow, spec: SearchSpec, qualificati
+   const incomplete = missingRequiredFields({ ...row, url: destination ?? null });
+   const wantsPublicContact = /public contact details?/i.test(spec.raw_query) && !contactSatisfied(row);
+   const required = queryRequiredFields(spec);
++  const needsProduct = serviceBoundaryState(spec, row) === "unknown";
+   const missingRequested = required.some((field) =>
+     (field === "email" && !row.email) || (field === "phone" && !row.phone) ||
+     (field === "contact" && !contactSatisfied(row)) ||
+     (field === "website" && !row.website_url) ||
+     (field === "socials" && !row.evidence?.some((item) => item.source_type === "social" && !!item.source_url)));
+-  if (qualification.disposition === "qualified" && incomplete.length === 0 && !wantsPublicContact && !missingRequested) return [];
++  if (qualification.disposition === "qualified" && incomplete.length === 0 && !wantsPublicContact && !missingRequested && !needsProduct) return [];
+   if (qualification.reject_code === "ENTITY_TYPE_MISMATCH" || qualification.reject_code === "LOCATION_MISMATCH") return [];
+   const needs: ResearchNeed[] = [];
+   const add = (need: ResearchNeed) => { if (!needs.includes(need)) needs.push(need); };
++  if (needsProduct) add("product_company");
+   if (!row.entity_resolved || qualification.reject_code === "ENTITY_UNRESOLVED" || qualification.reject_code === "PROVISIONAL_ENTITY" || qualification.reject_code === "IDENTITY_AMBIGUOUS") add("identity");
+   if (row.kind === "person" || requested(spec, "role")) {
+     if (!row.role || ["EMPLOYMENT_UNPROVEN", "CURRENTNESS_MISMATCH", "ASSOCIATED_COMPANY_UNRESOLVED"].includes(qualification.reject_code ?? "")) add("role");
+diff --git a/src/lib/search/source-plan.ts b/src/lib/search/source-plan.ts
+index 2d3f8933..33f7c045 100644
+--- a/src/lib/search/source-plan.ts
++++ b/src/lib/search/source-plan.ts
+@@ -539,6 +539,7 @@ export function buildCandidateResearchQueries(
+   const industry = fieldOf(spec, "industry") ?? fieldOf(spec, "category");
+   const noWebsite = fieldOf(spec, "opportunity") === "no_website";
+   const queries: Array<string | null> = [];
++  if (missing.includes("product_company")) queries.push([`"${exactName}"`, industry, "own software products platform official website"].filter(Boolean).join(" "));
+   const topics = (fieldOf(spec, "content_topic") ?? "").split(/\s+or\s+|\|/i).map((topic) => topic.trim()).filter(Boolean);
+   if (missing.includes("topic") || missing.includes("topic_evidence")) for (const topic of topics) queries.push([subject, `"${topic.replace(/"/g, "")}"`].join(" "));
+   if (noWebsite && (missing.includes("no_website_evidence") || missing.includes("no_website_verification"))) {
+diff --git a/src/lib/spec-search.functions.ts b/src/lib/spec-search.functions.ts
+index 0333d6ef..3cefd0fb 100644
+--- a/src/lib/spec-search.functions.ts
++++ b/src/lib/spec-search.functions.ts
+@@ -7,7 +7,7 @@
+  *
+  * Readers are injectable so tests prove logic without S3 credentials.
+  */
+-import { createServerFn } from "@tanstack/react-start";
++import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
+ import { z } from "zod";
+ import { requireMyAuth } from "@/integrations/my-supabase/auth-middleware";
+ import { extractSearchSpec } from "@/lib/search/search-spec-extract";
+@@ -17,13 +17,14 @@ import type { SearchSpec } from "@/lib/search/search-spec";
+ import type { UnderstandingFrame } from "@/lib/understanding/frame";
+ import type { DbHitMeta } from "@/lib/canonical/read-parquet.server";
+ import { personRoleMatches } from "@/lib/canonical/people.server";
+-import { companyCategoryMatches } from "@/lib/canonical/companies.server";
++import { companyCategoryMatches, companyCountryCode } from "@/lib/canonical/companies.server";
+ import { criterionPhraseMatches } from "@/lib/search/criterion-match";
+ import { craftMatches, tradeFamiliesOf } from "@/lib/canonical/businesses.server";
+ import type { searchPeopleDB } from "@/lib/canonical/people.server";
+ import type { searchCompaniesDB } from "@/lib/canonical/companies.server";
+ import type { searchBusinessesDB } from "@/lib/canonical/businesses.server";
+ import type { searchInvestorsDB } from "@/lib/canonical/investors.server";
++import { serviceBoundaryState } from "@/lib/search/service-boundary";
+ import { COUNTRY_ISO } from "@/lib/search/search-spec-extract";
+ import { countryHintForCity, locationSatisfies, resolveCanonicalLocation } from "@/lib/search/location-resolver";
+ import { useIndexedSearch, useObjectSearchIndex } from "@/lib/search/flag";
+@@ -363,10 +364,10 @@ async function loadCoverageMatrix(): Promise<CoverageMatrix> {
+ /** Bounded tier execution: a hung source can delay one query by at most its
+  *  budget, never the whole search. Timeout errors propagate to the caller,
+  *  which logs the stage and continues to the next tier. */
+-function withTierTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
++function withTierTimeout<T>(p: Promise<T>, ms: number, label: string, onTimeout?: () => void): Promise<T> {
+   let t: ReturnType<typeof setTimeout> | undefined;
+   const timeout = new Promise<never>((_, reject) => {
+-    t = setTimeout(() => reject(new Error(`tier timeout: ${label} after ${ms}ms`)), ms);
++    t = setTimeout(() => { onTimeout?.(); reject(new Error(`tier timeout: ${label} after ${ms}ms`)); }, ms);
+   });
+   return Promise.race([p, timeout]).finally(() => {
+     if (t !== undefined) clearTimeout(t);
+@@ -439,6 +440,7 @@ function specCategoryMatches(rowCategory: string | null | undefined, specCategor
+ }
+ 
+ export function rowSatisfiesSpec(spec: SearchSpec, row: SpecRow): boolean {
++  if (serviceBoundaryState(spec, row) !== "pass") return false;
+   if (violatesExclusion(spec, row)) return false;
+   if ((spec.locations?.length ?? 0) > 1) return spec.locations!.some((place) =>
+     rowSatisfiesSpec({
+@@ -617,6 +619,7 @@ const ROLE_WORD_RE =
+  */
+ /** Terminal research failures retain the exact requirement and evidence state. */
+ export function postResearchRejectReason(spec: SearchSpec, row: SpecRow): string {
++  if (serviceBoundaryState(spec, row) !== "pass") return "UNPROVEN_CRITERION:product_company=UNKNOWN";
+   const aliases: Record<string, string> = { investor_sector: "sector", investor_stage: "stage", investor_check: "check" };
+   const failures = spec.criteria.filter((criterion) => criterion.stated &&
+     !criterion.field.startsWith("exclude_") &&
+@@ -1073,6 +1076,8 @@ async function fetchS3Tier(
+       category: category ?? industry ?? undefined,
+       location: location ?? undefined,
+       limit,
++      signal: params.signal,
++      deadline: params.deadline,
+     });
+     return {
+       rows: r.rows.map((c, i) => {
+@@ -1094,6 +1099,7 @@ async function fetchS3Tier(
+           website_url: c.website,
+           category: c.category,
+           location: c.location,
++          country: companyCountryCode(c.location),
+           opportunity: fieldOf(spec, "opportunity"),
+           // Same contract as stored business/people rows: the stored record
+           // is the evidence a delivered lead shows.
+@@ -1176,6 +1182,7 @@ async function fetchS3Tier(
+         const rowSectors = (v.sectors ?? []).join(" ");
+         const rowStages = (v.stages ?? []).join(" ");
+         const entity_id = `db:investor:${(v.name ?? "x").toLowerCase().replace(/\s+/g, "-").slice(0, 48)}:${i}`;
++        const sourceUrl = v.linkedin?.trim() || v.website?.trim() || `db://investors/${encodeURIComponent(entity_id)}`;
+         return {
+           kind: "investor" as const,
+           key: entity_id,
+@@ -1201,8 +1208,9 @@ async function fetchS3Tier(
+           url: v.website ?? v.linkedin,
+           website_url: v.website,
+           profile_url: v.linkedin,
++          source_url: sourceUrl,
+           evidence: [makeEvidence({
+-            source_url: v.linkedin?.trim() || v.website?.trim() || `db://investors/${encodeURIComponent(entity_id)}`,
++            source_url: sourceUrl,
+             source_type: "db",
+             excerpt: [`${v.name ?? "?"} — ${v.role ?? "investor"} @ ${v.firm ?? "?"}`, rowSectors, rowStages, v.location_raw ?? v.location_city].filter(has).join(" · "),
+             evidence_type: "identity",
+@@ -1210,7 +1218,7 @@ async function fetchS3Tier(
+             extraction_method: "stored_investor_record",
+             subject: entity_id,
+           }), ...(rowSectors ? [makeEvidence({
+-            source_url: v.linkedin?.trim() || v.website?.trim() || `db://investors/${encodeURIComponent(entity_id)}`,
++            source_url: sourceUrl,
+             source_type: "db", subject: entity_id, evidence_type: "investment", supports: "intent",
+             excerpt: `${v.name ?? "?"}: curated investment sectors ${rowSectors}; stages ${rowStages}`,
+             extraction_method: "stored_investor_record",
+@@ -1224,7 +1232,7 @@ async function fetchS3Tier(
+   return { rows: [], meta: null };
+ }
+ 
+-export async function runSpecSearchCore(
++export const runSpecSearchCore = createServerOnlyFn(async function runSpecSearchCore(
+   query: string,
+   deps: SpecSearchDeps = {},
+   limit = 25,
+@@ -2140,16 +2148,26 @@ export async function runSpecSearchCore(
+         const s3TimeoutMs = spec.entity === "company" && fieldOf(spec, "location_kind") === "city"
+           ? Math.min(step.timeoutMs, 5_000)
+           : step.timeoutMs;
+-        const t = await withTierTimeout(
++        const tierController = new AbortController();
++        const abortTier = () => tierController.abort(deps.signal?.reason);
++        deps.signal?.addEventListener("abort", abortTier, { once: true });
++        if (deps.signal?.aborted) abortTier();
++        let t: Awaited<ReturnType<typeof fetchS3Tier>>;
++        try {
++        t = await withTierTimeout(
+           fetchS3Tier(
+             spec,
+             { people, companies, businesses, investors },
+             { role, industry, location, category, limit: fetchWindow,
+-              signal: deps.signal, deadline: Date.now() + Math.min(15_000, Math.max(1, s3TimeoutMs - 50)) },
++              signal: tierController.signal, deadline: Date.now() + Math.min(15_000, Math.max(1, s3TimeoutMs - 50)) },
+           ),
+           s3TimeoutMs,
+           "s3-parquet",
++          () => tierController.abort(),
+         );
++        } finally {
++          deps.signal?.removeEventListener("abort", abortTier);
++        }
+         if (t.meta) dbMeta.push(t.meta);
+         if (t.meta?.coverageIncomplete) routeDiagnostics.push({
+           code: "SOURCE_UNAVAILABLE", source: "s3-parquet",
+@@ -3426,7 +3444,7 @@ export async function runSpecSearchCore(
+   } finally {
+     runWatchdog.stop();
+   }
+-}
++});
+ 
+ export const getScrapyBrowserState = createServerFn({ method: "POST" })
+   .middleware([requireMyAuth])
+diff --git a/src/lib/understanding/chaos-buckets-regression.test.ts b/src/lib/understanding/chaos-buckets-regression.test.ts
+index 58edfe54..bd2ee3f5 100644
+--- a/src/lib/understanding/chaos-buckets-regression.test.ts
++++ b/src/lib/understanding/chaos-buckets-regression.test.ts
+@@ -2,14 +2,61 @@ import { describe, expect, it } from 'vitest';
+ import { extractFrameDeterministic } from './fallback';
+ import { validateFrame } from './validate';
+ import { frameToSearchSpec } from './to-search-spec';
+-import { openValue } from './frame';
++import { openValue, QuantitySchema } from './frame';
+ import { decideSpecClarification } from '../stage1/stage1-adapter';
+ import { deriveTemporalConstraint, evaluateTemporalValidity } from '../search/verification';
+ import { makeEvidence } from '../search/evidence';
+ 
+ const specOf = (raw: string) => frameToSearchSpec(validateFrame(extractFrameDeterministic(raw)).frame);
+ 
++const providerCompanyBucketsWithOptionalPeople = (raw: string, first: string, second: string) => {
++  const frame = validateFrame(extractFrameDeterministic(raw)).frame;
++  frame.meta.extractor = 'llm';
++  frame.target.entity_type = { value: 'person', raw: 'companies', confidence: .85 };
++  frame.target.category = openValue(first, first);
++  frame.target.role = openValue('founder or decision maker', 'founders or decision makers');
++  frame.constraints = frame.constraints.filter(c => c.field !== 'employee_count');
++  frame.compound = {
++    is_compound: true,
++    subgoals: [first, second].map((category, index) => ({
++      raw: index === 0 ? `15 ${category}` : `another 15 ${category}`,
++      target: {
++        ...frame.target,
++        entity_type: { value: 'person' as const, raw: category, confidence: .85 },
++        category: openValue(category, category),
++        role: openValue('founder or decision maker', 'founders or decision makers'),
++      },
++      relation: frame.relation,
++      location: frame.location,
++      temporal: null,
++      constraints: [],
++      quantity: QuantitySchema.parse({ requested: 15 }),
++    })),
++  };
++  return frameToSearchSpec(validateFrame(frame).frame);
++};
++
+ describe('chaos bucket and preference contracts', () => {
++  it.each([
++    ['looking for investors who actually invest in ai startups, ideally seed/preseed, canada or us is good, checks maybe 100k to 2m ish but thats not an absolute rule, bonus if theyve invested in devtools automation agents data infra kinda stuff recently, i want actual funds/angels not articles talking about venture capital', ['Canada', 'USA']],
++    ['Find investors investing in healthtech, preferably seed or pre-seed, Ireland or UK is fine', ['Ireland', 'UK']],
++    ['Find investors in climate startups, ideally early stage, in Germany and Netherlands', ['Germany', 'Netherlands']],
++    ['Find investors investing in robotics, seed stage preferred, Australia or New Zealand is good', ['Australia', 'New Zealand']],
++  ])('retains stage and target geography after a preference clause: %s', (raw, places) => {
++    const spec = specOf(raw);
++    expect(spec.locations).toEqual(places);
++    expect(spec.criteria.some(c => c.field === 'prefer_investor_stage')).toBe(true);
++    expect(spec.criteria.some(c => c.field === 'investor_stage')).toBe(false);
++  });
++
++  it.each([
++    'Find investors in Toronto, ideally seed stage, email contacts in Canada and UK',
++    'Find investors in Toronto, ideally seed stage, use registry sources in Canada and UK',
++    'Find investors in Toronto, ideally seed stage, not Canada just mentioning Canada because thats where im contacting them from',
++  ])('keeps post-preference contact, source and sender places out of targets: %s', raw => {
++    expect(specOf(raw).locations).toEqual(['Toronto']);
++  });
++
+   it.each([
+     'Find photographers in Ireland, need their website or instagram and some way to contact them',
+     'Find dentists in Canada, need email or phone',
+@@ -66,6 +113,8 @@ describe('chaos bucket and preference contracts', () => {
+     for (const goal of frame.compound.subgoals) {
+       const branch = frameToSearchSpec({ ...frame, input: { raw: goal.raw!, normalized: goal.raw! },
+         target: goal.target, relation: goal.relation, quantity: goal.quantity ?? null,
++        location: goal.location ?? frame.location,
++        locations: goal.location ? [goal.location] : frame.locations,
+         compound: { is_compound: false, subgoals: [] } });
+       expect(branch.criteria.some(c => c.field === 'employee_count')).toBe(false);
+       expect(branch.criteria.some(c => c.field === 'prefer_employee_count')).toBe(true);
+@@ -130,6 +179,46 @@ describe('chaos bucket and preference contracts', () => {
+     expect(decideSpecClarification(spec, true)).toBeNull();
+   });
+ 
++  it.each([
++    [
++      'need maybe 15 cybersecurity companies then another 15 ai infra/devtool startups, mostly usa/canada, preferably under like 100 employees but if headcount is unknown dont kill the result, founders or decision makers would be useful and pls dont mix cybersecurity consultants with actual product companies unless they genuinely fit',
++      'cybersecurity company',
++      'ai infra/devtool startup',
++    ],
++    [
++      'find 15 fintech companies and another 15 climate startups in Germany or Netherlands, ideally under 80 employees, founders would be helpful',
++      'fintech company',
++      'climate startup',
++    ],
++    [
++      'need 15 biotech companies then 15 robotics startups around Australia and New Zealand, preferably fewer than 120 employees, decision makers would be useful',
++      'biotech company',
++      'robotics startup',
++    ],
++  ])('keeps organization buckets primary when founders are optional: %s', (raw, first, second) => {
++    const spec = providerCompanyBucketsWithOptionalPeople(raw, first, second);
++    expect(spec.entity).toBe('company');
++    expect(spec.criteria.some(c => c.field === 'role')).toBe(false);
++    expect(spec.criteria.some(c => c.field === 'employee_count')).toBe(false);
++    expect(spec.criteria.some(c => c.field === 'prefer_employee_count')).toBe(true);
++    expect(spec.understanding?.compound.subgoals.map(goal => goal.target.entity_type.value)).toEqual(['company', 'company']);
++  });
++
++  it.each([
++    'Find founders of AI startups in Toronto',
++    'Find decision makers at cybersecurity companies in USA',
++    'Find founders of AI startups in Toronto, ideally under 100 employees',
++    'Find decision makers at cybersecurity companies in USA, preferably under 100 employees',
++    'Find founders of startups in Toronto, email would be useful',
++  ])('keeps primary person searches as people: %s', raw => {
++    const frame = validateFrame(extractFrameDeterministic(raw)).frame;
++    frame.meta.extractor = 'llm';
++    frame.target.entity_type = { value: 'person', raw: /decision/i.test(raw) ? 'decision makers' : 'founders', confidence: .9 };
++    frame.target.role = openValue(/decision/i.test(raw) ? 'decision maker' : 'founder', /decision/i.test(raw) ? 'decision makers' : 'founders');
++    frame.target.category = openValue(/cybersecurity/i.test(raw) ? 'cybersecurity company' : 'AI startup', /cybersecurity/i.test(raw) ? 'cybersecurity companies' : 'AI startups');
++    expect(frameToSearchSpec(validateFrame(frame).frame).entity).toBe('person');
++  });
++
+   it.each([
+     ['Find investors in AI in Australia, ideally seed or pre-seed', 'seed or pre-seed', 'investor_stage'],
+     ['Find investors in healthtech in Ireland, seed stage preferred', 'seed stage', 'investor_stage'],
+diff --git a/src/lib/understanding/chaos-scope-regression.test.ts b/src/lib/understanding/chaos-scope-regression.test.ts
+index a86f9c35..5bd9bd76 100644
+--- a/src/lib/understanding/chaos-scope-regression.test.ts
++++ b/src/lib/understanding/chaos-scope-regression.test.ts
+@@ -76,7 +76,7 @@ describe('chaos scope boundaries', () => {
+     const frame = read(raw, true);
+     if (raw.includes('UK + Ireland')) frame.location = { value: 'UK', canonical: 'UK', raw: 'in UK', scope: 'in', radius: null, radius_unit: null, country_code: 'GB', confidence: .9 };
+     const normalized = normalizeSearchFrame(frame);
+-    expect(frameToSearchSpec(frame).locations.length).toBeGreaterThanOrEqual(2);
++    expect(frameToSearchSpec(frame).locations?.length ?? 0).toBeGreaterThanOrEqual(2);
+     expect(normalized.required_fields.some(f => ['email', 'phone', 'website', 'linkedin'].includes(f.value))).toBe(false);
+     expect([...normalized.preferred_fields, ...normalized.enrichment_requirements].some(f => f.value === 'email')).toBe(true);
+   });
+diff --git a/src/lib/understanding/fallback.ts b/src/lib/understanding/fallback.ts
+index d7656f08..922df968 100644
+--- a/src/lib/understanding/fallback.ts
++++ b/src/lib/understanding/fallback.ts
+@@ -46,6 +46,7 @@
+ 
+ import { knownCityName, resolveCanonicalLocation, splitMultiPlace, splitTargetLocationList } from "@/lib/search/location-resolver";
+ import { normalizeRole } from "@/lib/search/search-spec-extract";
++import { repairServiceBoundaries } from "./service-boundary";
+ import {
+   clamp,
+   emptyFrame,
+@@ -1570,6 +1571,42 @@ function detectOrLocations(text: string, primary: FrameLocation | null): FrameLo
+   return [];
+ }
+ 
++/** A standalone target-place clause can follow a soft attribute, beyond the core cut. */
++function detectTrailingTargetLocations(text: string, excluded: Set<string>): FrameLocation[] {
++  for (const clause of text.split(/[,;]/).slice(1)) {
++    const raw = clause.trim();
++    const lead = /^(?:in|near|around|across|mostly)\s+/i.exec(raw);
++    const suffix = /\s+(?:is|are)\s+(?:good|fine|okay|ok|acceptable)\s*$/i.exec(raw);
++    if (!lead && !suffix) continue;
++    const list = raw.slice(lead?.[0].length ?? 0, suffix?.index ?? raw.length).trim();
++    const names = list.split(/\s+(?:or|and)\s+|\s*[+/]\s*/i).filter(Boolean)
++      .map(name => /^us$/i.test(name) ? "USA" : name);
++    // Every part must be exactly a known place: contact/source/sender predicates
++    // cannot supply geography merely because they contain a country name.
++    if (!names.length || names.some(name =>
++      resolveCanonicalLocation(name)?.resolution !== "resolved" || excluded.has(name.toLowerCase()))) continue;
++    const places = splitMultiPlace(names.join(" or "));
++    return places
++      ? places.map(place => geoFor(place.name, raw, lead ? scopeFor(lead[0]) : "in"))
++      : [geoFor(names[0]!, raw, lead ? scopeFor(lead[0]) : "in")];
++  }
++  return [];
++}
++
++/** Investor mandates use stage words without saying "stage" ("ideally seed/preseed"). */
++function detectInvestorStage(text: string): OpenValue | null {
++  const stage = String.raw`(?:pre[-\s]?seed|seed|series\s+[a-e]|early\s+stage|growth\s+stage)`;
++  const re = new RegExp(
++    `^\\s*(?:(?:ideally|preferably|prefer|must\\s+be)\\s+)?(${stage}(?:\\s*(?:/|or|and)\\s*${stage})*)(?:\\s+stage)?(?:\\s+(?:preferred|required))?\\s*$`,
++    "i",
++  );
++  for (const clause of text.split(/[,;]/).slice(1)) {
++    const match = re.exec(clause);
++    if (match) return openValue(match[1]!.toLowerCase(), clause.trim(), null, 0.85);
++  }
++  return null;
++}
++
+ // ── Constraints ───────────────────────────────────────────────────────────
+ 
+ const NUM = String.raw`(\d[\d,.]*)`;
+@@ -1580,6 +1617,9 @@ function num(s: string): number {
+ 
+ const EXCL_STOP = new Set(["and", "but", "or", "if", "with", "that", "who", "which", "plus", "please"]);
+ 
++// Negating a requirement's strength does not exclude a kind of prospect.
++const REQUIREMENT_STRENGTH = /^(?:(?:a|an|the)\s+)?(?:(?:absolute|strict|hard|firm)\s+)?(?:rules?|requirements?|conditions?|must|mandatory|required|compulsory)\b/i;
++
+ /**
+  * "not agencies", "excluding Toronto". The excluded thing is taken as at most
+  * three words and stops at a clause boundary: an unbounded lazy capture with a
+@@ -1592,6 +1632,7 @@ function detectExclusions(text: string): Constraint[] {
+   const re = new RegExp(EXCLUSION_CUE_RE.source, "giu");
+   let m: RegExpExecArray | null;
+   while ((m = re.exec(text))) {
++    if (/\bnot\b/i.test(m[0]) && REQUIREMENT_STRENGTH.test(text.slice(m.index + m[0].length).trimStart())) continue;
+     // Original case is kept as well as the folded form: the folded form is what
+     // gets compared and stored, the cased form is the only evidence that
+     // "excluding Waterford" names a town rather than a kind of business.
+@@ -1671,6 +1712,27 @@ export function detectConstraints(text: string): Constraint[] {
+ 
+   let m: RegExpExecArray | null;
+ 
++  // A stated optional check range is a preference, not a categorical check band.
++  // Keep both endpoints rather than inventing seed/growth hard filtering.
++  const checkRange = /\b(?:checks?|cheques?|tickets?)(?:[\s-]+sizes?)?\s+(?:(?:of|between|from|maybe|ideally|preferably|roughly|about|around)\s+)*(?:USD|CAD|EUR|GBP)?\s*([$€£]?)\s*(\d[\d,]*(?:\.\d+)?)\s*(k|m|b|thousand|million|billion)?\s*(?:to|and|[-–—])\s*(?:USD|CAD|EUR|GBP)?\s*([$€£]?)\s*(\d[\d,]*(?:\.\d+)?)\s*(k|m|b|thousand|million|billion)?\b/gi;
++  while (/\b(?:investors?|funds?|angels?|vc|venture\s+capital)\b/i.test(text) && (m = checkRange.exec(text))) {
++    const before = text.slice(0, m.index).split(/[,;.!?]|\b(?:and|but)\b/i).pop() ?? "";
++    const tail = text.slice(m.index + m[0].length);
++    const after = tail.split(/[,;.!?]|\b(?:and|but)\b/i)[0];
++    const ownClause = `${before} ${m[0]} ${after}`;
++    const soft = /\b(?:maybe|ideally|preferably|preferred|optional|roughly|about|around)\b/i.test(ownClause) ||
++      /^\s*(?:ish\s*)?(?:,\s*|but\s+)?(?:(?:that(?:['’]?s|\s+is)|it(?:['’]?s|\s+is)|this\s+is)\s+)?not\s+(?:(?:a|an|the)\s+)?(?:(?:absolute|strict|hard|firm)\s+)?(?:rule|requirement|condition|must|mandatory|required|compulsory)\b/i.test(tail);
++    if (!soft) continue;
++    const money = (digits: string, suffix: string | undefined) => num(digits) *
++      (/^(?:k|thousand)$/i.test(suffix ?? "") ? 1_000 : /^(?:m|million)$/i.test(suffix ?? "") ? 1_000_000 : /^(?:b|billion)$/i.test(suffix ?? "") ? 1_000_000_000 : 1);
++    const low = money(m[2], m[3]);
++    const high = money(m[5], m[6]);
++    if (!(low > 0 && high >= low)) continue;
++    const currency = /\b(USD|CAD|EUR|GBP)\b/i.exec(m[0])?.[1].toUpperCase() ??
++      (m[1] === "€" || m[4] === "€" ? "EUR" : m[1] === "£" || m[4] === "£" ? "GBP" : null);
++    push({ field: "prefer_investor_check", operator: "between", value: [String(low), String(high)], unit: currency, raw: m[0] });
++  }
++
+   const EMP = new RegExp(
+     `\\b(?:(at\\s+least|minimum|min|more\\s+than|over|under|fewer\\s+than|less\\s+than|no\\s+more\\s+than)\\s+(?:(?:like|about|roughly)\\s+)?)?${NUM}\\s*(\\+)?\\s*(?:employees|staff|people|headcount|team\\s+members)\\b`,
+     "i",
+@@ -2755,6 +2817,15 @@ export function extractFrameDeterministic(
+     modifierLocation ??
+     (trailingPlace ? geoFor(trailingPlace, trailingPlace, "in", 0.4) : null);
+   frame.locations = detectOrLocations(primaryRaw, frame.location);
++  const trailingLocations = detectTrailingTargetLocations(analysis, excluded);
++  if (trailingLocations.length && (!frame.location || trailingLocations.some(place =>
++    place.value === frame.location?.value || place.canonical === frame.location?.canonical))) {
++    frame.location = trailingLocations[0]!;
++    frame.locations = trailingLocations;
++  }
++  if (frame.target.entity_type.value === "investor" && !frame.target.company_stage) {
++    frame.target.company_stage = detectInvestorStage(analysis);
++  }
+   // "around edmonton sherwood park st albert area" — a fused multi-place
+   // phrase reads as one provisional blob and pins the search to a place
+   // nobody named. When that blob (or the request text behind it) contains
+@@ -2845,6 +2916,11 @@ export function extractFrameDeterministic(
+       if (shared) {
+         frame.location ??= shared;
+         if (places) frame.locations = places.map(geo => geoFor(geo.name, geo.name, 'in', .8));
++        // The final recursive bucket also sees this shared clause. Its singular
++        // location would override the root's list during branch compilation.
++        for (const goal of subgoals) {
++          if (goal.location?.raw?.trim() === sharedGeoClause.trim()) goal.location = null;
++        }
+       }
+     }
+   } else if (uncertain) {
+@@ -2967,6 +3043,7 @@ export function extractFrameDeterministic(
+     notes: notes.slice(0, 20),
+   };
+ 
++  repairServiceBoundaries(frame);
+   return UnderstandingFrameSchema.parse(frame);
+ }
+ 
+diff --git a/src/lib/understanding/validate.ts b/src/lib/understanding/validate.ts
+index d5aaae7e..6f2219f7 100644
+--- a/src/lib/understanding/validate.ts
++++ b/src/lib/understanding/validate.ts
+@@ -23,11 +23,13 @@ import type { Constraint, OpenValue, Relation, Target, UnderstandingFrame } from
+ import {
+   canonicalWindow,
+   detectRelation,
++  detectConstraints,
+   detectTemporal as detectTemporalDeterministic,
+   fieldRequirements,
+   splitCompound,
+ } from "./fallback";
+ import { openValue } from "./frame";
++import { repairServiceBoundaries } from "./service-boundary";
+ import {
+   classifyHead,
+   hedgesTheAsk,
+@@ -269,6 +271,50 @@ function locationSpan(clause: string, value: string): string | null {
+   return cue ? `${cue[1]} ${place}` : place;
+ }
+ 
++const ORG_TARGET_RE = /\b(?:compan(?:y|ies)|startups?|business(?:es)?|firms?|agenc(?:y|ies)|clinics?|studios?|shops?|funds?)\b/i;
++const OPTIONAL_PERSON_ROLE_RE = /\b(?:founders?|co-?founders?|owners?|operators?|decision[-\s]?makers?|ceos?|ctos?|presidents?|principals?)\b/i;
++const OPTIONAL_ROLE_CUE_RE =
++  /\b(?:would\s+be\s+(?:useful|helpful|great|nice)|could\s+be\s+(?:useful|helpful|great|nice)|prefer(?:ably|red)?|ideally|if\s+(?:possible|you\s+can)|nice\s+to\s+have|bonus)\b/i;
++
++function optionalRoleMention(raw: string, role: OpenValue | null | undefined): boolean {
++  const roleText = `${role?.raw ?? ""} ${role?.value ?? ""}`.trim();
++  if (!OPTIONAL_PERSON_ROLE_RE.test(roleText)) return false;
++  const match = OPTIONAL_PERSON_ROLE_RE.exec(raw);
++  if (!match) return false;
++  const organization = ORG_TARGET_RE.exec(raw);
++  // "Find founders of startups" asks for people even if another attribute is soft.
++  if (!organization || match.index < organization.index) return false;
++  const roleList = new RegExp(
++    `${OPTIONAL_PERSON_ROLE_RE.source}(?:\\s*(?:,|or|and|/)\\s*${OPTIONAL_PERSON_ROLE_RE.source})*`,
++    "i",
++  ).exec(raw.slice(match.index));
++  const before = raw.slice(0, match.index).trimEnd();
++  const after = raw.slice(match.index + (roleList?.[0].length ?? match[0].length)).trimStart();
++  // Bind the preference to the role phrase, not a nearby headcount/contact clause.
++  return new RegExp(`${OPTIONAL_ROLE_CUE_RE.source}$`, "i").test(before)
++    || new RegExp(`^${OPTIONAL_ROLE_CUE_RE.source}`, "i").test(after);
++}
++
++function repairOrganizationTargetWithOptionalRole(
++  target: Target,
++  raw: string,
++  path: string,
++  repairs: Repair[],
++): void {
++  if (target.entity_type.value !== "person") return;
++  const witness = `${target.entity_type.raw ?? ""} ${target.category?.raw ?? ""} ${target.category?.value ?? ""}`;
++  if (!ORG_TARGET_RE.test(witness)) return;
++  if (!optionalRoleMention(raw, target.role)) return;
++  const role = target.role;
++  target.entity_type = { value: "company", raw: target.entity_type.raw, confidence: target.entity_type.confidence };
++  target.role = null;
++  repairs.push({
++    code: "OPTIONAL_ROLE_NOT_PRIMARY_ENTITY",
++    message: `"${role?.raw ?? role?.value}" is a hedged contact preference; the requested target is the organization`,
++    path: `${path}.entity_type`,
++  });
++}
++
+ /**
+  * Backfill only missing provenance on compound subgoals.
+  *
+@@ -885,6 +931,57 @@ export function validateFrame(input: UnderstandingFrame): ValidationResult {
+     }
+   }
+ 
++  // A provider can miss a numeric preference while still returning an otherwise
++  // valid frame. Re-read only structured constraints from the raw text; the
++  // existing spec compiler decides whether the span is soft or hard.
++  {
++    const existing = new Set(frame.constraints.map((c) => `${c.field}:${c.operator}:${c.value}`));
++    for (const c of detectConstraints(frame.input.raw ?? "")) {
++      const key = `${fieldKey(c.field)}:${c.operator}:${c.value}`;
++      if (!["employee_count", "prefer_investor_check"].includes(c.field)) continue;
++      if (c.field === "prefer_investor_check") {
++        // A provider may preserve the range but miss its optional strength.
++        // Reclassify only the same stated monetary check; categorical answers
++        // from a separate clarification retain their hard band semantics.
++        for (const held of frame.constraints) {
++          // Extraction may singularize raw spans ("checks" -> "check"), or
++          // the provider may quote only the endpoints. Match the structured
++          // range instead; a different range, currency or negation stays hard.
++          const endpoints = (value: Constraint["value"]) =>
++            (Array.isArray(value) ? value : String(value).split("|")).map(Number);
++          const stated = endpoints(c.value);
++          const heldRange = endpoints(held.value);
++          if (held.field === "investor_check" && held.operator === c.operator &&
++              heldRange.length === 2 && heldRange.every((n, i) => Number.isFinite(n) && n === stated[i]) &&
++              (held.unit ?? "").toUpperCase() === (c.unit ?? "").toUpperCase() && held.negated === c.negated) {
++            if (frame.constraints.some(other => other !== held && other.field === "prefer_investor_check" &&
++                other.operator === c.operator && String(other.value) === String(c.value) &&
++                (other.unit ?? "").toUpperCase() === (c.unit ?? "").toUpperCase() && other.negated === c.negated)) {
++              frame.constraints = frame.constraints.filter(other => other !== held);
++            } else {
++              held.field = "prefer_investor_check";
++            }
++            existing.add(key);
++            repairs.push({
++              code: "CONSTRAINT_STRENGTH_RECOVERED_FROM_INPUT",
++              message: `"${c.raw}" makes the stated monetary check range a preference`,
++              path: "constraints",
++            });
++          }
++        }
++      }
++      if (existing.has(key)) continue;
++      c.field = fieldKey(c.field);
++      frame.constraints.push(c);
++      existing.add(key);
++      repairs.push({
++        code: "CONSTRAINT_RECOVERED_FROM_INPUT",
++        message: `"${c.raw}" constrains ${c.field}, which the extraction did not carry`,
++        path: "constraints",
++      });
++    }
++  }
++
+   // — an absence stated as a constraint IS lacks_asset ————————————————
+   //
+   // The converse of the rule further down, which turns lacks_asset(X) into a
+@@ -1003,6 +1100,8 @@ export function validateFrame(input: UnderstandingFrame): ValidationResult {
+     }
+   }
+ 
++  repairOrganizationTargetWithOptionalRole(frame.target, raw, "target", repairs);
++
+   // Root and nested semantic cores enter through the same normalizer. Run the
+   // root before relation-dependent checks so every later invariant observes
+   // the normalized relation.
+@@ -1328,12 +1427,15 @@ export function validateFrame(input: UnderstandingFrame): ValidationResult {
+   }
+ 
+   propagateCompoundProvenance(frame, repairs);
++  if (repairServiceBoundaries(frame)) repairs.push({ code: "SERVICE_BOUNDARY_RECOVERED",
++    message: "product-fit service contrast recovered in its named target scope", path: "constraints" });
+ 
+   // A subgoal that says nothing is a dropped half wearing a placeholder. It
+   // reads as a handled compound in the inspector, which is worse than an
+   // honest clarification.
+   frame.compound.subgoals.forEach((sg, i) => {
+     const base = `compound.subgoals[${i}]`;
++    repairOrganizationTargetWithOptionalRole(sg.target, raw, `${base}.target`, repairs);
+     normalizeSemanticCore(
+       sg.target,
+       sg.relation,
+diff --git a/vite.config.ts b/vite.config.ts
+index 6fdcf47c..15a98836 100644
+--- a/vite.config.ts
++++ b/vite.config.ts
+@@ -49,8 +49,7 @@ export default defineConfig({
+         // Marking them external leaves the specifier untouched in the client
+         // chunks instead of substituting a stub with no exports. Nitro/Vercel
+         // resolve `node:` natively for the server bundle, which is unaffected.
+-        external: (id: string, importer: string | undefined, isResolved: boolean) =>
+-          id === "kerberos" || (isResolved === false && id.startsWith("node:")),
++        external: ["kerberos", /^node:/],
+       },
+     },
+   },
+diff --git a/vitest.config.ts b/vitest.config.ts
+index b0cac676..4757734a 100644
+--- a/vitest.config.ts
++++ b/vitest.config.ts
+@@ -7,9 +7,9 @@ export default defineConfig({
+     globals: true,
+     environment: "node",
+     include: ["**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+-    // .kilo/** holds other agents' worktrees; "Promotional Videos/**" holds plain
+-    // Node scripts named *.test.js (no vitest suites) from the promo-film work.
+-    exclude: ["**/node_modules/**", "node_modules", "dist", ".vercel", ".tanstack", "freehire/**", "e2e/**", "reports/**", "local-business-finder/**", ".agents/**", ".kilo/**", "Promotional Videos/**", "Cotly/**"],
++    // .kilo/** holds other agents' worktrees; scrapivo_handoff/** holds copied source for manual review.
++    // "Promotional Videos/**" holds plain Node scripts named *.test.js (no vitest suites) from the promo-film work.
++    exclude: ["**/node_modules/**", "node_modules", "dist", ".vercel", ".tanstack", "freehire/**", "e2e/**", "reports/**", "local-business-finder/**", ".agents/**", ".kilo/**", "scrapivo_handoff/**", "Promotional Videos/**", "Cotly/**"],
+     coverage: {
+       provider: "v8",
+       reporter: ["text", "json", "html"],

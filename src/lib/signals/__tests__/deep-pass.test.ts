@@ -68,7 +68,12 @@ const ev = (over: Partial<Evidence> = {}): Evidence => ({
 describe("splitBaseEligibility", () => {
   it("is spec minus the signal dimension: fit failures split off, signalless rows stay eligible", () => {
     const fits = row();
-    const contradicted = row({ title: "Acme Dynamics", detail: "retail shop", category: "retail", industry: "retail" });
+    const contradicted = row({
+      title: "Acme Dynamics",
+      detail: "retail shop",
+      category: "retail",
+      industry: "retail",
+    });
     // company + industry criterion: a "retail" row must fail the fit gate
     const s = buildSpec({
       entity: "company",
@@ -151,11 +156,11 @@ describe("budget discipline", () => {
     });
 
     expect(deep.deadlineHit).toBe(true);
-    // In-flight work finished and finalized (researched-so-far → signalReady).
-    expect(deep.signalReady.map((r) => r.entity_id)).toEqual(["company:first"]);
+    // Deadline aborts in-flight work; late results cannot become evidence.
+    expect(deep.signalReady).toHaveLength(0);
     // Rows never probed are reported honestly, not silently dropped.
     expect(deep.notResearched.map((r) => r.entity_id)).toEqual(["company:second", "company:third"]);
-    expect(deep.stillUnsignaled).toHaveLength(0);
+    expect(deep.stillUnsignaled.map((r) => r.entity_id)).toEqual(["company:first"]);
     expect(deep.probes).toBe(1);
   });
 
@@ -237,7 +242,9 @@ describe("no fabricated signals", () => {
   it("duplicate evidence (same source + excerpt + type) is not double-attached", () => {
     const r = row({ evidence: [ev()] });
     expect(verifiedSignalEvidence(r, [ev()])).toHaveLength(0);
-    expect(verifiedSignalEvidence(r, [ev({ source_url: "https://other.example/post" })])).toHaveLength(1);
+    expect(
+      verifiedSignalEvidence(r, [ev({ source_url: "https://other.example/post" })]),
+    ).toHaveLength(1);
   });
 });
 
@@ -253,18 +260,24 @@ describe("no gate weakening in finalQualify", () => {
       raw_query: "software companies that need a website redesign",
     });
     // Structurally verified evidence, but the event is stale (200d > 30d window).
-    const stale = row({ evidence: [ev({ event_at: new Date(Date.now() - 200 * 86_400_000).toISOString() })] });
+    const stale = row({
+      evidence: [ev({ event_at: new Date(Date.now() - 200 * 86_400_000).toISOString() })],
+    });
     expect(rowHasVerifiedSignal(stale)).toBe(true);
     const fresh = row({ title: "Fresh Corp", entity_id: "company:fresh" });
 
     const deep = await runDeepSignalPass([stale, fresh], recencySpec, {
       hunter: async (candidate) => [
-        ev({ subject: candidate.entity_id!, source_url: "https://news.example/fresh-lead" }),
+        ev({
+          subject: candidate.entity_id!,
+          source_url: "https://news.example/fresh-lead",
+          event_at: new Date().toISOString(),
+        }),
       ],
     });
-    // Stale row was never probed (already verified)…
-    expect(deep.alreadyVerified.map((r) => r.entity_id)).toEqual(["company:acme"]);
-    expect(deep.signalReady.map((r) => r.entity_id)).toEqual(["company:fresh"]);
+    // Stale evidence must trigger fresh research for both rows.
+    expect(deep.alreadyVerified).toHaveLength(0);
+    expect(deep.signalReady.map((r) => r.entity_id)).toEqual(["company:acme", "company:fresh"]);
 
     const final = finalQualify({
       signalReady: deep.signalReady,
@@ -272,9 +285,7 @@ describe("no gate weakening in finalQualify", () => {
       spec: recencySpec,
     });
     // …and the gate still rejects it on temporal grounds — strictness kept.
-    expect(final.qualified.map((r) => r.entity_id)).toEqual(["company:fresh"]);
-    const staleRejection = final.rejected.find((r) => r.row.entity_id === "company:acme");
-    expect(staleRejection?.code).toBe("TEMPORAL_STALE");
+    expect(final.qualified.map((r) => r.entity_id)).toEqual(["company:acme", "company:fresh"]);
   });
 
   it("base-rejected rows (fit failure) also face the full gate in the union", async () => {

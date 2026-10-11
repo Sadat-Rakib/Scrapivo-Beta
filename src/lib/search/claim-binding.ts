@@ -5,11 +5,7 @@
 import type { SearchSpec } from "@/lib/search/search-spec";
 import type { Evidence, EvidenceType } from "@/lib/search/evidence";
 
-export type RoleCurrentness =
-  | "current_role"
-  | "former_role"
-  | "historical_role"
-  | "unknown";
+export type RoleCurrentness = "current_role" | "former_role" | "historical_role" | "unknown";
 
 export interface ClaimEvidence {
   subject: string;
@@ -33,6 +29,7 @@ export const QUALIFYING_CLAIM_TYPES: EvidenceType[] = [
   "funding",
   "investment",
   "social_ask",
+  "custom_signal",
 ];
 
 function fieldOf(spec: SearchSpec, f: string): string | null {
@@ -53,8 +50,12 @@ export function requestedClaimTypes(spec: SearchSpec): EvidenceType[] {
     if (n === "social_ask" || n === "social") out.add("social_ask");
     if (n === "service_request" || n === "need") out.add("service_request");
     if (n === "no_website") out.add("no_website");
+    if ((n === "custom_signal" || n === "custom") && fieldOf(spec, "opportunity") !== "no_website")
+      out.add("custom_signal");
   }
   if (fieldOf(spec, "opportunity") === "no_website") out.add("no_website");
+  if (spec.custom_signal_text?.trim() && fieldOf(spec, "opportunity") !== "no_website")
+    out.add("custom_signal");
   if (fieldOf(spec, "funding_status")) out.add("funding");
   if (fieldOf(spec, "requested_role")) {
     if (spec.entity === "person") out.add("social_ask");
@@ -106,10 +107,7 @@ export function asClaimEvidence(
 }
 
 /** Claim alignment: evidence.claim_type must be one of the Spec-requested claims. */
-export function isClaimAligned(
-  e: Evidence | ClaimEvidence,
-  requested: EvidenceType[],
-): boolean {
+export function isClaimAligned(e: Evidence | ClaimEvidence, requested: EvidenceType[]): boolean {
   if (!requested.length) return false;
   return requested.includes(evidenceClaimType(e));
 }

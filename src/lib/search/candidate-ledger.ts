@@ -37,7 +37,12 @@ export type LedgerRow = {
   missingFields?: string[];
 };
 
-export type StreamedReconciliation = { key: string; title: string; fate: CandidateFate; reason: string | null };
+export type StreamedReconciliation = {
+  key: string;
+  title: string;
+  fate: CandidateFate;
+  reason: string | null;
+};
 
 /** C6: did every candidate that entered the funnel end in exactly one fate? */
 export type CandidateAccounting = {
@@ -51,6 +56,7 @@ export type CandidateAccounting = {
 };
 
 export type CandidateLedgerSummary = {
+  stages?: Array<{ key: string; eligibility: string; signal: string; reason: string }>;
   counts: Record<CandidateFate, number>;
   /** Reject code → count for `rejected`. */
   rejectReasons: Record<string, number>;
@@ -65,12 +71,36 @@ export type CandidateLedgerSummary = {
   accounting?: CandidateAccounting;
 };
 
-const FATES: CandidateFate[] = ["returned", "qualified_more", "rejected", "gated", "filtered", "incomplete", "excluded", "absorbed", "unaccounted"];
+const FATES: CandidateFate[] = [
+  "returned",
+  "qualified_more",
+  "rejected",
+  "gated",
+  "filtered",
+  "incomplete",
+  "excluded",
+  "absorbed",
+  "unaccounted",
+];
 // Later stages win, except that nothing downgrades a delivered row. `absorbed`
 // sits with `unaccounted`: any real fate booked later overrides it.
-const RANK: Record<CandidateFate, number> = { unaccounted: 0, absorbed: 0, incomplete: 1, filtered: 2, rejected: 3, gated: 4, excluded: 5, qualified_more: 6, returned: 7 };
+const RANK: Record<CandidateFate, number> = {
+  unaccounted: 0,
+  absorbed: 0,
+  incomplete: 1,
+  filtered: 2,
+  rejected: 3,
+  gated: 4,
+  excluded: 5,
+  qualified_more: 6,
+  returned: 7,
+};
 
-const norm = (value: string | null | undefined) => (value ?? "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+const norm = (value: string | null | undefined) =>
+  (value ?? "")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
 
 /** Cheap registrable domain (last two labels) — enough to bind www-stripped hosts. */
 function registrableHost(url: string | null | undefined): string | null {
@@ -87,7 +117,9 @@ function registrableHost(url: string | null | undefined): string | null {
 /** Identity tokens: a DB/live merge can change the key but not the entity.
  *  A re-minted entity_id still binds through registrable host + name. */
 function identities(row: LedgerRow): string[] {
-  const tokens = [row.key, row.entity_id].filter((value): value is string => !!value).map((value) => `id:${value}`);
+  const tokens = [row.key, row.entity_id]
+    .filter((value): value is string => !!value)
+    .map((value) => `id:${value}`);
   const title = norm(row.title);
   if (title) tokens.push(`name:${title}|${norm(row.company)}`);
   const host = registrableHost(row.website_url) ?? registrableHost(row.profile_url);
@@ -96,9 +128,21 @@ function identities(row: LedgerRow): string[] {
 }
 
 export function createCandidateLedger() {
-  type Entry = { key: string; title: string; fate: CandidateFate; reason: string | null; streamed: boolean; fated: boolean; ids: string[] };
+  type Entry = {
+    key: string;
+    title: string;
+    fate: CandidateFate;
+    reason: string | null;
+    streamed: boolean;
+    fated: boolean;
+    ids: string[];
+  };
   const entries: Entry[] = [];
   const byId = new Map<string, Entry>();
+  const stages = new Map<
+    string,
+    { key: string; eligibility: string; signal: string; reason: string }
+  >();
 
   const find = (row: LedgerRow) => {
     for (const id of identities(row)) {
@@ -110,9 +154,21 @@ export function createCandidateLedger() {
   const upsert = (row: LedgerRow, fate: CandidateFate, reason: string | null, streamed = false) => {
     let entry = find(row);
     if (!entry) {
-      entry = { key: row.key ?? row.entity_id ?? norm(row.title), title: row.title ?? "", fate, reason, streamed, fated: true, ids: [] };
+      entry = {
+        key: row.key ?? row.entity_id ?? norm(row.title),
+        title: row.title ?? "",
+        fate,
+        reason,
+        streamed,
+        fated: true,
+        ids: [],
+      };
       entries.push(entry);
-    } else if (fate !== "unaccounted" && (RANK[fate] >= RANK[entry.fate] || entry.fate === "unaccounted") && entry.fate !== "returned") {
+    } else if (
+      fate !== "unaccounted" &&
+      (RANK[fate] >= RANK[entry.fate] || entry.fate === "unaccounted") &&
+      entry.fate !== "returned"
+    ) {
       entry.fate = fate;
       entry.reason = reason;
     }
@@ -128,8 +184,24 @@ export function createCandidateLedger() {
   };
 
   return {
+    stage(
+      row: LedgerRow,
+      eligibility: "ELIGIBLE" | "RESEARCHABLE_UNKNOWN" | "CONTRADICTED" | "DUPLICATE",
+      signal:
+        | "SUPPORTED"
+        | "UNVERIFIED"
+        | "CONTRADICTED"
+        | "NOT_RESEARCHED_BUDGET"
+        | "NOT_REQUIRED",
+      reason: string,
+    ) {
+      const key = find(row)?.key ?? row.key ?? row.entity_id ?? norm(row.title);
+      stages.set(key, { key, eligibility, signal, reason });
+    },
     /** A lead shown to the user while researching. */
-    streamed(row: LedgerRow) { upsert(row, "unaccounted", null, true); },
+    streamed(row: LedgerRow) {
+      upsert(row, "unaccounted", null, true);
+    },
     /**
      * A candidate that entered the funnel without streaming (DB/index rows
      * filtered before any stage, merge outputs). Books the entry as a stub
@@ -137,7 +209,15 @@ export function createCandidateLedger() {
      */
     retrieved(row: LedgerRow) {
       if (!find(row)) {
-        const entry: Entry = { key: row.key ?? row.entity_id ?? norm(row.title), title: row.title ?? "", fate: "unaccounted", reason: null, streamed: false, fated: false, ids: [] };
+        const entry: Entry = {
+          key: row.key ?? row.entity_id ?? norm(row.title),
+          title: row.title ?? "",
+          fate: "unaccounted",
+          reason: null,
+          streamed: false,
+          fated: false,
+          ids: [],
+        };
         entries.push(entry);
         for (const id of identities(row)) {
           if (!byId.has(id)) byId.set(id, entry);
@@ -164,17 +244,29 @@ export function createCandidateLedger() {
       if (entry && entry.fate === "rejected") return;
       upsert(row, "gated", reason);
     },
-    incomplete(row: LedgerRow) { upsert(row, "incomplete", row.missingFields?.length ? `missing: ${row.missingFields.join(", ")}` : "missing required fields"); },
+    incomplete(row: LedgerRow) {
+      upsert(
+        row,
+        "incomplete",
+        row.missingFields?.length
+          ? `missing: ${row.missingFields.join(", ")}`
+          : "missing required fields",
+      );
+    },
     /** Dropped by the spec judge: a stated criterion is contradicted or unproven. */
-    filtered(row: LedgerRow, reason = "SPEC_MISMATCH") { upsert(row, "filtered", reason); },
-    excluded(row: LedgerRow) { upsert(row, "excluded", "ALREADY_DELIVERED_IN_JOB"); },
+    filtered(row: LedgerRow, reason = "SPEC_MISMATCH") {
+      upsert(row, "filtered", reason);
+    },
+    excluded(row: LedgerRow) {
+      upsert(row, "excluded", "ALREADY_DELIVERED_IN_JOB");
+    },
     delivered(page: LedgerRow[], rest: LedgerRow[]) {
       for (const row of rest) upsert(row, "qualified_more", null);
       for (const row of page) upsert(row, "returned", null);
     },
     /** Terminal cancellation explains outstanding work without replacing any
      * booked fate (including absorbed duplicates). Never used on success. */
-    cancelled(reason: "SEARCH_CANCELLED" | "SEARCH_STALE_RUN") {
+    cancelled(reason: "SEARCH_CANCELLED" | "SEARCH_STALE_RUN" | "SEARCH_DEADLINE") {
       for (const entry of entries) {
         if (entry.fated && entry.fate !== "unaccounted") continue;
         entry.fate = "gated";
@@ -183,7 +275,10 @@ export function createCandidateLedger() {
       }
     },
     summary(): CandidateLedgerSummary {
-      const counts = Object.fromEntries(FATES.map((fate) => [fate, 0])) as Record<CandidateFate, number>;
+      const counts = Object.fromEntries(FATES.map((fate) => [fate, 0])) as Record<
+        CandidateFate,
+        number
+      >;
       const rejectReasons: Record<string, number> = {};
       const incompleteReasons: Record<string, number> = {};
       for (const entry of entries) {
@@ -193,7 +288,8 @@ export function createCandidateLedger() {
         // rows with rejectReasons {} because only fate "rejected" was tallied.
         if ((entry.fate === "rejected" || entry.fate === "filtered") && entry.reason)
           rejectReasons[entry.reason] = (rejectReasons[entry.reason] ?? 0) + 1;
-        if (entry.fate === "incomplete" && entry.reason) incompleteReasons[entry.reason] = (incompleteReasons[entry.reason] ?? 0) + 1;
+        if (entry.fate === "incomplete" && entry.reason)
+          incompleteReasons[entry.reason] = (incompleteReasons[entry.reason] ?? 0) + 1;
       }
       const streamed = entries.filter((entry) => entry.streamed);
       const retrieved = entries.length;
@@ -201,17 +297,22 @@ export function createCandidateLedger() {
       // retrieved()-born stubs awaiting a funnel booking stay unfated. A
       // stub is internal accounting, not a user-facing unaccounted loss.
       const fated = entries.filter((entry) => entry.fated).length;
-      const unaccounted = entries.filter((entry) => entry.streamed && entry.fate === "unaccounted").length;
+      const unaccounted = entries.filter(
+        (entry) => entry.streamed && entry.fate === "unaccounted",
+      ).length;
       return {
         counts,
         rejectReasons,
         incompleteReasons,
         streamed: streamed.length,
-        streamedNotReturned: streamed.filter((entry) => entry.fate !== "returned")
+        streamedNotReturned: streamed
+          .filter((entry) => entry.fate !== "returned")
           .map(({ key, title, fate, reason }) => ({ key, title, fate, reason })),
-        streamedReturned: streamed.filter((entry) => entry.fate === "returned")
+        streamedReturned: streamed
+          .filter((entry) => entry.fate === "returned")
           .map(({ key, title, fate, reason }) => ({ key, title, fate, reason })),
         accounting: { retrieved, fated, unaccounted, ok: retrieved === fated && unaccounted === 0 },
+        stages: [...stages.values()],
       };
     },
   };
@@ -226,8 +327,26 @@ export function mergeCandidateLedgers(
   terminalCancellation?: "SEARCH_CANCELLED" | "SEARCH_STALE_RUN",
 ): CandidateLedgerSummary | undefined {
   const present = summaries.filter((summary): summary is CandidateLedgerSummary => !!summary);
-  if (!present.length) return undefined;
-  const counts = Object.fromEntries(FATES.map((fate) => [fate, present.reduce((sum, summary) => sum + (summary.counts[fate] ?? 0), 0)])) as Record<CandidateFate, number>;
+  if (!present.length) {
+    // A terminal cancellation with no branch ledgers is still fully
+    // accounted: nothing was retrieved, nothing fated. The cancellation
+    // proof consumers require the accounting invariant to hold even here.
+    if (!terminalCancellation) return undefined;
+    return {
+      counts: Object.fromEntries(FATES.map((fate) => [fate, 0])) as Record<CandidateFate, number>,
+      rejectReasons: {},
+      incompleteReasons: {},
+      streamed: 0,
+      streamedNotReturned: [],
+      accounting: { retrieved: 0, fated: 0, unaccounted: 0, ok: true },
+    };
+  }
+  const counts = Object.fromEntries(
+    FATES.map((fate) => [
+      fate,
+      present.reduce((sum, summary) => sum + (summary.counts[fate] ?? 0), 0),
+    ]),
+  ) as Record<CandidateFate, number>;
   if (terminalCancellation) {
     // A subrun may have marked rows returned before a later location cancels
     // the aggregate. They were never delivered by the user-visible run.
@@ -238,24 +357,31 @@ export function mergeCandidateLedgers(
   const rejectReasons: Record<string, number> = {};
   const incompleteReasons: Record<string, number> = {};
   for (const summary of present) {
-    for (const [code, count] of Object.entries(summary.rejectReasons)) rejectReasons[code] = (rejectReasons[code] ?? 0) + count;
-    for (const [code, count] of Object.entries(summary.incompleteReasons ?? {})) incompleteReasons[code] = (incompleteReasons[code] ?? 0) + count;
+    for (const [code, count] of Object.entries(summary.rejectReasons))
+      rejectReasons[code] = (rejectReasons[code] ?? 0) + count;
+    for (const [code, count] of Object.entries(summary.incompleteReasons ?? {}))
+      incompleteReasons[code] = (incompleteReasons[code] ?? 0) + count;
   }
   const deliveredIds = new Set(delivered.flatMap(identities));
   const seen = new Set<string>();
-  const branchReconciliations = present.flatMap((summary) => terminalCancellation
-    ? [...summary.streamedNotReturned, ...(summary.streamedReturned ?? [])].map((item) =>
-      item.fate === "returned" || item.fate === "qualified_more"
-        ? { ...item, fate: "gated" as const, reason: terminalCancellation }
-        : item)
-    : summary.streamedNotReturned);
+  const branchReconciliations = present.flatMap((summary) =>
+    terminalCancellation
+      ? [...summary.streamedNotReturned, ...(summary.streamedReturned ?? [])].map((item) =>
+          item.fate === "returned" || item.fate === "qualified_more"
+            ? { ...item, fate: "gated" as const, reason: terminalCancellation }
+            : item,
+        )
+      : summary.streamedNotReturned,
+  );
   const streamedNotReturned = branchReconciliations.filter((item) => {
     const ids = identities({ key: item.key, title: item.title });
     if (ids.some((id) => deliveredIds.has(id)) || seen.has(item.key)) return false;
     seen.add(item.key);
     return true;
   });
-  const accountingParts = present.map((summary) => summary.accounting).filter((a): a is NonNullable<CandidateLedgerSummary["accounting"]> => !!a);
+  const accountingParts = present
+    .map((summary) => summary.accounting)
+    .filter((a): a is NonNullable<CandidateLedgerSummary["accounting"]> => !!a);
   const accounting = accountingParts.length
     ? {
         retrieved: accountingParts.reduce((sum, a) => sum + a.retrieved, 0),
@@ -264,24 +390,50 @@ export function mergeCandidateLedgers(
         ok: false,
       }
     : undefined;
-  if (accounting) accounting.ok = accounting.retrieved === accounting.fated && accounting.unaccounted === 0;
-  return { counts, rejectReasons, incompleteReasons, streamed: present.reduce((sum, summary) => sum + summary.streamed, 0), streamedNotReturned, accounting };
+  if (accounting)
+    accounting.ok = accounting.retrieved === accounting.fated && accounting.unaccounted === 0;
+  const stages = [
+    ...new Map(
+      present.flatMap((summary) => summary.stages ?? []).map((stage) => [stage.key, stage]),
+    ).values(),
+  ];
+  return {
+    counts,
+    rejectReasons,
+    incompleteReasons,
+    streamed: present.reduce((sum, summary) => sum + summary.streamed, 0),
+    streamedNotReturned,
+    accounting,
+    stages,
+  };
 }
 
 /** Short, user-facing explanation for a streamed lead missing from the final list. */
 export function streamedFateLabel(item: Pick<StreamedReconciliation, "fate" | "reason">): string {
   switch (item.fate) {
-    case "qualified_more": return "on the next page";
-    case "rejected": return item.reason === "MISSING_QUERY_REQUIRED" ? "missing a detail you asked for" : "did not pass the final checks";
+    case "qualified_more":
+      return "on the next page";
+    case "rejected":
+      return item.reason === "MISSING_QUERY_REQUIRED"
+        ? "missing a detail you asked for"
+        : "did not pass the final checks";
     case "gated":
       if (item.reason === "SEARCH_CANCELLED") return "search was cancelled before delivery";
       if (item.reason === "SEARCH_STALE_RUN") return "search was replaced before delivery";
-      return item.reason === "SIGNAL_NOT_VERIFIED" ? "no verified signal found" : "did not pass the final checks";
-    case "filtered": return "did not match every part of your request";
-    case "incomplete": return "still missing required details";
-    case "excluded": return "already delivered earlier";
-    case "absorbed": return "merged with a duplicate lead";
-    case "unaccounted": return "could not be confirmed";
-    default: return "not in the final list";
+      return item.reason === "SIGNAL_NOT_VERIFIED"
+        ? "no verified signal found"
+        : "did not pass the final checks";
+    case "filtered":
+      return "did not match every part of your request";
+    case "incomplete":
+      return "still missing required details";
+    case "excluded":
+      return "already delivered earlier";
+    case "absorbed":
+      return "merged with a duplicate lead";
+    case "unaccounted":
+      return "could not be confirmed";
+    default:
+      return "not in the final list";
   }
 }

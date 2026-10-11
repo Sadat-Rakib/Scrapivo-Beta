@@ -1,0 +1,359 @@
+/**
+ * M10 — QualifiedLead domain shape for persistence.
+ *
+ * Persistence must not qualify anything. Only theorem-qualified objects
+ * enter the qualified-lead store. Proof (ClaimEvidence + provenance +
+ * timestamps) is first-class — never reduced to verified=true.
+ */
+import type { SearchSpec } from "@/lib/search/search-spec";
+import type { SpecRow } from "@/lib/spec-search.functions";
+import type { Evidence } from "@/lib/search/evidence";
+import type { FieldProvenance } from "@/lib/search/enrichment-merge";
+import type { PageType, QualificationRejectCode } from "@/lib/search/canonical-contract";
+import {
+  evaluateQualifiedLeadTheorem,
+  isProvisionalEntityId,
+} from "@/lib/search/canonical-contract";
+import {
+  asClaimEvidence,
+  evidenceClaimType,
+  type ClaimEvidence,
+} from "@/lib/search/claim-binding";
+import { theoremCandidateFromRow, qualifyLead } from "@/lib/search/qualify";
+import { verifyCandidateClaims } from "@/lib/search/verification";
+import type { SearchRunIds } from "@/lib/search/search-run";
+import { shouldDiscardStaleResult } from "@/lib/search/search-run";
+
+export type PersistRejectCode =
+  | "NOT_QUALIFIED"
+  | "THEOREM_FAILED"
+  | "PROVISIONAL_ENTITY"
+  | "ENTITY_UNRESOLVED"
+  | "UNVERIFIED_CLAIM"
+  | "STALE_CLAIM"
+  | "INCOMPLETE_FIELDS"
+  | "SUBJECT_BINDING_FAILED"
+  | "LIST_PAGE_AS_ENTITY"
+  | "MISSING_IDENTITY"
+  | "STALE_RUN"
+  | "CANCELLED_RUN"
+  | "NO_CLAIM_TYPE"
+  | QualificationRejectCode;
+
+/**
+ * Canonical persisted QualifiedLead — the proof, not a boolean.
+ *
+ * Timestamps are distinct and must never be collapsed:
+ *   event_at     — on each ClaimEvidence (real-world event)
+ *   observed_at  — on each ClaimEvidence (when we saw it)
+ *   qualified_at — when the theorem passed for this projection
+ *   persisted_at — when written to the store
+ *   updated_at   — when the stored record last changed
+ */
+export interface QualifiedLead {
+  entity_id: string;
+  entity_type: string;
+  name: string;
+
+  /** Primary qualifying claim type — part of storage identity. */
+  claim_type: ClaimEvidence["claim_type"];
+
+  disposition: "qualified";
+  relevance_score: number;
+  intent_score: number;
+  /** Presentation only — must not replace evidence[]. */
+  why_match: string | null;
+
+  /** Spec that this lead was qualified against. */
+  spec: SearchSpec;
+
+  /** Run lineage (M11 UI consumes; M15 audits). */
+  search_run_id: string;
+  conversation_id: string;
+  turn_id: string;
+  request_id: string;
+
+  location: string | null;
+  location_id: string | null;
+  location_scope: string | null;
+  location_parents: string | null;
+  location_kind: string | null;
+  location_country: string | null;
+
+  fields: Record<string, string | number | boolean | null | undefined>;
+  field_provenance: Record<string, FieldProvenance>;
+
+  evidence: ClaimEvidence[];
+  outreach_drafts?: SpecRow['outreach_drafts'];
+
+  identity_confidence: number;
+  resolution_method: string | null;
+  page_type: PageType | string | null;
+  source_url: string | null;
+
+  qualified_at: string;
+  persisted_at: string | null;
+  updated_at: string | null;
+}
+
+function fieldOf(spec: SearchSpec, f: string): string | null {
+  const c = spec.criteria.find((x) => x.field === f);
+  return c?.value?.trim() ? c.value : null;
+}
+
+function nowIso(nowMs?: number): string {
+  return new Date(nowMs ?? Date.now()).toISOString();
+}
+
+/**
+ * Storage key: stable entity + claim type.
+ * Same entity with funding vs hiring are distinct opportunities.
+ */
+export function qualifiedLeadKey(entityId: string, claimType: string): string {
+  return `${entityId.trim()}::${claimType.trim()}`;
+}
+
+export function leadKeyOf(lead: QualifiedLead): string {
+  return qualifiedLeadKey(lead.entity_id, lead.claim_type);
+}
+
+/**
+ * Hard gate: only objects that still pass the theorem may enter the store.
+ * Persistence does not qualify — it only admits.
+ */
+export function canPersistAsQualifiedLead(args: {
+  row: SpecRow;
+  spec: SearchSpec;
+  run?: Partial<SearchRunIds> | null;
+  activeRunId?: string | null;
+  cancelled?: boolean;
+  nowMs?: number;
+}): { ok: true; claim_type: ClaimEvidence["claim_type"] } | {
+  ok: false;
+  reject_code: PersistRejectCode;
+  reason: string;
+} {
+  const { row, spec } = args;
+
+  if (args.cancelled) {
+    return { ok: false, reject_code: "CANCELLED_RUN", reason: "run cancelled" };
+  }
+
+  if (
+    args.activeRunId != null &&
+    args.run?.search_run_id &&
+    shouldDiscardStaleResult(
+      { search_run_id: args.run.search_run_id },
+      args.activeRunId,
+    )
+  ) {
+    return {
+      ok: false,
+      reject_code: "STALE_RUN",
+      reason: "search_run_id ≠ active run — cannot persist as delivered",
+    };
+  }
+
+  if (row.disposition !== "qualified") {
+    return {
+      ok: false,
+      reject_code: "NOT_QUALIFIED",
+      reason: `disposition=${row.disposition ?? "null"} — only qualified enters the store`,
+    };
+  }
+
+  if (isProvisionalEntityId(row.entity_id) || !row.entity_id?.trim()) {
+    return {
+      ok: false,
+      reject_code: "PROVISIONAL_ENTITY",
+      reason: "provisional/missing entity_id cannot persist as QualifiedLead",
+    };
+  }
+
+  if (row.entity_resolved !== true) {
+    return {
+      ok: false,
+      reject_code: "ENTITY_UNRESOLVED",
+      reason: "unresolved entity cannot persist as QualifiedLead",
+    };
+  }
+
+  const evidence = (row.evidence ?? []) as Evidence[];
+  const q = qualifyLead(row, spec, evidence);
+  if (q.disposition !== "qualified") {
+    return {
+      ok: false,
+      reject_code: (q.reject_code as PersistRejectCode) ?? "THEOREM_FAILED",
+      reason: q.label ?? "qualify() rejected",
+    };
+  }
+
+  const theorem = evaluateQualifiedLeadTheorem(
+    theoremCandidateFromRow(row, evidence),
+    spec,
+  );
+  if (!theorem.ok) {
+    const code = theorem.reject_code ?? "THEOREM_FAILED";
+    if (code === "TEMPORAL_STALE" || code === "TEMPORAL_UNKNOWN") {
+      return { ok: false, reject_code: "STALE_CLAIM", reason: theorem.reason ?? code };
+    }
+    if (code === "CLAIM_NOT_SUBJECT_BOUND") {
+      return {
+        ok: false,
+        reject_code: "SUBJECT_BINDING_FAILED",
+        reason: theorem.reason ?? code,
+      };
+    }
+    if (code === "MISSING_QUERY_REQUIRED") {
+      return {
+        ok: false,
+        reject_code: "INCOMPLETE_FIELDS",
+        reason: theorem.reason ?? code,
+      };
+    }
+    if (code === "NO_CLAIM_EVIDENCE" || code === "CLAIM_TYPE_MISMATCH") {
+      return {
+        ok: false,
+        reject_code: "UNVERIFIED_CLAIM",
+        reason: theorem.reason ?? code,
+      };
+    }
+    return {
+      ok: false,
+      reject_code: code,
+      reason: theorem.reason ?? "theorem failed",
+    };
+  }
+
+  if (spec.signal_required) {
+    const verified = verifyCandidateClaims({
+      evidence,
+      entityId: row.entity_id,
+      spec,
+      nowMs: args.nowMs,
+    });
+    if (!verified.ok || !verified.claim) {
+      return {
+        ok: false,
+        reject_code: (verified.reject_code as PersistRejectCode) ?? "UNVERIFIED_CLAIM",
+        reason: verified.reason ?? "claim verification failed",
+      };
+    }
+    return { ok: true, claim_type: verified.claim.claim_type };
+  }
+
+  // Non-signal Specs (e.g. directory browse) — still need a claim_type slot.
+  const first = evidence[0] ? evidenceClaimType(evidence[0]) : "identity";
+  return { ok: true, claim_type: first === "other" ? "identity" : first };
+}
+
+/**
+ * Project a theorem-qualified SpecRow into a QualifiedLead.
+ * Returns null when the gate refuses — never invents qualification.
+ */
+export function projectQualifiedLead(args: {
+  row: SpecRow;
+  spec: SearchSpec;
+  run?: Partial<SearchRunIds> | null;
+  activeRunId?: string | null;
+  cancelled?: boolean;
+  nowMs?: number;
+}):
+  | { ok: true; lead: QualifiedLead }
+  | { ok: false; reject_code: PersistRejectCode; reason: string } {
+  const gate = canPersistAsQualifiedLead(args);
+  if (!gate.ok) return gate;
+
+  const { row, spec } = args;
+  const evidence = (row.evidence ?? []) as Evidence[];
+  const q = qualifyLead(row, spec, evidence);
+  const entity_id = row.entity_id!.trim();
+
+  const claims: ClaimEvidence[] = [];
+  for (const e of evidence) {
+    const c = asClaimEvidence(e, entity_id);
+    if (!c) continue;
+    if (spec.signal_required) {
+      const v = verifyCandidateClaims({
+        evidence: [e],
+        entityId: entity_id,
+        spec,
+        nowMs: args.nowMs,
+      });
+      if (v.ok && v.claim) claims.push(v.claim);
+      continue;
+    }
+    claims.push(c);
+  }
+
+  if (spec.signal_required && !claims.length) {
+    return {
+      ok: false,
+      reject_code: "UNVERIFIED_CLAIM",
+      reason: "no verifying ClaimEvidence to persist",
+    };
+  }
+
+  const proof = claims.length
+    ? claims
+    : evidence
+        .map((e) => asClaimEvidence(e, entity_id))
+        .filter((c): c is ClaimEvidence => !!c);
+
+  const run = args.run ?? {};
+  const at = nowIso(args.nowMs);
+  const fp =
+    (row as SpecRow & { field_provenance?: Record<string, FieldProvenance> })
+      .field_provenance ?? {};
+
+  const lead: QualifiedLead = {
+    entity_id,
+    entity_type: row.kind,
+    name: (row.title ?? "").trim(),
+    outreach_drafts: row.outreach_drafts,
+    claim_type: gate.claim_type,
+    disposition: "qualified",
+    relevance_score: q.relevance_score,
+    intent_score: q.intent_score,
+    why_match: q.why_match,
+    spec,
+    search_run_id: run.search_run_id ?? "",
+    conversation_id: run.conversation_id ?? "",
+    turn_id: run.turn_id ?? "",
+    request_id: run.request_id ?? "",
+    location: row.location ?? null,
+    location_id: fieldOf(spec, "location_id"),
+    location_scope: fieldOf(spec, "location_scope"),
+    location_parents: fieldOf(spec, "location_parents"),
+    location_kind: fieldOf(spec, "location_kind"),
+    location_country: fieldOf(spec, "location_country"),
+    fields: {
+      location: row.location ?? null,
+      role: row.role ?? null,
+      company: row.company ?? null,
+      email: row.email ?? null,
+      phone: row.phone ?? null,
+      salary: (row as SpecRow & { salary?: string | number | null }).salary ?? null,
+      employer: (row as SpecRow & { employer?: string | null }).employer ?? null,
+      category: row.category ?? null,
+      industry: row.industry ?? null,
+      website_url: row.website_url ?? null,
+      contact_page_url: row.contact_page_url ?? null,
+      profile_url: row.profile_url ?? null,
+      apply_url: row.apply_url ?? null,
+    },
+    field_provenance: { ...fp },
+    evidence: proof,
+    identity_confidence: row.identity_confidence ?? 0.7,
+    resolution_method:
+      (row as SpecRow & { resolution_method?: string | null }).resolution_method ??
+      null,
+    page_type: row.page_type ?? null,
+    source_url: row.source_url ?? row.url ?? null,
+    qualified_at: at,
+    persisted_at: null,
+    updated_at: null,
+  };
+
+  return { ok: true, lead };
+}

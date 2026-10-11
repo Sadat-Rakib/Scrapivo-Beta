@@ -7,6 +7,7 @@
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { projectInvestorLocation } from "../src/lib/canonical/investor-location";
 
 const ROOT = resolve(process.cwd());
 const IN = resolve(ROOT, "data/investors_merged.json");
@@ -153,7 +154,7 @@ function main() {
     const bio = rawBio ? rawBio.slice(0, 600) : null;
 
     seen.add(id);
-    const locParts = location.split(",").map((s: string) => s.trim()).filter(Boolean);
+    const projectedLocation = projectInvestorLocation({ location_raw: location });
     out.push(
       JSON.stringify({
         id,
@@ -161,8 +162,8 @@ function main() {
         firm,
         role,
         location,
-        location_city: locParts[0] ?? location,
-        location_country: locParts[locParts.length - 1] ?? "",
+        location_city: projectedLocation.location_city,
+        location_country: projectedLocation.location_country,
         sectors,
         stages,
         check_min_usd: checkMin,

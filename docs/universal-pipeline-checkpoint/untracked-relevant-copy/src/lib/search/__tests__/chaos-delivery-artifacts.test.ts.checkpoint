@@ -1,0 +1,160 @@
+import { describe, expect, it } from 'vitest';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { rowSatisfiesSpec, type SpecRow } from '@/lib/spec-search.functions';
+import { requestedClaimTypes } from '@/lib/search/claim-binding';
+import { verifyClaimEvidence } from '@/lib/search/verification';
+import type { Evidence } from '@/lib/search/evidence';
+import type { SearchSpec } from '@/lib/search/search-spec';
+import { emptyFrame, openValue, type UnderstandingFrame } from '@/lib/understanding/frame';
+import { frameToSearchSpec } from '@/lib/understanding/to-search-spec';
+
+const baseSpec: SearchSpec = { entity: 'business', criteria: [], missing: [], signal_required: false,
+  signal_types: [], signal_recency: null, status: 'ready_to_search', raw_query: 'artifact audit' };
+
+const identityEvidence = (subject: string, source: string): Evidence[] => [{
+  source_type: 'web', source_url: source, subject, evidence_type: 'identity', supports: 'identity',
+  excerpt: 'Observed entity', observed_at: '2026-10-07T00:00:00Z', confidence: 1,
+}];
+
+function locationBranch(spec: SearchSpec, place: string): SearchSpec {
+  return { ...spec, locations: [place], criteria: [...(spec.criteria ?? []).filter(c => ![
+    'location', 'location_id', 'location_kind', 'location_country', 'location_scope', 'location_parent',
+  ].includes(c.field)),
+    { field: 'location', value: place, stated: true, confidence: 1 }] };
+}
+
+function branchSpecs(spec: SearchSpec): SearchSpec[] {
+  const frame = spec.understanding;
+  const subgoals = frame?.compound?.is_compound ? frame.compound.subgoals ?? [] : [];
+  if (!frame || !subgoals.length) return [spec];
+  return subgoals.map(goal => {
+    const branchFrame: UnderstandingFrame = {
+      ...frame,
+      target: goal.target,
+      relation: goal.relation,
+      location: goal.location ?? frame.location,
+      locations: goal.location ? [goal.location] : frame.locations,
+      temporal: goal.temporal ?? frame.temporal,
+      constraints: [...frame.constraints, ...goal.constraints],
+      quantity: goal.quantity ?? frame.quantity,
+      compound: { is_compound: false, subgoals: [] },
+    };
+    const branch = frameToSearchSpec(branchFrame);
+    return { ...branch, required_field_groups: spec.required_field_groups ?? branch.required_field_groups };
+  });
+}
+
+function rowMatchesAnyBranch(spec: SearchSpec, row: SpecRow): boolean {
+  return branchSpecs(spec).some(candidate => {
+    if (row.kind !== candidate.entity) return false;
+    const places = (candidate.locations?.length ?? 0) > 1 ? candidate.locations! : [undefined];
+    return places.some(place => rowSatisfiesSpec(place ? locationBranch(candidate, place) : candidate, row));
+  });
+}
+
+function hasSubjectBoundSource(row: SpecRow): boolean {
+  const source = row.source_url ?? row.website_url;
+  if (!source || !row.entity_id) return false;
+  return (row.evidence ?? []).some(evidence =>
+    evidence.subject === row.entity_id && evidence.source_url === source &&
+    (evidence.supports === 'identity' || evidence.evidence_type === 'identity' || evidence.evidence_type === 'contact'));
+}
+
+function hasRequiredSignalEvidence(spec: SearchSpec, row: SpecRow): boolean {
+  if (!spec.signal_required) return true;
+  const requested = requestedClaimTypes(spec);
+  if (!requested.length) return true;
+  const valid = new Set<string>();
+  for (const evidence of row.evidence ?? []) {
+    if (!requested.includes(evidence.evidence_type)) continue;
+    const check = verifyClaimEvidence({ evidence, entityId: row.entity_id ?? '', spec });
+    if (check.ok) valid.add(evidence.evidence_type);
+  }
+  const requiresAll = (spec.understanding?.constraints ?? []).some(item =>
+    item.field === 'signal_types' && item.operator !== 'one_of');
+  return requiresAll ? requested.every(type => valid.has(type)) : valid.size > 0;
+}
+
+function rowIssues(spec: SearchSpec, row: SpecRow): string[] {
+  const issues: string[] = [];
+  if (!branchSpecs(spec).some(candidate => candidate.entity === row.kind)) issues.push('row kind does not match requested entity');
+  if (!rowMatchesAnyBranch(spec, row)) issues.push('row fails production rowSatisfiesSpec');
+  if (!hasSubjectBoundSource(row)) issues.push('row lacks subject-bound source evidence');
+  if (!hasRequiredSignalEvidence(spec, row)) issues.push('row lacks aligned subject-bound signal evidence');
+  return issues;
+}
+
+function artifactsFromEnv(): Array<{ file: string; data: any }> {
+  const dir = process.env.CHAOS_ARTIFACT_DIR;
+  if (!dir) return [];
+  const expected = (process.env.CHAOS_EXPECT_IDS ?? '').split(',').map(id => id.trim()).filter(Boolean);
+  const files = readdirSync(dir, { recursive: true }).filter(file => String(file).endsWith('.json')).map(file => join(dir, String(file)));
+  const artifacts = files.map(file => ({ file, data: JSON.parse(readFileSync(file, 'utf8')) }))
+    .flatMap(item => (item.data?.phases ?? [item.data]).map((phase: any) => ({ file: item.file, data: { ...phase, id: phase.id ?? item.data.id } })))
+    .filter(item => !expected.length || expected.includes(item.data.id))
+    .filter(item => item.data?.result?.spec && Array.isArray(item.data.result.rows));
+  if (!artifacts.length) throw new Error('CHAOS_ARTIFACT_DIR has no response phase JSON artifacts: ' + dir);
+  for (const id of expected) {
+    const terminal = artifacts.some(item => item.data.id === id && ['QUALIFIED_RESULTS', 'NO_QUALIFIED_RESULTS'].includes(item.data.result?.outcome));
+    if (!terminal) throw new Error(`CHAOS_ARTIFACT_DIR missing terminal response artifact for ${id}`);
+  }
+  return artifacts;
+}
+
+describe('chaos delivery artifact audit', () => {
+  it('keeps meaningful synthetic negatives closed while authority contact-thin rows survive', () => {
+    const spec: SearchSpec = { ...baseSpec, locations: ['Toronto', 'Vancouver'], criteria: [{ field: 'category', value: 'dentist', stated: true, confidence: 1 }] };
+    const good: SpecRow = { kind: 'business', title: 'Toronto Dental', detail: '', category: 'dentist', location: 'Toronto', country: 'CA',
+      entity_id: 'dentist:1', source_url: 'db://dentist/1', evidence: [{ source_type: 'db', source_url: 'db://dentist/1', subject: 'dentist:1',
+        evidence_type: 'identity', supports: 'identity', excerpt: 'Toronto Dental', observed_at: '2026-10-07T00:00:00Z', confidence: 1 }] };
+    expect(rowIssues(spec, good)).toEqual([]);
+    expect(rowIssues(spec, { ...good, kind: 'person' })).toContain('row kind does not match requested entity');
+    expect(rowIssues(spec, { ...good, location: 'Calgary' })).toContain('row fails production rowSatisfiesSpec');
+    expect(rowIssues(spec, { ...good, category: 'physiotherapist' })).toContain('row fails production rowSatisfiesSpec');
+    expect(rowIssues(spec, { ...good, evidence: identityEvidence('other', 'db://dentist/1') })).toContain('row lacks subject-bound source evidence');
+  });
+
+  it('uses production frameToSearchSpec branch semantics for one inherited compound subgoal', () => {
+    const frame = emptyFrame('find dentists in Toronto and plumbers in Vancouver');
+    frame.target.entity_type = { value: 'business', raw: 'businesses', confidence: 1 };
+    frame.location = { value: 'Canada', raw: 'Canada', scope: 'in', radius: null, radius_unit: null, country_code: 'CA', canonical: 'Canada', confidence: 1 };
+    frame.locations = [frame.location];
+    frame.compound = { is_compound: true, subgoals: [
+      { raw: 'dentists in Toronto', target: { ...frame.target, category: openValue('dentist') }, relation: frame.relation,
+        location: { value: 'Toronto', raw: 'Toronto', scope: 'in', radius: null, radius_unit: null, country_code: 'CA', canonical: 'Toronto', confidence: 1 },
+        temporal: null, constraints: [], quantity: null },
+      { raw: 'plumbers in Vancouver', target: { ...frame.target, category: openValue('plumber') }, relation: frame.relation,
+        location: { value: 'Vancouver', raw: 'Vancouver', scope: 'in', radius: null, radius_unit: null, country_code: 'CA', canonical: 'Vancouver', confidence: 1 },
+        temporal: null, constraints: [], quantity: null },
+    ] };
+    const spec = frameToSearchSpec(frame);
+    const row: SpecRow = { kind: 'business', title: 'Pipe Co', detail: '', category: 'plumber', location: 'Vancouver', country: 'CA',
+      entity_id: 'plumber:1', source_url: 'https://pipe.example', evidence: identityEvidence('plumber:1', 'https://pipe.example') };
+    expect(rowIssues(spec, row)).toEqual([]);
+    expect(rowIssues(spec, { ...row, category: 'roofer' })).toContain('row fails production rowSatisfiesSpec');
+  });
+
+  it('requires aligned signal evidence only when the spec asks for a signal', () => {
+    const spec: SearchSpec = { ...baseSpec, signal_required: true, signal_types: ['investment'] };
+    const row: SpecRow = { kind: 'business', title: 'Fund', detail: 'Invests in AI', category: 'investor', location: 'Toronto',
+      entity_id: 'fund:1', source_url: 'https://fund.example', evidence: [
+        ...identityEvidence('fund:1', 'https://fund.example'),
+        { source_type: 'web', source_url: 'https://fund.example/thesis', subject: 'fund:1', evidence_type: 'investment', supports: 'intent',
+          excerpt: 'Invests in AI infrastructure', observed_at: '2026-10-07T00:00:00Z', confidence: 1 },
+        { source_type: 'web', source_url: 'https://fund.example/history', subject: 'fund:1', evidence_type: 'funding', supports: 'funding_status',
+          excerpt: 'Raised a fund in 2020', observed_at: '2026-10-07T00:00:00Z', confidence: 1 },
+      ] };
+    expect(rowIssues(spec, row)).toEqual([]);
+    expect(rowIssues(spec, { ...row, evidence: row.evidence!.filter(e => e.evidence_type !== 'investment') }))
+      .toContain('row lacks aligned subject-bound signal evidence');
+  });
+
+  it('audits delivered rows from CHAOS_ARTIFACT_DIR when provided', () => {
+    const artifacts = artifactsFromEnv();
+    for (const artifact of artifacts) {
+      const { spec, rows } = artifact.data.result;
+      for (const row of rows) expect(rowIssues(spec, row), artifact.file).toEqual([]);
+    }
+  });
+});

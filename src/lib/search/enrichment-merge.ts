@@ -70,13 +70,24 @@ function writeField(row: SpecRow, field: string, value: unknown): SpecRow {
   const v = value as string | number | boolean | null | undefined;
   if (field === "website") {
     const website_url = v == null ? null : String(v);
-    return { ...row, website_url, url: row.kind === "job" ? row.apply_url ?? row.url : row.kind === "person" ? row.profile_url ?? website_url : website_url };
+    return {
+      ...row,
+      website_url,
+      url:
+        row.kind === "job"
+          ? (row.apply_url ?? row.url)
+          : row.kind === "person"
+            ? (row.profile_url ?? website_url)
+            : website_url,
+    };
   }
   if (field === "url" || field === "apply_or_source_url") {
     const url = v == null ? null : String(v);
-    return row.kind === "job" ? { ...row, apply_url: url, url }
-      : row.kind === "person" ? { ...row, profile_url: url, url }
-      : { ...row, website_url: url, url };
+    return row.kind === "job"
+      ? { ...row, apply_url: url, url }
+      : row.kind === "person"
+        ? { ...row, profile_url: url, url }
+        : { ...row, website_url: url, url };
   }
   if (field === "email") return { ...row, email: v == null ? null : String(v) };
   if (field === "phone") return { ...row, phone: v == null ? null : String(v) };
@@ -164,8 +175,7 @@ export function mergeEnrichmentIntoRow(
 
     const existing = readField(next, f.field);
     if (hasValue(existing)) {
-      const same =
-        String(existing).trim().toLowerCase() === String(f.value).trim().toLowerCase();
+      const same = String(existing).trim().toLowerCase() === String(f.value).trim().toLowerCase();
       if (!same) {
         const prevConf = provenance[f.field]?.confidence ?? 0.8;
         const incomingConf = f.confidence ?? 0.5;
@@ -206,7 +216,7 @@ export function mergeEnrichmentIntoRow(
 
   const evidence = [...(next.evidence ?? [])];
   for (const c of patch.claims ?? []) {
-    if (allowedClaims && allowedClaims.length && !allowedClaims.includes(c.evidence_type)) {
+    if (allowedClaims && !allowedClaims.includes(c.evidence_type)) {
       refused.push({
         claim: c.evidence_type,
         reason: "claim_not_requested_no_laundering",

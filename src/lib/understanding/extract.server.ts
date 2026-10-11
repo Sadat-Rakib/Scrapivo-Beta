@@ -143,7 +143,7 @@ import {
  * v15 preserves calendar granularity: this month is not this quarter, and a
  * named calendar period is not a rolling within_last window.
  */
-export const UNDERSTANDING_PROMPT_VERSION = "u1-v17";
+export const UNDERSTANDING_PROMPT_VERSION = "u1-v18";
 
 const list = (xs: readonly string[]) => xs.join(" | ");
 

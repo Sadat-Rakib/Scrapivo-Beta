@@ -21,12 +21,14 @@ export function GenerateModal({
   kind,
   sender: senderProp,
   toEmail,
+  preparedDrafts,
   onClose,
 }: {
   lead: DraftLead;
   kind: GenerateKind;
   sender: DraftSender;
   toEmail?: string;
+  preparedDrafts?: import("@/lib/outreach-draft").PreparedOutreachDraft;
   onClose: () => void;
 }) {
   const [copied, setCopied] = useState(false);
@@ -37,12 +39,19 @@ export function GenerateModal({
   const [senderRole, setSenderRole] = useState(senderProp.senderRole ?? "");
   const [proof, setProof] = useState(senderProp.proof ?? "");
   const [editing, setEditing] = useState(false);
+  const [editedDraft, setEditedDraft] = useState<string | null>(null);
   const sender: DraftSender = { ...senderProp, name, service, senderRole, proof };
 
-  const email = kind === "email" ? buildEmailDraft(lead, sender) : null;
-  const text = email
+  const email =
+    kind === "email"
+      ? preparedDrafts
+        ? { subject: preparedDrafts.email_subject, body: preparedDrafts.email_body }
+        : buildEmailDraft(lead, sender)
+      : null;
+  const generatedText = email
     ? `Subject: ${email.subject}\n\n${email.body}`
-    : buildMessageDraft(lead, sender);
+    : (preparedDrafts?.dm ?? buildMessageDraft(lead, sender));
+  const text = editedDraft ?? generatedText;
 
   const copy = async () => {
     try {
@@ -83,8 +92,8 @@ export function GenerateModal({
           </button>
         </div>
         <textarea
-          readOnly
           value={text}
+          onChange={(e) => setEditedDraft(e.target.value)}
           rows={10}
           className="w-full resize-none rounded-xl border border-border bg-muted/30 p-3 text-xs leading-relaxed text-foreground"
         />
@@ -132,7 +141,7 @@ export function GenerateModal({
           </Button>
           {kind === "email" && toEmail && (
             <a
-              href={`mailto:${toEmail}?subject=${encodeURIComponent(email?.subject ?? "")}&body=${encodeURIComponent(email?.body ?? "")}`}
+              href={`mailto:${toEmail}?subject=${encodeURIComponent(/^Subject: ([^\n]*)/.exec(text)?.[1] ?? email?.subject ?? "")}&body=${encodeURIComponent(text.replace(/^Subject: [^\n]*\n\n/, ""))}`}
             >
               <Button size="sm" className="h-8 text-xs">
                 <Send className="size-3.5 mr-1" /> Send

@@ -170,6 +170,8 @@ export async function createSessionManager(options: {
   const sessions = new Map<string, WorkerSession>();
   const running = new Map<string, Running>();
   const queues = new Map<string, Promise<unknown>>();
+  const executing = new Map<string, Promise<unknown>>();
+  const closing = new Map<string, Promise<WorkerSession>>();
   const proxy = await startEgressProxy(guard);
 
   for (const id of await readdir(dataDir).catch(() => [] as string[])) {
@@ -190,10 +192,20 @@ export async function createSessionManager(options: {
     await rename(`${path}.tmp`, path);
   }
   async function serial<T>(key: string, fn: () => Promise<T>): Promise<T> {
+    if (SESSION_ID.test(key)) key = key.toLowerCase();
     const previous = queues.get(key) ?? Promise.resolve();
-    const next = previous.catch(() => {}).then(fn);
+    const next = previous.catch(() => {}).then(async () => {
+      for (let barrier = closing.get(key); barrier; barrier = closing.get(key)) await barrier;
+      const operation = Promise.resolve().then(fn);
+      executing.set(key, operation);
+      try { return await operation; } finally { if (executing.get(key) === operation) executing.delete(key); }
+    });
     queues.set(key, next);
     try { return await next; } finally { if (queues.get(key) === next) queues.delete(key); }
+  }
+  async function afterCurrent<T>(key: string, fn: () => Promise<T>): Promise<T> {
+    await (queues.get(key) ?? Promise.resolve()).catch(() => undefined);
+    return fn();
   }
   function owned(id: string, ownerId: string): WorkerSession {
     const session = sessions.get(validateSessionId(id));
@@ -345,6 +357,27 @@ export async function createSessionManager(options: {
     return update(session, { status: session.status === "error" ? "error" : "closed", controller: "agent" });
   }
 
+  function closeTerminal(session: WorkerSession): Promise<WorkerSession> {
+    const pending = closing.get(session.id);
+    if (pending) return pending;
+    const current = executing.get(session.id);
+    const instance = running.get(session.id);
+    if (instance) running.delete(session.id);
+    // Publish the barrier before teardown starts. Interrupt only the executing
+    // operation; queued steps wait here instead of acquiring the old profile.
+    const terminal = Promise.resolve().then(async () => {
+      if (instance) {
+        await instance.context.storageState({ path: join(directory(session.id), "storage.json") }).catch(() => undefined);
+        await instance.context.close().catch(() => undefined);
+      }
+      await current?.catch(() => undefined);
+      // A launch already executing when close began may have finished meanwhile.
+      return closeInternal(session);
+    }).finally(() => { if (closing.get(session.id) === terminal) closing.delete(session.id); });
+    closing.set(session.id, terminal);
+    return terminal;
+  }
+
   async function evictProfilesFor(newId: string) {
     const stored = [...sessions.values()].filter((item) => item.id !== newId);
     if (stored.length < maxProfiles) return;
@@ -417,11 +450,11 @@ export async function createSessionManager(options: {
     counts: () => ({ active: running.size, stored: sessions.size, maxActive, maxProfiles }),
     create,
     /** Relaunch a saved profile under the same id. */
-    reopen: (id: string, ownerId: string) => serial(id, async () => {
+    reopen: (id: string, ownerId: string) => afterCurrent(id, async () => serial(id, async () => {
       const session = owned(id, ownerId);
       await launch(session);
       return { ...session };
-    }),
+    })),
     /** Atomic navigate → read (+ element refs) for the agent lane. */
     observe: (id: string, ownerId: string, url: string, signal?: AbortSignal | null) => serial(id, async () => {
       const session = owned(id, ownerId);
@@ -555,14 +588,21 @@ export async function createSessionManager(options: {
       return update(session, { url: page.url(), title: (await page.title().catch(() => "")).slice(0, 300) });
     }),
     /** retain=true keeps Chromium open for viewing/takeover until retainMs or an explicit close. */
-    close: (id: string, ownerId: string, retain = false) => serial(id, async () => {
+    close: async (id: string, ownerId: string, retain = false) => {
       const session = owned(id, ownerId);
-      // A person driving the browser keeps control when the run ends.
-      if (retain && running.has(session.id)) return update(session, { status: "retained" });
-      return closeInternal(session);
-    }),
+      if (!retain) return closeTerminal(session);
+      // A person driving the browser keeps control when the run ends. Retain
+      // stays serialized so takeover/input actions finish before the viewer
+      // lane becomes retained.
+      return serial(id, async () => {
+        const current = owned(id, ownerId);
+        if (running.has(current.id)) return update(current, { status: "retained" });
+        return closeInternal(current);
+      });
+    },
     shutdown: async () => {
       clearInterval(sweeper);
+      await Promise.allSettled([...closing.values()]);
       await Promise.allSettled([...queues.values()]);
       await Promise.allSettled([...sessions.values()].filter((item) => running.has(item.id)).map((item) => closeInternal(item)));
       await proxy.close();

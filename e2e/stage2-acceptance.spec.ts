@@ -1,39 +1,124 @@
-/**
- * STAGE 2 REAL-UI ACCEPTANCE — the 10 mandated queries + cancellation +
- * impossible-search coverage exhaustion. Every run's funnel lands in the
- * server log as [stage2-funnel]. UI assertions: a run either delivers
- * candidate/results, reaches an honest zero AFTER a real run, or asks a
- * Stage-1 card — never hangs, never fabricates.
- */
 import { expect, test, type Page, type Request, type Response } from "@playwright/test";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
 import { fromCrossJSON, fromJSON } from "seroval";
+import type { SpecRow } from "../src/lib/spec-search.functions";
 import { fixMojibake } from "../src/lib/encoding";
 import { enrichZeroNarrative, zeroResultsNarrative } from "../src/lib/search/outcome-ui";
 
 const EMAIL = "e2e.scrapivo.test.001@gmail.com";
 const PASS = "E2eTest!2026-xyz";
+const REPORT_DIR = process.env.S2_REPORT_DIR ?? join(tmpdir(), "scrapivo-stage2", "acceptance");
+const SERVER_LOG = process.env.S2_SERVER_LOG ?? "";
+mkdirSync(REPORT_DIR, { recursive: true });
 
-const QUERIES = process.env.S2_QUERIES
-  ? process.env.S2_QUERIES.split("|")
-  : [
-      "find plumbers in Austin",
-      "yo need like 7 hvac guys gta sites + nums",
-      "solar installers in Windhoek",
-      "wedding photographers in Cebu",
-      "freight forwarders in Tbilisi",
-      "construction companies in Banja Luka",
-      "find SaaS founders globally",
-      "find copywriters in Toronto",
-      "React developer jobs in Calgary",
-      "seed investors for AI startups in Canada",
-    ];
+type QueryCase = {
+  id: string;
+  query: string;
+  kind: SpecRow["kind"][];
+  category?: string[];
+  roles?: string[];
+  locations?: string[];
+  fields?: string[];
+  requireResults: boolean;
+};
+
+type RunRequest = {
+  query: string;
+  force: boolean;
+  search_run_id: string;
+  conversation_id: string;
+  turn_id: string;
+  request_id: string;
+};
+
+type ProviderEvidence = {
+  provider?: string;
+  attempted: boolean;
+  succeeded: boolean;
+  queries?: number;
+  queryFunnel?: Array<{
+    query?: string;
+    stage: string;
+    serpEmpty: number;
+    serpBlocked: number;
+    serpErrors: number;
+    linksObserved: number;
+  }>;
+};
+
+type BackendResult = Omit<RunRequest, "query" | "force"> & {
+  outcome?: string;
+  stage?: string;
+  spec: { status?: string };
+  clarify: unknown[];
+  rows: SpecRow[];
+  qualified_count: number;
+  candidateLedger?: {
+    accounting?: { ok: boolean; retrieved: number; fated: number; unaccounted: number };
+    counts?: Record<string, number>;
+    rejectReasons?: Record<string, number>;
+    incompleteReasons?: Record<string, number>;
+    streamedNotReturned?: Array<{ title?: string; fate: string; reason?: string | null }>;
+  };
+  retrievalTrace?: {
+    reason: string;
+    returned: number;
+    rawCandidates?: number;
+    postSpecFilter?: number;
+    complete?: number;
+    pendingEnrichment?: number;
+    qualificationRejected?: number;
+    qualified?: number;
+    sourceHealth?: { summary?: string | null };
+    widening?: { outcome: string };
+    providers?: ProviderEvidence[];
+    timings?: unknown;
+  };
+  diagnostics?: unknown[];
+  providerAttempts?: ProviderEvidence[];
+  widening?: { outcome: string };
+};
+
+type PhaseReport = {
+  id: string;
+  query: string;
+  round: number;
+  phase: "initial" | "forced" | "cancel";
+  status: "PASS" | "FAIL" | "BLOCKED";
+  durationMs: number;
+  request?: RunRequest;
+  failure?: string;
+  settled?: "results" | "zero" | "card";
+  outcome?: string;
+  providers?: ProviderEvidence[];
+  funnel?: BackendResult["retrievalTrace"];
+  accounting?: NonNullable<BackendResult["candidateLedger"]>["accounting"];
+  rejects?: Record<string, number>;
+  incomplete?: Record<string, number>;
+  contacts?: Array<{ title: string; present: string[]; verified: string[]; missing: string[] }>;
+  evidence?: Array<{ title: string; urls: string[] }>;
+  rowIssues?: Array<{ title: string; issues: string[] }>;
+  uiRows?: string[];
+};
+
+const CASES = JSON.parse(
+  readFileSync("e2e/fixtures/stage2-acceptance-queries.json", "utf8"),
+) as QueryCase[];
+const IMPOSSIBLE: QueryCase = {
+  id: "Q00",
+  query: "Unicorn ranchers in Atlantis",
+  kind: ["business"],
+  category: ["unicorn", "rancher"],
+  locations: ["Atlantis"],
+  requireResults: false,
+};
 
 async function login(page: Page) {
   await page.addInitScript(() => {
-    try {
-      localStorage.setItem("scrapivo:onboarding-skipped", "1");
-      localStorage.setItem("scrapivo:guided-tour-seen", "1");
-    } catch { /* ignore */ }
+    localStorage.setItem("scrapivo:onboarding-skipped", "1");
+    localStorage.setItem("scrapivo:guided-tour-seen", "1");
   });
   await page.goto("/auth");
   await page.getByLabel(/email/i).fill(EMAIL);
@@ -46,73 +131,227 @@ async function login(page: Page) {
   await expect(page.getByRole("textbox").first()).toBeVisible({ timeout: 30_000 });
 }
 
+async function startFreshChat(page: Page) {
+  await expect(page.getByRole("button", { name: "Stop search", exact: true })).toBeHidden();
+  const newChat = page.getByRole("button", { name: "New chat", exact: true }).first();
+  if (await newChat.isVisible().catch(() => false)) await newChat.click();
+  await expect(page.getByRole("textbox").first()).toBeEnabled({ timeout: 30_000 });
+}
+
 async function submitQuery(page: Page, q: string) {
   await page.getByRole("textbox").first().fill(q);
   await page.getByRole("textbox").first().press("Enter");
 }
 
-type RunRequest = {
-  query: string;
-  force: boolean;
-  search_run_id: string;
-  conversation_id: string;
-  turn_id: string;
-  request_id: string;
-};
-type BackendResult = Omit<RunRequest, "query" | "force"> & {
-  outcome?: string;
-  stage?: string;
-  spec: { status?: string };
-  clarify: unknown[];
-  rows: Array<{ title: string; [key: string]: unknown }>;
-  qualified_count: number;
-  candidateLedger?: {
-    accounting?: { ok: boolean; retrieved: number; fated: number; unaccounted: number };
-    counts?: Record<string, number>;
-    rejectReasons?: Record<string, number>;
-    incompleteReasons?: Record<string, number>;
-    streamedNotReturned?: Array<{ fate: string; reason?: string | null }>;
-  };
-  retrievalTrace?: {
-    reason: string;
-    returned: number;
-    rawCandidates?: number;
-    postSpecFilter?: number;
-    complete?: number;
-    pendingEnrichment?: number;
-    qualificationRejected?: number;
-    sourceHealth?: { summary?: string | null };
-    widening?: { outcome: string };
-    providers?: ProviderEvidence[];
-    [key: string]: unknown;
-  };
-  diagnostics?: unknown[];
-  providerAttempts?: ProviderEvidence[];
-  widening?: { outcome: string };
-};
-type ProviderEvidence = {
-  attempted: boolean;
-  succeeded: boolean;
-  queries?: number;
-  queryFunnel?: Array<{ stage: string; serpEmpty: number; serpBlocked: number; serpErrors: number; linksObserved: number }>;
-};
-
 function searchRequest(request: Request, q: string, forced: boolean): RunRequest | undefined {
   if (request.method() !== "POST") return;
   const body = request.postData() ?? "";
   if (!body.includes("search_run_id") || !body.includes("query")) return;
-  // Ignore malformed unrelated POSTs. Only this query's spec-shaped payload
-  // may fail decoding and fail this acceptance attempt.
   if (!body.includes(JSON.stringify(q)) && !body.includes(q)) return;
-  // Start POSTs use toJSONAsync; responses use the cross-reference graph.
   const payload = fromJSON(JSON.parse(body), { plugins: [] }) as { data?: RunRequest };
   const data = payload.data;
   if (data?.query !== q || data.force !== forced) return;
-  if (![data.search_run_id, data.conversation_id, data.turn_id, data.request_id].every(id => typeof id === "string" && id.length > 0)) return;
+  if (
+    ![data.search_run_id, data.conversation_id, data.turn_id, data.request_id].every(
+      (id) => typeof id === "string" && id.length > 0,
+    )
+  )
+    return;
   return data;
 }
 
-function assertBackend(result: BackendResult, request: RunRequest, allowCard: boolean, impossible = false) {
+function subjectBoundEvidence(row: SpecRow) {
+  const subject = row.entity_id ?? row.key ?? "";
+  return (row.evidence ?? []).filter(
+    (evidence) =>
+      !!evidence.source_url &&
+      !!evidence.excerpt &&
+      (!subject || evidence.subject === subject),
+  );
+}
+
+function verifiedField(row: SpecRow, field: string) {
+  const provenance = row.field_provenance?.[field];
+  return (
+    !!provenance?.source_url &&
+    provenance.verification_status === "verified" &&
+    Number(provenance.confidence ?? 0) >= 0.7
+  );
+}
+
+function fieldOrEvidenceMatches(row: SpecRow, fields: string[], terms: string[] | undefined) {
+  if (!terms?.length) return true;
+  const text = [
+    ...fields.map((field) => row[field as keyof SpecRow]),
+    ...Object.entries(row.field_provenance ?? {})
+      .filter(([field, provenance]) => fields.includes(field) && provenance.verification_status === "verified")
+      .map(([, provenance]) => `${provenance.value} ${provenance.source_url}`),
+    ...subjectBoundEvidence(row).map(
+      (evidence) =>
+        `${evidence.evidence_type} ${evidence.supports} ${evidence.excerpt} ${JSON.stringify(evidence.claim_parameters ?? {})}`,
+    ),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  return terms.some((term) => text.includes(term.toLowerCase()));
+}
+
+function rowEvidenceUrls(row: SpecRow) {
+  return [
+    ...Object.values(row.field_provenance ?? {})
+      .filter((field) => field.verification_status === "verified")
+      .map((field) => field.source_url),
+    ...subjectBoundEvidence(row).map((evidence) => evidence.source_url),
+  ].filter((url): url is string => !!url);
+}
+
+function contactReport(row: SpecRow) {
+  const contactFields = [
+    "email",
+    "phone",
+    "website_url",
+    "contact_page_url",
+    "profile_url",
+    "apply_url",
+  ];
+  const present = contactFields.filter((field) => !!row[field as keyof SpecRow]);
+  const subject = row.entity_id ?? row.key ?? "";
+  const contactEvidence = subjectBoundEvidence(row).filter(
+    (evidence) =>
+      evidence.evidence_type === "contact" &&
+      (!subject || evidence.subject === subject) &&
+      Number(evidence.confidence ?? 0) >= 0.7,
+  );
+  const verified = present.filter(
+    (field) =>
+      verifiedField(row, field) ||
+      (["email", "phone", "contact_page_url"].includes(field) && contactEvidence.length > 0),
+  );
+  return {
+    title: row.title,
+    present,
+    verified,
+    missing: contactFields.filter((field) => !present.includes(field)),
+  };
+}
+
+function deliveredRowIssues(row: SpecRow, query: QueryCase) {
+  const issues: string[] = [];
+  if (!query.kind.includes(row.kind)) issues.push(`wrong kind: ${row.kind}`);
+  if (!row.title.trim()) issues.push("missing entity name");
+  if (row.entity_resolved !== true) issues.push("unresolved entity");
+  if ((row.entity_id ?? row.key ?? "").startsWith("provisional:"))
+    issues.push("provisional identity");
+  if (
+    ["list", "directory", "aggregator", "job_board", "article", "institute"].includes(
+      row.page_type ?? "",
+    )
+  )
+    issues.push("non-entity page");
+  if (row.disposition !== "qualified") issues.push("unqualified disposition");
+  if (row.verification_status === "rejected") issues.push("rejected verification");
+  if (!rowEvidenceUrls(row).length) issues.push("missing observed provenance");
+  if (!fieldOrEvidenceMatches(row, ["category", "industry", "sector", "detail"], query.category))
+    issues.push("category not evidenced");
+  if (!fieldOrEvidenceMatches(row, ["role", "title", "detail", "employer", "company"], query.roles))
+    issues.push("role not evidenced");
+  if (!fieldOrEvidenceMatches(row, ["location", "country", "detail"], query.locations))
+    issues.push("location not evidenced");
+  for (const field of query.fields ?? [])
+    if (!row[field as keyof SpecRow]) issues.push(`missing field: ${field}`);
+  return issues;
+}
+
+function reportFromResult(
+  base: Omit<PhaseReport, "status" | "durationMs">,
+  result: BackendResult | undefined,
+  durationMs: number,
+  status: PhaseReport["status"],
+  failure?: string,
+): PhaseReport {
+  const rows = result?.rows ?? [];
+  return {
+    ...base,
+    status,
+    durationMs,
+    failure,
+    outcome: result?.outcome,
+    providers: result?.providerAttempts ?? result?.retrievalTrace?.providers ?? [],
+    funnel: result?.retrievalTrace,
+    accounting: result?.candidateLedger?.accounting,
+    rejects: result?.candidateLedger?.rejectReasons,
+    incomplete: result?.candidateLedger?.incompleteReasons,
+    contacts: rows.map(contactReport),
+    evidence: rows.map((row) => ({ title: row.title, urls: rowEvidenceUrls(row) })),
+  };
+}
+
+function writeReport(report: PhaseReport) {
+  const file = join(REPORT_DIR, `${report.id}-round${report.round}-${report.phase}.json`);
+  writeFileSync(file, JSON.stringify(report, null, 2));
+}
+
+function parseRunLog(searchRunId: string) {
+  if (!SERVER_LOG) return [];
+  const lines = readFileSync(SERVER_LOG, "utf8").split(/\r?\n/);
+  return lines
+    .filter((line) => line.includes(searchRunId))
+    .map((line) => {
+      const jsonStart = line.indexOf("{");
+      const data =
+        jsonStart === -1
+          ? undefined
+          : (() => {
+              try {
+                return JSON.parse(line.slice(jsonStart));
+              } catch {
+                return undefined;
+              }
+            })();
+      return { line, data };
+    });
+}
+
+function hasCoreStarted(searchRunId: string) {
+  return parseRunLog(searchRunId).some(
+    (entry) =>
+      entry.line.includes("[spec-run]") &&
+      /core started/i.test(entry.line) &&
+      entry.data?.search_run_id === searchRunId,
+  );
+}
+
+function cancellationLogProof(searchRunId: string) {
+  const entries = parseRunLog(searchRunId);
+  const terminal = entries.find(
+    (entry) =>
+      entry.line.includes("[spec-run]") &&
+      /core returned/i.test(entry.line) &&
+      /SEARCH_CANCELLED|CANCELLED|SEARCH_STALE_RUN/.test(entry.line),
+  );
+  const funnel = entries.find((entry) => entry.line.includes("[stage2-funnel]"));
+  const accounting = funnel?.data?.accounting;
+  const returned = funnel?.data?.returned ?? funnel?.data?.funnel?.returned;
+  const lateRows = entries.filter(
+    (entry) => /QUALIFIED_RESULTS|delivered/i.test(entry.line) && !/SEARCH_CANCELLED|CANCELLED|SEARCH_STALE_RUN/.test(entry.line),
+  );
+  return {
+    terminal: !!terminal,
+    funnel: !!funnel,
+    accountingOk: accounting?.ok === true,
+    unaccountedZero: accounting?.unaccounted === 0,
+    returnedZero: returned === 0,
+    noLateRows: lateRows.length === 0,
+  };
+}
+
+function assertBackend(
+  result: BackendResult,
+  request: RunRequest,
+  query: QueryCase,
+  allowCard: boolean,
+) {
   for (const id of ["search_run_id", "conversation_id", "turn_id", "request_id"] as const) {
     expect(result[id], `Response ${id} must belong to this submission`).toBe(request[id]);
   }
@@ -121,109 +360,195 @@ function assertBackend(result: BackendResult, request: RunRequest, allowCard: bo
   expect(accounting?.ok, "Backend candidate accounting must reconcile").toBe(true);
   expect(accounting?.unaccounted).toBe(0);
   expect(accounting?.retrieved).toBe(accounting?.fated);
-  expect(["SOURCE_UNAVAILABLE", "TIMEOUT"]).not.toContain(result.retrievalTrace?.reason);
   expect(result.qualified_count).toBe(result.rows.length);
   if (result.outcome === undefined) {
-    expect(allowCard, "Forced search must have a terminal backend outcome").toBe(true);
-    expect(result.stage === "clarify" || result.stage === "confirm" || result.spec.status === "needs_clarification").toBe(true);
-    expect(result.rows).toHaveLength(0);
-    return "card";
+    expect(allowCard, "Forced clarification must reach terminal search").toBe(true);
+    expect(
+      result.stage === "clarify" ||
+        result.stage === "confirm" ||
+        result.spec.status === "needs_clarification",
+    ).toBe(true);
+    return "card" as const;
   }
-  expect(["QUALIFIED_RESULTS", "NO_QUALIFIED_RESULTS"], "Backend failures/cancellation are not successful settlement").toContain(result.outcome);
-  expect(result.retrievalTrace, "Completed search must include its retrieval trace").toBeDefined();
+  expect(
+    ["QUALIFIED_RESULTS", "NO_QUALIFIED_RESULTS"],
+    "Backend failures/cancellation are not successful settlement",
+  ).toContain(result.outcome);
+  expect(result.retrievalTrace, "Completed search must include retrieval trace").toBeDefined();
   expect(result.retrievalTrace?.returned).toBe(result.rows.length);
   if (result.outcome === "QUALIFIED_RESULTS") {
-    expect(result.rows.length).toBeGreaterThan(0);
-    return "results";
+    expect(result.rows.length, "QUALIFIED_RESULTS must deliver at least one row").toBeGreaterThan(0);
+    const rowIssues = result.rows
+      .map((row) => ({ title: row.title, issues: deliveredRowIssues(row, query) }))
+      .filter((item) => item.issues.length);
+    expect(
+      rowIssues,
+      "Delivered rows must match requested entity/role/category/location/evidence",
+    ).toEqual([]);
+    return "results" as const;
   }
-  expect(result.rows).toHaveLength(0);
-  if (result.retrievalTrace?.reason === "NO_CATEGORY_MATCH" && !impossible) {
-    const providers = (result.providerAttempts ?? result.retrievalTrace.providers ?? []).filter(provider => provider.attempted);
-    // Empty extraction/parser output is acquisition failure, even when the
-    // widening loop labels repeated empty passes COVERAGE_EXHAUSTED.
-    const coverageProven = (result.widening ?? result.retrievalTrace.widening)?.outcome === "COVERAGE_EXHAUSTED" &&
-      providers.length > 0 && providers.every(provider => provider.succeeded &&
-        (provider.queryFunnel?.length ?? 0) > 0 && provider.queries === provider.queryFunnel!.length &&
-        provider.queryFunnel!.every(funnel => funnel.stage === "SEARCH_EMPTY" && funnel.serpEmpty > 0 &&
-          funnel.serpBlocked === 0 && funnel.serpErrors === 0 && funnel.linksObserved === 0));
-    expect(coverageProven, "Normal-query NO_CATEGORY_MATCH is acquisition failure without complete, successful empty-search coverage proof").toBe(true);
-  }
-  if (allowCard && (result.clarify.length > 0 || result.stage === "confirm")) return "card";
-  return "zero";
+  const providers = (result.providerAttempts ?? result.retrievalTrace?.providers ?? []).filter(
+    (provider) => provider.attempted,
+  );
+  expect(providers.length, "Zero requires attempted sources").toBeGreaterThan(0);
+  expect(
+    providers.every((provider) => provider.succeeded),
+    "Unavailable sources cannot certify zero",
+  ).toBe(true);
+  expect(
+    result.retrievalTrace?.sourceHealth?.summary,
+    "Source-health warning blocks honest zero",
+  ).toBeFalsy();
+  expect(
+    result.retrievalTrace?.pendingEnrichment ?? 0,
+    "Unfinished enrichment blocks honest zero",
+  ).toBe(0);
+  if (query.requireResults) throw new Error("Known-positive query returned zero verified rows");
+  return "zero" as const;
 }
 
-async function waitForSettlement(page: Page, q: string, action: () => Promise<unknown>, forced = false, impossible = false) {
+async function waitForSettlement(
+  page: Page,
+  query: QueryCase,
+  round: number,
+  action: () => Promise<unknown>,
+  forced = false,
+) {
   const phase = forced ? "forced" : "initial";
+  const startedAt = Date.now();
   let request: Request | undefined;
   let data: RunRequest | undefined;
   let response: Response | undefined;
   let result: BackendResult | undefined;
   let rawBody: string | undefined;
   let failure: string | undefined;
-  let evidenceFailure: unknown;
-  let settled: "card" | "zero" | "results" | undefined;
-  const turn = page.locator("div.space-y-4").filter({ has: page.getByText(q, { exact: true }) });
-  const rowTitles = turn.locator(".lead-card-hover > .font-medium, div.bg-card > button.text-left.w-full .font-medium, table tbody tr > td:first-child, button > span > span.block.font-medium");
+  let settled: PhaseReport["settled"];
+  const turn = page
+    .locator("div.space-y-4")
+    .filter({ has: page.getByText(query.query, { exact: true }) });
+  const rowTitles = turn.locator(
+    ".lead-card-hover > .font-medium, div.bg-card > button.text-left.w-full .font-medium, table tbody tr > td:first-child, button > span > span.block.font-medium",
+  );
   let resolveResponse!: () => void;
   let rejectResponse!: (error: Error) => void;
-  const completed = new Promise<void>((resolve, reject) => { resolveResponse = resolve; rejectResponse = reject; });
+  const completed = new Promise<void>((resolve, reject) => {
+    resolveResponse = resolve;
+    rejectResponse = reject;
+  });
+  const requestTimer = setTimeout(
+    () => rejectResponse(new Error(`No runSpecSearch POST observed for ${query.id}`)),
+    30_000,
+  );
+  const timer = setTimeout(
+    () => rejectResponse(new Error(`Backend response timeout for ${query.id}`)),
+    660_000,
+  );
   const onRequest = (candidate: Request) => {
     try {
-      const candidateData = searchRequest(candidate, q, forced);
+      const candidateData = searchRequest(candidate, query.query, forced);
       if (!candidateData) return;
-      if (request) { rejectResponse(new Error(`Duplicate search submission: ${q}`)); return; }
+      if (request) {
+        rejectResponse(new Error(`Duplicate search submission: ${query.id}`));
+        return;
+      }
       request = candidate;
       data = candidateData;
       clearTimeout(requestTimer);
-    } catch (error) { rejectResponse(error as Error); }
+    } catch (error) {
+      rejectResponse(error as Error);
+    }
   };
   const onResponse = (candidate: Response) => {
     if (candidate.request() !== request) return;
     response = candidate;
-    // Headers alone are not completion. Wait for the entire response body.
-    void candidate.finished().then(error => {
-      if (error) rejectResponse(error); else resolveResponse();
-    }, rejectResponse);
+    void candidate
+      .finished()
+      .then((error) => (error ? rejectResponse(error) : resolveResponse()), rejectResponse);
   };
   const onFailed = (candidate: Request) => {
-    if (candidate === request) rejectResponse(new Error(`Search request failed: ${candidate.failure()?.errorText}`));
+    if (candidate === request)
+      rejectResponse(new Error(`Search request failed: ${candidate.failure()?.errorText}`));
   };
-  const timer = setTimeout(() => rejectResponse(new Error(`Backend response timeout: ${q}`)), 660_000);
-  const requestTimer = setTimeout(() => rejectResponse(new Error(`No runSpecSearch POST observed for query: ${q}`)), 30_000);
   page.on("request", onRequest);
   page.on("response", onResponse);
   page.on("requestfailed", onFailed);
   try {
     await Promise.all([completed, action()]);
-    expect(request, "This query must submit an actual runSpecSearch POST").toBeDefined();
     rawBody = await response!.text();
     expect(response?.ok(), "Search HTTP response must succeed").toBe(true);
     const wire = JSON.parse(rawBody);
-    const envelope = (typeof wire.t === "number" ? fromCrossJSON(wire, { plugins: [] }) : wire) as { result?: BackendResult; error?: unknown };
-    expect(envelope.error, "Server function returned an error").toBeUndefined();
-    expect(envelope.result).toBeDefined();
-    result = envelope.result!;
-    settled = assertBackend(result, data!, !forced, impossible);
-    await expect(page.getByRole("button", { name: "Stop search", exact: true })).toBeHidden({ timeout: 30_000 });
-    await expect(turn, "UI must render this query's own turn").toHaveCount(1);
+    const envelope = (typeof wire.t === "number" ? fromCrossJSON(wire, { plugins: [] }) : wire) as {
+      result?: BackendResult;
+      error?: unknown;
+    };
+    expect(envelope.error, "Server function returned error").toBeUndefined();
+    result = envelope.result;
+    expect(result).toBeDefined();
+    const preReport = reportFromResult(
+      { id: query.id, query: query.query, round, phase, request: data },
+      result,
+      Date.now() - startedAt,
+      "FAIL",
+    );
+    preReport.rowIssues =
+      result?.rows.map((row) => ({ title: row.title, issues: deliveredRowIssues(row, query) })) ??
+      [];
+    writeReport(preReport);
+    settled = assertBackend(result!, data!, query, !forced);
+    await expect(page.getByRole("button", { name: "Stop search", exact: true })).toBeHidden({
+      timeout: 30_000,
+    });
+    await expect(turn, "UI must render this query turn").toHaveCount(1);
     if (settled === "card") {
-      await expect(page.getByText(/Narrow this down|Here is what I understood/).first()).toBeVisible({ timeout: 30_000 });
+      await expect(
+        page.getByText(/Narrow this down|Here is what I understood/).first(),
+      ).toBeVisible({ timeout: 30_000 });
       await expect(rowTitles).toHaveCount(0);
     } else {
-      await expect(page.getByText(/Narrow this down|Here is what I understood/).first()).toBeHidden();
-      await expect(rowTitles).toHaveCount(result.rows.length, { timeout: 30_000 });
-      expect((await rowTitles.allTextContents()).map(title => title.trim()).sort()).toEqual(result.rows.map(row => fixMojibake(row.title.trim())).sort());
+      await expect(
+        page.getByText(/Narrow this down|Here is what I understood/).first(),
+      ).toBeHidden();
+      await expect(rowTitles).toHaveCount(result!.rows.length, { timeout: 30_000 });
+      expect((await rowTitles.allTextContents()).map((title) => title.trim()).sort()).toEqual(
+        result!.rows.map((row) => fixMojibake(row.title.trim())).sort(),
+      );
       if (settled === "zero") {
-        const narrative = enrichZeroNarrative(zeroResultsNarrative(result.retrievalTrace), result.candidateLedger);
-        // Exact product-owned copy, after backend zero/accounting validation.
+        const narrative = enrichZeroNarrative(
+          zeroResultsNarrative(result!.retrievalTrace),
+          result!.candidateLedger,
+        );
         if (narrative) await expect(turn.getByText(narrative, { exact: true })).toBeVisible();
         else await expect(turn.getByText(/No verified matches/).first()).toBeVisible();
+      } else {
+        await expect(
+          turn.getByRole("button", {
+            name: new RegExp(`^Fold \\(${result!.rows.length} results?\\)$`),
+          }),
+        ).toBeVisible();
       }
-      else await expect(turn.getByRole("button", { name: new RegExp(`^Fold \\(${result.rows.length} results?\\)$`) })).toBeVisible();
     }
-    console.log("S2-UI:", JSON.stringify({ q, phase, settled, run: data!.search_run_id, rows: result.rows.length, accounting: result.candidateLedger?.accounting }));
+    writeReport({
+      ...reportFromResult(
+        { id: query.id, query: query.query, round, phase, request: data, settled },
+        result,
+        Date.now() - startedAt,
+        "PASS",
+      ),
+      uiRows: await rowTitles.allTextContents().catch(() => []),
+    });
+    return settled;
   } catch (error) {
     failure = String(error);
+    writeReport({
+      ...reportFromResult(
+        { id: query.id, query: query.query, round, phase, request: data },
+        result,
+        Date.now() - startedAt,
+        "FAIL",
+        failure,
+      ),
+      settled,
+    });
     throw error;
   } finally {
     clearTimeout(timer);
@@ -231,117 +556,162 @@ async function waitForSettlement(page: Page, q: string, action: () => Promise<un
     page.off("request", onRequest);
     page.off("response", onResponse);
     page.off("requestfailed", onFailed);
-    const label = `S2-${q.replace(/[^a-z0-9]+/gi, "-").slice(0, 65)}-${phase}`;
-    try {
-      await test.info().attach(`${label}-backend-ui`, {
-        contentType: "application/json",
-        body: Buffer.from(JSON.stringify({
-          q, phase, request: data, status: response?.status(), failure,
-          outcome: result?.outcome, stage: result?.stage, qualified_count: result?.qualified_count,
-          rows: result?.rows,
-          diagnostics: result?.diagnostics, retrievalTrace: result?.retrievalTrace, candidateLedger: result?.candidateLedger,
-          uiRowTitles: await rowTitles.allTextContents().catch(() => []),
-          uiLinks: await turn.locator("a[href]").evaluateAll(links => links.map(link => ({ text: link.textContent, href: link.getAttribute("href") }))).catch(() => []),
-          uiText: await turn.allTextContents().catch(() => []),
-          ...(result ? {} : { rawBody }),
-        })),
+    if (rawBody && !result)
+      writeReport({
+        id: query.id,
+        query: query.query,
+        round,
+        phase,
+        status: "FAIL",
+        durationMs: Date.now() - startedAt,
+        request: data,
+        failure,
+        outcome: undefined,
       });
-      await test.info().attach(`${label}-screenshot`, { body: await page.screenshot(), contentType: "image/png" });
-    } catch (error) {
-      // A closed page must not replace the backend failure that caused it.
-      evidenceFailure = error;
-      console.warn("S2-EVIDENCE:", JSON.stringify({ q, phase, error: String(error) }));
-    }
   }
-  if (evidenceFailure) throw evidenceFailure;
-  return settled!;
 }
 
-async function forceIfAvailable(page: Page, q: string, impossible = false) {
+async function forceTerminal(page: Page, query: QueryCase, round: number) {
   const force = page.getByRole("button", { name: /Search with defaults|Confirm & search/ }).first();
-  // Multi-question cards expose defaults only after their Skip steps.
   const skip = page.getByRole("button", { name: "Skip", exact: true }).first();
   const deadline = Date.now() + 30_000;
-  while (!await force.isVisible() && await skip.isVisible()) {
-    expect(Date.now(), `Clarification steps did not advance: ${q}`).toBeLessThan(deadline);
+  while (
+    !(await force.isVisible().catch(() => false)) &&
+    (await skip.isVisible().catch(() => false))
+  ) {
+    expect(Date.now(), `Clarification steps did not advance: ${query.id}`).toBeLessThan(deadline);
     await skip.click();
   }
-  if (!await force.isVisible()) return false;
+  expect(
+    await force.isVisible().catch(() => false),
+    "Clarification must expose a force/confirm search action",
+  ).toBe(true);
   await expect(force).toBeEnabled();
-  // Observe the forced POST before clicking; never resubmit the textbox.
-  return await waitForSettlement(page, q, () => force.click(), true, impossible);
+  return await waitForSettlement(page, query, round, () => force.click(), true);
 }
 
-for (const q of QUERIES) {
-test(`stage2 acceptance query — ${q}`, async ({ page }) => {
-  test.setTimeout(1_400_000);
-  await login(page);
-  // Rotating the conversation aborts in-flight runs — only rotate when the
-  // previous run has settled (or after Stop), never mid-run.
-  await expect(page.getByRole("button", { name: "Stop search", exact: true })).toBeHidden();
-  const newChat = page.getByRole("button", { name: "New chat" }).first();
-  if (await newChat.isVisible().catch(() => false)) {
-    await newChat.click();
-    await page.waitForTimeout(2000);
-  }
-  const settled = await waitForSettlement(page, q, () => submitQuery(page, q));
-  if (settled === "card") {
-    await forceIfAvailable(page, q);
-  }
-});
-}
-
-test("stage2 acceptance — selected queries attempted", async () => {
-  expect(QUERIES.length).toBeGreaterThan(0);
-});
-
-test("stage2 acceptance — cancellation stops the run", async ({ page }) => {
-  test.setTimeout(240_000);
-  await login(page);
-  const q = "find 25 marketing agencies in London with email addresses";
-  const completed = new Set<Request>();
-  const recordCompletion = (request: Request) => { completed.add(request); };
-  page.on("requestfinished", recordCompletion);
-  page.on("requestfailed", recordCompletion);
-  try {
-    const started = page.waitForRequest(request =>
-      request.method() === "POST" &&
-      (request.postData() ?? "").includes(q) &&
-      (request.postData() ?? "").includes("search_run_id"),
-      { timeout: 30_000 },
-    );
-    const [request] = await Promise.all([started, submitQuery(page, q)]);
-    const stop = page.getByRole("button", { name: "Stop search", exact: true });
-    await expect(stop).toBeVisible({ timeout: 30_000 });
-    expect(completed.has(request), "Search request must still be in flight before Stop").toBe(false);
-    const aborted = page.waitForEvent("requestfailed", {
-      predicate: failed => failed === request,
-      timeout: 30_000,
+for (const round of [1, 2]) {
+  for (const query of CASES) {
+    test(`stage2 acceptance ${query.id} round ${round} - ${query.query}`, async ({ page }) => {
+      test.setTimeout(1_400_000);
+      await login(page);
+      await startFreshChat(page);
+      const settled = await waitForSettlement(page, query, round, () =>
+        submitQuery(page, query.query),
+      );
+      if (settled === "card") {
+        const forced = await forceTerminal(page, query, round);
+        expect(forced, "Clarification must force a terminal result or honest zero").not.toBe(
+          "card",
+        );
+      }
     });
-    await Promise.all([aborted, stop.click()]);
-    expect(request.failure()?.errorText).toMatch(/abort|cancel/i);
-    await expect(stop).toBeHidden({ timeout: 30_000 });
-    await expect(page.getByRole("button", { name: "Send", exact: true })).toBeVisible();
-    console.log("S2-CANCEL:", JSON.stringify({ started: true, aborted: true, settled: true }));
-  } finally {
-    page.off("requestfinished", recordCompletion);
-    page.off("requestfailed", recordCompletion);
   }
+  test(`stage2 impossible honest zero round ${round}`, async ({ page }) => {
+    test.setTimeout(1_400_000);
+    await login(page);
+    await startFreshChat(page);
+    const settled = await waitForSettlement(page, IMPOSSIBLE, round, () =>
+      submitQuery(page, IMPOSSIBLE.query),
+    );
+    if (settled === "card") {
+      const forced = await forceTerminal(page, IMPOSSIBLE, round);
+      expect(forced).toBe("zero");
+    } else {
+      expect(settled).toBe("zero");
+    }
+    await expect(page.getByText(/\([1-9]\d* results?\)/i)).toHaveCount(0);
+  });
+}
+
+test("stage2 acceptance selection is exact", () => {
+  expect(CASES.map((item) => item.query)).toEqual([
+    "Solar installers in Windhoek",
+    "Freight forwarders in Tbilisi",
+    "Photographers in Cebu",
+    "AI startup founders in Toronto",
+    "CTOs at SaaS startups in Berlin",
+    "Remote frontend developer jobs in Canada",
+    "Data analyst jobs in Dhaka",
+    "Climate-tech investors in Europe",
+    "Fintech angel investors in India",
+    "Founders or CTOs of AI startups in Toronto and Vancouver",
+  ]);
 });
 
-test("stage2 acceptance — impossible search exhausts honestly", async ({ page }) => {
-  test.setTimeout(1_400_000);
-  await login(page);
-  const q = "find unicorn ranchers in Atlantis";
-  const settled = await waitForSettlement(page, q, () => submitQuery(page, q), false, true);
-  const forced = settled === "card" && await forceIfAvailable(page, q, true);
-  if (settled === "card" && !forced) {
-    await expect(page.getByText(/Narrow this down|Here is what I understood/).first()).toBeVisible();
-    console.log("S2-IMPOSSIBLE:", JSON.stringify({ settled: "card", forced: false }));
-  } else {
-    expect(forced || settled).toBe("zero");
-    console.log("S2-IMPOSSIBLE:", JSON.stringify({ settled: "zero", forced }));
+test("stage2 cancellation requires backend cancellation proof", async ({ page }) => {
+  test.setTimeout(240_000);
+  if (!SERVER_LOG) {
+    writeReport({
+      id: "CANCEL",
+      query: "find 25 marketing agencies in London with email addresses",
+      round: 1,
+      phase: "cancel",
+      status: "BLOCKED",
+      durationMs: 0,
+      failure: "S2_SERVER_LOG not provided",
+    });
+    test.skip(true, "S2_SERVER_LOG required for backend cancellation proof");
   }
-  await expect(page.getByText(/\([1-9]\d* results?\)/i)).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Stop search", exact: true })).toBeHidden();
+  await login(page);
+  await startFreshChat(page);
+  const q = "find 25 marketing agencies in London with email addresses";
+  const startedAt = Date.now();
+  const requestPromise = page.waitForRequest((request) => !!searchRequest(request, q, false), {
+    timeout: 30_000,
+  });
+  const [request] = await Promise.all([requestPromise, submitQuery(page, q)]);
+  const data = searchRequest(request, q, false)!;
+  const stop = page.getByRole("button", { name: "Stop search", exact: true });
+  await expect(stop).toBeVisible({ timeout: 30_000 });
+  await expect
+    .poll(() => hasCoreStarted(data.search_run_id), {
+      message: "Cancellation needs backend/core [spec-run] core started proof before Stop",
+      timeout: 60_000,
+    })
+    .toBe(true);
+  const aborted = page.waitForEvent("requestfailed", {
+    predicate: (failed) => failed === request,
+    timeout: 30_000,
+  });
+  await Promise.all([aborted, stop.click()]);
+  await expect(stop).toBeHidden({ timeout: 30_000 });
+  await expect(page.getByRole("button", { name: "Send", exact: true })).toBeVisible();
+  const proof = await expect
+    .poll(() => cancellationLogProof(data.search_run_id), {
+      message: "Cancellation needs terminal core returned + stage2 funnel accounting",
+      timeout: 60_000,
+    })
+    .toMatchObject({
+      terminal: true,
+      funnel: true,
+      accountingOk: true,
+      unaccountedZero: true,
+      returnedZero: true,
+      noLateRows: true,
+    })
+    .then(() => cancellationLogProof(data.search_run_id));
+  const status: PhaseReport["status"] =
+    proof.terminal &&
+    proof.funnel &&
+    proof.accountingOk &&
+    proof.unaccountedZero &&
+    proof.returnedZero &&
+    proof.noLateRows
+      ? "PASS"
+      : "BLOCKED";
+  writeReport({
+    id: "CANCEL",
+    query: q,
+    round: 1,
+    phase: "cancel",
+    status,
+    durationMs: Date.now() - startedAt,
+    request: data,
+    failure:
+      status === "BLOCKED"
+        ? `Missing cancellation proof: ${JSON.stringify(proof)}`
+        : undefined,
+  });
+  expect(status, `Cancellation proof failed: ${JSON.stringify(proof)}`).toBe("PASS");
 });

@@ -169,8 +169,9 @@ describe("M7 — job discovery query constraints", () => {
   it.each([false, true])("keeps the captured Calgary spec local (widen=%s)", (widen) => {
     const spec = calgarySpec();
     const queries = buildResearchPlan(spec, { widen }).discoveryQueries;
+    // Discovery queries are geo-scoped with the resolved country (master PRD).
     expect(queries).toEqual([
-      "react developer Calgary job",
+      "react developer Calgary Canada job",
       '"react developer" Calgary',
       '"react engineer" Calgary',
       "site:greenhouse.io react developer Calgary",

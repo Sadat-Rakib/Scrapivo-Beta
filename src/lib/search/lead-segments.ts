@@ -102,6 +102,7 @@ export type OpportunityTag =
 export type WebsiteStatus = "listed" | "verified_no_website" | "unreachable" | "unknown";
 
 export type LocalBusinessRow = {
+  outreach_drafts?: import("../outreach-draft").PreparedOutreachDraft;
   key: string;
   name: string;
   category?: string;
@@ -248,15 +249,16 @@ export function composeLocalAbout(input: {
   const rawCat = (input.category ?? "").replace(/_/g, " ").trim();
   const cat = rawCat ? rawCat.charAt(0).toUpperCase() + rawCat.slice(1) : "";
   const place = (input.place ?? "").trim();
-  const head = cat || place ? `${cat ? `${cat} business` : "Local business"}${place ? ` in ${place}` : ""}.` : null;
+  const head =
+    cat || place
+      ? `${cat ? `${cat} business` : "Local business"}${place ? ` in ${place}` : ""}.`
+      : null;
   const hasSite = !!input.website;
   const hasPhone = !!input.phone;
   const hasEmail = !!input.email;
   let evidence: string | null = null;
   if (!hasSite && (hasPhone || hasEmail)) {
-    const via = [hasPhone ? "phone" : null, hasEmail ? "email" : null]
-      .filter(Boolean)
-      .join("/");
+    const via = [hasPhone ? "phone" : null, hasEmail ? "email" : null].filter(Boolean).join("/");
     evidence = `No website found — reachable by ${via} instead.`;
   } else if (!hasSite && !hasPhone && !hasEmail) {
     evidence = "No website, phone, or email listed.";
@@ -269,7 +271,14 @@ export function composeLocalAbout(input: {
   return evidence ? `${head} ${evidence}` : head;
 }
 
-const LOCAL_SOURCES = new Set(["osm", "geoapify", "foursquare", "coreclaw_maps", "smb", "overture"]);
+const LOCAL_SOURCES = new Set([
+  "osm",
+  "geoapify",
+  "foursquare",
+  "coreclaw_maps",
+  "smb",
+  "overture",
+]);
 
 /** Build Local Businesses tab from Places/OSM leads (not dumped into Posts). */
 export function buildLocalBusinesses(rawLeads: Lead[]): LocalBusinessRow[] {
@@ -1078,9 +1087,6 @@ function isPersonLead(lead: Lead): boolean {
       ) {
         author = fromLi.name;
         lead.author = fromLi.name;
-      } else if (!looksLikePersonName(author) && looksLikePersonName(toTitleCaseName(author))) {
-        author = toTitleCaseName(author);
-        lead.author = author;
       }
       lead.author_url = lead.author_url || fromLi.profile_url;
     } else if (author && looksLikePersonName(toTitleCaseName(author))) {

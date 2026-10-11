@@ -44,8 +44,14 @@
  * being careful.
  */
 
-import { knownCityName, resolveCanonicalLocation, splitMultiPlace, splitTargetLocationList } from "@/lib/search/location-resolver";
+import {
+  knownCityName,
+  resolveCanonicalLocation,
+  splitMultiPlace,
+  splitTargetLocationList,
+} from "@/lib/search/location-resolver";
 import { normalizeRole } from "@/lib/search/search-spec-extract";
+import { repairServiceBoundaries } from "./service-boundary";
 import {
   clamp,
   emptyFrame,
@@ -215,9 +221,24 @@ function span(s: string | null | undefined): string | null {
 }
 
 const NUM_WORDS: Record<string, number> = {
-  one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8,
-  nine: 9, ten: 10, eleven: 11, twelve: 12, twenty: 20, thirty: 30, fifty: 50,
-  hundred: 100, few: 3, couple: 2,
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+  five: 5,
+  six: 6,
+  seven: 7,
+  eight: 8,
+  nine: 9,
+  ten: 10,
+  eleven: 11,
+  twelve: 12,
+  twenty: 20,
+  thirty: 30,
+  fifty: 50,
+  hundred: 100,
+  few: 3,
+  couple: 2,
 };
 
 function toNumber(s: string | undefined): number | null {
@@ -299,8 +320,7 @@ function detectUserContext(text: string): { context: UserContext; analysis: stri
     // and it is the form casual writing uses when there is no imperative to
     // find: "i do waste haulage, need facilities managers in Kaunas". A
     // prospect's attribute never occupies the first character of a request.
-    const opensRequest =
-      sell.index === 0 || FILLER_ONLY_PREFIX_RE.test(text.slice(0, sell.index));
+    const opensRequest = sell.index === 0 || FILLER_ONLY_PREFIX_RE.test(text.slice(0, sell.index));
     if (!weakVerb || inPreamble || opensRequest) {
       const stop = SELLING_END_RE.exec(sell[2]);
       if (stop) sellEnd = sell.index + sell[0].length - sell[2].length + stop.index;
@@ -375,7 +395,10 @@ function detectUserContext(text: string): { context: UserContext; analysis: stri
   // exclusion filters. Keep the original wording in input.raw for provenance.
   if (/\bresearch\s+only\s*:/i.test(text) || /\bno\s+outreach\b/i.test(text)) {
     context.objective = openValue("research", "research only / no outreach", "research", 1);
-    analysis = analysis.replace(/\bresearch\s+only\s*:\s*/i, "").replace(/[,;]?\s*\bno\s+outreach\b/gi, "").trim();
+    analysis = analysis
+      .replace(/\bresearch\s+only\s*:\s*/i, "")
+      .replace(/[,;]?\s*\bno\s+outreach\b/gi, "")
+      .trim();
   }
   return { context, analysis: analysis || text };
 }
@@ -391,9 +414,15 @@ const DELIVERABLE_CUT_RE =
   /(?:[,;.]|\band\b)\s*(?=(?:phone|phones|email|emails|socials?|social\s+media|instagram|insta|ig|facebook|fb|linkedin|twitter|reviews?|ratings?|opening\s+hours|hours|address(?:es)?|owner|owners|verify|verified|confirm|double-?check|make\s+sure|prove|include|including|output|export|give\s+me|gimme|send|return|prefer(?:ably)?|ideally|bonus|optional|if\s+possible|if\s+available|nice\s+to\s+have|must\s+have|required|contact\s+info|contacts?|evidence|proof|source|(?:pull|scrape|grab|get|fetch|extract|collect|gather|note|add|append|attach)\s)\b)/i;
 
 function coreSegment(text: string): { core: string; tail: string } {
-  const contactAsk = /\b(?:need|want)\s+(?:the\s+|their\s+)?(?:emails?|phone|nums|socials?|contact\s+(?:details|info))\b/i.exec(text);
+  const contactAsk =
+    /\b(?:need|want)\s+(?:the\s+|their\s+)?(?:emails?|phone|nums|socials?|contact\s+(?:details|info))\b/i.exec(
+      text,
+    );
   if (contactAsk && contactAsk.index >= 8) {
-    return { core: text.slice(0, contactAsk.index).trim(), tail: text.slice(contactAsk.index).trim() };
+    return {
+      core: text.slice(0, contactAsk.index).trim(),
+      tail: text.slice(contactAsk.index).trim(),
+    };
   }
   const m = DELIVERABLE_CUT_RE.exec(text);
   if (!m || m.index < 8) return { core: text, tail: "" };
@@ -495,17 +524,33 @@ function detectQuantity(text: string): { quantity: Quantity | null; text: string
   const re = new RegExp(QUANTITY_RE.source, "giu");
   let m: RegExpExecArray | null;
   while ((m = re.exec(text))) {
-    const [rangeMin, rangeMax, minWord, minNum, maxWord, maxNum, apxWord, apxNum, plusNum, verbNum, bareNum] =
-      m.slice(1);
+    const [
+      rangeMin,
+      rangeMax,
+      minWord,
+      minNum,
+      maxWord,
+      maxNum,
+      apxWord,
+      apxNum,
+      plusNum,
+      verbNum,
+      bareNum,
+    ] = m.slice(1);
 
     // A currency amount can contain a shorter digit match ("$120,000" used
     // to yield a requested count of zero from its final three digits).
     const before = text.slice(0, m.index);
     const following = text.slice(m.index + m[0].length);
-    if (/(?:[$€£]\s*|\d,)$/.test(before) || /^,\d/.test(following) || /^\d/.test(following)) continue;
+    if (/(?:[$€£]\s*|\d,)$/.test(before) || /^,\d/.test(following) || /^\d/.test(following))
+      continue;
 
     // Reject when what follows the number is a unit — that is a filter.
-    const after = text.slice(m.index + m[0].length).trim().split(/\s+/)[0] ?? "";
+    const after =
+      text
+        .slice(m.index + m[0].length)
+        .trim()
+        .split(/\s+/)[0] ?? "";
     const tail = singularize(after.replace(/[^\p{L}\p{N}%]/gu, ""));
     const isPlus = !!plusNum;
     if (!isPlus && tail && UNIT_AFTER_NUMBER.test(tail)) continue;
@@ -556,11 +601,22 @@ function detectQuantity(text: string): { quantity: Quantity | null; text: string
  * extractors cannot name one month two ways.
  */
 const UNIT_CHAR: Record<string, string> = {
-  d: "d", day: "d",
-  w: "w", wk: "w", week: "w",
-  m: "m", mo: "m", mon: "m", mth: "m", month: "m",
-  q: "q", qtr: "q", quarter: "q",
-  y: "y", yr: "y", year: "y",
+  d: "d",
+  day: "d",
+  w: "w",
+  wk: "w",
+  week: "w",
+  m: "m",
+  mo: "m",
+  mon: "m",
+  mth: "m",
+  month: "m",
+  q: "q",
+  qtr: "q",
+  quarter: "q",
+  y: "y",
+  yr: "y",
+  year: "y",
 };
 
 /**
@@ -588,8 +644,7 @@ function detectTemporal(text: string): { temporal: UnderstandingFrame["temporal"
     const unit = UNIT_CHAR[w[3].toLowerCase()] ?? "d";
     const phrase = w[0].trim().toLowerCase().replace(/\s+/g, " ");
     const isBarePreviousPeriod =
-      !w[2] &&
-      /^(?:last|previous)\s+(?:week|month|quarter|year|yr)s?$/.test(phrase);
+      !w[2] && /^(?:last|previous)\s+(?:week|month|quarter|year|yr)s?$/.test(phrase);
     const previousRelation: Record<string, TemporalRelation> = {
       week: "last_week",
       month: "last_month",
@@ -603,9 +658,7 @@ function detectTemporal(text: string): { temporal: UnderstandingFrame["temporal"
         : null;
     return {
       temporal: {
-        relation: isBarePreviousPeriod
-          ? previousRelation[w[3].toLowerCase()]!
-          : "within_last",
+        relation: isBarePreviousPeriod ? previousRelation[w[3].toLowerCase()]! : "within_last",
         window: isBarePreviousPeriod ? null : `${n}${unit}`,
         year: previousYear,
         raw: w[0].trim(),
@@ -629,8 +682,7 @@ function detectTemporal(text: string): { temporal: UnderstandingFrame["temporal"
     else if (/^this\s+(year|yr)$/.test(phrase)) {
       relation = "this_year";
       year = String(new Date().getUTCFullYear());
-    }
-    else if (/^next\s+/.test(phrase)) relation = "future";
+    } else if (/^next\s+/.test(phrase)) relation = "future";
     else if (/^20\d\d$/.test(phrase)) {
       relation = "in_year";
       year = phrase;
@@ -689,9 +741,27 @@ const TARGET_CONTINUE = new Set(["of"]);
  * genuine noun phrase is untouched.
  */
 const TARGET_LEAD_FILLER = new Set([
-  "like", "some", "sum", "any", "a", "an", "the", "bunch", "few", "couple",
-  "several", "lots", "loads", "plenty", "just", "maybe", "perhaps", "pls",
-  "please", "kinda", "sorta",
+  "like",
+  "some",
+  "sum",
+  "any",
+  "a",
+  "an",
+  "the",
+  "bunch",
+  "few",
+  "couple",
+  "several",
+  "lots",
+  "loads",
+  "plenty",
+  "just",
+  "maybe",
+  "perhaps",
+  "pls",
+  "please",
+  "kinda",
+  "sorta",
 ]);
 
 function endsTarget(raw: string): boolean {
@@ -840,8 +910,7 @@ const SEEKING_WORK_MARKERS =
 const LACKS_CUE_RE =
   /\b(?:no|without|don'?t\s+have|dont\s+have|doesn'?t\s+have|doesnt\s+have|do\s+not\s+have|lacking|lacks?|missing|haven'?t\s+got|havent\s+got|hasn'?t\s+got|hasnt\s+got|don'?t\s+got|dont\s+got|ain'?t\s+got|aint\s+got|not\s+having|yet\s+to\s+(?:have|get|build))\s+/i;
 
-const HAS_CUE_RE =
-  /\b(?:with|has|have|having|got|runs?|running|maintains?)\s+/i;
+const HAS_CUE_RE = /\b(?:with|has|have|having|got|runs?|running|maintains?)\s+/i;
 
 const USES_TECH_RE =
   /\b(?:using|uses|built\s+on|running\s+on|powered\s+by|hosted\s+on|runs\s+on|on)\s+(shopify|wordpress|wix|squarespace|webflow|magento|woocommerce|salesforce|hubspot|zoho|stripe|react|next\.?js|vue|angular|django|rails|laravel|kubernetes|aws|azure|gcp|snowflake|databricks|sap|netsuite|zendesk|intercom|klaviyo|mailchimp|shopware|bigcommerce|prestashop|odoo|xero|quickbooks|freshdesk|pipedrive|monday\.?com|airtable|notion|jira|twilio|segment|braze|contentful|sanity|strapi|umbraco|drupal|joomla|typeform|calendly|squarespace)\b/i;
@@ -852,7 +921,8 @@ const USES_TECH_RE =
  * exception — whereas a bare `on` takes a place at least as often ("on the
  * high street"), which is why `on` stays confined to the known-tool list.
  */
-const USES_OPEN_RE = /\b(?:using|built\s+(?:on|with)|powered\s+by)\s+([\p{L}][\p{L}\p{N}.\-+]{2,24})\b/iu;
+const USES_OPEN_RE =
+  /\b(?:using|built\s+(?:on|with)|powered\s+by)\s+([\p{L}][\p{L}\p{N}.\-+]{2,24})\b/iu;
 
 const PARTNERED_RE =
   /\b(?:partnered\s+with|partners\s+with|integrat(?:ed|ing|es)\s+with|resell(?:er|ing|s)\s+of|official\s+partners?\s+of)\s+([\p{L}][\p{L}\s.&-]{1,40})/iu;
@@ -911,9 +981,25 @@ const SOCIAL_SIGNAL_RE =
  * commissioned: "get a new website BUILT", "need the logo REDONE".
  */
 const TRAILING_PARTICIPLE = new Set([
-  "built", "rebuilt", "done", "redone", "made", "remade", "designed",
-  "redesigned", "developed", "fixed", "sorted", "set", "setup", "up",
-  "written", "rewritten", "created", "launched", "sorted",
+  "built",
+  "rebuilt",
+  "done",
+  "redone",
+  "made",
+  "remade",
+  "designed",
+  "redesigned",
+  "developed",
+  "fixed",
+  "sorted",
+  "set",
+  "setup",
+  "up",
+  "written",
+  "rewritten",
+  "created",
+  "launched",
+  "sorted",
 ]);
 
 /**
@@ -972,7 +1058,15 @@ export function takeObject(text: string, from: number): { value: string; end: nu
     if (/[,;.]$/.test(piece)) break;
     if (out.length >= 5) break;
   }
-  while (out.length > 1 && TRAILING_PARTICIPLE.has(out.at(-1)!.toLowerCase().replace(/[^a-z]/g, ""))) {
+  while (
+    out.length > 1 &&
+    TRAILING_PARTICIPLE.has(
+      out
+        .at(-1)!
+        .toLowerCase()
+        .replace(/[^a-z]/g, ""),
+    )
+  ) {
     out.pop();
   }
   return { value: clean(out.join(" ")), end: from + consumed };
@@ -1084,7 +1178,13 @@ export function detectRelation(text: string, subject: HeadClassification): Relat
 
   // Seeking work, stated as a property of a person.
   if ((m = SEEKING_WORK_MARKERS.exec(text))) {
-    return hit("seeking_job", m, openValue("employment", m[0], "employment", 0.85), "subject_to_object", 0.85);
+    return hit(
+      "seeking_job",
+      m,
+      openValue("employment", m[0], "employment", 0.85),
+      "subject_to_object",
+      0.85,
+    );
   }
 
   // Absence first: "no website" must not be read as a negated constraint or a
@@ -1133,7 +1233,9 @@ export function detectRelation(text: string, subject: HeadClassification): Relat
     return hit(
       "investing_in",
       m,
-      obj.value ? openValue(obj.value.toLowerCase(), obj.value, canonicalize(obj.value), 0.75) : null,
+      obj.value
+        ? openValue(obj.value.toLowerCase(), obj.value, canonicalize(obj.value), 0.75)
+        : null,
       "subject_to_object",
       obj.value ? 0.8 : 0.6,
       null,
@@ -1145,8 +1247,12 @@ export function detectRelation(text: string, subject: HeadClassification): Relat
   // recruiters" wants one. Both contain a hiring word, so the EARLIER cue wins
   // — the verb the user actually chose comes first.
   const offerFirst = OFFERS_RE.exec(text);
-  const postedIsJob = (hit: RegExpExecArray | null) => !hit || !/posted|advertis/i.test(hit[0]) ||
-    /\b(?:job|role|vacancy|opening|position|candidate|staff|engineer|developer)\b/i.test(text.slice(hit.index, hit.index + 90));
+  const postedIsJob = (hit: RegExpExecArray | null) =>
+    !hit ||
+    !/posted|advertis/i.test(hit[0]) ||
+    /\b(?:job|role|vacancy|opening|position|candidate|staff|engineer|developer)\b/i.test(
+      text.slice(hit.index, hit.index + 90),
+    );
   const tentativeHire = HIRING_RE.exec(text);
   const hireFirst = postedIsJob(tentativeHire) ? tentativeHire : null;
   if (offerFirst && (!hireFirst || offerFirst.index < hireFirst.index)) {
@@ -1170,7 +1276,12 @@ export function detectRelation(text: string, subject: HeadClassification): Relat
       "hiring",
       m,
       obj.value
-        ? openValue(obj.value.toLowerCase(), obj.value, canonicalize(obj.value) ?? normalizeRole(obj.value), 0.75)
+        ? openValue(
+            obj.value.toLowerCase(),
+            obj.value,
+            canonicalize(obj.value) ?? normalizeRole(obj.value),
+            0.75,
+          )
         : null,
       "subject_to_object",
       obj.value ? 0.85 : 0.6,
@@ -1180,7 +1291,13 @@ export function detectRelation(text: string, subject: HeadClassification): Relat
   }
 
   if ((m = USES_TECH_RE.exec(text))) {
-    return hit("uses_technology", m, openValue(m[1].toLowerCase(), m[0], m[1].toLowerCase(), 0.85), "subject_to_object", 0.8);
+    return hit(
+      "uses_technology",
+      m,
+      openValue(m[1].toLowerCase(), m[0], m[1].toLowerCase(), 0.85),
+      "subject_to_object",
+      0.8,
+    );
   }
   if ((m = USES_OPEN_RE.exec(text))) {
     const tool = m[1].toLowerCase();
@@ -1191,7 +1308,15 @@ export function detectRelation(text: string, subject: HeadClassification): Relat
   if ((m = PARTNERED_RE.exec(text))) {
     const obj = objectAfterCue(text, m);
     if (obj.value) {
-      return hit("partnered_with", m, openValue(obj.value, obj.value, null, 0.7), "mutual", 0.7, null, obj.end);
+      return hit(
+        "partnered_with",
+        m,
+        openValue(obj.value, obj.value, null, 0.7),
+        "mutual",
+        0.7,
+        null,
+        obj.end,
+      );
     }
   }
   if ((m = ATTENDING_RE.exec(text))) {
@@ -1263,16 +1388,44 @@ export function detectRelation(text: string, subject: HeadClassification): Relat
     const head = singularize(raw.toLowerCase());
     if (raw) {
       if (CLIENT_OBJECT_RE.test(head) || CLIENT_OBJECT_RE.test(raw.toLowerCase())) {
-        return hit("seeking_client", m, openValue(raw.toLowerCase(), raw, "clients", 0.85), "subject_to_object", 0.85, null, obj.end);
+        return hit(
+          "seeking_client",
+          m,
+          openValue(raw.toLowerCase(), raw, "clients", 0.85),
+          "subject_to_object",
+          0.85,
+          null,
+          obj.end,
+        );
       }
       if (EMPLOYMENT_OBJECT_RE.test(head) || EMPLOYMENT_OBJECT_RE.test(raw.toLowerCase())) {
-        return hit("seeking_job", m, openValue(raw.toLowerCase(), raw, "employment", 0.85), "subject_to_object", 0.85, null, obj.end);
+        return hit(
+          "seeking_job",
+          m,
+          openValue(raw.toLowerCase(), raw, "employment", 0.85),
+          "subject_to_object",
+          0.85,
+          null,
+          obj.end,
+        );
       }
       if (/^(funding|investment|capital|investors?)$/.test(head)) {
-        return hit("seeking_funding", m, openValue(raw.toLowerCase(), raw, "funding", 0.8), "subject_to_object", 0.8, null, obj.end);
+        return hit(
+          "seeking_funding",
+          m,
+          openValue(raw.toLowerCase(), raw, "funding", 0.8),
+          "subject_to_object",
+          0.8,
+          null,
+          obj.end,
+        );
       }
       // A recruiter's search for a role is a vacancy, not a purchase.
-      if (subject.head && RECRUITER_SUBJECT.test(singularize(subject.head)) && classifyHead(raw).kind === "person") {
+      if (
+        subject.head &&
+        RECRUITER_SUBJECT.test(singularize(subject.head)) &&
+        classifyHead(raw).kind === "person"
+      ) {
         return hit(
           "hiring",
           m,
@@ -1308,6 +1461,27 @@ export function detectRelation(text: string, subject: HeadClassification): Relat
         "none",
         0.7,
         null,
+        obj.end,
+      );
+    }
+    // The existing possession grammar also expresses open observable
+    // properties. Keep its bounded object verbatim when no known asset,
+    // deliverable field or numeric threshold owns it; never invent a need.
+    if (
+      subject.kind !== "unknown" &&
+      /^[|\s]*(?:(?:who|that|which)\s+)?[|\s]*$/i.test(text.slice(0, m.index)) &&
+      obj.value &&
+      !fieldsNamedIn(obj.value).length &&
+      !/\b(?:contact|numbers?|details?|information)\b/i.test(obj.value) &&
+      !/^(?:\d|at least\b|at most\b|over\b|under\b|more than\b|less than\b)/i.test(obj.value)
+    ) {
+      return hit(
+        "custom",
+        m,
+        openValue(obj.value, obj.value, null, 0.7),
+        "subject_to_object",
+        0.7,
+        obj.value,
         obj.end,
       );
     }
@@ -1394,7 +1568,7 @@ const RADIUS_RE =
   /\b(?:with?in|inside)\s+(\d{1,4})\s*(km|kms|kilometer?s?|mi|miles?)\s+(?:of|from|around|outside)\s+(.{2,80})/i;
 
 const PREP_RE =
-  /\b(in|near|nearby|around|round|outside|based\s+in|located\s+in|headquartered\s+in|across|throughout|from|serving|covering)\s+(.{2,80})/i;
+  /\b(in|near|nearby|around|round|outside|based\s+in|located\s+in|headquartered\s+in|across|throughout|from|serving|covering|hybrid)\s+(.{2,80})/i;
 
 const REMOTE_RE =
   /\b(remote(?:ly)?|work\s+from\s+home|wfh|anywhere|distributed|worldwide|global(?:ly)?)\b/i;
@@ -1413,7 +1587,8 @@ const strictPlace = (s: string) => {
  * preposition — and this function's job is only to veto the spans that are
  * demonstrably something else.
  */
-const DELIVERABLE_WORD = /\b(?:public|contacts?|details?|info|e-?mails?|phones?|numbers?|websites?|socials?|linkedin)\b/i;
+const DELIVERABLE_WORD =
+  /\b(?:public|contacts?|details?|info|e-?mails?|phones?|numbers?|websites?|socials?|linkedin)\b/i;
 
 function plausiblePlace(span: string): boolean {
   const s = span.trim();
@@ -1491,7 +1666,11 @@ function detectLocation(
   if ((m = RADIUS_RE.exec(text))) {
     const span = takePlaceSpan(tokenize(m[3]), strictPlace).join(" ");
     if (span && plausiblePlace(span) && !excluded.has(span.toLowerCase())) {
-      const base = geoFor(span, `${m[0].slice(0, m[0].length - m[3].length)}${span}`, "within_radius");
+      const base = geoFor(
+        span,
+        `${m[0].slice(0, m[0].length - m[3].length)}${span}`,
+        "within_radius",
+      );
       return {
         location: {
           ...base,
@@ -1559,15 +1738,126 @@ function detectLocation(
 /** A single target searched in either place is one request with OR geography. */
 function detectOrLocations(text: string, primary: FrameLocation | null): FrameLocation[] {
   if (!primary || primary.scope === "remote") return [];
-  const re = /\b(?:in|near|around|across|from)\s+([\p{L}'-]+(?:\s+[\p{L}'-]+){0,3})\s+or\s+([\p{L}'-]+(?:\s+[\p{L}'-]+){0,3})/giu;
+  const re =
+    /\b(?:in|near|around|across|from)\s+([\p{L}'-]+(?:\s+[\p{L}'-]+){0,3})\s+or\s+([\p{L}'-]+(?:\s+[\p{L}'-]+){0,3})/giu;
   for (const match of text.matchAll(re)) {
     const first = takePlaceSpan(tokenize(match[1]), strictPlace).join(" ");
     const second = takePlaceSpan(tokenize(match[2]), strictPlace).join(" ");
     if (!first || !second || !plausiblePlace(first) || !plausiblePlace(second)) continue;
-    if (first.toLowerCase() !== primary.value.toLowerCase() && first.toLowerCase() !== primary.canonical?.toLowerCase()) continue;
+    if (
+      first.toLowerCase() !== primary.value.toLowerCase() &&
+      first.toLowerCase() !== primary.canonical?.toLowerCase()
+    )
+      continue;
     return [primary, geoFor(second, second, primary.scope)];
   }
   return [];
+}
+
+function locationsFromList(
+  raw: string,
+  scope: FrameLocation["scope"],
+  allowSingle = false,
+): FrameLocation[] {
+  const cleaned = raw
+    .replace(/\b(?:also|too|please|pls|if\s+possible)\b/gi, " ")
+    .replace(/\b(?:(?:is|are|would\s+be|looks?)\s+)?(?:also\s+)?(?:good|fine|okay|ok|acceptable)\b/gi, " ")
+    .replace(/\b(?:remote|hybrid|onsite|on-site)\b/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const places = splitMultiPlace(cleaned);
+  if (places) return places.map((place) => geoFor(place.name, place.name, scope, 0.8));
+  const names = cleaned
+    .split(/\s+(?:and|or)\s+|\s*[+/]\s*/i)
+    .map((name) => clean(name))
+    .filter((name) => name && plausiblePlace(name));
+  if (names.length >= 2) return names.map((name) => geoFor(name, name, scope, 0.6));
+  // A broad-scope preposition with one place ("across Europe") is a valid
+  // single-name enumeration: the scope word itself proves it is a place.
+  return allowSingle && names.length === 1
+    ? names.map((name) => geoFor(name, name, scope, 0.6))
+    : [];
+}
+
+function detectListedLocations(
+  text: string,
+  primary: FrameLocation | null,
+  excluded: Set<string>,
+): FrameLocation[] {
+  const out: FrameLocation[] = [];
+  const add = (places: FrameLocation[]) => {
+    for (const place of places) {
+      const key = (place.canonical ?? place.value).toLowerCase();
+      if (
+        !excluded.has(key) &&
+        !out.some((existing) => (existing.canonical ?? existing.value).toLowerCase() === key)
+      )
+        out.push(place);
+    }
+  };
+  if (
+    primary &&
+    primary.scope !== "remote" &&
+    !(primary.canonical == null && /\s+(?:hybrid|remote|onsite|on-site)\s+/i.test(primary.value))
+  )
+    add([primary]);
+  const re =
+    /\b(in|near|nearby|around|round|across|throughout|from|hybrid)\s+([^,.;]+(?:\s+(?:and|or|[+/])\s+[^,.;]+)?)/giu;
+  for (const match of text.matchAll(re)) {
+    add(
+      locationsFromList(
+        match[2] ?? "",
+        scopeFor(match[1] ?? "in"),
+        /^(?:across|throughout)$/i.test(match[1] ?? ""),
+      ),
+    );
+  }
+  return out.length >= 2 ? out : [];
+}
+
+/** A standalone target-place clause can follow a soft attribute, beyond the core cut. */
+function detectTrailingTargetLocations(text: string, excluded: Set<string>): FrameLocation[] {
+  for (const clause of text.split(/[,;]/).slice(1)) {
+    const raw = clause.trim();
+    const lead = /^(?:in|near|around|across|mostly)\s+/i.exec(raw);
+    const suffix = /\s+(?:is|are)\s+(?:good|fine|okay|ok|acceptable)\s*$/i.exec(raw);
+    if (!lead && !suffix) continue;
+    const list = raw.slice(lead?.[0].length ?? 0, suffix?.index ?? raw.length).trim();
+    const names = list
+      .split(/\s+(?:or|and)\s+|\s*[+/]\s*/i)
+      .filter(Boolean)
+      .map((name) => (/^us$/i.test(name) ? "USA" : name));
+    // Every part must be exactly a known place: contact/source/sender predicates
+    // cannot supply geography merely because they contain a country name.
+    if (
+      !names.length ||
+      names.some(
+        (name) =>
+          resolveCanonicalLocation(name)?.resolution !== "resolved" ||
+          excluded.has(name.toLowerCase()),
+      )
+    )
+      continue;
+    const places = splitMultiPlace(names.join(" or "));
+    return places
+      ? places.map((place) => geoFor(place.name, raw, lead ? scopeFor(lead[0]) : "in"))
+      : [geoFor(names[0]!, raw, lead ? scopeFor(lead[0]) : "in")];
+  }
+  return [];
+}
+
+/** Investor mandates use stage words without saying "stage" ("ideally seed/preseed"). */
+function detectInvestorStage(text: string): OpenValue | null {
+  const stage = String.raw`(?:pre[-\s]?seed|seed|series\s+[a-e]|early\s+stage|growth\s+stage)`;
+  const re = new RegExp(
+    `^\\s*(?:(?:ideally|preferably|prefer|must\\s+be)\\s+)?(${stage}(?:\\s*(?:/|or|and)\\s*${stage})*)(?:\\s+stage)?(?:\\s+(?:preferred|required))?\\s*$`,
+    "i",
+  );
+  for (const clause of text.split(/[,;]/).slice(1)) {
+    const match = re.exec(clause);
+    if (match) return openValue(match[1]!.toLowerCase(), clause.trim(), null, 0.85);
+  }
+  return null;
 }
 
 // ── Constraints ───────────────────────────────────────────────────────────
@@ -1578,7 +1868,22 @@ function num(s: string): number {
   return Number(s.replace(/,/g, ""));
 }
 
-const EXCL_STOP = new Set(["and", "but", "or", "if", "with", "that", "who", "which", "plus", "please"]);
+const EXCL_STOP = new Set([
+  "and",
+  "but",
+  "or",
+  "if",
+  "with",
+  "that",
+  "who",
+  "which",
+  "plus",
+  "please",
+]);
+
+// Negating a requirement's strength does not exclude a kind of prospect.
+const REQUIREMENT_STRENGTH =
+  /^(?:(?:a|an|the)\s+)?(?:(?:absolute|strict|hard|firm)\s+)?(?:rules?|requirements?|conditions?|must|mandatory|required|compulsory)\b/i;
 
 /**
  * "not agencies", "excluding Toronto". The excluded thing is taken as at most
@@ -1592,6 +1897,11 @@ function detectExclusions(text: string): Constraint[] {
   const re = new RegExp(EXCLUSION_CUE_RE.source, "giu");
   let m: RegExpExecArray | null;
   while ((m = re.exec(text))) {
+    if (
+      /\bnot\b/i.test(m[0]) &&
+      REQUIREMENT_STRENGTH.test(text.slice(m.index + m[0].length).trimStart())
+    )
+      continue;
     // Original case is kept as well as the folded form: the folded form is what
     // gets compared and stored, the cased form is the only evidence that
     // "excluding Waterford" names a town rather than a kind of business.
@@ -1613,7 +1923,7 @@ function detectExclusions(text: string): Constraint[] {
     // filter beside a relation that already says it — and the check goes
     // through the shared vocabulary, which tolerates "no proper wesbite",
     // rather than through a second list of asset words that drifts from it.
-    const value = words.map((w, i) => i === words.length - 1 ? singularize(w) : w).join(" ");
+    const value = words.map((w, i) => (i === words.length - 1 ? singularize(w) : w)).join(" ");
     if (isAssetPhrase(value)) continue;
 
     // What KIND of thing is being excluded decides the field, and the
@@ -1667,9 +1977,62 @@ export function dedupeConstraints(list: Constraint[]): Constraint[] {
 export function detectConstraints(text: string): Constraint[] {
   const out: Constraint[] = [];
   const push = (c: Partial<Constraint> & Pick<Constraint, "field" | "operator">) =>
-    out.push({ value: null, unit: null, negated: false, raw: null, confidence: 0.75, ...c } as Constraint);
+    out.push({
+      value: null,
+      unit: null,
+      negated: false,
+      raw: null,
+      confidence: 0.75,
+      ...c,
+    } as Constraint);
 
   let m: RegExpExecArray | null;
+
+  // A stated optional check range is a preference, not a categorical check band.
+  // Keep both endpoints rather than inventing seed/growth hard filtering.
+  const checkRange =
+    /\b(?:checks?|cheques?|tickets?)(?:[\s-]+sizes?)?\s+(?:(?:of|between|from|maybe|ideally|preferably|roughly|about|around)\s+)*(?:USD|CAD|EUR|GBP)?\s*([$€£]?)\s*(\d[\d,]*(?:\.\d+)?)\s*(k|m|b|thousand|million|billion)?\s*(?:to|and|[-–—])\s*(?:USD|CAD|EUR|GBP)?\s*([$€£]?)\s*(\d[\d,]*(?:\.\d+)?)\s*(k|m|b|thousand|million|billion)?\b/gi;
+  while (
+    /\b(?:investors?|funds?|angels?|vc|venture\s+capital)\b/i.test(text) &&
+    (m = checkRange.exec(text))
+  ) {
+    const before =
+      text
+        .slice(0, m.index)
+        .split(/[,;.!?]|\b(?:and|but)\b/i)
+        .pop() ?? "";
+    const tail = text.slice(m.index + m[0].length);
+    const after = tail.split(/[,;.!?]|\b(?:and|but)\b/i)[0];
+    const ownClause = `${before} ${m[0]} ${after}`;
+    const soft =
+      /\b(?:maybe|ideally|preferably|preferred|optional|roughly|about|around)\b/i.test(ownClause) ||
+      /^\s*(?:ish\s*)?(?:,\s*|but\s+)?(?:(?:that(?:['’]?s|\s+is)|it(?:['’]?s|\s+is)|this\s+is)\s+)?not\s+(?:(?:a|an|the)\s+)?(?:(?:absolute|strict|hard|firm)\s+)?(?:rule|requirement|condition|must|mandatory|required|compulsory)\b/i.test(
+        tail,
+      );
+    if (!soft) continue;
+    const money = (digits: string, suffix: string | undefined) =>
+      num(digits) *
+      (/^(?:k|thousand)$/i.test(suffix ?? "")
+        ? 1_000
+        : /^(?:m|million)$/i.test(suffix ?? "")
+          ? 1_000_000
+          : /^(?:b|billion)$/i.test(suffix ?? "")
+            ? 1_000_000_000
+            : 1);
+    const low = money(m[2], m[3]);
+    const high = money(m[5], m[6]);
+    if (!(low > 0 && high >= low)) continue;
+    const currency =
+      /\b(USD|CAD|EUR|GBP)\b/i.exec(m[0])?.[1].toUpperCase() ??
+      (m[1] === "€" || m[4] === "€" ? "EUR" : m[1] === "£" || m[4] === "£" ? "GBP" : null);
+    push({
+      field: "prefer_investor_check",
+      operator: "between",
+      value: [String(low), String(high)],
+      unit: currency,
+      raw: m[0],
+    });
+  }
 
   const EMP = new RegExp(
     `\\b(?:(at\\s+least|minimum|min|more\\s+than|over|under|fewer\\s+than|less\\s+than|no\\s+more\\s+than)\\s+(?:(?:like|about|roughly)\\s+)?)?${NUM}\\s*(\\+)?\\s*(?:employees|staff|people|headcount|team\\s+members)\\b`,
@@ -1710,11 +2073,14 @@ export function detectConstraints(text: string): Constraint[] {
     if (v > 0) push({ field: "rating", operator: op, value: v, unit: "stars", raw: m[0] });
   }
 
-    const MONEY = new RegExp(
+  const MONEY = new RegExp(
     `\\b(under|below|less\\s+than|over|above|more\\s+than|at\\s+least|around|about)\\s*[$€£]?\\s*${NUM}\\s*(k|m|b)?\\s*(?:\\/|\\s+per\\s+)?\\s*(hour|hr|month|mo|year|yr|day)?`,
     "i",
   );
-  if ((m = MONEY.exec(text)) && /[$€£]|budget|rate|price|revenue|cost|pay|\/\s*(?:hour|hr)/i.test(text)) {
+  if (
+    (m = MONEY.exec(text)) &&
+    /[$€£]|budget|rate|price|revenue|cost|pay|\/\s*(?:hour|hr)/i.test(text)
+  ) {
     const q = m[1].toLowerCase();
     let v = num(m[2]);
     const mult = (m[3] ?? "").toLowerCase();
@@ -1764,7 +2130,13 @@ export function detectConstraints(text: string): Constraint[] {
   }
 
   if (/\bremote\s+only\b|\bfully\s+remote\b/i.test(text)) {
-    push({ field: "work_mode", operator: "eq", value: "remote", raw: "remote only", confidence: 0.8 });
+    push({
+      field: "work_mode",
+      operator: "eq",
+      value: "remote",
+      raw: "remote only",
+      confidence: 0.8,
+    });
   }
 
   return out;
@@ -1813,14 +2185,18 @@ export function fieldRequirements(
   for (const clause of deliverableClauses(text)) {
     const isPreferred = preferredDeliverableClause(clause);
     const isRequired =
-      REQUIRED_MARKER.test(clause) ||
-      DELIVERY_MARKER.test(clause) ||
-      claimed.has(clause.trim());
+      REQUIRED_MARKER.test(clause) || DELIVERY_MARKER.test(clause) || claimed.has(clause.trim());
     if (!isPreferred && !isRequired) continue;
     const bucket = isPreferred ? preferred : required;
     for (const name of fieldsNamedIn(clause)) {
-      if (name === "website" && /\bneed(?:s)?\s+(?:a\s+)?websites?\b/i.test(clause) && !DELIVERY_MARKER.test(clause)) continue;
-      if (!bucket.some((f) => f.value === name)) bucket.push(openValue(name, clause.trim(), name, 0.7));
+      if (
+        name === "website" &&
+        /\bneed(?:s)?\s+(?:a\s+)?websites?\b/i.test(clause) &&
+        !DELIVERY_MARKER.test(clause)
+      )
+        continue;
+      if (!bucket.some((f) => f.value === name))
+        bucket.push(openValue(name, clause.trim(), name, 0.7));
     }
   }
 
@@ -1836,10 +2212,14 @@ export function fieldRequirements(
   }
   if (/\ball\s+contact\s+details?\b|\bcontact\s+info(?:rmation)?\b/i.test(text)) {
     for (const name of ["email", "phone"]) {
-      if (!required.some((f) => f.value === name)) required.push(openValue(name, "all contact details", name, 0.8));
+      if (!required.some((f) => f.value === name))
+        required.push(openValue(name, "all contact details", name, 0.8));
     }
   }
-  if (/\bemails?\b[^.;]{0,25}\bif\s+public\b/i.test(text) && !required.some((f) => f.value === "email")) {
+  if (
+    /\bemails?\b[^.;]{0,25}\bif\s+public\b/i.test(text) &&
+    !required.some((f) => f.value === "email")
+  ) {
     required.push(openValue("email", "email if public", "email", 0.8));
   }
   return { required, preferred };
@@ -1868,8 +2248,17 @@ function fieldsNamedIn(clause: string): string[] {
 /** Contact details the searcher can ask for by presence alone. A website is
  *  deliberately absent — see `fieldRequirements`. */
 const CONTACT_FIELDS: ReadonlySet<string> = new Set([
-  "phone", "email", "address", "owner_name", "instagram", "facebook",
-  "linkedin", "socials", "opening_hours", "reviews", "rating",
+  "phone",
+  "email",
+  "address",
+  "owner_name",
+  "instagram",
+  "facebook",
+  "linkedin",
+  "socials",
+  "opening_hours",
+  "reviews",
+  "rating",
 ]);
 
 /** `with <contact field>` — but never `with no …`, which is an absence and
@@ -1879,7 +2268,8 @@ function presenceRequests(text: string): string[] {
   const re = /\bwith\s+(?:a|an|the|their|thier|its)?\s*/gi;
   let m: RegExpExecArray | null;
   while ((m = re.exec(text))) {
-    const after = text.slice(m.index + m[0].length, m.index + m[0].length + 40).split(/[,.;|]/)[0] ?? "";
+    const after =
+      text.slice(m.index + m[0].length, m.index + m[0].length + 40).split(/[,.;|]/)[0] ?? "";
     if (/^(?:no|out|zero|nothing)\b/i.test(after)) continue;
     for (const name of fieldsNamedIn(after)) {
       if (CONTACT_FIELDS.has(name) && !out.includes(name)) out.push(name);
@@ -1904,7 +2294,9 @@ function deliverableClauses(text: string): string[] {
     // A final hedge qualifies a bare coordinated list: "include email and
     // phone whatever is available". A separate mandatory marker or a fresh
     // delivery verb establishes separate asks instead.
-    const independent = REQUIRED_MARKER.test(parts[0] ?? '') || preferredDeliverableClause(parts[0] ?? '') ||
+    const independent =
+      REQUIRED_MARKER.test(parts[0] ?? "") ||
+      preferredDeliverableClause(parts[0] ?? "") ||
       parts.slice(1).some((part) => DELIVERY_MARKER.test(part));
     if (parts.length > 1 && marked === parts.length && independent) out.push(...parts);
     else out.push(chunk);
@@ -1913,21 +2305,42 @@ function deliverableClauses(text: string): string[] {
 }
 
 function preferredDeliverableClause(clause: string): boolean {
-  return PREFERRED_MARKER.test(clause) || /\bwhatever\s+(?:(?:you\s+)?can\s+(?:actually\s+)?(?:verif\w*|find)|(?:is\s+)?available|works?|findable)\b/i.test(clause);
+  return (
+    PREFERRED_MARKER.test(clause) ||
+    /\bwhatever\s+(?:(?:you\s+)?can\s+(?:actually\s+)?(?:verif\w*|find)|(?:is\s+)?available|works?|findable)\b/i.test(
+      clause,
+    )
+  );
 }
 
 /** Explicit alternatives in a requested output clause; target-role ORs are not deliverables. */
 export function fieldAlternativeGroups(text: string): string[][] {
   const groups: string[][] = [];
-  for (const clause of deliverableClauses(text).flatMap(part => part.split(/\bbut\b/i))) {
-    if (preferredDeliverableClause(clause) || /\b(?:do\s+not|don'?t|dont)\s+(?:need|require|want)\b/i.test(clause)) continue;
+  for (const clause of deliverableClauses(text).flatMap((part) => part.split(/\bbut\b/i))) {
+    if (
+      preferredDeliverableClause(clause) ||
+      /\b(?:do\s+not|don'?t|dont)\s+(?:need|require|want)\b/i.test(clause)
+    )
+      continue;
     const alternatives = clause.split(/\bor\b/i);
     if (alternatives.length < 2) continue;
-    const bareList = alternatives.every(part => FIELD_WORDS.reduce((rest, [pattern]) => rest.replace(pattern, ''), part)
-      .replace(/\b(?:a|an|their|the)\b/gi, '').trim() === '');
-    if (!(REQUIRED_MARKER.test(clause) || DELIVERY_MARKER.test(clause) || /\bwith\s+/i.test(clause) || bareList)) continue;
+    const bareList = alternatives.every(
+      (part) =>
+        FIELD_WORDS.reduce((rest, [pattern]) => rest.replace(pattern, ""), part)
+          .replace(/\b(?:a|an|their|the)\b/gi, "")
+          .trim() === "",
+    );
+    if (
+      !(
+        REQUIRED_MARKER.test(clause) ||
+        DELIVERY_MARKER.test(clause) ||
+        /\bwith\s+/i.test(clause) ||
+        bareList
+      )
+    )
+      continue;
     const named = alternatives.map(fieldsNamedIn);
-    if (!named.every(fields => fields.length === 1)) continue;
+    if (!named.every((fields) => fields.length === 1)) continue;
     const group = [...new Set(named.flat())];
     if (group.length > 1) groups.push(group);
   }
@@ -1937,7 +2350,7 @@ export function fieldAlternativeGroups(text: string): string[][] {
 /** Singleton asks in separate clauses must survive overlapping alternative groups. */
 export function independentlyRequiredFields(text: string): Set<string> {
   const fields = new Set<string>();
-  for (const clause of deliverableClauses(text).flatMap(part => part.split(/\bbut\b/i))) {
+  for (const clause of deliverableClauses(text).flatMap((part) => part.split(/\bbut\b/i))) {
     if (fieldAlternativeGroups(clause).length) continue;
     for (const field of fieldRequirements(clause).required) fields.add(field.value);
   }
@@ -1950,10 +2363,16 @@ const VERIFY_RE =
 function detectVerification(text: string): UnderstandingFrame["verification"] {
   if (!VERIFY_RE.test(text)) return [];
   const out: UnderstandingFrame["verification"] = [];
-  const sentence = text.match(/[^.;]*\b(?:verify|verification|confirm|make\s+sure|double-?check|prove)\b[^.;]*/i);
+  const sentence = text.match(
+    /[^.;]*\b(?:verify|verification|confirm|make\s+sure|double-?check|prove)\b[^.;]*/i,
+  );
   const raw = sentence?.[0]?.trim() ?? null;
   const scope = raw ?? text;
-  if (/\b(no|without|don'?t\s+have|lack)\w*\s+(?:a\s+|an\s+|real\s+|proper\s+)?(website|site)/i.test(scope))
+  if (
+    /\b(no|without|don'?t\s+have|lack)\w*\s+(?:a\s+|an\s+|real\s+|proper\s+)?(website|site)/i.test(
+      scope,
+    )
+  )
     out.push({ kind: "no_owned_website", label: null, raw });
   if (/\bphone\b/i.test(scope)) out.push({ kind: "phone_is_public", label: null, raw });
   if (/\bemail\b/i.test(scope)) out.push({ kind: "email_deliverable", label: null, raw });
@@ -1969,13 +2388,20 @@ function detectVerification(text: string): UnderstandingFrame["verification"] {
 
 function detectOutput(text: string): UnderstandingFrame["output"] {
   const out: UnderstandingFrame["output"] = [];
-  if (/\btables?\b|\bspreadsheets?\b|\bgrid\b/i.test(text)) out.push({ kind: "table", label: null, raw: null });
+  if (/\btables?\b|\bspreadsheets?\b|\bgrid\b/i.test(text))
+    out.push({ kind: "table", label: null, raw: null });
   if (/\bcsv\b|\bexcel\b|\bxlsx?\b/i.test(text)) out.push({ kind: "csv", label: null, raw: null });
   if (/\bcards?\b/i.test(text)) out.push({ kind: "cards", label: null, raw: null });
-  if (/\b(?:outreach|cold\s+email|cold\s+dm|dm|message|pitch)\s*(?:drafts?|templates?|copy|scripts?)?\b/i.test(text))
+  if (
+    /\b(?:outreach|cold\s+email|cold\s+dm|dm|message|pitch)\s*(?:drafts?|templates?|copy|scripts?)?\b/i.test(
+      text,
+    )
+  )
     out.push({ kind: "outreach_drafts", label: null, raw: null });
-  if (/\bsummar(?:y|ise|ize|ies)\b/i.test(text)) out.push({ kind: "summary", label: null, raw: null });
-  if (/\bnotion\b/i.test(text)) out.push({ kind: "other", label: "Notion-ready output", raw: "notion" });
+  if (/\bsummar(?:y|ise|ize|ies)\b/i.test(text))
+    out.push({ kind: "summary", label: null, raw: null });
+  if (/\bnotion\b/i.test(text))
+    out.push({ kind: "other", label: "Notion-ready output", raw: "notion" });
   if (/\bgoogle\s+sheets?\b|\bsheets?\b/i.test(text))
     out.push({ kind: "other", label: "Google Sheets output", raw: "sheets" });
   return out;
@@ -2061,9 +2487,11 @@ function detectSources(text: string): { sources: OpenValue[]; text: string } {
 const SECOND_IMPERATIVE_RE =
   /\s*(?:,|;)?\s*\b(?:and\s+(?:also\s+)?|then\s+|plus\s+|also\s+)(?=(?:find|get|search\s+for|look\s+for|pull|give\s+me|show\s+me|i\s+(?:also\s+)?need|i\s+(?:also\s+)?want)\b)/i;
 
-const CONJUNCTION_SPLIT_RE = /\s+(?:,\s*)?(?:and\s+also|and\s+then|,\s*also|;\s*also|\band\b|;)\s+/i;
+const CONJUNCTION_SPLIT_RE =
+  /\s+(?:,\s*)?(?:and\s+also|and\s+then|,\s*also|;\s*also|\band\b|;)\s+/i;
 
-const LOCATIVE_RE = /\b(?:in|near|nearby|around|round|outside|across|throughout|within)\s+[\p{L}]/iu;
+const LOCATIVE_RE =
+  /\b(?:in|near|nearby|around|round|outside|across|throughout|within)\s+[\p{L}]/iu;
 
 /**
  * Wording that announces a second request outright. If it is present and the
@@ -2074,9 +2502,13 @@ const COMPOUND_SIGNAL_RE =
   /\b(?:and\s+also|also\s+(?:find|get|need|want|pull|list)|plus\s+(?:find|get|some)|as\s+well\s+as)\b/i;
 
 function splitCompound(text: string): { parts: string[]; uncertain: boolean } {
-  const counted = text.split(/\b(?:then|and)\s+(?:another|an\s+additional|a\s+further)\s+(?=(?:(?:about|around|roughly|approximately)\s+)?\d)/i)
-    .map(part => part.trim()).filter(Boolean);
-  if (counted.length > 1 && counted.every(part => detectQuantity(part).quantity)) {
+  const counted = text
+    .split(
+      /\b(?:then|and)\s+(?:another|an\s+additional|a\s+further)\s+(?=(?:(?:about|around|roughly|approximately)\s+)?\d)/i,
+    )
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (counted.length > 1 && counted.every((part) => detectQuantity(part).quantity)) {
     return { parts: counted, uncertain: false };
   }
   const byImperative = text
@@ -2148,6 +2580,22 @@ function unmaskTail(text: string, spans: Array<[number, number]>, tail: string):
 
 // ── Entry point ───────────────────────────────────────────────────────────
 
+function explicitRoleAlternatives(raw: string): string[] {
+  const beforeJob = /\b([\p{L}\p{N}\s+#./-]{3,120}?)\s+(?:jobs?|roles?|positions?|openings?|vacanc(?:y|ies))\b/iu.exec(
+    raw,
+  )?.[1];
+  const beforeOrg = /\b([\p{L}\p{N}\s+#./-]{3,120}?)\s+(?:at|in|with)\b/iu.exec(raw)?.[1];
+  const source = beforeJob ?? beforeOrg;
+  if (!source || !/\b(?:or|and)\b|[+/]/i.test(source)) return [];
+  return source
+    .replace(LEAD_VERB_PREFIX_RE, "")
+    .split(/\s+(?:or|and)\s+|\s*[\\/]\s*/i)
+    .map((part) => clean(part))
+    .filter(
+      (part) => part && !/^(?:remote|hybrid|onsite|on-site|junior|senior|entry\s+level)$/i.test(part),
+    );
+}
+
 export type FallbackOptions = { startedAt?: number; depth?: number };
 
 export function extractFrameDeterministic(
@@ -2201,7 +2649,9 @@ export function extractFrameDeterministic(
       fallback_used: false,
       cached: false,
       repair: null,
-      notes: ["addressed to the assistant, not a description of prospects — nothing was searched for"],
+      notes: [
+        "addressed to the assistant, not a description of prospects — nothing was searched for",
+      ],
     };
     return UnderstandingFrameSchema.parse(frame);
   }
@@ -2209,8 +2659,10 @@ export function extractFrameDeterministic(
   // 1. The searcher's own sentence, lifted out before anything reads the rest.
   let { context, analysis } = detectUserContext(text);
   frame.user_context = context;
-  analysis = analysis.replace(/\b(in|near|around)\s+(.+?)\s+(?:wait\s+)?no\s+(?:make\s+that|actually|rather|instead)\s+([\p{L}\s-]+?)(?=,|\.|\bwith\b|$)/iu,
-    (_whole, prep: string, _old: string, replacement: string) => `${prep} ${replacement.trim()}`);
+  analysis = analysis.replace(
+    /\b(in|near|around)\s+(.+?)\s+(?:wait\s+)?no\s+(?:make\s+that|actually|rather|instead)\s+([\p{L}\s-]+?)(?=,|\.|\bwith\b|$)/iu,
+    (_whole, prep: string, _old: string, replacement: string) => `${prep} ${replacement.trim()}`,
+  );
 
   // 2. Deliverables are cut BEFORE the compound split, or "…and give me a
   //    table plus outreach drafts" reads as a second search for tables. What
@@ -2229,14 +2681,35 @@ export function extractFrameDeterministic(
   const amountPlaceholder = /\bthis\s+much\b/i.exec(primaryRaw);
   if (amountPlaceholder) {
     const field = /\b(?:jobs?|salary|paying|paid|compensation|wages?)\b/i.test(primaryRaw)
-      ? "salary_min" : /\brevenue\b/i.test(primaryRaw) ? "revenue" : "amount";
+      ? "salary_min"
+      : /\brevenue\b/i.test(primaryRaw)
+        ? "revenue"
+        : "amount";
     frame.unresolved.push({ field, raw: amountPlaceholder[0] });
-    frame.constraints.push({ field, operator: "gte", value: null, unit: null, negated: false, raw: amountPlaceholder[0], confidence: 1 });
+    frame.constraints.push({
+      field,
+      operator: "gte",
+      value: null,
+      unit: null,
+      negated: false,
+      raw: amountPlaceholder[0],
+      confidence: 1,
+    });
   }
-  const sizePlaceholder = /\b(?:around|about|roughly|at least|under)\s+this\s+size\b/i.exec(primaryRaw);
+  const sizePlaceholder = /\b(?:around|about|roughly|at least|under)\s+this\s+size\b/i.exec(
+    primaryRaw,
+  );
   if (sizePlaceholder) {
     frame.unresolved.push({ field: "employee_count", raw: sizePlaceholder[0] });
-    frame.constraints.push({ field: "employee_count", operator: "eq", value: null, unit: null, negated: false, raw: sizePlaceholder[0], confidence: 1 });
+    frame.constraints.push({
+      field: "employee_count",
+      operator: "eq",
+      value: null,
+      unit: null,
+      negated: false,
+      raw: sizePlaceholder[0],
+      confidence: 1,
+    });
   }
   const t = detectTemporal(work);
   frame.temporal = t.temporal;
@@ -2285,12 +2758,21 @@ export function extractFrameDeterministic(
   //    become the positive one.
   // Read twice, never as one string: concatenating the masked core and the raw
   // request let a match start in one and end in the other.
-  frame.constraints = dedupeConstraints([...frame.constraints,
+  frame.constraints = dedupeConstraints([
+    ...frame.constraints,
     ...detectConstraints(work.slice(0, 1600)),
     ...detectConstraints(analysis.slice(0, 1600)),
   ]);
   if (/\b(?:not|never|exclude|excluding|without)\s+(?:already\s+)?funded\b/i.test(analysis)) {
-    frame.constraints.push({ field: "funding_status", operator: "neq", value: "funded", unit: null, negated: true, raw: "not already funded", confidence: 0.9 });
+    frame.constraints.push({
+      field: "funding_status",
+      operator: "neq",
+      value: "funded",
+      unit: null,
+      negated: true,
+      raw: "not already funded",
+      confidence: 0.9,
+    });
   }
   const excluded = new Set(
     frame.constraints
@@ -2356,7 +2838,8 @@ export function extractFrameDeterministic(
   // about churn", "agencies based…"); it is not a town, unless it is a place
   // someone actually knows ("cafes beijing").
   const takePlace = (tail: string): boolean =>
-    plausiblePlace(tail) && !excluded.has(tail.toLowerCase()) &&
+    plausiblePlace(tail) &&
+    !excluded.has(tail.toLowerCase()) &&
     !(/^[\p{L}]+(?:ing|ed)$/iu.test(tail) && !strictPlace(tail) && !knownCityName(tail));
 
   // An activity verb inside the phrase opens a clause, not a modifier:
@@ -2387,8 +2870,14 @@ export function extractFrameDeterministic(
       const placelike = takePlace(tail);
       // A shape-guessed head loses to a known head when what follows it is a
       // requested deliverable ("founders public contact details").
-      const deliverableTail = head.guessed === true && retry.guessed !== true && DELIVERABLE_WORD.test(tail);
-      if (head.kind !== "unknown" && !(placelike && retry.confidence > head.confidence) && !deliverableTail) continue;
+      const deliverableTail =
+        head.guessed === true && retry.guessed !== true && DELIVERABLE_WORD.test(tail);
+      if (
+        head.kind !== "unknown" &&
+        !(placelike && retry.confidence > head.confidence) &&
+        !deliverableTail
+      )
+        continue;
       head = retry;
       phrase = shorter;
       if (placelike) {
@@ -2434,16 +2923,26 @@ export function extractFrameDeterministic(
   // names what the target makes or does. That is an industry when the object
   // is a bare noun the head tables do not claim; an article ("building a
   // team") or a recognized noun ("building owners") reads as something else.
-  const activity = /\b(?:building|developing|focusing\s+on|working\s+on)\s+([\p{L}][\p{L}'-]*(?:\s+[\p{L}][\p{L}'-]*)?)/iu.exec(work);
+  const activity =
+    /\b(?:building|developing|focusing\s+on|working\s+on)\s+([\p{L}][\p{L}'-]*(?:\s+[\p{L}][\p{L}'-]*)?)/iu.exec(
+      work,
+    );
   if (activity && !frame.target.industry) {
     const activityWords: string[] = [];
     for (const w of activity[1].split(/\s+/)) {
-      if (activityWords.length >= 2 || CLAUSE_STOP_TOKENS.has(normalizeFunctionWord(w.toLowerCase()))) break;
+      if (
+        activityWords.length >= 2 ||
+        CLAUSE_STOP_TOKENS.has(normalizeFunctionWord(w.toLowerCase()))
+      )
+        break;
       activityWords.push(w);
     }
     const noun = activityWords.join(" ");
-    if (noun && !/^(?:a|an|the|their|our|your|its|his|her|my)\b/i.test(noun) &&
-        classifyHead(noun.split(/\s+/)[0]!, { guess: false }).kind === "unknown") {
+    if (
+      noun &&
+      !/^(?:a|an|the|their|our|your|its|his|her|my)\b/i.test(noun) &&
+      classifyHead(noun.split(/\s+/)[0]!, { guess: false }).kind === "unknown"
+    ) {
       frame.target.industry = openValue(noun.toLowerCase(), noun, null, 0.65);
       const at = activity.index + activity[0].length - activity[1].length;
       spans.push([at, at + noun.length]);
@@ -2464,7 +2963,10 @@ export function extractFrameDeterministic(
     for (const mod of head.modifiers) {
       if (!strictPlace(mod) || excluded.has(mod.toLowerCase())) continue;
       modifierLocation = geoFor(mod, mod, "in");
-      phrase = phrase.replace(new RegExp(`\\b${mod}\\b`, "i"), "").replace(/\s+/g, " ").trim();
+      phrase = phrase
+        .replace(new RegExp(`\\b${mod}\\b`, "i"), "")
+        .replace(/\s+/g, " ")
+        .trim();
       head = classifyHead(phrase);
       break;
     }
@@ -2481,12 +2983,25 @@ export function extractFrameDeterministic(
     );
   }
 
-  const entity: EntityType =
+  let entity: EntityType =
     head.kind === "unknown" ? (interrogative ? "business" : "unknown") : head.kind;
+  // scanTarget stops the head phrase at "or", so in "junior data analyst or
+  // python developer jobs" the job noun sits outside `phrase` — read the first
+  // comma-clause of the raw request too. Seeker phrasing ("looking for a job")
+  // names the searcher and posting verbs ("posted a ... role") name the
+  // poster: a clause carrying either keeps the head-noun entity.
+  const requestClause = primaryRaw.split(/[,;.]/)[0] ?? primaryRaw;
+  const explicitJobSearch =
+    /\b(?:jobs?|roles?|positions?|openings?|vacanc(?:y|ies))\b/i.test(phrase) ||
+    (!/\b(?:looking|seeking|searching|want(?:s|ed|ing)?|need(?:s|ed|ing)?|open\s+to|available\s+for|post(?:ed|ing|s)?|advertis(?:ed|ing)|list(?:ed|ing)|hiring)\b/i.test(
+      requestClause,
+    ) &&
+      /\b(?:jobs?|roles?|positions?|openings?|vacanc(?:y|ies))\b/i.test(requestClause));
+  if (explicitJobSearch && entity !== "investor") entity = "job";
   frame.target.entity_type = {
     value: entity,
     raw: span(head.head),
-    confidence: interrogative ? 0.4 : head.confidence,
+    confidence: explicitJobSearch ? Math.max(head.confidence, 0.85) : interrogative ? 0.4 : head.confidence,
   };
   if (head.ambiguous) {
     frame.target.entity_ambiguous = true;
@@ -2502,7 +3017,10 @@ export function extractFrameDeterministic(
     // typo is preserved verbatim in `raw`, and "foundders" as the value is a
     // descriptor nothing downstream can match on.
     let spelled = head.repairedFrom
-      ? phrase.replace(new RegExp(`\\b${head.repairedFrom}\\b`, "i"), head.head ?? head.repairedFrom)
+      ? phrase.replace(
+          new RegExp(`\\b${head.repairedFrom}\\b`, "i"),
+          head.head ?? head.repairedFrom,
+        )
       : phrase;
     // "b2b saas founders" is role=founder + industry=saas (+ model b2b, read
     // from the raw text later) — the lexicon's intent. Leaving the industry in
@@ -2511,7 +3029,8 @@ export function extractFrameDeterministic(
     let rolePhrase = phrase;
     if (entity === "person" && head.industry && head.head) {
       const industryTokens = new Set(head.industry.toLowerCase().split(/\s+/));
-      const keep = (word: string) => !industryTokens.has(word.toLowerCase()) && !/^(?:b2b|b2c|d2c|dtc)$/i.test(word);
+      const keep = (word: string) =>
+        !industryTokens.has(word.toLowerCase()) && !/^(?:b2b|b2c|d2c|dtc)$/i.test(word);
       const stripped = spelled.split(/\s+/).filter(keep).join(" ").trim();
       if (stripped && stripped.toLowerCase() !== spelled.toLowerCase()) {
         spelled = stripped;
@@ -2523,7 +3042,10 @@ export function extractFrameDeterministic(
     // startup noun is the company stage. A noun that narrows the kind of
     // organization ("founders of agencies", "of brands") is kept as said.
     if (entity === "person" && head.head) {
-      const ofOrg = /^(.+?)\s+(?:of|at|from)\s+(startups?|scale-?ups?|companies|company|firms?|businesses)$/i.exec(spelled.trim());
+      const ofOrg =
+        /^(.+?)\s+(?:of|at|from)\s+(startups?|scale-?ups?|companies|company|firms?|businesses)$/i.exec(
+          spelled.trim(),
+        );
       if (ofOrg && ofOrg[1].toLowerCase().includes(head.head.toLowerCase().replace(/s$/, ""))) {
         spelled = ofOrg[1];
         rolePhrase = rolePhrase.replace(/\s+(?:of|at|from)\s+\S+$/i, "").trim() || rolePhrase;
@@ -2555,10 +3077,49 @@ export function extractFrameDeterministic(
       notes.push(
         `"${phrase}" only restates the entity type, so it names no category — kept as entity_type=${entity} with no descriptor`,
       );
-    } else if (entity === "person") frame.target.role = descriptor;
+    } else if (entity === "person") {
+      frame.target.role = descriptor;
+      // "find founders or CTOs of ..." states several roles; only the job
+      // branch read alternatives before, so the extra roles were dropped.
+      const roleParts = explicitRoleAlternatives(primaryRaw).filter(
+        (part) =>
+          part.toLowerCase() !== (descriptor.normalized ?? "").toLowerCase() &&
+          !plausiblePlace(part),
+      );
+      if (roleParts.length > 1)
+        frame.constraints.push({
+          field: "role",
+          operator: "one_of",
+          value: roleParts,
+          negated: false,
+          unit: null,
+          raw: span(phrase) ?? phrase,
+          confidence: 0.75,
+        });
+    }
     else if (entity === "business" || entity === "company" || entity === "organization")
       frame.target.category = descriptor;
-    else if (entity === "job") frame.target.category = descriptor;
+    else if (entity === "job") {
+      frame.target.category = descriptor;
+      const roleList = (explicitRoleAlternatives(primaryRaw).length
+        ? explicitRoleAlternatives(primaryRaw)
+        : phrase
+        .replace(/\b(?:jobs?|roles?|positions?|openings?|vacanc(?:y|ies))\b/gi, "")
+        .split(/\s+(?:or|and)\s+|\s*[\\/]\s*/i)
+        .map((part) => clean(part))
+        .filter((part) => part && !/^(?:remote|hybrid|onsite|on-site)$/i.test(part)));
+      if (roleList.length > 1) {
+        frame.constraints.push({
+          field: "role",
+          operator: "one_of",
+          value: roleList,
+          negated: false,
+          unit: null,
+          raw: span(phrase) ?? phrase,
+          confidence: 0.75,
+        });
+      }
+    }
     else if (entity === "investor") frame.target.category = descriptor;
     else frame.target.descriptors = [descriptor];
   }
@@ -2576,7 +3137,12 @@ export function extractFrameDeterministic(
   const colloquialBrand = /\bd2c\s+(.+?)\s+(?:guys|people|folks)\b/i.exec(phrase);
   if (colloquialBrand && frame.target.entity_type.value === "company") {
     frame.target.entity_subtype = openValue("brand", colloquialBrand[0], "brand", 0.85);
-    frame.target.industry = openValue(colloquialBrand[1].toLowerCase(), colloquialBrand[1], null, 0.75);
+    frame.target.industry = openValue(
+      colloquialBrand[1].toLowerCase(),
+      colloquialBrand[1],
+      null,
+      0.75,
+    );
     frame.target.business_type = openValue("d2c", "D2C", "d2c", 0.9);
     frame.target.category = null;
   }
@@ -2603,14 +3169,22 @@ export function extractFrameDeterministic(
       // person works somewhere called "fintech companies". A recognized head
       // noun is what tells the two apart, and its modifier is the vertical.
       const kind = classifyHead(aff.company);
-      const isClass = kind.kind === "company" || kind.kind === "business" || kind.kind === "organization";
+      const isClass =
+        kind.kind === "company" || kind.kind === "business" || kind.kind === "organization";
       if (isClass) {
         if (kind.industry && !frame.target.industry) {
           frame.target.industry = openValue(kind.industry, aff.company, kind.industry, 0.7);
         }
-        notes.push(`"${aff.company}" read as the kind of employer, not as a named company or a place`);
+        notes.push(
+          `"${aff.company}" read as the kind of employer, not as a named company or a place`,
+        );
       } else {
-        frame.organization_context.company = openValue(aff.company, aff.company, canonicalize(aff.company), 0.75);
+        frame.organization_context.company = openValue(
+          aff.company,
+          aff.company,
+          canonicalize(aff.company),
+          0.75,
+        );
         notes.push(`"${aff.company}" read as the employer of the target, not as a place`);
       }
       work = mask(work, aff.start, aff.end);
@@ -2691,7 +3265,10 @@ export function extractFrameDeterministic(
     if ((rel.type === "hiring" || rel.type === "seeking_client") && entity === "person") {
       frame.organization_context.on_behalf_of_company = rel.type === "hiring" ? "yes" : "unknown";
     }
-  } else if (RELATION_SIGNAL_RE.test(work) && !/\b(?:posted?|posts?)\s+(?:recently|lately|this\s+(?:week|month))\b/i.test(work)) {
+  } else if (
+    RELATION_SIGNAL_RE.test(work) &&
+    !/\b(?:posted?|posts?)\s+(?:recently|lately|this\s+(?:week|month))\b/i.test(work)
+  ) {
     // Wording announces a relationship we could not read. That is `unknown`,
     // and it is a different statement from `none`.
     frame.relation.type = {
@@ -2707,19 +3284,32 @@ export function extractFrameDeterministic(
     frame.relation.direction = { value: "none", raw: null, confidence: 0.85 };
     frame.relation.object = null;
   }
-  if (frame.constraints.some((c) => c.field === "funding_status" && c.negated) && frame.relation.type.value === "received_funding") {
+  if (
+    frame.constraints.some((c) => c.field === "funding_status" && c.negated) &&
+    frame.relation.type.value === "received_funding"
+  ) {
     frame.relation.type = { value: "none", raw: null, confidence: 0.85 };
     frame.relation.direction = { value: "none", raw: null, confidence: 0.85 };
     frame.relation.object = null;
   }
-  if (frame.constraints.some((c) => c.field === "funding_status" && c.negated) && /\braising\b/i.test(primaryRaw)) {
+  if (
+    frame.constraints.some((c) => c.field === "funding_status" && c.negated) &&
+    /\braising\b/i.test(primaryRaw)
+  ) {
     frame.relation.type = { value: "seeking_funding", raw: "raising", confidence: 0.85 };
     frame.relation.direction = { value: "subject_to_object", raw: "raising", confidence: 0.85 };
     frame.relation.object = openValue("funding", "raising", "funding", 0.85);
-    frame.constraints = frame.constraints.filter((c) => c.field !== "relation" && c.field !== "service");
+    frame.constraints = frame.constraints.filter(
+      (c) => c.field !== "relation" && c.field !== "service",
+    );
   }
-  if (frame.target.entity_type.value === "company" && /\bbrands?\b/i.test(frame.target.category?.value ?? "") &&
-      frame.relation.type.value === "offers_service" && frame.relation.object && !frame.target.industry) {
+  if (
+    frame.target.entity_type.value === "company" &&
+    /\bbrands?\b/i.test(frame.target.category?.value ?? "") &&
+    frame.relation.type.value === "offers_service" &&
+    frame.relation.object &&
+    !frame.target.industry
+  ) {
     frame.target.industry = frame.relation.object;
   }
 
@@ -2755,36 +3345,75 @@ export function extractFrameDeterministic(
     modifierLocation ??
     (trailingPlace ? geoFor(trailingPlace, trailingPlace, "in", 0.4) : null);
   frame.locations = detectOrLocations(primaryRaw, frame.location);
+  const listedLocations = detectListedLocations(primaryRaw, frame.location, excluded);
+  if (listedLocations.length) {
+    frame.location = listedLocations[0]!;
+    frame.locations = listedLocations;
+  }
+  const trailingLocations = detectTrailingTargetLocations(analysis, excluded);
+  if (
+    trailingLocations.length &&
+    (!frame.location ||
+      trailingLocations.some(
+        (place) =>
+          place.value === frame.location?.value || place.canonical === frame.location?.canonical,
+      ))
+  ) {
+    frame.location = trailingLocations[0]!;
+    frame.locations = trailingLocations;
+  }
+  if (frame.target.entity_type.value === "investor" && !frame.target.company_stage) {
+    frame.target.company_stage = detectInvestorStage(analysis);
+  }
   // "around edmonton sherwood park st albert area" — a fused multi-place
   // phrase reads as one provisional blob and pins the search to a place
   // nobody named. When that blob (or the request text behind it) contains
   // several known places, search all of them instead.
   if (frame.location) {
-    const splitPlaces = splitTargetLocationList(primaryRaw, frame.location.raw ?? frame.location.value);
+    const splitPlaces = splitTargetLocationList(
+      primaryRaw,
+      frame.location.raw ?? frame.location.value,
+    );
     if (splitPlaces) {
       frame.locations = splitPlaces.map((geo) => geoFor(geo.name, geo.name, "in", 0.8));
-      frame.location = { ...frame.location, value: splitPlaces[0]!.name, canonical: splitPlaces[0]!.name };
-      frame.meta.notes.push(`split a multi-place phrase into ${splitPlaces.map((p) => p.name).join(", ")}`);
+      frame.location = {
+        ...frame.location,
+        value: splitPlaces[0]!.name,
+        canonical: splitPlaces[0]!.name,
+      };
+      frame.meta.notes.push(
+        `split a multi-place phrase into ${splitPlaces.map((p) => p.name).join(", ")}`,
+      );
     }
   }
   if (!frame.location) {
-    const prefix = /^([\p{Lu}][\p{L}'-]+(?:\s+[\p{Lu}][\p{L}'-]+){0,2})\s+(?:businesses|firms|shops|companies|brands|jobs|restaurants)\b/u.exec(primaryRaw);
+    const prefix =
+      /^([\p{Lu}][\p{L}'-]+(?:\s+[\p{Lu}][\p{L}'-]+){0,2})\s+(?:businesses|firms|shops|companies|brands|jobs|restaurants)\b/u.exec(
+        primaryRaw,
+      );
     if (prefix) {
       const words = prefix[1].split(/\s+/);
-      const place = words.length > 1 && strictPlace(words.at(-1)!) ? words.slice(0, -1).join(" ") : prefix[1];
+      const place =
+        words.length > 1 && strictPlace(words.at(-1)!) ? words.slice(0, -1).join(" ") : prefix[1];
       if (plausiblePlace(place)) frame.location = geoFor(place, place, "in", 0.5);
     }
   }
-  if (frame.location && frame.target.entity_type.value === "business" && !frame.target.entity_subtype &&
-      /^\s*[\p{Lu}][\p{L}'-]+\s+(?:[\p{Lu}][\p{L}'-]+\s+)?businesses\b/u.test(primaryRaw)) {
+  if (
+    frame.location &&
+    frame.target.entity_type.value === "business" &&
+    !frame.target.entity_subtype &&
+    /^\s*[\p{Lu}][\p{L}'-]+\s+(?:[\p{Lu}][\p{L}'-]+\s+)?businesses\b/u.test(primaryRaw)
+  ) {
     frame.target.entity_subtype = openValue("local", null, "local", 0.6);
   }
 
   // 9. Deliverables, from the whole request — the cut segment included.
   const fields = fieldRequirements(analysis, deliverableTail);
   frame.required_fields = fields.required;
-  if (frame.required_fields.some((f) => ["linkedin", "instagram", "facebook"].includes(f.value)) &&
-      !frame.required_fields.some((f) => f.value === "socials")) {
+  if (
+    frame.required_fields.some((f) => ["linkedin", "instagram", "facebook"].includes(f.value)) &&
+    !frame.required_fields.some((f) => f.value === "socials")
+  ) {
     frame.required_fields.push(openValue("socials", null, "socials", 0.6));
   }
   frame.preferred_fields = fields.preferred;
@@ -2792,9 +3421,17 @@ export function extractFrameDeterministic(
     ["phone", "email", "address", "linkedin", "instagram", "facebook", "socials"].includes(f.value),
   );
   frame.verification = detectVerification(analysis);
-  if (/\b(?:last|latest|recent|recently|this\s+(?:week|month)|active)\b[^.!?]{0,70}\b(?:social|posts?|posted|instagram|insta|facebook|linkedin)\b|\b(?:social|posts?|posted|instagram|insta|facebook|linkedin)\b[^.!?]{0,70}\b(?:last|latest|recent|recently|this\s+(?:week|month)|active)\b/i.test(analysis)) {
+  if (
+    /\b(?:last|latest|recent|recently|this\s+(?:week|month)|active)\b[^.!?]{0,70}\b(?:social|posts?|posted|instagram|insta|facebook|linkedin)\b|\b(?:social|posts?|posted|instagram|insta|facebook|linkedin)\b[^.!?]{0,70}\b(?:last|latest|recent|recently|this\s+(?:week|month)|active)\b/i.test(
+      analysis,
+    )
+  ) {
     if (!frame.verification.some((v) => /social post/i.test(v.label ?? ""))) {
-      frame.verification.push({ kind: "other", label: "last social post date", raw: span(analysis) });
+      frame.verification.push({
+        kind: "other",
+        label: "last social post date",
+        raw: span(analysis),
+      });
     }
   }
   frame.output = detectOutput(analysis);
@@ -2803,7 +3440,8 @@ export function extractFrameDeterministic(
   // out: a lead with no name is not a lead, and the answer to "verify this" is
   // the evidence. Only ever added beside fields the user did state, so a plain
   // "restaurants in Lisbon" stays free of requirements nobody asked for.
-  const specified = frame.required_fields.length + frame.preferred_fields.length + frame.verification.length > 0;
+  const specified =
+    frame.required_fields.length + frame.preferred_fields.length + frame.verification.length > 0;
   if (specified) {
     const has = (n: string) => frame.required_fields.some((f) => f.value === n);
     if (!has("name")) {
@@ -2812,7 +3450,9 @@ export function extractFrameDeterministic(
     }
     if (frame.verification.length > 0 && !has("evidence")) {
       frame.required_fields.push(openValue("evidence", null, "evidence", 0.6));
-      notes.push("added evidence to the required fields — it is what a verification request asks to see");
+      notes.push(
+        "added evidence to the required fields — it is what a verification request asks to see",
+      );
     }
   }
 
@@ -2836,15 +3476,24 @@ export function extractFrameDeterministic(
     // A comma-delimited geography clause following all counted populations
     // scopes the complete request. Per-population locatives remain separate.
     const lastBucketAt = analysis.lastIndexOf(parts.at(-1)!);
-    const sharedGeoClause = analysis.slice(Math.max(0, lastBucketAt)).split(/[,;.!?]/).slice(1)
-      .find(clause => /^\s*(?:mostly|in|near|around|across|throughout)\s+/i.test(clause));
-    if (sharedGeoClause && subgoals.every(goal => goal.quantity?.requested)) {
+    const sharedGeoClause = analysis
+      .slice(Math.max(0, lastBucketAt))
+      .split(/[,;.!?]/)
+      .slice(1)
+      .find((clause) => /^\s*(?:mostly|in|near|around|across|throughout)\s+/i.test(clause));
+    if (sharedGeoClause && subgoals.every((goal) => goal.quantity?.requested)) {
       const places = splitMultiPlace(sharedGeoClause);
-      const shared = detectLocation(sharedGeoClause, excluded).location ??
-        (places?.[0] ? geoFor(places[0].name, sharedGeoClause.trim(), 'in', .8) : null);
+      const shared =
+        detectLocation(sharedGeoClause, excluded).location ??
+        (places?.[0] ? geoFor(places[0].name, sharedGeoClause.trim(), "in", 0.8) : null);
       if (shared) {
         frame.location ??= shared;
-        if (places) frame.locations = places.map(geo => geoFor(geo.name, geo.name, 'in', .8));
+        if (places) frame.locations = places.map((geo) => geoFor(geo.name, geo.name, "in", 0.8));
+        // The final recursive bucket also sees this shared clause. Its singular
+        // location would override the root's list during branch compilation.
+        for (const goal of subgoals) {
+          if (goal.location?.raw?.trim() === sharedGeoClause.trim()) goal.location = null;
+        }
       }
     }
   } else if (uncertain) {
@@ -2862,17 +3511,32 @@ export function extractFrameDeterministic(
   // trade, not a mystery to clarify about. Implemented at the relation
   // evaluation ONLY (never in the shared ACTIVITY_VERB_TOKENS set — that
   // regressed place-span parsing; see SEARCH_EXECUTION_MAP.md P1-D).
-  if ((relType === "unknown" || relType === "offers_service" || relType === "none") &&
-      !frame.target.category && !frame.target.industry &&
-      ["business", "company", "organization", "unknown"].includes(frame.target.entity_type.value)) {
-    const activityMatch = /\b(?:doing|does|do|offering|offers|offer|providing|provides|provide|making|makes|make|running|runs|run)\s+((?:[a-z][a-z'-]*\s+){0,2}[a-z][a-z'-]*)\s*(?:\?|[.,;]|$|\s+(?:in|near|around|across|with|for)\b)/i.exec(frame.input.normalized);
+  if (
+    (relType === "unknown" || relType === "offers_service" || relType === "none") &&
+    !frame.target.category &&
+    !frame.target.industry &&
+    ["business", "company", "organization", "unknown"].includes(frame.target.entity_type.value)
+  ) {
+    const activityMatch =
+      /\b(?:doing|does|do|offering|offers|offer|providing|provides|provide|making|makes|make|running|runs|run)\s+((?:[a-z][a-z'-]*\s+){0,2}[a-z][a-z'-]*)\s*(?:\?|[.,;]|$|\s+(?:in|near|around|across|with|for)\b)/i.exec(
+        frame.input.normalized,
+      );
     const activity = activityMatch?.[1]?.trim();
     const vague = !activity || /^(that|this|it|them|the same|something|stuff)\b/i.test(activity);
     const locValue = frame.location?.value?.toLowerCase() ?? null;
     if (activity && !vague && !(locValue && activity.toLowerCase().includes(locValue))) {
-      frame.target.category = openValue(activity.toLowerCase(), activityMatch![0].trim(), null, 0.7);
+      frame.target.category = openValue(
+        activity.toLowerCase(),
+        activityMatch![0].trim(),
+        null,
+        0.7,
+      );
       if (frame.target.entity_type.value === "unknown") {
-        frame.target.entity_type = { value: "business", raw: "anyone doing " + activity, confidence: 0.7 };
+        frame.target.entity_type = {
+          value: "business",
+          raw: "anyone doing " + activity,
+          confidence: 0.7,
+        };
         notes.push('"anyone doing X" reads as a business target (PRD V2 Phase 4)');
       }
       notes.push('activity "' + activity + '" read as the target category (PRD V2 Phase 4)');
@@ -2895,13 +3559,16 @@ export function extractFrameDeterministic(
     frame.evidence.claim_evidence_required = obligation.claim;
     frame.evidence.intent_signal_required = obligation.intent;
   }
-  if (relType === "investing_in" && /\b(?:actively|recent|recently|actual|current)\b/i.test(analysis)) {
+  if (
+    relType === "investing_in" &&
+    /\b(?:actively|recent|recently|actual|current)\b/i.test(analysis)
+  ) {
     frame.evidence.intent_signal_required = true;
   }
   frame.task_type = {
-    value: entity === "job" ? "job_discovery" : "lead_discovery",
+    value: frame.target.entity_type.value === "job" ? "job_discovery" : "lead_discovery",
     raw: null,
-    confidence: entity === "unknown" ? 0.5 : 0.8,
+    confidence: frame.target.entity_type.value === "unknown" ? 0.5 : 0.8,
   };
 
   // 12. Clarification — only for genuine blockers. An unfamiliar occupation is
@@ -2953,7 +3620,8 @@ export function extractFrameDeterministic(
   }
 
   if (relType === "none") notes.push("no relationship was requested — relation=none, not unknown");
-  if (relType === "unknown") notes.push("relation wording present but not readable deterministically");
+  if (relType === "unknown")
+    notes.push("relation wording present but not readable deterministically");
 
   frame.meta = {
     extractor: "deterministic",
@@ -2967,7 +3635,26 @@ export function extractFrameDeterministic(
     notes: notes.slice(0, 20),
   };
 
+  repairServiceBoundaries(frame);
+  repairInvestorScope(frame);
   return UnderstandingFrameSchema.parse(frame);
+}
+
+/** Preserve an explicit requested investor class, including OR alternatives. */
+export function repairInvestorScope(frame: UnderstandingFrame): boolean {
+  const raw = frame.input.raw;
+  const fund = '(?:funds?|(?:venture\\s+capital|vc|investment)\\s+(?:funds?|firms?))';
+  const angel = '(?:(?:individual|private)\\s+)?angels?(?:\\s+investors?)?';
+  const match = new RegExp(`\\b(?:actual|real|genuine|only)?\\s*(${fund}\\s*(?:/|or)\\s*${angel}|${angel}\\s*(?:/|or)\\s*${fund})\\b`, 'i').exec(raw);
+  if (!match || /\b(?:not|without|exclude|excluding|ideally|preferably|prefer|bonus)\s*$/i.test(raw.slice(0, match.index).trim())) return false;
+  const holders = [frame.target, ...frame.compound.subgoals.map(goal => goal.target)].filter(target => target.entity_type.value === 'investor');
+  let changed = false;
+  for (const target of holders) {
+    if (target.entity_subtype?.normalized === 'fund or angel') continue;
+    target.entity_subtype = openValue('fund or angel', match[0].trim(), 'fund or angel', .95);
+    changed = true;
+  }
+  return changed;
 }
 
 export {

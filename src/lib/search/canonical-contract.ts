@@ -10,10 +10,7 @@
  */
 import type { SearchSpec, SpecEntity } from "@/lib/search/search-spec";
 import type { Evidence } from "@/lib/search/evidence";
-import {
-  locationSatisfies,
-  resolveCanonicalLocation,
-} from "@/lib/search/location-resolver";
+import { locationSatisfies, resolveCanonicalLocation } from "@/lib/search/location-resolver";
 import { verifyCandidateClaims } from "@/lib/search/verification";
 import {
   QUALIFYING_CLAIM_TYPES,
@@ -40,10 +37,7 @@ export {
 };
 
 /** Field tier semantics (query-aware completeness). */
-export type FieldTier =
-  | "required_for_qualification"
-  | "required_when_available"
-  | "optional";
+export type FieldTier = "required_for_qualification" | "required_when_available" | "optional";
 
 export type PageType =
   | "entity_page"
@@ -185,25 +179,34 @@ export function queryRequiredFields(spec: SearchSpec): string[] {
     req.push("salary");
   }
   if (
-    (legacyText && /\b(?:(?:with|require(?:s|d)?|must have)\s+(?:(?:emails?|email addresses?)\s+(?:and|or)\s+)?phone(?: numbers?)?|phone(?: numbers?)?\s+required)\b/i.test(
-      spec.raw_query,
-    )) ||
-    fieldOf(spec, "require_phone") === "true" || requested.has("phone")
+    (legacyText &&
+      /\b(?:(?:with|require(?:s|d)?|must have)\s+(?:(?:emails?|email addresses?)\s+(?:and|or)\s+)?phone(?: numbers?)?|phone(?: numbers?)?\s+required)\b/i.test(
+        spec.raw_query,
+      )) ||
+    fieldOf(spec, "require_phone") === "true" ||
+    requested.has("phone")
   ) {
     req.push("phone");
   }
   if (
-    (legacyText && /\b(with emails?|email addresses?|emails?\s+required|require(?:s|d)?\s+email)\b/i.test(
-      spec.raw_query,
-    )) ||
-    fieldOf(spec, "require_email") === "true" || requested.has("email")
+    (legacyText &&
+      /\b(with emails?|email addresses?|emails?\s+required|require(?:s|d)?\s+email)\b/i.test(
+        spec.raw_query,
+      )) ||
+    fieldOf(spec, "require_email") === "true" ||
+    requested.has("email")
   ) {
     req.push("email");
   }
   if (requested.has("website") || fieldOf(spec, "require_website") === "true") req.push("website");
   // Any public contact channel (email, phone, or first-party contact page).
   if (requested.has("contact") || fieldOf(spec, "require_contact") === "true") req.push("contact");
-  if (requested.has("socials") || requested.has("social") || fieldOf(spec, "require_socials") === "true") req.push("socials");
+  if (
+    requested.has("socials") ||
+    requested.has("social") ||
+    fieldOf(spec, "require_socials") === "true"
+  )
+    req.push("socials");
   if (spec.signal_required) {
     req.push("claim_evidence");
   }
@@ -321,8 +324,7 @@ export function evaluateQualifiedLeadTheorem(
     };
   }
 
-  const resolved =
-    candidate.entity_resolved === true || candidate.entity_resolution === "resolved";
+  const resolved = candidate.entity_resolved === true || candidate.entity_resolution === "resolved";
   if (!resolved) {
     return {
       ok: false,
@@ -358,32 +360,83 @@ export function evaluateQualifiedLeadTheorem(
   const qFields = queryRequiredFields(spec);
   const f = candidate.fields ?? {};
   const socialObservation = (item: Evidence | ClaimEvidence): boolean => {
-    if (("source_type" in item && item.source_type === "social") ||
-      ("evidence_source" in item && /social|instagram|facebook|linkedin|tiktok|youtube/i.test(item.evidence_source ?? ""))) return true;
-    if (!("extraction_method" in item && item.extraction_method === "browser_observed_text" && item.evidence_type === "identity" &&
-      !!candidate.name && !!item.excerpt?.toLowerCase().includes(candidate.name.toLowerCase()))) return false;
-    try { return /(?:^|\.)(?:instagram|facebook|linkedin|tiktok|youtube|twitter|x)\.com$/i.test(new URL(item.source_url).hostname); }
-    catch { return false; }
+    if (
+      ("source_type" in item && item.source_type === "social") ||
+      ("evidence_source" in item &&
+        /social|instagram|facebook|linkedin|tiktok|youtube/i.test(item.evidence_source ?? ""))
+    )
+      return true;
+    if (
+      !(
+        "extraction_method" in item &&
+        item.extraction_method === "browser_observed_text" &&
+        item.evidence_type === "identity" &&
+        !!candidate.name &&
+        !!item.excerpt?.toLowerCase().includes(candidate.name.toLowerCase())
+      )
+    )
+      return false;
+    try {
+      return /(?:^|\.)(?:instagram|facebook|linkedin|tiktok|youtube|twitter|x)\.com$/i.test(
+        new URL(item.source_url).hostname,
+      );
+    } catch {
+      return false;
+    }
   };
   const observedField = (field: string): boolean => {
     const text = (value: unknown) => typeof value === "string" && !!value.trim();
     if (field === "website") return text(f.website_url);
-    if (field === "contact") return text(f.email) || text(f.phone) ||
-      (text(f.contact_page_url) && (candidate.field_provenance?.contact_page_url as Record<string, unknown> | undefined)?.verification_status === "verified") ||
-      !!candidate.evidence?.some((item) => isSubjectBound(item, id!) && "evidence_type" in item && item.evidence_type === "contact" && !!item.source_url);
-    if (field === "socials" || field === "social") return !!candidate.evidence?.some((item) =>
-      isSubjectBound(item, id!) && socialObservation(item) &&
-      !!("source_url" in item ? item.source_url : item.evidence_url));
+    if (field === "contact")
+      return (
+        text(f.email) ||
+        text(f.phone) ||
+        (text(f.contact_page_url) &&
+          (candidate.field_provenance?.contact_page_url as Record<string, unknown> | undefined)
+            ?.verification_status === "verified") ||
+        !!candidate.evidence?.some(
+          (item) =>
+            isSubjectBound(item, id!) &&
+            "evidence_type" in item &&
+            item.evidence_type === "contact" &&
+            !!item.source_url,
+        )
+      );
+    if (field === "socials" || field === "social")
+      return !!candidate.evidence?.some(
+        (item) =>
+          isSubjectBound(item, id!) &&
+          socialObservation(item) &&
+          !!("source_url" in item ? item.source_url : item.evidence_url),
+      );
     if (["instagram", "facebook", "linkedin", "tiktok", "youtube", "twitter"].includes(field)) {
       const hostMatches = (url: unknown) => {
         if (!text(url)) return false;
-        try { const host = new URL(String(url)).hostname.toLowerCase(); return host === `${field}.com` || host.endsWith(`.${field}.com`) || (field === "twitter" && host === "x.com"); } catch { return false; }
+        try {
+          const host = new URL(String(url)).hostname.toLowerCase();
+          return (
+            host === `${field}.com` ||
+            host.endsWith(`.${field}.com`) ||
+            (field === "twitter" && host === "x.com")
+          );
+        } catch {
+          return false;
+        }
       };
-      const verifiedField = (name: string) => hostMatches(f[name]) &&
-        (candidate.field_provenance?.[name] as Record<string, unknown> | undefined)?.verification_status === "verified";
-      return verifiedField(`${field}_url`) || verifiedField(field) || !!candidate.evidence?.some((item) =>
-        isSubjectBound(item, id!) && socialObservation(item) &&
-        hostMatches("source_url" in item ? item.source_url : item.evidence_url));
+      const verifiedField = (name: string) =>
+        hostMatches(f[name]) &&
+        (candidate.field_provenance?.[name] as Record<string, unknown> | undefined)
+          ?.verification_status === "verified";
+      return (
+        verifiedField(`${field}_url`) ||
+        verifiedField(field) ||
+        !!candidate.evidence?.some(
+          (item) =>
+            isSubjectBound(item, id!) &&
+            socialObservation(item) &&
+            hostMatches("source_url" in item ? item.source_url : item.evidence_url),
+        )
+      );
     }
     return text(f[field]);
   };
@@ -395,14 +448,24 @@ export function evaluateQualifiedLeadTheorem(
     } else {
       // Spec location is a hard gate: Dallas cannot satisfy Austin even when
       // claim evidence matches. Prefer location_id when extract stamped one.
-      const required =
-        fieldOf(spec, "location_id") != null
-          ? resolveCanonicalLocation(fieldOf(spec, "location")!)
-          : fieldOf(spec, "location");
-      const normalizedCountryMatches = typeof required === "object" && required?.kind === "country" &&
-        typeof f.country === "string" && !!required.country_code &&
-        f.country.toUpperCase() === required.country_code.toUpperCase();
-      if (required && !normalizedCountryMatches && !locationSatisfies(String(loc), required)) {
+      const places = spec.locations?.length
+        ? spec.locations
+        : [fieldOf(spec, "location")].filter((place): place is string => !!place);
+      const matches = places.some((place) => {
+        const required = resolveCanonicalLocation(place) ?? place;
+        const countryCode =
+          typeof f.country === "string"
+            ? (resolveCanonicalLocation(f.country)?.country_code ?? f.country)
+            : null;
+        const countryMatches =
+          typeof required === "object" &&
+          required.kind === "country" &&
+          !!countryCode &&
+          !!required.country_code &&
+          countryCode.toUpperCase() === required.country_code.toUpperCase();
+        return countryMatches || locationSatisfies(String(loc), required);
+      });
+      if (places.length && !matches) {
         return {
           ok: false,
           reject_code: "LOCATION_MISMATCH",

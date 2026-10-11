@@ -2,14 +2,61 @@ import { describe, expect, it } from 'vitest';
 import { extractFrameDeterministic } from './fallback';
 import { validateFrame } from './validate';
 import { frameToSearchSpec } from './to-search-spec';
-import { openValue } from './frame';
+import { openValue, QuantitySchema } from './frame';
 import { decideSpecClarification } from '../stage1/stage1-adapter';
 import { deriveTemporalConstraint, evaluateTemporalValidity } from '../search/verification';
 import { makeEvidence } from '../search/evidence';
 
 const specOf = (raw: string) => frameToSearchSpec(validateFrame(extractFrameDeterministic(raw)).frame);
 
+const providerCompanyBucketsWithOptionalPeople = (raw: string, first: string, second: string) => {
+  const frame = validateFrame(extractFrameDeterministic(raw)).frame;
+  frame.meta.extractor = 'llm';
+  frame.target.entity_type = { value: 'person', raw: 'companies', confidence: .85 };
+  frame.target.category = openValue(first, first);
+  frame.target.role = openValue('founder or decision maker', 'founders or decision makers');
+  frame.constraints = frame.constraints.filter(c => c.field !== 'employee_count');
+  frame.compound = {
+    is_compound: true,
+    subgoals: [first, second].map((category, index) => ({
+      raw: index === 0 ? `15 ${category}` : `another 15 ${category}`,
+      target: {
+        ...frame.target,
+        entity_type: { value: 'person' as const, raw: category, confidence: .85 },
+        category: openValue(category, category),
+        role: openValue('founder or decision maker', 'founders or decision makers'),
+      },
+      relation: frame.relation,
+      location: frame.location,
+      temporal: null,
+      constraints: [],
+      quantity: QuantitySchema.parse({ requested: 15 }),
+    })),
+  };
+  return frameToSearchSpec(validateFrame(frame).frame);
+};
+
 describe('chaos bucket and preference contracts', () => {
+  it.each([
+    ['looking for investors who actually invest in ai startups, ideally seed/preseed, canada or us is good, checks maybe 100k to 2m ish but thats not an absolute rule, bonus if theyve invested in devtools automation agents data infra kinda stuff recently, i want actual funds/angels not articles talking about venture capital', ['Canada', 'USA']],
+    ['Find investors investing in healthtech, preferably seed or pre-seed, Ireland or UK is fine', ['Ireland', 'UK']],
+    ['Find investors in climate startups, ideally early stage, in Germany and Netherlands', ['Germany', 'Netherlands']],
+    ['Find investors investing in robotics, seed stage preferred, Australia or New Zealand is good', ['Australia', 'New Zealand']],
+  ])('retains stage and target geography after a preference clause: %s', (raw, places) => {
+    const spec = specOf(raw);
+    expect(spec.locations).toEqual(places);
+    expect(spec.criteria.some(c => c.field === 'prefer_investor_stage')).toBe(true);
+    expect(spec.criteria.some(c => c.field === 'investor_stage')).toBe(false);
+  });
+
+  it.each([
+    'Find investors in Toronto, ideally seed stage, email contacts in Canada and UK',
+    'Find investors in Toronto, ideally seed stage, use registry sources in Canada and UK',
+    'Find investors in Toronto, ideally seed stage, not Canada just mentioning Canada because thats where im contacting them from',
+  ])('keeps post-preference contact, source and sender places out of targets: %s', raw => {
+    expect(specOf(raw).locations).toEqual(['Toronto']);
+  });
+
   it.each([
     'Find photographers in Ireland, need their website or instagram and some way to contact them',
     'Find dentists in Canada, need email or phone',
@@ -66,6 +113,8 @@ describe('chaos bucket and preference contracts', () => {
     for (const goal of frame.compound.subgoals) {
       const branch = frameToSearchSpec({ ...frame, input: { raw: goal.raw!, normalized: goal.raw! },
         target: goal.target, relation: goal.relation, quantity: goal.quantity ?? null,
+        location: goal.location ?? frame.location,
+        locations: goal.location ? [goal.location] : frame.locations,
         compound: { is_compound: false, subgoals: [] } });
       expect(branch.criteria.some(c => c.field === 'employee_count')).toBe(false);
       expect(branch.criteria.some(c => c.field === 'prefer_employee_count')).toBe(true);
@@ -128,6 +177,46 @@ describe('chaos bucket and preference contracts', () => {
     const spec = specOf(raw);
     expect(decideSpecClarification(spec, false)).toBeNull();
     expect(decideSpecClarification(spec, true)).toBeNull();
+  });
+
+  it.each([
+    [
+      'need maybe 15 cybersecurity companies then another 15 ai infra/devtool startups, mostly usa/canada, preferably under like 100 employees but if headcount is unknown dont kill the result, founders or decision makers would be useful and pls dont mix cybersecurity consultants with actual product companies unless they genuinely fit',
+      'cybersecurity company',
+      'ai infra/devtool startup',
+    ],
+    [
+      'find 15 fintech companies and another 15 climate startups in Germany or Netherlands, ideally under 80 employees, founders would be helpful',
+      'fintech company',
+      'climate startup',
+    ],
+    [
+      'need 15 biotech companies then 15 robotics startups around Australia and New Zealand, preferably fewer than 120 employees, decision makers would be useful',
+      'biotech company',
+      'robotics startup',
+    ],
+  ])('keeps organization buckets primary when founders are optional: %s', (raw, first, second) => {
+    const spec = providerCompanyBucketsWithOptionalPeople(raw, first, second);
+    expect(spec.entity).toBe('company');
+    expect(spec.criteria.some(c => c.field === 'role')).toBe(false);
+    expect(spec.criteria.some(c => c.field === 'employee_count')).toBe(false);
+    expect(spec.criteria.some(c => c.field === 'prefer_employee_count')).toBe(true);
+    expect(spec.understanding?.compound.subgoals.map(goal => goal.target.entity_type.value)).toEqual(['company', 'company']);
+  });
+
+  it.each([
+    'Find founders of AI startups in Toronto',
+    'Find decision makers at cybersecurity companies in USA',
+    'Find founders of AI startups in Toronto, ideally under 100 employees',
+    'Find decision makers at cybersecurity companies in USA, preferably under 100 employees',
+    'Find founders of startups in Toronto, email would be useful',
+  ])('keeps primary person searches as people: %s', raw => {
+    const frame = validateFrame(extractFrameDeterministic(raw)).frame;
+    frame.meta.extractor = 'llm';
+    frame.target.entity_type = { value: 'person', raw: /decision/i.test(raw) ? 'decision makers' : 'founders', confidence: .9 };
+    frame.target.role = openValue(/decision/i.test(raw) ? 'decision maker' : 'founder', /decision/i.test(raw) ? 'decision makers' : 'founders');
+    frame.target.category = openValue(/cybersecurity/i.test(raw) ? 'cybersecurity company' : 'AI startup', /cybersecurity/i.test(raw) ? 'cybersecurity companies' : 'AI startups');
+    expect(frameToSearchSpec(validateFrame(frame).frame).entity).toBe('person');
   });
 
   it.each([

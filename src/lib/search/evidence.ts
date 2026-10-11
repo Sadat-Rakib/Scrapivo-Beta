@@ -21,6 +21,7 @@ export type EvidenceType =
   | "funding"
   | "investment"
   | "social_ask"
+  | "custom_signal"
   | "contact"
   | "identity"
   | "other";
@@ -83,10 +84,12 @@ export function nowIso(): string {
   return new Date().toISOString();
 }
 
-export function makeEvidence(partial: Omit<Evidence, "observed_at" | "confidence"> & {
-  observed_at?: string;
-  confidence?: number;
-}): Evidence {
+export function makeEvidence(
+  partial: Omit<Evidence, "observed_at" | "confidence"> & {
+    observed_at?: string;
+    confidence?: number;
+  },
+): Evidence {
   return {
     ...partial,
     confidence: partial.confidence ?? 0.7,
@@ -183,6 +186,14 @@ export function whyMatchFromEvidence(evidence: Evidence[] | null | undefined): s
 export function hasQualifyingEvidence(evidence: Evidence[] | null | undefined): boolean {
   if (!evidence?.length) return false;
   return evidence.some((e) =>
-    ["hiring", "service_request", "no_website", "funding", "investment", "social_ask"].includes(e.evidence_type),
+    [
+      "hiring",
+      "service_request",
+      "no_website",
+      "funding",
+      "investment",
+      "social_ask",
+      "custom_signal",
+    ].includes(e.evidence_type),
   );
 }

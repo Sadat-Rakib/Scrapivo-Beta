@@ -1,10 +1,13 @@
 import type { SpecRow } from "@/lib/spec-search.functions";
+import { verifyCandidateClaims } from './verification';
 import type { SearchSpec } from "./search-spec";
 import type { Qualification } from "./qualify";
 import { queryRequiredFields } from "./canonical-contract";
 import { missingRequiredFields } from "./completeness";
+import { serviceBoundaryState, softwareActivityRequested } from "./service-boundary";
+import { investorScopeState } from "./entity-resolve";
 
-export type ResearchNeed = "identity" | "role" | "company" | "industry" | "location" | "website" | "profile" | "contact" | "social" | "signal" | "topic" | "no_website_verification";
+export type ResearchNeed = "identity" | "role" | "company" | "industry" | "location" | "website" | "profile" | "contact" | "social" | "signal" | "topic" | "no_website_verification" | "product_company";
 export type ResearchStatus = "discovered" | "researching" | "ready_for_qualification" | "verified" | "exhausted" | "rejected";
 
 /**
@@ -39,15 +42,19 @@ export function computeResearchNeeds(row: SpecRow, spec: SearchSpec, qualificati
   const incomplete = missingRequiredFields({ ...row, url: destination ?? null });
   const wantsPublicContact = /public contact details?/i.test(spec.raw_query) && !contactSatisfied(row);
   const required = queryRequiredFields(spec);
+  const needsProduct = serviceBoundaryState(spec, row) === "unknown";
+  const needsInvestorIdentity = investorScopeState(spec, row) === "unknown";
   const missingRequested = required.some((field) =>
     (field === "email" && !row.email) || (field === "phone" && !row.phone) ||
     (field === "contact" && !contactSatisfied(row)) ||
     (field === "website" && !row.website_url) ||
     (field === "socials" && !row.evidence?.some((item) => item.source_type === "social" && !!item.source_url)));
-  if (qualification.disposition === "qualified" && incomplete.length === 0 && !wantsPublicContact && !missingRequested) return [];
+  if (qualification.disposition === "qualified" && incomplete.length === 0 && !wantsPublicContact && !missingRequested && !needsProduct && !needsInvestorIdentity) return [];
   if (qualification.reject_code === "ENTITY_TYPE_MISMATCH" || qualification.reject_code === "LOCATION_MISMATCH") return [];
   const needs: ResearchNeed[] = [];
   const add = (need: ResearchNeed) => { if (!needs.includes(need)) needs.push(need); };
+  if (needsProduct) add(softwareActivityRequested(spec) ? "industry" : "product_company");
+  if (needsInvestorIdentity) add("identity");
   if (!row.entity_resolved || qualification.reject_code === "ENTITY_UNRESOLVED" || qualification.reject_code === "PROVISIONAL_ENTITY" || qualification.reject_code === "IDENTITY_AMBIGUOUS") add("identity");
   if (row.kind === "person" || requested(spec, "role")) {
     if (!row.role || ["EMPLOYMENT_UNPROVEN", "CURRENTNESS_MISMATCH", "ASSOCIATED_COMPANY_UNRESOLVED"].includes(qualification.reject_code ?? "")) add("role");
@@ -73,6 +80,11 @@ export function computeResearchNeeds(row: SpecRow, spec: SearchSpec, qualificati
     else if (field === "url") add(row.kind === "person" ? "profile" : "website");
   }
   if (qualification.reject_code === "NO_CLAIM_EVIDENCE" && needs.length === 0 && requested(spec, "opportunity")) add("no_website_verification");
+  if (spec.signal_required && !verifyCandidateClaims({ evidence: row.evidence ?? [], entityId: row.entity_id ?? row.key ?? '', spec }).ok) {
+    // Resolve identity/fit and hunt signals before dedicated contact pages.
+    if (!spec.criteria.some(c => c.field === 'opportunity' && c.value === 'no_website')) add('signal');
+    return needs.filter(need => need !== 'contact');
+  }
   return needs;
 }
 

@@ -1,0 +1,35 @@
+import { expect, test } from "@playwright/test";
+import { join } from "node:path";
+const EMAIL = "e2e.scrapivo.test.001@gmail.com";
+const PASS = "E2eTest!2026-xyz";
+test("probe B08 v2", async ({ page }) => {
+  page.on("console", (m) => { if (m.type() === "error") console.log("PAGE-ERR:", m.text().slice(0, 250)); });
+  page.on("response", async (r) => {
+    if (r.request().method() === "POST" && r.url().includes("_serverFn") && !r.url().includes("progress")) {
+      let body = "";
+      try { body = (await r.text()).slice(0, 1200); } catch { body = "<no body>"; }
+      console.log("SF:", r.status(), JSON.stringify(body));
+    }
+  });
+  await page.addInitScript(() => {
+    localStorage.setItem("scrapivo:onboarding-skipped", "1");
+    localStorage.setItem("scrapivo:guided-tour-seen", "1");
+  });
+  await page.goto("/auth");
+  await page.getByLabel(/email/i).fill(EMAIL);
+  await page.getByLabel(/password/i).fill(PASS);
+  await page.getByRole("button", { name: "Sign In", exact: true }).click();
+  await page.waitForURL(/discover|home|\/$/, { timeout: 30_000 });
+  await page.goto("/discover");
+  const skip = page.locator("text=Skip for now").first();
+  if (await skip.isVisible({ timeout: 10_000 }).catch(() => false)) await skip.click();
+  await expect(page.getByRole("textbox").first()).toBeVisible({ timeout: 30_000 });
+  await page.locator('input[type="file"]').first().setInputFiles(join(process.cwd(), "e2e/fixtures/stage1-price-list.pdf"));
+  await expect(page.locator("text=/Stage 1 will read/i").first()).toBeVisible({ timeout: 40_000 });
+  console.log("CHIP-OK");
+  await page.getByRole("textbox").first().press("Enter");
+  console.log("SUBMITTED, waiting 60s");
+  await page.waitForTimeout(60_000);
+  console.log("DONE card:", await page.getByText(/Narrow this down|Here is what I understood/).count(), "zero:", await page.getByText(/No verified matches/).count());
+  expect(true).toBe(true);
+});

@@ -22,6 +22,8 @@ import {
   type FieldProvenance,
 } from "@/lib/search/enrichment-merge";
 import { contactSiteUrl } from "@/lib/search/enrich-incomplete";
+import { verifyCandidateClaims } from "./verification";
+import { rowCouldSatisfySpec } from "@/lib/spec-search.functions";
 
 export type EnrichmentAdapter = (ctx: {
   spec: SearchSpec;
@@ -68,11 +70,8 @@ async function resolveOfficialDestination(
   throwIfAborted(signal);
   const { discoverWebFreeFirst } = await import("@/lib/search/provider-ladder");
   const { classifyPage } = await import("@/lib/search/page-classify");
-  const {
-    normalizeEntityName,
-    normalizeDomain,
-    isFirstPartyEntityHost,
-  } = await import("@/lib/search/entity-resolve");
+  const { normalizeEntityName, normalizeDomain, isFirstPartyEntityHost } =
+    await import("@/lib/search/entity-resolve");
   const name = (candidate.title ?? "").trim();
   const companyName = candidate.kind === "person" ? (candidate.company ?? "").trim() : name;
   const subject = companyName || name;
@@ -103,12 +102,19 @@ async function resolveOfficialDestination(
     const hostNorm = normalizeEntityName(host.replace(/\.[a-z.]+$/, ""));
     const titleNorm = normalizeEntityName(r.title);
     const hostHit = subjectTokens.some((t) => hostNorm.includes(t));
-    const titleHit = titleNorm.includes(subjectNorm) || subjectNorm.includes(titleNorm) ||
-      titleNorm.split(" ").slice(0, 5).some((t) => t.length >= 4 && subjectTokens.includes(t));
+    const titleHit =
+      titleNorm.includes(subjectNorm) ||
+      subjectNorm.includes(titleNorm) ||
+      titleNorm
+        .split(" ")
+        .slice(0, 5)
+        .some((t) => t.length >= 4 && subjectTokens.includes(t));
     const snippetHit = normalizeEntityName(r.content ?? "").includes(subjectNorm);
     // Host token alone is too weak (plumbingsupply.com ≠ "A1 Plumbing").
     // Require title/snippet corroboration, or a full-name host hit.
-    if (!((hostHit && (titleHit || snippetHit)) || hostNorm.includes(subjectNorm.replace(/\s/g, "")))) {
+    if (
+      !((hostHit && (titleHit || snippetHit)) || hostNorm.includes(subjectNorm.replace(/\s/g, "")))
+    ) {
       continue;
     }
     return r.url;
@@ -123,8 +129,14 @@ export function defaultEnrichmentAdapters(): Partial<
   return {
     "no-website-verify": async ({ candidate, fields }) => {
       if (!fields.includes("no_website")) return { fields: [] };
-      const hasClaim = candidate.evidence?.some((e) => e.evidence_type === "no_website" &&
-        e.subject === candidate.entity_id && ["osm_absence_plus_exact_web_check", "structured_absence_plus_exact_web_check"].includes(e.extraction_method ?? ""));
+      const hasClaim = candidate.evidence?.some(
+        (e) =>
+          e.evidence_type === "no_website" &&
+          e.subject === candidate.entity_id &&
+          ["osm_absence_plus_exact_web_check", "structured_absence_plus_exact_web_check"].includes(
+            e.extraction_method ?? "",
+          ),
+      );
       if (hasClaim) return { fields: [] };
       const verification = candidate.no_website_verification;
       if (candidate.website_url || candidate.url || verification?.official_site_found) {
@@ -133,20 +145,34 @@ export function defaultEnrichmentAdapters(): Partial<
           error: "has_website_cannot_verify_absence",
         };
       }
-      if (candidate.entity_resolved === true && candidate.entity_id &&
-          verification?.structured_absence === true && verification.structured_source_url &&
-          new Set(verification.exact_queries.map((q) => q.trim().toLowerCase()).filter(Boolean)).size >= 2) {
-        return { fields: [], claims: [{
-          evidence_type: "no_website",
-          excerpt: "Official website not found after structured-source and exact-name verification.",
-          source_url: verification.structured_source_url,
-          source_type: verification.structured_source_url.startsWith("overture:") ? "db" : "osm",
-          supports: "opportunity",
-          subject: candidate.entity_id,
-          confidence: 0.7,
-          extraction_method: verification.structured_source_url.startsWith("overture:")
-            ? "structured_absence_plus_exact_web_check" : "osm_absence_plus_exact_web_check",
-        }] };
+      if (
+        candidate.entity_resolved === true &&
+        candidate.entity_id &&
+        verification?.structured_absence === true &&
+        verification.structured_source_url &&
+        new Set(verification.exact_queries.map((q) => q.trim().toLowerCase()).filter(Boolean))
+          .size >= 2
+      ) {
+        return {
+          fields: [],
+          claims: [
+            {
+              evidence_type: "no_website",
+              excerpt:
+                "Official website not found after structured-source and exact-name verification.",
+              source_url: verification.structured_source_url,
+              source_type: verification.structured_source_url.startsWith("overture:")
+                ? "db"
+                : "osm",
+              supports: "opportunity",
+              subject: candidate.entity_id,
+              confidence: 0.7,
+              extraction_method: verification.structured_source_url.startsWith("overture:")
+                ? "structured_absence_plus_exact_web_check"
+                : "osm_absence_plus_exact_web_check",
+            },
+          ],
+        };
       }
       return {
         fields: [],
@@ -294,6 +320,8 @@ export async function enrichCandidateForSpec(
       maxContactHarvest?: number;
       maxSteps?: number;
     };
+    /** Absolute shared batch deadline, never reset for each candidate. */
+    deadlineMs?: number;
   },
 ): Promise<EnrichCandidateResult> {
   throwIfAborted(opts?.signal);
@@ -309,6 +337,7 @@ export async function enrichCandidateForSpec(
 
   for (const step of plan.steps) {
     throwIfAborted(opts?.signal);
+    if (opts?.deadlineMs != null && Date.now() >= opts.deadlineMs) break;
     const adapter = adapters[step.providerId];
     if (!adapter) {
       diagnostics.push({
@@ -321,12 +350,34 @@ export async function enrichCandidateForSpec(
       continue;
     }
     try {
-      const result = await adapter({
-        spec,
-        candidate: row,
-        fields: step.fields,
-        signal: opts?.signal,
+      const controller = new AbortController();
+      const abort = () => controller.abort(opts?.signal?.reason);
+      if (opts?.signal?.aborted) abort();
+      else opts?.signal?.addEventListener("abort", abort, { once: true });
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const bounded = new Promise<EnrichmentAdapterResult>((resolve) => {
+        controller.signal.addEventListener(
+          "abort",
+          () => resolve({ fields: [], error: "enrichment_budget_or_cancelled" }),
+          { once: true },
+        );
+        if (opts?.deadlineMs != null)
+          timer = setTimeout(
+            () => controller.abort("enrichment_batch_deadline"),
+            Math.max(0, opts.deadlineMs - Date.now()),
+          );
       });
+      let result: EnrichmentAdapterResult;
+      try {
+        result = await Promise.race([
+          adapter({ spec, candidate: row, fields: step.fields, signal: controller.signal }),
+          bounded,
+        ]);
+      } finally {
+        if (timer) clearTimeout(timer);
+        opts?.signal?.removeEventListener("abort", abort);
+      }
+      throwIfAborted(opts?.signal);
       if (result.unavailable) {
         diagnostics.push({
           provider: step.providerId,
@@ -342,10 +393,7 @@ export async function enrichCandidateForSpec(
         entityId: row.entity_id,
         allowedClaims: requirements.requestedClaims,
       });
-      row = preserveNoWebsiteOpportunity(
-        merged.row,
-        fieldOf(spec, "opportunity"),
-      );
+      row = preserveNoWebsiteOpportunity(merged.row, fieldOf(spec, "opportunity"));
       diagnostics.push({
         provider: step.providerId,
         attempted: true,
@@ -388,18 +436,56 @@ export async function enrichCandidatesForSpec(
     maxPaidCalls?: number;
     /** Shared contact budget; optional metadata must not hold up search completion. */
     contactBudgetMs?: number;
+    maxAdapterCalls?: number;
+    sharedBudget?: {
+      deadlineMs?: number;
+      adapterCalls: number;
+      contactCandidates: number;
+      paidCalls: number;
+    };
   },
 ): Promise<{ rows: SpecRow[]; diagnostics: EnrichmentDiagnostic[] }> {
   throwIfAborted(opts?.signal);
   const maxContact = opts?.maxContactCandidates ?? 8;
   const out: SpecRow[] = [];
   const diagnostics: EnrichmentDiagnostic[] = [];
-  let contactUsed = 0;
-  let paidUsed = 0;
-  const contactDeadline = Date.now() + (opts?.contactBudgetMs ?? 20_000);
+  let contactUsed = opts?.sharedBudget?.contactCandidates ?? 0;
+  let paidUsed = opts?.sharedBudget?.paidCalls ?? 0;
+  let adapterCalls = opts?.sharedBudget?.adapterCalls ?? 0;
+  const contactDeadline =
+    opts?.sharedBudget?.deadlineMs ?? Date.now() + (opts?.contactBudgetMs ?? 20_000);
+  if (opts?.sharedBudget) opts.sharedBudget.deadlineMs = contactDeadline;
 
-  for (const row of rows) {
+  // Spend shared contacts on the strongest eligible candidates first. Stable
+  // ties retain source order; final delivery ranking remains the caller's gate.
+  const prioritized = rows
+    .map((row, index) => ({ row, index }))
+    .sort(
+      (a, b) =>
+        (b.row.relevance_score ?? 0) +
+          (b.row.identity_confidence ?? 0) -
+          ((a.row.relevance_score ?? 0) + (a.row.identity_confidence ?? 0)) || a.index - b.index,
+    );
+  for (const { row } of prioritized) {
     throwIfAborted(opts?.signal);
+    if (Date.now() >= contactDeadline || adapterCalls >= (opts?.maxAdapterCalls ?? 64)) {
+      out.push(row);
+      continue;
+    }
+    // Missing contact data is researchable, but contact research is authorized
+    // only after known constraints and mandatory signal evidence pass.
+    if (
+      !rowCouldSatisfySpec(spec, row) ||
+      (spec.signal_required &&
+        !verifyCandidateClaims({
+          evidence: row.evidence ?? [],
+          entityId: row.entity_id ?? row.key ?? "",
+          spec,
+        }).ok)
+    ) {
+      out.push(row);
+      continue;
+    }
     // Never enrich unresolved / provisional sources — they cannot qualify yet,
     // and spending budget on list/article pages is waste (and a 100× trap).
     if (row.entity_resolved !== true) {
@@ -415,10 +501,11 @@ export async function enrichCandidatesForSpec(
     const res = await enrichCandidateForSpec(row, spec, {
       adapters: opts?.adapters,
       signal: opts?.signal,
+      deadlineMs: contactDeadline,
       budget: {
         maxContactHarvest: allowContact ? 1 : 0,
         maxPaidCalls: allowPaid ? 1 : 0,
-        maxSteps: 4,
+        maxSteps: Math.min(4, (opts?.maxAdapterCalls ?? 64) - adapterCalls),
       },
     });
     if (res.diagnostics.some((d) => d.provider === "contact-harvest" && d.attempted)) {
@@ -428,6 +515,13 @@ export async function enrichCandidatesForSpec(
       paidUsed += 1;
     }
     diagnostics.push(...res.diagnostics);
+    adapterCalls += res.diagnostics.filter((d) => d.attempted).length;
+    if (opts?.sharedBudget)
+      Object.assign(opts.sharedBudget, {
+        adapterCalls,
+        contactCandidates: contactUsed,
+        paidCalls: paidUsed,
+      });
     out.push(res.row);
   }
 
@@ -438,8 +532,7 @@ export async function enrichCandidatesForSpec(
 export function enrichmentAdapter(
   result: EnrichmentAdapterResult | ((fields: string[]) => EnrichmentAdapterResult),
 ): EnrichmentAdapter {
-  return async ({ fields }) =>
-    typeof result === "function" ? result(fields) : result;
+  return async ({ fields }) => (typeof result === "function" ? result(fields) : result);
 }
 
 export type { FieldProvenance };

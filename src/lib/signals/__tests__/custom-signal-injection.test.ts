@@ -16,11 +16,7 @@ import type { Evidence } from "@/lib/search/evidence";
 import type { SpecRow } from "@/lib/spec-search.functions";
 import type { CompiledCustomSignal } from "../custom-compiler";
 import { CustomSignalSchema } from "../custom-compiler";
-import {
-  createCustomSignalHunter,
-  finalQualify,
-  runDeepSignalPass,
-} from "../deep-pass.server";
+import { createCustomSignalHunter, finalQualify, runDeepSignalPass } from "../deep-pass.server";
 
 const spec: SearchSpec = buildSpec({
   entity: "company",
@@ -141,15 +137,13 @@ describe("createCustomSignalHunter — indicator-aware evidence scoring", () => 
     expect(final.qualified[0]!.entity_id).toBe("company:acme");
   });
 
-  it("default verification counts even when no observableIndicator matches", async () => {
+  it("unrelated service evidence cannot satisfy the requested automation signal", async () => {
     const hunter = createCustomSignalHunter(compiled(), {
-      webSearch: async () => [
-        hit("Acme Dynamics is looking for a website redesign service"),
-      ],
+      webSearch: async () => [hit("Acme Dynamics is looking for a website redesign service")],
     });
     const deep = await runDeepSignalPass([row()], spec, { hunter });
-    expect(deep.signalReady).toHaveLength(1);
-    const attached = deep.signalReady[0]!.evidence ?? [];
+    expect(deep.signalReady).toHaveLength(0);
+    const attached = deep.stillUnsignaled[0]!.evidence ?? [];
     expect(attached[0]!.extraction_method).toBe("searxng_snippet");
   });
 
@@ -176,7 +170,8 @@ describe("createCustomSignalHunter — indicator-aware evidence scoring", () => 
       ],
     });
     const deep = await runDeepSignalPass([row()], spec, { hunter });
-    const attached = deep.signalReady[0]?.evidence ?? [];
+    expect(deep.signalReady).toHaveLength(0);
+    const attached = deep.stillUnsignaled[0]?.evidence ?? [];
     expect(attached[0]!.evidence_type).toBe("hiring");
   });
 

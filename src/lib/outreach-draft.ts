@@ -21,8 +21,11 @@ import {
 export type DraftVertical = "investor" | "company" | "local" | "job";
 /** Alias some callers use for the local-business vertical. */
 export type DraftLeadVertical = DraftVertical | "business";
+export type PreparedOutreachDraft = { email_subject: string; email_body: string; dm: string };
 
 export type DraftLead = {
+  /** Pipeline drafts must state only supplied verified facts and sender intent. */
+  verifiedFactsOnly?: boolean;
   vertical?: DraftLeadVertical;
   name: string;
   firm?: string;
@@ -279,9 +282,7 @@ function companyMessage(lead: DraftLead, sender: DraftSender): string {
   const firm = lead.firm?.trim() || lead.name.trim();
   const hiring = lead.whyNow?.trim();
 
-  const hook = hiring
-    ? `I saw ${firm} is hiring right now`
-    : `I've been following ${firm}`;
+  const hook = hiring ? `I saw ${firm} is hiring right now` : `I've been following ${firm}`;
   const relevance = sender.senderRole?.trim()
     ? `I'm ${sender.senderRole.trim()}${proofClause(sender)}`
     : `I can help with exactly this kind of work`;
@@ -316,7 +317,9 @@ function jobEmail(lead: DraftLead, sender: DraftSender): { subject: string; body
 
 function jobMessage(lead: DraftLead, sender: DraftSender): string {
   const posting = lead.postingTitle?.trim() || lead.role?.trim() || "the role";
-  const relevance = sender.senderRole?.trim() ? `I'm ${article(sender.senderRole.trim())} ${sender.senderRole.trim().toLowerCase()}` : `I work in this exact space`;
+  const relevance = sender.senderRole?.trim()
+    ? `I'm ${article(sender.senderRole.trim())} ${sender.senderRole.trim().toLowerCase()}`
+    : `I work in this exact space`;
   return `Hi ${fn0(lead.name)} — I'm reaching out about ${posting}${lead.firm ? ` at ${lead.firm}` : ""}. ${relevance}${proofClause(sender)} Could I ask you two quick questions about the team's priorities?`;
 }
 
@@ -344,6 +347,28 @@ export function buildEmailDraft(
   lead: DraftLead,
   sender: DraftSender,
 ): { subject: string; body: string; jurisdiction?: OutreachJurisdiction } {
+  if (lead.verifiedFactsOnly) {
+    const fact = lead.whyMatch?.trim();
+    const purpose = sender.service?.trim()
+      ? `I'd like to discuss ${sender.service.trim()}.`
+      : "I'd like to connect about a potential opportunity.";
+    return withJurisdictionFooter(
+      {
+        subject: `A quick note for ${lead.name}`,
+        body: [
+          `Hi ${lead.name},`,
+          "",
+          fact ? `I came across this public information: ${fact}` : `I came across ${lead.name}.`,
+          "",
+          purpose,
+          "Would you be open to a brief conversation?",
+          "",
+          sender.name?.trim() || "[Your name]",
+        ].join("\n"),
+      },
+      lead,
+    );
+  }
   let draft: { subject: string; body: string };
   switch (lead.vertical) {
     case "local":
@@ -363,6 +388,8 @@ export function buildEmailDraft(
 }
 
 export function buildMessageDraft(lead: DraftLead, sender: DraftSender): string {
+  if (lead.verifiedFactsOnly)
+    return `Hi ${lead.name}, ${lead.whyMatch?.trim() ? `I came across this public information: ${lead.whyMatch.trim()} ` : ""}${sender.service?.trim() ? `I'd like to discuss ${sender.service.trim()}. ` : ""}Would you be open to a brief conversation?`;
   switch (lead.vertical) {
     case "local":
     case "business":

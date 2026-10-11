@@ -40,6 +40,26 @@ dist-ssr
 .lovable/
 .qodo/
 .DS_Store
+.kilo/
+.kiro/
+.zcode/
+ %LOG%
+$workerLog
+
+# Generated run reports / test evidence (multi-GB, regenerable)
+reports/
+test-results/
+
+# Local media assets
+Promotional Videos/
+
+# Separate embedded projects / handoff archives
+Cotly/
+scrapivo_handoff/
+scrapivo-core-forensic.zip
+scrapivo_handoff.zip
+scrapivo_stage2_handoff.zip
+scrapivo_stage2_recovery.zip
 
 # Editor directories and files
 .vscode/*

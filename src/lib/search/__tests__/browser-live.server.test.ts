@@ -147,12 +147,12 @@ describe("staged page allocation (PRD Phase 3 — cap starvation fix)", () => {
       onQueryFunnel: (funnel) => funnels.push(funnel) });
     const f = funnels[0];
     console.log("FUNNEL_DEBUG", JSON.stringify(f));
-    expect(f.pagesScheduled).toBe(4);
-    expect(f.pagesNavigated).toBe(4);
-    expect(f.linkRejections.cap).toBe(6);
-    // Direct sites fill the first three slots; the directory gets one, last.
-    expect(navigated.slice(0, 3).every((h) => !h.includes("yelp"))).toBe(true);
-    expect(navigated[3]).toContain("yelp");
+    expect(f.pagesScheduled).toBe(7);
+    expect(f.pagesNavigated).toBe(7);
+    expect(f.linkRejections.cap).toBe(3);
+    // Direct sites fill the first six slots; the directory gets one, last.
+    expect(navigated.slice(0, 6).every((h) => !h.includes("yelp"))).toBe(true);
+    expect(navigated[6]).toContain("yelp");
     expect(rows.length).toBeGreaterThanOrEqual(1);
   });
 });

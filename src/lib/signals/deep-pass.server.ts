@@ -72,7 +72,8 @@
  * and run the plain gate — on the deadline the gate still runs synchronously.
  */
 import type { SearchSpec } from "@/lib/search/search-spec";
-import { rowSatisfiesSpec, type SpecRow } from "@/lib/spec-search.functions";
+import { rowCouldSatisfySpec, type SpecRow } from "@/lib/spec-search.functions";
+import { verifyCandidateClaims } from "@/lib/search/verification";
 import { applyWhyMatchGate } from "@/lib/search/live-gapfill";
 import { makeEvidence, type Evidence } from "@/lib/search/evidence";
 import { qualifyLead } from "@/lib/search/qualify";
@@ -123,7 +124,7 @@ export function splitBaseEligibility(
   const baseEligible: SpecRow[] = [];
   const baseRejected: SpecRow[] = [];
   for (const row of rows) {
-    (rowSatisfiesSpec(spec, row) ? baseEligible : baseRejected).push(row);
+    (rowCouldSatisfySpec(spec, row) ? baseEligible : baseRejected).push(row);
   }
   return { baseEligible, baseRejected };
 }
@@ -138,13 +139,9 @@ export function splitBaseEligibility(
  * verification), identity/contact are not demand. The theorem gate keeps its
  * own stricter rules; this is the floor for the deep pass to ATTACH anything.
  */
-export const SIGNAL_EVIDENCE_TYPES: ReadonlySet<Evidence["evidence_type"]> =
-  new Set<Evidence["evidence_type"]>([
-    "hiring",
-    "service_request",
-    "funding",
-    "social_ask",
-  ]);
+export const SIGNAL_EVIDENCE_TYPES: ReadonlySet<Evidence["evidence_type"]> = new Set<
+  Evidence["evidence_type"]
+>(["hiring", "service_request", "funding", "investment", "social_ask", "custom_signal"]);
 
 /** Stable entity id a row can prove (provisional ids bind nothing). */
 export function deepPassEntityIdOf(row: SpecRow): string | null {
@@ -178,14 +175,16 @@ export function isVerifiedSignalEvidence(row: SpecRow, ev: Evidence): boolean {
   const subjectId = deepPassEntityIdOf(row);
   if (!subjectId) return false;
   if ((ev.subject ?? "").trim() !== subjectId) return false;
-  if (typeof ev.confidence !== "number" || ev.confidence < 0 || ev.confidence > 1)
-    return false;
+  if (typeof ev.confidence !== "number" || ev.confidence < 0 || ev.confidence > 1) return false;
   return true;
 }
 
 /** Whether the row already carries verified signal evidence. */
-export function rowHasVerifiedSignal(row: SpecRow): boolean {
-  return (row.evidence ?? []).some((ev) => isVerifiedSignalEvidence(row, ev));
+export function rowHasVerifiedSignal(row: SpecRow, spec?: SearchSpec): boolean {
+  const evidence = (row.evidence ?? []).filter((ev) => isVerifiedSignalEvidence(row, ev));
+  if (!spec) return evidence.length > 0;
+  const entityId = deepPassEntityIdOf(row);
+  return !!entityId && verifyCandidateClaims({ evidence, entityId, spec }).ok;
 }
 
 function evidenceKey(ev: Evidence): string {
@@ -340,8 +339,8 @@ export async function runDeepSignalPass(
   const pastDeadline = () => Date.now() >= deadline;
 
   // Partition: already-verified rows skip research entirely.
-  const toResearch = baseEligibleRows.filter((r) => !rowHasVerifiedSignal(r));
-  result.alreadyVerified = baseEligibleRows.filter((r) => rowHasVerifiedSignal(r));
+  const toResearch = baseEligibleRows.filter((r) => !rowHasVerifiedSignal(r, spec));
+  result.alreadyVerified = baseEligibleRows.filter((r) => rowHasVerifiedSignal(r, spec));
   if (!toResearch.length) return result;
 
   opts.onProgress?.({
@@ -371,21 +370,23 @@ export async function runDeepSignalPass(
   let stopStarting = false;
 
   const settleRow = (row: SpecRow, verified: Evidence[]) => {
-    if (verified.length) {
-      result.signalReady.push(attachVerifiedEvidence(row, verified));
+    const combined = attachVerifiedEvidence(row, verified);
+    if (rowHasVerifiedSignal(combined, spec)) {
+      result.signalReady.push(combined);
       result.verifiedRows += 1;
     } else {
-      result.stillUnsignaled.push(row);
+      result.stillUnsignaled.push(combined);
     }
   };
 
   /** One probe with timeout + abort discipline. Resolves null on failure. */
-  const runProbe = async (
-    row: SpecRow,
-    probeIndex: number,
-  ): Promise<Evidence[] | null> => {
+  const runProbe = async (row: SpecRow, probeIndex: number): Promise<Evidence[] | null> => {
+    const probeController = new AbortController();
+    const abortProbe = () => probeController.abort(signal?.reason);
+    if (signal?.aborted) abortProbe();
+    else signal?.addEventListener("abort", abortProbe, { once: true });
     const ctx: DeepPassContext = {
-      signal,
+      signal: probeController.signal,
       probeIndex,
       probesLeft: probesPerCandidate - probeIndex,
     };
@@ -395,15 +396,25 @@ export async function runDeepSignalPass(
         .then(() => hunter(row, spec, ctx))
         .then((raw) => (Array.isArray(raw) ? (raw as Evidence[]) : null));
       const timeout = new Promise<null>((resolve) => {
-        timer = setTimeout(() => resolve(null), probeTimeoutMs);
+        timer = setTimeout(
+          () => {
+            probeController.abort("signal_probe_timeout");
+            resolve(null);
+          },
+          Math.min(probeTimeoutMs, Math.max(0, deadline - Date.now())),
+        );
       });
-      return await Promise.race([probe, timeout]);
+      const cancelled = new Promise<null>((resolve) =>
+        probeController.signal.addEventListener("abort", () => resolve(null), { once: true }),
+      );
+      return await Promise.race([probe, timeout, cancelled]);
     } catch {
       // Probe failure is not an honest zero against the CANDIDATE unless
       // verified evidence exists elsewhere; per-probe errors just yield null.
       return null;
     } finally {
       if (timer) clearTimeout(timer);
+      signal?.removeEventListener("abort", abortProbe);
     }
   };
 
@@ -420,13 +431,14 @@ export async function runDeepSignalPass(
     // No bindable stable id → verified evidence can never attach; probing
     // would only burn budget. Honest stillUnsignaled.
     if (!deepPassEntityIdOf(row)) return finish([]);
+    const collected: Evidence[] = [];
     for (let probeIndex = 0; probeIndex < probesPerCandidate; probeIndex++) {
-      if (signal?.aborted || pastDeadline()) return finish([]);
+      if (signal?.aborted || pastDeadline()) return finish(collected);
       const raw = await runProbe(row, probeIndex);
       result.probes += 1;
-      const verified = verifiedSignalEvidence(row, raw);
-      if (verified.length) {
-        finish(verified);
+      collected.push(...verifiedSignalEvidence(attachVerifiedEvidence(row, collected), raw));
+      if (rowHasVerifiedSignal(attachVerifiedEvidence(row, collected), spec)) {
+        finish(collected);
         opts.onProgress?.({
           action: "Signal verified",
           source: "deep-signal",
@@ -434,9 +446,9 @@ export async function runDeepSignalPass(
         });
         return;
       }
-      if (signal?.aborted || pastDeadline()) return finish([]);
+      if (signal?.aborted || pastDeadline()) return finish(collected);
     }
-    finish([]);
+    finish(collected);
   };
 
   // Small internal pool (mirrors the WS2 candidate pool: bounded in-flight,
@@ -608,7 +620,9 @@ function defaultWebSearch(): NonNullable<DefaultHunterDeps["webSearch"]> {
  * words never bind a hit to a candidate.
  */
 export function candidateIdentityToken(row: SpecRow): string | null {
-  const hostUrl = row.website_url ?? (row.kind === "business" || row.kind === "company" ? row.url ?? null : null);
+  const hostUrl =
+    row.website_url ??
+    (row.kind === "business" || row.kind === "company" ? (row.url ?? null) : null);
   if (hostUrl) {
     try {
       const host = new URL(hostUrl).hostname.toLowerCase().replace(/^www\./, "");
@@ -627,13 +641,21 @@ export function candidateIdentityToken(row: SpecRow): string | null {
 
 function hitNamesCandidate(text: string, row: SpecRow): boolean {
   const token = candidateIdentityToken(row);
-  if (!token) return false;
-  return text.toLowerCase().includes(token);
+  if (token && text.toLowerCase().includes(token)) return true;
+  // A first-party domain is a search token, but public snippets normally
+  // name the entity rather than printing its hostname. Match its full name,
+  // never a loose individual word from a multiword company/person name.
+  const name = row.title
+    .split(/[—|]/)[0]
+    ?.trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ");
+  const normalized = ` ${text.toLowerCase().replace(/[^a-z0-9]+/g, " ")} `;
+  return !!name && name.length >= 4 && normalized.includes(` ${name} `);
 }
 
 function needTermsFromSpec(spec: SearchSpec): string | null {
-  const field = (f: string) =>
-    spec.criteria.find((c) => c.field === f)?.value?.trim() || null;
+  const field = (f: string) => spec.criteria.find((c) => c.field === f)?.value?.trim() || null;
   return (
     field("requested_service") ??
     field("requested_product") ??
@@ -664,9 +686,8 @@ export function createDefaultSignalHunter(deps: DefaultHunterDeps = {}): SignalH
         const { redditSocialProvider } = await import("@/lib/search/social-signal");
         return redditSocialProvider.search(spec, 8) as Promise<SocialHitLike[]>;
       };
-      socialHitsPromise = (deps.socialSearch
-        ? Promise.resolve(deps.socialSearch(spec, 8))
-        : fallback()
+      socialHitsPromise = (
+        deps.socialSearch ? Promise.resolve(deps.socialSearch(spec, 8)) : fallback()
       ).catch(() => [] as SocialHitLike[]);
     }
     return socialHitsPromise;
@@ -679,9 +700,7 @@ export function createDefaultSignalHunter(deps: DefaultHunterDeps = {}): SignalH
 
     if (ctx.probeIndex === 0) {
       const webSearch = deps.webSearch ?? defaultWebSearch();
-      const query = [row.title, need, "(need OR looking for OR hiring)"]
-        .filter(Boolean)
-        .join(" ");
+      const query = [row.title, need, "(need OR looking for OR hiring)"].filter(Boolean).join(" ");
       const hits = await webSearch({ queries: [query], maxQueries: 4, signal: ctx.signal ?? null });
       const out: Evidence[] = [];
       for (const hit of hits) {
@@ -729,10 +748,13 @@ const CUSTOM_PROBE_MAX_QUERIES = 4;
  * need observed on the public web.
  */
 function customIndicatorEvidenceType(text: string): Evidence["evidence_type"] {
-  if (/\b(hiring|we're hiring|we are hiring|join our team|open role|job opening|now hiring)\b/i.test(text))
+  if (
+    /\b(hiring|we're hiring|we are hiring|join our team|open role|job opening|now hiring)\b/i.test(
+      text,
+    )
+  )
     return "hiring";
-  if (/\b(funded|raises|raised|series\s+[a-d]|seed round)\b/i.test(text))
-    return "funding";
+  if (/\b(funded|raises|raised|series\s+[a-d]|seed round)\b/i.test(text)) return "funding";
   return "service_request";
 }
 
@@ -742,16 +764,36 @@ function customIndicatorEvidenceType(text: string): Evidence["evidence_type"] {
  * source, observed_at, subject-bound), just lower confidence and a distinct
  * extraction_method. isVerifiedSignalEvidence keeps the final say.
  */
-function customIndicatorEvidence(hit: WebHitLike, subjectId: string): Evidence {
+function customIndicatorEvidence(
+  hit: WebHitLike,
+  subjectId: string,
+  customText: string,
+  indicator: string,
+  boundExcerpt?: string,
+): Evidence {
+  const excerpt = (boundExcerpt ?? `${hit.title} ${hit.snippet}`).slice(0, 600);
+  // Match the existing browser extractor's literal YYYY-MM-DD convention.
+  // Ambiguous multiple dates remain unknown; observation time never fills it.
+  const dates = [...excerpt.matchAll(/\b\d{4}-\d{2}-\d{2}\b/g)].map((match) => match[0]);
+  const eventAt =
+    dates.length === 1 &&
+    /\b(certified|obtained|received|achieved|awarded|issued|completed|began|started|launched)\b/i.test(
+      excerpt,
+    ) &&
+    !Number.isNaN(Date.parse(dates[0]!))
+      ? `${dates[0]}T00:00:00.000Z`
+      : null;
   return makeEvidence({
     source_url: hit.url,
     source_type: "web",
-    excerpt: (hit.snippet || hit.title).slice(0, 180),
-    evidence_type: customIndicatorEvidenceType(`${hit.title} ${hit.snippet}`),
+    excerpt,
+    evidence_type: "custom_signal",
     supports: "intent",
     extraction_method: "custom_signal_indicator",
     confidence: 0.55,
     subject: subjectId,
+    claim_parameters: { custom_signal_text: customText, observable_indicator: indicator },
+    event_at: eventAt,
   });
 }
 
@@ -818,12 +860,37 @@ export function createCustomSignalHunter(
         url: hit.url,
         spec,
       });
-      if (verified.length) {
+      if (!spec.custom_signal_text?.trim() && verified.length) {
         for (const ev of verified) out.push(makeEvidence({ ...ev, subject: subjectId }));
         continue;
       }
-      if (indicators.some((ind) => lower.includes(ind))) {
-        out.push(customIndicatorEvidence(hit, subjectId));
+      const indicator = indicators.find((ind) => lower.includes(ind));
+      if (indicator && spec.custom_signal_text?.trim()) {
+        const boundExcerpt = `${hit.snippet}. ${hit.title}`
+          .split(/[.!?](?:\s|$)/)
+          .find(
+            (sentence) =>
+              sentence.toLowerCase().includes(indicator) && hitNamesCandidate(sentence, row),
+          );
+        if (boundExcerpt)
+          out.push(
+            customIndicatorEvidence(
+              hit,
+              subjectId,
+              spec.custom_signal_text.trim(),
+              indicator,
+              boundExcerpt,
+            ),
+          );
+      } else if (indicator) {
+        // Legacy injected compilers keep honest source-derived claim types;
+        // they cannot qualify an explicit arbitrary custom request.
+        out.push(
+          makeEvidence({
+            ...customIndicatorEvidence(hit, subjectId, "", indicator),
+            evidence_type: customIndicatorEvidenceType(`${hit.title} ${hit.snippet}`),
+          }),
+        );
       }
     }
     return out.length ? out : null;

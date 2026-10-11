@@ -1,8 +1,9 @@
 /**
  * Canonical companies reader — S3 Parquet, initial-partition pruned (Phase 1).
  */
-import { listPartitionFilesBySize, readFiltered, type DbHitMeta } from "./read-parquet.server";
+import { listPartitionFilesBySize, readFiltered, type DbHitMeta, type ReadBudget } from "./read-parquet.server";
 import { criterionAlternatives, criterionPhraseMatches } from "@/lib/search/criterion-match";
+import { locationSatisfies, resolveCanonicalLocation } from "@/lib/search/location-resolver";
 
 export interface CanonicalCompany {
   company_name: string | null;
@@ -22,7 +23,7 @@ export interface CanonicalCompany {
 const COLS = ["company_name", "website", "location", "category", "email", "phone",
   "linkedin", "facebook", "twitter", "description", "employees", "quality_score"];
 
-export interface CompanyQuery {
+export interface CompanyQuery extends ReadBudget {
   name?: string;
   category?: string;
   industry?: string;
@@ -45,6 +46,8 @@ export function companyCategoryTerms(wanted: string): string[] {
     healthcare: ["healthcare", "health care"],
     fintech: ["fintech", "financial technology"],
     "e commerce": ["e-commerce", "ecommerce"],
+    cybersecurity: ["cybersecurity", "cyber security", "computer & network security", "computer and network security", "network security"],
+    "cyber security": ["cybersecurity", "cyber security", "computer & network security", "computer and network security", "network security"],
   };
   return aliases[key] ?? [industry];
 }
@@ -55,32 +58,35 @@ export function companyCategoryMatches(value: unknown, wanted: string): boolean 
     .some(part => companyCategoryTerms(part.replace(/\s+startups?$/i, "")).some((term) => like(value, term)));
 }
 
-/**
- * Location matching against data-derived values (no hand-typed region maps).
- * Distinct company locations come from processed/gazetteer/gazetteer.json.
- * The ONLY hand seed is country abbreviations (us/usa/uk — pure linguistic
- * knowledge, documented here): everything else matches data values directly.
- */
-const ABBREV_SEED: Record<string, string[]> = {
-  us: ["northeastern us", "southern us", "midwestern us", "western us", "east coast", "west coast", "america"],
-  usa: ["northeastern us", "southern us", "midwestern us", "western us", "east coast", "west coast", "america"],
-  uk: ["london", "britain", "england"],
-};
+function canonicalCompanyPlace(raw: string) {
+  // ISO abbreviations are language, not a city-to-country dictionary.
+  const token = raw.trim().replace(/^CAN$/i, "Canada").replace(/^US$/i, "USA");
+  return resolveCanonicalLocation(token);
+}
 
-function locationMatches(v: unknown, needle: string): boolean {
-  if (like(v, needle)) return true;
-  const n = needle.toLowerCase().trim();
-  // Abbreviation seed expands to region phrases that DO exist in data.
-  const seeds = ABBREV_SEED[n] ?? [];
-  if (seeds.length) return seeds.some((a) => like(v, a));
-  // Token overlap against known data values: "new york" matches
-  // "Greater New York Area, ..." without anyone typing the mapping.
-  const toks = n.split(/[^a-z0-9]+/).filter((t) => t.length > 2);
-  if (toks.length && typeof v === "string") {
-    const vl = v.toLowerCase();
-    if (toks.every((t) => vl.includes(t))) return true;
+/** Only observed country/city/region tokens establish country membership. */
+export function companyCountryCode(raw: string | null | undefined): string | null {
+  const codes = new Set<string>();
+  const explicit = new Set<string>();
+  for (const part of (raw ?? "").split(",").map(value => value.trim()).filter(Boolean)) {
+    if (/^(?:(?:north|south|central|latin)\s+)?america$/i.test(part)) continue;
+    const regional = part.match(/^(?:north(?:east|west)?ern|south(?:east|west)?ern|midwestern|western|eastern)\s+(US|USA|Canada|CAN)$/i);
+    const geo = canonicalCompanyPlace(regional?.[1] ?? part);
+    if (geo?.country_code && geo.resolution === "resolved") {
+      codes.add(geo.country_code);
+      if (geo.kind === "country" || regional) explicit.add(geo.country_code);
+    }
   }
-  return false;
+  if (explicit.size) return explicit.size === 1 ? [...explicit][0] : null;
+  return codes.size === 1 ? [...codes][0] : null;
+}
+
+export function companyLocationMatches(v: unknown, needle: string): boolean {
+  if (typeof v !== "string") return false;
+  const required = canonicalCompanyPlace(needle);
+  if (!required) return false;
+  if (required.kind === "country") return companyCountryCode(v) === required.country_code;
+  return locationSatisfies(v, required);
 }
 
 export async function searchCompaniesDB(
@@ -89,7 +95,8 @@ export async function searchCompaniesDB(
   const limit = Math.min(q.limit ?? 50, 200);
   // Size-ordered shards (largest first): alphabetical order reads the
   // emptiest shards first and starves results. Read until the limit is met.
-  const all = (await listPartitionFilesBySize("processed/companies_by_initial/")).map((f) => f.key);
+  const budget = { signal: q.signal, deadline: q.deadline };
+  const all = (await listPartitionFilesBySize("processed/companies_by_initial/", budget)).map((f) => f.key);
   let keys = all;
   const read: string[] = [];
   if (q.name) {
@@ -111,21 +118,23 @@ export async function searchCompaniesDB(
   const where = (r: Record<string, unknown>) =>
     (!q.name || like(r.company_name, q.name)) &&
     (!cat || companyCategoryMatches(r.category, cat)) &&
-    (!q.location || locationMatches(r.location, q.location));
+    (!q.location || companyLocationMatches(r.location, q.location));
   const first = await readFiltered<CanonicalCompany>({
+    ...budget,
     keys,
     columns: COLS,
     limit,
     meta: { dbHit: false, engine: "s3-parquet", partitionsRead: read },
     where,
   });
-  if (first.rows.length >= limit || keys.length >= all.length) return first;
+  if (first.rows.length >= limit || keys.length >= all.length || first.meta.coverageIncomplete) return first;
   // Thin first pass (location-only queries match no particular initial):
   // widen to the remaining shards, same limit. Bounded: one extra pass over
   // small files, then stop — the tier timeout owns the wall clock.
   const rest = all.filter((k) => !keys.includes(k));
   read.push(`processed/companies_by_initial/ (widened +${rest.length} shard(s))`);
   const second = await readFiltered<CanonicalCompany>({
+    ...budget,
     keys: rest,
     columns: COLS,
     limit,

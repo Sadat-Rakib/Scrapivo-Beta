@@ -17,13 +17,14 @@
  * Usage:
  *   npm run verify:understanding
  *   npm run verify:understanding -- --seed 4242 --holdout 120 --chaos 120
+ *   npm run verify:understanding -- --report-dir "$TEMP/scrapivo-gate1"
  *   npm run verify:understanding -- --set train
  *   npm run verify:understanding -- --deterministic     (no LLM; fallback only)
  */
 
 import "./_env.mts";
 import { mkdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 
 import {
   TRAIN,
@@ -41,6 +42,8 @@ import { syncClarification } from "../src/lib/understanding/clarify-state";
 import { validateFrame, type Repair, type Violation } from "../src/lib/understanding/validate";
 import type { UnderstandingFrame } from "../src/lib/understanding/frame";
 import { mustAbortRequiredLlmRun, sameLocation } from "./verify-understanding-runner";
+import { ensureCityGazetteer } from "../src/lib/search/gazetteer.server";
+import { cityGazetteerRegistered } from "../src/lib/search/location-resolver";
 
 // ── Arguments ─────────────────────────────────────────────────────────────
 
@@ -54,6 +57,7 @@ const SEED = Number.parseInt(arg("seed", String(Date.now() % 100000)), 10);
 const HOLDOUT_N = Number.parseInt(arg("holdout", "80"), 10);
 const CHAOS_N = Number.parseInt(arg("chaos", "80"), 10);
 const ONLY = flag("smoke") ? "smoke" : arg("set", "all");
+const REPORT_DIR = arg("report-dir", "");
 const DETERMINISTIC = flag("deterministic");
 /** Pin certification to one gateway/model. Empty string means "the ladder". */
 const PROVIDER = arg("provider", "");
@@ -324,8 +328,8 @@ function grade(c: Case, frame: UnderstandingFrame, violations: Violation[]): Che
     "LOCATION",
     e.location === undefined
       ? null
-      : sameLocation(e.location, frame.location?.value) ||
-          sameLocation(e.location, frame.location?.canonical),
+      : sameLocation(e.location, frame.location?.value, frame.location?.country_code) ||
+          sameLocation(e.location, frame.location?.canonical, frame.location?.country_code),
     `want ~"${e.location}" · got ${frame.location?.value ?? "null"}`,
   );
   add(
@@ -1035,6 +1039,9 @@ function setSection(title: string, graded: Graded[], readMe: string): string {
 // ── Main ──────────────────────────────────────────────────────────────────
 
 async function main() {
+  await ensureCityGazetteer();
+  if (!cityGazetteerRegistered()) throw new Error("city gazetteer failed to register");
+
   const holdout = generateHoldout(SEED, HOLDOUT_N);
   const chaos = generateChaos(SEED, CHAOS_N);
 
@@ -1088,7 +1095,7 @@ async function main() {
 
   // Persist the drawn cases so a report can be reproduced even if the pools or
   // the generator change later.
-  const outDir = join(process.cwd(), "reports", "understanding");
+  const outDir = REPORT_DIR ? resolve(REPORT_DIR) : join(process.cwd(), "reports", "understanding");
   mkdirSync(outDir, { recursive: true });
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
   const base = `gate1-${stamp}-seed${SEED}`;

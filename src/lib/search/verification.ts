@@ -13,7 +13,7 @@
  */
 import type { SearchSpec } from "@/lib/search/search-spec";
 import { criterionPhraseMatches } from "@/lib/search/criterion-match";
-import type { Evidence } from "@/lib/search/evidence";
+import type { Evidence, EvidenceType } from "@/lib/search/evidence";
 import {
   asClaimEvidence,
   evidenceClaimType,
@@ -26,6 +26,7 @@ import {
 } from "@/lib/search/claim-binding";
 import type { QualificationRejectCode } from "@/lib/search/canonical-contract";
 import { personImpliesCurrentRole } from "@/lib/search/person";
+import { deterministicFallback } from "@/lib/signals/custom-compiler";
 
 export type Freshness = "fresh" | "stale" | "unknown";
 
@@ -147,9 +148,20 @@ export function evaluateTemporalValidity(
   const constraint = deriveTemporalConstraint(spec);
   const claim = asClaimEvidence(evidence, evidenceSubject(evidence));
   const observed_at =
-    claim?.observed_at ??
-    ("observed_at" in evidence ? (evidence as Evidence).observed_at : null);
+    claim?.observed_at ?? ("observed_at" in evidence ? (evidence as Evidence).observed_at : null);
   const event_at = claim?.event_at ?? null;
+  // A supplied event timestamp must describe an event that already occurred,
+  // even when the user did not request a recency window. Missing optional
+  // event dates remain unknown; observed_at never supplies an event date.
+  if (event_at && Date.parse(event_at) > nowMs)
+    return {
+      freshness: "unknown",
+      ok: false,
+      reason: "event_at_in_future",
+      event_at,
+      observed_at,
+      window_ms: null,
+    };
 
   if (!constraint.required) {
     return {
@@ -187,7 +199,7 @@ export function evaluateTemporalValidity(
     }
     const y = new Date(t).getUTCFullYear();
     const want = Number(constraint.year);
-    const ok = y === want;
+    const ok = y === want && t <= nowMs;
     return {
       freshness: ok ? "fresh" : "stale",
       ok,
@@ -226,6 +238,15 @@ export function evaluateTemporalValidity(
   }
 
   const age = nowMs - t;
+  if (age < 0)
+    return {
+      freshness: "unknown",
+      ok: false,
+      reason: "event_at_in_future",
+      event_at,
+      observed_at,
+      window_ms: windowMs,
+    };
   if (windowMs != null && age > windowMs) {
     return {
       freshness: "stale",
@@ -250,15 +271,18 @@ export function evaluateTemporalValidity(
 /**
  * Claim parameters the Spec requires (not optional metadata).
  */
-export function deriveRequiredClaimParameters(spec: SearchSpec): ClaimParameters {
+export function deriveRequiredClaimParameters(
+  spec: SearchSpec,
+  claimType?: EvidenceType,
+): ClaimParameters {
   const params: ClaimParameters = {};
-  if (requestedClaimTypes(spec).includes("investment")) {
+  const claims = claimType ? [claimType] : requestedClaimTypes(spec);
+  if (claims.includes("investment")) {
     params.investor_sector = fieldOf(spec, "investor_sector") ?? fieldOf(spec, "industry");
     params.investor_stage = fieldOf(spec, "investor_stage");
   }
   const role =
-    fieldOf(spec, "requested_role") ||
-    (spec.entity === "job" ? fieldOf(spec, "role") : null);
+    fieldOf(spec, "requested_role") || (spec.entity === "job" ? fieldOf(spec, "role") : null);
   const tech = fieldOf(spec, "technology") || fieldOf(spec, "skill");
   const seniority = fieldOf(spec, "seniority");
   const service = fieldOf(spec, "requested_service");
@@ -266,7 +290,6 @@ export function deriveRequiredClaimParameters(spec: SearchSpec): ClaimParameters
   const funding = fieldOf(spec, "funding_status");
 
   // Hiring / person-need: role (+ tech/seniority when stated) are required params.
-  const claims = requestedClaimTypes(spec);
   if (claims.includes("hiring") || claims.includes("social_ask")) {
     if (role) params.role = role;
     if (tech) params.technology = tech;
@@ -277,12 +300,7 @@ export function deriveRequiredClaimParameters(spec: SearchSpec): ClaimParameters
     if (product) params.product = product;
   }
   // "recent" is temporal (signal_recency), not a funding-stage parameter.
-  if (
-    claims.includes("funding") &&
-    funding &&
-    funding !== "recent" &&
-    funding !== "current"
-  ) {
+  if (claims.includes("funding") && funding && funding !== "recent" && funding !== "current") {
     params.funding_stage = funding;
   }
   // Location is an M6 candidate-field gate (entity geography), not a claim
@@ -330,7 +348,7 @@ export function claimParametersMatch(
   const claim = asClaimEvidence(evidence, evidenceSubject(evidence));
   const params = claim?.claim_parameters ?? {};
   const hay = `${claim?.claim ?? ""} ${claim?.evidence_text ?? ""} ${
-    "excerpt" in evidence ? (evidence as Evidence).excerpt ?? "" : ""
+    "excerpt" in evidence ? ((evidence as Evidence).excerpt ?? "") : ""
   }`.toLowerCase();
 
   const mismatched: string[] = [];
@@ -339,7 +357,8 @@ export function claimParametersMatch(
     if (!want) continue;
     const haveRaw = params[key];
     if (key === "investor_sector" || key === "technology") {
-      if (!criterionPhraseMatches(haveRaw == null ? hay : String(haveRaw), String(required[key]))) mismatched.push(key);
+      if (!criterionPhraseMatches(haveRaw == null ? hay : String(haveRaw), String(required[key])))
+        mismatched.push(key);
       continue;
     }
     if (haveRaw != null && String(haveRaw).trim() !== "") {
@@ -386,10 +405,7 @@ export function provenanceComplete(evidence: Evidence | ClaimEvidence): boolean 
  * a historical event_at. Conflicting event dates → keep existing (fail closed
  * on convenience).
  */
-export function mergeEvidencePreservingEventAt(
-  existing: Evidence,
-  incoming: Evidence,
-): Evidence {
+export function mergeEvidencePreservingEventAt(existing: Evidence, incoming: Evidence): Evidence {
   const sameSubject =
     (existing.subject ?? "") === (incoming.subject ?? "") &&
     existing.evidence_type === incoming.evidence_type;
@@ -482,6 +498,15 @@ export function evaluateRoleCurrentness(
 /**
  * Full claim verification for one evidence item against Spec + entity.
  */
+export function actualInvestmentQuoteMatches(text: string, investor: string, investee: string): boolean {
+  const literal = (value: string) => value.trim().split(/\s+/).map(word => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("\\s+");
+  if (!investor.trim() || !investee.trim() || investor.trim().toLowerCase() === investee.trim().toLowerCase()) return false;
+  // An investee must be a named entity, not the fund's sector or stage mandate.
+  if (/^(?:AI|SaaS|seed|preseed|startups?|companies|devtools|automation|agents|data infra)(?:[ -](?:startups?|companies|sector|funds?))?$/i.test(investee.trim())) return false;
+  const subject = literal(investor), target = literal(investee);
+  return new RegExp(`(?<![\\p{L}\\p{N}])${subject}(?![\\p{L}\\p{N}])(?:['’]s)?(?:\\s+(?:has|recently|also|previously|successfully))*\\s+(?:invest(?:s|ed|ing)?\\s+in|back(?:s|ed|ing)?|portfolio\\s+(?:includes|contains|features))\\s+${target}(?![\\p{L}\\p{N}])`, "iu").test(text);
+}
+
 export function verifyClaimEvidence(args: {
   evidence: Evidence | ClaimEvidence;
   entityId: string;
@@ -515,7 +540,43 @@ export function verifyClaimEvidence(args: {
     };
   }
 
-  const requiredParams = deriveRequiredClaimParameters(spec);
+  if (evidenceClaimType(evidence) === "investment") {
+    const claim = asClaimEvidence(evidence);
+    const method = "extraction_method" in evidence ? evidence.extraction_method : "";
+    if (["stored_investor_record", "browser_observed_investment_mandate"].includes(String(method)) ||
+      !actualInvestmentQuoteMatches(claim?.evidence_text ?? "", String(claim?.claim_parameters?.investor_name ?? ""), String(claim?.claim_parameters?.investee ?? ""))) {
+      return { ok: false, reject_code: "CLAIM_PARAMETER_MISMATCH", reason: "investment_requires_named_observed_investee" };
+    }
+  }
+
+  if (evidenceClaimType(evidence) === "custom_signal") {
+    const claim = asClaimEvidence(evidence);
+    const wanted = spec.custom_signal_text?.trim();
+    const text = (claim?.evidence_text ?? "").toLowerCase();
+    const indicator = String(claim?.claim_parameters?.observable_indicator ?? "")
+      .toLowerCase()
+      .trim();
+    const compiled = wanted ? deterministicFallback(wanted) : null;
+    const indicators =
+      compiled?.observableIndicators.map((value) => value.toLowerCase().trim()) ?? [];
+    const specific = indicators.filter((value) => /\s/.test(value));
+    if (
+      !wanted ||
+      claim?.claim_parameters?.custom_signal_text !== wanted ||
+      !indicator ||
+      !indicators.includes(indicator) ||
+      !text.includes(indicator) ||
+      (specific.length > 0 && !specific.some((value) => text.includes(value))) ||
+      compiled?.negativeIndicators.some((value) => text.includes(value.toLowerCase()))
+    )
+      return {
+        ok: false,
+        reject_code: "CLAIM_PARAMETER_MISMATCH",
+        reason: "custom_signal_indicator_not_bound_to_requested_intent",
+      };
+  }
+
+  const requiredParams = deriveRequiredClaimParameters(spec, evidenceClaimType(evidence));
   const paramMatch = claimParametersMatch(evidence, requiredParams);
   if (!paramMatch.ok) {
     return {
@@ -529,8 +590,7 @@ export function verifyClaimEvidence(args: {
   if (!temporal.ok) {
     return {
       ok: false,
-      reject_code:
-        temporal.freshness === "unknown" ? "TEMPORAL_UNKNOWN" : "TEMPORAL_STALE",
+      reject_code: temporal.freshness === "unknown" ? "TEMPORAL_UNKNOWN" : "TEMPORAL_STALE",
       reason: temporal.reason,
       freshness: temporal.freshness,
     };
@@ -567,6 +627,24 @@ export function verifyCandidateClaims(args: {
   nowMs?: number;
 }): ClaimVerificationResult {
   const { evidence, entityId, spec } = args;
+  if (spec.signal_mode === "all") {
+    const requested = requestedClaimTypes(spec);
+    let firstSuccess: ClaimVerificationResult | undefined;
+    for (const type of requested) {
+      const result = verifyCandidateClaims({
+        ...args,
+        evidence: evidence.filter((e) => evidenceClaimType(e) === type),
+        spec: { ...spec, signal_mode: "any" },
+      });
+      if (!result.ok)
+        return {
+          ...result,
+          reason: `required ${type}: ${result.reason ?? "no verifying evidence"}`,
+        };
+      firstSuccess ??= result;
+    }
+    if (firstSuccess) return firstSuccess;
+  }
   if (!evidence.length) {
     return {
       ok: false,

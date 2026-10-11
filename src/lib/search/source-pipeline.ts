@@ -27,6 +27,7 @@ import {
 } from "@/lib/search/source-plan";
 import type { SourceProviderId } from "@/lib/search/source-capabilities";
 import { throwIfAborted } from "@/lib/search/search-run";
+import { mergeDuplicateCandidates } from "./candidate-merge";
 
 /** Raw discovery artifact — never a QualifiedLead. */
 export type DiscoveryArtifact = {
@@ -66,16 +67,10 @@ export type CanonicalPipelineResult = {
   invoked: SourceProviderId[];
 };
 
-function artifactToRow(
-  a: DiscoveryArtifact,
-  provider: string,
-  index: number,
-): SpecRow {
+function artifactToRow(a: DiscoveryArtifact, provider: string, index: number): SpecRow {
   const url = a.url ?? null;
   const title = (a.title || "").trim() || "Untitled";
-  const key =
-    a.key?.trim() ||
-    `${provider}:${index}:${(url ?? title).slice(0, 48)}`;
+  const key = a.key?.trim() || `${provider}:${index}:${(url ?? title).slice(0, 48)}`;
   const entity_id = mintProvisionalEntityId(key);
   const base: SpecRow = {
     kind: "company",
@@ -109,6 +104,7 @@ export async function runCanonicalSourcePipeline(args: {
   signal?: AbortSignal | null;
   /** Max primary providers to attempt (default: all primaries). */
   maxPrimary?: number;
+  desiredCount?: number;
   allowPaidEscalation?: boolean;
   /** M8: query-aware enrichment before qualify. */
   enrichmentAdapters?: Partial<Record<EnrichmentProviderId, EnrichmentAdapter>>;
@@ -116,15 +112,13 @@ export async function runCanonicalSourcePipeline(args: {
 }): Promise<CanonicalPipelineResult> {
   throwIfAborted(args.signal);
   const requirements = deriveCoverageRequirements(args.spec);
-  const plan = buildSourcePlan(args.spec, requirements);
+  const plan = buildSourcePlan(args.spec, requirements, { desiredCount: args.desiredCount });
   const diagnostics: ProviderDiagnostic[] = [];
   const invoked: SourceProviderId[] = [];
   const rows: SpecRow[] = [];
   let entitiesResolved = 0;
 
-  const tryStep = async (
-    step: SourcePlan["steps"][number],
-  ): Promise<void> => {
+  const tryStep = async (step: SourcePlan["steps"][number]): Promise<void> => {
     throwIfAborted(args.signal);
     const adapter = args.adapters[step.providerId];
     if (!adapter) {
@@ -218,23 +212,25 @@ export async function runCanonicalSourcePipeline(args: {
 
   const primaries = plan.steps.filter((s) => s.role === "primary");
   const maxP = args.maxPrimary ?? primaries.length;
+  const target = Math.max(
+    1,
+    Number(args.spec.criteria.find((c) => c.field === "requested_count")?.value) ||
+      Number(args.spec.criteria.find((c) => c.field === "minimum_count")?.value) ||
+      plan.researchPlan.desiredCount,
+  );
   for (const step of primaries.slice(0, maxP)) {
     await tryStep(step);
-    // Free-first early stop: once a discovery primary returns artifacts,
-    // do not keep spending on further primaries or escalate to paid.
-    const last = diagnostics[diagnostics.length - 1];
+    // Discovery artifacts are not leads. Only theorem-qualified unique rows
+    // satisfy requested volume; otherwise exhaust the bounded primary plan.
     if (
-      last &&
-      last.provider === step.providerId &&
-      last.succeeded &&
-      last.artifactsFound > 0 &&
-      step.capabilities.discovery
+      applyQualificationGate(mergeDuplicateCandidates(rows), args.spec, { keepPotential: false })
+        .qualified.length >= target
     ) {
       break;
     }
   }
 
-  const allowPaid = args.allowPaidEscalation !== false;
+  const allowPaid = args.allowPaidEscalation === true;
   if (allowPaid && shouldInvokePaidSerp(plan, diagnostics)) {
     const paid = plan.steps.find((s) => s.providerId === "paid-serp");
     if (paid) await tryStep(paid);
@@ -257,7 +253,7 @@ export async function runCanonicalSourcePipeline(args: {
     }
   }
 
-  let working = rows;
+  let working = mergeDuplicateCandidates(rows);
   if (!args.skipEnrichment) {
     throwIfAborted(args.signal);
     const enriched = await enrichCandidatesForSpec(working, args.spec, {
@@ -276,9 +272,7 @@ export async function runCanonicalSourcePipeline(args: {
   // Stamp qualified counts onto diagnostics (per-provider is approximate:
   // we attribute by key prefix provider:).
   for (const d of diagnostics) {
-    d.qualified = qualified.filter((r) =>
-      (r.key ?? "").startsWith(`${d.provider}:`),
-    ).length;
+    d.qualified = qualified.filter((r) => (r.key ?? "").startsWith(`${d.provider}:`)).length;
   }
 
   const fin = resolveSourcePlanOutcome({

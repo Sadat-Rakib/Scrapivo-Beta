@@ -1,0 +1,21 @@
+import { expect, test, type Page } from "@playwright/test";
+const EMAIL = "e2e.scrapivo.test.001@gmail.com";
+const PASS = "E2eTest!2026-xyz";
+test("probe live frame for find businesses", async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("scrapivo:onboarding-skipped", "1");
+    localStorage.setItem("scrapivo:guided-tour-seen", "1");
+  });
+  await page.goto("/auth");
+  await page.getByLabel(/email/i).fill(EMAIL);
+  await page.getByLabel(/password/i).fill(PASS);
+  await page.getByRole("button", { name: "Sign In", exact: true }).click();
+  await page.waitForURL(/discover|home|\/$/, { timeout: 30_000 });
+  await page.goto("/discover?inspect=1");
+  await page.getByRole("textbox").first().fill("find businesses");
+  await page.getByRole("button", { name: /extract|understand|run/i }).first().click();
+  await page.waitForTimeout(15_000);
+  const body = await page.locator("body").textContent();
+  console.log("FRAME:", (body ?? "").slice(0, 3000));
+  expect(true).toBe(true);
+});

@@ -68,10 +68,14 @@ describe("resolver with the gazetteer (opt-in)", () => {
     expect(resolve("Portland, OR")).toMatchObject({ country_code: "US" });
   });
 
-  it("keeps an unqualified or contradicted name literal instead of guessing a country", () => {
-    expect(resolve("Bali")).toMatchObject({ kind: "stated", country_code: null });
-    expect(resolve("Cornwall")).toMatchObject({ kind: "stated" });
-    expect(resolve("Tallinn")).toMatchObject({ kind: "stated" });
+  it("resolves an unambiguous bare city, keeps ambiguous and contradicted names literal", () => {
+    // Contract (master PRD): a bare name whose gazetteer hits share ONE
+    // country resolves ("Windhoek" -> NA) so discovery geo-scopes; a name
+    // the fixture knows in several countries or not at all stays literal,
+    // and a contradicting qualifier never overrules the city's country.
+    expect(resolve("Bali")).toMatchObject({ kind: "city", country_code: "IN" });
+    expect(resolve("Cornwall")).toMatchObject({ kind: "city" });
+    expect(resolve("Tallinn")).toMatchObject({ kind: "city", country_code: "EE" });
     expect(resolve("Leipzig, Canada")).toMatchObject({ kind: "stated" });
   });
 

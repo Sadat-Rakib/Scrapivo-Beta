@@ -4,13 +4,32 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { SpecRow } from "../src/lib/spec-search.functions";
+import type { SearchSpec } from "../src/lib/search/search-spec";
 import { fixMojibake } from "../src/lib/encoding";
 import { enrichZeroNarrative, zeroResultsNarrative } from "../src/lib/search/outcome-ui";
+import { serviceBoundaryState } from "../src/lib/search/service-boundary";
+import { frameToSearchSpec } from "../src/lib/understanding/to-search-spec";
 
 const EMAIL = "e2e.scrapivo.test.001@gmail.com";
 const PASS = "E2eTest!2026-xyz";
 
-const QUERIES: Array<{ id: string; q: string }> = JSON.parse(readFileSync("e2e/fixtures/chaos-queries.json", "utf8"));
+type SemanticExpectation = {
+  entity?: string[]; places?: string[][]; notPositivePlaces?: string[]; exclusions?: string[][];
+  requiredFields?: string[]; optionalFields?: string[]; preferredFields?: string[]; alternatives?: string[][];
+  targets?: string[][]; buckets?: Array<{ target: string[]; requested: number }>; softCriteria?: string[];
+  signals?: string[]; forbiddenSignals?: string[]; signalMode?: "any"; softRecency?: boolean;
+  hardRecency?: string[]; remoteScope?: string[]; searchCombinations?: boolean;
+  requestedCount?: number; productBoundary?: boolean;
+};
+const QUERIES: Array<{ id: string; q: string; expect?: SemanticExpectation }> = JSON.parse(readFileSync("e2e/fixtures/chaos-queries.json", "utf8"));
+const q11 = QUERIES.find(query => query.id === "Q11");
+if (q11) q11.expect = { ...q11.expect, productBoundary: true };
+if (process.env.CHAOS_BREADTH === "1") {
+  for (const requestedCount of [10, 50, 100]) QUERIES.push({
+    id: `V${requestedCount}`, q: `find ${requestedCount} software companies in USA or Canada`,
+    expect: { entity: ["company"], places: [["USA", "United States"], ["Canada"]], requestedCount },
+  });
+}
 const SELECTED = process.env.CHAOS_IDS ? QUERIES.filter(item => process.env.CHAOS_IDS!.split(",").includes(item.id)) : QUERIES;
 const ARTIFACT_DIR = process.env.CHAOS_REPORT_DIR ?? join(tmpdir(), "scrapivo-chaos", new Date().toISOString().replace(/[:.]/g, "-"));
 mkdirSync(ARTIFACT_DIR, { recursive: true });
@@ -51,10 +70,11 @@ type BackendResult = Omit<RunRequest, "query" | "force"> & {
   [key: string]: unknown;
   outcome?: string;
   stage?: string;
-  spec: { status?: string };
+  spec: SearchSpec;
   clarify: unknown[];
   rows: SpecRow[];
   qualified_count: number;
+  executionPlan?: { researchPlan?: { desiredCount?: number } };
   candidateLedger?: {
     accounting?: { ok: boolean; retrieved: number; fated: number; unaccounted: number };
     counts?: Record<string, number>;
@@ -83,8 +103,115 @@ type ProviderEvidence = {
   attempted: boolean;
   succeeded: boolean;
   queries?: number;
-  queryFunnel?: Array<{ stage: string; serpEmpty: number; serpBlocked: number; serpErrors: number; linksObserved: number }>;
+  queryFunnel?: Array<{ query?: string; stage: string; serpEmpty: number; serpBlocked: number; serpErrors: number; linksObserved: number }>;
 };
+
+// Check returned canonical meaning, never reparse the submitted wording.
+function semanticIssues(spec: SearchSpec, expected: SemanticExpectation, result?: BackendResult): string[] {
+  const issues: string[] = [];
+  const normalize = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  const matches = (text: string, alternatives: string[]) => {
+    const normalizedText = normalize(text);
+    if (!normalizedText) return false;
+    return alternatives.some(token => {
+      const normalizedToken = normalize(token);
+      if (!normalizedToken) return false;
+      if (normalizedToken.length <= 3) return ` ${normalizedText} `.includes(` ${normalizedToken} `);
+      return normalizedText.includes(normalizedToken);
+    });
+  };
+  const frame = spec.understanding;
+  if (expected.requestedCount !== undefined &&
+      !spec.criteria.some(item => item.field === "requested_count" && Number(item.value) === expected.requestedCount)) {
+    issues.push(`lost requested target: ${expected.requestedCount}`);
+  }
+  if (expected.productBoundary && !(frame?.compound.subgoals ?? []).some(goal =>
+    /cyber\s*security/i.test(goal.target.category?.normalized ?? goal.target.category?.value ?? "") &&
+    goal.constraints.some(item => item.field === "service_only" && item.negated && item.value === "consultant"))) {
+    issues.push("lost scoped cybersecurity product/consultant boundary");
+  }
+  const criteria = spec.criteria ?? [];
+  const values = (field: string) => criteria.filter(item => item.field === field).map(item => item.value);
+  const places = [ ...(spec.locations ?? []), ...values("location"), ...values("location_country"),
+    ...[frame?.location, ...(frame?.locations ?? [])].filter(Boolean).flatMap(place => [place!.value, place!.canonical ?? ""]),
+    ...(frame?.compound.subgoals ?? []).flatMap(goal => goal.location ? [goal.location.value, goal.location.canonical ?? ""] : []) ].join(" | ");
+  const required = new Set([...(spec.requested_fields ?? []), ...criteria.filter(item => item.field.startsWith("require_") && item.value !== "false").map(item => item.field.slice(8)),
+    ...(frame?.required_fields ?? []).map(field => field.value), ...(frame?.contact_requirements ?? []).map(field => field.value)]);
+  const preferred = new Set([...(frame?.preferred_fields ?? []).map(field => field.value), ...(frame?.enrichment_requirements ?? []).map(field => field.value),
+    ...criteria.filter(item => item.field.startsWith("prefer_")).map(item => item.field.slice(7))]);
+  const targetText = [frame?.target, ...(frame?.compound.subgoals ?? []).map(goal => goal.target)].filter(Boolean)
+    .flatMap(target => [target!.role, target!.job_title, target!.industry, target!.category, target!.business_type, target!.niche].map(value => value?.value ?? ""))
+    .concat(criteria.filter(item => /^(role|category|industry|investor_sector|requested_role)$/.test(item.field)).map(item => item.value)).join(" | ");
+  if (expected.entity && !expected.entity.includes(spec.entity)) issues.push(`entity ${spec.entity} not requested`);
+  for (const place of expected.places ?? []) {
+    if (!matches(places, place)) {
+      const unresolved = [...(spec.unresolved ?? []).map(item => item.raw), spec.locationSuggestion?.typed ?? ""];
+      if (!(spec.status === "needs_clarification" && unresolved.some(item => matches(item, place)))) issues.push(`lost place: ${place.join(" / ")}`);
+    }
+  }
+  for (const place of expected.notPositivePlaces ?? []) if (matches(places, [place])) issues.push(`non-target place became positive: ${place}`);
+  const exclusions = criteria.filter(item => item.field.startsWith("exclude_")).map(item => item.value)
+    .concat((frame?.constraints ?? []).filter(item => item.negated || item.operator === "neq").map(item => String(item.value ?? ""))).join(" | ");
+  for (const exclusion of expected.exclusions ?? []) if (!matches(exclusions, exclusion)) issues.push(`lost exclusion: ${exclusion.join(" / ")}`);
+  for (const field of expected.requiredFields ?? []) if (!required.has(field)) issues.push(`lost mandatory field: ${field}`);
+  for (const field of expected.optionalFields ?? []) if (required.has(field)) issues.push(`optional field became mandatory: ${field}`);
+  for (const field of expected.preferredFields ?? []) if (!preferred.has(field)) issues.push(`lost field preference: ${field}`);
+  for (const group of expected.alternatives ?? []) {
+    if (!(spec.required_field_groups ?? []).some(actual => group.every(field => actual.any_of.includes(field)))) issues.push(`lost channel OR group: ${group.join(" | ")}`);
+    if (group.some(field => required.has(field))) issues.push(`channel OR flattened into mandatory fields: ${group.join(" | ")}`);
+  }
+  for (const target of expected.targets ?? []) if (!matches(targetText, target)) issues.push(`lost target: ${target.join(" / ")}`);
+  for (const bucket of expected.buckets ?? []) {
+    const found = (frame?.compound.subgoals ?? []).some(goal => {
+      const text = [goal.target.category, goal.target.industry, goal.target.business_type].map(item => item?.value ?? "").join(" | ");
+      return matches(text, bucket.target) && goal.quantity?.requested === bucket.requested;
+    });
+    if (!found) issues.push(`lost independently counted bucket: ${bucket.target.join(" / ")} (${bucket.requested})`);
+  }
+  if (expected.buckets && (frame?.compound.subgoals.length ?? 0) < expected.buckets.length) issues.push("counted buckets collapsed");
+  for (const field of expected.softCriteria ?? []) {
+    if (criteria.some(item => item.field === field)) issues.push(`preference became hard criterion: ${field}`);
+    if (!criteria.some(item => item.field === `prefer_${field}`)) issues.push(`lost soft criterion: ${field}`);
+  }
+  for (const signal of expected.signals ?? []) if (!spec.signal_types.includes(signal)) issues.push(`lost signal type: ${signal}`);
+  for (const signal of expected.forbiddenSignals ?? []) if (spec.signal_types.includes(signal)) issues.push(`wrong signal type: ${signal}`);
+  if (expected.signalMode === "any" && !(frame?.constraints ?? []).some(item => item.field === "signal_types" && item.operator === "one_of")) issues.push("signal alternatives lack explicit OR semantics");
+  if (expected.softRecency) {
+    if (!expected.hardRecency && spec.signal_recency !== null) issues.push("preferred recency became mandatory");
+    if (!criteria.some(item => item.field.startsWith("prefer_temporal_"))) issues.push("lost preferred temporal window");
+  }
+  if (expected.hardRecency && ![spec.signal_recency ?? "", ...values("temporal_max_age")].some(value => matches(value, expected.hardRecency!))) issues.push("lost independent stale-age bound");
+  if (expected.remoteScope && !values("geo_scope").some(value => matches(value, expected.remoteScope!))) issues.push("lost worldwide remote scope");
+  const queries = (result?.providerAttempts ?? result?.retrievalTrace?.providers ?? []).flatMap(provider => provider.queryFunnel ?? []).map(query => query.query ?? "").filter(Boolean);
+  if (result?.outcome && expected.searchCombinations) {
+    for (const target of expected.targets ?? []) for (const place of expected.places ?? []) {
+      if (!queries.some(query => matches(query, target) && matches(query, place))) issues.push(`no observed search for ${target.join(" / ")} × ${place.join(" / ")}`);
+    }
+  }
+  return issues;
+}
+
+test("chaos semantic matcher uses token boundaries", () => {
+  const spec = (locations: string[]): SearchSpec => ({
+    entity: "business",
+    status: "ready",
+    criteria: [],
+    locations,
+    requested_fields: [],
+    required_field_groups: [],
+    signal_types: [],
+    signal_recency: null,
+    unresolved: [],
+  }) as unknown as SearchSpec;
+
+  expect(semanticIssues(spec(["paid search agencies", "Australia"]), { places: [["AI"], ["US"]] })).toEqual([
+    "lost place: AI",
+    "lost place: US",
+  ]);
+  expect(semanticIssues(spec(["AI consultancies", "US", "north-america robotics"]), { places: [["AI"], ["US"], ["north america"]] })).toEqual([]);
+  expect(semanticIssues(spec(["roofing contractors", "devtools agencies"]), { places: [["roof"], ["devtool"]] })).toEqual([]);
+  expect(semanticIssues(spec(["AI consultancies"]), { places: [[""]] })).toEqual(["lost place: "]);
+});
 
 function searchRequest(request: Request, q: string, forced: boolean): RunRequest | undefined {
   if (request.method() !== "POST") return;
@@ -158,6 +285,11 @@ function assertBackend(result: BackendResult, request: RunRequest, allowCard: bo
     return "card";
   }
   expect(["QUALIFIED_RESULTS", "NO_QUALIFIED_RESULTS"], "Backend failures/cancellation are not successful settlement").toContain(result.outcome);
+  const requestedTarget = QUERIES.find(query => query.q === request.query)?.expect?.requestedCount;
+  if (requestedTarget !== undefined) {
+    expect(result.executionPlan?.researchPlan?.desiredCount,
+      "Production research target must honor the requested count independently of page size").toBe(requestedTarget);
+  }
   expect(result.retrievalTrace, "Completed search must include its retrieval trace").toBeDefined();
   expect(result.retrievalTrace?.returned).toBe(result.rows.length);
   if (result.outcome === "QUALIFIED_RESULTS") {
@@ -269,6 +401,23 @@ async function waitForSettlement(page: Page, id: string, q: string, action: () =
     expect(envelope.error, "Server function returned an error").toBeUndefined();
     expect(envelope.result).toBeDefined();
     result = envelope.result!;
+    const expectedMeaning = QUERIES.find(query => query.id === id)?.expect;
+    if (expectedMeaning) expect(semanticIssues(result.spec, expectedMeaning, result), `${id} ${phase}: requested meaning must survive understanding and execution`).toEqual([]);
+    if (expectedMeaning?.productBoundary && result.rows.length) {
+      const frame = result.spec.understanding;
+      expect(frame).toBeDefined();
+      const branches = frame!.compound.subgoals.map(goal => frameToSearchSpec({
+        ...frame!, target: goal.target, quantity: goal.quantity,
+        constraints: [...frame!.constraints, ...goal.constraints],
+        compound: { ...frame!.compound, subgoals: [] },
+      }));
+      for (const row of result.rows) {
+        const branch = branches.find(spec => spec.criteria.some(item =>
+          ["industry", "category"].includes(item.field) && row.why_match?.toLowerCase().startsWith(item.value.toLowerCase())));
+        expect(branch, `${row.title}: delivered row must identify its requested bucket`).toBeDefined();
+        expect(serviceBoundaryState(branch!, row), `${row.title}: actual requested product/activity needs subject evidence`).toBe("pass");
+      }
+    }
     settled = assertBackend(result, data!, !forced, impossible);
     if (settled !== "card" && Date.now() - startedAt > 5_000) {
       expect(activity.length, "A running search must show progress activity before settlement").toBeGreaterThan(0);
@@ -400,8 +549,10 @@ for (const { id, q } of SELECTED) {
     test.setTimeout(1_400_000);
     await login(page);
     await expect(page.getByRole("button", { name: "Stop search", exact: true })).toBeHidden();
-    const newChat = page.getByRole("button", { name: "New chat" }).first();
-    if (await newChat.isVisible()) await newChat.click();
+    const newChat = page.getByRole("button", { name: "New chat", exact: true }).first();
+    await expect(newChat, "Every case must rotate the persisted conversation before submission").toBeVisible();
+    await newChat.click();
+    await expect(page.locator("div.space-y-4").filter({ has: page.getByText(q, { exact: true }) }), "Previous identical raw turn must be cleared before this run").toHaveCount(0);
     const settled = await waitForSettlement(page, id, q, async () => {
       await page.getByRole("textbox").first().fill(q);
       await page.getByRole("textbox").first().press("Enter");

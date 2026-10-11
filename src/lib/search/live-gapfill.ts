@@ -12,16 +12,13 @@
 import type { SearchSpec } from "./search-spec";
 import type { SpecRow } from "@/lib/spec-search.functions";
 import { resolveCanonicalLocation } from "./location-resolver";
-import {
-  makeEvidence,
-  whyMatchFromEvidence,
-  type Evidence,
-} from "./evidence";
+import { makeEvidence, whyMatchFromEvidence, type Evidence } from "./evidence";
 import { applyQualificationGate } from "./qualify";
 import { mintProvisionalEntityId } from "./canonical-contract";
 import { applyPageClassificationToLiveRow } from "./page-classify";
 import { applyEntityResolutionToRow } from "./entity-resolve";
 import { mergeDuplicateCandidates } from "./candidate-merge";
+import { awaitSearchWork, throwIfAborted } from "./search-run";
 import {
   buildSourcePlan,
   buildResearchPlan,
@@ -43,10 +40,32 @@ export type LiveGapfillResult = {
 
 export type LiveGapfillDeps = {
   /** Injectable browser discovery; production always uses the browser adapter. */
-  browser?: ((spec: SearchSpec, options: { searchRunId?: string; signal?: AbortSignal | null; onProgress?: (event: { action: string; source?: string; detail?: string }) => void; researchPlan?: ReturnType<typeof buildResearchPlan>; initialCandidates?: SpecRow[]; desiredCount?: number; isVerified?: (row: SpecRow) => boolean; timeoutMs?: number; onTrace?: (event: import("./browser-live.server").BrowserTraceEvent) => void; onQueryFunnel?: (funnel: import("./browser-live.server").BrowserQueryFunnel) => void }) => Promise<SpecRow[]>) | null;
+  browser?:
+    | ((
+        spec: SearchSpec,
+        options: {
+          searchRunId?: string;
+          signal?: AbortSignal | null;
+          onProgress?: (event: { action: string; source?: string; detail?: string }) => void;
+          researchPlan?: ReturnType<typeof buildResearchPlan>;
+          initialCandidates?: SpecRow[];
+          desiredCount?: number;
+          isVerified?: (row: SpecRow) => boolean;
+          timeoutMs?: number;
+          onTrace?: (event: import("./browser-live.server").BrowserTraceEvent) => void;
+          onQueryFunnel?: (funnel: import("./browser-live.server").BrowserQueryFunnel) => void;
+        },
+      ) => Promise<SpecRow[]>)
+    | null;
   searchRunId?: string;
   ownerId?: string;
-  onBrowserProgress?: (event: { action: string; source?: string; detail?: string; count?: number | string; row?: import("@/lib/search/search-browser-progress.server").StreamedLead }) => void;
+  onBrowserProgress?: (event: {
+    action: string;
+    source?: string;
+    detail?: string;
+    count?: number | string;
+    row?: import("@/lib/search/search-browser-progress.server").StreamedLead;
+  }) => void;
   /** Diagnostic browser lifecycle trace (harnesses only); never changes behavior. */
   onBrowserTrace?: (event: import("./browser-live.server").BrowserTraceEvent) => void;
   desiredCount?: number;
@@ -54,10 +73,15 @@ export type LiveGapfillDeps = {
   isVerified?: (row: SpecRow) => boolean;
   /** OSM / local businesses live search. Null skips. */
   osm?:
-    | ((query: string, location: string, category: string, opts?: { widen?: boolean }) => Promise<SpecRow[]>)
+    | ((
+        query: string,
+        location: string,
+        category: string,
+        opts?: { widen?: boolean; signal?: AbortSignal | null },
+      ) => Promise<SpecRow[]>)
     | null;
   /** Jobs fleet. Null skips. */
-  jobs?: ((query: string, location?: string) => Promise<SpecRow[]>) | null;
+  jobs?: ((query: string, location?: string, opts?: { signal?: AbortSignal | null }) => Promise<SpecRow[]>) | null;
   /** Web/SERP directory discovery for company/person (and business fallback). */
   web?:
     | ((
@@ -65,7 +89,7 @@ export type LiveGapfillDeps = {
         location: string | null,
         entity: string,
         spec?: SearchSpec,
-        opts?: { widen?: boolean },
+        opts?: { widen?: boolean; signal?: AbortSignal | null },
       ) => Promise<SpecRow[]>)
     | null;
   /** M3: abort in-flight provider work when signalled. */
@@ -96,7 +120,11 @@ export function craftFromTag(tag: string, fallback: string, name = ""): string {
   if (/dental|dentist/.test(t)) return "dentist";
   // A general medical tag (amenity=clinic) stays a clinic unless the
   // business's own name says it is a dental practice.
-  if (/^(?:clinic|doctors?|healthcare)$/.test(t) && /\b(?:dental|dentist\w*|orthodont\w*|endodont\w*|periodont\w*)\b/i.test(name)) return "dentist";
+  if (
+    /^(?:clinic|doctors?|healthcare)$/.test(t) &&
+    /\b(?:dental|dentist\w*|orthodont\w*|endodont\w*|periodont\w*)\b/i.test(name)
+  )
+    return "dentist";
   if (/plumb/.test(t)) return "plumber";
   if (/caf[eé]|coffee|roaster/.test(t)) return "cafe";
   if (/yoga/.test(t)) return "yoga";
@@ -111,7 +139,7 @@ async function defaultOsm(
   query: string,
   location: string,
   category: string,
-  opts?: { widen?: boolean },
+  opts?: { widen?: boolean; signal?: AbortSignal | null },
 ): Promise<SpecRow[]> {
   const { searchOsmLocalBusinesses } = await import("./osm-local-businesses.server");
   const { checkPhone } = await import("./phone-safety");
@@ -135,7 +163,7 @@ async function defaultOsm(
       negativeSignals: [],
     },
     location,
-    { widen: opts?.widen === true },
+    { widen: opts?.widen === true, signal: opts?.signal },
   );
   return leads.map((l, i) => {
     const tag = (l.match_reasons?.[0] ?? "").split(" near ")[0] || category;
@@ -147,14 +175,16 @@ async function defaultOsm(
     const contact = l as unknown as { phones?: string[]; emails?: string[] };
     // First phone candidate that survives the country/validity check — a
     // source may list several (semicolon lists) and some may be unusable.
-    let checked = { phone: null as string | null, status: "unverifiable" as import("./phone-safety").PhoneStatus };
+    let checked = {
+      phone: null as string | null,
+      status: "unverifiable" as import("./phone-safety").PhoneStatus,
+    };
     for (const candidate of contact.phones ?? []) {
       checked = checkPhone(candidate, "");
       if (checked.phone) break;
     }
     const why =
-      l.match_reasons?.[0] ||
-      (l.full_post_url ? `Listed on OpenStreetMap near ${location}` : null);
+      l.match_reasons?.[0] || (l.full_post_url ? `Listed on OpenStreetMap near ${location}` : null);
     const entity_id = `live-osm:${slug}`;
     return {
       kind: "business" as const,
@@ -173,41 +203,52 @@ async function defaultOsm(
       website_url: l.full_post_url ?? null,
       source_url: (l as typeof l & { source_record_url?: string }).source_record_url ?? null,
       no_website_verification: {
-        structured_source_url: (l as typeof l & { source_record_url?: string }).source_record_url ?? null,
-        structured_absence: (l as typeof l & { structured_website_absent?: boolean }).structured_website_absent === true,
+        structured_source_url:
+          (l as typeof l & { source_record_url?: string }).source_record_url ?? null,
+        structured_absence:
+          (l as typeof l & { structured_website_absent?: boolean }).structured_website_absent ===
+          true,
         exact_queries: [],
       },
       category: craftFromTag(tag, category, l.title ?? ""),
       location,
       country: null,
       // The actual OSM record supports identity/contact facts, never website absence.
-      evidence: [{
-        source_url: (l as typeof l & { source_record_url?: string }).source_record_url ?? `osm:${entity_id}`,
-        source_type: "osm" as const,
-        excerpt: [l.title, tag, location, checked.phone ? `phone ${checked.phone}` : null].filter(Boolean).join(" · "),
-        observed_at: new Date().toISOString(),
-        evidence_type: "identity" as const,
-        supports: "identity" as const,
-        confidence: 0.8,
-        extraction_method: "osm_tags",
-        subject: entity_id,
-      }],
+      evidence: [
+        {
+          source_url:
+            (l as typeof l & { source_record_url?: string }).source_record_url ??
+            `osm:${entity_id}`,
+          source_type: "osm" as const,
+          excerpt: [l.title, tag, location, checked.phone ? `phone ${checked.phone}` : null]
+            .filter(Boolean)
+            .join(" · "),
+          observed_at: new Date().toISOString(),
+          evidence_type: "identity" as const,
+          supports: "identity" as const,
+          confidence: 0.8,
+          extraction_method: "osm_tags",
+          subject: entity_id,
+        },
+      ],
       why_match: why,
     };
   });
 }
 
-async function defaultJobs(query: string, location?: string): Promise<SpecRow[]> {
+async function defaultJobs(query: string, location?: string, opts?: { signal?: AbortSignal | null }): Promise<SpecRow[]> {
   const { fetchSpecJobs, jobPostingToSpecRow } = await import("./jobs-provider");
   const j = await fetchSpecJobs({
     query,
     location,
     limit: 25,
+    signal: opts?.signal,
   });
   let extra: SpecRow[] = [];
   try {
     const { fetchJobSpyJobs } = await import("@/lib/jobs/jobspy-adapter");
-    const js = await fetchJobSpyJobs({ query, location, limit: 10 });
+    throwIfAborted(opts?.signal);
+    const js = await awaitSearchWork(fetchJobSpyJobs({ query, location, limit: 10 }), opts?.signal);
     extra = js.map((p) => jobPostingToSpecRow(p, "live-jobspy"));
   } catch {
     // optional adapter
@@ -225,13 +266,15 @@ async function defaultWeb(
   location: string | null,
   entity: string,
   spec?: SearchSpec,
-  opts?: { widen?: boolean },
+  opts?: { widen?: boolean; signal?: AbortSignal | null },
 ): Promise<SpecRow[]> {
   const { discoverWebFreeFirst } = await import("./provider-ladder");
   const plan = spec
     ? buildResearchPlan(spec, { desiredCount: opts?.widen ? 20 : 10, widen: opts?.widen })
     : null;
-  const queries = plan?.discoveryQueries.length ? plan.discoveryQueries : [query.trim()].filter(Boolean);
+  const queries = plan?.discoveryQueries.length
+    ? plan.discoveryQueries
+    : [query.trim()].filter(Boolean);
   if (!queries.length) return [];
   const { results } = await discoverWebFreeFirst({
     queries,
@@ -239,6 +282,7 @@ async function defaultWeb(
     timeRange: "year",
     sourceKey: `live-${entity}`,
     operation: `live-gapfill:${entity}`,
+    signal: opts?.signal,
   });
   // Kind starts neutral — M4 resolution sets entity type from the page,
   // never from Spec.entity / query-kind inheritance. Junk SERP titles
@@ -252,11 +296,15 @@ async function defaultWeb(
     const url = r.url || null;
     const snippet = (r.content || "").slice(0, 180);
     const entity_id = mintProvisionalEntityId(`live-web:${i}:${(url ?? title).slice(0, 48)}`);
-    const evidence =
-      url && spec ? evidenceFromWebHit({ title, snippet, url, spec }) : [];
+    const evidence = url && spec ? evidenceFromWebHit({ title, snippet, url, spec }) : [];
     const why = evidence.length ? whyMatchFromEvidence(evidence) : null;
     const base = {
-      kind: "company" as SpecRow["kind"],
+      kind: (entity === "investor" ||
+      entity === "job" ||
+      entity === "person" ||
+      entity === "business"
+        ? entity
+        : "company") as SpecRow["kind"],
       key: `live-web:${i}:${(url ?? title).slice(0, 48)}`,
       entity_id,
       entity_resolved: false as const,
@@ -299,15 +347,14 @@ export function evidenceFromWebHit(args: {
   const funding = fieldOf(args.spec, "funding_status");
 
   const looksHiring =
-    /\b(hiring|we're hiring|we are hiring|looking for a|join our team|open role|job opening)\b/i.test(
-      hay,
-    );
-  const looksNeed =
-    /\b(need(?:s|ing)?|looking for|asking for|help with)\b/i.test(hay);
-  const looksFunding =
-    /\b(funded|raises?|raised|series\s+[a-d]|seed round|venture)\b/i.test(hay);
+    /\b(hiring|we're hiring|we are hiring|join our team|open role|job opening)\b/i.test(hay);
+  const looksNeed = /\b(need(?:s|ing)?|looking for|asking for|help with)\b/i.test(hay);
+  const looksFunding = /\b(funded|raises?|raised|series\s+[a-d]|seed round|venture)\b/i.test(hay);
 
-  if (looksHiring || (role && hay.includes(role.toLowerCase()) && /\bhiring|looking for\b/i.test(hay))) {
+  if (
+    looksHiring ||
+    (role && hay.includes(role.toLowerCase()) && /\bhiring|looking for\b/i.test(hay))
+  ) {
     out.push(
       makeEvidence({
         source_url: args.url,
@@ -474,11 +521,12 @@ async function runSourceGapfill(
   const category = fieldOf(spec, "category") ?? fieldOf(spec, "industry");
   const role = fieldOf(spec, "role");
   const model = fieldOf(spec, "business_model");
-  const web = deps.web === null ? null : (deps.web ?? defaultWeb);
+  const web =
+    deps.web === null ? null : (deps.web ?? (process.env.VITEST ? async () => [] : defaultWeb));
   // Widening (PRD §35): a widen round tries ADDITIONAL public sources of the
   // same constraints instead of stopping at the first provider with rows.
   const widen = deps.widen === true;
-  const stopOnFirstSuccess = !widen;
+  const target = Math.max(1, deps.desiredCount ?? 10);
 
   const requirements = deriveCoverageRequirements(spec);
   const plan = buildSourcePlan(spec, requirements, { desiredCount: deps.desiredCount });
@@ -535,11 +583,13 @@ async function runSourceGapfill(
       }
       try {
         const geo = resolveCanonicalLocation(location);
-        const osmLocation = geo?.kind === "metro"
-          ? geo.member_ids.find((id) => id.startsWith("geo:city:"))?.slice("geo:city:".length) ?? location
-          : location;
+        const osmLocation =
+          geo?.kind === "metro"
+            ? (geo.member_ids.find((id) => id.startsWith("geo:city:"))?.slice("geo:city:".length) ??
+              location)
+            : location;
         const osmStartedAt = Date.now();
-        const rows = await osm(spec.raw_query, osmLocation, category, { widen });
+        const rows = await awaitSearchWork(osm(spec.raw_query, osmLocation, category, { widen, signal: deps.signal }), deps.signal);
         record("osm-local", {
           attempted: true,
           succeeded: true,
@@ -548,12 +598,24 @@ async function runSourceGapfill(
           costTier: 1,
           latencyMs: Date.now() - osmStartedAt,
         });
-        deps.onBrowserProgress?.({ action: "Searching OpenStreetMap", source: "osm", detail: osmLocation });
+        deps.onBrowserProgress?.({
+          action: "Searching OpenStreetMap",
+          source: "osm",
+          detail: osmLocation,
+        });
         if (rows.length) {
-          deps.onBrowserProgress?.({ action: "Found local businesses", source: "osm", count: rows.length });
-          if (stopOnFirstSuccess) {
+          deps.onBrowserProgress?.({
+            action: "Found local businesses",
+            source: "osm",
+            count: rows.length,
+          });
+          if (
+            applyQualificationGate(mergeDuplicateCandidates([...widenedRows, ...rows]), spec, {
+              keepPotential: false,
+            }).qualified.length >= target
+          ) {
             return {
-              rows,
+              rows: mergeDuplicateCandidates([...widenedRows, ...rows]),
               engine: "live-osm",
               scanned: rows.length,
               plan,
@@ -596,7 +658,7 @@ async function runSourceGapfill(
       }
       try {
         const jobsStartedAt = Date.now();
-        const rows = await jobs(role ?? category ?? spec.raw_query, location ?? undefined);
+        const rows = await awaitSearchWork(jobs(role ?? category ?? spec.raw_query, location ?? undefined, { signal: deps.signal }), deps.signal);
         record("jobs-fleet", {
           attempted: true,
           succeeded: true,
@@ -605,7 +667,11 @@ async function runSourceGapfill(
           costTier: 1,
           latencyMs: Date.now() - jobsStartedAt,
         });
-        deps.onBrowserProgress?.({ action: "Found job postings", source: "jobs", count: rows.length });
+        deps.onBrowserProgress?.({
+          action: "Found job postings",
+          source: "jobs",
+          count: rows.length,
+        });
         return {
           rows,
           engine: "live-jobs",
@@ -643,6 +709,8 @@ async function runSourceGapfill(
       if (
         spec.entity !== "company" &&
         spec.entity !== "person" &&
+        spec.entity !== "investor" &&
+        spec.entity !== "job" &&
         !(spec.entity === "business" && location && category)
       ) {
         continue;
@@ -652,17 +720,22 @@ async function runSourceGapfill(
         // E2E-C8 observability: the exact query variants gapfill will spend
         // live-browser budget on, for post-run debugging.
         if (typeof console !== "undefined") {
-          console.info("[gapfill-queries]", JSON.stringify(webPlan.discoveryQueries.slice(0, widen ? 10 : 6)));
+          console.info(
+            "[gapfill-queries]",
+            JSON.stringify(webPlan.discoveryQueries.slice(0, widen ? 10 : 6)),
+          );
         }
         const q = webPlan.discoveryQueries[0] ?? "";
         const entity =
           spec.entity === "business" ||
           spec.entity === "company" ||
+          spec.entity === "investor" ||
+          spec.entity === "job" ||
           spec.entity === "person"
             ? spec.entity
             : "company";
         const webStartedAt = Date.now();
-        const rows = await web(q, location, entity, spec, { widen });
+        const rows = await awaitSearchWork(web(q, location, entity, spec, { widen, signal: deps.signal }), deps.signal);
         record(step.providerId, {
           attempted: true,
           succeeded: true,
@@ -673,11 +746,19 @@ async function runSourceGapfill(
           queries: webPlan.discoveryQueries.length,
           pages: webPlan.stoppingRules.maxPages,
         });
-        deps.onBrowserProgress?.({ action: "Found web candidates", source: "web", count: rows.length });
+        deps.onBrowserProgress?.({
+          action: "Found web candidates",
+          source: "web",
+          count: rows.length,
+        });
         if (rows.length) {
-          if (stopOnFirstSuccess) {
+          if (
+            applyQualificationGate(mergeDuplicateCandidates([...widenedRows, ...rows]), spec, {
+              keepPotential: false,
+            }).qualified.length >= target
+          ) {
             return {
-              rows,
+              rows: mergeDuplicateCandidates([...widenedRows, ...rows]),
               engine: "live-web",
               scanned: rows.length,
               plan,
@@ -691,8 +772,7 @@ async function runSourceGapfill(
         }
       } catch (e) {
         const code =
-          e instanceof Error &&
-          (e as Error & { code?: string }).code === "SOURCE_UNAVAILABLE"
+          e instanceof Error && (e as Error & { code?: string }).code === "SOURCE_UNAVAILABLE"
             ? "SOURCE_UNAVAILABLE"
             : "SOURCE_ERROR";
         record(step.providerId, {
@@ -740,7 +820,7 @@ async function runSourceGapfill(
 
   if (widenedRows.length) {
     return {
-      rows: widenedRows,
+      rows: mergeDuplicateCandidates(widenedRows),
       engine: widenedEngineParts.join("+"),
       scanned: widenedScanned,
       plan,
@@ -757,55 +837,100 @@ export async function runLiveGapfill(
 ): Promise<LiveGapfillResult> {
   const { throwIfAborted, isDeadlineAbort } = await import("./search-run");
   throwIfAborted(deps.signal);
-  const browser = deps.browser === null ? null : (deps.browser ?? (process.env.VITEST ? async () => [] as SpecRow[] : async (query: SearchSpec, options: { searchRunId?: string; signal?: AbortSignal | null; onProgress?: (event: { action: string; source?: string; detail?: string }) => void; onTrace?: (event: import("./browser-live.server").BrowserTraceEvent) => void }) => {
-    const { discoverWithBrowser } = await import("./browser-live.server");
-    return discoverWithBrowser(query, options);
-  }));
-  const sourceResult = await Promise.resolve(runSourceGapfill(spec, deps)).then(
+  const browser =
+    deps.browser === null
+      ? null
+      : (deps.browser ??
+        (process.env.VITEST
+          ? async () => [] as SpecRow[]
+          : async (
+              query: SearchSpec,
+              options: {
+                searchRunId?: string;
+                signal?: AbortSignal | null;
+                onProgress?: (event: { action: string; source?: string; detail?: string }) => void;
+                onTrace?: (event: import("./browser-live.server").BrowserTraceEvent) => void;
+              },
+            ) => {
+              const { discoverWithBrowser } = await import("./browser-live.server");
+              return discoverWithBrowser(query, options);
+            }));
+  const sourceResult = await awaitSearchWork(runSourceGapfill(spec, deps), deps.signal).then(
     (value) => ({ status: "fulfilled" as const, value }),
     (reason) => ({ status: "rejected" as const, reason }),
   );
   throwIfAborted(deps.signal);
-  if (sourceResult.status === "rejected" && sourceResult.reason instanceof Error && sourceResult.reason.message === "SEARCH_CANCELLED") {
+  if (
+    sourceResult.status === "rejected" &&
+    sourceResult.reason instanceof Error &&
+    sourceResult.reason.message === "SEARCH_CANCELLED"
+  ) {
     throw sourceResult.reason;
   }
 
   const source = sourceResult.status === "fulfilled" ? sourceResult.value : null;
   const initialCandidates = [...(deps.initialCandidates ?? []), ...(source?.rows ?? [])];
   const desiredCount = Math.max(1, deps.desiredCount ?? 10);
-  const isVerified = deps.isVerified ?? ((row: SpecRow) => row.disposition === "qualified" || row.verification_status === "verified");
+  const isVerified =
+    deps.isVerified ??
+    ((row: SpecRow) => row.disposition === "qualified" || row.verification_status === "verified");
   const verifiedCount = initialCandidates.filter(isVerified).length;
   const shouldBrowse = !!browser && verifiedCount < desiredCount;
-  const matchSeed = fieldOf(spec, "opportunity") === "no_website"
-    ? (await import("@/lib/spec-search.functions")).rowSatisfiesSpec
-    : null;
+  const matchSeed =
+    fieldOf(spec, "opportunity") === "no_website"
+      ? (await import("@/lib/spec-search.functions")).rowSatisfiesSpec
+      : null;
   // Browser research is the scarce budget. A seed whose known category, role
   // or location already contradicts the request (a structured source's
   // generic "company" office for "marketing agencies") is never researched.
-  const specGate = !matchSeed && initialCandidates.length ? await import("@/lib/spec-search.functions") : null;
-  const researchable = (row: SpecRow) => !specGate || specGate.rowCouldSatisfySpec(spec, specGate.sanitizeSpecRow(row, spec));
+  const specGate =
+    !matchSeed && initialCandidates.length ? await import("@/lib/spec-search.functions") : null;
+  const researchable = (row: SpecRow) =>
+    !specGate || specGate.rowCouldSatisfySpec(spec, specGate.sanitizeSpecRow(row, spec));
   const browserSeeds = matchSeed
     ? initialCandidates
-        .filter((row) => !row.website_url && row.no_website_verification?.structured_absence === true &&
-          !!row.no_website_verification.structured_source_url && matchSeed(spec, row))
+        .filter(
+          (row) =>
+            !row.website_url &&
+            row.no_website_verification?.structured_absence === true &&
+            !!row.no_website_verification.structured_source_url &&
+            matchSeed(spec, row),
+        )
         .sort((a, b) => {
           const strength = (row: SpecRow) =>
-            Number(!!row.phone) * 4 + Number(!!row.email) * 3 +
+            Number(!!row.phone) * 4 +
+            Number(!!row.email) * 3 +
             Number(!!row.detail && row.detail !== row.location) * 2 +
-            Number(!!row.category) + Number(!!row.entity_resolved);
+            Number(!!row.category) +
+            Number(!!row.entity_resolved);
           return strength(b) - strength(a);
         })
         .slice(0, Math.min(20, Math.max(15, desiredCount * 2)))
-    : initialCandidates.filter(researchable)
+    : initialCandidates
+        .filter(researchable)
         .sort((a, b) => {
           const strength = (row: SpecRow) =>
-            Number(!!row.phone) * 4 + Number(!!row.email) * 3 +
-            Number(!!row.website_url) * 3 + Number(!!row.detail && row.detail !== row.location) * 2 +
-            Number(!!row.category) + Number(!!row.entity_resolved);
+            Number(!!row.phone) * 4 +
+            Number(!!row.email) * 3 +
+            Number(!!row.website_url) * 3 +
+            Number(!!row.detail && row.detail !== row.location) * 2 +
+            Number(!!row.category) +
+            Number(!!row.entity_resolved);
           return strength(b) - strength(a);
         })
         .slice(0, Math.min(60, Math.max(12, desiredCount * 3)));
   const researchPlan = buildResearchPlan(spec, { desiredCount });
+  // Widen passes explore NEW query territory instead of replaying pass 1's
+  // SERPs: each pass starts its query window one family later (the plan
+  // generates more families than the per-pass cap can spend). Pass 1 keeps
+  // the natural order; constraints never change — only the visit order does.
+  const rotateBy = Math.max(0, (deps.widenPass ?? 1) - 1) % Math.max(1, researchPlan.discoveryQueries.length);
+  if (rotateBy > 0) {
+    researchPlan.discoveryQueries = [
+      ...researchPlan.discoveryQueries.slice(rotateBy),
+      ...researchPlan.discoveryQueries.slice(0, rotateBy),
+    ];
+  }
   // WS1 per-query funnel accounting, attached to the browser-live diagnostic.
   const browserQueryFunnels: import("./browser-live.server").BrowserQueryFunnel[] = [];
   const browserOptions = {
@@ -814,27 +939,41 @@ export async function runLiveGapfill(
     ...(deps.signal ? { signal: deps.signal } : {}),
     ...(deps.onBrowserProgress ? { onProgress: deps.onBrowserProgress } : {}),
     ...(deps.onBrowserTrace ? { onTrace: deps.onBrowserTrace } : {}),
-    onQueryFunnel: (funnel: import("./browser-live.server").BrowserQueryFunnel) => { browserQueryFunnels.push(funnel); },
+    onQueryFunnel: (funnel: import("./browser-live.server").BrowserQueryFunnel) => {
+      browserQueryFunnels.push(funnel);
+    },
     researchPlan,
+    // The browser discovery builds its own plan when discoveryQueries is
+    // absent; hand it the rotated window so widen passes actually explore
+    // new query families (PRD §35 widening is a visit-order change only).
+    ...(rotateBy > 0 ? { discoveryQueries: researchPlan.discoveryQueries } : {}),
     initialCandidates: browserSeeds,
     desiredCount,
     isVerified,
     // Leave time for final enrichment/qualification before the 120s run abort.
-    timeoutMs: spec.entity === "company" ? 75_000 : spec.entity === "investor" ? 120_000 : 90_000,
+    // Company discovery reads, extracts, and researches in one window: 75s
+    // aborted mid-pass before extraction could run (live funnels showed pages
+    // navigated but entitiesExtracted 0). 90s covers reads + model extraction
+    // without starving the later widen passes.
+    timeoutMs: spec.entity === "company" ? 90_000 : spec.entity === "investor" ? 120_000 : 90_000,
   };
   const browserStartedAt = Date.now();
   const browserResult = shouldBrowse
-    ? await Promise.resolve(browser(spec, browserOptions)).then(
+    ? await awaitSearchWork(browser(spec, browserOptions), deps.signal).then(
         (value) => ({ status: "fulfilled" as const, value }),
         (reason) => ({ status: "rejected" as const, reason }),
       )
-    : ({ status: "fulfilled" as const, value: [] as SpecRow[] });
+    : { status: "fulfilled" as const, value: [] as SpecRow[] };
   const browserLatencyMs = Date.now() - browserStartedAt;
   // Keep browser rows on the hard deadline: the research is already paid
   // for, and the caller finalizes whatever qualifies. Only a real
   // cancellation stops delivery here.
   if (deps.signal?.aborted && !isDeadlineAbort(deps.signal)) throwIfAborted(deps.signal);
-  if (browserResult.status === "rejected" && browserResult.reason instanceof Error && browserResult.reason.message === "SEARCH_CANCELLED") {
+  if (
+    browserResult.status === "rejected" &&
+    browserResult.reason instanceof Error &&
+    browserResult.reason.message === "SEARCH_CANCELLED"
+  ) {
     throw browserResult.reason;
   }
 
@@ -849,7 +988,10 @@ export async function runLiveGapfill(
       entitiesResolved: 0,
       qualified: 0,
       outcome: "SOURCE_ERROR",
-      error: sourceResult.reason instanceof Error ? sourceResult.reason.message : String(sourceResult.reason),
+      error:
+        sourceResult.reason instanceof Error
+          ? sourceResult.reason.message
+          : String(sourceResult.reason),
     });
   }
   diagnostics.push({
@@ -863,16 +1005,25 @@ export async function runLiveGapfill(
     queries: researchPlan.discoveryQueries.length,
     pages: researchPlan.stoppingRules.maxPages,
     ...(browserQueryFunnels.length ? { queryFunnel: browserQueryFunnels } : {}),
-    ...(browserResult.status === "rejected" ? {
-      outcome: "SOURCE_ERROR" as const,
-      error: browserResult.reason instanceof Error ? browserResult.reason.message : String(browserResult.reason),
-    } : {}),
+    ...(browserResult.status === "rejected"
+      ? {
+          outcome: "SOURCE_ERROR" as const,
+          error:
+            browserResult.reason instanceof Error
+              ? browserResult.reason.message
+              : String(browserResult.reason),
+        }
+      : {}),
   });
 
   const rows = mergeDuplicateCandidates([...(source?.rows ?? []), ...browserRows]);
   return {
     rows,
-    engine: browserRows.length ? (source?.rows.length ? `${source.engine}+browser` : "live-browser") : (source?.engine ?? "live-none"),
+    engine: browserRows.length
+      ? source?.rows.length
+        ? `${source.engine}+browser`
+        : "live-browser"
+      : (source?.engine ?? "live-none"),
     scanned: (source?.scanned ?? 0) + browserRows.length,
     plan: source?.plan,
     diagnostics,

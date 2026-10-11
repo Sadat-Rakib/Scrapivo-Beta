@@ -1,0 +1,90 @@
+[
+  {
+    "id": "Q01",
+    "query": "Solar installers in Windhoek",
+    "kind": ["business", "company"],
+    "category": ["solar", "installer", "renewable", "photovoltaic"],
+    "locations": ["Windhoek", "Namibia"],
+    "requireResults": true
+  },
+  {
+    "id": "Q02",
+    "query": "Freight forwarders in Tbilisi",
+    "kind": ["business", "company"],
+    "category": ["freight", "forward", "logistics", "shipping"],
+    "locations": ["Tbilisi", "Georgia"],
+    "requireResults": true
+  },
+  {
+    "id": "Q03",
+    "query": "Photographers in Cebu",
+    "kind": ["business", "person", "company"],
+    "category": ["photographer", "photography"],
+    "locations": ["Cebu", "Philippines"],
+    "requireResults": true
+  },
+  {
+    "id": "Q04",
+    "query": "AI startup founders in Toronto",
+    "kind": ["person"],
+    "roles": ["founder", "co-founder", "ceo"],
+    "category": ["ai", "artificial intelligence", "startup"],
+    "locations": ["Toronto", "Canada"],
+    "requireResults": true
+  },
+  {
+    "id": "Q05",
+    "query": "CTOs at SaaS startups in Berlin",
+    "kind": ["person"],
+    "roles": ["cto", "chief technology officer", "technical founder"],
+    "category": ["saas", "startup", "software"],
+    "locations": ["Berlin", "Germany"],
+    "requireResults": true
+  },
+  {
+    "id": "Q06",
+    "query": "Remote frontend developer jobs in Canada",
+    "kind": ["job"],
+    "roles": ["frontend", "front end", "front-end", "react", "developer"],
+    "category": ["remote", "job"],
+    "locations": ["Canada"],
+    "fields": ["location", "detail", "apply_url"],
+    "requireResults": true
+  },
+  {
+    "id": "Q07",
+    "query": "Data analyst jobs in Dhaka",
+    "kind": ["job"],
+    "roles": ["data analyst", "analyst"],
+    "category": ["job"],
+    "locations": ["Dhaka", "Bangladesh"],
+    "fields": ["location", "detail", "apply_url"],
+    "requireResults": true
+  },
+  {
+    "id": "Q08",
+    "query": "Climate-tech investors in Europe",
+    "kind": ["investor", "company", "person"],
+    "category": ["climate", "cleantech", "climate-tech", "sustainability", "investor"],
+    "locations": ["Europe"],
+    "requireResults": true
+  },
+  {
+    "id": "Q09",
+    "query": "Fintech angel investors in India",
+    "kind": ["investor", "person"],
+    "roles": ["angel", "investor"],
+    "category": ["fintech", "financial technology"],
+    "locations": ["India"],
+    "requireResults": true
+  },
+  {
+    "id": "Q10",
+    "query": "Founders or CTOs of AI startups in Toronto and Vancouver",
+    "kind": ["person"],
+    "roles": ["founder", "co-founder", "cto", "chief technology officer"],
+    "category": ["ai", "artificial intelligence", "startup"],
+    "locations": ["Toronto", "Vancouver", "Canada"],
+    "requireResults": true
+  }
+]

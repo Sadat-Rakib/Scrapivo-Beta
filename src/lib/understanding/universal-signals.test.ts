@@ -1,0 +1,147 @@
+import { describe, expect, it } from "vitest";
+import { extractFrameDeterministic } from "./fallback";
+import { validateFrame } from "./validate";
+import { frameToSearchSpec } from "./to-search-spec";
+import { buildSpec } from "../search/search-spec";
+import { verifyCandidateClaims } from "../search/verification";
+import type { ClaimEvidence } from "../search/claim-binding";
+import { qualifyLead } from "../search/qualify";
+import { makeEvidence } from "../search/evidence";
+import { rowSatisfiesSpec, type SpecRow } from "../spec-search.functions";
+
+const specOf = (query: string) =>
+  frameToSearchSpec(validateFrame(extractFrameDeterministic(query)).frame);
+const claim = (type: "funding" | "hiring"): ClaimEvidence => ({
+  subject: "acme",
+  claim: type,
+  claim_type: type,
+  evidence_url: "https://acme.com/news",
+  evidence_text: type,
+  observed_at: new Date().toISOString(),
+  event_at: new Date().toISOString(),
+  confidence: 0.9,
+});
+
+describe("universal signal semantics", () => {
+  it.each(["Find companies with manual onboarding", "Find companies with ISO 27001 certification"])(
+    "binds production custom conversion without an unrelated service-request alias: %s",
+    (query) => {
+      const spec = specOf(query);
+      expect(spec.custom_signal_text).toBeTruthy();
+      expect(spec.signal_types).toEqual(["custom_signal"]);
+      const evidence = [
+        makeEvidence({
+          subject: "acme",
+          source_url: "https://acme.com/news",
+          source_type: "web",
+          evidence_type: "service_request",
+          supports: "intent",
+          excerpt: "Acme needs payroll services.",
+        }),
+      ];
+      const row = {
+        kind: "company",
+        title: "Acme",
+        detail: "Software company",
+        website_url: "https://acme.com",
+        url: "https://acme.com",
+        entity_id: "acme",
+        entity_resolved: true,
+        page_type: "company_page",
+        identity_confidence: 0.9,
+        evidence,
+      } as SpecRow;
+      expect(verifyCandidateClaims({ evidence, entityId: "acme", spec }).ok).toBe(false);
+      expect(qualifyLead(row, spec, evidence).disposition).not.toBe("qualified");
+    },
+  );
+  it.each([
+    ["AND", "all"],
+    ["OR", "any"],
+  ])("preserves funded %s hiring", (join, mode) => {
+    const spec = specOf(`Find AI companies recently funded ${join} hiring in Canada`);
+    expect(spec.signal_types).toEqual(expect.arrayContaining(["funding", "hiring"]));
+    expect(spec).toHaveProperty("signal_mode", mode);
+  });
+  it("does not invent intent for a directory query", () => {
+    const spec = specOf("Find dentists in Edmonton");
+    expect(spec.signal_required).toBe(false);
+    expect(spec.signal_types).toEqual([]);
+  });
+  it("requires both claims for AND", () => {
+    const spec = {
+      ...buildSpec({
+        entity: "company",
+        criteria: [],
+        raw_query: "funded and hiring",
+        signal_required: true,
+        signal_types: ["funding", "hiring"],
+      }),
+      signal_mode: "all" as const,
+    };
+    expect(verifyCandidateClaims({ spec, entityId: "acme", evidence: [claim("funding")] }).ok).toBe(
+      false,
+    );
+    expect(
+      verifyCandidateClaims({
+        spec,
+        entityId: "acme",
+        evidence: [claim("funding"), claim("hiring")],
+      }).ok,
+    ).toBe(true);
+  });
+  it("accepts either claim for OR without demanding the other claim parameters", () => {
+    const spec = {
+      ...buildSpec({
+        entity: "company",
+        criteria: [{ field: "requested_role", value: "engineer", stated: true, confidence: 1 }],
+        raw_query: "funded or hiring engineers",
+        signal_required: true,
+        signal_types: ["funding", "hiring"],
+      }),
+      signal_mode: "any" as const,
+    };
+    expect(verifyCandidateClaims({ spec, entityId: "acme", evidence: [claim("funding")] }).ok).toBe(
+      true,
+    );
+  });
+  it("keeps investment separate from startup funding", () => {
+    expect(specOf("Find investors who invest in AI startups in Canada").signal_types).toEqual([
+      "investment",
+    ]);
+  });
+  it.each(["funding", "hiring"] as const)(
+    "qualifies the %s-only OR branch through final gates",
+    (type) => {
+      const spec = specOf("Find AI companies recently funded OR hiring in Canada");
+      const evidence = [
+        makeEvidence({
+          subject: "acme",
+          source_url: "https://acme.com/news",
+          source_type: "web",
+          evidence_type: type,
+          supports: "intent",
+          excerpt: `Acme ${type}`,
+          event_at: new Date().toISOString(),
+        }),
+      ];
+      const row = {
+        kind: "company",
+        title: "Acme",
+        category: "AI",
+        detail: "AI company in Toronto Canada",
+        location: "Toronto",
+        country: "CA",
+        url: "https://acme.com",
+        website_url: "https://acme.com",
+        entity_id: "acme",
+        entity_resolved: true,
+        identity_confidence: 0.95,
+        page_type: "company_page",
+        evidence,
+      } as SpecRow;
+      expect(rowSatisfiesSpec(spec, row)).toBe(true);
+      expect(qualifyLead(row, spec, evidence).disposition).toBe("qualified");
+    },
+  );
+});
